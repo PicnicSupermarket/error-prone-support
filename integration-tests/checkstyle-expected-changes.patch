@@ -9962,6 +9962,71 @@
      final File fileToProcess =
          new File(getNonCompilablePath("InputXpathSealedShouldHavePermitsListTopLevel.java"));
  
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSeparatorWrapTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSeparatorWrapTest.java
+@@ -19,15 +19,15 @@
+ 
+ package org.checkstyle.suppressionxpathfilter;
+ 
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+ import com.puppycrawl.tools.checkstyle.checks.whitespace.SeparatorWrapCheck;
+ import java.io.File;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
++final class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
+ 
+   private final String checkName = SeparatorWrapCheck.class.getSimpleName();
+ 
+@@ -37,7 +37,7 @@ public class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testClass() throws Exception {
++  void testClass() throws Exception {
+     final File fileToProcess = new File(getPath("InputXpathSeparatorWrapClass.java"));
+     final DefaultConfiguration moduleConfig = createModuleConfig(SeparatorWrapCheck.class);
+ 
+@@ -47,7 +47,7 @@ public class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF"
+                 + "[./IDENT[@text='InputXpathSeparatorWrapClass']]"
+                 + "/OBJBLOCK/METHOD_DEF[./IDENT[@text='testMethod']]"
+@@ -57,7 +57,7 @@ public class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testInterface() throws Exception {
++  void testInterface() throws Exception {
+     final File fileToProcess = new File(getPath("InputXpathSeparatorWrapInterface.java"));
+ 
+     final DefaultConfiguration moduleConfig = createModuleConfig(SeparatorWrapCheck.class);
+@@ -68,7 +68,7 @@ public class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/INTERFACE_DEF"
+                 + "[./IDENT[@text='InputXpathSeparatorWrapInterface']]"
+                 + "/OBJBLOCK/METHOD_DEF[./IDENT[@text='testMethod2']]"
+@@ -78,7 +78,7 @@ public class XpathRegressionSeparatorWrapTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testMethod() throws Exception {
++  void method() throws Exception {
+     final File fileToProcess = new File(getPath("InputXpathSeparatorWrapMethod.java"));
+ 
+     final DefaultConfiguration moduleConfig = createModuleConfig(SeparatorWrapCheck.class);
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSimplifyBooleanExpressionTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSimplifyBooleanExpressionTest.java
 @@ -21,15 +21,15 @@ package org.checkstyle.suppressionxpathfilter;
@@ -10332,6 +10397,80 @@
              "/COMPILATION_UNIT/CLASS_DEF"
                  + "[./IDENT[@text='InputXpathSuperClonePlainAndSubclasses']]"
                  + "/OBJBLOCK/METHOD_DEF/IDENT[@text='clone']");
+--- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSuperFinalizeTest.java
++++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSuperFinalizeTest.java
+@@ -19,15 +19,15 @@
+ 
+ package org.checkstyle.suppressionxpathfilter;
+ 
++import com.google.common.collect.ImmutableList;
+ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+ import com.puppycrawl.tools.checkstyle.checks.coding.AbstractSuperCheck;
+ import com.puppycrawl.tools.checkstyle.checks.coding.SuperFinalizeCheck;
+ import java.io.File;
+-import java.util.Collections;
+ import java.util.List;
+ import org.junit.jupiter.api.Test;
+ 
+-public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
++final class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+ 
+   private final String checkName = SuperFinalizeCheck.class.getSimpleName();
+ 
+@@ -37,7 +37,7 @@ public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testDefault() throws Exception {
++  void testDefault() throws Exception {
+     final File fileToProcess = new File(getPath("InputXpathSuperFinalizeNoFinalize.java"));
+     final DefaultConfiguration moduleConfig = createModuleConfig(SuperFinalizeCheck.class);
+ 
+@@ -46,7 +46,7 @@ public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF"
+                 + "[./IDENT[@text='InputXpathSuperFinalizeNoFinalize']]"
+                 + "/OBJBLOCK/METHOD_DEF/IDENT[@text='finalize']");
+@@ -54,7 +54,7 @@ public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testInnerClass() throws Exception {
++  void innerClass() throws Exception {
+     final File fileToProcess = new File(getPath("InputXpathSuperFinalizeInnerClass.java"));
+     final DefaultConfiguration moduleConfig = createModuleConfig(SuperFinalizeCheck.class);
+ 
+@@ -63,7 +63,7 @@ public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF"
+                 + "[./IDENT[@text='InputXpathSuperFinalizeInnerClass']]"
+                 + "/OBJBLOCK/METHOD_DEF/IDENT[@text='finalize']");
+@@ -71,7 +71,7 @@ public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+   }
+ 
+   @Test
+-  public void testAnonymousClass() throws Exception {
++  void anonymousClass() throws Exception {
+     final File fileToProcess = new File(getPath("InputXpathSuperFinalizeAnonymousClass.java"));
+     final DefaultConfiguration moduleConfig = createModuleConfig(SuperFinalizeCheck.class);
+ 
+@@ -80,7 +80,7 @@ public class XpathRegressionSuperFinalizeTest extends AbstractXpathTestSupport {
+     };
+ 
+     final List<String> expectedXpathQueries =
+-        Collections.singletonList(
++        ImmutableList.of(
+             "/COMPILATION_UNIT/CLASS_DEF"
+                 + "[./IDENT[@text='InputXpathSuperFinalizeAnonymousClass']]"
+                 + "/OBJBLOCK/METHOD_DEF[./IDENT[@text='createAnonymousClass']]"
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSuppressWarningsTest.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/XpathRegressionSuppressWarningsTest.java
 @@ -28,7 +28,7 @@ import java.util.Arrays;
@@ -11820,7 +11959,7 @@
      return catchParameterDef;
    }
  
-@@ -1421,8 +1423,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1423,8 +1425,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
  
      // We always add an 'ELIST' node
      final DetailAstImpl expressionList =
@@ -11830,7 +11969,7 @@
  
      DetailAstPair.addAstChild(currentAst, expressionList);
      DetailAstPair.addAstChild(currentAst, create(ctx.RPAREN()));
-@@ -1448,8 +1449,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1450,8 +1451,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
      methodCall.addChild(visit(ctx.id()));
      // We always add an 'ELIST' node
      final DetailAstImpl expressionList =
@@ -11840,7 +11979,7 @@
  
      methodCall.addChild(expressionList);
      methodCall.addChild(create((Token) ctx.RPAREN().getPayload()));
-@@ -1508,7 +1508,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1510,7 +1510,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
      final List<ParseTree> children =
          ctx.children.stream()
              .filter(child -> !child.equals(ctx.DOUBLE_COLON()))
@@ -11849,7 +11988,7 @@
      processChildren(doubleColon, children);
      return doubleColon;
    }
-@@ -1520,7 +1520,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1522,7 +1522,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
          root,
          ctx.children.stream()
              .filter(child -> !child.equals(ctx.QUESTION()))
@@ -11858,7 +11997,7 @@
      return root;
    }
  
-@@ -1547,7 +1547,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1549,7 +1549,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
        final Queue<DetailAstImpl> descendantList =
            binOpList.parallelStream()
                .map(this::getInnerBopAst)
@@ -11867,7 +12006,7 @@
  
        bop.addChild(descendantList.poll());
        DetailAstImpl pointer = bop.getFirstChild();
-@@ -1584,8 +1584,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1586,8 +1586,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
          create(TokenTypes.METHOD_CALL, (Token) ctx.LPAREN().getPayload());
      // We always add an 'ELIST' node
      final DetailAstImpl expressionList =
@@ -11877,7 +12016,7 @@
  
      final DetailAstImpl dot = create(ctx.DOT());
      dot.addChild(visit(ctx.expr()));
-@@ -1618,8 +1617,8 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1620,8 +1619,8 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
  
      // We add an 'PARAMETERS' node here whether it exists or not
      final DetailAstImpl parameters =
@@ -11888,7 +12027,7 @@
      addLastSibling(lparen, parameters);
      addLastSibling(lparen, create(ctx.RPAREN()));
      return lparen;
-@@ -1882,8 +1881,8 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1884,8 +1883,8 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
        root.addChild(dot);
  
        final DetailAstImpl expressionList =
@@ -11899,7 +12038,7 @@
        root.addChild(expressionList);
  
        root.addChild(create(ctx.RPAREN()));
-@@ -1898,8 +1897,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+@@ -1900,8 +1899,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
  
      // We always add an 'ELIST' node
      final DetailAstImpl expressionList =
@@ -12898,7 +13037,7 @@
      }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/annotation/SuppressWarningsCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/annotation/SuppressWarningsCheck.java
-@@ -19,13 +19,14 @@
+@@ -19,6 +19,8 @@
  
  package com.puppycrawl.tools.checkstyle.checks.annotation;
  
@@ -12907,14 +13046,15 @@
  import com.puppycrawl.tools.checkstyle.StatelessCheck;
  import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  import com.puppycrawl.tools.checkstyle.api.DetailAST;
- import com.puppycrawl.tools.checkstyle.api.TokenTypes;
- import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
+@@ -27,7 +29,6 @@ import com.puppycrawl.tools.checkstyle.utils.AnnotationUtil;
  import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+ import java.util.ArrayDeque;
+ import java.util.Deque;
 -import java.util.Objects;
  import java.util.regex.Matcher;
  import java.util.regex.Pattern;
  
-@@ -166,7 +167,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
+@@ -168,7 +169,7 @@ public class SuppressWarningsCheck extends AbstractCheck {
        final DetailAST token = warningHolder.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
  
        // case like '@SuppressWarnings(value = UNUSED)'
@@ -12923,7 +13063,7 @@
        DetailAST warning = parent.findFirstToken(TokenTypes.EXPR);
  
        // rare case with empty array ex: @SuppressWarnings({})
-@@ -246,10 +247,10 @@ public class SuppressWarningsCheck extends AbstractCheck {
+@@ -248,10 +249,10 @@ public class SuppressWarningsCheck extends AbstractCheck {
      final DetailAST annValuePair =
          annotation.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
  
@@ -13578,17 +13718,7 @@
  import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
  import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-@@ -166,8 +167,8 @@ public class ImportControlCheck extends AbstractCheck implements ExternalResourc
-   }
- 
-   // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
--  @SuppressWarnings("deprecation")
-   @Override
-+  @SuppressWarnings("deprecation")
-   public void beginTree(DetailAST rootAST) {
-     currentImportControl = null;
-     processCurrentFile = path.matcher(getFilePath()).find();
-@@ -206,7 +207,7 @@ public class ImportControlCheck extends AbstractCheck implements ExternalResourc
+@@ -200,7 +201,7 @@ public class ImportControlCheck extends AbstractCheck implements ExternalResourc
  
    @Override
    public Set<String> getExternalResourceLocations() {
@@ -13940,7 +14070,7 @@
    }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/WriteTagCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/WriteTagCheck.java
-@@ -158,8 +158,8 @@ public class WriteTagCheck extends AbstractCheck {
+@@ -159,8 +159,8 @@ public class WriteTagCheck extends AbstractCheck {
    }
  
    // suppress deprecation until https://github.com/checkstyle/checkstyle/issues/11166
@@ -22489,7 +22619,7 @@
          .that(filterSet.toString())
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/api/FullIdentTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/api/FullIdentTest.java
-@@ -30,7 +30,7 @@ import java.io.File;
+@@ -31,7 +31,7 @@ import java.io.File;
  import java.nio.charset.StandardCharsets;
  import org.junit.jupiter.api.Test;
  
@@ -22498,7 +22628,7 @@
  
    @Override
    protected String getPackageLocation() {
-@@ -38,7 +38,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -39,7 +39,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22507,7 +22637,7 @@
      final DetailAstImpl ast = new DetailAstImpl();
      ast.setType(TokenTypes.LITERAL_NEW);
      ast.setColumnNo(14);
-@@ -60,7 +60,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -61,7 +61,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22516,7 +22646,7 @@
      final DetailAST ast = new DetailAstImpl();
  
      final FullIdent indent = FullIdent.createFullIdentBelow(ast);
-@@ -68,7 +68,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -69,7 +69,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22525,7 +22655,7 @@
      final FileText testFileText =
          new FileText(
              new File(getPath("InputFullIdentTestArrayType.java")).getAbsoluteFile(),
-@@ -83,7 +83,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -84,7 +84,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22534,7 +22664,7 @@
      final FullIdent fullIdent = prepareFullIdentWithCoordinates(14, 15);
      assertWithMessage("Invalid full indent")
          .that(fullIdent.toString())
-@@ -91,7 +91,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -92,7 +92,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22543,7 +22673,7 @@
      final FullIdent fullIdent = prepareFullIdentWithCoordinates(0, 0);
      assertWithMessage("Invalid full indent")
          .that(fullIdent.toString())
-@@ -99,7 +99,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -100,7 +100,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22552,7 +22682,7 @@
      final FileText testFileText =
          new FileText(
              new File(getPath("InputFullIdentTestArrayType.java")).getAbsoluteFile(),
-@@ -118,7 +118,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -119,7 +119,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22561,7 +22691,7 @@
      final FileText testFileText =
          new FileText(
              new File(getPath("InputFullIdentAnnotation.java")).getAbsoluteFile(),
-@@ -146,7 +146,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -147,7 +147,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22570,7 +22700,7 @@
      final FileText testFileText =
          new FileText(
              new File(getPath("InputFullIdentArrayInit.java")).getAbsoluteFile(),
-@@ -203,7 +203,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -204,7 +204,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22579,7 +22709,7 @@
      final FileText testFileText =
          new FileText(
              new File(getPath("InputFullIdentReturnNoAnnotation.java")).getAbsoluteFile(),
-@@ -216,7 +216,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -217,7 +217,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22588,7 +22718,7 @@
      final FileText testFileText =
          new FileText(
              new File(getPath("InputFullIdentFullyQualifiedStringArray.java")).getAbsoluteFile(),
-@@ -236,7 +236,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+@@ -237,7 +237,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22597,6 +22727,15 @@
      final String[] expected = {
        "9:1: " + getCheckMessage(ImportOrderCheck.class, MSG_ORDERING, "java.util.HashMap"),
      };
+@@ -246,7 +246,7 @@ public class FullIdentTest extends AbstractModuleTestSupport {
+   }
+ 
+   @Test
+-  public void testLiteralNewCondition() throws Exception {
++  void literalNewCondition() throws Exception {
+     final String[] expected = {
+       "11:9: "
+           + getCheckMessage(
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/api/JavadocTokenTypesTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/api/JavadocTokenTypesTest.java
 @@ -25,17 +25,17 @@ import static com.puppycrawl.tools.checkstyle.internal.utils.TestUtil.isUtilsCla
@@ -23078,7 +23217,7 @@
  import org.xml.sax.InputSource;
  
  public final class InlineConfigParser {
-@@ -333,7 +333,7 @@ public final class InlineConfigParser {
+@@ -330,7 +330,7 @@ public final class InlineConfigParser {
        throws Exception {
      final TestInputConfiguration.Builder testInputConfigBuilder =
          new TestInputConfiguration.Builder();
@@ -23087,7 +23226,7 @@
      final List<String> lines = readFile(filePath);
      try {
        setModules(testInputConfigBuilder, inputFilePath, lines);
-@@ -353,7 +353,7 @@ public final class InlineConfigParser {
+@@ -350,7 +350,7 @@ public final class InlineConfigParser {
        throws Exception {
      final TestInputConfiguration.Builder testInputConfigBuilder =
          new TestInputConfiguration.Builder();
@@ -23096,7 +23235,7 @@
      final List<String> lines = readFile(filePath);
  
      try {
-@@ -380,7 +380,7 @@ public final class InlineConfigParser {
+@@ -377,7 +377,7 @@ public final class InlineConfigParser {
     */
    public static TestInputConfiguration parseWithXmlHeader(String inputFilePath) throws Exception {
  
@@ -23105,7 +23244,7 @@
      final List<String> lines = readFile(filePath);
      if (!checkIsXmlConfig(lines)) {
        throw new CheckstyleException("Config cannot be parsed as xml.");
-@@ -455,7 +455,7 @@ public final class InlineConfigParser {
+@@ -452,7 +452,7 @@ public final class InlineConfigParser {
      return lines.stream()
          .skip(1)
          .takeWhile(line -> !line.startsWith("*/"))
@@ -41025,7 +41164,7 @@
  }
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTypeCheckTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTypeCheckTest.java
-@@ -30,7 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+@@ -31,7 +31,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
@@ -41034,7 +41173,7 @@
  
    @Override
    protected String getPackageLocation() {
-@@ -38,7 +38,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -39,7 +39,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41043,7 +41182,7 @@
      final JavadocTypeCheck javadocTypeCheck = new JavadocTypeCheck();
      assertWithMessage("JavadocTypeCheck#getRequiredTokens should return empty array by default")
          .that(javadocTypeCheck.getRequiredTokens())
-@@ -46,7 +46,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -47,7 +47,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41052,7 +41191,7 @@
      final JavadocTypeCheck javadocTypeCheck = new JavadocTypeCheck();
  
      final int[] actual = javadocTypeCheck.getAcceptableTokens();
-@@ -62,43 +62,43 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -63,43 +63,43 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41103,7 +41242,7 @@
      final String[] expected = {
        "53:5: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
      };
-@@ -106,13 +106,13 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -107,13 +107,13 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41119,7 +41258,7 @@
      final String[] expected = {
        "23:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
      };
-@@ -120,7 +120,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -121,7 +121,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41128,7 +41267,7 @@
      final String[] expected = {
        "31:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
        "67:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
-@@ -130,7 +130,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -131,7 +131,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41137,7 +41276,7 @@
      final String[] expected = {
        "22:1: " + getCheckMessage(MSG_TAG_FORMAT, "@author", "ABC"),
        "31:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
-@@ -146,7 +146,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -147,7 +147,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41146,7 +41285,7 @@
      final String[] expected = {
        "23:1: " + getCheckMessage(MSG_MISSING_TAG, "@version"),
      };
-@@ -154,7 +154,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -155,7 +155,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41155,7 +41294,7 @@
      final String[] expected = {
        "31:1: " + getCheckMessage(MSG_MISSING_TAG, "@version"),
        "67:1: " + getCheckMessage(MSG_MISSING_TAG, "@version"),
-@@ -164,7 +164,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -165,7 +165,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41164,7 +41303,7 @@
      final String[] expected = {
        "22:1: " + getCheckMessage(MSG_TAG_FORMAT, "@version", "\\$Revision.*\\$"),
        "31:1: " + getCheckMessage(MSG_MISSING_TAG, "@version"),
-@@ -183,7 +183,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -184,7 +184,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41173,7 +41312,7 @@
      final String[] expected = {
        "18:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
        "137:5: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
-@@ -192,13 +192,13 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -193,13 +193,13 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41189,7 +41328,7 @@
      final String[] expected = {
        "18:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
      };
-@@ -206,7 +206,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -207,7 +207,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41198,7 +41337,7 @@
      final String[] expected = {
        "137:5: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
      };
-@@ -214,7 +214,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -215,7 +215,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41207,7 +41346,7 @@
      final String[] expected = {
        "21:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<D123>"),
        "25:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <C456>"),
-@@ -226,7 +226,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -228,7 +228,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41216,7 +41355,7 @@
      final String[] expected = {
        "21:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<D123>"),
        "58:8: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<C>"),
-@@ -236,7 +236,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -238,7 +238,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41225,7 +41364,7 @@
      final String[] expected = {
        "20:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "BAD"),
        "21:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<BAD>"),
-@@ -246,7 +246,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -249,7 +249,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41233,8 +41372,8 @@
 +  void badTag() throws Exception {
      final String[] expected = {
        "19:4: " + getCheckMessage(MSG_UNKNOWN_TAG, "mytag"),
-     };
-@@ -254,33 +254,33 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+       "21:4: " + getCheckMessage(MSG_UNKNOWN_TAG, "mytag"),
+@@ -259,33 +259,33 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41273,7 +41412,7 @@
  
      final String[] expected = {
        "38:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
-@@ -289,7 +289,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -294,7 +294,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41282,7 +41421,7 @@
      final String[] expected = {
        "24:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
        "33:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
-@@ -301,7 +301,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -306,7 +306,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41291,7 +41430,7 @@
  
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
  
-@@ -310,7 +310,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -315,7 +315,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41300,7 +41439,7 @@
      final String[] expected = {
        "44:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<P>"),
        "46:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <U>"),
-@@ -322,7 +322,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -327,7 +327,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41309,7 +41448,7 @@
      final String[] expected = {
        "51:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<P>"),
        "53:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <U>"),
-@@ -338,7 +338,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -343,7 +343,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41318,7 +41457,7 @@
  
      final String[] expected = {
        "44:1: " + getCheckMessage(MSG_MISSING_TAG, "@param <X>"),
-@@ -359,7 +359,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -364,7 +364,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41327,7 +41466,7 @@
  
      final String[] expected = {
        "19:5: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<T>"),
-@@ -370,7 +370,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -375,7 +375,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41336,7 +41475,7 @@
      final String[] expected = {
        "21:4: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<D123>"),
      };
-@@ -378,13 +378,13 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -383,13 +383,13 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41352,7 +41491,7 @@
      final String[] expected = {
        "15:1: " + getCheckMessage(MSG_MISSING_TAG, "@author"),
      };
-@@ -392,7 +392,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -397,7 +397,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -41361,7 +41500,7 @@
      final String[] expected = {
        "28:5: " + getCheckMessage(MSG_MISSING_TAG, "@param <T>"),
      };
-@@ -400,7 +400,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
+@@ -405,7 +405,7 @@ public class JavadocTypeCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42333,7 +42472,7 @@
      final String[] expected = {
        "16: " + getCheckMessage(MSG_KEY),
        "17: " + getCheckMessage(MSG_KEY),
-@@ -107,7 +107,7 @@ public class NonEmptyAtclauseDescriptionCheckTest extends AbstractModuleTestSupp
+@@ -109,7 +109,7 @@ public class NonEmptyAtclauseDescriptionCheckTest extends AbstractModuleTestSupp
     */
    @SuppressForbidden
    @Test
@@ -42675,16 +42814,17 @@
  import static com.puppycrawl.tools.checkstyle.checks.javadoc.WriteTagCheck.MSG_WRITE_TAG;
 +import static java.nio.charset.StandardCharsets.UTF_8;
  
+ import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean;
  import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
- import com.puppycrawl.tools.checkstyle.Checker;
-@@ -31,14 +32,13 @@ import java.io.ByteArrayInputStream;
+@@ -39,7 +40,6 @@ import java.io.ByteArrayOutputStream;
  import java.io.File;
  import java.io.InputStreamReader;
  import java.io.LineNumberReader;
 -import java.nio.charset.StandardCharsets;
  import java.util.ArrayList;
  import java.util.Collections;
- import java.util.List;
+ import java.util.HashSet;
+@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
  import org.junit.jupiter.api.Test;
  
  /** Unit test for WriteTagCheck. */
@@ -42693,7 +42833,7 @@
  
    @Override
    protected String getPackageLocation() {
-@@ -46,13 +46,13 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -58,13 +58,13 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42709,7 +42849,7 @@
      final String[] expected = {
        "15: " + getCheckMessage(MSG_WRITE_TAG, "@author", "Daniel Grenner"),
      };
-@@ -60,7 +60,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -72,7 +72,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42718,7 +42858,7 @@
      final String[] expected = {
        "15: " + getCheckMessage(MSG_WRITE_TAG, "@author", "Daniel Grenner"),
      };
-@@ -68,7 +68,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -80,7 +80,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42727,7 +42867,7 @@
      final String[] expected = {
        "16: " + getCheckMessage(MSG_WRITE_TAG, "@incomplete", "This class needs more code..."),
      };
-@@ -76,7 +76,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -88,7 +88,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42736,7 +42876,7 @@
      final String[] expected = {
        "18: " + getCheckMessage(MSG_WRITE_TAG, "@doubletag", "first text"),
        "19: " + getCheckMessage(MSG_WRITE_TAG, "@doubletag", "second text"),
-@@ -85,7 +85,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -97,7 +97,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42745,7 +42885,7 @@
      final String[] expected = {
        "19: " + getCheckMessage(MSG_WRITE_TAG, "@emptytag", ""),
      };
-@@ -93,7 +93,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -105,7 +105,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42754,7 +42894,7 @@
      final String[] expected = {
        "20: " + getCheckMessage(MSG_MISSING_TAG, "@missingtag"),
      };
-@@ -101,7 +101,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -113,7 +113,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42763,7 +42903,7 @@
      final String[] expected = {
        "24: " + getCheckMessage(MSG_WRITE_TAG, "@todo", "Add a constructor comment"),
        "36: " + getCheckMessage(MSG_WRITE_TAG, "@todo", "Add a comment"),
-@@ -110,7 +110,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -122,7 +122,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42772,7 +42912,19 @@
      final String[] expected = {
        "16: " + getCheckMessage(MSG_WRITE_TAG, "@author", "Daniel Grenner"),
      };
-@@ -118,19 +118,19 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -137,9 +137,9 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+    * checked upon using the log's severity level. This test needs to use a forbidden api {@code
+    * ByteArrayOutputStream#toString()} to get the logs as a string from the output stream
+    */
+-  @Test
+   @SuppressForbidden
+-  public void testResetSeverityLevel() throws Exception {
++  @Test
++  void resetSeverityLevel() throws Exception {
+ 
+     final Checker checker = new Checker();
+ 
+@@ -204,19 +204,19 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42795,7 +42947,7 @@
      final String[] expected = {
        "15: " + getCheckMessage(MSG_TAG_FORMAT, "@author", "ABC"),
      };
-@@ -138,7 +138,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -224,7 +224,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -42804,25 +42956,24 @@
      final String[] expected = {
        "16: " + getCheckMessage(MSG_WRITE_TAG, "@incomplete", "This enum needs more code..."),
        "21: "
-@@ -152,7 +152,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+@@ -238,14 +238,14 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testNoJavadocs() throws Exception {
 +  void noJavadocs() throws Exception {
-     final String[] expected = {
-       "13: " + getCheckMessage(MSG_MISSING_TAG, "null"),
-     };
-@@ -160,7 +160,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+ 
+     verifyWithInlineConfigParserTwice(getPath("InputWriteTagNoJavadoc.java"), expected);
    }
  
    @Test
 -  public void testWriteTagRecordsAndCompactCtors() throws Exception {
 +  void writeTagRecordsAndCompactCtors() throws Exception {
      final String[] expected = {
-       "15: " + getCheckMessage(MSG_MISSING_TAG, "@incomplete"),
        "19: " + getCheckMessage(MSG_TAG_FORMAT, "@incomplete", "\\S"),
-@@ -196,8 +196,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
+       "26: "
+@@ -276,8 +276,7 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
  
      // process each of the lines
      try (ByteArrayInputStream localStream = new ByteArrayInputStream(getStream().toByteArray());
@@ -42853,9 +43004,18 @@
 -  public void testExtractBlockTags() {
 +  void extractBlockTags() {
      final String[] text = {
-       "/** @foo abc ", " * @bar def  ", "   @baz ghi  ", " * @qux jkl", " */",
+       "/** @foo abc ", " * @bar def  ", "   @baz ghi  ", " * @qux jkl", " * @mytag", " */",
      };
-@@ -57,7 +57,7 @@ public class BlockTagUtilTest {
+@@ -60,7 +60,7 @@ public class BlockTagUtilTest {
+   }
+ 
+   @Test
+-  public void testExtractBlockTagFirstLine() {
++  void extractBlockTagFirstLine() {
+     final String[] text = {
+       "/** @foo", " */",
+     };
+@@ -73,7 +73,7 @@ public class BlockTagUtilTest {
    }
  
    @Test
@@ -42864,7 +43024,7 @@
      final String[] text = {
        "/** ", " * @version 1.0", " */",
      };
-@@ -68,7 +68,7 @@ public class BlockTagUtilTest {
+@@ -84,7 +84,7 @@ public class BlockTagUtilTest {
    }
  
    @Test
@@ -52485,6 +52645,15 @@
      final File file = new File(getPath("InputSuppressionXpathSingleFilterComplexQuery.java"));
  
      final SuppressionXpathSingleFilter filter = new SuppressionXpathSingleFilter();
+@@ -519,7 +519,7 @@ public class SuppressionXpathSingleFilterTest extends AbstractModuleTestSupport
+    * @throws Exception when there is problem to load Input file
+    */
+   @Test
+-  public void testSetMessageHandlesNullCorrectly() throws Exception {
++  void setMessageHandlesNullCorrectly() throws Exception {
+     final File file = new File(getPath("InputSuppressionXpathSingleFilterComplexQuery.java"));
+ 
+     final SuppressionXpathSingleFilter filter = new SuppressionXpathSingleFilter();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/filters/SuppressionsLoaderTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/filters/SuppressionsLoaderTest.java
 @@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
@@ -53036,7 +53205,7 @@
      verifyAst(
          getPath("ExpectedNewlineCrAtEndOfFileAst.txt"),
          getPath("InputAstRegressionNewlineCrAtEndOfFile.java"),
-@@ -178,105 +178,105 @@ public class AstRegressionTest extends AbstractTreeTestSupport {
+@@ -178,112 +178,112 @@ public class AstRegressionTest extends AbstractTreeTestSupport {
    }
  
    @Test
@@ -53157,6 +53326,14 @@
      verifyAst(
          getPath("ExpectedAstRegressionManyAlternativesInMultiCatch.txt"),
          getPath("InputAstRegressionManyAlternativesInMultiCatch.java"));
+   }
+ 
+   @Test
+-  public void testTryWithResourcesOnAutoCloseable() throws Exception {
++  void tryWithResourcesOnAutoCloseable() throws Exception {
+     verifyAst(
+         getPath("ExpectedAstRegressionTryWithResourcesOnAutoCloseable.txt"),
+         getPath("InputAstRegressionTryWithResourcesOnAutoCloseable.java"));
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/grammar/CrAwareLexerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/grammar/CrAwareLexerTest.java
 @@ -25,10 +25,10 @@ import org.antlr.v4.runtime.CharStream;
@@ -56667,7 +56844,7 @@
      final DescribedPredicate<JavaField> moduleProperties = new ModulePropertyPredicate();
  
      final ArchCondition<JavaField> beSuppressedField =
-@@ -247,7 +246,7 @@ public class ImmutabilityTest {
+@@ -249,7 +248,7 @@ public class ImmutabilityTest {
  
    /** Test to ensure classes with immutable fields are annotated with {@link StatelessCheck}. */
    @Test
@@ -56676,7 +56853,7 @@
      final ArchCondition<JavaClass> beSuppressedClass =
          new SuppressionArchCondition<>(
              SUPPRESSED_CLASSES_FOR_STATELESS_CHECK_RULE, "be suppressed");
-@@ -269,7 +268,7 @@ public class ImmutabilityTest {
+@@ -271,7 +270,7 @@ public class ImmutabilityTest {
     * {@link GlobalStatefulCheck}.
     */
    @Test
@@ -56790,7 +56967,7 @@
  import java.util.stream.IntStream;
  import java.util.stream.Stream;
  import org.apache.commons.beanutils.PropertyUtils;
-@@ -85,10 +86,10 @@ import org.xml.sax.InputSource;
+@@ -86,10 +87,10 @@ import org.xml.sax.InputSource;
   * following commands have to be executed: - mvn clean compile - Required for next command - mvn
   * plexus-component-metadata:generate-metadata - Required to find custom macros and parser
   */
@@ -56804,7 +56981,7 @@
    private static final String LINK_TEMPLATE =
        "(?s).*<a href=\"[^\"]+#%1$s\">([\\r\\n\\s])*%1$s([\\r\\n\\s])*</a>.*";
  
-@@ -153,7 +154,7 @@ public class XdocsPagesTest {
+@@ -154,7 +155,7 @@ public class XdocsPagesTest {
            "CustomImportOrder.customImportOrderRules");
  
    private static final Set<String> SUN_MODULES =
@@ -56813,22 +56990,22 @@
    // ignore the not yet properly covered modules while testing newly added ones
    // add proper sections to the coverage report and integration tests
    // and then remove this list eventually
-@@ -223,7 +224,7 @@ public class XdocsPagesTest {
+@@ -224,7 +225,7 @@ public class XdocsPagesTest {
            "WhitespaceAround");
  
    private static final Set<String> GOOGLE_MODULES =
 -      Collections.unmodifiableSet(CheckUtil.getConfigGoogleStyleModules());
 +      unmodifiableSet(CheckUtil.getConfigGoogleStyleModules());
  
-   /**
-    * Generate xdoc content from templates before validation. This method will be removed once <a
-@@ -232,12 +233,12 @@ public class XdocsPagesTest {
+   @TempDir private static File temporaryFolder;
+ 
+@@ -235,12 +236,12 @@ public class XdocsPagesTest {
     * @throws Exception if something goes wrong
     */
    @BeforeAll
 -  public static void generateXdocContent() throws Exception {
 +  static void generateXdocContent() throws Exception {
-     XdocGenerator.generateXdocContent();
+     XdocGenerator.generateXdocContent(temporaryFolder);
    }
  
    @Test
@@ -56837,7 +57014,7 @@
      final String availableChecks = Files.readString(AVAILABLE_CHECKS_PATH);
  
      CheckUtil.getSimpleNames(CheckUtil.getCheckstyleChecks()).stream()
-@@ -265,7 +266,7 @@ public class XdocsPagesTest {
+@@ -268,7 +269,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56846,7 +57023,7 @@
      final String siteContent = Files.readString(SITE_PATH);
  
      for (Path path : XdocUtil.getXdocsConfigFilePaths(XdocUtil.getXdocsFilePaths())) {
-@@ -282,8 +283,8 @@ public class XdocsPagesTest {
+@@ -285,8 +286,8 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56857,7 +57034,7 @@
      final Map<String, String> summaries = readSummaries();
  
      for (Path path : XdocUtil.getXdocsConfigFilePaths(XdocUtil.getXdocsFilePaths())) {
-@@ -333,7 +334,7 @@ public class XdocsPagesTest {
+@@ -336,7 +337,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56866,7 +57043,7 @@
      final Map<String, String> summaries = readSummaries();
      for (Path path : XdocUtil.getXdocsConfigFilePaths(XdocUtil.getXdocsFilePaths())) {
        final String fileName = path.getFileName().toString();
-@@ -386,7 +387,7 @@ public class XdocsPagesTest {
+@@ -389,7 +390,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56875,7 +57052,7 @@
      for (Path path : XdocUtil.getXdocsFilePaths()) {
        final String input = Files.readString(path);
        final String fileName = path.getFileName().toString();
-@@ -443,7 +444,7 @@ public class XdocsPagesTest {
+@@ -446,7 +447,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56884,7 +57061,7 @@
      for (Path path : XdocUtil.getXdocsFilePaths()) {
        final String input = Files.readString(path);
        final String fileName = path.getFileName().toString();
-@@ -566,7 +567,7 @@ public class XdocsPagesTest {
+@@ -569,7 +570,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56893,7 +57070,7 @@
      final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
  
      for (Path path : XdocUtil.getXdocsConfigFilePaths(XdocUtil.getXdocsFilePaths())) {
-@@ -619,10 +620,10 @@ public class XdocsPagesTest {
+@@ -622,10 +623,10 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56906,7 +57083,7 @@
      final String fileName = path.getFileName().toString();
  
      final String input = Files.readString(path);
-@@ -1076,7 +1077,7 @@ public class XdocsPagesTest {
+@@ -1079,7 +1080,7 @@ public class XdocsPagesTest {
          Optional.ofNullable(field)
              .map(nonNullField -> nonNullField.getAnnotation(XdocsPropertyType.class))
              .map(propertyType -> propertyType.value().getDescription())
@@ -56915,7 +57092,7 @@
      final String expectedValue =
          getModulePropertyExpectedValue(sectionName, propertyName, field, fieldClass, instance);
  
-@@ -1359,7 +1360,7 @@ public class XdocsPagesTest {
+@@ -1362,7 +1363,7 @@ public class XdocsPagesTest {
          final Object[] array = (Object[]) value;
          valuesStream = Arrays.stream(array);
        }
@@ -56924,7 +57101,7 @@
      }
  
      if (result.isEmpty()) {
-@@ -1388,8 +1389,7 @@ public class XdocsPagesTest {
+@@ -1391,8 +1392,7 @@ public class XdocsPagesTest {
      } else {
        stream = Arrays.stream((int[]) value);
      }
@@ -56934,7 +57111,7 @@
      if (result.isEmpty()) {
        result = "{}";
      }
-@@ -1465,7 +1465,7 @@ public class XdocsPagesTest {
+@@ -1468,7 +1468,7 @@ public class XdocsPagesTest {
        result =
            XmlUtil.getChildrenElements(node).stream()
                .map(Node::getTextContent)
@@ -56943,7 +57120,7 @@
      }
      return result;
    }
-@@ -1679,7 +1679,7 @@ public class XdocsPagesTest {
+@@ -1682,7 +1682,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -56952,7 +57129,7 @@
      for (Path path : XdocUtil.getXdocsStyleFilePaths(XdocUtil.getXdocsFilePaths())) {
        final String fileName = path.getFileName().toString();
        final String styleName = fileName.substring(0, fileName.lastIndexOf('_'));
-@@ -2151,7 +2151,7 @@ public class XdocsPagesTest {
+@@ -2154,7 +2154,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -57071,8 +57248,17 @@
            JavadocStyleCheck.class,
            JavadocMethodCheck.class,
            JavadocTypeCheck.class,
-@@ -99,7 +101,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
-           "SuperFinalize");
+@@ -89,7 +91,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+   // Checks that allowed to have no XPath IT Regression Testing
+   // till https://github.com/checkstyle/checkstyle/issues/6207
+   private static final Set<String> MISSING_CHECK_NAMES =
+-      Set.of(
++      ImmutableSet.of(
+           "ClassFanOutComplexity",
+           "DescendantToken",
+           "DesignForExtension",
+@@ -97,7 +99,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+           "RedundantModifier");
  
    // Modules that will never have xpath support ever because they not report violations
 -  private static final Set<String> NO_VIOLATION_MODULES = Set.of("SuppressWarningsHolder");
@@ -57080,7 +57266,7 @@
  
    private static final Set<String> SIMPLE_CHECK_NAMES = getSimpleCheckNames();
    private static final Map<String, String> ALLOWED_DIRECTORY_AND_CHECKS =
-@@ -120,9 +122,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -118,9 +120,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
  
    private static Map<String, String> getAllowedDirectoryAndChecks() {
      return SIMPLE_CHECK_NAMES.stream()
@@ -57091,7 +57277,7 @@
    }
  
    private static Set<String> getInternalModules() {
-@@ -132,13 +132,13 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -130,13 +130,13 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
                final String[] packageTokens = moduleName.split("\\.");
                return packageTokens[packageTokens.length - 1];
              })
@@ -57109,7 +57295,7 @@
    }
  
    @Override
-@@ -152,12 +152,12 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -150,12 +150,12 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -57124,7 +57310,7 @@
      // add the extra checks
      abstractJavadocCheckNames.addAll(REGEXP_JAVADOC_CHECKS);
      final Set<String> abstractJavadocCheckSimpleNames =
-@@ -171,7 +171,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -169,7 +169,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -57133,7 +57319,7 @@
      final Set<String> compatibleChecks = new HashSet<>();
      final Pattern pattern = Pattern.compile("^XpathRegression(.+)Test\\.java$");
      try (DirectoryStream<Path> javaPaths = Files.newDirectoryStream(javaDir)) {
-@@ -215,7 +215,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -213,7 +213,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
      final Set<String> allChecks = new HashSet<>(SIMPLE_CHECK_NAMES);
      allChecks.removeAll(INCOMPATIBLE_JAVADOC_CHECK_NAMES);
      allChecks.removeAll(INCOMPATIBLE_CHECK_NAMES);
@@ -57142,7 +57328,7 @@
      allChecks.removeAll(MISSING_CHECK_NAMES);
      allChecks.removeAll(NO_VIOLATION_MODULES);
      allChecks.removeAll(compatibleChecks);
-@@ -230,7 +230,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
+@@ -228,7 +228,7 @@ public class XpathRegressionTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -57284,14 +57470,7 @@
  import java.nio.file.Files;
  import java.nio.file.Path;
  import java.nio.file.StandardCopyOption;
-@@ -52,17 +53,16 @@ public final class XdocGenerator {
-       final String pathToFile = path.toString();
-       final File inputFile = new File(pathToFile);
-       final File outputFile = new File(pathToFile.replace(".template", ""));
--      final File tempFile = File.createTempFile(outputFile.getName(), "");
-+      final File tempFile = Files.createTempFile(outputFile.getName(), "").toFile();
-       tempFile.deleteOnExit();
-       final XdocsTemplateSinkFactory sinkFactory =
+@@ -58,11 +59,10 @@ public final class XdocGenerator {
            (XdocsTemplateSinkFactory) plexus.lookup(SinkFactory.ROLE, XDOCS_TEMPLATE_HINT);
        final Sink sink =
            sinkFactory.createSink(
@@ -61972,10 +62151,10 @@
      verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/UncommentedMainCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/UncommentedMainCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class UncommentedMainCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class UncommentedMainCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -61986,17 +62165,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "14:3: " + getCheckMessage(UncommentedMainCheck.MSG_KEY),
+       "19:3: " + getCheckMessage(UncommentedMainCheck.MSG_KEY),
+@@ -39,7 +39,7 @@ public class UncommentedMainCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "16:3: " + getCheckMessage(UncommentedMainCheck.MSG_KEY),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/UniquePropertiesCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/UniquePropertiesCheckExamplesTest.java
 @@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
@@ -62832,10 +63012,10 @@
      };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsAvoidNullCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsAvoidNullCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,14 +25,14 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.EqualsAvoidNullCheck
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class EqualsAvoidNullCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class EqualsAvoidNullCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -62846,17 +63026,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "17:22: " + getCheckMessage(MSG_EQUALS_AVOID_NULL),
+       "20:32: " + getCheckMessage(MSG_EQUALS_IGNORE_CASE_AVOID_NULL),
+@@ -42,7 +42,7 @@ public class EqualsAvoidNullCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "19:22: " + getCheckMessage(MSG_EQUALS_AVOID_NULL),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsHashCodeCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsHashCodeCheckExamplesTest.java
 @@ -25,14 +25,14 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.EqualsHashCodeCheck.
@@ -63247,10 +63428,10 @@
        "23:18: " + getCheckMessage(MSG_KEY, "^0[^lx]"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTypeCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTypeCheckExamplesTest.java
-@@ -24,56 +24,56 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63261,57 +63442,63 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "22:31: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "TreeSet"),
+       "24:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "java.util.HashSet"),
+@@ -46,7 +46,7 @@ public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "25:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "java.util.HashSet"),
+       "35:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "java.util.HashSet"),
+@@ -59,7 +59,7 @@ public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "23:31: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "TreeSet"),
+       "25:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "java.util.HashSet"),
+@@ -74,7 +74,7 @@ public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "24:31: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "TreeSet"),
+       "26:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "java.util.HashSet"),
+@@ -92,7 +92,7 @@ public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
+     final String[] expected = {
+       "24:31: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "TreeSet"),
+       "26:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "java.util.HashSet"),
+@@ -105,7 +105,7 @@ public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample6() throws Exception {
 +  void example6() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
+     final String[] expected = {
+       "48:21: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "Boolean"),
+       "56:25: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "Boolean"),
+@@ -120,7 +120,7 @@ public class IllegalTypeCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample7() throws Exception {
 +  void example7() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example7.txt"), expected);
+     final String[] expected = {
+       "71:10: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "Optional"),
+       "73:3: " + getCheckMessage(IllegalTypeCheck.MSG_KEY, "Optional"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/InnerAssignmentCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/InnerAssignmentCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.InnerAssignmentCheck
@@ -63485,10 +63672,10 @@
      };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/MissingSwitchDefaultCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/MissingSwitchDefaultCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -23,14 +23,14 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class MissingSwitchDefaultCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class MissingSwitchDefaultCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63499,25 +63686,25 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "13:5: " + getCheckMessage(MissingSwitchDefaultCheck.MSG_KEY),
+     };
+@@ -39,13 +39,13 @@ public class MissingSwitchDefaultCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getNonCompilablePath("Example2.java"), expected);
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getNonCompilablePath("Example3.java"), expected);
+   }
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/ModifiedControlVariableCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/ModifiedControlVariableCheckExamplesTest.java
 @@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
@@ -63548,47 +63735,51 @@
      };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleStringLiteralsCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleStringLiteralsCheckExamplesTest.java
-@@ -24,35 +24,35 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,7 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class MultipleStringLiteralsCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class MultipleStringLiteralsCheckExamplesTest extends AbstractExamplesModuleTestSupport {
+ 
    @Override
    protected String getPackageLocation() {
-     return "com/puppycrawl/tools/checkstyle/checks/coding/multiplestringliterals";
+@@ -30,7 +30,7 @@ public class MultipleStringLiteralsCheckExamplesTest extends AbstractExamplesMod
    }
  
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "13:14: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\"StringContents\"", 2),
+       "18:17: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\"DuoString\"", 2),
+@@ -41,7 +41,7 @@ public class MultipleStringLiteralsCheckExamplesTest extends AbstractExamplesMod
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "22:17: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\", \"", 3),
+     };
+@@ -50,7 +50,7 @@ public class MultipleStringLiteralsCheckExamplesTest extends AbstractExamplesMod
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "16:14: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\"StringContents\"", 2),
+       "21:17: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\"DuoString\"", 2),
+@@ -60,7 +60,7 @@ public class MultipleStringLiteralsCheckExamplesTest extends AbstractExamplesMod
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "15:14: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\"StringContents\"", 2),
+       "16:15: " + getCheckMessage(MultipleStringLiteralsCheck.MSG_KEY, "\"unchecked\"", 2),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleVariableDeclarationsCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleVariableDeclarationsCheckExamplesTest.java
 @@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleVariableDecl
@@ -63639,10 +63830,10 @@
      };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/NestedIfDepthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/NestedIfDepthCheckExamplesTest.java
-@@ -24,35 +24,35 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class NestedIfDepthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class NestedIfDepthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63653,39 +63844,24 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "20:9: " + getCheckMessage(NestedIfDepthCheck.MSG_KEY, 2, 1),
+       "27:9: " + getCheckMessage(NestedIfDepthCheck.MSG_KEY, 2, 1),
+@@ -44,7 +44,7 @@ public class NestedIfDepthCheckExamplesTest extends AbstractExamplesModuleTestSu
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
-   }
- 
-   @Test
--  public void testExample3() throws Exception {
-+  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
-   }
- 
-   @Test
--  public void testExample4() throws Exception {
-+  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "40:13: " + getCheckMessage(NestedIfDepthCheck.MSG_KEY, 4, 3),
+       "41:15: " + getCheckMessage(NestedIfDepthCheck.MSG_KEY, 5, 3),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/NestedTryDepthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/NestedTryDepthCheckExamplesTest.java
-@@ -24,42 +24,42 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class NestedTryDepthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class NestedTryDepthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63696,41 +63872,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "20:9: " + getCheckMessage(NestedTryDepthCheck.MSG_KEY, 2, 1),
+       "27:9: " + getCheckMessage(NestedTryDepthCheck.MSG_KEY, 2, 1),
+@@ -41,7 +41,7 @@ public class NestedTryDepthCheckExamplesTest extends AbstractExamplesModuleTestS
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
-   }
- 
-   @Test
--  public void testExample3() throws Exception {
-+  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
-   }
- 
-   @Test
--  public void testExample4() throws Exception {
-+  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
-   }
- 
-   @Test
--  public void testExample5() throws Exception {
-+  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
+     final String[] expected = {
+       "31:13: " + getCheckMessage(NestedTryDepthCheck.MSG_KEY, 4, 3),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/NoArrayTrailingCommaCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/NoArrayTrailingCommaCheckExamplesTest.java
 @@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
@@ -63837,38 +63990,30 @@
        "24:23: " + getCheckMessage(OneStatementPerLineCheck.MSG_KEY),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/OverloadMethodsDeclarationOrderCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/OverloadMethodsDeclarationOrderCheckExamplesTest.java
-@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,7 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class OverloadMethodsDeclarationOrderCheckExamplesTest
 +final class OverloadMethodsDeclarationOrderCheckExamplesTest
      extends AbstractExamplesModuleTestSupport {
    @Override
    protected String getPackageLocation() {
-@@ -32,14 +32,14 @@ public class OverloadMethodsDeclarationOrderCheckExamplesTest
+@@ -30,7 +30,7 @@ public class OverloadMethodsDeclarationOrderCheckExamplesTest
    }
  
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
-   }
- 
-   @Test
--  public void testExample2() throws Exception {
-+  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "23:3: " + getCheckMessage(OverloadMethodsDeclarationOrderCheck.MSG_KEY, "20"),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/PackageDeclarationCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/PackageDeclarationCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,14 +25,14 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class PackageDeclarationCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class PackageDeclarationCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63879,17 +64024,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "10:1: " + getCheckMessage(MSG_KEY_MISSING),
+     };
+@@ -41,7 +41,7 @@ public class PackageDeclarationCheckExamplesTest extends AbstractExamplesModuleT
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example2.java"), expected);
+   }
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.ParameterAssignmentC
@@ -63911,10 +64057,10 @@
        "34:27: " + getCheckMessage(MSG_KEY, "a"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/RequireThisCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/RequireThisCheckExamplesTest.java
-@@ -24,49 +24,49 @@ import org.junit.jupiter.api.Disabled;
+@@ -23,14 +23,14 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -63925,49 +64071,54 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "26:5: " + getCheckMessage(RequireThisCheck.MSG_VARIABLE, "field3", ""),
+     };
+@@ -39,7 +39,7 @@ public class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "19:5: " + getCheckMessage(RequireThisCheck.MSG_VARIABLE, "field2", ""),
+       "29:5: " + getCheckMessage(RequireThisCheck.MSG_VARIABLE, "field3", ""),
+@@ -49,7 +49,7 @@ public class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "20:5: " + getCheckMessage(RequireThisCheck.MSG_METHOD, "foo", ""),
+       "24:5: " + getCheckMessage(RequireThisCheck.MSG_METHOD, "foo", ""),
+@@ -59,7 +59,7 @@ public class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "18:5: " + getCheckMessage(RequireThisCheck.MSG_VARIABLE, "field2", ""),
+       "19:5: " + getCheckMessage(RequireThisCheck.MSG_METHOD, "foo", ""),
+@@ -71,7 +71,7 @@ public class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
+     final String[] expected = {
+       "23:5: " + getCheckMessage(RequireThisCheck.MSG_VARIABLE, "field2", ""),
+     };
+@@ -80,7 +80,7 @@ public class RequireThisCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample6() throws Exception {
 +  void example6() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example6.java"), expected);
+   }
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/ReturnCountCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/ReturnCountCheckExamplesTest.java
 @@ -25,14 +25,14 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck.MSG
@@ -64044,10 +64195,10 @@
        "19:11: " + getCheckMessage(SimplifyBooleanExpressionCheck.MSG_KEY),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/SimplifyBooleanReturnCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/SimplifyBooleanReturnCheckExamplesTest.java
-@@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class SimplifyBooleanReturnCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class SimplifyBooleanReturnCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -64058,9 +64209,9 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "17:5: " + getCheckMessage(SimplifyBooleanReturnCheck.MSG_KEY),
+       "29:5: " + getCheckMessage(SimplifyBooleanReturnCheck.MSG_KEY),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/StringLiteralEqualityCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/coding/StringLiteralEqualityCheckExamplesTest.java
 @@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
@@ -64624,10 +64775,10 @@
      };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/ThrowsCountCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/ThrowsCountCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.design.ThrowsCountCheck.MSG
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class ThrowsCountCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class ThrowsCountCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -64638,25 +64789,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "14:28: " + getCheckMessage(MSG_KEY, 5, 4),
+     };
+@@ -40,7 +40,7 @@ public class ThrowsCountCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "16:28: " + getCheckMessage(MSG_KEY, 5, 2), "23:24: " + getCheckMessage(MSG_KEY, 3, 2),
+     };
+@@ -49,7 +49,7 @@ public class ThrowsCountCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "16:28: " + getCheckMessage(MSG_KEY, 5, 4), "28:30: " + getCheckMessage(MSG_KEY, 5, 4),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheckExamplesTest.java
 @@ -25,14 +25,14 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
@@ -65323,10 +65476,10 @@
        "24:8: " + getCheckMessage(MSG_KEY, "java.util.Map"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/indentation/CommentsIndentationCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/indentation/CommentsIndentationCheckExamplesTest.java
-@@ -24,77 +24,77 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.indentation;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class CommentsIndentationCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -65337,81 +65490,72 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "18:7: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_BLOCK, 21, 6, 4),
+       "31:9: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 30, 8, 4),
+@@ -39,7 +39,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "33:9: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 32, 8, 4),
+     };
+@@ -48,7 +48,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "17:5: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 20, 4, 2),
+     };
+@@ -57,7 +57,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "21:2: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 22, 1, 2),
+     };
+@@ -66,7 +66,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
+     final String[] expected = {
+       "20:13: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 21, 12, 8),
+       "26:6: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, "25, 27", 5, "6, 6"),
+@@ -76,7 +76,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample6() throws Exception {
 +  void example6() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
+     final String[] expected = {
+       "15:5: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 16, 4, 8),
+     };
+@@ -85,7 +85,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample7() throws Exception {
 +  void example7() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example7.txt"), expected);
+     final String[] expected = {
+       "22:15: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 25, 14, 4),
+       "23:10: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, 25, 9, 4),
+@@ -96,7 +96,7 @@ public class CommentsIndentationCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample8() throws Exception {
 +  void example8() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example8.txt"), expected);
-   }
- 
-   @Test
--  public void testExample9() throws Exception {
-+  void example9() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example9.txt"), expected);
-   }
- 
-   @Test
--  public void testExample10() throws Exception {
-+  void example10() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example10.txt"), expected);
+     final String[] expected = {
+       "24:6: " + getCheckMessage(CommentsIndentationCheck.MSG_KEY_SINGLE, "23, 25", 5, "6, 4"),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentationCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentationCheckExamplesTest.java
 @@ -24,35 +24,35 @@ import org.junit.jupiter.api.Disabled;
@@ -65663,10 +65807,10 @@
        "39: " + getCheckMessage(MSG_MISSING_ASTERISK),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMissingWhitespaceAfterAsteriskCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocMissingWhitespaceAfterAsteriskCheckExamplesTest.java
-@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMissingWhite
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class JavadocMissingWhitespaceAfterAsteriskCheckExamplesTest
 +final class JavadocMissingWhitespaceAfterAsteriskCheckExamplesTest
      extends AbstractExamplesModuleTestSupport {
@@ -65678,9 +65822,9 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "14:5: " + getCheckMessage(MSG_KEY), "22:6: " + getCheckMessage(MSG_KEY),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocPackageCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocPackageCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
@@ -65789,40 +65933,40 @@
      verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagContinuationIndentationCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagContinuationIndentationCheckExamplesTest.java
-@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
+@@ -26,7 +26,7 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class JavadocTagContinuationIndentationCheckExamplesTest
 +final class JavadocTagContinuationIndentationCheckExamplesTest
      extends AbstractExamplesModuleTestSupport {
    @Override
    protected String getPackageLocation() {
-@@ -32,21 +32,21 @@ public class JavadocTagContinuationIndentationCheckExamplesTest
+@@ -34,7 +34,7 @@ public class JavadocTagContinuationIndentationCheckExamplesTest
    }
  
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "27: " + getCheckMessage(MSG_KEY, 4),
+     };
+@@ -43,13 +43,13 @@ public class JavadocTagContinuationIndentationCheckExamplesTest
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example2.java"), expected);
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "14: " + getCheckMessage(MSG_KEY_UNCLOSED_HTML_TAG, "p"),
+       "29: " + getCheckMessage(MSG_KEY, 4),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTypeCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTypeCheckExamplesTest.java
 @@ -24,63 +24,63 @@ import org.junit.jupiter.api.Disabled;
@@ -66103,24 +66247,24 @@
      verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/RequireEmptyLineBeforeBlockTagGroupCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/RequireEmptyLineBeforeBlockTagGroupCheckExamplesTest.java
-@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,7 +22,7 @@ package com.puppycrawl.tools.checkstyle.checks.javadoc;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RequireEmptyLineBeforeBlockTagGroupCheckExamplesTest
 +final class RequireEmptyLineBeforeBlockTagGroupCheckExamplesTest
      extends AbstractExamplesModuleTestSupport {
    @Override
    protected String getPackageLocation() {
-@@ -32,7 +32,7 @@ public class RequireEmptyLineBeforeBlockTagGroupCheckExamplesTest
+@@ -30,7 +30,7 @@ public class RequireEmptyLineBeforeBlockTagGroupCheckExamplesTest
    }
  
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "22: "
+           + getCheckMessage(
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/SingleLineJavadocCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/SingleLineJavadocCheckExamplesTest.java
 @@ -25,14 +25,14 @@ import static com.puppycrawl.tools.checkstyle.checks.javadoc.SingleLineJavadocCh
@@ -66227,10 +66371,10 @@
      verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/WriteTagCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/javadoc/WriteTagCheckExamplesTest.java
-@@ -24,35 +24,35 @@ import org.junit.jupiter.api.Disabled;
+@@ -23,20 +23,20 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class WriteTagCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class WriteTagCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -66241,33 +66385,43 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "16: " + getCheckMessage(WriteTagCheck.MSG_MISSING_TAG, "@since"),
+     };
+@@ -45,7 +45,7 @@ public class WriteTagCheckExamplesTest extends AbstractExamplesModuleTestSupport
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "19: " + getCheckMessage(WriteTagCheck.MSG_MISSING_TAG, "@since"),
+       "24: " + getCheckMessage(WriteTagCheck.MSG_WRITE_TAG, "@since", ""),
+@@ -55,7 +55,7 @@ public class WriteTagCheckExamplesTest extends AbstractExamplesModuleTestSupport
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
+     final String pattern = "[1-9\\.]";
+     final String[] expected = {
+       "26: " + getCheckMessage(WriteTagCheck.MSG_TAG_FORMAT, "@since", pattern),
+@@ -66,7 +66,7 @@ public class WriteTagCheckExamplesTest extends AbstractExamplesModuleTestSupport
+   }
  
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+   @Test
+-  public void testExample5() throws Exception {
++  void example5() throws Exception {
+     final String pattern = "[1-9\\.]";
+     final String[] expected = {
+       "21: " + getCheckMessage(WriteTagCheck.MSG_WRITE_TAG, "@since", "1.2"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/BooleanExpressionComplexityCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/BooleanExpressionComplexityCheckExamplesTest.java
 @@ -24,15 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.metrics.BooleanExpressionCo
@@ -66512,10 +66666,10 @@
      verifyWithInlineConfigParser(getPath("Example11.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/CyclomaticComplexityCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/CyclomaticComplexityCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.metrics;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class CyclomaticComplexityCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class CyclomaticComplexityCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -66526,25 +66680,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "32:3: " + getCheckMessage(CyclomaticComplexityCheck.MSG_KEY, 13, 10),
+     };
+@@ -38,7 +38,7 @@ public class CyclomaticComplexityCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "17:3: " + getCheckMessage(CyclomaticComplexityCheck.MSG_KEY, 5, 4),
+     };
+@@ -47,7 +47,7 @@ public class CyclomaticComplexityCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "34:3: " + getCheckMessage(CyclomaticComplexityCheck.MSG_KEY, 11, 10),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/JavaNCSSCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/JavaNCSSCheckExamplesTest.java
 @@ -25,35 +25,35 @@ import org.junit.jupiter.api.Test;
@@ -66563,7 +66719,7 @@
 +  void example1() throws Exception {
      final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
@@ -66590,9 +66746,9 @@
      verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/NPathComplexityCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/metrics/NPathComplexityCheckExamplesTest.java
-@@ -25,21 +25,21 @@ import org.junit.jupiter.api.Test;
+@@ -23,14 +23,14 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
  // -@cs[AbbreviationAsWordInName] Test should be named as its main class.
 -public class NPathComplexityCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class NPathComplexityCheckExamplesTest extends AbstractExamplesModuleTestSupport {
@@ -66604,23 +66760,24 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "28:3: " + getCheckMessage(NPathComplexityCheck.MSG_KEY, 217, 200),
+     };
+@@ -39,7 +39,7 @@ public class NPathComplexityCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "14:3: " + getCheckMessage(NPathComplexityCheck.MSG_KEY, 128, 100),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/ClassMemberImpliedModifierCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/ClassMemberImpliedModifierCheckExamplesTest.java
-@@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.modifier.ClassMemberImplied
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class ClassMemberImpliedModifierCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class ClassMemberImpliedModifierCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -66631,9 +66788,9 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "16:3: " + getCheckMessage(MSG_KEY, "static"),
+       "23:3: " + getCheckMessage(MSG_KEY, "static"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/InterfaceMemberImpliedModifierCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/InterfaceMemberImpliedModifierCheckExamplesTest.java
 @@ -24,7 +24,7 @@ import org.junit.jupiter.api.Disabled;
@@ -66664,10 +66821,10 @@
      verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/ModifierOrderCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/ModifierOrderCheckExamplesTest.java
-@@ -24,14 +24,14 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,14 +25,14 @@ import static com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class ModifierOrderCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class ModifierOrderCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -66678,9 +66835,9 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "15:9: " + getCheckMessage(MSG_MODIFIER_ORDER, "private"),
+       "18:10: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@Deprecated"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/RedundantModifierCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/modifier/RedundantModifierCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.modifier.RedundantModifierC
@@ -67368,10 +67525,10 @@
        "37:30: " + getCheckMessage(MSG_INVALID_PATTERN, "BAD", "^([a-z][a-zA-Z0-9]*|_)$"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/RecordComponentNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/RecordComponentNameCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RecordComponentNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class RecordComponentNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -67382,23 +67539,24 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String pattern = "^[a-z][a-zA-Z0-9]*$";
+ 
+@@ -43,7 +43,7 @@ public class RecordComponentNameCheckExamplesTest extends AbstractExamplesModule
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String pattern = "^[a-z]+$";
+ 
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/RecordTypeParameterNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/RecordTypeParameterNameCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RecordTypeParameterNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class RecordTypeParameterNameCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -67409,17 +67567,18 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String pattern = "^[A-Z]$";
+ 
+@@ -44,7 +44,7 @@ public class RecordTypeParameterNameCheckExamplesTest extends AbstractExamplesMo
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String pattern = "^[a-zA-Z]$";
+ 
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/StaticVariableNameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/naming/StaticVariableNameCheckExamplesTest.java
 @@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
@@ -67612,10 +67771,10 @@
      verifyWithInlineConfigParser(getPath("Example13.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpMultilineCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpMultilineCheckExamplesTest.java
-@@ -24,49 +24,49 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,20 +25,20 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RegexpMultilineCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class RegexpMultilineCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -67626,49 +67785,43 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "14: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "System\\.(out)|(err)\\.print(ln)?\\("),
+       "16: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "System\\.(out)|(err)\\.print(ln)?\\("),
+@@ -56,7 +56,7 @@ public class RegexpMultilineCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "15: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "System\\.out.*?print\\("),
+     };
+@@ -65,7 +65,7 @@ public class RegexpMultilineCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "40: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "Test #[0-9]+:[A-Za-z ]+"),
+       "42: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "Test #[0-9]+:[A-Za-z ]+"),
+@@ -75,7 +75,7 @@ public class RegexpMultilineCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
-   }
- 
-   @Test
--  public void testExample6() throws Exception {
-+  void example6() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
+     final String[] expected = {
+       "30: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "Test #[0-9]+:[A-Za-z ]+"),
+       "39: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "Test #[0-9]+:[A-Za-z ]+"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpOnFilenameCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpOnFilenameCheckExamplesTest.java
 @@ -24,56 +24,56 @@ import org.junit.jupiter.api.Disabled;
@@ -67805,10 +67958,10 @@
      verifyWithInlineConfigParser(getPath("Example7.txt"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpSinglelineJavaCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpSinglelineJavaCheckExamplesTest.java
-@@ -24,56 +24,56 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,20 +25,20 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -67819,63 +67972,67 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "25: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "System\\.out\\.println"),
+       "47: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "System\\.out\\.println"),
+@@ -48,7 +48,7 @@ public class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "23: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "debug"),
+     };
+@@ -57,7 +57,7 @@ public class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = {
+       "5: " + "IO found", "30: " + "IO found", "33: " + "IO found", "37: " + "IO found",
+     };
+@@ -66,7 +66,7 @@ public class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
+     final String[] expected = {
+       "43: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "\\.info(.*)"),
+       "44: " + getCheckMessage(MSG_ILLEGAL_REGEXP, "\\.info(.*)"),
+@@ -77,7 +77,7 @@ public class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample6() throws Exception {
 +  void example6() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
+     final String[] expected = {
+       "42: " + "public member found",
+     };
+@@ -86,7 +86,7 @@ public class RegexpSinglelineJavaCheckExamplesTest extends AbstractExamplesModul
    }
  
    @Test
 -  public void testExample7() throws Exception {
 +  void example7() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example7.txt"), expected);
+     final String[] expected = {
+       "23: " + "private member found", "30: " + "private member found",
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/AnonInnerLengthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/AnonInnerLengthCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,20 +25,20 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class AnonInnerLengthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class AnonInnerLengthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -67886,23 +68043,22 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "23:30: " + getCheckMessage(MSG_KEY, 9, 7),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/ExecutableStatementCountCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/ExecutableStatementCountCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,21 +22,21 @@ package com.puppycrawl.tools.checkstyle.checks.sizes;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class ExecutableStatementCountCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class ExecutableStatementCountCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -67915,15 +68071,24 @@
 +  void example1() throws Exception {
      final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
+     final String[] expected = {
+       "16:3: " + getCheckMessage(ExecutableStatementCountCheck.MSG_KEY, 3, 2),
+     };
+@@ -45,7 +45,7 @@ public class ExecutableStatementCountCheckExamplesTest extends AbstractExamplesM
+   }
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+   @Test
+-  public void testExample3() throws Exception {
++  void example3() throws Exception {
+     final String[] expected = {
+       "21:3: " + getCheckMessage(ExecutableStatementCountCheck.MSG_KEY, 3, 2),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/FileLengthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/FileLengthCheckExamplesTest.java
 @@ -24,21 +24,21 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.FileLengthCheck.MSG_K
@@ -67991,10 +68156,10 @@
      final String[] expected = {
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/LineLengthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/LineLengthCheckExamplesTest.java
-@@ -24,49 +24,49 @@ import org.junit.jupiter.api.Disabled;
+@@ -25,14 +25,14 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class LineLengthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class LineLengthCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -68005,55 +68170,47 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "13: " + getCheckMessage(MSG_KEY, 80, 84), "21: " + getCheckMessage(MSG_KEY, 80, 92),
+     };
+@@ -41,13 +41,13 @@ public class LineLengthCheckExamplesTest extends AbstractExamplesModuleTestSuppo
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example2.java"), expected);
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "11: " + getCheckMessage(MSG_KEY, 80, 83), "23: " + getCheckMessage(MSG_KEY, 80, 92),
+     };
+@@ -56,13 +56,13 @@ public class LineLengthCheckExamplesTest extends AbstractExamplesModuleTestSuppo
    }
  
    @Test
 -  public void testExample4() throws Exception {
 +  void example4() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example4.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example4.java"), expected);
    }
  
    @Test
 -  public void testExample5() throws Exception {
 +  void example5() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example5.txt"), expected);
-   }
- 
-   @Test
--  public void testExample6() throws Exception {
-+  void example6() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example6.txt"), expected);
+     final String[] expected = {
+       "11: " + getCheckMessage(MSG_KEY, 60, 64),
+       "17: " + getCheckMessage(MSG_KEY, 60, 84),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodCountCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodCountCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -23,20 +23,20 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class MethodCountCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class MethodCountCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -68064,25 +68221,25 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getPath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "13:1: " + getCheckMessage(MethodCountCheck.MSG_MANY_METHODS, 6, 5),
+     };
+@@ -45,7 +45,7 @@ public class MethodCountCheckExamplesTest extends AbstractExamplesModuleTestSupp
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "14:1: " + getCheckMessage(MethodCountCheck.MSG_PUBLIC_METHODS, 3, 2),
+     };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck.MSG
@@ -68122,23 +68279,25 @@
      };
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/OuterTypeNumberCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/OuterTypeNumberCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -24,7 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.OuterTypeNumberCheck.
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class OuterTypeNumberCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class OuterTypeNumberCheckExamplesTest extends AbstractExamplesModuleTestSupport {
+ 
    @Override
    protected String getPackageLocation() {
-     return "com/puppycrawl/tools/checkstyle/checks/sizes/outertypenumber";
+@@ -32,7 +32,7 @@ public class OuterTypeNumberCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "9:1: " + getCheckMessage(MSG_KEY, 3, 1),
+     };
+@@ -41,7 +41,7 @@ public class OuterTypeNumberCheckExamplesTest extends AbstractExamplesModuleTest
    }
  
    @Test
@@ -68146,7 +68305,7 @@
 +  void example2() throws Exception {
      final String[] expected = {};
  
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     verifyWithInlineConfigParser(getPath("Example2.java"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/ParameterNumberCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/ParameterNumberCheckExamplesTest.java
 @@ -24,14 +24,14 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.ParameterNumberCheck.
@@ -68194,10 +68353,10 @@
        "27:15: " + getCheckMessage(MSG_KEY, 7, 8),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/RecordComponentNumberCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/sizes/RecordComponentNumberCheckExamplesTest.java
-@@ -24,28 +24,28 @@ import org.junit.jupiter.api.Disabled;
+@@ -22,14 +22,14 @@ package com.puppycrawl.tools.checkstyle.checks.sizes;
+ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class RecordComponentNumberCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class RecordComponentNumberCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -68208,25 +68367,27 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = {
+       "19:3: " + getCheckMessage(RecordComponentNumberCheck.MSG_KEY, 9, 8),
+     };
+@@ -38,7 +38,7 @@ public class RecordComponentNumberCheckExamplesTest extends AbstractExamplesModu
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "18:3: " + getCheckMessage(RecordComponentNumberCheck.MSG_KEY, 6, 5),
+       "21:3: " + getCheckMessage(RecordComponentNumberCheck.MSG_KEY, 9, 5),
+@@ -48,7 +48,7 @@ public class RecordComponentNumberCheckExamplesTest extends AbstractExamplesModu
    }
  
    @Test
 -  public void testExample3() throws Exception {
 +  void example3() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example3.txt"), expected);
+     final String[] expected = {
+       "23:3: " + getCheckMessage(RecordComponentNumberCheck.MSG_KEY, 6, 5),
+       "29:3: " + getCheckMessage(RecordComponentNumberCheck.MSG_KEY, 4, 3),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/whitespace/EmptyForInitializerPadExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/whitespace/EmptyForInitializerPadExamplesTest.java
 @@ -25,14 +25,14 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyForInitiali
@@ -68395,10 +68556,10 @@
      verifyWithInlineConfigParser(getPath("Example5.html"), expected);
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/whitespace/GenericWhitespaceCheckExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/whitespace/GenericWhitespaceCheckExamplesTest.java
-@@ -24,21 +24,21 @@ import org.junit.jupiter.api.Disabled;
+@@ -23,20 +23,20 @@ import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
+ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import org.junit.jupiter.api.Test;
  
- @Disabled("until https://github.com/checkstyle/checkstyle/issues/13345")
 -public class GenericWhitespaceCheckExamplesTest extends AbstractExamplesModuleTestSupport {
 +final class GenericWhitespaceCheckExamplesTest extends AbstractExamplesModuleTestSupport {
    @Override
@@ -68409,17 +68570,16 @@
    @Test
 -  public void testExample1() throws Exception {
 +  void example1() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example1.txt"), expected);
+     final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
+     verifyWithInlineConfigParser(getNonCompilablePath("Example1.java"), expected);
    }
  
    @Test
 -  public void testExample2() throws Exception {
 +  void example2() throws Exception {
-     final String[] expected = {};
- 
-     verifyWithInlineConfigParser(getPath("Example2.txt"), expected);
+     final String[] expected = {
+       "15:8: " + getCheckMessage(GenericWhitespaceCheck.MSG_WS_PRECEDED, "<"),
+       "16:9: " + getCheckMessage(GenericWhitespaceCheck.MSG_WS_NOT_PRECEDED, "<"),
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/whitespace/MethodParamPadExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/whitespace/MethodParamPadExamplesTest.java
 @@ -26,14 +26,14 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.MethodParamPadCh
