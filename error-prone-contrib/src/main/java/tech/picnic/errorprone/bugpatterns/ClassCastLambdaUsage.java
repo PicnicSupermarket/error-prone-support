@@ -18,6 +18,7 @@ import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
+import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -48,7 +49,10 @@ public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpr
     }
 
     Type type = ASTHelpers.getType(typeCast);
-    if (type == null || type.isParameterized() || type.isPrimitive()) {
+    if (type == null
+        || type.isParameterized()
+        || type.isPrimitive()
+        || type.getKind() == TypeKind.TYPEVAR) {
       /*
        * The method reference syntax does not support casting to parameterized types. Additionally,
        * `Class#cast` does not support the same range of type conversions between (boxed) primitive
