@@ -39,12 +39,10 @@ final class ClassCastLambdaUsageTest {
             "",
             "    // BUG: Diagnostic contains:",
             "    Stream.of(10).map(i -> (Integer) i);",
+            "  }",
             "",
-            "    class B<T> {",
-            "      void m() {",
-            "        Stream.of(11).map(i -> (T) i);",
-            "      }",
-            "    }",
+            "  private <T> void m2() {",
+            "    Stream.of(11).map(i -> (T) i);",
             "  }",
             "}")
         .doTest();
