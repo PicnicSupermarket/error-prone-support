@@ -89,15 +89,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
     return describeMatch(compilationUnitTree, suggestedFix);
   }
 
-  /**
-   * Matches a class.
-   *
-   * @param tree xxx
-   * @param state xxx
-   * @param compilationUnit xxx
-   * @return xxx
-   */
-  public SuggestedFix matchClass(
+  private SuggestedFix matchClass(
       ClassTree tree, VisitorState state, JCTree.JCCompilationUnit compilationUnit) {
     Kind treeKind = tree.getKind();
     if (treeKind != Kind.CLASS && treeKind != Kind.INTERFACE && treeKind != Kind.ENUM) {
@@ -267,9 +259,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
               return original.equals(replacement)
                   ? SuggestedFix.emptyFix()
                   : SuggestedFix.replace(
-                      original.startPosition(),
-                      original.endPosition(),
-                      replacementSource.toString());
+                      original.startPosition(), original.endPosition(), replacementSource);
             })
         .reduce(SuggestedFix.builder(), SuggestedFix.Builder::merge, SuggestedFix.Builder::merge)
         .build();
@@ -296,11 +286,11 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
 
     abstract int endPosition();
 
-    abstract Integer preferredOrdinal();
+    abstract int preferredOrdinal();
 
     @Override
     public int compareTo(TypeMemberOrder.TypeMember o) {
-      return preferredOrdinal().compareTo(o.preferredOrdinal());
+      return Integer.compare(preferredOrdinal(), o.preferredOrdinal());
     }
   }
 }
