@@ -217,7 +217,7 @@ Other highly relevant commands:
 - `mvn fmt:format` formats the code using
   [`google-java-format`][google-java-format].
 - [`./run-full-build.sh`][script-run-full-build] builds the project twice,
-  where the second pass validates compatbility with Picnic's [Error Prone
+  where the second pass validates compatibility with Picnic's [Error Prone
   fork][error-prone-fork-repo] and compliance of the code with any rules
   defined within this project. (Consider running this before [opening a pull
   request][contributing-pull-request], as the PR checks also perform this

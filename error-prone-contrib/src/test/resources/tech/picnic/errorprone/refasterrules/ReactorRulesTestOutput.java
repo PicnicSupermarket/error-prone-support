@@ -47,6 +47,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         List.class,
         ImmutableCollection.class,
         ImmutableMap.class,
+        assertThat(false),
         assertThat(0),
         maxBy(null),
         minBy(null),
@@ -575,6 +576,35 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
     return ImmutableSet.of(PublisherProbe.empty(), PublisherProbe.empty());
+  }
+
+  void testPublisherProbeAssertWasSubscribed() {
+    PublisherProbe.of(Mono.just(1)).assertWasSubscribed();
+    PublisherProbe.of(Mono.just(2)).assertWasSubscribed();
+    PublisherProbe.of(Mono.just(3)).assertWasSubscribed();
+    PublisherProbe.of(Mono.just(4)).assertWasSubscribed();
+  }
+
+  void testPublisherProbeAssertWasNotSubscribed() {
+    PublisherProbe.of(Mono.just(1)).assertWasNotSubscribed();
+    PublisherProbe.of(Mono.just(2)).assertWasNotSubscribed();
+    PublisherProbe.of(Mono.just(3)).assertWasNotSubscribed();
+  }
+
+  void testPublisherProbeAssertWasCancelled() {
+    PublisherProbe.empty().assertWasCancelled();
+  }
+
+  void testPublisherProbeAssertWasNotCancelled() {
+    PublisherProbe.empty().assertWasNotCancelled();
+  }
+
+  void testPublisherProbeAssertWasRequested() {
+    PublisherProbe.empty().assertWasRequested();
+  }
+
+  void testPublisherProbeAssertWasNotRequested() {
+    PublisherProbe.empty().assertWasNotRequested();
   }
 
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {

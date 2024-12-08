@@ -1742,6 +1742,91 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link PublisherProbe#assertWasSubscribed()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasSubscribed<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      Refaster.anyOf(
+          assertThat(probe.wasSubscribed()).isTrue(),
+          assertThat(probe.subscribeCount()).isNotNegative(),
+          assertThat(probe.subscribeCount()).isNotEqualTo(0),
+          assertThat(probe.subscribeCount()).isPositive());
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasSubscribed();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasNotSubscribed()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasNotSubscribed<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      Refaster.anyOf(
+          assertThat(probe.wasSubscribed()).isFalse(),
+          assertThat(probe.subscribeCount()).isEqualTo(0),
+          assertThat(probe.subscribeCount()).isNotPositive());
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasNotSubscribed();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasCancelled()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasCancelled<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasCancelled()).isTrue();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasCancelled();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasNotCancelled()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasNotCancelled<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasCancelled()).isFalse();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasNotCancelled();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasRequested()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasRequested<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasRequested()).isTrue();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasRequested();
+    }
+  }
+
+  /** Prefer {@link PublisherProbe#assertWasNotRequested()} over more verbose alternatives. */
+  static final class PublisherProbeAssertWasNotRequested<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe) {
+      assertThat(probe.wasRequested()).isFalse();
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe) {
+      probe.assertWasNotRequested();
+    }
+  }
+
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
