@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.utils;
 
-import static tech.picnic.errorprone.utils.JavaKeywords.isValidIdentifier;
-
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ImportTree;
@@ -47,7 +45,7 @@ public final class ConflictDetection {
       return Optional.of(String.format("`%s` is already statically imported", newName));
     }
 
-    if (!isValidIdentifier(newName)) {
+    if (!SourceCode.isValidIdentifier(newName)) {
       return Optional.of(String.format("`%s` is not a valid identifier", newName));
     }
 
