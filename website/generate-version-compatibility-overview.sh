@@ -45,6 +45,13 @@ for eps_version in ${eps_versions}; do
   (set +u && echo n | sdk install maven "${mvn_version}")
   sdk use maven "${mvn_version}"
 
+  # As of version 2.36.0, Error Prone requires that the
+  # `--should-stop=ifError=FLOW` flag is provided. Make sure that this flag is
+  # always specified. (The `-XDcompilePolicy=simple` flag has been specified
+  # since the first Error Prone Support release. It's okay if the added flag is
+  # present more than once; the last variant listed wins.)
+  sed -i 's,<arg>-XDcompilePolicy=simple</arg>,<arg>-XDcompilePolicy=simple</arg><arg>--should-stop=ifError=FLOW</arg>,' pom.xml
+
   # Collect the list of checks supported by this version of Error Prone
   # Support.
   # XXX: Conditionally omit the `MethodReferenceUsage` exclusion once that
