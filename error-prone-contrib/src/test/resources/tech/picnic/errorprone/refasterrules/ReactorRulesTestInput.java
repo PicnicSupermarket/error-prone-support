@@ -44,6 +44,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         List.class,
         ImmutableCollection.class,
         ImmutableMap.class,
+        assertThat(false),
         assertThat(0),
         maxBy(null),
         minBy(null),
@@ -587,6 +588,35 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
     return ImmutableSet.of(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
+  }
+
+  void testPublisherProbeAssertWasSubscribed() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isTrue();
+    assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isNotNegative();
+    assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotEqualTo(0);
+    assertThat(PublisherProbe.of(Mono.just(4)).subscribeCount()).isPositive();
+  }
+
+  void testPublisherProbeAssertWasNotSubscribed() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isFalse();
+    assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isEqualTo(0);
+    assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotPositive();
+  }
+
+  void testPublisherProbeAssertWasCancelled() {
+    assertThat(PublisherProbe.empty().wasCancelled()).isTrue();
+  }
+
+  void testPublisherProbeAssertWasNotCancelled() {
+    assertThat(PublisherProbe.empty().wasCancelled()).isFalse();
+  }
+
+  void testPublisherProbeAssertWasRequested() {
+    assertThat(PublisherProbe.empty().wasRequested()).isTrue();
+  }
+
+  void testPublisherProbeAssertWasNotRequested() {
+    assertThat(PublisherProbe.empty().wasRequested()).isFalse();
   }
 
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
