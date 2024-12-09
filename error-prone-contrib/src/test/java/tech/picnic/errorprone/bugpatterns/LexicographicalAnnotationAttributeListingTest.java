@@ -152,7 +152,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "",
             "  // BUG: Diagnostic contains:",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"b\", \"a\"})})",
-            "  A unsortedInnderAnns();",
+            "  A unsortedInnerAnns();",
             "",
             "  @Foo({\"a=foo\", \"a.b=bar\", \"a.c=baz\"})",
             "  A hierarchicallySorted();",
@@ -237,7 +237,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "  A unsortedAnns();",
             "",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"b\", \"a\"})})",
-            "  A unsortedInnderAnns();",
+            "  A unsortedInnerAnns();",
             "}")
         .addOutputLines(
             "A.java",
@@ -284,7 +284,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "  A unsortedAnns();",
             "",
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"a\", \"b\"})})",
-            "  A unsortedInnderAnns();",
+            "  A unsortedInnerAnns();",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
