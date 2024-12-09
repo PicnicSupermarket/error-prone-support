@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.utils;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
@@ -22,10 +24,41 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 final class SourceCodeTest {
+  private static Stream<Arguments> isValidIdentifierTestCases() {
+    /* { string, expected } */
+    return Stream.of(
+        arguments("", false),
+        arguments(".", false),
+        arguments("a.", false),
+        arguments(".a", false),
+        arguments("a.b", false),
+        arguments("public", false),
+        arguments("true", false),
+        arguments("false", false),
+        arguments("null", false),
+        arguments("0", false),
+        arguments("\0", false),
+        arguments("a%\0", false),
+        arguments("a", true),
+        arguments("a0", true),
+        arguments("_a0", true),
+        arguments("test", true));
+  }
+
+  @MethodSource("isValidIdentifierTestCases")
+  @ParameterizedTest
+  void isValidIdentifier(String string, boolean expected) {
+    assertThat(SourceCode.isValidIdentifier(string)).isEqualTo(expected);
+  }
+
   @Test
   void toStringConstantExpression() {
     BugCheckerRefactoringTestHelper.newInstance(
