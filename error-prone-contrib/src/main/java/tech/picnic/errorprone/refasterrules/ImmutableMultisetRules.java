@@ -21,8 +21,6 @@ final class ImmutableMultisetRules {
   private ImmutableMultisetRules() {}
 
   /** Prefer {@link ImmutableMultiset#builder()} over the associated constructor. */
-  // XXX: This drops generic type information, sometimes leading to non-compilable code. See
-  // https://github.com/google/error-prone/pull/2706.
   static final class ImmutableMultisetBuilder<T> {
     @BeforeTemplate
     ImmutableMultiset.Builder<T> before() {
@@ -31,7 +29,7 @@ final class ImmutableMultisetRules {
 
     @AfterTemplate
     ImmutableMultiset.Builder<T> after() {
-      return ImmutableMultiset.builder();
+      return ImmutableMultiset.<T>builder();
     }
   }
 
