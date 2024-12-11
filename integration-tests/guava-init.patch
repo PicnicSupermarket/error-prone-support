@@ -167,14 +167,14 @@ index e02cbcc..e48400e 100644
    }
  
 diff --git a/guava-tests/benchmark/com/google/common/primitives/UnsignedLongsBenchmark.java b/guava-tests/benchmark/com/google/common/primitives/UnsignedLongsBenchmark.java
-index 288aa0c..0c1f459 100644
+index 288aa0c..16b4776 100644
 --- a/guava-tests/benchmark/com/google/common/primitives/UnsignedLongsBenchmark.java
 +++ b/guava-tests/benchmark/com/google/common/primitives/UnsignedLongsBenchmark.java
 @@ -25,6 +25,7 @@ import java.util.Random;
   *
   * @author Eamonn McManus
   */
-+@SuppressWarnings("LongToUnsignedString")
++@SuppressWarnings({"ConstantNaming" /* To prevent overlapping changes break the build. */, "LongToUnsignedString"})
  public class UnsignedLongsBenchmark {
    private static final int ARRAY_SIZE = 0x10000;
    private static final int ARRAY_MASK = 0x0ffff;
@@ -271,6 +271,18 @@ index 9936a86..251f426 100644
  @ElementTypesAreNonnullByDefault
  public class ImmutableMapTest extends TestCase {
  
+diff --git a/guava-tests/test/com/google/common/collect/ImmutableMultimapAsMapImplementsMapTest.java b/guava-tests/test/com/google/common/collect/ImmutableMultimapAsMapImplementsMapTest.java
+index f216745..0fb3456 100644
+--- a/guava-tests/test/com/google/common/collect/ImmutableMultimapAsMapImplementsMapTest.java
++++ b/guava-tests/test/com/google/common/collect/ImmutableMultimapAsMapImplementsMapTest.java
+@@ -36,6 +36,7 @@ public class ImmutableMultimapAsMapImplementsMapTest
+   }
+ 
+   @Override
++  @SuppressWarnings("EmptyImmutableListMultimap")
+   protected Map<String, Collection<Integer>> makeEmptyMap() {
+     return ImmutableMultimap.<String, Integer>of().asMap();
+   }
 diff --git a/guava-tests/test/com/google/common/collect/ImmutableMultimapTest.java b/guava-tests/test/com/google/common/collect/ImmutableMultimapTest.java
 index 12dcf31..a738f23 100644
 --- a/guava-tests/test/com/google/common/collect/ImmutableMultimapTest.java
@@ -386,6 +398,18 @@ index d7a281a..e2cef61 100644
    public void testFastAddAllMultiset() {
      final AtomicInteger addCalls = new AtomicInteger();
      Multiset<String> multiset =
+diff --git a/guava-tests/test/com/google/common/hash/Fingerprint2011Test.java b/guava-tests/test/com/google/common/hash/Fingerprint2011Test.java
+index 7aafe77..a2aed87 100644
+--- a/guava-tests/test/com/google/common/hash/Fingerprint2011Test.java
++++ b/guava-tests/test/com/google/common/hash/Fingerprint2011Test.java
+@@ -24,6 +24,7 @@ public class Fingerprint2011Test extends TestCase {
+   private static final int MAX_BYTES = 1000;
+ 
+   // Map from sample string lengths to the fingerprint
++  @SuppressWarnings("ImmutableSortedMapBuilder")
+   private static final ImmutableSortedMap<Integer, Long> LENGTH_FINGERPRINTS =
+       new ImmutableSortedMap.Builder<Integer, Long>(Ordering.natural())
+           .put(1000, 0x433109b33e13e6edL)
 diff --git a/guava-tests/test/com/google/common/hash/MessageDigestHashFunctionTest.java b/guava-tests/test/com/google/common/hash/MessageDigestHashFunctionTest.java
 index c58d50d..08a4389 100644
 --- a/guava-tests/test/com/google/common/hash/MessageDigestHashFunctionTest.java
@@ -410,6 +434,19 @@ index 0019ec0..b0e327e 100644
      protected File createFile() throws IOException {
        File file = File.createTempFile("SinkSourceFile", "txt");
        fileThreadLocal.set(file);
+diff --git a/guava-tests/test/com/google/common/util/concurrent/JdkFutureAdaptersTest.java b/guava-tests/test/com/google/common/util/concurrent/JdkFutureAdaptersTest.java
+index 741ff45..d82897f 100644
+--- a/guava-tests/test/com/google/common/util/concurrent/JdkFutureAdaptersTest.java
++++ b/guava-tests/test/com/google/common/util/concurrent/JdkFutureAdaptersTest.java
+@@ -233,7 +233,7 @@ public class JdkFutureAdaptersTest extends TestCase {
+     }
+   }
+ 
+-  @SuppressWarnings("IsInstanceIncompatibleType") // intentional.
++  @SuppressWarnings({"IsInstanceIncompatibleType", "Instanceof"}) // intentional.
+   public void testListenInPoolThreadRunsListenerAfterRuntimeException() throws Exception {
+     RuntimeExceptionThrowingFuture<String> input = new RuntimeExceptionThrowingFuture<>();
+     /*
 diff --git a/guava/src/com/google/common/base/Charsets.java b/guava/src/com/google/common/base/Charsets.java
 index 809b109..470bacd 100644
 --- a/guava/src/com/google/common/base/Charsets.java
