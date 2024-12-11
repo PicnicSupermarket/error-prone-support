@@ -1,0 +1,434 @@
+--- a/android/guava/src/com/google/common/base/Preconditions.java
++++ b/android/guava/src/com/google/common/base/Preconditions.java
+@@ -115,6 +115,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
+  */
+ @GwtCompatible
+ @ElementTypesAreNonnullByDefault
++@SuppressWarnings("PreconditionsRules")
+ public final class Preconditions {
+   private Preconditions() {}
+ 
+--- a/android/guava/src/com/google/common/graph/DirectedNetworkConnections.java
++++ b/android/guava/src/com/google/common/graph/DirectedNetworkConnections.java
+@@ -44,6 +44,7 @@ final class DirectedNetworkConnections<N, E> extends AbstractDirectedNetworkConn
+         HashBiMap.<E, N>create(EXPECTED_DEGREE), HashBiMap.<E, N>create(EXPECTED_DEGREE), 0);
+   }
+ 
++  @SuppressWarnings("IdentityConversion")
+   static <N, E> DirectedNetworkConnections<N, E> ofImmutable(
+       Map<E, N> inEdges, Map<E, N> outEdges, int selfLoopCount) {
+     return new DirectedNetworkConnections<>(
+--- a/android/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
++++ b/android/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
+@@ -43,6 +43,7 @@ final class UndirectedNetworkConnections<N, E> extends AbstractUndirectedNetwork
+     return new UndirectedNetworkConnections<>(HashBiMap.<E, N>create(EXPECTED_DEGREE));
+   }
+ 
++  @SuppressWarnings("IdentityConversion")
+   static <N, E> UndirectedNetworkConnections<N, E> ofImmutable(Map<E, N> incidentEdges) {
+     return new UndirectedNetworkConnections<>(ImmutableBiMap.copyOf(incidentEdges));
+   }
+--- a/guava-gwt/pom.xml
++++ b/guava-gwt/pom.xml
+@@ -364,8 +364,9 @@
+               <goal>compile</goal>
+             </goals>
+             <configuration>
++              <skip>true</skip>
+               <module>com.google.common.ForceGuavaCompilation</module>
+-              <failOnError>true</failOnError>
++              <failOnError>false</failOnError>
+               <logLevel>${gwt.logLevel}</logLevel>
+               <generateJsInteropExports>true</generateJsInteropExports>
+               <validateOnly>true</validateOnly>
+@@ -417,6 +418,7 @@
+               <goal>test</goal>
+             </goals>
+             <configuration>
++              <skip>true</skip>
+               <module>com.google.common.GuavaTests</module>
+               <includes>**/GwtTestSuite.java</includes>
+               <logLevel>${gwt.logLevel}</logLevel>
+--- a/guava-testlib/src/com/google/common/collect/testing/Helpers.java
++++ b/guava-testlib/src/com/google/common/collect/testing/Helpers.java
+@@ -220,6 +220,7 @@ public class Helpers {
+     };
+   }
+ 
++  @SuppressWarnings("ImmutableSetOf")
+   static <T extends @Nullable Object> Iterator<T> cycle(Iterable<T> iterable) {
+     return new Iterator<T>() {
+       Iterator<T> iterator = Collections.<T>emptySet().iterator();
+--- a/guava-testlib/src/com/google/common/collect/testing/google/MapGenerators.java
++++ b/guava-testlib/src/com/google/common/collect/testing/google/MapGenerators.java
+@@ -61,6 +61,7 @@ public class MapGenerators {
+ 
+   public static class ImmutableMapCopyOfGenerator extends TestStringMapGenerator {
+     @Override
++    @SuppressWarnings("IdentityConversion")
+     protected Map<String, String> create(Entry<String, String>[] entries) {
+       Map<String, String> builder = Maps.newLinkedHashMap();
+       for (Entry<String, String> entry : entries) {
+@@ -72,6 +73,7 @@ public class MapGenerators {
+ 
+   public static class ImmutableMapCopyOfEntriesGenerator extends TestStringMapGenerator {
+     @Override
++    @SuppressWarnings("IdentityConversion")
+     protected Map<String, String> create(Entry<String, String>[] entries) {
+       return ImmutableMap.copyOf(Arrays.asList(entries));
+     }
+@@ -163,6 +165,7 @@ public class MapGenerators {
+ 
+   public static class ImmutableMapCopyOfEnumMapGenerator extends TestEnumMapGenerator {
+     @Override
++    @SuppressWarnings("IdentityConversion")
+     protected Map<AnEnum, String> create(Entry<AnEnum, String>[] entries) {
+       EnumMap<AnEnum, String> map = new EnumMap<>(AnEnum.class);
+       for (Entry<AnEnum, String> entry : entries) {
+--- a/guava-testlib/src/com/google/common/collect/testing/google/MultimapTestSuiteBuilder.java
++++ b/guava-testlib/src/com/google/common/collect/testing/google/MultimapTestSuiteBuilder.java
+@@ -270,6 +270,7 @@ public class MultimapTestSuiteBuilder<K, V, M extends Multimap<K, V>>
+     return derivedFeatures;
+   }
+ 
++  @SuppressWarnings("ImmutableListMultimapBuilder")
+   private static final ImmutableMultimap<Feature<?>, Feature<?>> GET_FEATURE_MAP =
+       ImmutableMultimap.<Feature<?>, Feature<?>>builder()
+           .put(
+--- a/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
++++ b/guava-testlib/test/com/google/common/testing/ClassSanityTesterTest.java
+@@ -1317,7 +1317,7 @@ public class ClassSanityTesterTest extends TestCase {
+   private enum EnumFailsToCheckNull {
+     A;
+ 
+-    @SuppressWarnings("unused")
++    @SuppressWarnings({"EmptyMethod", "unused"})
+     public void failToCheckNull(String s) {}
+   }
+ 
+--- a/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
++++ b/guava-testlib/test/com/google/common/testing/NullPointerTesterTest.java
+@@ -837,6 +837,7 @@ public class NullPointerTesterTest extends TestCase {
+ 
+   @SuppressWarnings("unused") // for NullPointerTester
+   private static class ClassThatFailsToThrowForStatic {
++    @SuppressWarnings("EmptyMethod")
+     static void staticOneArg(String s) {}
+   }
+ 
+@@ -852,6 +853,7 @@ public class NullPointerTesterTest extends TestCase {
+ 
+   private static class SubclassThatTriesToOverrideBadStaticMethod
+       extends ClassThatFailsToThrowForStatic {
++    @SuppressWarnings("EmptyMethod")
+     static void staticOneArg(String unused) {}
+   }
+ 
+--- a/guava-tests/test/com/google/common/base/PredicatesTest.java
++++ b/guava-tests/test/com/google/common/base/PredicatesTest.java
+@@ -47,6 +47,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
+  */
+ @ElementTypesAreNonnullByDefault
+ @GwtCompatible(emulated = true)
++@SuppressWarnings("PatternRules")
+ public class PredicatesTest extends TestCase {
+   private static final Predicate<@Nullable Integer> TRUE = Predicates.alwaysTrue();
+   private static final Predicate<@Nullable Integer> FALSE = Predicates.alwaysFalse();
+--- a/guava-tests/test/com/google/common/collect/EnumBiMapTest.java
++++ b/guava-tests/test/com/google/common/collect/EnumBiMapTest.java
+@@ -140,6 +140,7 @@ public class EnumBiMapTest extends TestCase {
+     assertEquals(Currency.DOLLAR, bimap.inverse().get(Country.CANADA));
+   }
+ 
++  @SuppressWarnings("ImmutableMapOf")
+   public void testCreateFromMap() {
+     /* Test with non-empty Map. */
+     Map<Currency, Country> map =
+--- a/guava-tests/test/com/google/common/collect/EnumHashBiMapTest.java
++++ b/guava-tests/test/com/google/common/collect/EnumHashBiMapTest.java
+@@ -133,6 +133,7 @@ public class EnumHashBiMapTest extends TestCase {
+     assertEquals(Currency.DOLLAR, bimap.inverse().get("dollar"));
+   }
+ 
++  @SuppressWarnings("ImmutableMapOf")
+   public void testCreateFromMap() {
+     /* Test with non-empty Map. */
+     Map<Currency, String> map =
+--- a/guava-tests/test/com/google/common/collect/ImmutableBiMapTest.java
++++ b/guava-tests/test/com/google/common/collect/ImmutableBiMapTest.java
+@@ -581,6 +581,7 @@ public class ImmutableBiMapTest extends TestCase {
+     assertMapEquals(bimap.inverse(), 1, "one", 2, "two");
+   }
+ 
++  @SuppressWarnings("ImmutableMapBuilder")
+   public void testFromImmutableMap() {
+     ImmutableBiMap<String, Integer> bimap =
+         ImmutableBiMap.copyOf(
+@@ -595,6 +596,7 @@ public class ImmutableBiMapTest extends TestCase {
+     assertMapEquals(bimap.inverse(), 1, "one", 2, "two", 3, "three", 4, "four", 5, "five");
+   }
+ 
++  @SuppressWarnings("ImmutableMapBuilder")
+   public void testDuplicateValues() {
+     ImmutableMap<String, Integer> map =
+         new ImmutableMap.Builder<String, Integer>()
+--- a/guava-tests/test/com/google/common/collect/ImmutableMultimapTest.java
++++ b/guava-tests/test/com/google/common/collect/ImmutableMultimapTest.java
+@@ -39,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
+  */
+ @GwtCompatible(emulated = true)
+ @ElementTypesAreNonnullByDefault
++@SuppressWarnings({"ImmutableListMultimapBuilder", "MapEntry"})
+ public class ImmutableMultimapTest extends TestCase {
+ 
+   @SuppressWarnings("JUnitIncompatibleType")
+--- a/guava-tests/test/com/google/common/collect/ImmutableSetMultimapTest.java
++++ b/guava-tests/test/com/google/common/collect/ImmutableSetMultimapTest.java
+@@ -201,6 +201,7 @@ public class ImmutableSetMultimapTest extends TestCase {
+     assertEquals(ImmutableSet.of(1), multimap.get("one"));
+   }
+ 
++  @SuppressWarnings({"ImmutableSetMultimapBuilder", "MapEntry"})
+   public void testBuilder_withImmutableEntryAndNullContents() {
+     Builder<String, Integer> builder = new Builder<>();
+     try {
+@@ -711,6 +712,7 @@ public class ImmutableSetMultimapTest extends TestCase {
+ 
+   @J2ktIncompatible
+   @GwtIncompatible // SerializableTester
++  @SuppressWarnings("ImmutableSetMultimapBuilder")
+   public void testSortedSerialization() {
+     Multimap<String, Integer> multimap =
+         new ImmutableSetMultimap.Builder<String, Integer>()
+--- a/guava-tests/test/com/google/common/collect/ImmutableSortedMapTest.java
++++ b/guava-tests/test/com/google/common/collect/ImmutableSortedMapTest.java
+@@ -622,6 +622,7 @@ public class ImmutableSortedMapTest extends TestCase {
+     assertEquals(Ordering.<String>natural().reverse(), map.comparator());
+   }
+ 
++  @SuppressWarnings("ImmutableSortedMapBuilder")
+   public void testBuilderComparator() {
+     Comparator<String> comparator = Ordering.<String>natural().reverse();
+     ImmutableSortedMap<String, Integer> map =
+--- a/guava-tests/test/com/google/common/collect/IteratorsTest.java
++++ b/guava-tests/test/com/google/common/collect/IteratorsTest.java
+@@ -255,6 +255,7 @@ public class IteratorsTest extends TestCase {
+   }
+ 
+   @GwtIncompatible // Iterators.toArray(Iterator, Class)
++  @SuppressWarnings("ImmutableListOf")
+   public void testToArrayEmpty() {
+     Iterator<String> iterator = Collections.<String>emptyList().iterator();
+     String[] array = Iterators.toArray(iterator, String.class);
+@@ -300,6 +301,7 @@ public class IteratorsTest extends TestCase {
+     assertEquals(expected, actual);
+   }
+ 
++  @SuppressWarnings("ImmutableListOf")
+   public void testFilterNothing() {
+     Iterator<String> unfiltered = Collections.<String>emptyList().iterator();
+     Iterator<String> filtered =
+@@ -1295,6 +1297,7 @@ public class IteratorsTest extends TestCase {
+     assertEquals("[hello, null, world]", Iterators.toString(iterator));
+   }
+ 
++  @SuppressWarnings("ImmutableListOf")
+   public void testToStringEmptyIterator() {
+     Iterator<String> iterator = Collections.<String>emptyList().iterator();
+     assertEquals("[]", Iterators.toString(iterator));
+--- a/guava-tests/test/com/google/common/collect/MultimapsTest.java
++++ b/guava-tests/test/com/google/common/collect/MultimapsTest.java
+@@ -74,6 +74,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
+  */
+ @GwtCompatible(emulated = true)
+ @ElementTypesAreNonnullByDefault
++@SuppressWarnings("ImmutableListMultimapBuilder")
+ public class MultimapsTest extends TestCase {
+ 
+   private static final Comparator<Integer> INT_COMPARATOR =
+--- a/guava-tests/test/com/google/common/collect/SimpleAbstractMultisetTest.java
++++ b/guava-tests/test/com/google/common/collect/SimpleAbstractMultisetTest.java
+@@ -68,6 +68,7 @@ public class SimpleAbstractMultisetTest extends TestCase {
+     return suite;
+   }
+ 
++  @SuppressWarnings("ImmutableMultisetBuilder")
+   public void testFastAddAllMultiset() {
+     final AtomicInteger addCalls = new AtomicInteger();
+     Multiset<String> multiset =
+--- a/guava-tests/test/com/google/common/io/SourceSinkFactories.java
++++ b/guava-tests/test/com/google/common/io/SourceSinkFactories.java
+@@ -297,6 +297,7 @@ public class SourceSinkFactories {
+ 
+     private final ThreadLocal<File> fileThreadLocal = new ThreadLocal<>();
+ 
++    @SuppressWarnings("FilesCreateTempFileToFile")
+     protected File createFile() throws IOException {
+       File file = File.createTempFile("SinkSourceFile", "txt");
+       fileThreadLocal.set(file);
+--- a/guava/src/com/google/common/base/Charsets.java
++++ b/guava/src/com/google/common/base/Charsets.java
+@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
+  */
+ @GwtCompatible(emulated = true)
+ @ElementTypesAreNonnullByDefault
++@SuppressWarnings("StaticImport")
+ public final class Charsets {
+   private Charsets() {}
+ 
+--- a/guava/src/com/google/common/base/Preconditions.java
++++ b/guava/src/com/google/common/base/Preconditions.java
+@@ -115,6 +115,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
+  */
+ @GwtCompatible
+ @ElementTypesAreNonnullByDefault
++@SuppressWarnings("PreconditionsRules")
+ public final class Preconditions {
+   private Preconditions() {}
+ 
+--- a/guava/src/com/google/common/collect/ImmutableList.java
++++ b/guava/src/com/google/common/collect/ImmutableList.java
+@@ -271,6 +271,7 @@ public abstract class ImmutableList<E> extends ImmutableCollection<E>
+    *
+    * @throws NullPointerException if {@code elements} contains a null element
+    */
++  @SuppressWarnings("ImmutableListBuilder")
+   public static <E> ImmutableList<E> copyOf(Iterator<? extends E> elements) {
+     // We special-case for 0 or 1 elements, but going further is madness.
+     if (!elements.hasNext()) {
+--- a/guava/src/com/google/common/collect/ImmutableMultiset.java
++++ b/guava/src/com/google/common/collect/ImmutableMultiset.java
+@@ -161,6 +161,7 @@ public abstract class ImmutableMultiset<E> extends ImmutableMultisetGwtSerializa
+    * @throws NullPointerException if any element is null
+    * @since 6.0 (source-compatible since 2.0)
+    */
++  @SuppressWarnings("ImmutableMultisetBuilder")
+   public static <E> ImmutableMultiset<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E... others) {
+     return new Builder<E>().add(e1).add(e2).add(e3).add(e4).add(e5).add(e6).add(others).build();
+   }
+@@ -451,6 +452,7 @@ public abstract class ImmutableMultiset<E> extends ImmutableMultisetGwtSerializa
+    * Returns a new builder. The generated builder is equivalent to the builder created by the {@link
+    * Builder} constructor.
+    */
++  @SuppressWarnings("ImmutableMultisetBuilder")
+   public static <E> Builder<E> builder() {
+     return new Builder<>();
+   }
+--- a/guava/src/com/google/common/collect/ImmutableSet.java
++++ b/guava/src/com/google/common/collect/ImmutableSet.java
+@@ -230,6 +230,7 @@ public abstract class ImmutableSet<E> extends ImmutableCollection<E> implements
+    *
+    * @throws NullPointerException if any of {@code elements} is null
+    */
++  @SuppressWarnings("ImmutableSetBuilder")
+   public static <E> ImmutableSet<E> copyOf(Iterator<? extends E> elements) {
+     // We special-case for 0 or 1 elements, but anything further is madness.
+     if (!elements.hasNext()) {
+--- a/guava/src/com/google/common/collect/ImmutableSetMultimap.java
++++ b/guava/src/com/google/common/collect/ImmutableSetMultimap.java
+@@ -451,6 +451,7 @@ public class ImmutableSetMultimap<K, V> extends ImmutableMultimap<K, V>
+    * @throws NullPointerException if any key, value, or entry is null
+    * @since 19.0
+    */
++  @SuppressWarnings("ImmutableSetMultimapBuilder")
+   public static <K, V> ImmutableSetMultimap<K, V> copyOf(
+       Iterable<? extends Entry<? extends K, ? extends V>> entries) {
+     return new Builder<K, V>().putAll(entries).build();
+--- a/guava/src/com/google/common/collect/Iterables.java
++++ b/guava/src/com/google/common/collect/Iterables.java
+@@ -1040,6 +1040,7 @@ public final class Iterables {
+    *
+    * @return {@code true} if the iterable contains no elements
+    */
++  @SuppressWarnings("IterableIsEmpty")
+   public static boolean isEmpty(Iterable<?> iterable) {
+     if (iterable instanceof Collection) {
+       return ((Collection<?>) iterable).isEmpty();
+--- a/guava/src/com/google/common/collect/RegularImmutableSortedSet.java
++++ b/guava/src/com/google/common/collect/RegularImmutableSortedSet.java
+@@ -324,6 +324,7 @@ final class RegularImmutableSortedSet<E> extends ImmutableSortedSet<E> {
+   }
+ 
+   @Override
++  @SuppressWarnings("StaticImport")
+   ImmutableSortedSet<E> createDescendingSet() {
+     Comparator<? super E> reversedOrder = Collections.reverseOrder(comparator);
+     return isEmpty()
+--- a/guava/src/com/google/common/collect/Sets.java
++++ b/guava/src/com/google/common/collect/Sets.java
+@@ -804,7 +804,7 @@ public final class Sets {
+       }
+ 
+       @Override
+-      @SuppressWarnings({"nullness", "unchecked"}) // see supertype
++      @SuppressWarnings({"nullness", "unchecked", "ImmutableSetBuilder"}) // see supertype
+       public ImmutableSet<@NonNull E> immutableCopy() {
+         ImmutableSet.Builder<@NonNull E> builder =
+             new ImmutableSet.Builder<@NonNull E>()
+--- a/guava/src/com/google/common/graph/DirectedNetworkConnections.java
++++ b/guava/src/com/google/common/graph/DirectedNetworkConnections.java
+@@ -44,6 +44,7 @@ final class DirectedNetworkConnections<N, E> extends AbstractDirectedNetworkConn
+         HashBiMap.<E, N>create(EXPECTED_DEGREE), HashBiMap.<E, N>create(EXPECTED_DEGREE), 0);
+   }
+ 
++  @SuppressWarnings("IdentityConversion")
+   static <N, E> DirectedNetworkConnections<N, E> ofImmutable(
+       Map<E, N> inEdges, Map<E, N> outEdges, int selfLoopCount) {
+     return new DirectedNetworkConnections<>(
+--- a/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
++++ b/guava/src/com/google/common/graph/UndirectedNetworkConnections.java
+@@ -43,6 +43,7 @@ final class UndirectedNetworkConnections<N, E> extends AbstractUndirectedNetwork
+     return new UndirectedNetworkConnections<>(HashBiMap.<E, N>create(EXPECTED_DEGREE));
+   }
+ 
++  @SuppressWarnings("IdentityConversion")
+   static <N, E> UndirectedNetworkConnections<N, E> ofImmutable(Map<E, N> incidentEdges) {
+     return new UndirectedNetworkConnections<>(ImmutableBiMap.copyOf(incidentEdges));
+   }
+--- a/pom.xml
++++ b/pom.xml
+@@ -23,7 +23,7 @@
+     <truth.version>1.4.4</truth.version>
+     <jsr305.version>3.0.2</jsr305.version>
+     <checker.version>3.43.0</checker.version>
+-    <errorprone.version>2.28.0</errorprone.version>
++    <errorprone.version>2.35.1</errorprone.version>
+     <j2objc.version>3.0.0</j2objc.version>
+     <!-- Empty for all JDKs but 9-12 -->
+     <maven-javadoc-plugin.additionalJOptions></maven-javadoc-plugin.additionalJOptions>
+@@ -155,7 +155,7 @@
+                    be passed as part of the same <arg> as -Xplugin:ErrorProne,
+                    and I gave up trying to figure out how to do that for test
+                    compilation only. -->
+-              <arg>-Xplugin:ErrorProne -Xep:NullArgumentForNonNullParameter:OFF -Xep:Java8ApiChecker:ERROR</arg>
++              <arg>-Xplugin:ErrorProne -Xep:NullArgumentForNonNullParameter:OFF -Xep:Java8ApiChecker:ERROR ${error-prone.configuration-args}</arg>
+               <!-- https://github.com/google/error-prone/blob/f8e33bc460be82ab22256a7ef8b979d7a2cacaba/docs/installation.md#jdk-16 -->
+               <!-- TODO(cpovirk): Use .mvn/jvm.config instead (per
+                    https://errorprone.info/docs/installation#maven). -->
+@@ -174,7 +174,17 @@
+               <path>
+                 <groupId>com.google.errorprone</groupId>
+                 <artifactId>error_prone_core</artifactId>
+-                <version>2.23.0</version>
++                <version>${error-prone.version}</version>
++              </path>
++              <path>
++                <groupId>tech.picnic.error-prone-support</groupId>
++                <artifactId>error-prone-contrib</artifactId>
++                <version>${error-prone-support.version}</version>
++              </path>
++              <path>
++                <groupId>tech.picnic.error-prone-support</groupId>
++                <artifactId>refaster-runner</artifactId>
++                <version>${error-prone-support.version}</version>
+               </path>
+             </annotationProcessorPaths>
+             <!-- Fork because we need args like add-exports. (But see the TODO above about .mvn/jvm.config.) -->
+@@ -281,6 +291,7 @@
+             </dependency>
+           </dependencies>
+           <configuration>
++            <skip>true</skip>
+             <annotations>com.google.common.base.IgnoreJRERequirement,com.google.common.cache.IgnoreJRERequirement,com.google.common.collect.IgnoreJRERequirement,com.google.common.hash.IgnoreJRERequirement,com.google.common.io.IgnoreJRERequirement,com.google.common.reflect.IgnoreJRERequirement,com.google.common.testing.IgnoreJRERequirement</annotations>
+             <checkTestClasses>true</checkTestClasses>
+             <signature>
