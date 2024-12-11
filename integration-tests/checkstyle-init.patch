@@ -13,7 +13,12 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2420,6 +2426,8 @@
+@@ -2417,9 +2423,13 @@
+                   <compilerArgs>
+                     <arg>-Xpkginfo:always</arg>
+                     <arg>-XDcompilePolicy=simple</arg>
++                    <!-- XXX: Drop this flag once the project uses Error Prone 2.36.0+ by default. -->
++                    <arg>--should-stop=ifError=FLOW</arg>
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -22,7 +27,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2432,6 +2440,11 @@
+@@ -2432,6 +2442,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -34,8 +39,12 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2474,9 +2487,10 @@
+@@ -2472,11 +2487,14 @@
+                   <compilerArgs>
+                     <arg>-Xpkginfo:always</arg>
                      <arg>-XDcompilePolicy=simple</arg>
++                    <!-- XXX: Drop this flag once the project uses Error Prone 2.36.0+ by default. -->
++                    <arg>--should-stop=ifError=FLOW</arg>
                      <arg>
                        -Xplugin:ErrorProne \
 -                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
@@ -46,7 +55,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2489,6 +2503,11 @@
+@@ -2489,6 +2507,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
