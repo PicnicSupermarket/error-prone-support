@@ -149,7 +149,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
      * If all overloads have a single parameter, and at least one of them is a varargs method, then
      * we assume that unwrapping the iterable argument will cause a suitable overload to be invoked.
      * (Note that there may be multiple varargs overloads, either with different parameter types, or
-     * due to method overriding; this check is does not attempt to determine which exact method or
+     * due to method overriding; this check does not attempt to determine which exact method or
      * overload will be invoked as a result of the suggested simplification.)
      *
      * Note that this is a (highly!) imperfect heuristic, but it is sufficient to prevent e.g.
