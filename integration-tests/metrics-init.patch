@@ -52,16 +52,18 @@
      <profiles>
          <profile>
              <id>jdk8</id>
-@@ -218,7 +239,7 @@
+@@ -218,7 +239,9 @@
                              <compilerArgs>
                                  <arg>-Xlint:all</arg>
                                  <arg>-XDcompilePolicy=simple</arg>
 -                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
++                                <!-- XXX: Drop this flag once the project uses Error Prone 2.36.0+ by default. -->
++                                <arg>--should-stop=ifError=FLOW</arg>
 +                                <arg>-Xplugin:ErrorProne ${error-prone.configuration-args}</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-@@ -229,12 +250,24 @@
+@@ -229,12 +252,24 @@
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                                  <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                                  <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
@@ -87,7 +89,7 @@
                                  </path>
                              </annotationProcessorPaths>
                          </configuration>
-@@ -364,7 +397,7 @@
+@@ -364,7 +399,7 @@
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-compiler-plugin</artifactId>
                  <configuration>
