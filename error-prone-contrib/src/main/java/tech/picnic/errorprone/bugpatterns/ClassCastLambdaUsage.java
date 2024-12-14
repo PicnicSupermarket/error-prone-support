@@ -54,9 +54,9 @@ public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpr
         || type.isPrimitive()
         || type.getKind() == TypeKind.TYPEVAR) {
       /*
-       * The method reference syntax does not support casting to parameterized types. Additionally,
-       * `Class#cast` does not support the same range of type conversions between (boxed) primitive
-       * types as the cast operator.
+       * The method reference syntax does not support casting to parameterized types, and type
+       * variables aren't supported either. Additionally, `Class#cast` does not support the same
+       * range of type conversions between (boxed) primitive types as the cast operator.
        */
       // XXX: Depending on the declared type of the value being cast, in some cases we _can_ rewrite
       // primitive casts. Add support for this.
