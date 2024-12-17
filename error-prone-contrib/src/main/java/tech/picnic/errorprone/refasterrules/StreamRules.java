@@ -297,6 +297,18 @@ final class StreamRules {
     }
   }
 
+  static final class StreamMapToValuesFromMap<K, V> {
+    @BeforeTemplate
+    Stream<V> before(Stream<K> stream, Map<K, V> map) {
+      return stream.filter(map::containsKey).map(map::get);
+    }
+
+    @AfterTemplate
+    Stream<V> after(Stream<K> stream, Map<K, V> map) {
+      return stream.map(map::get).filter(Objects::nonNull);
+    }
+  }
+
   static final class StreamMin<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
