@@ -141,7 +141,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).findFirst().isPresent();
   }
 
-  Stream<String> testStreamMapToValuesFromMap() {
+  Stream<String> testStreamMapFilter() {
     ImmutableMap<String, String> map = ImmutableMap.of("foo", "bar");
     return Stream.of("foo").filter(map::containsKey).map(map::get);
   }

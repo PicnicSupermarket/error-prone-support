@@ -297,7 +297,12 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMapToValuesFromMap<K, V> {
+  /**
+   * When using {@link Map#get(Object)} in a {@link Stream#map(Function)} operation, prefer
+   * filtering null values after the map operation with {@link Objects#nonNull(Object)} over
+   * filtering beforehand with {@link Map#containsKey(Object)} to avoid a double lookup.
+   */
+  static final class StreamMapFilter<K, V> {
     @BeforeTemplate
     Stream<V> before(Stream<K> stream, Map<K, V> map) {
       return stream.filter(map::containsKey).map(map::get);
