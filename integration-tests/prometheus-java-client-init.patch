@@ -1,0 +1,146 @@
+--- a/pom.xml
++++ b/pom.xml
+@@ -19,11 +19,11 @@
+         <automatic.module.name>--module-name-need-to-be-overriden--</automatic.module.name>
+         <junit-jupiter.version>5.11.3</junit-jupiter.version>
+         <otel.instrumentation.version>2.10.0-alpha</otel.instrumentation.version>
+-        <java.version>8</java.version>
++        <java.version>11</java.version>
+         <jacoco.line-coverage>0.70</jacoco.line-coverage>
+         <checkstyle.skip>false</checkstyle.skip>
+         <coverage.skip>false</coverage.skip>
+-        <warnings>-Werror</warnings>
++      <!--  <warnings>-Werror</warnings>-->
+     </properties>
+ 
+     <licenses>
+@@ -128,7 +128,6 @@
+         <dependency>
+             <groupId>com.google.guava</groupId>
+             <artifactId>guava</artifactId>
+-            <scope>test</scope>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+@@ -369,14 +368,24 @@
+                             -Xep:MissingSummary:OFF
+                             -Xep:LongDoubleConversion:OFF
+                             -Xep:StringSplitter:OFF
+-                            -XepExcludedPaths:.*/generated/.*
++                            ${error-prone.configuration-args}
+                         </arg>
+                     </compilerArgs>
+                     <annotationProcessorPaths>
+                         <path>
+                             <groupId>com.google.errorprone</groupId>
+                             <artifactId>error_prone_core</artifactId>
+-                            <version>2.36.0</version>
++                            <version>${error-prone.version}</version>
++                        </path>
++                        <path>
++                            <groupId>tech.picnic.error-prone-support</groupId>
++                            <artifactId>error-prone-contrib</artifactId>
++                            <version>${error-prone-support.version}</version>
++                        </path>
++                        <path>
++                            <groupId>tech.picnic.error-prone-support</groupId>
++                            <artifactId>refaster-runner</artifactId>
++                            <version>${error-prone-support.version}</version>
+                         </path>
+                         <!-- Other annotation processors go here.
+ 
+--- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
++++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
+@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
+ 
+ class PrometheusInstrumentationScopeTest {
+ 
++  @SuppressWarnings("AssertThatThrownBy")
+   @Test
+   void loadInstrumentationScopeInfo() {
+     assertThatExceptionOfType(IllegalStateException.class)
+--- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
++++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
+@@ -7,35 +7,36 @@ import org.junit.jupiter.api.Test;
+ 
+ class MetricSnapshotTest {
+ 
++  @SuppressWarnings("AssertThatThrownBy")
+   @Test
+   public void testDuplicateLabels() {
+     assertThatExceptionOfType(DuplicateLabelsException.class)
+-        .isThrownBy(
+-            () ->
+-                CounterSnapshot.builder()
+-                    .name("events")
+-                    .dataPoint(
+-                        CounterSnapshot.CounterDataPointSnapshot.builder()
+-                            .labels(Labels.of("path", "/hello", "status", "200"))
+-                            .value(1.0)
+-                            .build())
+-                    .dataPoint(
+-                        CounterSnapshot.CounterDataPointSnapshot.builder()
+-                            .labels(Labels.of("path", "/world", "status", "200"))
+-                            .value(2.0)
+-                            .build())
+-                    .dataPoint(
+-                        CounterSnapshot.CounterDataPointSnapshot.builder()
+-                            .labels(Labels.of("status", "200", "path", "/hello"))
+-                            .value(3.0)
+-                            .build())
+-                    .build())
+-        .satisfies(
+-            e -> {
+-              assertThat(e.getMetadata().getName()).isEqualTo("events");
+-              assertThat((Iterable<? extends Label>) e.getLabels())
+-                  .isEqualTo(Labels.of("path", "/hello", "status", "200"));
+-            });
++      .isThrownBy(
++        () ->
++          CounterSnapshot.builder()
++            .name("events")
++            .dataPoint(
++              CounterSnapshot.CounterDataPointSnapshot.builder()
++                .labels(Labels.of("path", "/hello", "status", "200"))
++                .value(1.0)
++                .build())
++            .dataPoint(
++              CounterSnapshot.CounterDataPointSnapshot.builder()
++                .labels(Labels.of("path", "/world", "status", "200"))
++                .value(2.0)
++                .build())
++            .dataPoint(
++              CounterSnapshot.CounterDataPointSnapshot.builder()
++                .labels(Labels.of("status", "200", "path", "/hello"))
++                .value(3.0)
++                .build())
++            .build())
++      .satisfies(
++        e -> {
++          assertThat(e.getMetadata().getName()).isEqualTo("events");
++          assertThat((Iterable<? extends Label>) e.getLabels())
++            .isEqualTo(Labels.of("path", "/hello", "status", "200"));
++        });
+   }
+ 
+   @Test
+@@ -47,6 +48,8 @@ class MetricSnapshotTest {
+   @Test
+   public void testNullData() {
+     assertThatExceptionOfType(NullPointerException.class)
+-        .isThrownBy(() -> new CounterSnapshot(new MetricMetadata("test"), null));
++      .isThrownBy(() -> new CounterSnapshot(new MetricMetadata("test"), null));
+   }
+ }
++
++
+--- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
++++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
+@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+ 
+ import org.junit.jupiter.api.Test;
+ 
++@SuppressWarnings("JUnitMethodDeclaration" /* Fix bug with star import. */)
+ class PrometheusNamingTest {
+ 
+   @Test
