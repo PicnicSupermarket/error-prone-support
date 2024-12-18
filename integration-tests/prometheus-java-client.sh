@@ -9,7 +9,7 @@ revision='v1.3.5'
 additional_build_flags=''
 additional_source_directories=''
 # XXX: Minimize the diff by including
-# `-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=LOGGER` once such
+# `-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=logger` once such
 # flags are supported in patch mode. See
 # https://github.com/google/error-prone/pull/4699.
 shared_error_prone_flags='-XepExcludedPaths:.*/generated/.*'
