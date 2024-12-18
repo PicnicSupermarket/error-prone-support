@@ -1,8 +1,6 @@
-diff --git a/pom.xml b/pom.xml
-index 2f9aa6df..470fe89c 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -19,11 +19,11 @@
+@@ -19,7 +19,7 @@
          <automatic.module.name>--module-name-need-to-be-overriden--</automatic.module.name>
          <junit-jupiter.version>5.11.3</junit-jupiter.version>
          <otel.instrumentation.version>2.10.0-alpha</otel.instrumentation.version>
@@ -11,11 +9,6 @@ index 2f9aa6df..470fe89c 100644
          <jacoco.line-coverage>0.70</jacoco.line-coverage>
          <checkstyle.skip>false</checkstyle.skip>
          <coverage.skip>false</coverage.skip>
--        <warnings>-Werror</warnings>
-+      <!--  <warnings>-Werror</warnings>-->
-     </properties>
- 
-     <licenses>
 @@ -128,7 +128,6 @@
          <dependency>
              <groupId>com.google.guava</groupId>
@@ -24,7 +17,15 @@ index 2f9aa6df..470fe89c 100644
          </dependency>
          <dependency>
              <groupId>org.slf4j</groupId>
-@@ -369,14 +368,24 @@
+@@ -360,7 +359,6 @@
+                     <showWarnings>true</showWarnings>
+                     <compilerArgs>
+                         <arg>-Xlint:all,-serial,-processing,-options</arg>
+-                        <arg>${warnings}</arg>
+                         <arg>--should-stop=ifError=FLOW</arg>
+                         <arg>-XDcompilePolicy=simple</arg>
+                         <arg>
+@@ -369,14 +367,24 @@
                              -Xep:MissingSummary:OFF
                              -Xep:LongDoubleConversion:OFF
                              -Xep:StringSplitter:OFF
@@ -51,8 +52,6 @@ index 2f9aa6df..470fe89c 100644
                          </path>
                          <!-- Other annotation processors go here.
  
-diff --git a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
-index e1b97e04..27c1f990 100644
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
 @@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
@@ -64,8 +63,6 @@ index e1b97e04..27c1f990 100644
    @Test
    void loadInstrumentationScopeInfo() {
      assertThatExceptionOfType(IllegalStateException.class)
-diff --git a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
-index 2c1c04bb..fcf66246 100644
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
 @@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
@@ -82,8 +79,6 @@ index 2c1c04bb..fcf66246 100644
  }
 +
 +
-diff --git a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
-index fad55e0a..949102ee 100644
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
 @@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
