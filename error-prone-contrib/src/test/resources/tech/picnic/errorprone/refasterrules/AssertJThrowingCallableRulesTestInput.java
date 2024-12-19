@@ -31,6 +31,13 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionRootCauseHasMessage() {
+    return assertThatIllegalArgumentException()
+        .isThrownBy(() -> {})
+        .havingRootCause()
+        .withMessage("foo");
+  }
+
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessageParameters() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
@@ -59,6 +66,13 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionRootCauseHasMessage() {
+    return assertThatIllegalStateException()
+        .isThrownBy(() -> {})
+        .havingRootCause()
+        .withMessage("foo");
+  }
+
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageParameters() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
@@ -81,6 +95,13 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessage() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessage("foo");
+  }
+
+  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionRootCauseHasMessage() {
+    return assertThatNullPointerException()
+        .isThrownBy(() -> {})
+        .havingRootCause()
+        .withMessage("foo");
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageParameters() {
@@ -107,6 +128,10 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo");
   }
 
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionRootCauseHasMessage() {
+    return assertThatIOException().isThrownBy(() -> {}).havingRootCause().withMessage("foo");
+  }
+
   AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageParameters() {
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
@@ -130,6 +155,13 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
   AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessage() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
+        .withMessage("foo");
+  }
+
+  AbstractObjectAssert<?, ?> testAssertThatThrownByRootCauseHasMessage() {
+    return assertThatExceptionOfType(IllegalArgumentException.class)
+        .isThrownBy(() -> {})
+        .havingRootCause()
         .withMessage("foo");
   }
 
