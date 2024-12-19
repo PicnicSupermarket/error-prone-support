@@ -1,0 +1,111 @@
+--- a/pom.xml
++++ b/pom.xml
+@@ -19,7 +19,7 @@
+         <automatic.module.name>--module-name-need-to-be-overriden--</automatic.module.name>
+         <junit-jupiter.version>5.11.3</junit-jupiter.version>
+         <otel.instrumentation.version>2.10.0-alpha</otel.instrumentation.version>
+-        <java.version>8</java.version>
++        <java.version>11</java.version>
+         <jacoco.line-coverage>0.70</jacoco.line-coverage>
+         <checkstyle.skip>false</checkstyle.skip>
+         <coverage.skip>false</coverage.skip>
+@@ -128,7 +128,6 @@
+         <dependency>
+             <groupId>com.google.guava</groupId>
+             <artifactId>guava</artifactId>
+-            <scope>test</scope>
+         </dependency>
+         <dependency>
+             <groupId>org.slf4j</groupId>
+@@ -360,7 +359,6 @@
+                     <showWarnings>true</showWarnings>
+                     <compilerArgs>
+                         <arg>-Xlint:all,-serial,-processing,-options</arg>
+-                        <arg>${warnings}</arg>
+                         <arg>--should-stop=ifError=FLOW</arg>
+                         <arg>-XDcompilePolicy=simple</arg>
+                         <arg>
+@@ -369,14 +367,24 @@
+                             -Xep:MissingSummary:OFF
+                             -Xep:LongDoubleConversion:OFF
+                             -Xep:StringSplitter:OFF
+-                            -XepExcludedPaths:.*/generated/.*
++                            ${error-prone.configuration-args}
+                         </arg>
+                     </compilerArgs>
+                     <annotationProcessorPaths>
+                         <path>
+                             <groupId>com.google.errorprone</groupId>
+                             <artifactId>error_prone_core</artifactId>
+-                            <version>2.36.0</version>
++                            <version>${error-prone.version}</version>
++                        </path>
++                        <path>
++                            <groupId>tech.picnic.error-prone-support</groupId>
++                            <artifactId>error-prone-contrib</artifactId>
++                            <version>${error-prone-support.version}</version>
++                        </path>
++                        <path>
++                            <groupId>tech.picnic.error-prone-support</groupId>
++                            <artifactId>refaster-runner</artifactId>
++                            <version>${error-prone-support.version}</version>
+                         </path>
+                         <!-- Other annotation processors go here.
+ 
+--- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
++++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
+@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
+ 
+ class PrometheusInstrumentationScopeTest {
+ 
++  // XXX: Introduce support for rewriting `assertThatThrownBy#havingRootCause()`.
++  @SuppressWarnings("AssertThatThrownBy")
+   @Test
+   void loadInstrumentationScopeInfo() {
+     assertThatExceptionOfType(IllegalStateException.class)
+--- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/registry/MetricNameFilter.java
++++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/registry/MetricNameFilter.java
+@@ -8,6 +8,7 @@ import java.util.Collection;
+ import java.util.function.Predicate;
+ 
+ /** Filter samples (i.e. time series) by name. */
++@SuppressWarnings("ExplicitArgumentEnumeration" /* False positive because of overloads. */)
+ public class MetricNameFilter implements Predicate<String> {
+ 
+   /** For convenience, a filter that allows all names. */
+--- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Quantiles.java
++++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Quantiles.java
+@@ -41,6 +41,7 @@ public class Quantiles implements Iterable<Quantile> {
+    * Create a new Quantiles instance. You can either create Quantiles with one of the static {@code
+    * Quantiles.of(...)} methods, or you can use the {@link Quantiles#builder()}.
+    */
++  @SuppressWarnings("ExplicitArgumentEnumeration" /* False positive because of overloads. */)
+   public static Quantiles of(Quantile... quantiles) {
+     return of(Arrays.asList(quantiles));
+   }
+--- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
++++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
+@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
+ 
+ class MetricSnapshotTest {
+ 
++  @SuppressWarnings("AssertThatThrownBy")
+   @Test
+   public void testDuplicateLabels() {
+     assertThatExceptionOfType(DuplicateLabelsException.class)
+@@ -50,3 +51,5 @@ class MetricSnapshotTest {
+         .isThrownBy(() -> new CounterSnapshot(new MetricMetadata("test"), null));
+   }
+ }
++
++
+--- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
++++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
+@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+ 
+ import org.junit.jupiter.api.Test;
+ 
++@SuppressWarnings("JUnitMethodDeclaration")
+ class PrometheusNamingTest {
+ 
+   @Test
