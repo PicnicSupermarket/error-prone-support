@@ -2953,7 +2953,7 @@
      Histogram histogram =
          Histogram.builder()
              .name("test")
-@@ -1313,47 +1302,47 @@ class HistogramTest {
+@@ -1313,47 +1302,46 @@ class HistogramTest {
      List<Double> upperBounds =
          getData(histogram).getClassicBuckets().stream()
              .map(ClassicHistogramBucket::getUpperBound)
@@ -2975,9 +2975,10 @@
 +            .collect(toImmutableList());
      assertThat(upperBounds)
 -        .isEqualTo(
-+        .containsExactlyElementsOf(
-             Arrays.asList(
-                 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, Double.POSITIVE_INFINITY));
+-            Arrays.asList(
+-                0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, Double.POSITIVE_INFINITY));
++        .containsExactly(
++            0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, Double.POSITIVE_INFINITY);
    }
  
    @Test
@@ -3016,7 +3017,7 @@
      assertThat(getData(noLabels).getSum()).isEqualTo(0.0);
    }
  
-@@ -1365,26 +1354,26 @@ class HistogramTest {
+@@ -1365,26 +1353,26 @@ class HistogramTest {
    }
  
    @Test
@@ -3055,7 +3056,7 @@
      Histogram histogram =
          Histogram.builder()
              .name("histogram")
-@@ -1405,27 +1394,27 @@ class HistogramTest {
+@@ -1405,27 +1393,27 @@ class HistogramTest {
      List<Long> actualBucketCounts =
          getData(histogram).getClassicBuckets().stream()
              .map(ClassicHistogramBucket::getCount)
@@ -3094,7 +3095,7 @@
      Histogram histogram =
          Histogram.builder()
              .name("test")
-@@ -1441,20 +1430,19 @@ class HistogramTest {
+@@ -1441,20 +1429,19 @@ class HistogramTest {
          getData(histogram, "env", "prod", "path", "/hello", "status", "500");
      assertThat(data200.getCount()).isEqualTo(2);
      assertThat(data200.getSum()).isCloseTo(0.31, offset(0.0000001));
@@ -3118,7 +3119,7 @@
      // Hard to test concurrency, but let's run a couple of observations in parallel and assert none
      // gets lost.
      Histogram histogram = Histogram.builder().name("test").labelNames("status").build();
-@@ -1485,7 +1473,7 @@ class HistogramTest {
+@@ -1485,7 +1472,7 @@ class HistogramTest {
        List<HistogramSnapshot> snapshots = future.get(5, TimeUnit.SECONDS);
        long count = 0;
        for (HistogramSnapshot snapshot : snapshots) {
