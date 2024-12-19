@@ -9,15 +9,6 @@
          <jacoco.line-coverage>0.70</jacoco.line-coverage>
          <checkstyle.skip>false</checkstyle.skip>
          <coverage.skip>false</coverage.skip>
-@@ -87,7 +87,7 @@
-             <dependency>
-                 <groupId>com.google.guava</groupId>
-                 <artifactId>guava</artifactId>
--                <version>33.3.1-jre</version>
-+                <version>33.3.1-jre<!-- Renovate: com.google.guava:guava-bom --></version>
-             </dependency>
-         </dependencies>
-     </dependencyManagement>
 @@ -128,7 +128,6 @@
          <dependency>
              <groupId>com.google.guava</groupId>
