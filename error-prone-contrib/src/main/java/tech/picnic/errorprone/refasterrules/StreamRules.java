@@ -298,18 +298,17 @@ final class StreamRules {
   }
 
   /**
-   * When using {@link Map#get(Object)} in a {@link Stream#map(Function)} operation, prefer
-   * filtering null values after the map operation with {@link Objects#nonNull(Object)} over
-   * filtering beforehand with {@link Map#containsKey(Object)} to avoid a double lookup.
+   * Prefer an unconditional {@link Map#get(Object)} call followed by a {@code null} check over a
+   * call to {@link Map#containsKey(Object)}, as the former avoids a second lookup operation.
    */
-  static final class StreamMapFilter<K, V> {
+  static final class StreamMapFilter<T, K, V> {
     @BeforeTemplate
-    Stream<V> before(Stream<K> stream, Map<K, V> map) {
+    Stream<V> before(Stream<T> stream, Map<K, V> map) {
       return stream.filter(map::containsKey).map(map::get);
     }
 
     @AfterTemplate
-    Stream<V> after(Stream<K> stream, Map<K, V> map) {
+    Stream<V> after(Stream<T> stream, Map<K, V> map) {
       return stream.map(map::get).filter(Objects::nonNull);
     }
   }
