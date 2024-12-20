@@ -12,7 +12,7 @@ additional_source_directories=''
 # `-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=logger` once such
 # flags are supported in patch mode. See
 # https://github.com/google/error-prone/pull/4699.
-shared_error_prone_flags='-XepExcludedPaths:.*/generated/.*'
+shared_error_prone_flags=''
 patch_error_prone_flags=''
 validation_error_prone_flags=''
 validation_build_flags=''
