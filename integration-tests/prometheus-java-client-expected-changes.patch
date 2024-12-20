@@ -4511,10 +4511,10 @@
        testCase.systemProperties.keySet().forEach(System::clearProperty);
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
-@@ -1,22 +1,23 @@
+@@ -1,40 +1,40 @@
  package io.prometheus.metrics.exporter.opentelemetry;
  
- import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 +import static org.assertj.core.api.Assertions.assertThatThrownBy;
  import static org.junit.jupiter.api.Assertions.*;
  
@@ -4538,7 +4538,33 @@
 +        .hasMessage(
              "Prometheus metrics library initialization error: Failed to read path from classpath.");
  
-     assertThatExceptionOfType(IllegalStateException.class)
+-    assertThatExceptionOfType(IllegalStateException.class)
+-        .isThrownBy(
++    assertThatThrownBy(
+             () ->
+                 PrometheusInstrumentationScope.loadInstrumentationScopeInfo(
+                     "instrumentationScope.properties", "name", "version"))
+-        .havingRootCause()
+-        .withMessage(
++        .isInstanceOf(IllegalStateException.class)
++        .rootCause()
++        .hasMessage(
+             "Prometheus metrics library initialization error: name not found in instrumentationScope.properties in classpath.");
+ 
+-    assertThatExceptionOfType(IllegalStateException.class)
+-        .isThrownBy(
++    assertThatThrownBy(
+             () ->
+                 PrometheusInstrumentationScope.loadInstrumentationScopeInfo(
+                     "instrumentationScope.properties", "instrumentationScope.name", "version"))
+-        .havingRootCause()
+-        .withMessage(
++        .isInstanceOf(IllegalStateException.class)
++        .rootCause()
++        .hasMessage(
+             "Prometheus metrics library initialization error: version not found in instrumentationScope.properties in classpath.");
+   }
+ }
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
 @@ -7,7 +7,7 @@ import io.prometheus.metrics.model.snapshots.Unit;
@@ -9448,7 +9474,7 @@
  }
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
-@@ -2,14 +2,15 @@ package io.prometheus.metrics.model.snapshots;
+@@ -2,15 +2,16 @@ package io.prometheus.metrics.model.snapshots;
  
  import static org.assertj.core.api.Assertions.assertThat;
  import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -9459,6 +9485,7 @@
 -class MetricSnapshotTest {
 +final class MetricSnapshotTest {
  
+   // XXX: Investigate the `satisfies` and how to rewrite this.
    @SuppressWarnings("AssertThatThrownBy")
    @Test
 -  public void testDuplicateLabels() {
@@ -9466,7 +9493,7 @@
      assertThatExceptionOfType(DuplicateLabelsException.class)
          .isThrownBy(
              () ->
-@@ -40,14 +41,14 @@ class MetricSnapshotTest {
+@@ -41,14 +42,14 @@ class MetricSnapshotTest {
    }
  
    @Test
@@ -9628,7 +9655,7 @@
  }
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
-@@ -2,12 +2,12 @@ package io.prometheus.metrics.model.snapshots;
+@@ -2,13 +2,13 @@ package io.prometheus.metrics.model.snapshots;
  
  import static io.prometheus.metrics.model.snapshots.PrometheusNaming.*;
  import static org.assertj.core.api.Assertions.assertThat;
@@ -9637,13 +9664,14 @@
  
  import org.junit.jupiter.api.Test;
  
+ // XXX: Fix this edge case in the `JUnitMethodDeclaration` check.
  @SuppressWarnings("JUnitMethodDeclaration")
 -class PrometheusNamingTest {
 +final class PrometheusNamingTest {
  
    @Test
    public void testSanitizeMetricName() {
-@@ -26,19 +26,19 @@ class PrometheusNamingTest {
+@@ -27,19 +27,19 @@ class PrometheusNamingTest {
    @Test
    public void testSanitizeMetricNameWithUnit() {
      assertThat(prometheusName(sanitizeMetricName("0abc.def", Unit.RATIO)))
@@ -9673,7 +9701,7 @@
    }
  
    @Test
-@@ -76,25 +76,23 @@ class PrometheusNamingTest {
+@@ -77,25 +77,23 @@ class PrometheusNamingTest {
  
    @Test
    public void testInvalidUnitName1() {
