@@ -6,12 +6,8 @@ test_name="$(basename "${0}" .sh)"
 project='prometheus-java-client'
 repository='https://github.com/prometheus/client_java.git'
 revision='v1.3.5'
-additional_build_flags=''
+additional_build_flags='-Djava.version=11 -Dwarnings='
 additional_source_directories=''
-# XXX: Minimize the diff by including
-# `-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=logger` once such
-# flags are supported in patch mode. See
-# https://github.com/google/error-prone/pull/4699.
 shared_error_prone_flags=''
 patch_error_prone_flags=''
 validation_error_prone_flags=''

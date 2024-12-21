@@ -4511,7 +4511,7 @@
        testCase.systemProperties.keySet().forEach(System::clearProperty);
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
-@@ -1,40 +1,40 @@
+@@ -1,38 +1,38 @@
  package io.prometheus.metrics.exporter.opentelemetry;
  
 -import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -4523,8 +4523,6 @@
 -class PrometheusInstrumentationScopeTest {
 +final class PrometheusInstrumentationScopeTest {
  
-   // XXX: Introduce support for rewriting `assertThatThrownBy#havingRootCause()`.
-   @SuppressWarnings("AssertThatThrownBy")
    @Test
    void loadInstrumentationScopeInfo() {
 -    assertThatExceptionOfType(IllegalStateException.class)
