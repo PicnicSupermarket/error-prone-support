@@ -61,6 +61,27 @@ final class AssertJThrowingCallableRules {
     }
   }
 
+  static final class AssertThatThrownByIllegalArgumentExceptionRootCauseHasMessage {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
+    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+      return assertThatIllegalArgumentException()
+          .isThrownBy(throwingCallable)
+          .havingRootCause()
+          .withMessage(message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IllegalArgumentException.class)
+          .rootCause()
+          .hasMessage(message);
+    }
+  }
+
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
@@ -167,6 +188,27 @@ final class AssertJThrowingCallableRules {
     AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(IllegalStateException.class)
+          .hasMessage(message);
+    }
+  }
+
+  static final class AssertThatThrownByIllegalStateExceptionRootCauseHasMessage {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
+    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+      return assertThatIllegalStateException()
+          .isThrownBy(throwingCallable)
+          .havingRootCause()
+          .withMessage(message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IllegalStateException.class)
+          .rootCause()
           .hasMessage(message);
     }
   }
@@ -279,6 +321,27 @@ final class AssertJThrowingCallableRules {
     }
   }
 
+  static final class AssertThatThrownByNullPointerExceptionRootCauseHasMessage {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
+    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+      return assertThatNullPointerException()
+          .isThrownBy(throwingCallable)
+          .havingRootCause()
+          .withMessage(message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(NullPointerException.class)
+          .rootCause()
+          .hasMessage(message);
+    }
+  }
+
   static final class AssertThatThrownByNullPointerExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
@@ -386,6 +449,26 @@ final class AssertJThrowingCallableRules {
     }
   }
 
+  static final class AssertThatThrownByIOExceptionRootCauseHasMessage {
+    @BeforeTemplate
+    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
+    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+      return assertThatIOException()
+          .isThrownBy(throwingCallable)
+          .havingRootCause()
+          .withMessage(message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(IOException.class)
+          .rootCause()
+          .hasMessage(message);
+    }
+  }
+
   static final class AssertThatThrownByIOExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
@@ -486,6 +569,32 @@ final class AssertJThrowingCallableRules {
         Class<? extends Throwable> exceptionType,
         String message) {
       return assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType).hasMessage(message);
+    }
+  }
+
+  static final class AssertThatThrownByRootCauseHasMessage {
+    @BeforeTemplate
+    @SuppressWarnings("AssertThatThrownBy" /* This is a more specific template. */)
+    AbstractObjectAssert<?, ?> before(
+        ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
+        String message) {
+      return assertThatExceptionOfType(exceptionType)
+          .isThrownBy(throwingCallable)
+          .havingRootCause()
+          .withMessage(message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractObjectAssert<?, ?> after(
+        ThrowingCallable throwingCallable,
+        Class<? extends Throwable> exceptionType,
+        String message) {
+      return assertThatThrownBy(throwingCallable)
+          .isInstanceOf(exceptionType)
+          .rootCause()
+          .hasMessage(message);
     }
   }
 
