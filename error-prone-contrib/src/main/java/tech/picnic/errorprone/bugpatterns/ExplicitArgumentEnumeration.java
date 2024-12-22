@@ -130,7 +130,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       /*
        * This isn't a method invocation we can simplify, or it's an invocation of a local overload.
        * The latter type of invocation we do not suggest replacing, as this is fairly likely to
-       * introduce a mutually recursive call chain.
+       * introduce an unbounded recursive call chain.
        */
       return Description.NO_MATCH;
     }
