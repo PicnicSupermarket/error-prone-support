@@ -5,9 +5,11 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static com.google.errorprone.matchers.Matchers.symbolMatcher;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -28,11 +30,13 @@ import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.Visibility;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -74,6 +78,19 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                   List.class.getCanonicalName(),
                   Set.class.getCanonicalName())
               .named("of"),
+          allOf(
+              staticMethod()
+                  .onClassAny(
+                      ImmutableList.class.getCanonicalName(),
+                      ImmutableMultiset.class.getCanonicalName(),
+                      ImmutableSet.class.getCanonicalName())
+                  .named("copyOf"),
+              symbolMatcher(
+                  (symbol, state) ->
+                      state
+                          .getSymtab()
+                          .arrayClass
+                          .equals(((MethodSymbol) symbol).params().get(0).type.tsym))),
           staticMethod().onClass(Arrays.class.getCanonicalName()).named("asList"));
   private static final Matcher<ExpressionTree> IMMUTABLE_COLLECTION_BUILDER =
       instanceMethod().onDescendantOf(ImmutableCollection.Builder.class.getCanonicalName());
@@ -109,7 +126,12 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     }
 
     MethodSymbol method = ASTHelpers.getSymbol(tree);
-    if (!isUnaryIterableAcceptingMethod(method, state)) {
+    if (!isUnaryIterableAcceptingMethod(method, state) || isLocalOverload(method, state)) {
+      /*
+       * This isn't a method invocation we can simplify, or it's an invocation of a local overload.
+       * The latter type of invocation we do not suggest replacing, as this is fairly likely to
+       * introduce a mutually recursive call chain.
+       */
       return Description.NO_MATCH;
     }
 
@@ -129,6 +151,17 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     return !method.isVarArgs()
         && params.size() == 1
         && ASTHelpers.isSubtype(params.get(0).type, state.getSymtab().iterableType, state);
+  }
+
+  private static boolean isLocalOverload(MethodSymbol calledMethod, VisitorState state) {
+    MethodTree enclosingMethod = state.findEnclosing(MethodTree.class);
+    if (enclosingMethod == null) {
+      return false;
+    }
+
+    MethodSymbol callingMethod = ASTHelpers.getSymbol(enclosingMethod);
+    return Objects.equals(callingMethod.getEnclosingElement(), calledMethod.getEnclosingElement())
+        && callingMethod.getSimpleName().equals(calledMethod.getSimpleName());
   }
 
   private static Optional<SuggestedFix> trySuggestCallingVarargsOverload(
