@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.utils;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.util.TreeScanner;
@@ -81,20 +82,17 @@ public final class ConflictDetection {
 
           @Override
           public Boolean visitMethodInvocation(MethodInvocationTree tree, @Nullable Void unused) {
-            ExpressionTree methodSelect = tree.getMethodSelect();
-            if (methodSelect instanceof IdentifierTree identifier) {
-              if (name.contentEquals(identifier.getName())) {
-                return Boolean.TRUE;
-              }
-            }
-
-            return super.visitMethodInvocation(tree, null);
+            return (tree.getMethodSelect() instanceof IdentifierTree identifier
+                    && name.contentEquals(identifier.getName()))
+                || super.visitMethodInvocation(tree, null);
           }
 
           @Override
           public Boolean reduce(Boolean r1, Boolean r2) {
             return Boolean.TRUE.equals(r1) || Boolean.TRUE.equals(r2);
           }
-        }.scan(state.findEnclosing(ClassTree.class).getMembers(), null));
+        }.scan(
+            requireNonNull(state.findEnclosing(ClassTree.class), "No enclosing class").getMembers(),
+            null));
   }
 }
