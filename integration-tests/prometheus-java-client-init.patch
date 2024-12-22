@@ -34,28 +34,6 @@
                          </path>
                          <!-- Other annotation processors go here.
  
---- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/registry/MetricNameFilter.java
-+++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/registry/MetricNameFilter.java
-@@ -8,6 +8,8 @@ import java.util.Collection;
- import java.util.function.Predicate;
- 
- /** Filter samples (i.e. time series) by name. */
-+// XXX: Don't suggest changes when there are local methods with the same name.
-+@SuppressWarnings("ExplicitArgumentEnumeration")
- public class MetricNameFilter implements Predicate<String> {
- 
-   /** For convenience, a filter that allows all names. */
---- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Quantiles.java
-+++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Quantiles.java
-@@ -41,6 +41,8 @@ public class Quantiles implements Iterable<Quantile> {
-    * Create a new Quantiles instance. You can either create Quantiles with one of the static {@code
-    * Quantiles.of(...)} methods, or you can use the {@link Quantiles#builder()}.
-    */
-+  // XXX: Don't suggest changes when there are local methods with the same name.
-+  @SuppressWarnings("ExplicitArgumentEnumeration")
-   public static Quantiles of(Quantile... quantiles) {
-     return of(Arrays.asList(quantiles));
-   }
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
 @@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
