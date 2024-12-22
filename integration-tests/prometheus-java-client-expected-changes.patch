@@ -9653,7 +9653,7 @@
  }
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
-@@ -2,13 +2,13 @@ package io.prometheus.metrics.model.snapshots;
+@@ -2,14 +2,14 @@ package io.prometheus.metrics.model.snapshots;
  
  import static io.prometheus.metrics.model.snapshots.PrometheusNaming.*;
  import static org.assertj.core.api.Assertions.assertThat;
@@ -9662,16 +9662,21 @@
  
  import org.junit.jupiter.api.Test;
  
- // XXX: Fix this edge case in the `JUnitMethodDeclaration` check.
- @SuppressWarnings("JUnitMethodDeclaration")
 -class PrometheusNamingTest {
 +final class PrometheusNamingTest {
  
    @Test
-   public void testSanitizeMetricName() {
-@@ -27,19 +27,19 @@ class PrometheusNamingTest {
+-  public void testSanitizeMetricName() {
++  void testSanitizeMetricName() {
+     assertThat(prometheusName(sanitizeMetricName("0abc.def"))).isEqualTo("_abc_def");
+     assertThat(prometheusName(sanitizeMetricName("___ab.:c0"))).isEqualTo("___ab__c0");
+     assertThat(sanitizeMetricName("my_prefix/my_metric")).isEqualTo("my_prefix_my_metric");
+@@ -23,25 +23,25 @@ class PrometheusNamingTest {
+   }
+ 
    @Test
-   public void testSanitizeMetricNameWithUnit() {
+-  public void testSanitizeMetricNameWithUnit() {
++  void sanitizeMetricNameWithUnit() {
      assertThat(prometheusName(sanitizeMetricName("0abc.def", Unit.RATIO)))
 -        .isEqualTo("_abc_def_" + Unit.RATIO);
 +        .isEqualTo("_abc_def_%s", Unit.RATIO);
@@ -9699,35 +9704,63 @@
    }
  
    @Test
-@@ -77,25 +77,23 @@ class PrometheusNamingTest {
+-  public void testSanitizeLabelName() {
++  void testSanitizeLabelName() {
+     assertThat(prometheusName(sanitizeLabelName("0abc.def"))).isEqualTo("_abc_def");
+     assertThat(prometheusName(sanitizeLabelName("_abc"))).isEqualTo("_abc");
+     assertThat(prometheusName(sanitizeLabelName("__abc"))).isEqualTo("_abc");
+@@ -52,7 +52,7 @@ class PrometheusNamingTest {
+   }
  
    @Test
-   public void testInvalidUnitName1() {
+-  public void testValidateUnitName() {
++  void testValidateUnitName() {
+     assertThat(validateUnitName("secondstotal")).isNotNull();
+     assertThat(validateUnitName("total")).isNotNull();
+     assertThat(validateUnitName("seconds_total")).isNotNull();
+@@ -64,7 +64,7 @@ class PrometheusNamingTest {
+   }
+ 
+   @Test
+-  public void testSanitizeUnitName() {
++  void testSanitizeUnitName() {
+     assertThat(sanitizeUnitName("seconds")).isEqualTo("seconds");
+     assertThat(sanitizeUnitName("seconds_total")).isEqualTo("seconds");
+     assertThat(sanitizeUnitName("seconds_total_total")).isEqualTo("seconds");
+@@ -74,26 +74,24 @@ class PrometheusNamingTest {
+   }
+ 
+   @Test
+-  public void testInvalidUnitName1() {
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(() -> sanitizeUnitName("total"));
++  void invalidUnitName1() {
 +    assertThatThrownBy(() -> sanitizeUnitName("total"))
 +        .isInstanceOf(IllegalArgumentException.class);
    }
  
    @Test
-   public void testInvalidUnitName2() {
+-  public void testInvalidUnitName2() {
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(() -> sanitizeUnitName("_total"));
++  void invalidUnitName2() {
 +    assertThatThrownBy(() -> sanitizeUnitName("_total"))
 +        .isInstanceOf(IllegalArgumentException.class);
    }
  
    @Test
-   public void testInvalidUnitName3() {
+-  public void testInvalidUnitName3() {
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(() -> sanitizeUnitName("%"));
++  void invalidUnitName3() {
 +    assertThatThrownBy(() -> sanitizeUnitName("%")).isInstanceOf(IllegalArgumentException.class);
    }
  
    @Test
-   public void testEmptyUnitName() {
+-  public void testEmptyUnitName() {
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(() -> sanitizeUnitName(""));
++  void emptyUnitName() {
 +    assertThatThrownBy(() -> sanitizeUnitName("")).isInstanceOf(IllegalArgumentException.class);
    }
  }

@@ -11,7 +11,8 @@ additional_source_directories=''
 shared_error_prone_flags=''
 patch_error_prone_flags=''
 validation_error_prone_flags=''
-validation_build_flags=''
+# XXX: Drop these flags once prometheus/client_java#1242 is resolved.
+validation_build_flags='-Dtest=!SlidingWindowTest#rotate -Dsurefire.failIfNoSpecifiedTests=false'
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
   >&2 echo "Usage: ${0} [--sync] [<report_directory>]"

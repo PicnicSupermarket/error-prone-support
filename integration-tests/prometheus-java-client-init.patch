@@ -45,14 +45,3 @@
    @Test
    public void testDuplicateLabels() {
      assertThatExceptionOfType(DuplicateLabelsException.class)
---- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
-+++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/PrometheusNamingTest.java
-@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
- 
- import org.junit.jupiter.api.Test;
- 
-+// XXX: Fix this edge case in the `JUnitMethodDeclaration` check.
-+@SuppressWarnings("JUnitMethodDeclaration")
- class PrometheusNamingTest {
- 
-   @Test
