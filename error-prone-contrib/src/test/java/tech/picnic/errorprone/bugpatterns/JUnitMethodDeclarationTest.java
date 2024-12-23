@@ -11,7 +11,7 @@ final class JUnitMethodDeclarationTest {
     CompilationTestHelper.newInstance(JUnitMethodDeclaration.class, getClass())
         .addSourceLines(
             "A.java",
-            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
+            "import static org.junit.jupiter.params.provider.Arguments.*;",
             "",
             "import org.junit.jupiter.api.AfterAll;",
             "import org.junit.jupiter.api.AfterEach;",
@@ -154,8 +154,10 @@ final class JUnitMethodDeclarationTest {
             "  void overload() {}",
             "",
             "  @Test",
-            "  // BUG: Diagnostic contains: (but note that `arguments` is already statically imported)",
-            "  void testArguments() {}",
+            "  // BUG: Diagnostic contains: (but note that another method named `arguments` is in scope)",
+            "  void testArguments() {",
+            "    arguments();",
+            "  }",
             "",
             "  @Test",
             "  // BUG: Diagnostic contains: (but note that `public` is not a valid identifier)",
