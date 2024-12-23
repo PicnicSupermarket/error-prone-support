@@ -29,6 +29,9 @@ jobs:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
+            # XXX: After updating the validation build flags in
+            # `integration-tests/prometheus-java-client.sh`, review whether the
+            # Docker domains specified here can be dropped.
             api.adoptium.net:443
             auth.docker.io:443
             checkstyle.org:443

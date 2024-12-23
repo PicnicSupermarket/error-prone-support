@@ -16,7 +16,9 @@ validation_error_prone_flags=''
 #   file that is created only after test completion, causing the tests to fail.
 # - The `SlidingWindowTest#rotate` test is flaky.
 # XXX: Drop the `SlidingWindowTest` exclusion once prometheus/client_java#1242
-# is resolved.
+# is resolved. For unclear reasons, it appears that without this exclusion the
+# integration tests are no longer executed, meaning that perhaps all flags
+# specified here can then be dropped.
 validation_build_flags='-Dtest=!PushGatewayIT,!SlidingWindowTest#rotate -Dsurefire.failIfNoSpecifiedTests=false'
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
