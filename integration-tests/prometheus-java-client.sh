@@ -11,8 +11,13 @@ additional_source_directories=''
 shared_error_prone_flags=''
 patch_error_prone_flags=''
 validation_error_prone_flags=''
-# XXX: Drop these flags once prometheus/client_java#1242 is resolved.
-validation_build_flags='-Dtest=!SlidingWindowTest#rotate -Dsurefire.failIfNoSpecifiedTests=false'
+# Validation skips some tests:
+# - Starting from a clean repository, the `PushGatewayIT` tests reference a JAR
+#   file that is created only after test completion, causing the tests to fail.
+# - The `SlidingWindowTest#rotate` test is flaky.
+# XXX: Drop the `SlidingWindowTest` exclusion once prometheus/client_java#1242
+# is resolved.
+validation_build_flags='-Dtest=!PushGatewayIT,!SlidingWindowTest#rotate -Dsurefire.failIfNoSpecifiedTests=false'
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
   >&2 echo "Usage: ${0} [--sync] [<report_directory>]"
