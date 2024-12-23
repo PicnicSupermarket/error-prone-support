@@ -36,7 +36,9 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 // XXX: What about `v1 + "sep" + v2` and similar expressions? Do we want to rewrite those to
 // `String.join`, or should some `String.join` invocations be rewritten to use the `+` operator?
-// (The latter suggestion would conflict with the `FormatStringConcatenation` check.)
+// (The latter suggestion would conflict with the `FormatStringConcatenation` check, but does make
+// more sense when `"sep"` is a long string. Similarly for `String.format("%s some long text %s",
+// arg1, arg2)`.)
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `String#join` over `String#format`",
