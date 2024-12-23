@@ -30,6 +30,7 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
+            auth.docker.io:443
             checkstyle.org:443
             example.com:80
             github.com:443
