@@ -297,6 +297,22 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer an unconditional {@link Map#get(Object)} call followed by a {@code null} check over a
+   * call to {@link Map#containsKey(Object)}, as the former avoids a second lookup operation.
+   */
+  static final class StreamMapFilter<T, K, V> {
+    @BeforeTemplate
+    Stream<V> before(Stream<T> stream, Map<K, V> map) {
+      return stream.filter(map::containsKey).map(map::get);
+    }
+
+    @AfterTemplate
+    Stream<V> after(Stream<T> stream, Map<K, V> map) {
+      return stream.map(map::get).filter(Objects::nonNull);
+    }
+  }
+
   static final class StreamMin<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
