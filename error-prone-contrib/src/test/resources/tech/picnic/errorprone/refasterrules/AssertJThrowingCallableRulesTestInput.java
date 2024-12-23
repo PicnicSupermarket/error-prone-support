@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.throwable;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractObjectAssert;
@@ -20,7 +22,13 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
         assertThatIOException(),
         assertThatIllegalArgumentException(),
         assertThatIllegalStateException(),
-        assertThatNullPointerException());
+        assertThatNullPointerException(),
+        type(Throwable.class));
+  }
+
+  void testAssertThatThrownByIsInstanceOf() {
+    assertThatThrownBy(() -> {}).asInstanceOf(throwable(IllegalArgumentException.class));
+    assertThatThrownBy(() -> {}).asInstanceOf(type(IllegalArgumentException.class));
   }
 
   AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentException() {
@@ -148,7 +156,7 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return assertThatIOException().isThrownBy(() -> {}).withMessageNotContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownBy() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByAsInstanceOfThrowable() {
     return assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {});
   }
 
