@@ -36,6 +36,7 @@ jobs:
             github.com:443
             objects.githubusercontent.com:443
             oss.sonatype.org:443
+            production.cloudflare.docker.com:443
             raw.githubusercontent.com:443
             registry-1.docker.io:443
             repo.maven.apache.org:443
