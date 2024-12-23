@@ -34,14 +34,3 @@
                          </path>
                          <!-- Other annotation processors go here.
  
---- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
-+++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
-@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
- 
- class MetricSnapshotTest {
- 
-+  // XXX: Investigate the `satisfies` and how to rewrite this.
-+  @SuppressWarnings("AssertThatThrownBy")
-   @Test
-   public void testDuplicateLabels() {
-     assertThatExceptionOfType(DuplicateLabelsException.class)

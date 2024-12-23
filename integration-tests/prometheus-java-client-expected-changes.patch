@@ -9472,26 +9472,37 @@
  }
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
 +++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/MetricSnapshotTest.java
-@@ -2,15 +2,16 @@ package io.prometheus.metrics.model.snapshots;
+@@ -1,16 +1,16 @@
+ package io.prometheus.metrics.model.snapshots;
  
  import static org.assertj.core.api.Assertions.assertThat;
- import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 +import static org.assertj.core.api.Assertions.assertThatThrownBy;
++import static org.assertj.core.api.InstanceOfAssertFactories.throwable;
  
  import org.junit.jupiter.api.Test;
  
 -class MetricSnapshotTest {
 +final class MetricSnapshotTest {
  
-   // XXX: Investigate the `satisfies` and how to rewrite this.
-   @SuppressWarnings("AssertThatThrownBy")
    @Test
 -  public void testDuplicateLabels() {
+-    assertThatExceptionOfType(DuplicateLabelsException.class)
+-        .isThrownBy(
 +  void duplicateLabels() {
-     assertThatExceptionOfType(DuplicateLabelsException.class)
-         .isThrownBy(
++    assertThatThrownBy(
              () ->
-@@ -41,14 +42,14 @@ class MetricSnapshotTest {
+                 CounterSnapshot.builder()
+                     .name("events")
+@@ -30,6 +30,7 @@ class MetricSnapshotTest {
+                             .value(3.0)
+                             .build())
+                     .build())
++        .asInstanceOf(throwable(DuplicateLabelsException.class))
+         .satisfies(
+             e -> {
+               assertThat(e.getMetadata().getName()).isEqualTo("events");
+@@ -39,14 +40,14 @@ class MetricSnapshotTest {
    }
  
    @Test
