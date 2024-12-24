@@ -1,0 +1,100 @@
+--- a/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
++++ b/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
+@@ -188,6 +188,9 @@ public class MetricsServlet extends HttpServlet {
+         return mapper.writer();
+     }
+ 
++    // Here `value` may be `null`, while `TimeUnit#valueOf` requires a non-`null` argument.
++    // XXX: Investigate better nullness handling by `IdentityConversion`.
++    @SuppressWarnings("IdentityConversion")
+     protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
+         try {
+             return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
+--- a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
++++ b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
+@@ -188,6 +188,9 @@ public class MetricsServlet extends HttpServlet {
+         return mapper.writer();
+     }
+ 
++    // Here `value` may be `null`, while `TimeUnit#valueOf` requires a non-`null` argument.
++    // XXX: Investigate better nullness handling by `IdentityConversion`.
++    @SuppressWarnings("IdentityConversion")
+     protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
+         try {
+             return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
+--- a/pom.xml
++++ b/pom.xml
+@@ -136,6 +136,27 @@
+         </repository>
+     </distributionManagement>
+ 
++    <dependencyManagement>
++        <dependencies>
++            <dependency>
++                <groupId>com.google.errorprone</groupId>
++                <artifactId>error_prone_annotations</artifactId>
++                <version>${error-prone.version}</version>
++            </dependency>
++            <dependency>
++                <groupId>com.google.guava</groupId>
++                <artifactId>guava</artifactId>
++                <version>33.4.0-jre<!-- Renovate: com.google.guava:guava-bom --></version>
++            </dependency>
++        </dependencies>
++    </dependencyManagement>
++    <dependencies>
++        <dependency>
++            <groupId>com.google.guava</groupId>
++            <artifactId>guava</artifactId>
++        </dependency>
++    </dependencies>
++
+     <profiles>
+         <profile>
+             <id>jdk8</id>
+@@ -218,7 +239,9 @@
+                             <compilerArgs>
+                                 <arg>-Xlint:all</arg>
+                                 <arg>-XDcompilePolicy=simple</arg>
+-                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
++                                <!-- XXX: Drop this flag once the project uses Error Prone 2.36.0+ by default. -->
++                                <arg>--should-stop=ifError=FLOW</arg>
++                                <arg>-Xplugin:ErrorProne ${error-prone.configuration-args}</arg>
+                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+@@ -229,12 +252,24 @@
+                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
++                                <arg>-Xmaxwarns</arg>
++                                <arg>1000000</arg>
+                             </compilerArgs>
+                             <annotationProcessorPaths>
+                                 <path>
+                                     <groupId>com.google.errorprone</groupId>
+                                     <artifactId>error_prone_core</artifactId>
+-                                    <version>${errorprone.version}</version>
++                                    <version>${error-prone.version}</version>
++                                </path>
++                                <path>
++                                    <groupId>tech.picnic.error-prone-support</groupId>
++                                    <artifactId>error-prone-contrib</artifactId>
++                                    <version>${error-prone-support.version}</version>
++                                </path>
++                                <path>
++                                    <groupId>tech.picnic.error-prone-support</groupId>
++                                    <artifactId>refaster-runner</artifactId>
++                                    <version>${error-prone-support.version}</version>
+                                 </path>
+                             </annotationProcessorPaths>
+                         </configuration>
+@@ -364,7 +399,7 @@
+                 <groupId>org.apache.maven.plugins</groupId>
+                 <artifactId>maven-compiler-plugin</artifactId>
+                 <configuration>
+-                    <release>8</release>
++                    <release>11</release>
+                     <fork>true</fork>
+                     <parameters>true</parameters>
+                     <showWarnings>true</showWarnings>

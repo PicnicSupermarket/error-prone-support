@@ -6,7 +6,9 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -28,6 +30,21 @@ final class MultimapRules {
     }
   }
 
+  /** Prefer {@link Multimap#isEmpty()} over more contrived alternatives. */
+  static final class MultimapIsEmpty<K, V> {
+    @BeforeTemplate
+    boolean before(Multimap<K, V> multimap) {
+      return Refaster.anyOf(
+              multimap.keySet(), multimap.keys(), multimap.values(), multimap.entries())
+          .isEmpty();
+    }
+
+    @AfterTemplate
+    boolean after(Multimap<K, V> multimap) {
+      return multimap.isEmpty();
+    }
+  }
+
   /** Prefer {@link Multimap#size()} over more contrived alternatives. */
   static final class MultimapSize<K, V> {
     @BeforeTemplate
@@ -38,6 +55,32 @@ final class MultimapRules {
     @AfterTemplate
     int after(Multimap<K, V> multimap) {
       return multimap.size();
+    }
+  }
+
+  /** Prefer {@link Multimap#containsKey(Object)} over more contrived alternatives. */
+  static final class MultimapContainsKey<K, V, T> {
+    @BeforeTemplate
+    boolean before(Multimap<K, V> multimap, T key) {
+      return Refaster.anyOf(multimap.keySet(), multimap.keys()).contains(key);
+    }
+
+    @AfterTemplate
+    boolean after(Multimap<K, V> multimap, T key) {
+      return multimap.containsKey(key);
+    }
+  }
+
+  /** Prefer {@link Multimap#containsValue(Object)} over more contrived alternatives. */
+  static final class MultimapContainsValue<K, V, T> {
+    @BeforeTemplate
+    boolean before(Multimap<K, V> multimap, T value) {
+      return multimap.values().contains(value);
+    }
+
+    @AfterTemplate
+    boolean after(Multimap<K, V> multimap, T value) {
+      return multimap.containsValue(value);
     }
   }
 
@@ -57,6 +100,32 @@ final class MultimapRules {
     @AfterTemplate
     Collection<V> after(Multimap<K, V> multimap, K key) {
       return multimap.get(key);
+    }
+  }
+
+  /** Don't unnecessarily use {@link Multimap#entries()}. */
+  static final class MultimapKeysStream<K, V> {
+    @BeforeTemplate
+    Stream<K> before(Multimap<K, V> multimap) {
+      return multimap.entries().stream().map(Map.Entry::getKey);
+    }
+
+    @AfterTemplate
+    Stream<K> after(Multimap<K, V> multimap) {
+      return multimap.keys().stream();
+    }
+  }
+
+  /** Don't unnecessarily use {@link Multimap#entries()}. */
+  static final class MultimapValuesStream<K, V> {
+    @BeforeTemplate
+    Stream<V> before(Multimap<K, V> multimap) {
+      return multimap.entries().stream().map(Map.Entry::getValue);
+    }
+
+    @AfterTemplate
+    Stream<V> after(Multimap<K, V> multimap) {
+      return multimap.values().stream();
     }
   }
 }

@@ -6,13 +6,13 @@ import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.Matchers.typePredicateMatcher;
 import static com.google.errorprone.predicates.TypePredicates.allOf;
 import static com.google.errorprone.predicates.TypePredicates.not;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypePredicates.hasTypeParameter;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypePredicates.isSubTypeOf;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.raw;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.type;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreTypePredicates.hasTypeParameter;
+import static tech.picnic.errorprone.utils.MoreTypePredicates.isSubTypeOf;
+import static tech.picnic.errorprone.utils.MoreTypes.generic;
+import static tech.picnic.errorprone.utils.MoreTypes.raw;
+import static tech.picnic.errorprone.utils.MoreTypes.subOf;
+import static tech.picnic.errorprone.utils.MoreTypes.type;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -34,8 +34,9 @@ import com.sun.tools.javac.code.Type;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid `Publisher`s that emit other `Publishers`s; "
-            + "the resultant code is hard to reason about",
+        """
+        Avoid `Publisher`s that emit other `Publishers`s; the resultant code is hard to reason \
+        about""",
     link = BUG_PATTERNS_BASE_URL + "NestedPublishers",
     linkType = CUSTOM,
     severity = WARNING,

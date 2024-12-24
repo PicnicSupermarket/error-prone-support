@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -37,7 +38,12 @@ final class ClassRules {
     }
   }
 
-  /** Prefer {@link Class#isInstance(Object)} method references over more verbose alternatives. */
+  /**
+   * Prefer {@link Class#isInstance(Object)} method references over lambda expressions that require
+   * naming a variable.
+   */
+  // XXX: Once the `ClassReferenceIsInstancePredicate` rule is dropped, rename this rule to just
+  // `ClassIsInstancePredicate`.
   static final class ClassLiteralIsInstancePredicate<T, S> {
     @BeforeTemplate
     Predicate<S> before() {
@@ -50,7 +56,11 @@ final class ClassRules {
     }
   }
 
-  /** Prefer {@link Class#isInstance(Object)} method references over more verbose alternatives. */
+  /**
+   * Prefer {@link Class#isInstance(Object)} method references over lambda expressions that require
+   * naming a variable.
+   */
+  // XXX: Drop this rule once the `MethodReferenceUsage` rule is enabled by default.
   static final class ClassReferenceIsInstancePredicate<T, S> {
     @BeforeTemplate
     Predicate<S> before(Class<T> clazz) {
@@ -60,6 +70,23 @@ final class ClassRules {
     @AfterTemplate
     Predicate<S> after(Class<T> clazz) {
       return clazz::isInstance;
+    }
+  }
+
+  /**
+   * Prefer {@link Class#cast(Object)} method references over lambda expressions that require naming
+   * a variable.
+   */
+  // XXX: Drop this rule once the `MethodReferenceUsage` rule is enabled by default.
+  static final class ClassReferenceCast<T, S> {
+    @BeforeTemplate
+    Function<T, S> before(Class<? extends S> clazz) {
+      return o -> clazz.cast(o);
+    }
+
+    @AfterTemplate
+    Function<T, S> after(Class<? extends S> clazz) {
+      return clazz::cast;
     }
   }
 }

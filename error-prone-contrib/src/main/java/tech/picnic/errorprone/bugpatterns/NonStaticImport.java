@@ -4,7 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
@@ -33,9 +33,10 @@ import java.time.Clock;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags static imports of type members that should *not* be statically
@@ -71,7 +72,9 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           Strings.class.getCanonicalName(),
           VisitorState.class.getCanonicalName(),
           ZoneOffset.class.getCanonicalName(),
-          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode");
+          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
+          "reactor.core.publisher.Flux",
+          "reactor.core.publisher.Mono");
 
   /**
    * Type members that should never be statically imported.
@@ -103,6 +106,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
               "sort",
               "swap")
           .put(Locale.class.getCanonicalName(), "ROOT")
+          .put(Optional.class.getCanonicalName(), "empty")
           .putAll(Pattern.class.getCanonicalName(), "compile", "matches", "quote")
           .put(Predicates.class.getCanonicalName(), "contains")
           .put("org.springframework.http.MediaType", "ALL")
@@ -125,7 +129,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "builder",
           "copyOf",
           "create",
-          "empty",
           "from",
           "getDefaultInstance",
           "INSTANCE",
@@ -136,10 +139,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "newBuilder",
           "newInstance",
           "of",
-          "ONE",
           "parse",
-          "valueOf",
-          "ZERO");
+          "valueOf");
 
   /** Instantiates a new {@link NonStaticImport} instance. */
   public NonStaticImport() {}
@@ -168,10 +169,9 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
         ImmutableTable.builder();
     for (ImportTree importTree : tree.getImports()) {
       Tree qualifiedIdentifier = importTree.getQualifiedIdentifier();
-      if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree) {
-        MemberSelectTree memberSelectTree = (MemberSelectTree) qualifiedIdentifier;
-        String type = SourceCode.treeToString(memberSelectTree.getExpression(), state);
-        String member = memberSelectTree.getIdentifier().toString();
+      if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree memberSelect) {
+        String type = SourceCode.treeToString(memberSelect.getExpression(), state);
+        String member = memberSelect.getIdentifier().toString();
         if (shouldNotBeStaticallyImported(type, member)) {
           imports.put(
               type,
@@ -210,7 +210,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           }
         }
 
-        return super.visitIdentifier(node, unused);
+        return super.visitIdentifier(node, null);
       }
     }.scan(tree, null);
   }

@@ -11,7 +11,7 @@ import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.returnStatement;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Streams;
@@ -39,8 +39,8 @@ import com.sun.tools.javac.code.Symbol;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags unnecessary local variable assignments preceding a return
@@ -101,19 +101,17 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   }
 
   private static Optional<ExpressionTree> tryMatchAssignment(Symbol targetSymbol, Tree tree) {
-    if (tree instanceof ExpressionStatementTree) {
-      return tryMatchAssignment(targetSymbol, ((ExpressionStatementTree) tree).getExpression());
+    if (tree instanceof ExpressionStatementTree expressionStatement) {
+      return tryMatchAssignment(targetSymbol, expressionStatement.getExpression());
     }
 
-    if (tree instanceof AssignmentTree) {
-      AssignmentTree assignment = (AssignmentTree) tree;
+    if (tree instanceof AssignmentTree assignment) {
       return targetSymbol.equals(ASTHelpers.getSymbol(assignment.getVariable()))
           ? Optional.of(assignment.getExpression())
           : Optional.empty();
     }
 
-    if (tree instanceof VariableTree) {
-      VariableTree declaration = (VariableTree) tree;
+    if (tree instanceof VariableTree declaration) {
       return declaration.getModifiers().getAnnotations().isEmpty()
               && targetSymbol.equals(ASTHelpers.getSymbol(declaration))
           ? Optional.ofNullable(declaration.getInitializer())
@@ -151,11 +149,11 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
             Streams.stream(state.getPath()).skip(1),
             Streams.stream(state.getPath()),
             (tree, child) -> {
-              if (!(tree instanceof TryTree)) {
+              if (!(tree instanceof TryTree tryTree)) {
                 return null;
               }
 
-              BlockTree finallyBlock = ((TryTree) tree).getFinallyBlock();
+              BlockTree finallyBlock = tryTree.getFinallyBlock();
               return !child.equals(finallyBlock) ? finallyBlock : null;
             })
         .anyMatch(finallyBlock -> referencesIdentifierSymbol(symbol, finallyBlock));

@@ -4,7 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -23,12 +23,11 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.Constants;
 import java.util.Formattable;
 import java.util.Iterator;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@link String#format(String, Object...)} invocations which can be
@@ -150,7 +149,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(tree.getMethodSelect(), "String.join")
-            .replace(arguments.next(), Constants.format(separator));
+            .replace(arguments.next(), SourceCode.toStringConstantExpression(separator, state));
 
     while (arguments.hasNext()) {
       ExpressionTree argument = arguments.next();

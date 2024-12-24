@@ -7,7 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableBiMap;
@@ -39,9 +39,10 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
@@ -51,6 +52,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // is effectively the identity operation.
 // XXX: Also flag nullary instance method invocations that represent an identity conversion, such as
 // `Boolean#booleanValue()`, `Byte#byteValue()` and friends.
+// XXX: Also flag redundant round-trip conversions such as `path.toFile().toPath()`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
@@ -83,6 +85,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                   ImmutableSetMultimap.class.getCanonicalName(),
                   ImmutableTable.class.getCanonicalName())
               .named("copyOf"),
+          staticMethod().onClass(Instant.class.getCanonicalName()).namedAnyOf("from"),
           staticMethod().onClass(Matchers.class.getCanonicalName()).namedAnyOf("allOf", "anyOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
@@ -124,8 +127,9 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
 
     return buildDescription(tree)
         .setMessage(
-            "This method invocation appears redundant; remove it or suppress this warning and "
-                + "add a comment explaining its purpose")
+            """
+            This method invocation appears redundant; remove it or suppress this warning and add a \
+            comment explaining its purpose""")
         .addFix(SuggestedFix.replace(tree, SourceCode.treeToString(sourceTree, state)))
         .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
         .build();

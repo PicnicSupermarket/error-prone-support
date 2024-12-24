@@ -6,9 +6,11 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -29,7 +31,9 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(5).size() > 0,
         ImmutableSet.of(6).size() >= 1,
         Iterables.isEmpty(ImmutableSet.of(7)),
-        ImmutableSet.of(8).asList().isEmpty());
+        ImmutableSet.of(8).stream().findAny().isEmpty(),
+        ImmutableSet.of(9).stream().findFirst().isEmpty(),
+        ImmutableSet.of(10).asList().isEmpty());
   }
 
   ImmutableSet<Integer> testCollectionSize() {
@@ -68,6 +72,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
+  Stream<Integer> testSetStream() {
+    return ImmutableSet.of(1).stream().distinct();
+  }
+
   ArrayList<String> testNewArrayListFromCollection() {
     return Lists.newArrayList(ImmutableList.of("foo"));
   }
@@ -92,6 +100,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).asList().toString();
   }
 
+  List<String> testArraysAsList() {
+    return Arrays.stream(new String[0]).toList();
+  }
+
   ImmutableSet<Object[]> testCollectionToArray() {
     return ImmutableSet.of(
         ImmutableSet.of(1).toArray(new Object[1]),
@@ -107,8 +119,9 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).asList().toArray(Integer[]::new);
   }
 
-  Iterator<Integer> testImmutableCollectionIterator() {
-    return ImmutableSet.of(1).asList().iterator();
+  ImmutableSet<Iterator<Integer>> testCollectionIterator() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).stream().iterator(), ImmutableSet.of(2).asList().iterator());
   }
 
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {

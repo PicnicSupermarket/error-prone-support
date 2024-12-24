@@ -6,7 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS;
 import static tech.picnic.errorprone.bugpatterns.NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
@@ -39,11 +39,13 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matchers;
+import com.google.errorprone.predicates.TypePredicates;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
@@ -100,6 +102,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           Preconditions.class.getCanonicalName(),
           Predicates.class.getCanonicalName(),
           StandardCharsets.class.getCanonicalName(),
+          TypePredicates.class.getCanonicalName(),
           Verify.class.getCanonicalName(),
           "com.fasterxml.jackson.annotation.JsonCreator.Mode",
           "com.fasterxml.jackson.annotation.JsonFormat.Shape",
@@ -132,7 +135,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           "org.springframework.http.MediaType",
           "org.testng.Assert",
           "reactor.function.TupleUtils",
-          "tech.picnic.errorprone.bugpatterns.util.MoreTypes");
+          "tech.picnic.errorprone.utils.MoreTypes");
 
   /**
    * Type members that should be statically imported.
@@ -209,15 +212,10 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
     Tree parentTree =
         requireNonNull(state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
             .getLeaf();
-    switch (parentTree.getKind()) {
-      case IMPORT:
-      case MEMBER_SELECT:
-        return false;
-      case METHOD_INVOCATION:
-        return ((MethodInvocationTree) parentTree).getTypeArguments().isEmpty();
-      default:
-        return true;
-    }
+
+    return parentTree instanceof MethodInvocationTree methodInvocation
+        ? methodInvocation.getTypeArguments().isEmpty()
+        : (parentTree.getKind() != Kind.IMPORT && parentTree.getKind() != Kind.MEMBER_SELECT);
   }
 
   private static boolean isCandidate(MemberSelectTree tree) {

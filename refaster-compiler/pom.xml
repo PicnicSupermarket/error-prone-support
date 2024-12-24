@@ -5,13 +5,14 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.14.1-SNAPSHOT</version>
+        <version>0.19.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-compiler</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Compiler</name>
     <description>A Java compiler plugin that identifies and compiles Refaster rules, storing them as resource files on the classpath.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>

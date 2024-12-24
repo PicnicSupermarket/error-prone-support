@@ -3,11 +3,11 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.isSubTypeOf;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.generic;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.raw;
-import static tech.picnic.errorprone.bugpatterns.util.MoreTypes.subOf;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreMatchers.isSubTypeOf;
+import static tech.picnic.errorprone.utils.MoreTypes.generic;
+import static tech.picnic.errorprone.utils.MoreTypes.raw;
+import static tech.picnic.errorprone.utils.MoreTypes.subOf;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;

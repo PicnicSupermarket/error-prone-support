@@ -41,7 +41,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testFail() {
-    throw new AssertionError();
+    fail();
   }
 
   void testFailWithMessage() {

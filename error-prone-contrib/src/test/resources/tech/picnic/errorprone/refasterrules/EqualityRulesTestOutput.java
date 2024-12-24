@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 
 import com.google.common.collect.BoundType;
@@ -14,15 +15,21 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Objects.class, Optional.class, not(null));
+    return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
-  ImmutableSet<Boolean> testPrimitiveOrReferenceEquality() {
+  ImmutableSet<Boolean> testEnumReferenceEquality() {
     return ImmutableSet.of(
         RoundingMode.UP == RoundingMode.DOWN,
         RoundingMode.UP == RoundingMode.DOWN,
+        RoundingMode.UP == RoundingMode.DOWN,
+        RoundingMode.UP != RoundingMode.DOWN,
         RoundingMode.UP != RoundingMode.DOWN,
         RoundingMode.UP != RoundingMode.DOWN);
+  }
+
+  ImmutableSet<Predicate<RoundingMode>> testEnumReferenceEqualityLambda() {
+    return ImmutableSet.of(v -> v == RoundingMode.DOWN, v -> v == RoundingMode.UP);
   }
 
   boolean testEqualsPredicate() {
@@ -69,15 +76,11 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return v -> !v.isEmpty();
   }
 
-  boolean testEqualsLhsNullable() {
-    return "bar".equals("foo");
+  ImmutableSet<Boolean> testEquals() {
+    return ImmutableSet.of("foo".equals("bar"), "baz".equals("qux"), "quuz".equals("quux"));
   }
 
-  boolean testEqualsRhsNullable() {
-    return "foo".equals("bar");
-  }
-
-  boolean testEqualsLhsAndRhsNullable() {
+  boolean testObjectsEquals() {
     return Objects.equals("foo", "bar");
   }
 }

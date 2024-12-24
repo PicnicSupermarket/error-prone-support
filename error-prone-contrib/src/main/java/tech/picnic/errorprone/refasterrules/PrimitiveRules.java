@@ -8,6 +8,8 @@ import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import com.google.common.primitives.UnsignedInts;
+import com.google.common.primitives.UnsignedLongs;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -76,6 +78,8 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@link Math#toIntExact(long)} over the Guava alternative. */
+  // XXX: This rule changes the exception possibly thrown from `IllegalArgumentException` to
+  // `ArithmeticException`.
   static final class LongToIntExact {
     @BeforeTemplate
     int before(long l) {
@@ -189,97 +193,6 @@ final class PrimitiveRules {
     @AfterTemplate
     int after(double d) {
       return Double.hashCode(d);
-    }
-  }
-
-  /** Prefer {@link Boolean#compare(boolean, boolean)} over the Guava alternative. */
-  static final class BooleanCompare {
-    @BeforeTemplate
-    int before(boolean a, boolean b) {
-      return Booleans.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(boolean a, boolean b) {
-      return Boolean.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Character#compare(char, char)} over the Guava alternative. */
-  static final class CharacterCompare {
-    @BeforeTemplate
-    int before(char a, char b) {
-      return Chars.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(char a, char b) {
-      return Character.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Short#compare(short, short)} over the Guava alternative. */
-  static final class ShortCompare {
-    @BeforeTemplate
-    int before(short a, short b) {
-      return Shorts.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(short a, short b) {
-      return Short.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Integer#compare(int, int)} over the Guava alternative. */
-  static final class IntegerCompare {
-    @BeforeTemplate
-    int before(int a, int b) {
-      return Ints.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(int a, int b) {
-      return Integer.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Long#compare(long, long)} over the Guava alternative. */
-  static final class LongCompare {
-    @BeforeTemplate
-    int before(long a, long b) {
-      return Longs.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(long a, long b) {
-      return Long.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Float#compare(float, float)} over the Guava alternative. */
-  static final class FloatCompare {
-    @BeforeTemplate
-    int before(float a, float b) {
-      return Floats.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(float a, float b) {
-      return Float.compare(a, b);
-    }
-  }
-
-  /** Prefer {@link Double#compare(double, double)} over the Guava alternative. */
-  static final class DoubleCompare {
-    @BeforeTemplate
-    int before(double a, double b) {
-      return Doubles.compare(a, b);
-    }
-
-    @AfterTemplate
-    int after(double a, double b) {
-      return Double.compare(a, b);
     }
   }
 
@@ -440,6 +353,207 @@ final class PrimitiveRules {
     @AlsoNegation
     boolean after(long l) {
       return Long.signum(l) == -1;
+    }
+  }
+
+  /** Prefer JDK's {@link Integer#compareUnsigned(int, int)} over third-party alternatives. */
+  static final class IntegerCompareUnsigned {
+    @BeforeTemplate
+    int before(int x, int y) {
+      return UnsignedInts.compare(x, y);
+    }
+
+    @AfterTemplate
+    int after(int x, int y) {
+      return Integer.compareUnsigned(x, y);
+    }
+  }
+
+  /** Prefer JDK's {@link Long#compareUnsigned(long, long)} over third-party alternatives. */
+  static final class LongCompareUnsigned {
+    @BeforeTemplate
+    long before(long x, long y) {
+      return UnsignedLongs.compare(x, y);
+    }
+
+    @AfterTemplate
+    long after(long x, long y) {
+      return Long.compareUnsigned(x, y);
+    }
+  }
+
+  /** Prefer JDK's {@link Integer#divideUnsigned(int, int)} over third-party alternatives. */
+  static final class IntegerDivideUnsigned {
+    @BeforeTemplate
+    int before(int x, int y) {
+      return UnsignedInts.divide(x, y);
+    }
+
+    @AfterTemplate
+    int after(int x, int y) {
+      return Integer.divideUnsigned(x, y);
+    }
+  }
+
+  /** Prefer JDK's {@link Long#divideUnsigned(long, long)} over third-party alternatives. */
+  static final class LongDivideUnsigned {
+    @BeforeTemplate
+    long before(long x, long y) {
+      return UnsignedLongs.divide(x, y);
+    }
+
+    @AfterTemplate
+    long after(long x, long y) {
+      return Long.divideUnsigned(x, y);
+    }
+  }
+
+  /** Prefer JDK's {@link Integer#remainderUnsigned(int, int)} over third-party alternatives. */
+  static final class IntegerRemainderUnsigned {
+    @BeforeTemplate
+    int before(int x, int y) {
+      return UnsignedInts.remainder(x, y);
+    }
+
+    @AfterTemplate
+    int after(int x, int y) {
+      return Integer.remainderUnsigned(x, y);
+    }
+  }
+
+  /** Prefer JDK's {@link Long#remainderUnsigned(long, long)} over third-party alternatives. */
+  static final class LongRemainderUnsigned {
+    @BeforeTemplate
+    long before(long x, long y) {
+      return UnsignedLongs.remainder(x, y);
+    }
+
+    @AfterTemplate
+    long after(long x, long y) {
+      return Long.remainderUnsigned(x, y);
+    }
+  }
+
+  /**
+   * Prefer JDK's {@link Integer#parseUnsignedInt(String)} over third-party or more verbose
+   * alternatives.
+   */
+  static final class IntegerParseUnsignedInt {
+    @BeforeTemplate
+    int before(String string) {
+      return Refaster.anyOf(
+          UnsignedInts.parseUnsignedInt(string), Integer.parseUnsignedInt(string, 10));
+    }
+
+    @AfterTemplate
+    int after(String string) {
+      return Integer.parseUnsignedInt(string);
+    }
+  }
+
+  /**
+   * Prefer JDK's {@link Long#parseUnsignedLong(String)} over third-party or more verbose
+   * alternatives.
+   */
+  static final class LongParseUnsignedLong {
+    @BeforeTemplate
+    long before(String string) {
+      return Refaster.anyOf(
+          UnsignedLongs.parseUnsignedLong(string), Long.parseUnsignedLong(string, 10));
+    }
+
+    @AfterTemplate
+    long after(String string) {
+      return Long.parseUnsignedLong(string);
+    }
+  }
+
+  /** Prefer JDK's {@link Integer#parseUnsignedInt(String, int)} over third-party alternatives. */
+  static final class IntegerParseUnsignedIntWithRadix {
+    @BeforeTemplate
+    int before(String string, int radix) {
+      return UnsignedInts.parseUnsignedInt(string, radix);
+    }
+
+    @AfterTemplate
+    int after(String string, int radix) {
+      return Integer.parseUnsignedInt(string, radix);
+    }
+  }
+
+  /** Prefer JDK's {@link Long#parseUnsignedLong(String, int)} over third-party alternatives. */
+  static final class LongParseUnsignedLongWithRadix {
+    @BeforeTemplate
+    long before(String string, int radix) {
+      return UnsignedLongs.parseUnsignedLong(string, radix);
+    }
+
+    @AfterTemplate
+    long after(String string, int radix) {
+      return Long.parseUnsignedLong(string, radix);
+    }
+  }
+
+  /**
+   * Prefer JDK's {@link Integer#toUnsignedString(int)} over third-party or more verbose
+   * alternatives.
+   */
+  static final class IntegerToUnsignedString {
+    @BeforeTemplate
+    String before(int i) {
+      return Refaster.anyOf(UnsignedInts.toString(i), Integer.toUnsignedString(i, 10));
+    }
+
+    @AfterTemplate
+    String after(int i) {
+      return Integer.toUnsignedString(i);
+    }
+  }
+
+  /**
+   * Prefer JDK's {@link Long#toUnsignedString(long)} over third-party or more verbose alternatives.
+   */
+  static final class LongToUnsignedString {
+    @BeforeTemplate
+    String before(long i) {
+      return Refaster.anyOf(UnsignedLongs.toString(i), Long.toUnsignedString(i, 10));
+    }
+
+    @AfterTemplate
+    String after(long i) {
+      return Long.toUnsignedString(i);
+    }
+  }
+
+  /**
+   * Prefer JDK's {@link Integer#toUnsignedString(int,int)} over third-party or more verbose
+   * alternatives.
+   */
+  static final class IntegerToUnsignedStringWithRadix {
+    @BeforeTemplate
+    String before(int i, int radix) {
+      return UnsignedInts.toString(i, radix);
+    }
+
+    @AfterTemplate
+    String after(int i, int radix) {
+      return Integer.toUnsignedString(i, radix);
+    }
+  }
+
+  /**
+   * Prefer JDK's {@link Long#toUnsignedString(long,int)} over third-party or more verbose
+   * alternatives.
+   */
+  static final class LongToUnsignedStringWithRadix {
+    @BeforeTemplate
+    String before(long i, int radix) {
+      return UnsignedLongs.toString(i, radix);
+    }
+
+    @AfterTemplate
+    String after(long i, int radix) {
+      return Long.toUnsignedString(i, radix);
     }
   }
 }

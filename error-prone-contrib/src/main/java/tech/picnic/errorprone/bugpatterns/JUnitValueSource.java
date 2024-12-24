@@ -19,9 +19,9 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.HAS_METHOD_SOURCE;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.getMethodSourceFactoryNames;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.HAS_METHOD_SOURCE;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.getMethodSourceFactoryNames;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
@@ -58,7 +58,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags JUnit tests with a {@link
@@ -232,7 +232,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
       @Override
       public @Nullable Void visitReturn(ReturnTree node, @Nullable Void unused) {
         returnExpressions.add(node.getExpression());
-        return super.visitReturn(node, unused);
+        return super.visitReturn(node, null);
       }
 
       @Override
@@ -265,8 +265,8 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             arguments.stream()
                 .map(
                     arg ->
-                        arg instanceof MethodInvocationTree
-                            ? Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments())
+                        arg instanceof MethodInvocationTree methodInvocation
+                            ? Iterables.getOnlyElement(methodInvocation.getArguments())
                             : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
@@ -276,16 +276,12 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static String toValueSourceAttributeName(Type type) {
     String typeString = type.tsym.name.toString();
 
-    switch (typeString) {
-      case "Class":
-        return "classes";
-      case "Character":
-        return "chars";
-      case "Integer":
-        return "ints";
-      default:
-        return typeString.toLowerCase(Locale.ROOT) + 's';
-    }
+    return switch (typeString) {
+      case "Class" -> "classes";
+      case "Character" -> "chars";
+      case "Integer" -> "ints";
+      default -> typeString.toLowerCase(Locale.ROOT) + 's';
+    };
   }
 
   private static <T> Optional<T> getElementIfSingleton(Collection<T> collection) {
@@ -297,11 +293,10 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static Matcher<ExpressionTree> isSingleDimensionArrayCreationWithAllElementsMatching(
       Matcher<? super ExpressionTree> elementMatcher) {
     return (tree, state) -> {
-      if (!(tree instanceof NewArrayTree)) {
+      if (!(tree instanceof NewArrayTree newArray)) {
         return false;
       }
 
-      NewArrayTree newArray = (NewArrayTree) tree;
       return newArray.getDimensions().isEmpty()
           && !newArray.getInitializers().isEmpty()
           && newArray.getInitializers().stream()

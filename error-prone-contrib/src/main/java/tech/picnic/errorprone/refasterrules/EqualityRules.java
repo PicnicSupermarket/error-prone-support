@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.function.Predicate.not;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -19,9 +20,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class EqualityRules {
   private EqualityRules() {}
 
-  /** Prefer reference-based quality for enums. */
-  // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
-  static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
+  /** Prefer reference-based equality for enums. */
+  // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
+  static final class EnumReferenceEquality<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -30,8 +31,9 @@ final class EqualityRules {
     // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
     // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
+    @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(T a, T b) {
-      return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
+      return Refaster.anyOf(a.equals(b), Objects.equals(a, b), a.ordinal() == b.ordinal());
     }
 
     @AfterTemplate
@@ -39,6 +41,20 @@ final class EqualityRules {
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     boolean after(T a, T b) {
       return a == b;
+    }
+  }
+
+  /** Prefer reference-based equality for enums. */
+  static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
+    @BeforeTemplate
+    Predicate<T> before(T e) {
+      return Refaster.anyOf(isEqual(e), e::equals);
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
+    Predicate<T> after(T e) {
+      return v -> v == e;
     }
   }
 
@@ -157,23 +173,13 @@ final class EqualityRules {
   }
 
   /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class EqualsLhsNullable<T, S> {
+  static final class Equals<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {
-      return Optional.ofNullable(value1).equals(Optional.of(value2));
-    }
-
-    @AfterTemplate
-    boolean after(T value1, S value2) {
-      return value2.equals(value1);
-    }
-  }
-
-  /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class EqualsRhsNullable<T, S> {
-    @BeforeTemplate
-    boolean before(T value1, S value2) {
-      return Optional.of(value1).equals(Optional.ofNullable(value2));
+      return Refaster.anyOf(
+          Optional.of(value1).equals(Optional.of(value2)),
+          Optional.of(value1).equals(Optional.ofNullable(value2)),
+          Optional.ofNullable(value2).equals(Optional.of(value1)));
     }
 
     @AfterTemplate
@@ -183,7 +189,7 @@ final class EqualityRules {
   }
 
   /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class EqualsLhsAndRhsNullable<T, S> {
+  static final class ObjectsEquals<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {
       return Optional.ofNullable(value1).equals(Optional.ofNullable(value2));

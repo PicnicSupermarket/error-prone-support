@@ -3,14 +3,19 @@ package tech.picnic.errorprone.refasterrules;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
 
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -48,6 +53,10 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.comparing(identity(), Comparator.comparingInt(String::length)),
         Comparator.comparing(s -> s, Comparator.comparingInt(String::length)),
         Comparator.comparing(s -> "foo", Comparator.comparingInt(String::length)));
+  }
+
+  Comparator<String> testComparingEnum() {
+    return Comparator.comparingInt(s -> RoundingMode.valueOf(s).ordinal());
   }
 
   Comparator<String> testThenComparing() {
@@ -98,6 +107,24 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>reverseOrder().compare("baz", "qux"));
   }
 
+  void testCollectionsSort() {
+    Collections.sort(ImmutableList.of("foo", "bar"), naturalOrder());
+  }
+
+  ImmutableSet<String> testCollectionsMin() {
+    return ImmutableSet.of(
+        Collections.min(ImmutableList.of("foo"), naturalOrder()),
+        Collections.max(ImmutableList.of("bar"), reverseOrder()));
+  }
+
+  String testMinOfArray() {
+    return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
+  }
+
+  String testCollectionsMinWithComparator() {
+    return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
+  }
+
   int testMinOfVarargs() {
     return Stream.of(1, 2).min(naturalOrder()).orElseThrow();
   }
@@ -124,6 +151,20 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(Arrays.asList("a", "b"), (a, b) -> -1),
         Collections.min(ImmutableList.of("a", "b"), (a, b) -> 0),
         Collections.min(ImmutableSet.of("a", "b"), (a, b) -> 1));
+  }
+
+  ImmutableSet<String> testCollectionsMax() {
+    return ImmutableSet.of(
+        Collections.max(ImmutableList.of("foo"), naturalOrder()),
+        Collections.min(ImmutableList.of("bar"), reverseOrder()));
+  }
+
+  String testMaxOfArray() {
+    return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
+  }
+
+  String testCollectionsMaxWithComparator() {
+    return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
   }
 
   int testMaxOfVarargs() {
@@ -160,5 +201,25 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
 
   BinaryOperator<String> testComparatorsMax() {
     return BinaryOperator.maxBy(naturalOrder());
+  }
+
+  Collector<Integer, ?, Optional<Integer>> testMinByNaturalOrder() {
+    return maxBy(reverseOrder());
+  }
+
+  Collector<Integer, ?, Optional<Integer>> testMaxByNaturalOrder() {
+    return minBy(reverseOrder());
+  }
+
+  ImmutableSet<Boolean> testIsLessThan() {
+    return ImmutableSet.of(
+        RoundingMode.UP.ordinal() < RoundingMode.DOWN.ordinal(),
+        RoundingMode.UP.ordinal() >= RoundingMode.DOWN.ordinal());
+  }
+
+  ImmutableSet<Boolean> testIsLessThanOrEqualTo() {
+    return ImmutableSet.of(
+        RoundingMode.UP.ordinal() <= RoundingMode.DOWN.ordinal(),
+        RoundingMode.UP.ordinal() > RoundingMode.DOWN.ordinal());
   }
 }

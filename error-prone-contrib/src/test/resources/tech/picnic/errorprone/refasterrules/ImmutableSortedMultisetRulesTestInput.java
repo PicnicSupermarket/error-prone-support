@@ -37,6 +37,7 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
         Stream.<Integer>empty().collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
+  @SuppressWarnings("unchecked")
   ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
     return ImmutableMultiset.of(
         ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(1)),

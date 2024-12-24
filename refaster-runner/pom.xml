@@ -5,13 +5,14 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.14.1-SNAPSHOT</version>
+        <version>0.19.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>refaster-runner</artifactId>
 
     <name>Picnic :: Error Prone Support :: Refaster Runner</name>
     <description>Exposes Refaster rules found on the classpath through a regular Error Prone check.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>
@@ -76,6 +77,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
@@ -95,6 +101,8 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- XXX: Explicitly declared as a workaround for
+        https://github.com/pitest/pitest-junit5-plugin/issues/105. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -110,6 +118,21 @@
             <artifactId>jmh-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-templating</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -120,15 +143,15 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
                         <annotationProcessorPaths combine.children="append">
+                            <!-- XXX: Drop the version declaration once
+                            properly supported. See
+                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-compiler</artifactId>
                                 <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
-                        <compilerArgs combine.children="append">
-                            <arg>-Xplugin:RefasterRuleCompiler</arg>
-                        </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>

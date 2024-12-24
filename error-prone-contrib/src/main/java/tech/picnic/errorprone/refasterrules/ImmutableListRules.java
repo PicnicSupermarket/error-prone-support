@@ -118,17 +118,17 @@ final class ImmutableListRules {
    */
   static final class ImmutableListSortedCopyOfWithCustomComparator<T> {
     @BeforeTemplate
-    ImmutableList<T> before(Iterable<T> iterable, Comparator<T> cmp) {
+    ImmutableList<T> before(Comparator<T> cmp, Iterable<T> iterable) {
       return Streams.stream(iterable).sorted(cmp).collect(toImmutableList());
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Collection<T> iterable, Comparator<T> cmp) {
+    ImmutableList<T> before(Comparator<T> cmp, Collection<T> iterable) {
       return iterable.stream().sorted(cmp).collect(toImmutableList());
     }
 
     @AfterTemplate
-    ImmutableList<T> after(Collection<T> iterable, Comparator<? super T> cmp) {
+    ImmutableList<T> after(Comparator<? super T> cmp, Collection<T> iterable) {
       return ImmutableList.sortedCopyOf(cmp, iterable);
     }
   }

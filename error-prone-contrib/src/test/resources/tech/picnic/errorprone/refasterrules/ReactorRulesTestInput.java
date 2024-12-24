@@ -2,11 +2,15 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.MoreCollectors.toOptional;
+import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.maxBy;
+import static java.util.stream.Collectors.minBy;
 import static java.util.stream.Collectors.toCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -18,9 +22,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.math.MathFlux;
 import reactor.test.StepVerifier;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
@@ -37,7 +44,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         List.class,
         ImmutableCollection.class,
         ImmutableMap.class,
+        assertThat(false),
         assertThat(0),
+        maxBy(null),
+        minBy(null),
+        naturalOrder(),
         toCollection(null),
         toImmutableList(),
         toOptional());
@@ -135,7 +146,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<Integer> testFluxTake() {
-    return Flux.just(1, 2, 3).take(1);
+    return Flux.just(1, 2, 3).take(1, true);
   }
 
   Mono<String> testMonoDefaultIfEmpty() {
@@ -175,8 +186,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.range(0, 0));
   }
 
-  Flux<Integer> testFluxJust() {
-    return Flux.range(0, 1);
+  ImmutableSet<Flux<Integer>> testFluxJust() {
+    return ImmutableSet.of(Flux.range(0, 1), Mono.just(2).repeat().take(1));
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
@@ -200,11 +211,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Integer>> testFluxConcatMap() {
     return ImmutableSet.of(
-        Flux.just(1).flatMap(Mono::just, 1),
-        Flux.just(2).flatMapSequential(Mono::just, 1),
-        Flux.just(3).map(Mono::just).concatMap(identity()),
-        Flux.just(4).map(Mono::just).concatMap(v -> v),
-        Flux.just(5).map(Mono::just).concatMap(v -> Mono.empty()));
+        Flux.just(1).concatMap(Mono::just, 0),
+        Flux.just(2).flatMap(Mono::just, 1),
+        Flux.just(3).flatMapSequential(Mono::just, 1),
+        Flux.just(4).map(Mono::just).concatMap(identity()),
+        Flux.just(5).map(Mono::just).concatMap(v -> v),
+        Flux.just(6).map(Mono::just).concatMap(v -> Mono.empty()));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
@@ -218,10 +230,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Integer>> testMonoFlatMapIterable() {
     return ImmutableSet.of(
-        Mono.just(1).map(ImmutableSet::of).flatMapIterable(identity()),
-        Mono.just(2).map(ImmutableSet::of).flatMapIterable(v -> v),
-        Mono.just(3).map(ImmutableSet::of).flatMapIterable(v -> ImmutableSet.of()),
-        Mono.just(4).flux().concatMapIterable(ImmutableSet::of));
+        Mono.just(1).map(ImmutableSet::of).flatMapMany(Flux::fromIterable),
+        Mono.just(2).map(ImmutableSet::of).flatMapIterable(identity()),
+        Mono.just(3).map(ImmutableSet::of).flatMapIterable(v -> v),
+        Mono.just(4).map(ImmutableSet::of).flatMapIterable(v -> ImmutableSet.of()),
+        Mono.just(5).flux().concatMapIterable(ImmutableSet::of));
   }
 
   Flux<Integer> testMonoFlatMapIterableIdentity() {
@@ -336,8 +349,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just("foo").ignoreElements().thenEmpty(Mono.empty());
   }
 
-  Flux<String> testMonoThenMany() {
-    return Mono.just("foo").ignoreElement().thenMany(Flux.just("bar"));
+  ImmutableSet<Flux<String>> testMonoThenMany() {
+    return ImmutableSet.of(
+        Mono.just("foo").ignoreElement().thenMany(Flux.just("bar")),
+        Mono.just("baz").ignoreElement().thenMany(Flux.just("qux")));
   }
 
   Flux<String> testMonoThenMonoFlux() {
@@ -351,7 +366,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<?>> testMonoThenMono() {
     return ImmutableSet.of(
         Mono.just("foo").ignoreElement().then(Mono.just("bar")),
-        Mono.just("baz").thenEmpty(Mono.<Void>empty()));
+        Mono.just("baz").flux().then(Mono.just("qux")),
+        Mono.just("quux").thenEmpty(Mono.<Void>empty()));
   }
 
   ImmutableSet<Mono<?>> testFluxThenMono() {
@@ -363,7 +379,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Optional<String>>> testMonoSingleOptional() {
     return ImmutableSet.of(
         Mono.just("foo").flux().collect(toOptional()),
-        Mono.just("bar").map(Optional::of).defaultIfEmpty(Optional.empty()));
+        Mono.just("bar").map(Optional::of).defaultIfEmpty(Optional.empty()),
+        Mono.just("baz").transform(Mono::singleOptional));
   }
 
   Mono<Number> testMonoCast() {
@@ -418,6 +435,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.just(ImmutableList.of("foo")).concatMap(list -> Flux.fromIterable(list), 1),
         Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
+  }
+
+  ImmutableSet<Flux<String>> testFluxFromIterable() {
+    return ImmutableSet.of(
+        Flux.fromStream(ImmutableList.of("foo")::stream),
+        Flux.fromStream(() -> ImmutableList.of("bar").stream()));
   }
 
   ImmutableSet<Mono<Integer>> testFluxCountMapMathToIntExact() {
@@ -525,6 +548,40 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).collect(toImmutableList()).map(ImmutableSet::copyOf);
   }
 
+  Flux<Integer> testFluxSort() {
+    return Flux.just(1).sort(naturalOrder());
+  }
+
+  Mono<Integer> testFluxTransformMin() {
+    return Flux.just(1).sort().next();
+  }
+
+  ImmutableSet<Mono<Integer>> testFluxTransformMinWithComparator() {
+    return ImmutableSet.of(
+        Flux.just(1).sort(reverseOrder()).next(),
+        Flux.just(2).collect(minBy(reverseOrder())).flatMap(Mono::justOrEmpty));
+  }
+
+  Mono<Integer> testFluxTransformMax() {
+    return Flux.just(1).sort().last();
+  }
+
+  ImmutableSet<Mono<Integer>> testFluxTransformMaxWithComparator() {
+    return ImmutableSet.of(
+        Flux.just(1).sort(reverseOrder()).last(),
+        Flux.just(2).collect(maxBy(reverseOrder())).flatMap(Mono::justOrEmpty));
+  }
+
+  ImmutableSet<Mono<Integer>> testMathFluxMin() {
+    return ImmutableSet.of(
+        MathFlux.min(Flux.just(1), naturalOrder()), MathFlux.max(Flux.just(2), reverseOrder()));
+  }
+
+  ImmutableSet<Mono<Integer>> testMathFluxMax() {
+    return ImmutableSet.of(
+        MathFlux.min(Flux.just(1), reverseOrder()), MathFlux.max(Flux.just(2), naturalOrder()));
+  }
+
   ImmutableSet<Context> testContextEmpty() {
     return ImmutableSet.of(Context.of(ImmutableMap.of()), Context.of(ImmutableMap.of(1, 2)));
   }
@@ -533,12 +590,54 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(PublisherProbe.of(Mono.empty()), PublisherProbe.of(Flux.empty()));
   }
 
-  StepVerifier.FirstStep<Integer> testStepVerifierFromMono() {
-    return StepVerifier.create(Mono.just(1));
+  void testPublisherProbeAssertWasSubscribed() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isTrue();
+    assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isNotNegative();
+    assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotEqualTo(0);
+    assertThat(PublisherProbe.of(Mono.just(4)).subscribeCount()).isPositive();
+  }
+
+  void testPublisherProbeAssertWasNotSubscribed() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isFalse();
+    assertThat(PublisherProbe.of(Mono.just(2)).subscribeCount()).isEqualTo(0);
+    assertThat(PublisherProbe.of(Mono.just(3)).subscribeCount()).isNotPositive();
+  }
+
+  void testPublisherProbeAssertWasCancelled() {
+    assertThat(PublisherProbe.empty().wasCancelled()).isTrue();
+  }
+
+  void testPublisherProbeAssertWasNotCancelled() {
+    assertThat(PublisherProbe.empty().wasCancelled()).isFalse();
+  }
+
+  void testPublisherProbeAssertWasRequested() {
+    assertThat(PublisherProbe.empty().wasRequested()).isTrue();
+  }
+
+  void testPublisherProbeAssertWasNotRequested() {
+    assertThat(PublisherProbe.empty().wasRequested()).isFalse();
+  }
+
+  ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
+    return ImmutableSet.of(
+        StepVerifier.create(Mono.just(1)), Mono.just(2).flux().as(StepVerifier::create));
   }
 
   StepVerifier.FirstStep<Integer> testStepVerifierFromFlux() {
     return StepVerifier.create(Flux.just(1));
+  }
+
+  Object testStepVerifierVerify() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyThenAssertThat();
+  }
+
+  Object testStepVerifierVerifyDuration() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyThenAssertThat(Duration.ZERO);
+  }
+
+  StepVerifier testStepVerifierVerifyLater() {
+    return Mono.empty().as(StepVerifier::create).expectError().verifyLater().verifyLater();
   }
 
   ImmutableSet<StepVerifier.Step<Integer>> testStepVerifierStepIdentity() {
@@ -581,15 +680,41 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
             .verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(AssertionError.class)));
   }
 
-  Duration testStepVerifierLastStepVerifyErrorMatches() {
-    return Mono.empty()
-        .as(StepVerifier::create)
-        .expectErrorMatches(IllegalArgumentException.class::equals)
-        .verify();
+  ImmutableSet<?> testStepVerifierLastStepVerifyErrorMatches() {
+    return ImmutableSet.of(
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectErrorMatches(IllegalArgumentException.class::equals)
+            .verify(),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectError()
+            .verifyThenAssertThat()
+            .hasOperatorErrorMatching(IllegalStateException.class::equals));
   }
 
   Duration testStepVerifierLastStepVerifyErrorSatisfies() {
     return Mono.empty().as(StepVerifier::create).expectErrorSatisfies(t -> {}).verify();
+  }
+
+  ImmutableSet<?> testStepVerifierLastStepVerifyErrorSatisfiesAssertJ() {
+    return ImmutableSet.of(
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectError()
+            .verifyThenAssertThat()
+            .hasOperatorErrorOfType(IllegalArgumentException.class)
+            .hasOperatorErrorWithMessage("foo"),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectError(IllegalStateException.class)
+            .verifyThenAssertThat()
+            .hasOperatorErrorWithMessage("bar"),
+        Mono.empty()
+            .as(StepVerifier::create)
+            .expectErrorMessage("baz")
+            .verifyThenAssertThat()
+            .hasOperatorErrorOfType(AssertionError.class));
   }
 
   Duration testStepVerifierLastStepVerifyErrorMessage() {
@@ -598,5 +723,21 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Duration testStepVerifierLastStepVerifyTimeout() {
     return Mono.empty().as(StepVerifier::create).expectTimeout(Duration.ZERO).verify();
+  }
+
+  Mono<Void> testMonoFromFutureSupplier() {
+    return Mono.fromFuture(CompletableFuture.completedFuture(null));
+  }
+
+  Mono<Void> testMonoFromFutureSupplierBoolean() {
+    return Mono.fromFuture(CompletableFuture.completedFuture(null), true);
+  }
+
+  Mono<String> testMonoFromFutureAsyncLoadingCacheGet() {
+    return Mono.fromFuture(() -> ((AsyncLoadingCache<Integer, String>) null).get(0));
+  }
+
+  Flux<Integer> testFluxFromStreamSupplier() {
+    return Flux.fromStream(Stream.of(1));
   }
 }

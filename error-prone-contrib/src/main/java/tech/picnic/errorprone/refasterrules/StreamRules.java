@@ -4,6 +4,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
 import static java.util.stream.Collectors.flatMapping;
@@ -24,6 +25,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -37,6 +39,7 @@ import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
@@ -254,37 +257,59 @@ final class StreamRules {
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
-  static final class StreamIsEmpty<T> {
+  static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Collection<?>> collector) {
+    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
       return Refaster.anyOf(
           stream.count() == 0,
           stream.count() <= 0,
           stream.count() < 1,
           stream.findFirst().isEmpty(),
-          stream.collect(collector).isEmpty());
+          stream.collect(collector).isEmpty(),
+          stream.collect(collectingAndThen(collector, C::isEmpty)));
+    }
+
+    @BeforeTemplate
+    boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> collector) {
+      return stream.collect(collectingAndThen(collector, M::isEmpty));
     }
 
     @AfterTemplate
+    @AlsoNegation
     boolean after(Stream<T> stream) {
       return stream.findAny().isEmpty();
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
-  static final class StreamIsNotEmpty<T> {
+  /**
+   * Prefer {@link Stream#findAny()} over {@link Stream#findFirst()} if one only cares whether the
+   * stream is nonempty.
+   */
+  static final class StreamFindAnyIsPresent<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream) {
-      return Refaster.anyOf(
-          stream.count() != 0,
-          stream.count() > 0,
-          stream.count() >= 1,
-          stream.findFirst().isPresent());
+      return stream.findFirst().isPresent();
     }
 
     @AfterTemplate
     boolean after(Stream<T> stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  /**
+   * Prefer an unconditional {@link Map#get(Object)} call followed by a {@code null} check over a
+   * call to {@link Map#containsKey(Object)}, as the former avoids a second lookup operation.
+   */
+  static final class StreamMapFilter<T, K, V> {
+    @BeforeTemplate
+    Stream<V> before(Stream<T> stream, Map<K, V> map) {
+      return stream.filter(map::containsKey).map(map::get);
+    }
+
+    @AfterTemplate
+    Stream<V> after(Stream<T> stream, Map<K, V> map) {
+      return stream.map(map::get).filter(Objects::nonNull);
     }
   }
 

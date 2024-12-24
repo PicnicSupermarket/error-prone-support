@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
+import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
@@ -60,7 +61,10 @@ import tech.picnic.errorprone.refaster.runner.Refaster;
 // XXX: This check currently only validates that one `Refaster.anyOf` branch in one
 // `@BeforeTemplate` method is covered by a test. Review how we can make sure that _all_
 // `@BeforeTemplate` methods and `Refaster.anyOf` branches are covered.
-@BugPattern(summary = "Exercises a Refaster rule collection", severity = ERROR)
+// XXX: Look into replacing this setup with another that allows test cases to be co-located
+// with/nested within the rules. This way any rule change only requires modifications in a single
+// place, rather than in three.
+@BugPattern(summary = "Exercises a Refaster rule collection", linkType = NONE, severity = ERROR)
 @SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class RefasterRuleCollection extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
@@ -154,8 +158,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     String expectedClassName = ruleCollectionUnderTest + "Test";
 
     for (Tree typeDeclaration : tree.getTypeDecls()) {
-      if (typeDeclaration instanceof ClassTree) {
-        if (!((ClassTree) typeDeclaration).getSimpleName().contentEquals(expectedClassName)) {
+      if (typeDeclaration instanceof ClassTree classTree) {
+        if (!classTree.getSimpleName().contentEquals(expectedClassName)) {
           state.reportMatch(
               describeMatch(
                   typeDeclaration,
@@ -276,9 +280,10 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             unexpectedMatchesByLineNumber.entries().stream()
                 .map(
                     e ->
-                        String.format(
-                            "Rule `%s` matches on line %s, while it should match in a method named `test%s`.",
-                            e.getValue(), e.getKey(), e.getValue()))
+                        """
+                        Rule `%s` matches on line %s, while it should match in a method named \
+                        `test%s`."""
+                            .formatted(e.getValue(), e.getKey(), e.getValue()))
                 .collect(toImmutableSet()),
             state);
       }
@@ -317,7 +322,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       return indexedMatches.subRangeMap(Range.closedOpen(startPosition, endPosition));
     }
 
-    private ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(
+    private static ImmutableListMultimap<Long, String> getUnexpectedMatchesByLineNumber(
         ImmutableRangeMap<Integer, String> matches, String ruleUnderTest, VisitorState state) {
       LineMap lineMap = state.getPath().getCompilationUnit().getLineMap();
       return matches.asMapOfRanges().entrySet().stream()

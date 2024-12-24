@@ -4,7 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -24,7 +24,9 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Avoid MongoDB's `$text` filter operator, as it can trigger heavy queries and even cause the server to run out of memory",
+        """
+        Avoid MongoDB's `$text` filter operator, as it can trigger heavy queries and even cause \
+        the server to run out of memory""",
     link = BUG_PATTERNS_BASE_URL + "MongoDBTextFilterUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,

@@ -15,7 +15,7 @@ import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Preconditions;
@@ -53,9 +53,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.inject.Inject;
-import tech.picnic.errorprone.bugpatterns.util.Flags;
-import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.Flags;
+import tech.picnic.errorprone.utils.MethodMatcherFactory;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
@@ -331,36 +331,32 @@ public final class RedundantStringConversion extends BugChecker
   }
 
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.METHOD_INVOCATION) {
+    if (!(tree instanceof MethodInvocationTree methodInvocation)) {
       return Optional.empty();
     }
 
-    MethodInvocationTree methodInvocation = (MethodInvocationTree) tree;
     if (!conversionMethodMatcher.matches(methodInvocation, state)) {
       return Optional.empty();
     }
 
-    switch (methodInvocation.getArguments().size()) {
-      case 0:
-        return trySimplifyNullaryMethod(methodInvocation, state);
-      case 1:
-        return trySimplifyUnaryMethod(methodInvocation, state);
-      default:
-        throw new IllegalStateException(
-            "Cannot simplify method call with two or more arguments: "
-                + SourceCode.treeToString(tree, state));
-    }
+    return switch (methodInvocation.getArguments().size()) {
+      case 0 -> trySimplifyNullaryMethod(methodInvocation, state);
+      case 1 -> trySimplifyUnaryMethod(methodInvocation, state);
+      default ->
+          throw new IllegalStateException(
+              "Cannot simplify method call with two or more arguments: "
+                  + SourceCode.treeToString(tree, state));
+    };
   }
 
   private static Optional<ExpressionTree> trySimplifyNullaryMethod(
       MethodInvocationTree methodInvocation, VisitorState state) {
-    if (!instanceMethod().matches(methodInvocation, state)) {
+    if (!instanceMethod().matches(methodInvocation, state)
+        || !(methodInvocation.getMethodSelect() instanceof MemberSelectTree memberSelect)) {
       return Optional.empty();
     }
 
-    return Optional.of(methodInvocation.getMethodSelect())
-        .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
-        .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
+    return Optional.of(memberSelect.getExpression())
         .filter(expr -> !"super".equals(SourceCode.treeToString(expr, state)));
   }
 
@@ -382,11 +378,11 @@ public final class RedundantStringConversion extends BugChecker
 
   private static Matcher<MethodInvocationTree> createConversionMethodMatcher(
       ErrorProneFlags flags) {
-    // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
-    // For this class methods accepting more than one argument are not valid, but still: not nice.
+    // XXX: `Flags#getSet` splits by comma, but method signatures may also contain commas. For this
+    // class methods accepting more than one argument are not valid, but still: not nice.
     return anyOf(
         WELL_KNOWN_STRING_CONVERSION_METHODS,
         new MethodMatcherFactory()
-            .create(Flags.getList(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
+            .create(Flags.getSet(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
   }
 }

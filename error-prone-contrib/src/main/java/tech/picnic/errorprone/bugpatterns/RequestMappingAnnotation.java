@@ -11,7 +11,7 @@ import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 import static com.google.errorprone.matchers.Matchers.not;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -73,7 +73,9 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                           isType(ANN_PACKAGE_PREFIX + "RequestBody"),
                           isType(ANN_PACKAGE_PREFIX + "RequestHeader"),
                           isType(ANN_PACKAGE_PREFIX + "RequestParam"),
-                          isType(ANN_PACKAGE_PREFIX + "RequestPart"))),
+                          isType(ANN_PACKAGE_PREFIX + "RequestPart"),
+                          isType(
+                              "org.springframework.security.core.annotation.CurrentSecurityContext"))),
                   isSameType(InputStream.class.getCanonicalName()),
                   isSameType(Locale.class.getCanonicalName()),
                   isSameType(TimeZone.class.getCanonicalName()),
@@ -103,9 +105,10 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
             && LACKS_PARAMETER_ANNOTATION.matches(tree, state)
         ? buildDescription(tree)
             .setMessage(
-                "Not all parameters of this request mapping method are annotated; this may be a "
-                    + "mistake. If the unannotated parameters represent query string parameters, "
-                    + "annotate them with `@RequestParam`.")
+                """
+                Not all parameters of this request mapping method are annotated; this may be a \
+                mistake. If the unannotated parameters represent query string parameters, annotate \
+                them with `@RequestParam`.""")
             .build()
         : Description.NO_MATCH;
   }

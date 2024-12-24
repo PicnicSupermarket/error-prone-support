@@ -9,19 +9,25 @@ permissions:
   contents: read
 jobs:
   analyze-pr:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - name: Check out code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
-          fetch-depth: 2
-          persist-credentials: false
-      - name: Set up JDK
-        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            github.com:443
+            objects.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@9a27433d289dd99d73851f653607c39d3444e8ba # v1.17.0
         with:
-          java-version: 17.0.8
-          distribution: temurin
-          cache: maven
+          checkout-fetch-depth: 2
+          java-version: 17.0.13
+          java-distribution: temurin
+          maven-version: 3.9.9
       - name: Run Pitest
         # By running with features `+GIT(from[HEAD~1]), +gitci`, Pitest only
         # analyzes lines changed in the associated pull request, as GitHub
@@ -32,7 +38,7 @@ jobs:
       - name: Aggregate Pitest reports
         run: mvn pitest-git:aggregate -DkilledEmoji=":tada:" -DmutantEmoji=":zombie:" -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under [_Files changed_](${{ github.event.number }}/files)."
       - name: Upload Pitest reports as artifact
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: pitest-reports
           path: ./target/pit-reports-ci

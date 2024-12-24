@@ -10,7 +10,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Preconditions;
@@ -36,7 +36,8 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags string concatenations that produce a format string; in such cases
@@ -203,12 +204,8 @@ public final class FormatStringConcatenation extends BugChecker
 
     ExpressionTree argument = ASTHelpers.stripParentheses(arguments.get(argPosition));
     return argument instanceof BinaryTree
-        && isStringTyped(argument, state)
+        && MoreASTHelpers.isStringTyped(argument, state)
         && ASTHelpers.constValue(argument, String.class) == null;
-  }
-
-  private static boolean isStringTyped(ExpressionTree tree, VisitorState state) {
-    return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
   }
 
   private static class ReplacementArgumentsConstructor
@@ -223,7 +220,7 @@ public final class FormatStringConcatenation extends BugChecker
 
     @Override
     public @Nullable Void visitBinary(BinaryTree tree, VisitorState state) {
-      if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
+      if (tree.getKind() == Kind.PLUS && MoreASTHelpers.isStringTyped(tree, state)) {
         tree.getLeftOperand().accept(this, state);
         tree.getRightOperand().accept(this, state);
       } else {
@@ -245,8 +242,8 @@ public final class FormatStringConcatenation extends BugChecker
     }
 
     private void appendExpression(Tree tree) {
-      if (tree instanceof LiteralTree) {
-        formatString.append(((LiteralTree) tree).getValue());
+      if (tree instanceof LiteralTree literal) {
+        formatString.append(literal.getValue());
       } else {
         formatString.append(formatSpecifier);
         formatArguments.add(tree);

@@ -4,6 +4,13 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.function.Predicate.not;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.service.AutoService;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
@@ -15,11 +22,12 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.util.TreeScanner;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
+import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCases;
 
 /**
  * An {@link Extractor} that describes how to extract data from classes that test a {@code
@@ -32,7 +40,7 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestCases;
 @Immutable
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
-public final class BugPatternTestExtractor implements Extractor<TestCases> {
+public final class BugPatternTestExtractor implements Extractor<BugPatternTestCases> {
   /** Instantiates a new {@link BugPatternTestExtractor} instance. */
   public BugPatternTestExtractor() {}
 
@@ -42,7 +50,7 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
   }
 
   @Override
-  public Optional<TestCases> tryExtract(ClassTree tree, VisitorState state) {
+  public Optional<BugPatternTestCases> tryExtract(ClassTree tree, VisitorState state) {
     BugPatternTestCollector collector = new BugPatternTestCollector();
 
     collector.scan(tree, state);
@@ -51,8 +59,10 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
         .filter(not(ImmutableList::isEmpty))
         .map(
             tests ->
-                new AutoValue_BugPatternTestExtractor_TestCases(
-                    ASTHelpers.getSymbol(tree).className(), tests));
+                new AutoValue_BugPatternTestExtractor_BugPatternTestCases(
+                    state.getPath().getCompilationUnit().getSourceFile().toUri(),
+                    ASTHelpers.getSymbol(tree).className(),
+                    tests));
   }
 
   private static final class BugPatternTestCollector
@@ -85,10 +95,10 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
             .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
             .namedAnyOf("addOutputLines", "expectUnchanged");
 
-    private final List<TestCase> collectedTestCases = new ArrayList<>();
+    private final List<BugPatternTestCase> collectedBugPatternTestCases = new ArrayList<>();
 
-    private ImmutableList<TestCase> getCollectedTests() {
-      return ImmutableList.copyOf(collectedTestCases);
+    private ImmutableList<BugPatternTestCase> getCollectedTests() {
+      return ImmutableList.copyOf(collectedBugPatternTestCases);
     }
 
     @Override
@@ -100,14 +110,14 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
                 classUnderTest -> {
                   List<TestEntry> entries = new ArrayList<>();
                   if (isReplacementTest) {
-                    extractReplacementTestCases(node, entries, state);
+                    extractReplacementBugPatternTestCases(node, entries, state);
                   } else {
-                    extractIdentificationTestCases(node, entries, state);
+                    extractIdentificationBugPatternTestCases(node, entries, state);
                   }
 
                   if (!entries.isEmpty()) {
-                    collectedTestCases.add(
-                        new AutoValue_BugPatternTestExtractor_TestCase(
+                    collectedBugPatternTestCases.add(
+                        new AutoValue_BugPatternTestExtractor_BugPatternTestCase(
                             classUnderTest, ImmutableList.copyOf(entries).reverse()));
                   }
                 });
@@ -125,12 +135,12 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      return receiver instanceof MethodInvocationTree
-          ? getClassUnderTest((MethodInvocationTree) receiver, state)
+      return receiver instanceof MethodInvocationTree methodInvocation
+          ? getClassUnderTest(methodInvocation, state)
           : Optional.empty();
     }
 
-    private static void extractIdentificationTestCases(
+    private static void extractIdentificationBugPatternTestCases(
         MethodInvocationTree tree, List<TestEntry> sink, VisitorState state) {
       if (IDENTIFICATION_SOURCE_LINES.matches(tree, state)) {
         String path = ASTHelpers.constValue(tree.getArguments().get(0), String.class);
@@ -144,12 +154,12 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      if (receiver instanceof MethodInvocationTree) {
-        extractIdentificationTestCases((MethodInvocationTree) receiver, sink, state);
+      if (receiver instanceof MethodInvocationTree methodInvocation) {
+        extractIdentificationBugPatternTestCases(methodInvocation, sink, state);
       }
     }
 
-    private static void extractReplacementTestCases(
+    private static void extractReplacementBugPatternTestCases(
         MethodInvocationTree tree, List<TestEntry> sink, VisitorState state) {
       if (REPLACEMENT_OUTPUT_SOURCE_LINES.matches(tree, state)) {
         /*
@@ -174,8 +184,8 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      if (receiver instanceof MethodInvocationTree) {
-        extractReplacementTestCases((MethodInvocationTree) receiver, sink, state);
+      if (receiver instanceof MethodInvocationTree methodInvocation) {
+        extractReplacementBugPatternTestCases(methodInvocation, sink, state);
       }
     }
 
@@ -198,32 +208,80 @@ public final class BugPatternTestExtractor implements Extractor<TestCases> {
   }
 
   @AutoValue
-  abstract static class TestCases {
+  @JsonDeserialize(as = AutoValue_BugPatternTestExtractor_BugPatternTestCases.class)
+  abstract static class BugPatternTestCases {
+    static BugPatternTestCases create(
+        URI source, String testClass, ImmutableList<BugPatternTestCase> testCases) {
+      return new AutoValue_BugPatternTestExtractor_BugPatternTestCases(
+          source, testClass, testCases);
+    }
+
+    abstract URI source();
+
     abstract String testClass();
 
-    abstract ImmutableList<TestCase> testCases();
+    abstract ImmutableList<BugPatternTestCase> testCases();
   }
 
   @AutoValue
-  abstract static class TestCase {
+  @JsonDeserialize(as = AutoValue_BugPatternTestExtractor_BugPatternTestCase.class)
+  abstract static class BugPatternTestCase {
+    static BugPatternTestCase create(String classUnderTest, ImmutableList<TestEntry> entries) {
+      return new AutoValue_BugPatternTestExtractor_BugPatternTestCase(classUnderTest, entries);
+    }
+
     abstract String classUnderTest();
 
     abstract ImmutableList<TestEntry> entries();
   }
 
+  @JsonSubTypes({
+    @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_IdentificationTestEntry.class),
+    @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_ReplacementTestEntry.class)
+  })
+  @JsonTypeInfo(include = As.EXISTING_PROPERTY, property = "type", use = JsonTypeInfo.Id.DEDUCTION)
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonPropertyOrder("type")
   interface TestEntry {
+    TestType type();
+
     String path();
-  }
 
-  @AutoValue
-  abstract static class ReplacementTestEntry implements TestEntry {
-    abstract String input();
-
-    abstract String output();
+    enum TestType {
+      IDENTIFICATION,
+      REPLACEMENT
+    }
   }
 
   @AutoValue
   abstract static class IdentificationTestEntry implements TestEntry {
+    static IdentificationTestEntry create(String path, String code) {
+      return new AutoValue_BugPatternTestExtractor_IdentificationTestEntry(path, code);
+    }
+
+    @JsonProperty
+    @Override
+    public final TestType type() {
+      return TestType.IDENTIFICATION;
+    }
+
     abstract String code();
+  }
+
+  @AutoValue
+  abstract static class ReplacementTestEntry implements TestEntry {
+    static ReplacementTestEntry create(String path, String input, String output) {
+      return new AutoValue_BugPatternTestExtractor_ReplacementTestEntry(path, input, output);
+    }
+
+    @JsonProperty
+    @Override
+    public final TestType type() {
+      return TestType.REPLACEMENT;
+    }
+
+    abstract String input();
+
+    abstract String output();
   }
 }
