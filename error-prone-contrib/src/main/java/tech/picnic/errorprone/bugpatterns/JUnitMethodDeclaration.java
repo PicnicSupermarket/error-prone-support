@@ -101,6 +101,8 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
             .build());
   }
 
+  // XXX: Consider dropping leading underscores that otherwise result when canonicalizing
+  // `test_some_method_name`.
   private static Optional<String> tryCanonicalizeMethodName(MethodSymbol symbol) {
     return Optional.of(symbol.getQualifiedName().toString())
         .filter(name -> name.startsWith(TEST_PREFIX))
