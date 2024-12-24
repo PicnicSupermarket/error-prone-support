@@ -1945,7 +1945,7 @@
                                 <path>
                                     <groupId>com.jakewharton.nopen</groupId>
                                     <artifactId>nopen-checker</artifactId>
-                                    <version>${version.nopen-checker}</version>
+                                    <version>${version.nopen}</version>
                                 </path>
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
