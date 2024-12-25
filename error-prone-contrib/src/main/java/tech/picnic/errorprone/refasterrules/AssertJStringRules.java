@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -66,6 +67,32 @@ final class AssertJStringRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractAssert<?, ?> after(String string) {
       return assertThat(string).isNotEmpty();
+    }
+  }
+
+  static final class AssertThatStringContains {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String substring) {
+      return assertThat(string.contains(substring)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String substring) {
+      return assertThat(string).contains(substring);
+    }
+  }
+
+  static final class AssertThatStringDoesNotContain {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String substring) {
+      return assertThat(string.contains(substring)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String substring) {
+      return assertThat(string).doesNotContain(substring);
     }
   }
 
