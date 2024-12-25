@@ -264,6 +264,7 @@ final class AssertJRules {
       Refaster.anyOf(
           assertThat(iterable).hasSize(0),
           assertThat(iterable.iterator().hasNext()).isFalse(),
+          assertThat(iterable.iterator()).isExhausted(),
           assertThat(Iterables.size(iterable)).isEqualTo(0L),
           assertThat(Iterables.size(iterable)).isNotPositive());
     }
