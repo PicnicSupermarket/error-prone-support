@@ -32,6 +32,7 @@ final class StringRules {
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
   // subtypes. This does require a mechanism (perhaps an annotation, or a separate Maven module) to
   // make sure that non-String expressions are rewritten only if client code also targets JDK 15+.
+  @SuppressWarnings("CharSequenceIsEmpty" /* This is a more specific template. */)
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String str) {
