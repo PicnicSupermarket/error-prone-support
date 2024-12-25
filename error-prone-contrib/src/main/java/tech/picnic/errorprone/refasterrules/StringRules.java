@@ -29,12 +29,14 @@ final class StringRules {
   private StringRules() {}
 
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
-  // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
-  // subtypes. This does require a mechanism (perhaps an annotation, or a separate Maven module) to
-  // make sure that non-String expressions are rewritten only if client code also targets JDK 15+.
-  @SuppressWarnings("CharSequenceIsEmpty" /* This is a more specific template. */)
+  // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
+  // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects
+  // that target JDK 11 can disable `CharSequenceIsEmpty` without losing a valuable rule.)
+  // XXX: Look into a more general approach to supporting different Java language levels, such as
+  // rule selection based on some annotation, or a separate Maven module.
   static final class StringIsEmpty {
     @BeforeTemplate
+    @SuppressWarnings("CharSequenceIsEmpty" /* This is a more specific template. */)
     boolean before(String str) {
       return Refaster.anyOf(str.length() == 0, str.length() <= 0, str.length() < 1);
     }

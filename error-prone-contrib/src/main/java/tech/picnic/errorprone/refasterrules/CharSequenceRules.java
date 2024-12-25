@@ -15,16 +15,19 @@ final class CharSequenceRules {
    * Prefer {@link CharSequence#isEmpty()} over alternatives that consult the char sequence's
    * length.
    */
+  // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
+  // below.
   static final class CharSequenceIsEmpty {
     @BeforeTemplate
-    boolean before(CharSequence ch) {
-      return Refaster.anyOf(ch.length() == 0, ch.length() <= 0, ch.length() < 1);
+    boolean before(CharSequence charSequence) {
+      return Refaster.anyOf(
+          charSequence.length() == 0, charSequence.length() <= 0, charSequence.length() < 1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(CharSequence ch) {
-      return ch.isEmpty();
+    boolean after(CharSequence charSequence) {
+      return charSequence.isEmpty();
     }
   }
 }
