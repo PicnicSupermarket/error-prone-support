@@ -19,7 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Name.
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{github.event.pull_request.head.ref}}
           repository: ${{github.event.pull_request.head.repo.full_name}}
@@ -30,26 +31,25 @@ jobs:
           java-distribution: temurin
           maven-version: 3.9.9
 
-      # Capture the PR number
       # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#using-data-from-the-triggering-workflow
-      - name: Create pr_number.txt
+      - name: Capture the PR number.
         run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v4
+      - name: Upload `pr_number.txt`.
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: pr_number
           path: pr_number.txt
       - name: Remove pr_number.txt
         run: rm -f pr_number.txt
 
-      # Execute Error Prone
-      - name: Run Error Prone
-        run: mvn -T1C verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+      - name: Run Error Prone and Error Prone Support.
+        run: ./apply-error-prone-suggestions.sh
 
-      # Capture the diff
-      - name: Create patch
+      - name: Capture the diff and create the patch.
         run: |
           git diff | tee git-diff.patch
-      - uses: actions/upload-artifact@v4
+      - name: Upload the diff.
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: patch
           path: git-diff.patch
