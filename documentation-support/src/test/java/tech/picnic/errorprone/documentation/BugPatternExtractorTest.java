@@ -19,9 +19,11 @@ final class BugPatternExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "TestCheckerWithoutAnnotation.java",
-        "import com.google.errorprone.bugpatterns.BugChecker;",
-        "",
-        "public final class TestCheckerWithoutAnnotation extends BugChecker {}");
+        """
+        import com.google.errorprone.bugpatterns.BugChecker;
+
+        public final class TestCheckerWithoutAnnotation extends BugChecker {}
+        """);
 
     assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
@@ -31,14 +33,16 @@ final class BugPatternExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "MinimalBugChecker.java",
-        "package pkg;",
-        "",
-        "import com.google.errorprone.BugPattern;",
-        "import com.google.errorprone.BugPattern.SeverityLevel;",
-        "import com.google.errorprone.bugpatterns.BugChecker;",
-        "",
-        "@BugPattern(summary = \"MinimalBugChecker summary\", severity = SeverityLevel.ERROR)",
-        "public final class MinimalBugChecker extends BugChecker {}");
+        """
+        package pkg;
+
+        import com.google.errorprone.BugPattern;
+        import com.google.errorprone.BugPattern.SeverityLevel;
+        import com.google.errorprone.bugpatterns.BugChecker;
+
+        @BugPattern(summary = "MinimalBugChecker summary", severity = SeverityLevel.ERROR)
+        public final class MinimalBugChecker extends BugChecker {}
+        """);
 
     verifyGeneratedFileContent(
         outputDirectory,
@@ -62,25 +66,27 @@ final class BugPatternExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CompleteBugChecker.java",
-        "package pkg;",
-        "",
-        "import com.google.errorprone.BugPattern;",
-        "import com.google.errorprone.BugPattern.SeverityLevel;",
-        "import com.google.errorprone.bugpatterns.BugChecker;",
-        "import org.junit.jupiter.api.Test;",
-        "",
-        "@BugPattern(",
-        "    name = \"OtherName\",",
-        "    summary = \"CompleteBugChecker summary\",",
-        "    linkType = BugPattern.LinkType.CUSTOM,",
-        "    link = \"https://error-prone.picnic.tech\",",
-        "    explanation = \"Example explanation\",",
-        "    severity = SeverityLevel.SUGGESTION,",
-        "    altNames = \"Check\",",
-        "    tags = BugPattern.StandardTags.SIMPLIFICATION,",
-        "    disableable = false,",
-        "    suppressionAnnotations = {BugPattern.class, Test.class})",
-        "public final class CompleteBugChecker extends BugChecker {}");
+        """
+        package pkg;
+
+        import com.google.errorprone.BugPattern;
+        import com.google.errorprone.BugPattern.SeverityLevel;
+        import com.google.errorprone.bugpatterns.BugChecker;
+        import org.junit.jupiter.api.Test;
+
+        @BugPattern(
+            name = "OtherName",
+            summary = "CompleteBugChecker summary",
+            linkType = BugPattern.LinkType.CUSTOM,
+            link = "https://error-prone.picnic.tech",
+            explanation = "Example explanation",
+            severity = SeverityLevel.SUGGESTION,
+            altNames = "Check",
+            tags = BugPattern.StandardTags.SIMPLIFICATION,
+            disableable = false,
+            suppressionAnnotations = {BugPattern.class, Test.class})
+        public final class CompleteBugChecker extends BugChecker {}
+        """);
 
     verifyGeneratedFileContent(
         outputDirectory,
@@ -104,17 +110,19 @@ final class BugPatternExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "UndocumentedSuppressionBugPattern.java",
-        "package pkg;",
-        "",
-        "import com.google.errorprone.BugPattern;",
-        "import com.google.errorprone.BugPattern.SeverityLevel;",
-        "import com.google.errorprone.bugpatterns.BugChecker;",
-        "",
-        "@BugPattern(",
-        "    summary = \"UndocumentedSuppressionBugPattern summary\",",
-        "    severity = SeverityLevel.WARNING,",
-        "    documentSuppression = false)",
-        "public final class UndocumentedSuppressionBugPattern extends BugChecker {}");
+        """
+        package pkg;
+
+        import com.google.errorprone.BugPattern;
+        import com.google.errorprone.BugPattern.SeverityLevel;
+        import com.google.errorprone.bugpatterns.BugChecker;
+
+        @BugPattern(
+            summary = "UndocumentedSuppressionBugPattern summary",
+            severity = SeverityLevel.WARNING,
+            documentSuppression = false)
+        public final class UndocumentedSuppressionBugPattern extends BugChecker {}
+        """);
 
     verifyGeneratedFileContent(
         outputDirectory,

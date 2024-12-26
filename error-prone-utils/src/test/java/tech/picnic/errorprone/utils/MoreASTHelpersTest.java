@@ -30,24 +30,26 @@ final class MoreASTHelpersTest {
     CompilationTestHelper.newInstance(FindMethodsTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}",
-            "  void foo() {}",
-            "",
-            "  // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}",
-            "  void bar() {}",
-            "",
-            "  // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}",
-            "  void bar(int i) {}",
-            "",
-            "  static class B {",
-            "    // BUG: Diagnostic contains: {foo=0, bar=1, baz=1}",
-            "    void bar() {}",
-            "",
-            "    // BUG: Diagnostic contains: {foo=0, bar=1, baz=1}",
-            "    void baz() {}",
-            "  }",
-            "}")
+            """
+            class A {
+              // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}
+              void foo() {}
+
+              // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}
+              void bar() {}
+
+              // BUG: Diagnostic contains: {foo=1, bar=2, baz=0}
+              void bar(int i) {}
+
+              static class B {
+                // BUG: Diagnostic contains: {foo=0, bar=1, baz=1}
+                void bar() {}
+
+                // BUG: Diagnostic contains: {foo=0, bar=1, baz=1}
+                void baz() {}
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -56,24 +58,26 @@ final class MoreASTHelpersTest {
     CompilationTestHelper.newInstance(MethodExistsTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}",
-            "  void foo() {}",
-            "",
-            "  // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}",
-            "  void bar() {}",
-            "",
-            "  // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}",
-            "  void bar(int i) {}",
-            "",
-            "  static class B {",
-            "    // BUG: Diagnostic contains: {foo=false, bar=true, baz=true}",
-            "    void bar() {}",
-            "",
-            "    // BUG: Diagnostic contains: {foo=false, bar=true, baz=true}",
-            "    void baz() {}",
-            "  }",
-            "}")
+            """
+            class A {
+              // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}
+              void foo() {}
+
+              // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}
+              void bar() {}
+
+              // BUG: Diagnostic contains: {foo=true, bar=true, baz=false}
+              void bar(int i) {}
+
+              static class B {
+                // BUG: Diagnostic contains: {foo=false, bar=true, baz=true}
+                void bar() {}
+
+                // BUG: Diagnostic contains: {foo=false, bar=true, baz=true}
+                void baz() {}
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -82,42 +86,44 @@ final class MoreASTHelpersTest {
     CompilationTestHelper.newInstance(FindMethodReturnTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import java.util.stream.Stream;",
-            "",
-            "class A {",
-            "  {",
-            "    toString();",
-            "  }",
-            "",
-            "  String topLevelMethod() {",
-            "    // BUG: Diagnostic contains: topLevelMethod",
-            "    toString();",
-            "    // BUG: Diagnostic contains: topLevelMethod",
-            "    return toString();",
-            "  }",
-            "",
-            "  Stream<String> anotherMethod() {",
-            "    // BUG: Diagnostic contains: anotherMethod",
-            "    return Stream.of(1)",
-            "        .map(",
-            "            n -> {",
-            "              toString();",
-            "              return toString();",
-            "            });",
-            "  }",
-            "",
-            "  void recursiveMethod(Runnable r) {",
-            "    // BUG: Diagnostic contains: recursiveMethod",
-            "    recursiveMethod(",
-            "        new Runnable() {",
-            "          @Override",
-            "          public void run() {",
-            "            // BUG: Diagnostic contains: run",
-            "            toString();",
-            "          }",
-            "        });",
-            "  }",
-            "}")
+            """
+            import java.util.stream.Stream;
+
+            class A {
+              {
+                toString();
+              }
+
+              String topLevelMethod() {
+                // BUG: Diagnostic contains: topLevelMethod
+                toString();
+                // BUG: Diagnostic contains: topLevelMethod
+                return toString();
+              }
+
+              Stream<String> anotherMethod() {
+                // BUG: Diagnostic contains: anotherMethod
+                return Stream.of(1)
+                    .map(
+                        n -> {
+                          toString();
+                          return toString();
+                        });
+              }
+
+              void recursiveMethod(Runnable r) {
+                // BUG: Diagnostic contains: recursiveMethod
+                recursiveMethod(
+                    new Runnable() {
+                      @Override
+                      public void run() {
+                        // BUG: Diagnostic contains: run
+                        toString();
+                      }
+                    });
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -126,17 +132,19 @@ final class MoreASTHelpersTest {
     CompilationTestHelper.newInstance(AreSameTypeTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  void negative1(String a, Integer b) {}",
-            "",
-            "  void negative2(Integer a, Number b) {}",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  void positive1(String a, String b) {}",
-            "",
-            "  // BUG: Diagnostic contains:",
-            "  void positive2(Iterable<String> a, Iterable<Integer> b) {}",
-            "}")
+            """
+            class A {
+              void negative1(String a, Integer b) {}
+
+              void negative2(Integer a, Number b) {}
+
+              // BUG: Diagnostic contains:
+              void positive1(String a, String b) {}
+
+              // BUG: Diagnostic contains:
+              void positive2(Iterable<String> a, Iterable<Integer> b) {}
+            }
+            """)
         .doTest();
   }
 
@@ -145,17 +153,19 @@ final class MoreASTHelpersTest {
     CompilationTestHelper.newInstance(IsStringTypedTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  void m() {",
-            "    int foo = 1;",
-            "    // BUG: Diagnostic contains:",
-            "    String s = \"foo\";",
-            "",
-            "    hashCode();",
-            "    // BUG: Diagnostic contains:",
-            "    toString();",
-            "  }",
-            "}")
+            """
+            class A {
+              void m() {
+                int foo = 1;
+                // BUG: Diagnostic contains:
+                String s = "foo";
+
+                hashCode();
+                // BUG: Diagnostic contains:
+                toString();
+              }
+            }
+            """)
         .doTest();
   }
 

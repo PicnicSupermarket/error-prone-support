@@ -19,64 +19,66 @@ final class ConflictDetectionTest {
     CompilationTestHelper.newInstance(RenameBlockerFlagger.class, getClass())
         .addSourceLines(
             "pkg/A.java",
-            "package pkg;",
-            "",
-            "import static pkg.A.StaticType.method3t;",
-            "import static pkg.A.StaticType.method4t;",
-            "",
-            "import pkg.A.method4t;",
-            "",
-            "class A {",
-            "  void method1() {",
-            "    method4(method4t.class);",
-            "  }",
-            "",
-            "  // BUG: Diagnostic contains: a method named `method2t` is already defined in this class or a",
-            "  // supertype",
-            "  void method2() {}",
-            "",
-            "  void method2t() {}",
-            "",
-            "  // BUG: Diagnostic contains: another method named `method3t` is in scope",
-            "  void method3() {}",
-            "",
-            "  void method4(Object o) {}",
-            "",
-            "  // BUG: Diagnostic contains: `int` is not a valid identifier",
-            "  void in() {}",
-            "",
-            "  class InstanceType {",
-            "    void m() {",
-            "      System.out.println(method3t());",
-            "    }",
-            "  }",
-            "",
-            "  static class StaticType {",
-            "    static int method3t() {",
-            "      return 0;",
-            "    }",
-            "",
-            "    static void method4t() {",
-            "      method4t();",
-            "    }",
-            "  }",
-            "",
-            "  record RecordType() {",
-            "    void m() {",
-            "      method4t();",
-            "    }",
-            "  }",
-            "",
-            "  enum EnumType {",
-            "    ELEM;",
-            "",
-            "    void m() {",
-            "      method4t();",
-            "    }",
-            "  }",
-            "",
-            "  class method4t {}",
-            "}")
+            """
+            package pkg;
+
+            import static pkg.A.StaticType.method3t;
+            import static pkg.A.StaticType.method4t;
+
+            import pkg.A.method4t;
+
+            class A {
+              void method1() {
+                method4(method4t.class);
+              }
+
+              // BUG: Diagnostic contains: a method named `method2t` is already defined in this class or a
+              // supertype
+              void method2() {}
+
+              void method2t() {}
+
+              // BUG: Diagnostic contains: another method named `method3t` is in scope
+              void method3() {}
+
+              void method4(Object o) {}
+
+              // BUG: Diagnostic contains: `int` is not a valid identifier
+              void in() {}
+
+              class InstanceType {
+                void m() {
+                  System.out.println(method3t());
+                }
+              }
+
+              static class StaticType {
+                static int method3t() {
+                  return 0;
+                }
+
+                static void method4t() {
+                  method4t();
+                }
+              }
+
+              record RecordType() {
+                void m() {
+                  method4t();
+                }
+              }
+
+              enum EnumType {
+                ELEM;
+
+                void m() {
+                  method4t();
+                }
+              }
+
+              class method4t {}
+            }
+            """)
         .doTest();
   }
 

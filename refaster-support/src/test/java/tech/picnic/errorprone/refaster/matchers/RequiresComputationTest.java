@@ -14,126 +14,128 @@ final class RequiresComputationTest {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import java.io.OutputStream;",
-            "import java.util.Comparator;",
-            "import java.util.function.Predicate;",
-            "",
-            "class A {",
-            "  int negative1() {",
-            "    int[] arr = new int[0];",
-            "    return arr[0];",
-            "  }",
-            "",
-            "  String negative2() {",
-            "    return null;",
-            "  }",
-            "",
-            "  boolean negative3() {",
-            "    return false;",
-            "  }",
-            "",
-            "  int negative4() {",
-            "    return 0;",
-            "  }",
-            "",
-            "  String negative5() {",
-            "    return \"foo\" + \"bar\";",
-            "  }",
-            "",
-            "  Predicate<String> negative6() {",
-            "    return v -> \"foo\".equals(v);",
-            "  }",
-            "",
-            "  A negative7() {",
-            "    return this;",
-            "  }",
-            "",
-            "  Predicate<String> negative8() {",
-            "    return \"foo\"::equals;",
-            "  }",
-            "",
-            "  OutputStream negative9() {",
-            "    return System.out;",
-            "  }",
-            "",
-            "  A negative10() {",
-            "    return (this);",
-            "  }",
-            "",
-            "  Object negative11() {",
-            "    return (Object) this;",
-            "  }",
-            "",
-            "  boolean negative12() {",
-            "    boolean[] arr = new boolean[0];",
-            "    return !arr[0];",
-            "  }",
-            "",
-            "  String negative13() {",
-            "    return \"foo\" + 0;",
-            "  }",
-            "",
-            "  String positive1() {",
-            "    // BUG: Diagnostic contains:",
-            "    return toString();",
-            "  }",
-            "",
-            "  String positive2() {",
-            "    // BUG: Diagnostic contains:",
-            "    return this.toString();",
-            "  }",
-            "",
-            "  String positive3() {",
-            "    // BUG: Diagnostic contains:",
-            "    return String.valueOf(1);",
-            "  }",
-            "",
-            "  String positive4() {",
-            "    // BUG: Diagnostic contains:",
-            "    return toString().toString();",
-            "  }",
-            "",
-            "  String positive5() {",
-            "    // BUG: Diagnostic contains:",
-            "    return \"foo\" + toString();",
-            "  }",
-            "",
-            "  byte positive6() {",
-            "    // BUG: Diagnostic contains:",
-            "    return \"foo\".getBytes()[0];",
-            "  }",
-            "",
-            "  int positive7() {",
-            "    int[] arr = new int[0];",
-            "    // BUG: Diagnostic contains:",
-            "    return arr[hashCode()];",
-            "  }",
-            "",
-            "  Predicate<String> positive8() {",
-            "    // BUG: Diagnostic contains:",
-            "    return toString()::equals;",
-            "  }",
-            "",
-            "  Comparator<String> positive9() {",
-            "    // BUG: Diagnostic contains:",
-            "    return toString().CASE_INSENSITIVE_ORDER;",
-            "  }",
-            "",
-            "  String positive10() {",
-            "    // BUG: Diagnostic contains:",
-            "    return (toString());",
-            "  }",
-            "",
-            "  Object positive11() {",
-            "    // BUG: Diagnostic contains:",
-            "    return (Object) toString();",
-            "  }",
-            "",
-            "  int positive12() {",
-            "    // BUG: Diagnostic contains:",
-            "    return -hashCode();",
-            "  }",
-            "}")
+            """
+            import java.io.OutputStream;
+            import java.util.Comparator;
+            import java.util.function.Predicate;
+
+            class A {
+              int negative1() {
+                int[] arr = new int[0];
+                return arr[0];
+              }
+
+              String negative2() {
+                return null;
+              }
+
+              boolean negative3() {
+                return false;
+              }
+
+              int negative4() {
+                return 0;
+              }
+
+              String negative5() {
+                return "foo" + "bar";
+              }
+
+              Predicate<String> negative6() {
+                return v -> "foo".equals(v);
+              }
+
+              A negative7() {
+                return this;
+              }
+
+              Predicate<String> negative8() {
+                return "foo"::equals;
+              }
+
+              OutputStream negative9() {
+                return System.out;
+              }
+
+              A negative10() {
+                return (this);
+              }
+
+              Object negative11() {
+                return (Object) this;
+              }
+
+              boolean negative12() {
+                boolean[] arr = new boolean[0];
+                return !arr[0];
+              }
+
+              String negative13() {
+                return "foo" + 0;
+              }
+
+              String positive1() {
+                // BUG: Diagnostic contains:
+                return toString();
+              }
+
+              String positive2() {
+                // BUG: Diagnostic contains:
+                return this.toString();
+              }
+
+              String positive3() {
+                // BUG: Diagnostic contains:
+                return String.valueOf(1);
+              }
+
+              String positive4() {
+                // BUG: Diagnostic contains:
+                return toString().toString();
+              }
+
+              String positive5() {
+                // BUG: Diagnostic contains:
+                return "foo" + toString();
+              }
+
+              byte positive6() {
+                // BUG: Diagnostic contains:
+                return "foo".getBytes()[0];
+              }
+
+              int positive7() {
+                int[] arr = new int[0];
+                // BUG: Diagnostic contains:
+                return arr[hashCode()];
+              }
+
+              Predicate<String> positive8() {
+                // BUG: Diagnostic contains:
+                return toString()::equals;
+              }
+
+              Comparator<String> positive9() {
+                // BUG: Diagnostic contains:
+                return toString().CASE_INSENSITIVE_ORDER;
+              }
+
+              String positive10() {
+                // BUG: Diagnostic contains:
+                return (toString());
+              }
+
+              Object positive11() {
+                // BUG: Diagnostic contains:
+                return (Object) toString();
+              }
+
+              int positive12() {
+                // BUG: Diagnostic contains:
+                return -hashCode();
+              }
+            }
+            """)
         .doTest();
   }
 
