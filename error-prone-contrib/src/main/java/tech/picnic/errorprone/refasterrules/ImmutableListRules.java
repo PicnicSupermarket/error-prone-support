@@ -28,6 +28,7 @@ final class ImmutableListRules {
   private ImmutableListRules() {}
 
   /** Prefer {@link ImmutableList#builder()} over the associated constructor. */
+  // XXX: This rule may drop generic type information, leading to non-compilable code.
   static final class ImmutableListBuilder<T> {
     @BeforeTemplate
     ImmutableList.Builder<T> before() {
@@ -36,7 +37,7 @@ final class ImmutableListRules {
 
     @AfterTemplate
     ImmutableList.Builder<T> after() {
-      return ImmutableList.<T>builder();
+      return ImmutableList.builder();
     }
   }
 

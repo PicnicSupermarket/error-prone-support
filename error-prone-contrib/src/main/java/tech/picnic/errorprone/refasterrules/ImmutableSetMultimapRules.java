@@ -29,6 +29,7 @@ final class ImmutableSetMultimapRules {
   private ImmutableSetMultimapRules() {}
 
   /** Prefer {@link ImmutableSetMultimap#builder()} over the associated constructor. */
+  // XXX: This rule may drop generic type information, leading to non-compilable code.
   static final class ImmutableSetMultimapBuilder<K, V> {
     @BeforeTemplate
     ImmutableSetMultimap.Builder<K, V> before() {
@@ -37,7 +38,7 @@ final class ImmutableSetMultimapRules {
 
     @AfterTemplate
     ImmutableSetMultimap.Builder<K, V> after() {
-      return ImmutableSetMultimap.<K, V>builder();
+      return ImmutableSetMultimap.builder();
     }
   }
 

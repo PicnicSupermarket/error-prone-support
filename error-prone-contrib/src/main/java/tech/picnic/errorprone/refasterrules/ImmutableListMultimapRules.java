@@ -36,6 +36,7 @@ final class ImmutableListMultimapRules {
    * Prefer {@link ImmutableListMultimap#builder()} over the associated constructor on constructions
    * that produce a less-specific type.
    */
+  // XXX: This rule may drop generic type information, leading to non-compilable code.
   static final class ImmutableListMultimapBuilder<K, V> {
     @BeforeTemplate
     ImmutableMultimap.Builder<K, V> before() {
@@ -47,7 +48,7 @@ final class ImmutableListMultimapRules {
 
     @AfterTemplate
     ImmutableListMultimap.Builder<K, V> after() {
-      return ImmutableListMultimap.<K, V>builder();
+      return ImmutableListMultimap.builder();
     }
   }
 

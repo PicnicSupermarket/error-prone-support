@@ -20,8 +20,8 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
         Arrays.class, Collections.class, Comparator.class, Streams.class, naturalOrder());
   }
 
-  ImmutableSet<ImmutableList.Builder<String>> testImmutableListBuilder() {
-    return ImmutableSet.of(new ImmutableList.Builder<>(), new ImmutableList.Builder<String>());
+  ImmutableList.Builder<String> testImmutableListBuilder() {
+    return new ImmutableList.Builder<>();
   }
 
   ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
