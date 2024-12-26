@@ -10,12 +10,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
+import java.util.List;
 import java.util.Optional;
 import javax.lang.model.SourceVersion;
 
@@ -26,6 +29,15 @@ import javax.lang.model.SourceVersion;
 public final class SourceCode {
   /** The complement of {@link CharMatcher#whitespace()}. */
   private static final CharMatcher NON_WHITESPACE_MATCHER = CharMatcher.whitespace().negate();
+
+  /** The Java syntax that indicates the start and end of a text block. */
+  public static final String TEXT_BLOCK_DELIMITER = "\"\"\"";
+
+  /**
+   * The string separating lines in a Java text block, independently of the platform on which the
+   * code is compiled.
+   */
+  public static final String TEXT_BLOCK_LINE_SEPARATOR = "\n";
 
   private SourceCode() {}
 
@@ -39,6 +51,25 @@ public final class SourceCode {
    */
   public static boolean isValidIdentifier(String str) {
     return str.indexOf('.') < 0 && SourceVersion.isName(str);
+  }
+
+  /**
+   * Tells whether the given expression is a text block.
+   *
+   * @param tree The AST node of interest.
+   * @param state A {@link VisitorState} describing the context in which the given {@link
+   *     ExpressionTree} is found.
+   * @return {@code true} iff the given expression is a text block.
+   */
+  // XXX: Add tests!
+  public static boolean isTextBlock(ExpressionTree tree, VisitorState state) {
+    if (tree.getKind() != Tree.Kind.STRING_LITERAL) {
+      return false;
+    }
+
+    /* If the source code is unavailable then we assume that this literal is _not_ a text block. */
+    String src = state.getSourceForNode(tree);
+    return src != null && src.startsWith(TEXT_BLOCK_DELIMITER);
   }
 
   /**
@@ -71,6 +102,39 @@ public final class SourceCode {
   // with the proposed `CharSequence` compatibility change.
   public static String toStringConstantExpression(Object value, VisitorState state) {
     return state.getConstantExpression(value instanceof CharSequence ? value.toString() : value);
+  }
+
+  /**
+   * Constructs a multi-line string by joining the given source code lines, if they all represent
+   * compile-time constants.
+   *
+   * @implNote Lines are always joined with {@value #TEXT_BLOCK_LINE_SEPARATOR}, independent of the
+   *     platform on which this method is executed. This ensures consistent line separation in case
+   *     some of the lines are multi-line text blocks.
+   * @param sourceLines The source code lines of interest.
+   * @return A non-empty optional iff all source code lines represent compile-time constants.
+   */
+  // XXX: Test!
+  // XXX: This method doesn't add a trailing newline for the benefit of one caller, but that's
+  // perhaps a bit awkward.
+  public static Optional<String> joinConstantSourceCodeLines(
+      List<? extends ExpressionTree> sourceLines) {
+    StringBuilder source = new StringBuilder();
+
+    for (ExpressionTree sourceLine : sourceLines) {
+      if (!source.isEmpty()) {
+        source.append(TEXT_BLOCK_LINE_SEPARATOR);
+      }
+
+      String value = ASTHelpers.constValue(sourceLine, String.class);
+      if (value == null) {
+        return Optional.empty();
+      }
+
+      source.append(value);
+    }
+
+    return Optional.of(source.toString());
   }
 
   /**

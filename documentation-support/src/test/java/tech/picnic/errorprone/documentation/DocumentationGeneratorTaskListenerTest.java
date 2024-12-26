@@ -68,6 +68,8 @@ final class DocumentationGeneratorTaskListenerTest {
         .hasMessageEndingWith("Error while creating directory with path '%s'", outputDirectory);
   }
 
+  // XXX: For this case the text block conversion introduces too much indentation. (Possibly i.c.w.
+  // post-processing by GJF; TBD.)
   @Test
   void noClassNoOutput(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(outputDirectory, "A.java", "package pkg;");

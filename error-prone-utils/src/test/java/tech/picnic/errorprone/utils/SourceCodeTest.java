@@ -7,26 +7,32 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.LiteralTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.ReturnTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.lang.model.element.Name;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,6 +63,32 @@ final class SourceCodeTest {
   @ParameterizedTest
   void isValidIdentifier(String string, boolean expected) {
     assertThat(SourceCode.isValidIdentifier(string)).isEqualTo(expected);
+  }
+
+  // XXX: I think we can drop this annotation; check.
+  @DisabledForJreRange(max = JRE.JAVA_14)
+  @Test
+  void isTextBlock() {
+    CompilationTestHelper.newInstance(TextBlockFlagger.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "class A {",
+            "  String negative1() {",
+            "    return toString();",
+            "  }",
+            "",
+            "  String negative2() {",
+            "    return \"foo\";",
+            "  }",
+            "",
+            "  String positive1() {",
+            "    // BUG: Diagnostic contains:",
+            "    return \"\"\"",
+            "    foo",
+            "    \"\"\";",
+            "  }",
+            "}")
+        .doTest();
   }
 
   @Test
@@ -290,6 +322,22 @@ final class SourceCodeTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link SourceCode#isTextBlock(ExpressionTree,
+   * VisitorState)}.
+   */
+  @BugPattern(summary = "Interacts with `SourceCode` for testing purposes", severity = ERROR)
+  public static final class TextBlockFlagger extends BugChecker implements ReturnTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchReturn(ReturnTree tree, VisitorState state) {
+      return SourceCode.isTextBlock(tree.getExpression(), state)
+          ? describeMatch(tree)
+          : Description.NO_MATCH;
+    }
   }
 
   /**
