@@ -9,6 +9,8 @@ on:
     workflows: ["receive-pr"]
     types:
       - completed
+permissions:
+  actions: read
 
 jobs:
   post-suggestions:
