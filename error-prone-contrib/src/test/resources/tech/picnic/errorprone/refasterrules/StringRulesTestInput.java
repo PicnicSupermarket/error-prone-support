@@ -28,9 +28,9 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         "foo".length() == 0,
         "bar".length() <= 0,
         "baz".length() < 1,
-        "foo".length() != 0,
-        "bar".length() > 0,
-        "baz".length() >= 1);
+        "qux".length() != 0,
+        "quux".length() > 0,
+        "corge".length() >= 1);
   }
 
   boolean testStringIsEmptyPredicate() {

@@ -31,9 +31,9 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         "foo".isEmpty(),
         "bar".isEmpty(),
         "baz".isEmpty(),
-        !"foo".isEmpty(),
-        !"bar".isEmpty(),
-        !"baz".isEmpty());
+        !"qux".isEmpty(),
+        !"quux".isEmpty(),
+        !"corge".isEmpty());
   }
 
   boolean testStringIsEmptyPredicate() {
