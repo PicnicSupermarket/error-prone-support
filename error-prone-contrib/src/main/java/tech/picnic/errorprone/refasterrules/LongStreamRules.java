@@ -290,4 +290,16 @@ final class LongStreamRules {
       return stream.allMatch(e -> test(e));
     }
   }
+
+  static final class LongStreamTakeWhile {
+    @BeforeTemplate
+    LongStream before(LongStream stream, LongPredicate predicate) {
+      return stream.takeWhile(predicate).filter(predicate);
+    }
+
+    @AfterTemplate
+    LongStream after(LongStream stream, LongPredicate predicate) {
+      return stream.takeWhile(predicate);
+    }
+  }
 }

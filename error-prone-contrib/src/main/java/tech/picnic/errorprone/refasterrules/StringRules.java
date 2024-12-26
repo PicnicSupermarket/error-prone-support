@@ -29,7 +29,9 @@ final class StringRules {
   private StringRules() {}
 
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
-  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
+  // subtypes. This does require a mechanism (perhaps an annotation, or a separate Maven module) to
+  // make sure that non-String expressions are rewritten only if client code also targets JDK 15+.
   static final class StringIsEmpty {
     @BeforeTemplate
     boolean before(String str) {
@@ -44,7 +46,9 @@ final class StringRules {
   }
 
   /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
-  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
+  // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
+  // to introduce a rule that suggests `String::isEmpty` where possible.
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
   // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
   static final class StringIsEmptyPredicate {
@@ -60,7 +64,9 @@ final class StringRules {
   }
 
   /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
-  // XXX: Once we target JDK 15+, generalize this rule to cover all `CharSequence` subtypes.
+  // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
+  // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
+  // to introduce a rule that suggests `String::isEmpty` where possible.
   static final class StringIsNotEmptyPredicate {
     @BeforeTemplate
     Predicate<String> before() {
@@ -163,6 +169,39 @@ final class StringRules {
   }
 
   /**
+   * Prefer direct invocation of {@link String#String(char[], int, int)} over the indirection
+   * introduced by alternatives.
+   */
+  static final class NewStringFromCharArraySubSequence {
+    @BeforeTemplate
+    String before(char[] data, int offset, int count) {
+      return Refaster.anyOf(
+          String.valueOf(data, offset, count), String.copyValueOf(data, offset, count));
+    }
+
+    @AfterTemplate
+    String after(char[] data, int offset, int count) {
+      return new String(data, offset, count);
+    }
+  }
+
+  /**
+   * Prefer direct invocation of {@link String#String(char[])} over the indirection introduced by
+   * alternatives.
+   */
+  static final class NewStringFromCharArray {
+    @BeforeTemplate
+    String before(char[] data) {
+      return Refaster.anyOf(String.valueOf(data), new String(data, 0, data.length));
+    }
+
+    @AfterTemplate
+    String after(char[] data) {
+      return new String(data);
+    }
+  }
+
+  /**
    * Prefer direct delegation to {@link String#valueOf(Object)} over the indirection introduced by
    * {@link Objects#toString(Object)}.
    */
@@ -203,6 +242,107 @@ final class StringRules {
     @AfterTemplate
     int after(String str) {
       return Utf8.encodedLength(str);
+    }
+  }
+
+  /** Prefer {@link String#indexOf(int, int)} over less efficient alternatives. */
+  static final class StringIndexOfChar {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    int before(String string, int ch, int fromIndex) {
+      return string.substring(fromIndex).indexOf(ch);
+    }
+
+    @AfterTemplate
+    int after(String string, int ch, int fromIndex) {
+      return Math.max(-1, string.indexOf(ch, fromIndex) - fromIndex);
+    }
+  }
+
+  /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
+  static final class StringIndexOfString {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    int before(String string, String substring, int fromIndex) {
+      return string.substring(fromIndex).indexOf(substring);
+    }
+
+    @AfterTemplate
+    int after(String string, String substring, int fromIndex) {
+      return Math.max(-1, string.indexOf(substring, fromIndex) - fromIndex);
+    }
+  }
+
+  // XXX: Once we compile Refaster templates with JDK 21 also suggest `String#indexOf(int, int,
+  // int)` and `String#indexOf(String, int, int)`.
+
+  /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
+  static final class StringLastIndexOfChar {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    int before(String string, int ch, int fromIndex) {
+      return string.substring(fromIndex).lastIndexOf(ch);
+    }
+
+    @AfterTemplate
+    int after(String string, int ch, int fromIndex) {
+      return Math.max(-1, string.lastIndexOf(ch) - fromIndex);
+    }
+  }
+
+  /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
+  static final class StringLastIndexOfString {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    int before(String string, String substring, int fromIndex) {
+      return string.substring(fromIndex).lastIndexOf(substring);
+    }
+
+    @AfterTemplate
+    int after(String string, String substring, int fromIndex) {
+      return Math.max(-1, string.lastIndexOf(substring) - fromIndex);
+    }
+  }
+
+  /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
+  static final class StringLastIndexOfCharWithIndex {
+    @BeforeTemplate
+    int before(String string, int ch, int fromIndex) {
+      return string.substring(0, fromIndex).lastIndexOf(ch);
+    }
+
+    @AfterTemplate
+    int after(String string, int ch, int fromIndex) {
+      return string.lastIndexOf(ch, fromIndex - 1);
+    }
+  }
+
+  /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
+  // XXX: The replacement expression isn't fully equivalent: in case `substring` is empty, then
+  // the replacement yields `fromIndex - 1` rather than `fromIndex`.
+  static final class StringLastIndexOfStringWithIndex {
+    @BeforeTemplate
+    int before(String string, String substring, int fromIndex) {
+      return string.substring(0, fromIndex).lastIndexOf(substring);
+    }
+
+    @AfterTemplate
+    int after(String string, String substring, int fromIndex) {
+      return string.lastIndexOf(substring, fromIndex - 1);
+    }
+  }
+
+  /** Prefer {@link String#startsWith(String, int)} over less efficient alternatives. */
+  static final class StringStartsWith {
+    @BeforeTemplate
+    @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
+    boolean before(String string, String prefix, int fromIndex) {
+      return string.substring(fromIndex).startsWith(prefix);
+    }
+
+    @AfterTemplate
+    boolean after(String string, String prefix, int fromIndex) {
+      return string.startsWith(prefix, fromIndex);
     }
   }
 }

@@ -7,9 +7,20 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.suppliers.Suppliers.OBJECT_TYPE;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableRangeMap;
+import com.google.common.collect.ImmutableRangeSet;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableTable;
 import com.google.common.primitives.Primitives;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -20,6 +31,7 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ASTHelpers.TargetType;
 import com.sun.source.tree.ExpressionTree;
@@ -27,9 +39,10 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant identity conversions. */
 // XXX: Consider detecting cases where a flagged expression is passed to a method, and where removal
@@ -37,6 +50,9 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 // the target method such a modification may change the code's semantics or performance.
 // XXX: Also flag `Stream#map`, `Mono#map` and `Flux#map` invocations where the given transformation
 // is effectively the identity operation.
+// XXX: Also flag nullary instance method invocations that represent an identity conversion, such as
+// `Boolean#booleanValue()`, `Byte#byteValue()` and friends.
+// XXX: Also flag redundant round-trip conversions such as `path.toFile().toPath()`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
@@ -54,24 +70,23 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
                       .map(Class::getName)
                       .collect(toImmutableSet()))
               .named("valueOf"),
-          staticMethod().onClass(String.class.getName()).named("valueOf"),
+          staticMethod().onClass(String.class.getCanonicalName()).named("valueOf"),
           staticMethod()
               .onClassAny(
-                  "com.google.common.collect.ImmutableBiMap",
-                  "com.google.common.collect.ImmutableList",
-                  "com.google.common.collect.ImmutableListMultimap",
-                  "com.google.common.collect.ImmutableMap",
-                  "com.google.common.collect.ImmutableMultimap",
-                  "com.google.common.collect.ImmutableMultiset",
-                  "com.google.common.collect.ImmutableRangeMap",
-                  "com.google.common.collect.ImmutableRangeSet",
-                  "com.google.common.collect.ImmutableSet",
-                  "com.google.common.collect.ImmutableSetMultimap",
-                  "com.google.common.collect.ImmutableTable")
+                  ImmutableBiMap.class.getCanonicalName(),
+                  ImmutableList.class.getCanonicalName(),
+                  ImmutableListMultimap.class.getCanonicalName(),
+                  ImmutableMap.class.getCanonicalName(),
+                  ImmutableMultimap.class.getCanonicalName(),
+                  ImmutableMultiset.class.getCanonicalName(),
+                  ImmutableRangeMap.class.getCanonicalName(),
+                  ImmutableRangeSet.class.getCanonicalName(),
+                  ImmutableSet.class.getCanonicalName(),
+                  ImmutableSetMultimap.class.getCanonicalName(),
+                  ImmutableTable.class.getCanonicalName())
               .named("copyOf"),
-          staticMethod()
-              .onClass("com.google.errorprone.matchers.Matchers")
-              .namedAnyOf("allOf", "anyOf"),
+          staticMethod().onClass(Instant.class.getCanonicalName()).namedAnyOf("from"),
+          staticMethod().onClass(Matchers.class.getCanonicalName()).namedAnyOf("allOf", "anyOf"),
           staticMethod().onClass("reactor.adapter.rxjava.RxJava2Adapter"),
           staticMethod()
               .onClass("reactor.core.publisher.Flux")
@@ -112,8 +127,9 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
 
     return buildDescription(tree)
         .setMessage(
-            "This method invocation appears redundant; remove it or suppress this warning and "
-                + "add a comment explaining its purpose")
+            """
+            This method invocation appears redundant; remove it or suppress this warning and add a \
+            comment explaining its purpose""")
         .addFix(SuggestedFix.replace(tree, SourceCode.treeToString(sourceTree, state)))
         .addFix(SuggestedFixes.addSuppressWarnings(state, canonicalName()))
         .build();

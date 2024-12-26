@@ -1,7 +1,7 @@
 # Arcmutate license for Error Prone Support, requested by sending an email to
 # support@arcmutate.com.
-expires=07/11/2023
+expires=27/10/2025
 keyVersion=1
-signature=MhZxMbnO6UovNfllM0JuVWkZyvRT3/G5o/uT0Mm36c7200VpZNVu03gTAGivnl9W5RzvZhfpIHccuQ5ctjQkrqhsFSrl4fyqPqu3y5V2fsHIdFXP/G72EGj6Kay9ndLpaEHalqE0bEwxdnHMzEYq5y3O9vUPv8MhUl57xk+rvBo\=
+signature=aQLVt0J//7nXDAlJuBe9ru7Dq6oApcLh17rxsgHoJqBkUCd2zvrtRxkcPm5PmF1I8gBDT9PHb+kTf6Kcfz+D1fT0wRrZv38ip56521AQPD6zjRSqak9O2Gisjo+QTPMD7oS009aSWKzQ1SMdtuZ+KIRvw4Gl+frtYzexqnGWEUQ\=
 packages=tech.picnic.errorprone.*
 type=OSSS

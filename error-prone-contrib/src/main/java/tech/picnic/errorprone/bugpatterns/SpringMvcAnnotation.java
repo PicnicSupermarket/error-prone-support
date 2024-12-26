@@ -1,12 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Verify.verify;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -18,16 +17,16 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.Tree.Kind;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@code @RequestMapping} annotations that can be written more
@@ -79,31 +78,25 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
   }
 
   private static Optional<String> extractUniqueMethod(ExpressionTree arg, VisitorState state) {
-    verify(
-        arg.getKind() == Kind.ASSIGNMENT,
-        "Annotation attribute is not an assignment: %s",
-        arg.getKind());
-
-    ExpressionTree expr = ((AssignmentTree) arg).getExpression();
-    if (expr.getKind() != Kind.NEW_ARRAY) {
-      return Optional.of(extractMethod(expr, state));
+    if (!(arg instanceof AssignmentTree assignment)) {
+      throw new VerifyException("Annotation attribute is not an assignment:" + arg.getKind());
     }
 
-    NewArrayTree newArray = (NewArrayTree) expr;
-    return Optional.of(newArray.getInitializers())
-        .filter(args -> args.size() == 1)
-        .map(args -> extractMethod(args.get(0), state));
+    ExpressionTree expr = assignment.getExpression();
+    return expr instanceof NewArrayTree newArray
+        ? Optional.of(newArray.getInitializers())
+            .filter(args -> args.size() == 1)
+            .map(args -> extractMethod(args.get(0), state))
+        : Optional.of(extractMethod(expr, state));
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static String extractMethod(ExpressionTree expr, VisitorState state) {
-    switch (expr.getKind()) {
-      case IDENTIFIER:
-        return SourceCode.treeToString(expr, state);
-      case MEMBER_SELECT:
-        return ((MemberSelectTree) expr).getIdentifier().toString();
-      default:
-        throw new VerifyException("Unexpected type of expression: " + expr.getKind());
-    }
+    return switch (expr.getKind()) {
+      case IDENTIFIER -> SourceCode.treeToString(expr, state);
+      case MEMBER_SELECT -> ((MemberSelectTree) expr).getIdentifier().toString();
+      default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
+    };
   }
 
   private static Fix replaceAnnotation(
@@ -114,9 +107,8 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
             .map(arg -> SourceCode.treeToString(arg, state))
             .collect(joining(", "));
 
-    return SuggestedFix.builder()
-        .addImport(ANN_PACKAGE_PREFIX + newAnnotation)
-        .replace(tree, String.format("@%s(%s)", newAnnotation, newArguments))
-        .build();
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String annotation = SuggestedFixes.qualifyType(state, fix, ANN_PACKAGE_PREFIX + newAnnotation);
+    return fix.replace(tree, String.format("@%s(%s)", annotation, newArguments)).build();
   }
 }

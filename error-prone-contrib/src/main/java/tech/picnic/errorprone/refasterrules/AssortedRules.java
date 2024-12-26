@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkElementIndex;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static com.google.common.collect.Sets.toImmutableEnumSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Collections.disjoint;
 import static java.util.Objects.checkIndex;
@@ -70,28 +68,6 @@ final class AssortedRules {
     }
   }
 
-  /**
-   * Use {@link Sets#toImmutableEnumSet()} when possible, as it is more efficient than {@link
-   * ImmutableSet#toImmutableSet()} and produces a more compact object.
-   *
-   * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving: while the
-   * original code produces a set that iterates over the elements in encounter order, the
-   * replacement code iterates over the elements in enum definition order.
-   */
-  // XXX: ^ Consider emitting a comment warning about this fact?
-  static final class StreamToImmutableEnumSet<T extends Enum<T>> {
-    @BeforeTemplate
-    ImmutableSet<T> before(Stream<T> stream) {
-      return stream.collect(toImmutableSet());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ImmutableSet<T> after(Stream<T> stream) {
-      return stream.collect(toImmutableEnumSet());
-    }
-  }
-
   /** Prefer {@link Iterators#getNext(Iterator, Object)} over more contrived alternatives. */
   static final class IteratorGetNextOrDefault<T> {
     @BeforeTemplate
@@ -103,8 +79,7 @@ final class AssortedRules {
     }
 
     @AfterTemplate
-    @Nullable
-    T after(Iterator<T> iterator, T defaultValue) {
+    @Nullable T after(Iterator<T> iterator, T defaultValue) {
       return Iterators.getNext(iterator, defaultValue);
     }
   }

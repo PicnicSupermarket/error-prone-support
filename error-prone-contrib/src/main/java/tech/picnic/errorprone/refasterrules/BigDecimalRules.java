@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.math.BigDecimal;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -64,6 +65,63 @@ final class BigDecimalRules {
     @AfterTemplate
     BigDecimal after(double value) {
       return BigDecimal.valueOf(value);
+    }
+  }
+
+  /** Prefer using {@link BigDecimal#signum()} over more contrived alternatives. */
+  static final class BigDecimalSignumIsZero {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) == 0, BigDecimal.ZERO.compareTo(value) == 0);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(BigDecimal value) {
+      return value.signum() == 0;
+    }
+  }
+
+  /**
+   * Prefer a {@link BigDecimal#signum()} comparison to 1 over more contrived or less clear
+   * alternatives.
+   */
+  static final class BigDecimalSignumIsPositive {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) > 0,
+          BigDecimal.ZERO.compareTo(value) < 0,
+          value.signum() > 0,
+          value.signum() >= 1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(BigDecimal value) {
+      return value.signum() == 1;
+    }
+  }
+
+  /**
+   * Prefer a {@link BigDecimal#signum()} comparison to -1 over more contrived or less clear
+   * alternatives.
+   */
+  static final class BigDecimalSignumIsNegative {
+    @BeforeTemplate
+    boolean before(BigDecimal value) {
+      return Refaster.anyOf(
+          value.compareTo(BigDecimal.ZERO) < 0,
+          BigDecimal.ZERO.compareTo(value) > 0,
+          value.signum() < 0,
+          value.signum() <= -1);
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(BigDecimal value) {
+      return value.signum() == -1;
     }
   }
 }

@@ -7,7 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.DECLARATION;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.TYPE;
 import static java.util.Comparator.comparing;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -28,7 +28,7 @@ import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
 import java.util.Comparator;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
@@ -36,6 +36,10 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same annotation.
  */
+// XXX: Currently this checker only flags method-level annotations. It should likely also flag
+// type-, field- and parameter-level annotations.
+// XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
+// flags duplicates.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
@@ -46,6 +50,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class LexicographicalAnnotationListing extends BugChecker
     implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
+
   /**
    * A comparator that minimally reorders {@link AnnotationType}s, such that declaration annotations
    * are placed before type annotations.

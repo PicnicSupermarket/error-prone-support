@@ -6,10 +6,9 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -17,13 +16,14 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.MultiMatcher;
+import com.google.errorprone.matchers.MultiMatcher.MultiMatchResult;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.List;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant {@code @Autowired} constructor annotations. */
 @AutoService(BugChecker.class)
@@ -48,11 +48,9 @@ public final class AutowiredConstructor extends BugChecker implements ClassTreeM
       return Description.NO_MATCH;
     }
 
-    ImmutableList<AnnotationTree> annotations =
-        AUTOWIRED_ANNOTATION
-            .multiMatchResult(Iterables.getOnlyElement(constructors), state)
-            .matchingNodes();
-    if (annotations.size() != 1) {
+    MultiMatchResult<AnnotationTree> hasAutowiredAnnotation =
+        AUTOWIRED_ANNOTATION.multiMatchResult(Iterables.getOnlyElement(constructors), state);
+    if (!hasAutowiredAnnotation.matches()) {
       return Description.NO_MATCH;
     }
 
@@ -61,7 +59,7 @@ public final class AutowiredConstructor extends BugChecker implements ClassTreeM
      * means that the associated import can be removed as well. Rather than adding code for this
      * case we leave flagging the unused import to Error Prone's `RemoveUnusedImports` check.
      */
-    AnnotationTree annotation = Iterables.getOnlyElement(annotations);
+    AnnotationTree annotation = hasAutowiredAnnotation.onlyMatchingNode();
     return describeMatch(annotation, SourceCode.deleteWithTrailingWhitespace(annotation, state));
   }
 }

@@ -9,7 +9,7 @@ import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isVariable;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -25,7 +25,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import java.util.List;
-import tech.picnic.errorprone.bugpatterns.util.MoreASTHelpers;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags the use of {@link org.mockito.Mockito#mock(Class)} and {@link
@@ -50,7 +50,7 @@ public final class MockitoMockClassReference extends BugChecker
   private static final long serialVersionUID = 1L;
   private static final Matcher<MethodInvocationTree> MOCKITO_MOCK_OR_SPY_WITH_HARDCODED_TYPE =
       allOf(
-          argument(0, allOf(isSameType(Class.class.getName()), not(isVariable()))),
+          argument(0, allOf(isSameType(Class.class.getCanonicalName()), not(isVariable()))),
           staticMethod().onClass("org.mockito.Mockito").namedAnyOf("mock", "spy"));
 
   /** Instantiates a new {@link MockitoMockClassReference} instance. */
@@ -67,20 +67,19 @@ public final class MockitoMockClassReference extends BugChecker
     return describeMatch(tree, SuggestedFixes.removeElement(arguments.get(0), arguments, state));
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static boolean isTypeDerivableFromContext(MethodInvocationTree tree, VisitorState state) {
     Tree parent = state.getPath().getParentPath().getLeaf();
-    switch (parent.getKind()) {
-      case VARIABLE:
-        return !ASTHelpers.hasNoExplicitType((VariableTree) parent, state)
-            && MoreASTHelpers.areSameType(tree, parent, state);
-      case ASSIGNMENT:
-        return MoreASTHelpers.areSameType(tree, parent, state);
-      case RETURN:
-        return MoreASTHelpers.findMethodExitedOnReturn(state)
-            .filter(m -> MoreASTHelpers.areSameType(tree, m.getReturnType(), state))
-            .isPresent();
-      default:
-        return false;
-    }
+    return switch (parent.getKind()) {
+      case VARIABLE ->
+          !ASTHelpers.hasImplicitType((VariableTree) parent, state)
+              && MoreASTHelpers.areSameType(tree, parent, state);
+      case ASSIGNMENT -> MoreASTHelpers.areSameType(tree, parent, state);
+      case RETURN ->
+          MoreASTHelpers.findMethodExitedOnReturn(state)
+              .filter(m -> MoreASTHelpers.areSameType(tree, m.getReturnType(), state))
+              .isPresent();
+      default -> false;
+    };
   }
 }

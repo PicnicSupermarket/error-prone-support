@@ -15,9 +15,11 @@ focussing on maintainability, consistency and avoidance of common pitfalls.
 > Error Prone is a static analysis tool for Java that catches common
 > programming mistakes at compile-time.
 
-Read more on how Picnic uses Error Prone (Support) in the blog post [_Picnic
-loves Error Prone: producing high-quality and consistent Java
-code_][picnic-blog-ep-post].
+To learn more about Error Prone (Support), how you can start using Error Prone
+in practice, and how we use it at Picnic, watch the conference talk
+[_Automating away bugs with Error Prone in practice_][conference-talk]. Also
+consider checking out the blog post [_Picnic loves Error Prone: producing
+high-quality and consistent Java code_][picnic-blog-ep-post].
 
 [![Maven Central][maven-central-badge]][maven-central-search]
 [![Reproducible Builds][reproducible-builds-badge]][reproducible-builds-report]
@@ -47,7 +49,9 @@ code_][picnic-blog-ep-post].
 ### Installation
 
 This library is built on top of [Error Prone][error-prone-orig-repo]. To use
-it, read the installation guide for Maven or Gradle below.
+it, read the installation guide for Maven or Gradle below. The library requires
+that your build is executed using JDK 17 or above, but supports builds that
+[target][baeldung-java-source-target-options] older versions of Java.
 
 #### Maven
 
@@ -63,6 +67,8 @@ it, read the installation guide for Maven or Gradle below.
                <plugin>
                    <groupId>org.apache.maven.plugins</groupId>
                    <artifactId>maven-compiler-plugin</artifactId>
+                   <!-- Prefer using the latest release. -->
+                   <version>3.12.0</version>
                    <configuration>
                        <annotationProcessorPaths>
                            <!-- Error Prone itself. -->
@@ -92,8 +98,6 @@ it, read the installation guide for Maven or Gradle below.
                            </arg>
                            <arg>-XDcompilePolicy=simple</arg>
                        </compilerArgs>
-                       <!-- Some checks raise warnings rather than errors. -->
-                       <showWarnings>true</showWarnings>
                        <!-- Enable this if you'd like to fail your build upon warnings. -->
                        <!-- <failOnWarning>true</failOnWarning> -->
                    </configuration>
@@ -213,7 +217,7 @@ Other highly relevant commands:
 - `mvn fmt:format` formats the code using
   [`google-java-format`][google-java-format].
 - [`./run-full-build.sh`][script-run-full-build] builds the project twice,
-  where the second pass validates compatbility with Picnic's [Error Prone
+  where the second pass validates compatibility with Picnic's [Error Prone
   fork][error-prone-fork-repo] and compliance of the code with any rules
   defined within this project. (Consider running this before [opening a pull
   request][contributing-pull-request], as the PR checks also perform this
@@ -223,10 +227,13 @@ Other highly relevant commands:
   Before running this command, make sure to have installed the project (`mvn
   clean install`) and make sure that the current working directory does not
   contain unstaged or uncommited changes.
-- [`./run-mutation-tests.sh`][script-run-mutation-tests] runs mutation tests
-  using [Pitest][pitest]. The results can be reviewed by opening the respective
-  `target/pit-reports/index.html` files. For more information check the [PIT
-  Maven plugin][pitest-maven].
+- [`./run-branch-mutation-tests.sh`][script-run-branch-mutation-tests] uses
+  [Pitest][pitest] to run mutation tests against code that is modified relative
+  to the upstream default branch. The results can be reviewed by opening the
+  respective `target/pit-reports/index.html` files. One can use
+  [`./run-mutation-tests.sh`][script-run-mutation-tests] to run mutation tests
+  against _all_ code in the current working directory. For more information
+  check the [PIT Maven plugin][pitest-maven].
 
 When running the project's tests in IntelliJ IDEA, you might see the following
 error:
@@ -258,10 +265,12 @@ guidelines][contributing].
 If you want to report a security vulnerability, please do so through a private
 channel; please see our [security policy][security] for details.
 
+[baeldung-java-source-target-options]: https://www.baeldung.com/java-source-target-options
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
 [codeql-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml/badge.svg?branch=master&event=push
 [codeql-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml?query=branch:master+event:push
+[conference-talk]: https://www.youtube.com/watch?v=-47WD-3wKBs
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
 [contributing-pull-request]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-opening-a-pull-request
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
@@ -271,8 +280,8 @@ channel; please see our [security policy][security] for details.
 [error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
 [error-prone-orig-repo]: https://github.com/google/error-prone
 [error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
-[github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml/badge.svg
-[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yaml?query=branch:master&event=push
+[github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml/badge.svg
+[github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml?query=branch:master&event=push
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
@@ -283,7 +292,7 @@ channel; please see our [security policy][security] for details.
 [openssf-best-practices-badge]: https://bestpractices.coreinfrastructure.org/projects/7199/badge
 [openssf-best-practices-checklist]: https://bestpractices.coreinfrastructure.org/projects/7199
 [openssf-scorecard-badge]: https://img.shields.io/ossf-scorecard/github.com/PicnicSupermarket/error-prone-support?label=openssf%20scorecard
-[openssf-scorecard-report]: https://api.securityscorecards.dev/projects/github.com/PicnicSupermarket/error-prone-support
+[openssf-scorecard-report]: https://securityscorecards.dev/viewer/?uri=github.com/PicnicSupermarket/error-prone-support
 [picnic-blog-ep-post]: https://blog.picnic.nl/picnic-loves-error-prone-producing-high-quality-and-consistent-java-code-b8a566be6886
 [picnic-blog]: https://blog.picnic.nl
 [pitest-badge]: https://img.shields.io/badge/-Mutation%20tested%20with%20PIT-blue.svg
@@ -293,9 +302,10 @@ channel; please see our [security policy][security] for details.
 [refaster]: https://errorprone.info/docs/refaster
 [refaster-rules-bigdecimal]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/BigDecimalRules.java
 [refaster-rules]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/
-[reproducible-builds-badge]: https://img.shields.io/badge/Reproducible_Builds-ok-success?labelColor=1e5b96
+[reproducible-builds-badge]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/tech/picnic/error-prone-support/error-prone-support/badge.json
 [reproducible-builds-report]: https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/tech/picnic/error-prone-support/error-prone-support/README.md
 [script-apply-error-prone-suggestions]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
+[script-run-branch-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [script-run-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
 [script-run-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
 [security]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/SECURITY.md

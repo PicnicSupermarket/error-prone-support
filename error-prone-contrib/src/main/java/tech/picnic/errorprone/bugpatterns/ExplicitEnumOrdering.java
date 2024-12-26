@@ -7,7 +7,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.stream.Collectors.collectingAndThen;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 public final class ExplicitEnumOrdering extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> EXPLICIT_ORDERING =
-      staticMethod().onClass(Ordering.class.getName()).named("explicit");
+      staticMethod().onClass(Ordering.class.getCanonicalName()).named("explicit");
 
   /** Instantiates a new {@link ExplicitEnumOrdering} instance. */
   public ExplicitEnumOrdering() {}
@@ -72,7 +72,7 @@ public final class ExplicitEnumOrdering extends BugChecker implements MethodInvo
       List<? extends ExpressionTree> expressions) {
     return expressions.stream()
         .map(ASTHelpers::getSymbol)
-        .filter(Symbol::isEnum)
+        .filter(s -> s != null && s.isEnum())
         .collect(
             collectingAndThen(
                 toImmutableSetMultimap(Symbol::asType, Symbol::toString),

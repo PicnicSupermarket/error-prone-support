@@ -29,6 +29,7 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 
 /**
  * Refaster rules that replace TestNG assertions with equivalent AssertJ assertions.
@@ -48,32 +49,107 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
  * List<Map<String, Object>> myMaps = new ArrayList<>();
  * assertEquals(myMaps, ImmutableList.of(ImmutableMap.of()));
  * }</pre>
- *
- * <p>A few {@link Assert} methods are not rewritten:
- *
- * <ul>
- *   <li>These methods cannot (easily) be expressed using AssertJ because they mix regular equality
- *       and array equality:
- *       <ul>
- *         <li>{@link Assert#assertEqualsDeep(Map, Map)}
- *         <li>{@link Assert#assertEqualsDeep(Map, Map, String)}
- *         <li>{@link Assert#assertEqualsDeep(Set, Set, String)}
- *         <li>{@link Assert#assertNotEqualsDeep(Map, Map)}
- *         <li>{@link Assert#assertNotEqualsDeep(Map, Map, String)}
- *         <li>{@link Assert#assertNotEqualsDeep(Set, Set)}
- *         <li>{@link Assert#assertNotEqualsDeep(Set, Set, String)}
- *       </ul>
- *   <li>This method returns the caught exception; there is no direct counterpart for this in
- *       AssertJ:
- *       <ul>
- *         <li>{@link Assert#expectThrows(Class, ThrowingRunnable)}
- *       </ul>
- * </ul>
  */
 // XXX: As-is these rules do not result in a complete migration:
 // - Expressions containing comments are skipped due to a limitation of Refaster.
 // - Assertions inside lambda expressions are also skipped. Unclear why.
+// XXX: The `assertEquals` tests for this class generally use the same expression for `expected` and
+// `actual`, which makes the validation weaker than necessary; fix this. (And investigate whether we
+// can introduce validation for this.)
 @OnlineDocumentation
+@TypeMigration(
+    of = Assert.class,
+    unmigratedMethods = {
+      // XXX: Add migrations for the methods below.
+      "assertEquals(Boolean, Boolean)",
+      "assertEquals(Boolean, boolean)",
+      "assertEquals(boolean, Boolean)",
+      "assertEquals(Boolean, Boolean, String)",
+      "assertEquals(Boolean, boolean, String)",
+      "assertEquals(boolean, Boolean, String)",
+      "assertEquals(Byte, Byte)",
+      "assertEquals(Byte, byte)",
+      "assertEquals(byte, Byte)",
+      "assertEquals(Byte, Byte, String)",
+      "assertEquals(Byte, byte, String)",
+      "assertEquals(byte, Byte, String)",
+      "assertEquals(char, Character)",
+      "assertEquals(char, Character, String)",
+      "assertEquals(Character, char)",
+      "assertEquals(Character, char, String)",
+      "assertEquals(Character, Character)",
+      "assertEquals(Character, Character, String)",
+      "assertEquals(Double, Double)",
+      "assertEquals(Double, double)",
+      "assertEquals(double, Double)",
+      "assertEquals(Double, Double, String)",
+      "assertEquals(Double, double, String)",
+      "assertEquals(double, Double, String)",
+      "assertEquals(double[], double[], double)",
+      "assertEquals(double[], double[], double, String)",
+      "assertEquals(Float, Float)",
+      "assertEquals(Float, float)",
+      "assertEquals(float, Float)",
+      "assertEquals(Float, Float, String)",
+      "assertEquals(Float, float, String)",
+      "assertEquals(float, Float, String)",
+      "assertEquals(float[], float[], float)",
+      "assertEquals(float[], float[], float, String)",
+      "assertEquals(int, Integer)",
+      "assertEquals(int, Integer, String)",
+      "assertEquals(Integer, int)",
+      "assertEquals(Integer, int, String)",
+      "assertEquals(Integer, Integer)",
+      "assertEquals(Integer, Integer, String)",
+      "assertEquals(Long, Long)",
+      "assertEquals(Long, long)",
+      "assertEquals(long, Long)",
+      "assertEquals(Long, Long, String)",
+      "assertEquals(Long, long, String)",
+      "assertEquals(Short, Short)",
+      "assertEquals(Short, short)",
+      "assertEquals(short, Short)",
+      "assertEquals(Short, Short, String)",
+      "assertEquals(Short, short, String)",
+      "assertEquals(short, Short, String)",
+      /*
+       * These `assertEqualsDeep` methods cannot (easily) be expressed using AssertJ because they
+       * mix regular equality and array equality:
+       */
+      "assertEqualsDeep(Map<?, ?>, Map<?, ?>)",
+      "assertEqualsDeep(Map<?, ?>, Map<?, ?>, String)",
+      "assertEqualsDeep(Set<?>, Set<?>, String)",
+      // XXX: Add migrations for the methods below.
+      "assertEqualsNoOrder(Collection<?>, Collection<?>)",
+      "assertEqualsNoOrder(Collection<?>, Collection<?>, String)",
+      "assertEqualsNoOrder(Iterator<?>, Iterator<?>)",
+      "assertEqualsNoOrder(Iterator<?>, Iterator<?>, String)",
+      "assertListContains(List<T>, Predicate<T>, String)",
+      "assertListContainsObject(List<T>, T, String)",
+      "assertListNotContains(List<T>, Predicate<T>, String)",
+      "assertListNotContainsObject(List<T>, T, String)",
+      "assertNotEquals(Collection<?>, Collection<?>)",
+      "assertNotEquals(Collection<?>, Collection<?>, String)",
+      "assertNotEquals(Iterator<?>, Iterator<?>)",
+      "assertNotEquals(Iterator<?>, Iterator<?>, String)",
+      "assertNotEquals(Object[], Object[], String)",
+      /*
+       * These `assertNotEqualsDeep` methods cannot (easily) be expressed using AssertJ because they
+       * mix regular equality and array equality:
+       */
+      "assertNotEqualsDeep(Map<?, ?>, Map<?, ?>)",
+      "assertNotEqualsDeep(Map<?, ?>, Map<?, ?>, String)",
+      "assertNotEqualsDeep(Set<?>, Set<?>)",
+      "assertNotEqualsDeep(Set<?>, Set<?>, String)",
+      // XXX: Add a migration for this `assertThrows` method.
+      "assertThrows(String, Class<T>, ThrowingRunnable)",
+      /*
+       * These `expectThrows` methods return the caught exception; there is no direct counterpart
+       * for this in AssertJ.
+       */
+      "expectThrows(Class<T>, ThrowingRunnable)",
+      "expectThrows(String, Class<T>, ThrowingRunnable)"
+    })
 final class TestNGToAssertJRules {
   private TestNGToAssertJRules() {}
 
@@ -85,8 +161,9 @@ final class TestNGToAssertJRules {
 
     @AfterTemplate
     @DoNotCall
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after() {
-      throw new AssertionError();
+      fail();
     }
   }
 
@@ -237,13 +314,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertSameWithMessage {
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object actual, String message, Object expected) {
       assertSame(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object actual, String message, Object expected) {
       assertThat(actual).withFailMessage(message).isSameAs(expected);
     }
   }
@@ -263,13 +340,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertNotSameWithMessage {
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object actual, String message, Object expected) {
       assertNotSame(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object actual, String message, Object expected) {
       assertThat(actual).withFailMessage(message).isNotSameAs(expected);
     }
   }
@@ -339,63 +416,63 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualWithMessage {
     @BeforeTemplate
-    void before(boolean actual, boolean expected, String message) {
+    void before(boolean actual, String message, boolean expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(byte actual, byte expected, String message) {
+    void before(byte actual, String message, byte expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(char actual, char expected, String message) {
+    void before(char actual, String message, char expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(short actual, short expected, String message) {
+    void before(short actual, String message, short expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(int actual, int expected, String message) {
+    void before(int actual, String message, int expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(long actual, long expected, String message) {
+    void before(long actual, String message, long expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(float actual, float expected, String message) {
+    void before(float actual, String message, float expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(double actual, double expected, String message) {
+    void before(double actual, String message, double expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object actual, String message, Object expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(String actual, String expected, String message) {
+    void before(String actual, String message, String expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Map<?, ?> actual, Map<?, ?> expected, String message) {
+    void before(Map<?, ?> actual, String message, Map<?, ?> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object actual, String message, Object expected) {
       assertThat(actual).withFailMessage(message).isEqualTo(expected);
     }
   }
@@ -415,13 +492,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualFloatsWithDeltaWithMessage {
     @BeforeTemplate
-    void before(float actual, float expected, float delta, String message) {
+    void before(float actual, String message, float expected, float delta) {
       assertEquals(actual, expected, delta, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(float actual, float expected, float delta, String message) {
+    void after(float actual, String message, float expected, float delta) {
       assertThat(actual).withFailMessage(message).isCloseTo(expected, offset(delta));
     }
   }
@@ -441,13 +518,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualDoublesWithDeltaWithMessage {
     @BeforeTemplate
-    void before(double actual, double expected, double delta, String message) {
+    void before(double actual, String message, double expected, double delta) {
       assertEquals(actual, expected, delta, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(double actual, double expected, double delta, String message) {
+    void after(double actual, String message, double expected, double delta) {
       assertThat(actual).withFailMessage(message).isCloseTo(expected, offset(delta));
     }
   }
@@ -507,53 +584,53 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualArrayIterationOrderWithMessage {
     @BeforeTemplate
-    void before(boolean[] actual, boolean[] expected, String message) {
+    void before(boolean[] actual, String message, boolean[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(byte[] actual, byte[] expected, String message) {
+    void before(byte[] actual, String message, byte[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(char[] actual, char[] expected, String message) {
+    void before(char[] actual, String message, char[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(short[] actual, short[] expected, String message) {
+    void before(short[] actual, String message, short[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(int[] actual, int[] expected, String message) {
+    void before(int[] actual, String message, int[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(long[] actual, long[] expected, String message) {
+    void before(long[] actual, String message, long[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(float[] actual, float[] expected, String message) {
+    void before(float[] actual, String message, float[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(double[] actual, double[] expected, String message) {
+    void before(double[] actual, String message, double[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Object[] actual, Object[] expected, String message) {
+    void before(Object[] actual, String message, Object[] expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object[] actual, Object[] expected, String message) {
+    void after(Object[] actual, String message, Object[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -573,13 +650,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualArraysIrrespectiveOfOrderWithMessage {
     @BeforeTemplate
-    void before(Object[] actual, Object[] expected, String message) {
+    void before(Object[] actual, String message, Object[] expected) {
       assertEqualsNoOrder(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object[] actual, Object[] expected, String message) {
+    void after(Object[] actual, String message, Object[] expected) {
       assertThat(actual).withFailMessage(message).containsExactlyInAnyOrder(expected);
     }
   }
@@ -601,13 +678,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualIteratorIterationOrderWithMessage {
     @BeforeTemplate
-    void before(Iterator<?> actual, Iterator<?> expected, String message) {
+    void before(Iterator<?> actual, String message, Iterator<?> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Iterator<S> actual, Iterator<T> expected, String message) {
+    <S, T extends S> void after(Iterator<S> actual, String message, Iterator<T> expected) {
       // XXX: This is not `null`-safe.
       // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
       assertThat(actual)
@@ -639,18 +716,18 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualIterableIterationOrderWithMessage {
     @BeforeTemplate
-    void before(Iterable<?> actual, Iterable<?> expected, String message) {
+    void before(Iterable<?> actual, String message, Iterable<?> expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Collection<?> actual, Collection<?> expected, String message) {
+    void before(Collection<?> actual, String message, Collection<?> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Iterable<S> actual, Iterable<T> expected, String message) {
+    <S, T extends S> void after(Iterable<S> actual, String message, Iterable<T> expected) {
       assertThat(actual).withFailMessage(message).containsExactlyElementsOf(expected);
     }
   }
@@ -670,13 +747,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertEqualSetsWithMessage {
     @BeforeTemplate
-    void before(Set<?> actual, Set<?> expected, String message) {
+    void before(Set<?> actual, String message, Set<?> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Set<S> actual, Set<T> expected, String message) {
+    <S, T extends S> void after(Set<S> actual, String message, Set<T> expected) {
       assertThat(actual).withFailMessage(message).hasSameElementsAs(expected);
     }
   }
@@ -751,68 +828,68 @@ final class TestNGToAssertJRules {
 
   static final class AssertUnequalWithMessage {
     @BeforeTemplate
-    void before(boolean actual, boolean expected, String message) {
+    void before(boolean actual, String message, boolean expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(byte actual, byte expected, String message) {
+    void before(byte actual, String message, byte expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(char actual, char expected, String message) {
+    void before(char actual, String message, char expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(short actual, short expected, String message) {
+    void before(short actual, String message, short expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(int actual, int expected, String message) {
+    void before(int actual, String message, int expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(long actual, long expected, String message) {
+    void before(long actual, String message, long expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(float actual, float expected, String message) {
+    void before(float actual, String message, float expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(double actual, double expected, String message) {
+    void before(double actual, String message, double expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Object actual, Object expected, String message) {
+    void before(Object actual, String message, Object expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(String actual, String expected, String message) {
+    void before(String actual, String message, String expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Set<?> actual, Set<?> expected, String message) {
+    void before(Set<?> actual, String message, Set<?> expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Map<?, ?> actual, Map<?, ?> expected, String message) {
+    void before(Map<?, ?> actual, String message, Map<?, ?> expected) {
       assertNotEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Object expected, String message) {
+    void after(Object actual, String message, Object expected) {
       assertThat(actual).withFailMessage(message).isNotEqualTo(expected);
     }
   }
@@ -832,13 +909,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertUnequalFloatsWithDeltaWithMessage {
     @BeforeTemplate
-    void before(float actual, float expected, float delta, String message) {
+    void before(float actual, String message, float expected, float delta) {
       assertNotEquals(actual, expected, delta, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(float actual, float expected, float delta, String message) {
+    void after(float actual, String message, float expected, float delta) {
       assertThat(actual).withFailMessage(message).isNotCloseTo(expected, offset(delta));
     }
   }
@@ -858,13 +935,13 @@ final class TestNGToAssertJRules {
 
   static final class AssertUnequalDoublesWithDeltaWithMessage {
     @BeforeTemplate
-    void before(double actual, double expected, double delta, String message) {
+    void before(double actual, String message, double expected, double delta) {
       assertNotEquals(actual, expected, delta, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(double actual, double expected, double delta, String message) {
+    void after(double actual, String message, double expected, double delta) {
       assertThat(actual).withFailMessage(message).isNotCloseTo(expected, offset(delta));
     }
   }

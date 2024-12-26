@@ -76,11 +76,22 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
 
   ImmutableSet<ImmutableListMultimap<Integer, Integer>> testIndexIterableToImmutableListMultimap() {
     return ImmutableSet.of(
-        ImmutableList.of(1).stream().collect(toImmutableListMultimap(n -> n * 2, identity())),
-        Streams.stream(ImmutableList.of(2)::iterator)
-            .collect(toImmutableListMultimap(Integer::valueOf, n -> n)),
+        Streams.stream(ImmutableList.of(1).iterator())
+            .collect(toImmutableListMultimap(n -> n * 2, identity())),
+        Streams.stream(ImmutableList.of(2).iterator())
+            .collect(toImmutableListMultimap(n -> n * 2, v -> v)),
         Streams.stream(ImmutableList.of(3).iterator())
-            .collect(toImmutableListMultimap(n -> n.intValue(), identity())));
+            .collect(toImmutableListMultimap(n -> n * 2, v -> 0)),
+        Streams.stream(ImmutableList.of(4)::iterator)
+            .collect(toImmutableListMultimap(Integer::valueOf, identity())),
+        Streams.stream(ImmutableList.of(5)::iterator)
+            .collect(toImmutableListMultimap(Integer::valueOf, v -> v)),
+        Streams.stream(ImmutableList.of(6)::iterator)
+            .collect(toImmutableListMultimap(Integer::valueOf, v -> 0)),
+        ImmutableList.of(7).stream()
+            .collect(toImmutableListMultimap(n -> n.intValue(), identity())),
+        ImmutableList.of(8).stream().collect(toImmutableListMultimap(n -> n.intValue(), v -> v)),
+        ImmutableList.of(9).stream().collect(toImmutableListMultimap(n -> n.intValue(), v -> 0)));
   }
 
   ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {

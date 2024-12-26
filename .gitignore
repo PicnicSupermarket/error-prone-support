@@ -4,8 +4,12 @@
 .DS_Store
 .factorypath
 .idea
+!.idea/icon.svg
 .project
 .settings
 target
 *.iml
 *.swp
+
+# The Git repositories checked out by the integration test framework.
+integration-tests/.repos

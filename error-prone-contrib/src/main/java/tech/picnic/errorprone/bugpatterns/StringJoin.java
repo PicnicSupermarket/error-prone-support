@@ -4,7 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
@@ -23,12 +23,11 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.Convert;
 import java.util.Formattable;
 import java.util.Iterator;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@link String#format(String, Object...)} invocations which can be
@@ -37,7 +36,9 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  */
 // XXX: What about `v1 + "sep" + v2` and similar expressions? Do we want to rewrite those to
 // `String.join`, or should some `String.join` invocations be rewritten to use the `+` operator?
-// (The latter suggestion would conflict with the `FormatStringConcatenation` check.)
+// (The latter suggestion would conflict with the `FormatStringConcatenation` check, but does make
+// more sense when `"sep"` is a long string. Similarly for `String.format("%s some long text %s",
+// arg1, arg2)`.)
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `String#join` over `String#format`",
@@ -49,7 +50,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
   private static final long serialVersionUID = 1L;
   private static final Splitter FORMAT_SPECIFIER_SPLITTER = Splitter.on("%s");
   private static final Matcher<ExpressionTree> STRING_FORMAT_INVOCATION =
-      staticMethod().onClass(String.class.getName()).named("format");
+      staticMethod().onClass(String.class.getCanonicalName()).named("format");
   private static final Supplier<Type> CHAR_SEQUENCE_TYPE =
       Suppliers.typeFromClass(CharSequence.class);
   private static final Supplier<Type> FORMATTABLE_TYPE = Suppliers.typeFromClass(Formattable.class);
@@ -150,7 +151,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
     SuggestedFix.Builder fix =
         SuggestedFix.builder()
             .replace(tree.getMethodSelect(), "String.join")
-            .replace(arguments.next(), String.format("\"%s\"", Convert.quote(separator)));
+            .replace(arguments.next(), SourceCode.toStringConstantExpression(separator, state));
 
     while (arguments.hasNext()) {
       ExpressionTree argument = arguments.next();

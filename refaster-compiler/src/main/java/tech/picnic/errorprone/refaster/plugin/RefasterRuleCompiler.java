@@ -25,4 +25,9 @@ public final class RefasterRuleCompiler implements Plugin {
     javacTask.addTaskListener(
         new RefasterRuleCompilerTaskListener(((BasicJavacTask) javacTask).getContext()));
   }
+
+  @Override
+  public boolean autoStart() {
+    return true;
+  }
 }

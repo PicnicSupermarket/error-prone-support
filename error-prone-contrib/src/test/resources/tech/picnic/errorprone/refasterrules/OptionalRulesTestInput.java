@@ -13,6 +13,10 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
+  Optional<String> testOptionalEmpty() {
+    return Optional.ofNullable(null);
+  }
+
   ImmutableSet<Optional<String>> testOptionalOfNullable() {
     return ImmutableSet.of(
         toString() == null ? Optional.empty() : Optional.of(toString()),
@@ -33,6 +37,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
     return Optional::get;
+  }
+
+  ImmutableSet<Boolean> testOptionalEqualsOptional() {
+    return ImmutableSet.of(
+        Optional.of("foo").filter("bar"::equals).isPresent(),
+        Optional.of("baz").stream().anyMatch("qux"::equals));
   }
 
   ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
@@ -73,6 +83,11 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").orElseGet(() -> Optional.of("bar").orElseThrow());
   }
 
+  ImmutableSet<String> testOptionalOrElse() {
+    return ImmutableSet.of(
+        Optional.of("foo").orElseGet(() -> "bar"), Optional.of("baz").orElseGet(() -> toString()));
+  }
+
   ImmutableSet<Object> testStreamFlatMapOptional() {
     return ImmutableSet.of(
         Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::orElseThrow),
@@ -99,15 +114,20 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").map(Optional::of).orElse(Optional.of("bar")),
         Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.of("qux")),
-        Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst());
+        Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst(),
+        Optional.of("corge").isPresent() ? Optional.of("corge") : Optional.of("grault"));
   }
 
   ImmutableSet<Optional<String>> testOptionalIdentity() {
     return ImmutableSet.of(
-        Optional.of("foo").stream().findFirst(),
-        Optional.of("bar").stream().findAny(),
-        Optional.of("baz").stream().min(String::compareTo),
-        Optional.of("qux").stream().max(String::compareTo));
+        Optional.of("foo").or(() -> Optional.empty()),
+        Optional.of("bar").or(Optional::empty),
+        Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.empty()),
+        Optional.of("qux").map(Optional::of).orElseGet(Optional::empty),
+        Optional.of("quux").stream().findFirst(),
+        Optional.of("quuz").stream().findAny(),
+        Optional.of("corge").stream().min(String::compareTo),
+        Optional.of("grault").stream().max(String::compareTo));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {
@@ -118,5 +138,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   Optional<String> testOptionalMap() {
     return Optional.of(1).stream().map(String::valueOf).findAny();
+  }
+
+  Stream<String> testOptionalStream() {
+    return Optional.of("foo").map(Stream::of).orElseGet(Stream::empty);
   }
 }

@@ -11,12 +11,12 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.not;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableCollection;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -28,13 +28,15 @@ import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import javax.inject.Inject;
-import tech.picnic.errorprone.bugpatterns.util.Flags;
+import tech.picnic.errorprone.utils.Flags;
 
 /** A {@link BugChecker} that flags {@code @RequestParam} parameters with an unsupported type. */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "By default, `@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` subtypes",
+        """
+        By default, `@RequestParam` does not support `ImmutableCollection` and `ImmutableMap` \
+        subtypes""",
     link = BUG_PATTERNS_BASE_URL + "RequestParamType",
     linkType = CUSTOM,
     severity = ERROR,
@@ -72,10 +74,10 @@ public final class RequestParamType extends BugChecker implements VariableTreeMa
     return allOf(
         annotations(AT_LEAST_ONE, isType("org.springframework.web.bind.annotation.RequestParam")),
         anyOf(isSubtypeOf(ImmutableCollection.class), isSubtypeOf(ImmutableMap.class)),
-        not(isSubtypeOfAny(Flags.getList(flags, SUPPORTED_CUSTOM_TYPES_FLAG))));
+        not(isSubtypeOfAny(Flags.getSet(flags, SUPPORTED_CUSTOM_TYPES_FLAG))));
   }
 
-  private static Matcher<Tree> isSubtypeOfAny(ImmutableList<String> inclusions) {
+  private static Matcher<Tree> isSubtypeOfAny(ImmutableSet<String> inclusions) {
     return anyOf(
         inclusions.stream()
             .map(inclusion -> isSubtypeOf(Suppliers.typeFromString(inclusion)))

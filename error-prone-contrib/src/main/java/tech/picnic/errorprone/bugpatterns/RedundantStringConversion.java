@@ -15,9 +15,11 @@ import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Primitives;
@@ -51,9 +53,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.inject.Inject;
-import tech.picnic.errorprone.bugpatterns.util.Flags;
-import tech.picnic.errorprone.bugpatterns.util.MethodMatcherFactory;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.Flags;
+import tech.picnic.errorprone.utils.MethodMatcherFactory;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags redundant explicit string conversions. */
 @AutoService(BugChecker.class)
@@ -86,7 +88,7 @@ public final class RedundantStringConversion extends BugChecker
   private static final Matcher<MethodInvocationTree> WELL_KNOWN_STRING_CONVERSION_METHODS =
       anyOf(
           instanceMethod()
-              .onDescendantOfAny(Object.class.getName())
+              .onDescendantOfAny(Object.class.getCanonicalName())
               .named("toString")
               .withNoParameters(),
           allOf(
@@ -100,7 +102,7 @@ public final class RedundantStringConversion extends BugChecker
                               .collect(toImmutableSet()))
                       .named("toString"),
                   allOf(
-                      staticMethod().onClass(String.class.getName()).named("valueOf"),
+                      staticMethod().onClass(String.class.getCanonicalName()).named("valueOf"),
                       not(
                           anyMethod()
                               .anyClass()
@@ -109,35 +111,37 @@ public final class RedundantStringConversion extends BugChecker
                                   ImmutableList.of(Suppliers.arrayOf(Suppliers.CHAR_TYPE))))))));
   private static final Matcher<ExpressionTree> STRINGBUILDER_APPEND_INVOCATION =
       instanceMethod()
-          .onDescendantOf(StringBuilder.class.getName())
+          .onDescendantOf(StringBuilder.class.getCanonicalName())
           .named("append")
-          .withParameters(String.class.getName());
+          .withParameters(String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> STRINGBUILDER_INSERT_INVOCATION =
       instanceMethod()
-          .onDescendantOf(StringBuilder.class.getName())
+          .onDescendantOf(StringBuilder.class.getCanonicalName())
           .named("insert")
-          .withParameters(int.class.getName(), String.class.getName());
+          .withParameters(int.class.getCanonicalName(), String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> FORMATTER_INVOCATION =
       anyOf(
-          staticMethod().onClass(String.class.getName()).named("format"),
-          instanceMethod().onDescendantOf(Formatter.class.getName()).named("format"),
+          staticMethod().onClass(String.class.getCanonicalName()).named("format"),
+          instanceMethod().onDescendantOf(Formatter.class.getCanonicalName()).named("format"),
           instanceMethod()
-              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
+              .onDescendantOfAny(
+                  PrintStream.class.getCanonicalName(), PrintWriter.class.getCanonicalName())
               .namedAnyOf("format", "printf"),
           instanceMethod()
-              .onDescendantOfAny(PrintStream.class.getName(), PrintWriter.class.getName())
+              .onDescendantOfAny(
+                  PrintStream.class.getCanonicalName(), PrintWriter.class.getCanonicalName())
               .namedAnyOf("print", "println")
-              .withParameters(Object.class.getName()),
+              .withParameters(Object.class.getCanonicalName()),
           staticMethod()
-              .onClass(Console.class.getName())
+              .onClass(Console.class.getCanonicalName())
               .namedAnyOf("format", "printf", "readline", "readPassword"));
   private static final Matcher<ExpressionTree> GUAVA_GUARD_INVOCATION =
       anyOf(
           staticMethod()
-              .onClass("com.google.common.base.Preconditions")
+              .onClass(Preconditions.class.getCanonicalName())
               .namedAnyOf("checkArgument", "checkState", "checkNotNull"),
           staticMethod()
-              .onClass("com.google.common.base.Verify")
+              .onClass(Verify.class.getCanonicalName())
               .namedAnyOf("verify", "verifyNotNull"));
   private static final Matcher<ExpressionTree> SLF4J_LOGGER_INVOCATION =
       instanceMethod()
@@ -327,36 +331,32 @@ public final class RedundantStringConversion extends BugChecker
   }
 
   private Optional<ExpressionTree> trySimplify(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.METHOD_INVOCATION) {
+    if (!(tree instanceof MethodInvocationTree methodInvocation)) {
       return Optional.empty();
     }
 
-    MethodInvocationTree methodInvocation = (MethodInvocationTree) tree;
     if (!conversionMethodMatcher.matches(methodInvocation, state)) {
       return Optional.empty();
     }
 
-    switch (methodInvocation.getArguments().size()) {
-      case 0:
-        return trySimplifyNullaryMethod(methodInvocation, state);
-      case 1:
-        return trySimplifyUnaryMethod(methodInvocation, state);
-      default:
-        throw new IllegalStateException(
-            "Cannot simplify method call with two or more arguments: "
-                + SourceCode.treeToString(tree, state));
-    }
+    return switch (methodInvocation.getArguments().size()) {
+      case 0 -> trySimplifyNullaryMethod(methodInvocation, state);
+      case 1 -> trySimplifyUnaryMethod(methodInvocation, state);
+      default ->
+          throw new IllegalStateException(
+              "Cannot simplify method call with two or more arguments: "
+                  + SourceCode.treeToString(tree, state));
+    };
   }
 
   private static Optional<ExpressionTree> trySimplifyNullaryMethod(
       MethodInvocationTree methodInvocation, VisitorState state) {
-    if (!instanceMethod().matches(methodInvocation, state)) {
+    if (!instanceMethod().matches(methodInvocation, state)
+        || !(methodInvocation.getMethodSelect() instanceof MemberSelectTree memberSelect)) {
       return Optional.empty();
     }
 
-    return Optional.of(methodInvocation.getMethodSelect())
-        .filter(methodSelect -> methodSelect.getKind() == Kind.MEMBER_SELECT)
-        .map(methodSelect -> ((MemberSelectTree) methodSelect).getExpression())
+    return Optional.of(memberSelect.getExpression())
         .filter(expr -> !"super".equals(SourceCode.treeToString(expr, state)));
   }
 
@@ -378,11 +378,11 @@ public final class RedundantStringConversion extends BugChecker
 
   private static Matcher<MethodInvocationTree> createConversionMethodMatcher(
       ErrorProneFlags flags) {
-    // XXX: ErrorProneFlags#getList splits by comma, but method signatures may also contain commas.
-    // For this class methods accepting more than one argument are not valid, but still: not nice.
+    // XXX: `Flags#getSet` splits by comma, but method signatures may also contain commas. For this
+    // class methods accepting more than one argument are not valid, but still: not nice.
     return anyOf(
         WELL_KNOWN_STRING_CONVERSION_METHODS,
         new MethodMatcherFactory()
-            .create(Flags.getList(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
+            .create(Flags.getSet(flags, EXTRA_STRING_CONVERSION_METHODS_FLAG)));
   }
 }

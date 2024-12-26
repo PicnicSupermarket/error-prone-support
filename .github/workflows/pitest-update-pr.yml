@@ -17,20 +17,27 @@ jobs:
       checks: write
       contents: read
       pull-requests: write
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3.1.0
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
-          persist-credentials: false
-      - name: Set up JDK
-        uses: actions/setup-java@v3.8.0
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@9a27433d289dd99d73851f653607c39d3444e8ba # v1.17.0
         with:
-          java-version: 17.0.7
-          distribution: temurin
-          cache: maven
+          java-version: 17.0.13
+          java-distribution: temurin
+          maven-version: 3.9.9
       - name: Download Pitest analysis artifact
-        uses: dawidd6/action-download-artifact@v2.24.2
+        uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # v3.1.4
         with:
           workflow: ${{ github.event.workflow_run.workflow_id }}
           name: pitest-reports

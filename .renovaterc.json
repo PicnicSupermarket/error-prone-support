@@ -1,18 +1,36 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "helpers:pinGitHubActionDigests"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": [
+        "^integration-tests/.*(-init\\.patch|\\.sh)$"
+      ],
+      "matchStrings": [
+        "\\b(?<packageName>[a-z0-9_.-]+?:[a-z0-9_.-]+?):(?<currentValue>[^:]+?):[a-zA-Z0-9_-]+\\b",
+        "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
+      ],
+      "datasourceTemplate": "maven"
+    }
+  ],
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "^org\\.springframework:spring-framework-bom$",
-        "^org\\.springframework\\.boot:spring-boot[a-z-]*$"
+      "matchPackageNames": [
+        "/^org\\.springframework:spring-framework-bom$/",
+        "/^org\\.springframework\\.boot:spring-boot[a-z-]*$/"
       ],
       "separateMinorPatch": true
     },
     {
-      "matchPackagePatterns": [
-        "^ruby\\/setup-ruby$"
+      "matchPackageNames": [
+        "dawidd6/action-download-artifact",
+        "github/codeql-action",
+        "ruby/setup-ruby"
       ],
-      "schedule": "* * 1 * *"
+      "schedule": "every 4 weeks on Monday"
     }
   ],
   "reviewers": [

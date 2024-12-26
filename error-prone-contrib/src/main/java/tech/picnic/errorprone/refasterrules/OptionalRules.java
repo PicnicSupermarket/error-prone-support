@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Comparator;
@@ -19,11 +20,25 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */
 @OnlineDocumentation
 final class OptionalRules {
   private OptionalRules() {}
+
+  /** Prefer {@link Optional#empty()} over the more contrived alternative. */
+  static final class OptionalEmpty<T> {
+    @BeforeTemplate
+    Optional<T> before() {
+      return Optional.ofNullable(null);
+    }
+
+    @AfterTemplate
+    Optional<T> after() {
+      return Optional.empty();
+    }
+  }
 
   static final class OptionalOfNullable<T> {
     // XXX: Refaster should be smart enough to also rewrite occurrences in which there are
@@ -98,6 +113,20 @@ final class OptionalRules {
     }
   }
 
+  /** Prefer {@link Optional#equals(Object)} over more contrived alternatives. */
+  static final class OptionalEqualsOptional<T, S> {
+    @BeforeTemplate
+    boolean before(Optional<T> optional, S value) {
+      return Refaster.anyOf(
+          optional.filter(value::equals).isPresent(), optional.stream().anyMatch(value::equals));
+    }
+
+    @AfterTemplate
+    boolean after(Optional<T> optional, S value) {
+      return optional.equals(Optional.of(value));
+    }
+  }
+
   /**
    * Don't use the ternary operator to extract the first element of a possibly-empty {@link
    * Iterator} as an {@link Optional}.
@@ -118,7 +147,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our `Refaster` checker should test `compilesWithFix`?
+  // Review whether a `@Matcher` can be used to avoid this.
   abstract static class TernaryOperatorOptionalPositiveFiltering<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -138,7 +167,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#filter(Predicate)} over usage of the ternary operator. */
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
-  // Maybe our `Refaster` checker should test `compilesWithFix`?
+  // Review whether a `@Matcher` can be used to avoid this.
   abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -161,6 +190,7 @@ final class OptionalRules {
    */
   static final class MapOptionalToBoolean<T> {
     @BeforeTemplate
+    @SuppressWarnings("OptionalOrElseGet" /* Rule is confused by `Refaster#anyOf` usage. */)
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
       return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
     }
@@ -225,11 +255,33 @@ final class OptionalRules {
   }
 
   /**
+   * Prefer {@link Optional#orElse(Object)} over {@link Optional#orElseGet(Supplier)} if the
+   * fallback value does not require non-trivial computation.
+   */
+  // XXX: This rule is the counterpart to the `OptionalOrElseGet` bug checker. Once the
+  // `MethodReferenceUsage` bug checker is "production ready", that bug checker may similarly be
+  // replaced with a Refaster rule.
+  static final class OptionalOrElse<T> {
+    @BeforeTemplate
+    T before(Optional<T> optional, @NotMatches(RequiresComputation.class) T value) {
+      return optional.orElseGet(() -> value);
+    }
+
+    @AfterTemplate
+    T after(Optional<T> optional, T value) {
+      return optional.orElse(value);
+    }
+  }
+
+  /**
    * Flatten a stream of {@link Optional}s using {@link Optional#stream()}, rather than using one of
    * the more verbose alternatives.
    */
   // XXX: Do we need the `.filter(Optional::isPresent)`? If it's absent the caller probably assumed
   // that the values are present. (If we drop it, we should rewrite vacuous filter steps.)
+  // XXX: The rewritten `filter`/`map` expression may be more performant than its replacement. See
+  // https://github.com/palantir/gradle-baseline/pull/2946. (There are plans to pair Refaster rules
+  // with JMH benchmarks; this would be a great use case.)
   static final class StreamFlatMapOptional<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
@@ -321,14 +373,23 @@ final class OptionalRules {
   /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
   static final class OptionalOrOtherOptional<T> {
     @BeforeTemplate
-    @SuppressWarnings("NestedOptionals" /* Auto-fix for the `NestedOptionals` check. */)
+    @SuppressWarnings({
+      "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
+      "NestedOptionals" /* This violation will be rewritten. */,
+      "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.
+      // XXX: Note that rewriting the first, third and fourth variant will introduce a compilation
+      // error if `optional2` is not effectively final. Review whether a `@Matcher` can be used to
+      // avoid this.
       return Refaster.anyOf(
           optional1.map(Optional::of).orElse(optional2),
           optional1.map(Optional::of).orElseGet(() -> optional2),
-          Stream.of(optional1, optional2).flatMap(Optional::stream).findFirst());
+          Stream.of(optional1, optional2).flatMap(Optional::stream).findFirst(),
+          optional1.isPresent() ? optional1 : optional2);
     }
 
     @AfterTemplate
@@ -337,14 +398,16 @@ final class OptionalRules {
     }
   }
 
-  /**
-   * Avoid unnecessary operations on an {@link Optional} that ultimately result in that very same
-   * {@link Optional}.
-   */
+  /** Don't unnecessarily transform an {@link Optional} to an equivalent instance. */
   static final class OptionalIdentity<T> {
     @BeforeTemplate
+    @SuppressWarnings("NestedOptionals")
     Optional<T> before(Optional<T> optional, Comparator<? super T> comparator) {
       return Refaster.anyOf(
+          optional.or(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
+          optional
+              .map(Optional::of)
+              .orElseGet(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
           optional.stream().findFirst(),
           optional.stream().findAny(),
           optional.stream().min(comparator),
@@ -394,12 +457,20 @@ final class OptionalRules {
     }
   }
 
-  // XXX: Add a rule for:
-  // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
-  // (Maybe canonicalize the inner expression. Maybe we rewrite already.)
+  /** Prefer {@link Optional#stream()} over more contrived alternatives. */
+  static final class OptionalStream<T> {
+    @BeforeTemplate
+    Stream<T> before(Optional<T> optional) {
+      return optional.map(Stream::of).orElseGet(Stream::empty);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Optional<T> optional) {
+      return optional.stream();
+    }
+  }
 
   // XXX: Add a rule for:
-  // `optional.map(Stream::of).orElse(Stream.empty())`
-  // `optional.map(Stream::of).orElseGet(Stream::empty)`
-  // -> `optional.stream()`
+  // `optional.flatMap(x -> pred(x) ? Optional.empty() : Optional.of(x))` and variants.
+  // (Maybe canonicalize the inner expression. Maybe we rewrite it already.)
 }

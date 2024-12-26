@@ -96,4 +96,8 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
   boolean testDoubleStreamAllMatch2() {
     return DoubleStream.of(1).noneMatch(n -> !(n > 1));
   }
+
+  DoubleStream testDoubleStreamTakeWhile() {
+    return DoubleStream.of(1, 2, 3).takeWhile(i -> i < 2).filter(i -> i < 2);
+  }
 }

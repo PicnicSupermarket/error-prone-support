@@ -1,0 +1,63 @@
+# If requested by means of a pull request comment, runs integration tests
+# against the project, using the code found on the pull request branch.
+# XXX: Review whether then build matrix should also vary JDK or OS versions.
+# XXX: Support `/integration-test [name...]` comment syntax to specify the
+# subset of integration tests to run.
+# See this example of a dynamic build matrix:
+# https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
+name: "Integration tests"
+on:
+  issue_comment:
+    types: [ created ]
+permissions:
+  contents: read
+jobs:
+  run-integration-tests:
+    name: On-demand integration test
+    if: |
+      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        integration-test: [ "checkstyle", "metrics", "prometheus-java-client" ]
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            # XXX: After updating the validation build flags in
+            # `integration-tests/prometheus-java-client.sh`, review whether the
+            # Docker domains specified here can be dropped.
+            api.adoptium.net:443
+            auth.docker.io:443
+            checkstyle.org:443
+            example.com:80
+            github.com:443
+            objects.githubusercontent.com:443
+            oss.sonatype.org:443
+            production.cloudflare.docker.com:443
+            raw.githubusercontent.com:443
+            registry-1.docker.io:443
+            repo.maven.apache.org:443
+            repository.sonatype.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@9a27433d289dd99d73851f653607c39d3444e8ba # v1.17.0
+        with:
+          checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
+          java-version: 17.0.13
+          java-distribution: temurin
+          maven-version: 3.9.9
+      - name: Install project to local Maven repository
+        run: mvn -T1C install -DskipTests -Dverification.skip
+      - name: Run integration test
+        run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
+      - name: Upload artifacts on failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: "integration-test-${{ matrix.integration-test }}"
+          path: "${{ runner.temp }}/artifacts"
+      - name: Remove installed project artifacts
+        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId

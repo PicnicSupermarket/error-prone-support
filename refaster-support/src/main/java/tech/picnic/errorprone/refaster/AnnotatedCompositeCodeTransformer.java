@@ -148,8 +148,7 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
 
   private static SeverityLevel overrideSeverity(SeverityLevel severity, Context context) {
     ErrorProneOptions options = context.get(ErrorProneOptions.class);
-    SeverityLevel minSeverity =
-        ErrorProneFork.isSuggestionsAsWarningsEnabled(options) ? WARNING : SUGGESTION;
+    SeverityLevel minSeverity = options.isSuggestionsAsWarnings() ? WARNING : SUGGESTION;
     SeverityLevel maxSeverity = options.isDropErrorsToWarnings() ? WARNING : ERROR;
 
     return Comparators.max(Comparators.min(severity, minSeverity), maxSeverity);

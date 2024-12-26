@@ -11,12 +11,12 @@ import static com.google.errorprone.matchers.Matchers.hasMethod;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.not;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.TEST_METHOD;
-import static tech.picnic.errorprone.bugpatterns.util.MoreMatchers.hasMetaAnnotation;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.TEST_METHOD;
+import static tech.picnic.errorprone.utils.MoreMatchers.hasMetaAnnotation;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -70,7 +70,7 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
     SuggestedFixes.removeModifiers(
             tree.getModifiers(),
             state,
-            ImmutableSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC))
+            Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC))
         .ifPresent(fixBuilder::merge);
 
     if (!HAS_SPRING_CONFIGURATION_ANNOTATION.matches(tree, state)) {

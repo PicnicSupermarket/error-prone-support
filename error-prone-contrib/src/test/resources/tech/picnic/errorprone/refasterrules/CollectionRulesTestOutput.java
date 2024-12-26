@@ -6,9 +6,11 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -29,11 +31,17 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         !ImmutableSet.of(5).isEmpty(),
         !ImmutableSet.of(6).isEmpty(),
         ImmutableSet.of(7).isEmpty(),
-        ImmutableSet.of(8).isEmpty());
+        ImmutableSet.of(8).isEmpty(),
+        ImmutableSet.of(9).isEmpty(),
+        ImmutableSet.of(10).isEmpty());
   }
 
   ImmutableSet<Integer> testCollectionSize() {
     return ImmutableSet.of(ImmutableSet.of(1).size(), ImmutableSet.of(2).size());
+  }
+
+  boolean testCollectionContains() {
+    return ImmutableSet.of("foo").contains("bar");
   }
 
   boolean testCollectionAddAllToCollectionExpression() {
@@ -54,6 +62,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     new HashSet<>().removeAll(ImmutableSet.of("foo"));
     new HashSet<Number>().removeAll(ImmutableList.of(1));
     new HashSet<Number>().removeAll(ImmutableSet.of(2));
+  }
+
+  Stream<Integer> testSetStream() {
+    return ImmutableSet.of(1).stream();
   }
 
   ArrayList<String> testNewArrayListFromCollection() {
@@ -80,6 +92,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).toString();
   }
 
+  List<String> testArraysAsList() {
+    return Arrays.asList(new String[0]);
+  }
+
   ImmutableSet<Object[]> testCollectionToArray() {
     return ImmutableSet.of(
         ImmutableSet.of(1).toArray(), ImmutableSet.of(2).toArray(), ImmutableSet.of(3).toArray());
@@ -93,8 +109,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).toArray(Integer[]::new);
   }
 
-  Iterator<Integer> testImmutableCollectionIterator() {
-    return ImmutableSet.of(1).iterator();
+  ImmutableSet<Iterator<Integer>> testCollectionIterator() {
+    return ImmutableSet.of(ImmutableSet.of(1).iterator(), ImmutableSet.of(2).iterator());
   }
 
   ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {

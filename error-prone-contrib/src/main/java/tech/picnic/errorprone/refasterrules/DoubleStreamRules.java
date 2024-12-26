@@ -277,4 +277,16 @@ final class DoubleStreamRules {
       return stream.allMatch(e -> test(e));
     }
   }
+
+  static final class DoubleStreamTakeWhile {
+    @BeforeTemplate
+    DoubleStream before(DoubleStream stream, DoublePredicate predicate) {
+      return stream.takeWhile(predicate).filter(predicate);
+    }
+
+    @AfterTemplate
+    DoubleStream after(DoubleStream stream, DoublePredicate predicate) {
+      return stream.takeWhile(predicate);
+    }
+  }
 }

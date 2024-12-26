@@ -88,16 +88,8 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     /* First, collect all matches. */
     List<Description> matches = new ArrayList<>();
-    try {
-      codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
-    } catch (LinkageError e) {
-      // XXX: This `try/catch` block handles the issue described and resolved in
-      // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
-      // released.
-      // XXX: Find a way to identify that we're running Picnic's Error Prone fork and disable this
-      // fallback if so, as it might hide other bugs.
-      return Description.NO_MATCH;
-    }
+    codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+
     /* Then apply them. */
     applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
@@ -144,16 +136,13 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   }
 
   private static Optional<SeverityLevel> toSeverityLevel(Severity severity) {
-    switch (severity) {
-      case DEFAULT:
-        return Optional.empty();
-      case WARN:
-        return Optional.of(WARNING);
-      case ERROR:
-        return Optional.of(ERROR);
-      default:
-        throw new IllegalStateException(String.format("Unsupported severity='%s'", severity));
-    }
+    return switch (severity) {
+      case DEFAULT -> Optional.empty();
+      case WARN -> Optional.of(WARNING);
+      case ERROR -> Optional.of(ERROR);
+      default ->
+          throw new IllegalStateException(String.format("Unsupported severity='%s'", severity));
+    };
   }
 
   /**
@@ -177,7 +166,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
             "Refaster Rule",
             description.getLink(),
             String.join(": ", description.checkName, description.getRawMessage()))
-        .overrideSeverity(severityOverride.orElse(description.severity()))
+        .overrideSeverity(severityOverride.orElseGet(description::severity))
         .addAllFixes(description.fixes)
         .build();
   }

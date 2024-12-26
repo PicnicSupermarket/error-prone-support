@@ -1,11 +1,17 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.function.Predicate.isEqual;
+import static java.util.function.Predicate.not;
+
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.MayOptionallyUse;
+import com.google.errorprone.refaster.annotation.Placeholder;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -14,9 +20,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class EqualityRules {
   private EqualityRules() {}
 
-  /** Prefer reference-based quality for enums. */
-  // Primitive value comparisons are not listed, because Error Prone flags those out of the box.
-  static final class PrimitiveOrReferenceEquality<T extends Enum<T>> {
+  /** Prefer reference-based equality for enums. */
+  // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
+  static final class EnumReferenceEquality<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -25,8 +31,9 @@ final class EqualityRules {
     // XXX: This Refaster rule is the topic of https://github.com/google/error-prone/issues/559. We
     // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
+    @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(T a, T b) {
-      return Refaster.anyOf(a.equals(b), Objects.equals(a, b));
+      return Refaster.anyOf(a.equals(b), Objects.equals(a, b), a.ordinal() == b.ordinal());
     }
 
     @AfterTemplate
@@ -34,6 +41,20 @@ final class EqualityRules {
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
     boolean after(T a, T b) {
       return a == b;
+    }
+  }
+
+  /** Prefer reference-based equality for enums. */
+  static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
+    @BeforeTemplate
+    Predicate<T> before(T e) {
+      return Refaster.anyOf(isEqual(e), e::equals);
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
+    Predicate<T> after(T e) {
+      return v -> v == e;
     }
   }
 
@@ -129,6 +150,54 @@ final class EqualityRules {
     @AfterTemplate
     boolean after(boolean a, boolean b) {
       return a == b;
+    }
+  }
+
+  /**
+   * Don't pass a lambda expression to {@link Predicate#not(Predicate)}; instead push the negation
+   * into the lambda expression.
+   */
+  abstract static class PredicateLambda<T> {
+    @Placeholder(allowsIdentity = true)
+    abstract boolean predicate(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Predicate<T> before() {
+      return not(v -> predicate(v));
+    }
+
+    @AfterTemplate
+    Predicate<T> after() {
+      return v -> !predicate(v);
+    }
+  }
+
+  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  static final class Equals<T, S> {
+    @BeforeTemplate
+    boolean before(T value1, S value2) {
+      return Refaster.anyOf(
+          Optional.of(value1).equals(Optional.of(value2)),
+          Optional.of(value1).equals(Optional.ofNullable(value2)),
+          Optional.ofNullable(value2).equals(Optional.of(value1)));
+    }
+
+    @AfterTemplate
+    boolean after(T value1, S value2) {
+      return value1.equals(value2);
+    }
+  }
+
+  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  static final class ObjectsEquals<T, S> {
+    @BeforeTemplate
+    boolean before(T value1, S value2) {
+      return Optional.ofNullable(value1).equals(Optional.ofNullable(value2));
+    }
+
+    @AfterTemplate
+    boolean after(T value1, S value2) {
+      return Objects.equals(value1, value2);
     }
   }
 }

@@ -5,13 +5,14 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.11.2-SNAPSHOT</version>
+        <version>0.19.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>error-prone-contrib</artifactId>
 
     <name>Picnic :: Error Prone Support :: Contrib</name>
     <description>Extra Error Prone plugins by Picnic.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>
@@ -49,8 +50,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
-            <scope>provided</scope>
+            <!-- XXX: One would expect this to be a `provided` dependency (as
+            Refaster rules are interpreted by the `refaster-runner` module),
+            but the `OptionalOrElseGet` bug checker defined by this module
+            depends on the `RequiresComputation` matcher that
+            `refaster-support` primarily exposes for use by Refaster rules.
+            Review this setup. (Should the matchers be moved elsewhere?) -->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -60,11 +70,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.auto</groupId>
-            <artifactId>auto-common</artifactId>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -73,8 +83,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.google.googlejavaformat</groupId>
-            <artifactId>google-java-format</artifactId>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value-annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -82,9 +93,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.newrelic.agent.java</groupId>
-            <artifactId>newrelic-api</artifactId>
-            <scope>test</scope>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -127,6 +138,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
@@ -152,6 +168,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jspecify</groupId>
             <artifactId>jspecify</artifactId>
             <scope>provided</scope>
@@ -161,6 +182,8 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- XXX: Explicitly declared as a workaround for
+        https://github.com/pitest/pitest-junit5-plugin/issues/105. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
@@ -175,6 +198,36 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java-17</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-templating</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.reactivestreams</groupId>
@@ -212,6 +265,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <scope>provided</scope>
@@ -226,6 +284,9 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
                         <annotationProcessorPaths combine.children="append">
+                            <!-- XXX: Drop the version declarations once
+                            properly supported. See
+                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>documentation-support</artifactId>
@@ -243,21 +304,58 @@
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
-                            <arg>-Xplugin:RefasterRuleCompiler</arg>
                             <arg>-Xplugin:DocumentationGenerator -XoutputDirectory=${project.build.directory}/docs</arg>
                         </compilerArgs>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <configuration>
-                        <ignoredUnusedDeclaredDependencies>
-                            <!-- XXX: Figure out why the plugin thinks this
-                            dependency is unused. -->
-                            <ignoredUnusedDeclaredDependency>${project.groupId}:refaster-support</ignoredUnusedDeclaredDependency>
-                        </ignoredUnusedDeclaredDependencies>
-                    </configuration>
+                    <executions>
+                        <!-- The Refaster input/output test classes used by
+                        `RefasterRuleCollection` are modelled as classpath
+                        resources, and thus not subject to the default test
+                        compilation step. These two custom compilation steps
+                        serve two purposes:
+                        - To provide early feedback in case of syntax errors.
+                        - To enable the `DocumentationGenerator` compiler
+                        plugin to extract documentation metadata from them.
+                        Note that the input and output files must be compiled
+                        separately and to distinct output directories, as they
+                        define the same set of class names. -->
+                        <!-- XXX: Drop these executions if/when the Refaster
+                        test framework is reimplemented such that tests can be
+                        located alongside rules, rather than in two additional
+                        resource files. -->
+                        <execution>
+                            <id>compile-refaster-test-input</id>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                            <phase>process-test-resources</phase>
+                            <configuration>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/test/resources</compileSourceRoot>
+                                </compileSourceRoots>
+                                <testIncludes>
+                                    <testInclude>**/*Input.java</testInclude>
+                                </testIncludes>
+                                <outputDirectory>${project.build.directory}/refaster-test-input</outputDirectory>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>compile-refaster-test-output</id>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                            <phase>process-test-resources</phase>
+                            <configuration>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/test/resources</compileSourceRoot>
+                                </compileSourceRoots>
+                                <testIncludes>
+                                    <testInclude>**/*Output.java</testInclude>
+                                </testIncludes>
+                                <outputDirectory>${project.build.directory}/refaster-test-output</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>

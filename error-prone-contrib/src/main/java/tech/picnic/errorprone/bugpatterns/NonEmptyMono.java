@@ -5,7 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -20,7 +20,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.util.function.BiFunction;
 import reactor.core.publisher.Mono;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@link Mono} operations that are known to be vacuous, given that
@@ -72,7 +72,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Flux")
               .named("reduce")
-              .withParameters(Object.class.getName(), BiFunction.class.getName()),
+              .withParameters(Object.class.getCanonicalName(), BiFunction.class.getCanonicalName()),
           instanceMethod()
               .onDescendantOf("reactor.core.publisher.Mono")
               .namedAnyOf("defaultIfEmpty", "hasElement", "single"));

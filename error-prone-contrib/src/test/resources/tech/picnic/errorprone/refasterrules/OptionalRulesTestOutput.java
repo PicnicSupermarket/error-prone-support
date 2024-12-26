@@ -15,6 +15,10 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
+  Optional<String> testOptionalEmpty() {
+    return Optional.empty();
+  }
+
   ImmutableSet<Optional<String>> testOptionalOfNullable() {
     return ImmutableSet.of(Optional.ofNullable(toString()), Optional.ofNullable(toString()));
   }
@@ -33,6 +37,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
     return Optional::orElseThrow;
+  }
+
+  ImmutableSet<Boolean> testOptionalEqualsOptional() {
+    return ImmutableSet.of(
+        Optional.of("foo").equals(Optional.of("bar")),
+        Optional.of("baz").equals(Optional.of("qux")));
   }
 
   ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
@@ -70,6 +80,11 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").or(() -> Optional.of("bar")).orElseThrow();
   }
 
+  ImmutableSet<String> testOptionalOrElse() {
+    return ImmutableSet.of(
+        Optional.of("foo").orElse("bar"), Optional.of("baz").orElseGet(() -> toString()));
+  }
+
   ImmutableSet<Object> testStreamFlatMapOptional() {
     return ImmutableSet.of(
         Stream.of(Optional.empty()).flatMap(Optional::stream),
@@ -96,12 +111,20 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").or(() -> Optional.of("bar")),
         Optional.of("baz").or(() -> Optional.of("qux")),
-        Optional.of("quux").or(() -> Optional.of("quuz")));
+        Optional.of("quux").or(() -> Optional.of("quuz")),
+        Optional.of("corge").or(() -> Optional.of("grault")));
   }
 
   ImmutableSet<Optional<String>> testOptionalIdentity() {
     return ImmutableSet.of(
-        Optional.of("foo"), Optional.of("bar"), Optional.of("baz"), Optional.of("qux"));
+        Optional.of("foo"),
+        Optional.of("bar"),
+        Optional.of("baz"),
+        Optional.of("qux"),
+        Optional.of("quux"),
+        Optional.of("quuz"),
+        Optional.of("corge"),
+        Optional.of("grault"));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {
@@ -111,5 +134,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   Optional<String> testOptionalMap() {
     return Optional.of(1).map(String::valueOf);
+  }
+
+  Stream<String> testOptionalStream() {
+    return Optional.of("foo").stream();
   }
 }

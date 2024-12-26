@@ -19,17 +19,20 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.HAS_METHOD_SOURCE;
-import static tech.picnic.errorprone.bugpatterns.util.MoreJUnitMatchers.getMethodSourceFactoryNames;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.HAS_METHOD_SOURCE;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.getMethodSourceFactoryNames;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -55,7 +58,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags JUnit tests with a {@link
@@ -99,14 +102,14 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
           allOf(
               staticMethod()
                   .onClassAny(
-                      Stream.class.getName(),
-                      IntStream.class.getName(),
-                      LongStream.class.getName(),
-                      DoubleStream.class.getName(),
-                      List.class.getName(),
-                      Set.class.getName(),
-                      "com.google.common.collect.ImmutableList",
-                      "com.google.common.collect.ImmutableSet")
+                      Stream.class.getCanonicalName(),
+                      IntStream.class.getCanonicalName(),
+                      LongStream.class.getCanonicalName(),
+                      DoubleStream.class.getCanonicalName(),
+                      List.class.getCanonicalName(),
+                      Set.class.getCanonicalName(),
+                      ImmutableList.class.getCanonicalName(),
+                      ImmutableSet.class.getCanonicalName())
                   .named("of"),
               hasArguments(AT_LEAST_ONE, anything()),
               hasArguments(ALL, SUPPORTED_VALUE_FACTORY_VALUES)));
@@ -199,16 +202,21 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
     return getSingleReturnExpression(valueFactoryMethod)
         .flatMap(expression -> tryExtractValueSourceAttributeValue(expression, state))
         .map(
-            valueSourceAttributeValue ->
-                SuggestedFix.builder()
-                    .addImport("org.junit.jupiter.params.provider.ValueSource")
-                    .replace(
-                        methodSourceAnnotation,
-                        String.format(
-                            "@ValueSource(%s = %s)",
-                            toValueSourceAttributeName(parameterType), valueSourceAttributeValue))
-                    .delete(valueFactoryMethod)
-                    .build());
+            valueSourceAttributeValue -> {
+              SuggestedFix.Builder fix = SuggestedFix.builder();
+              String valueSource =
+                  SuggestedFixes.qualifyType(
+                      state, fix, "org.junit.jupiter.params.provider.ValueSource");
+              return fix.replace(
+                      methodSourceAnnotation,
+                      String.format(
+                          "@%s(%s = %s)",
+                          valueSource,
+                          toValueSourceAttributeName(parameterType),
+                          valueSourceAttributeValue))
+                  .delete(valueFactoryMethod)
+                  .build();
+            });
   }
 
   // XXX: This pattern also occurs a few times inside Error Prone; contribute upstream.
@@ -224,7 +232,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
       @Override
       public @Nullable Void visitReturn(ReturnTree node, @Nullable Void unused) {
         returnExpressions.add(node.getExpression());
-        return super.visitReturn(node, unused);
+        return super.visitReturn(node, null);
       }
 
       @Override
@@ -257,8 +265,8 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             arguments.stream()
                 .map(
                     arg ->
-                        arg instanceof MethodInvocationTree
-                            ? Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments())
+                        arg instanceof MethodInvocationTree methodInvocation
+                            ? Iterables.getOnlyElement(methodInvocation.getArguments())
                             : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
@@ -268,16 +276,12 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static String toValueSourceAttributeName(Type type) {
     String typeString = type.tsym.name.toString();
 
-    switch (typeString) {
-      case "Class":
-        return "classes";
-      case "Character":
-        return "chars";
-      case "Integer":
-        return "ints";
-      default:
-        return typeString.toLowerCase(Locale.ROOT) + 's';
-    }
+    return switch (typeString) {
+      case "Class" -> "classes";
+      case "Character" -> "chars";
+      case "Integer" -> "ints";
+      default -> typeString.toLowerCase(Locale.ROOT) + 's';
+    };
   }
 
   private static <T> Optional<T> getElementIfSingleton(Collection<T> collection) {
@@ -289,11 +293,10 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static Matcher<ExpressionTree> isSingleDimensionArrayCreationWithAllElementsMatching(
       Matcher<? super ExpressionTree> elementMatcher) {
     return (tree, state) -> {
-      if (!(tree instanceof NewArrayTree)) {
+      if (!(tree instanceof NewArrayTree newArray)) {
         return false;
       }
 
-      NewArrayTree newArray = (NewArrayTree) tree;
       return newArray.getDimensions().isEmpty()
           && !newArray.getInitializers().isEmpty()
           && newArray.getInitializers().stream()

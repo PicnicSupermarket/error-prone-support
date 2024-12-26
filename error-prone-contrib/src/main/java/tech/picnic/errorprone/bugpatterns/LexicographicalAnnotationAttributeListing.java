@@ -7,13 +7,14 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
@@ -31,20 +32,17 @@ import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.AnnotationAttributeMatcher;
-import tech.picnic.errorprone.bugpatterns.util.Flags;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.AnnotationAttributeMatcher;
+import tech.picnic.errorprone.utils.Flags;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags annotation array listings which aren't sorted lexicographically.
@@ -52,6 +50,9 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same entry.
  */
+// XXX: In some places we declare a `@SuppressWarnings` annotation with a final value of
+// `key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict`. That entry must stay
+// last. Consider adding (generic?) support for such cases.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Where possible, sort annotation array attributes lexicographically",
@@ -65,17 +66,19 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   private static final long serialVersionUID = 1L;
   private static final ImmutableSet<String> BLACKLISTED_ANNOTATIONS =
       ImmutableSet.of(
-          // XXX: unless JsonPropertyOrder#alphabetic is true...
+          // XXX: Unless `JsonPropertyOrder#alphabetic` is true...
           "com.fasterxml.jackson.annotation.JsonPropertyOrder#value",
           "io.swagger.annotations.ApiImplicitParams#value",
           "io.swagger.v3.oas.annotations.Parameters#value",
           "javax.xml.bind.annotation.XmlType#propOrder",
           "org.springframework.context.annotation.PropertySource#value",
           "org.springframework.test.context.TestPropertySource#locations",
-          "org.springframework.test.context.TestPropertySource#value");
+          "org.springframework.test.context.TestPropertySource#value",
+          "picocli.CommandLine.Option#names");
   private static final String FLAG_PREFIX = "LexicographicalAnnotationAttributeListing:";
   private static final String INCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Includes";
   private static final String EXCLUDED_ANNOTATIONS_FLAG = FLAG_PREFIX + "Excludes";
+
   /**
    * The splitter applied to string-typed annotation arguments prior to lexicographical sorting. By
    * splitting on {@code =}, strings that represent e.g. inline Spring property declarations are
@@ -121,13 +124,9 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   }
 
   private static Optional<NewArrayTree> extractArray(ExpressionTree expr) {
-    if (expr.getKind() == Kind.ASSIGNMENT) {
-      return extractArray(((AssignmentTree) expr).getExpression());
-    }
-
-    return Optional.of(expr)
-        .filter(e -> e.getKind() == Kind.NEW_ARRAY)
-        .map(NewArrayTree.class::cast);
+    return expr instanceof AssignmentTree assignment
+        ? extractArray(assignment.getExpression())
+        : Optional.of(expr).filter(NewArrayTree.class::isInstance).map(NewArrayTree.class::cast);
   }
 
   private static Optional<SuggestedFix.Builder> suggestSorting(
@@ -163,7 +162,12 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
 
     /* For now we don't force sorting on numeric types. */
     return Stream.of(
-            symtab.annotationType, symtab.classType, symtab.enumSym.type, symtab.stringType)
+            symtab.annotationType,
+            symtab.booleanType,
+            symtab.charType,
+            symtab.classType,
+            symtab.enumSym.type,
+            symtab.stringType)
         .anyMatch(t -> ASTHelpers.isSubtype(elemType, t, state));
   }
 
@@ -192,24 +196,24 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
       @Override
       public @Nullable Void visitIdentifier(IdentifierTree node, @Nullable Void unused) {
         nodes.add(ImmutableList.of(node.getName().toString()));
-        return super.visitIdentifier(node, unused);
+        return super.visitIdentifier(node, null);
       }
 
       @Override
       public @Nullable Void visitLiteral(LiteralTree node, @Nullable Void unused) {
         Object value = ASTHelpers.constValue(node);
         nodes.add(
-            value instanceof String
-                ? STRING_ARGUMENT_SPLITTER.splitToStream((String) value).collect(toImmutableList())
+            value instanceof String str
+                ? STRING_ARGUMENT_SPLITTER.splitToStream(str).collect(toImmutableList())
                 : ImmutableList.of(String.valueOf(value)));
 
-        return super.visitLiteral(node, unused);
+        return super.visitLiteral(node, null);
       }
 
       @Override
       public @Nullable Void visitPrimitiveType(PrimitiveTypeTree node, @Nullable Void unused) {
         nodes.add(ImmutableList.of(node.getPrimitiveTypeKind().toString()));
-        return super.visitPrimitiveType(node, unused);
+        return super.visitPrimitiveType(node, null);
       }
     }.scan(array, null);
 
@@ -219,13 +223,14 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
   private static AnnotationAttributeMatcher createAnnotationAttributeMatcher(
       ErrorProneFlags flags) {
     return AnnotationAttributeMatcher.create(
-        flags.getList(INCLUDED_ANNOTATIONS_FLAG), excludedAnnotations(flags));
+        flags.get(INCLUDED_ANNOTATIONS_FLAG).isPresent()
+            ? Optional.of(flags.getListOrEmpty(INCLUDED_ANNOTATIONS_FLAG))
+            : Optional.empty(),
+        excludedAnnotations(flags));
   }
 
-  private static ImmutableList<String> excludedAnnotations(ErrorProneFlags flags) {
-    Set<String> exclusions = new HashSet<>();
-    exclusions.addAll(Flags.getList(flags, EXCLUDED_ANNOTATIONS_FLAG));
-    exclusions.addAll(BLACKLISTED_ANNOTATIONS);
-    return ImmutableList.copyOf(exclusions);
+  private static ImmutableSet<String> excludedAnnotations(ErrorProneFlags flags) {
+    return Sets.union(BLACKLISTED_ANNOTATIONS, Flags.getSet(flags, EXCLUDED_ANNOTATIONS_FLAG))
+        .immutableCopy();
   }
 }

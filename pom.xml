@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.11.2-SNAPSHOT</version>
+    <version>0.19.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -41,15 +41,18 @@
     <modules>
         <module>documentation-support</module>
         <module>error-prone-contrib</module>
+        <module>error-prone-experimental</module>
+        <module>error-prone-guidelines</module>
+        <module>error-prone-utils</module>
         <module>refaster-compiler</module>
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
     </modules>
 
-    <scm>
+    <scm child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
         <developerConnection>scm:git:git@github.com:PicnicSupermarket/error-prone-support.git</developerConnection>
-        <tag>v0.10.0</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/PicnicSupermarket/error-prone-support</url>
     </scm>
     <issueManagement>
@@ -100,10 +103,17 @@
             <!-- The test JVMs are short-running. By disabling certain
             expensive JIT optimizations we actually speed up most tests. -->
             -XX:TieredStopAtLevel=1
+            <!-- The test JVMs run in a non-interactive and generally
+            multi-core context, where the Parallel Garbage Collector generally
+            has the highest throughput. -->
+            -XX:+UseParallelGC
             <!-- We cap memory usage. This may be relevant for build agents,
             but also prevents excessive memory usage by heavily parallelized
             local builds. -->
             -Xmx${argLine.xmx}
+            <!-- Configure the Byte Buddy Java agent used by Mockito to create
+            mocks. -->
+            -javaagent:${org.mockito:mockito-core:jar}
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -141,7 +151,7 @@
         <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2023-05-16T15:38:46Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2024-11-03T15:58:19Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -197,20 +207,21 @@
         <!-- Dependency and plugin versions that are referenced in more than
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
-        <version.auto-service>1.0.1</version.auto-service>
-        <version.auto-value>1.10.1</version.auto-value>
+        <version.auto-service>1.1.1</version.auto-service>
+        <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.19.1</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.18</version.error-prone-slf4j>
+        <version.error-prone-orig>2.36.0</version.error-prone-orig>
+        <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
-        <version.jdk>11</version.jdk>
-        <version.maven>3.8.7</version.maven>
-        <version.mockito>5.3.1</version.mockito>
+        <version.jdk>17</version.jdk>
+        <version.maven>3.9.9</version.maven>
+        <version.mockito>5.14.2</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
-        <version.nullaway>0.10.10</version.nullaway>
-        <version.pitest-git>1.0.10</version.pitest-git>
-        <version.surefire>3.1.0</version.surefire>
+        <version.nullaway>0.12.2</version.nullaway>
+        <version.pitest-git>1.1.4</version.pitest-git>
+        <version.rewrite-templating>1.20.2</version.rewrite-templating>
+        <version.surefire>3.2.3</version.surefire>
     </properties>
 
     <dependencyManagement>
@@ -247,6 +258,26 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-contrib</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-experimental</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-guidelines</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>error-prone-utils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>refaster-compiler</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -268,14 +299,24 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.15.1</version>
+                <version>2.18.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>3.1.8</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.auto</groupId>
                 <artifactId>auto-common</artifactId>
-                <version>1.2.1</version>
+                <version>1.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${version.auto-service}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto.service</groupId>
@@ -295,10 +336,8 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.17.0</version>
+                <version>1.25.2</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-beta-checker</artifactId>
@@ -307,38 +346,36 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>31.1-jre</version>
+                <version>33.4.0-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>1.1.3</version>
+                <version>1.4.4</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>com.jakewharton.nopen</groupId>
                 <artifactId>nopen-checker</artifactId>
                 <version>${version.nopen-checker}</version>
             </dependency>
             <dependency>
-                <groupId>com.newrelic.agent.java</groupId>
-                <artifactId>newrelic-api</artifactId>
-                <version>8.2.0</version>
-            </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
-            <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
                 <version>${version.nullaway}</version>
             </dependency>
             <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-bom</artifactId>
+                <version>1.14.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2022.0.7</version>
+                <version>2024.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -350,17 +387,22 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>1.6.11</version>
+                <version>1.6.14</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.10</version>
+                <version>2.2.27</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.0.0</version>
+                <version>6.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.3.2</version>
             </dependency>
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -372,8 +414,6 @@
                 <artifactId>jaxb-api</artifactId>
                 <version>2.3.1</version>
             </dependency>
-            <!-- Specified as a workaround for
-            https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
             <dependency>
                 <groupId>jp.skypencil.errorprone.slf4j</groupId>
                 <artifactId>errorprone-slf4j</artifactId>
@@ -387,7 +427,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.14.4</version>
+                <version>1.15.11</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -400,39 +440,44 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.19</version>
+                <version>1.9.22.1</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.24.2</version>
+                <version>3.27.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.34.0</version>
+                <version>3.48.3</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest-core</artifactId>
-                <version>2.2</version>
+                <version>3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.immutables</groupId>
                 <artifactId>value-annotations</artifactId>
-                <version>2.9.3</version>
+                <version>2.10.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>3.19.16</version>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>
-                <version>0.3.0</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.9.3</version>
+                <version>5.11.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -444,29 +489,66 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-core</artifactId>
+                <version>5.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-templating</artifactId>
+                <version>${version.rewrite-templating}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openrewrite.recipe</groupId>
+                <artifactId>rewrite-recipe-bom</artifactId>
+                <version>2.23.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>2.0.7</version>
+                <artifactId>slf4j-bom</artifactId>
+                <version>2.0.16</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>5.3.27</version>
+                <version>6.2.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>2.7.11</version>
+                <version>3.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-bom</artifactId>
+                <version>6.4.2</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.8.0</version>
+                <version>7.10.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <dependencies>
+        <!-- To avoid repetition of fairly complex configuration, Surefire
+        is configured to always load Mockito's Java agent. Declaring the
+        associated dependency here avoids additional repetition, and prevents
+        a slightly obscure error that happens if the dependency is absent. -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -474,7 +556,7 @@
                 <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
                     <artifactId>sortpom-maven-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>4.0.0</version>
                     <configuration>
                         <createBackupFile>false</createBackupFile>
                         <encoding>${project.build.sourceEncoding}</encoding>
@@ -511,7 +593,7 @@
                 <plugin>
                     <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
-                    <version>2.20</version>
+                    <version>2.25</version>
                     <configuration>
                         <additionalSourceDirectories>
                             <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
@@ -519,11 +601,19 @@
                         <forkMode>never</forkMode>
                         <failOnError>false</failOnError>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>check-source-format</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.8</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -570,7 +660,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>5.0.0</version>
+                    <version>9.0.1</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -589,7 +679,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <checkstyleRules>
                             <!-- We only enable rules that are not enforced by
@@ -625,6 +715,7 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
+                                    <module name="ConstructorsDeclarationGrouping" />
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
@@ -694,6 +785,10 @@
                                             <!-- Instead, please use
                                             `com.google.errorprone.annotations.Immutable`. -->
                                         </property>
+                                        <property name="illegalClasses" value="org.jetbrains.annotations.CheckReturnValue">
+                                            <!-- Instead, please use
+                                            `com.google.errorprone.annotations.CheckReturnValue`. -->
+                                        </property>
                                         <property name="illegalClasses" value="org.jetbrains.annotations.VisibleForTesting">
                                             <!-- Instead, please use
                                             `com.google.common.annotations.VisibleForTesting`. -->
@@ -706,13 +801,13 @@
                                             <!-- Instead, please use
                                             `org.jspecify.annotations.Nullable`. -->
                                         </property>
+                                        <property name="illegalPkgs" value="autovalue.shaded" />
                                         <property name="illegalPkgs" value="com.amazonaws.annotation" />
                                         <property name="illegalPkgs" value="com.beust.jcommander.internal" />
                                         <property name="illegalPkgs" value="com.google.api.client.repackaged" />
                                         <property name="illegalPkgs" value="com.google.common.cache">
                                             <!-- Instead, please use Caffeine. -->
                                         </property>
-                                        <property name="illegalPkgs" value="com.newrelic.agent.deps" />
                                         <property name="illegalPkgs" value="com.tngtech.archunit.thirdparty" />
                                         <property name="illegalPkgs" value="jdk" />
                                         <property name="illegalPkgs" value="jersey.repackaged" />
@@ -800,6 +895,7 @@
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
+                                    <module name="SummaryJavadoc" />
                                     <module name="SuppressWarningsHolder">
                                         <property name="aliasList" value="com.puppycrawl.tools.checkstyle.checks.coding.UnusedLocalVariableCheck=unused" />
                                     </module>
@@ -818,28 +914,21 @@
                                 <module name="io.spring.nohttp.checkstyle.check.NoHttpCheck" />
                             </module>
                         </checkstyleRules>
+                        <excludeGeneratedSources>true</excludeGeneratedSources>
                         <failOnViolation>false</failOnViolation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <!-- The plugin's "excludes" property accepts an Ant
-                        pattern, but does not match against the full path. So
-                        rather than explicitly excluding generated sources, we
-                        have to explicitly include "original" sources. -->
-                        <sourceDirectories>
-                            <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
-                        </sourceDirectories>
-                        <testSourceDirectories>
-                            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
-                            <!-- Refaster input and output test files represent
-                            valid Java code, exposed as resources on the test
-                            classpath. -->
-                            <testSourceDirectory>${basedir}/src/test/resources</testSourceDirectory>
-                        </testSourceDirectories>
+                        <resourceIncludes>**/*</resourceIncludes>
+                        <!-- XXX: The generated
+                        `target/generated-sources/license/THIRD-PARTY.txt`
+                        files are not excluded by the `excludeGeneratedSources`
+                        setting. Consider filing an issue for this. -->
+                        <resourceExcludes>THIRD-PARTY.txt</resourceExcludes>
                     </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.11.0</version>
+                            <version>10.21.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -859,27 +948,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
+                    <version>3.13.0</version>
                     <configuration>
-                        <!-- XXX: MCOMPILER-503: The plugin constructs a highly
-                        unintuitive annotation processor classpath, in which
-                        some indirect dependencies take precedence over
-                        explicitly defined dependencies. This can largely be
-                        mitigated through careful ordering of the dependencies,
-                        but this prevents (where relevant) declaring these
-                        dependencies as part of their corresponding Maven
-                        profile. -->
                         <annotationProcessorPaths>
-                            <path>
-                                <groupId>${groupId.error-prone}</groupId>
-                                <artifactId>error_prone_core</artifactId>
-                                <version>${version.error-prone}</version>
-                            </path>
+                            <!-- XXX: Inline and drop the version
+                            declarations once properly supported. See
+                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>com.google.auto.value</groupId>
                                 <artifactId>auto-value</artifactId>
@@ -891,29 +970,9 @@
                                 <version>${version.auto-service}</version>
                             </path>
                             <path>
-                                <groupId>com.google.guava</groupId>
-                                <artifactId>guava-beta-checker</artifactId>
-                                <version>${version.guava-beta-checker}</version>
-                            </path>
-                            <path>
-                                <groupId>com.jakewharton.nopen</groupId>
-                                <artifactId>nopen-checker</artifactId>
-                                <version>${version.nopen-checker}</version>
-                            </path>
-                            <path>
-                                <groupId>com.uber.nullaway</groupId>
-                                <artifactId>nullaway</artifactId>
-                                <version>${version.nullaway}</version>
-                            </path>
-                            <path>
-                                <groupId>jp.skypencil.errorprone.slf4j</groupId>
-                                <artifactId>errorprone-slf4j</artifactId>
-                                <version>${version.error-prone-slf4j}</version>
-                            </path>
-                            <path>
-                                <groupId>org.mockito</groupId>
-                                <artifactId>mockito-errorprone</artifactId>
-                                <version>${version.mockito}</version>
+                                <groupId>org.openrewrite</groupId>
+                                <artifactId>rewrite-templating</artifactId>
+                                <version>${version.rewrite-templating}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
@@ -932,15 +991,48 @@
                         <parameters>true</parameters>
                         <source>${version.jdk}</source>
                         <target>${version.jdk}</target>
+                        <showWarnings>false</showWarnings>
                         <!-- Erroneously inverted logic... for details, see
                         https://issues.apache.org/jira/browse/MCOMPILER-209. -->
                         <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
+                    <executions>
+                        <!-- OpenRewrite recipe sources, generated by the
+                        `rewrite-templating` annotation processor and
+                        identified as classes whose name ends in `Recipes`, are
+                        compiled to target Java 8 for compatibility with the
+                        wider OpenRewrite ecosystem. The `maven-jar-plugin` is
+                        configured to package these files into a separate JAR. -->
+                        <execution>
+                            <id>compile-recipes</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <compilerArgs combine.self="override">
+                                    <!-- When Java 8 is targeted we can't use
+                                    the `add-exports` flag. And since this goal
+                                    only recompiles already-compiled code,
+                                    static analysis is irrelevant. As such we
+                                    clear all compiler arguments, and only
+                                    suppress source/target/bootstrap classpath
+                                    warnings. -->
+                                    <arg>-Xlint:-options</arg>
+                                </compilerArgs>
+                                <source>8</source>
+                                <target>8</target>
+                                <includes>
+                                    <include>**/*Recipes.java</include>
+                                </includes>
+                                <outputDirectory>${project.build.directory}/openrewrite-recipes</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <!-- XXX: Drop `ignoreAllNonTestScoped` once
                         https://issues.apache.org/jira/browse/MNG-6058 is
@@ -951,11 +1043,19 @@
                         <ignoreDirect>false</ignoreDirect>
                         <ignoreNonCompile>true</ignoreNonCompile>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>set-additional-properties</id>
+                            <goals>
+                                <goal>properties</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.3</version>
                     <configuration>
                         <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
                     </configuration>
@@ -963,7 +1063,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -972,7 +1072,7 @@
                             <banDuplicateClasses>
                                 <dependencies>
                                     <dependency>
-                                        <groupId>org.checkerframework</groupId>
+                                        <groupId>io.github.eisop</groupId>
                                         <artifactId>dataflow-errorprone</artifactId>
                                         <!-- This package is contained in
                                         Checker Framework's `checker-qual` and
@@ -1002,19 +1102,9 @@
                             </banDuplicateClasses>
                             <banDuplicatePomDependencyVersions />
                             <banDynamicVersions>
-                                <!-- XXX: Drop this once the `ignores` section
-                                below works as expected. -->
-                                <allowSnapshots>true</allowSnapshots>
-                                <!-- XXX: It shouldn't be necessary to specify
-                                an empty `excludedScopes` parameter, but
-                                without this an NPE results. See
-                                https://issues.apache.org/jira/browse/MENFORCER-481. -->
-                                <excludedScopes />
-                                <!-- XXX: This doesn't work. See
-                                https://issues.apache.org/jira/browse/MENFORCER-480.
                                 <ignores>
                                     <ignore>${project.groupId}</ignore>
-                                </ignores> -->
+                                </ignores>
                             </banDynamicVersions>
                             <dependencyConvergence />
                             <enforceBytecodeVersion>
@@ -1028,30 +1118,22 @@
                             <requireJavaVersion>
                                 <version>${version.jdk}</version>
                             </requireJavaVersion>
+                            <requireMatchingCoordinates>
+                                <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
+                            </requireMatchingCoordinates>
                             <requireMavenVersion>
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
                             <requireNoRepositories />
                             <requirePluginVersions />
-                            <requireUpperBoundDeps>
-                                <excludes>
-                                    <!-- XXX:
-                                    `com.google.errorprone:error_prone_test_helpers`
-                                    pulls in a more recent version of Truth
-                                    than
-                                    `com.google.testing.compile:compile-testing`,
-                                    but the latter is incompatible with said
-                                    never version. -->
-                                    <exclude>com.google.truth:truth</exclude>
-                                </excludes>
-                            </requireUpperBoundDeps>
+                            <requireUpperBoundDeps />
                         </rules>
                     </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.6.2</version>
+                            <version>1.9.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1066,7 +1148,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.7</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
@@ -1079,12 +1161,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.4.2</version>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                         <archive>
@@ -1102,6 +1184,39 @@
                     </configuration>
                     <executions>
                         <execution>
+                            <id>default-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <!-- These Java 17 bytecode classes are omitted
+                                from the default JAR, as instead we produce a
+                                separate artifact with Java 8 bytecode variants. -->
+                                <excludes>
+                                    <excludes>**/*Recipe$*.class</excludes>
+                                    <excludes>**/*Recipe.class</excludes>
+                                    <excludes>**/*Recipes.class</excludes>
+                                </excludes>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <!-- Creates a custom JAR with Java 8-compatible
+                            OpenRewrite recipe classes. -->
+                            <id>create-openrewrite-recipes-jar</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                            <configuration>
+                                <classesDirectory>${project.build.directory}/openrewrite-recipes</classesDirectory>
+                                <classifier>recipes</classifier>
+                                <includes>
+                                    <includes>**/*Recipe$*.class</includes>
+                                    <includes>**/*Recipe.class</includes>
+                                    <includes>**/*Recipes.class</includes>
+                                </includes>
+                            </configuration>
+                        </execution>
+                        <execution>
                             <id>create-test-jar</id>
                             <goals>
                                 <goal>test-jar</goal>
@@ -1112,7 +1227,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.11.2</version>
                     <configuration>
                         <additionalJOptions>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
@@ -1141,7 +1256,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationProfiles>release</preparationProfiles>
@@ -1163,12 +1278,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.21.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.1</version>
                     <executions>
                         <execution>
                             <id>generate-source-jar</id>
@@ -1182,27 +1297,23 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${version.surefire}</version>
+                    <version>3.5.2</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
                         <properties>
                             <configurationParameters>junit.jupiter.execution.parallel.enabled=true
-                                junit.jupiter.execution.parallel.mode.default=concurrent</configurationParameters>
+                                junit.jupiter.execution.parallel.mode.default=concurrent
+                                junit.platform.stacktrace.pruning.enabled=false</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.4.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.0.1</version>
+                    <version>2.5.0</version>
                     <configuration>
                         <includedLicenses>
                             <!-- The SPDX IDs of licenses of third-party
@@ -1210,12 +1321,15 @@
                             non-distributed (i.e. Picnic-internal) deployable
                             artifacts (i.e. web services). -->
                             <includedLicense>Apache-2.0</includedLicense>
+                            <includedLicense>BSD-2-Clause</includedLicense>
                             <includedLicense>BSD-3-Clause</includedLicense>
                             <includedLicense>CC0-1.0</includedLicense>
                             <includedLicense>CDDL-1.1</includedLicense>
                             <includedLicense>EPL-1.0</includedLicense>
                             <includedLicense>EPL-2.0</includedLicense>
                             <includedLicense>GPL-2.0-with-classpath-exception</includedLicense>
+                            <includedLicense>ICU</includedLicense>
+                            <includedLicense>LGPL-2.1+</includedLicense>
                             <includedLicense>LGPL-3.0+</includedLicense>
                             <includedLicense>MIT</includedLicense>
                             <includedLicense>MIT-0</includedLicense>
@@ -1238,18 +1352,31 @@
                                 | The Apache Software License, Version 2.0
                             </licenseMerge>
                             <licenseMerge>
-                                <!-- -->
+                                <!-- XXX: Get projects referencing just "BSD"
+                                to explicitly state the clause count. -->
+                                BSD-2-Clause
+                                | The BSD License
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- XXX: Get projects referencing just "BSD"
+                                to explicitly state the clause count. -->
                                 BSD-3-Clause
                                 | 3-Clause BSD License
                                 | BSD 3-clause
+                                | BSD 3-Clause "New" or "Revised" License (BSD-3-Clause)
+                                <!-- XXX: Typo; file ticket. -->
+                                | BSD licence
                                 | BSD License 3
                                 | Eclipse Distribution License (New BSD License)
+                                | Eclipse Distribution License - v 1.0
+                                | EDL 1.0
                                 | New BSD License
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
                                 CC0-1.0
                                 | CC0
+                                | Public Domain, per Creative Commons CC0
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
@@ -1268,17 +1395,30 @@
                                 EPL-2.0
                                 | Eclipse Public License - v 2.0
                                 | Eclipse Public License v2.0
+                                | EPL 2.0
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- -->
+                                ICU
+                                | Unicode/ICU License
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
                                 GPL-2.0-with-classpath-exception
                                 | CDDL/GPLv2+CE
+                                | CDDL + GPLv2 with classpath exception
                                 | GNU General Public License, version 2 (GPL2), with the classpath exception
                                 | GNU General Public License, version 2, with the Classpath Exception
                                 | GPL2 w/ CPE
                             </licenseMerge>
                             <licenseMerge>
                                 <!-- -->
+                                LGPL-2.1+
+                                | LGPL-2.1-or-later
+                            </licenseMerge>
+                            <licenseMerge>
+                                <!-- XXX: Get projects referencing just "LGPL"
+                                to explicitly state the license version. -->
                                 LGPL-3.0+
                                 | GNU Lesser Public License
                             </licenseMerge>
@@ -1288,6 +1428,7 @@
                                 | MIT license
                                 | MIT License
                                 | The MIT License
+                                | The MIT License (MIT)
                             </licenseMerge>
                         </licenseMerges>
                         <!-- Nearly no projects ship a "missing third party
@@ -1300,12 +1441,20 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>tidy-maven-plugin</artifactId>
-                    <version>1.2.0</version>
+                    <version>1.3.0</version>
+                    <executions>
+                        <execution>
+                            <id>check-pom</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.15.0</version>
+                    <version>2.18.0</version>
                     <configuration>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
@@ -1313,7 +1462,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>2.6.0</version>
+                    <version>2.9.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1344,7 +1493,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.10</version>
+                    <version>0.8.12</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
@@ -1354,9 +1503,27 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.kordamp.maven</groupId>
+                    <artifactId>pomchecker-maven-plugin</artifactId>
+                    <version>1.14.0</version>
+                    <configuration>
+                        <failOnError>false</failOnError>
+                        <release>false</release>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>check-maven-central-compliance</id>
+                            <goals>
+                                <goal>check-maven-central</goal>
+                            </goals>
+                            <phase>verify</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.13.1</version>
+                    <version>1.17.3</version>
                     <configuration>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
@@ -1385,17 +1552,17 @@
                         <dependency>
                             <groupId>com.groupcdg.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.0.4</version>
+                            <version>1.2.2</version>
                         </dependency>
                         <dependency>
                             <groupId>com.groupcdg.pitest</groupId>
                             <artifactId>pitest-accelerator-junit5</artifactId>
-                            <version>1.0.5</version>
+                            <version>1.0.6</version>
                         </dependency>
                         <dependency>
                             <groupId>org.pitest</groupId>
                             <artifactId>pitest-junit5-plugin</artifactId>
-                            <version>1.1.2</version>
+                            <version>1.2.1</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1410,7 +1577,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.9.1.2184</version>
+                    <version>5.0.0.4389</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1418,6 +1585,10 @@
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1496,8 +1667,6 @@
                 <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
             </properties>
             <dependencyManagement>
-                <!-- Specified as a workaround for
-                https://github.com/mojohaus/versions-maven-plugin/issues/244. -->
                 <dependencies>
                     <dependency>
                         <groupId>com.github.lhotari</groupId>
@@ -1513,6 +1682,9 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
+                                <!-- XXX: Inline and drop the version
+                                declaration once properly supported. See
+                                https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                                 <path>
                                     <groupId>com.github.lhotari</groupId>
                                     <artifactId>reactor-error-prone</artifactId>
@@ -1537,7 +1709,7 @@
                 `BugChecker` test code and the Refaster test files) does not
                 exhibit anti-patterns other than those associated with the
                 check/rule under test. Ideally all test cases are realistic. -->
-                <error-prone.self-check-args>-XepAllSuggestionsAsWarnings -Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
+                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
             </properties>
             <build>
                 <plugins>
@@ -1546,9 +1718,22 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
+                                <!-- XXX: Drop the version declarations once
+                                properly supported. See
+                                https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-contrib</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>error-prone-experimental</artifactId>
+                                    <version>${project.version}</version>
+                                </path>
+                                <path>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>error-prone-guidelines</artifactId>
                                     <version>${project.version}</version>
                                 </path>
                                 <path>
@@ -1560,6 +1745,31 @@
                         </configuration>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- A counterpart to the `disallow-warnings` profile which
+            explicitly "tones down" plugins enabled by the `build-checks`
+            profile. Necessary for dealing with plugins that default to failing
+            the build upon encountering a violation. -->
+            <id>avoid-errors</id>
+            <activation>
+                <property>
+                    <name>verification.warn</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>tidy-maven-plugin</artifactId>
+                            <configuration>
+                                <skip>true</skip>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>
@@ -1582,14 +1792,6 @@
                     <plugin>
                         <groupId>com.spotify.fmt</groupId>
                         <artifactId>fmt-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>check-source-format</id>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>de.thetaphi</groupId>
@@ -1669,8 +1871,16 @@
                         </executions>
                     </plugin>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>tidy-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
                         <groupId>org.gaul</groupId>
                         <artifactId>modernizer-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.kordamp.maven</groupId>
+                        <artifactId>pomchecker-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
@@ -1692,6 +1902,41 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
+                            <annotationProcessorPaths combine.children="append">
+                                <!-- XXX: Inline and drop the version
+                                declarations once properly supported. See
+                                https://youtrack.jetbrains.com/issue/IDEA-342187. -->
+                                <path>
+                                    <groupId>${groupId.error-prone}</groupId>
+                                    <artifactId>error_prone_core</artifactId>
+                                    <version>${version.error-prone}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava-beta-checker</artifactId>
+                                    <version>${version.guava-beta-checker}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.jakewharton.nopen</groupId>
+                                    <artifactId>nopen-checker</artifactId>
+                                    <version>${version.nopen-checker}</version>
+                                </path>
+                                <path>
+                                    <groupId>com.uber.nullaway</groupId>
+                                    <artifactId>nullaway</artifactId>
+                                    <version>${version.nullaway}</version>
+                                </path>
+                                <path>
+                                    <groupId>jp.skypencil.errorprone.slf4j</groupId>
+                                    <artifactId>errorprone-slf4j</artifactId>
+                                    <version>${version.error-prone-slf4j}</version>
+                                </path>
+                                <path>
+                                    <groupId>org.mockito</groupId>
+                                    <artifactId>mockito-errorprone</artifactId>
+                                    <version>${version.mockito}</version>
+                                </path>
+                            </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
                                 <!-- Enable and configure Error Prone. -->
                                 <arg>
@@ -1702,15 +1947,23 @@
                                     failing the build on the first error
                                     encountered. -->
                                     -XepAllErrorsAsWarnings
+                                    -XepAllSuggestionsAsWarnings
+                                    <!-- We want to enable almost all Error
+                                    Prone bug pattern checkers, so we enable
+                                    all and then selectively deactivate some. -->
+                                    -XepAllDisabledChecksAsWarnings
                                     <!-- Some generated classes violate Error
                                     Prone bug patterns. We cannot in all cases
                                     avoid that, so we simply tell Error Prone
                                     not to warn about generated code. -->
                                     -XepDisableWarningsInGeneratedCode
-                                    <!-- We want to enable almost all Error
-                                    Prone bug pattern checkers, so we enable
-                                    all and then selectively deactivate some. -->
-                                    -XepAllDisabledChecksAsWarnings
+                                    <!-- XXX: Ideally we'd match against
+                                    `\Q${project.build.directory}${file.separator}\E.*`,
+                                    but that approach doesn't work on Windows,
+                                    as Error Prone matches against a path that
+                                    always contains forward-slash path
+                                    separators. -->
+                                    -XepExcludedPaths:(?!.*/src/[^/]+/java/.*).*
                                     <!-- We don't target Android. -->
                                     -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
@@ -1731,28 +1984,35 @@
                                     <!-- XXX: Enable once there are fewer
                                     false-positives.
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
+                                    <!-- XXX: Consider renaming flagged types
+                                    instead. -->
+                                    -XepOpt:IdentifierName:AllowInitialismsInTypeName=true
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:StatementSwitchToExpressionSwitch:EnableAssignmentSwitchConversion=true
+                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true
                                     -XepOpt:StatementSwitchToExpressionSwitch:EnableReturnSwitchConversion=true
-                                    <!-- XXX: Enable once this check respects
-                                    the compilation source version. See
-                                    https://github.com/google/error-prone/pull/3646.
-                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true -->
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
                                 </arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
-                                moment it is invoked. Those assumptions are met
-                                when using the `simple` compile policy. This
-                                flag may be dropped after resolution of
+                                moment it is invoked. Those assumptions require
+                                the `simple` compile policy. This flag may be
+                                dropped after resolution of
                                 https://bugs.openjdk.java.net/browse/JDK-8155674. -->
                                 <arg>-XDcompilePolicy=simple</arg>
+                                <!-- Similarly, Error Prone requires that flow
+                                analysis has been performed, e.g. to determine
+                                whether variables are effectively final. This
+                                flag may be dropped if it ever becomes the
+                                default. See
+                                https://bugs.openjdk.org/browse/JDK-8134117. -->
+                                <arg>--should-stop=ifError=FLOW</arg>
                             </compilerArgs>
                         </configuration>
                     </plugin>
@@ -1774,10 +2034,10 @@
             </properties>
         </profile>
         <profile>
-            <!-- The `build-checks` and `error-prone` profiles enable a bunch
-            of additional compile checks. By default, those warnings break the
-            build. This profile allows one to collect all build warnings
-            without failing the build. -->
+            <!-- The `build-checks` and `error-prone` profiles enable numerous
+            additional validations. By default, any violations break the build.
+            This profile allows one to collect all violations without failing
+            the build. -->
             <id>disallow-warnings</id>
             <activation>
                 <property>
@@ -1859,6 +2119,14 @@
                                 <failOnViolations>true</failOnViolations>
                             </configuration>
                         </plugin>
+                        <plugin>
+                            <groupId>org.kordamp.maven</groupId>
+                            <artifactId>pomchecker-maven-plugin</artifactId>
+                            <configuration>
+                                <failOnError>true</failOnError>
+                                <failOnWarning>true</failOnWarning>
+                            </configuration>
+                        </plugin>
                     </plugins>
                 </pluginManagement>
             </build>
@@ -1930,6 +2198,13 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                     <?SORTPOM RESUME?>
+                    <plugin>
+                        <groupId>org.kordamp.maven</groupId>
+                        <artifactId>pomchecker-maven-plugin</artifactId>
+                        <configuration>
+                            <release>true</release>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

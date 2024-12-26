@@ -3,31 +3,22 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedMultiset;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -47,6 +38,7 @@ import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
+import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate
@@ -181,63 +173,16 @@ final class AssertJRules {
   static final class AssertThatObjectEnumerableIsEmpty<E> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
-    void before(ObjectEnumerableAssert<?, E> enumAssert) {
+    void before(
+        ObjectEnumerableAssert<?, E> enumAssert,
+        @Matches(IsEmpty.class) Iterable<? extends E> wellTypedIterable,
+        @Matches(IsEmpty.class) Iterable<?> arbitrarilyTypedIterable) {
       Refaster.anyOf(
-          enumAssert.containsExactlyElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.containsExactlyInAnyOrderElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.hasSameElementsAs(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.hasSameSizeAs(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
-          enumAssert.isSubsetOf(
-              Refaster.anyOf(
-                  ImmutableList.of(),
-                  new ArrayList<>(),
-                  ImmutableSet.of(),
-                  new HashSet<>(),
-                  new LinkedHashSet<>(),
-                  ImmutableSortedSet.of(),
-                  new TreeSet<>(),
-                  ImmutableMultiset.of(),
-                  ImmutableSortedMultiset.of())),
+          enumAssert.containsExactlyElementsOf(wellTypedIterable),
+          enumAssert.containsExactlyInAnyOrderElementsOf(wellTypedIterable),
+          enumAssert.hasSameElementsAs(wellTypedIterable),
+          enumAssert.hasSameSizeAs(arbitrarilyTypedIterable),
+          enumAssert.isSubsetOf(wellTypedIterable),
           enumAssert.containsExactly(),
           enumAssert.containsExactlyInAnyOrder(),
           enumAssert.containsOnly(),
@@ -255,32 +200,8 @@ final class AssertJRules {
     @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return Refaster.anyOf(
-          iterAssert.containsAnyElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
           iterAssert.containsAnyOf(element),
-          iterAssert.containsAll(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
-          iterAssert.containsSequence(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
           iterAssert.containsSequence(element),
-          iterAssert.containsSubsequence(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
           iterAssert.containsSubsequence(element));
     }
 
@@ -295,20 +216,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return Refaster.anyOf(
-          iterAssert.doesNotContainAnyElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
-          iterAssert.doesNotContainSequence(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
-          iterAssert.doesNotContainSequence(element));
+      return iterAssert.doesNotContainSequence(element);
     }
 
     @AfterTemplate
@@ -321,25 +229,7 @@ final class AssertJRules {
   static final class ObjectEnumerableContainsExactlyOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return Refaster.anyOf(
-          iterAssert.containsExactlyElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))),
-          iterAssert.containsExactlyInAnyOrderElementsOf(
-              Refaster.anyOf(
-                  ImmutableList.of(element),
-                  Arrays.asList(element),
-                  ImmutableSet.of(element),
-                  ImmutableMultiset.of(element))));
-    }
-
-    @BeforeTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> before2(
+    ObjectEnumerableAssert<?, S> before(
         ObjectEnumerableAssert<?, S> iterAssert, @NotMatches(IsArray.class) T element) {
       return iterAssert.containsExactlyInAnyOrder(element);
     }
@@ -364,42 +254,6 @@ final class AssertJRules {
     }
   }
 
-  static final class ObjectEnumerableContainsOneDistinctElement<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.hasSameElementsAs(
-          Refaster.anyOf(
-              ImmutableList.of(element),
-              Arrays.asList(element),
-              ImmutableSet.of(element),
-              ImmutableMultiset.of(element)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.containsOnly(element);
-    }
-  }
-
-  static final class ObjectEnumerableIsSubsetOfOneElement<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.isSubsetOf(
-          Refaster.anyOf(
-              ImmutableList.of(element),
-              Arrays.asList(element),
-              ImmutableSet.of(element),
-              ImmutableMultiset.of(element)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.isSubsetOf(element);
-    }
-  }
-
   //
   // Iterable
   //
@@ -410,6 +264,7 @@ final class AssertJRules {
       Refaster.anyOf(
           assertThat(iterable).hasSize(0),
           assertThat(iterable.iterator().hasNext()).isFalse(),
+          assertThat(iterable.iterator()).isExhausted(),
           assertThat(Iterables.size(iterable)).isEqualTo(0L),
           assertThat(Iterables.size(iterable)).isNotPositive());
     }
@@ -581,13 +436,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyElementsOf(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyElementsOf(iterable);
     }
 
@@ -602,13 +457,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsAnyOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyOf(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyOf(array);
     }
 
@@ -624,14 +479,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsAnyOf" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsAnyOf" /* Varargs converted to array. */)
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
     }
 
@@ -647,13 +502,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsAll<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsAll(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsAll(iterable);
     }
 
@@ -668,13 +523,13 @@ final class AssertJRules {
   static final class AssertThatStreamContains<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).contains(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).contains(array);
     }
 
@@ -690,14 +545,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContains" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContains" /* Varargs converted to array. */)
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
     }
 
@@ -712,7 +567,7 @@ final class AssertJRules {
   static final class AssertThatStreamContainsExactlyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyElementsOf(iterable);
     }
 
@@ -727,7 +582,7 @@ final class AssertJRules {
   static final class AssertThatStreamContainsExactly<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactly(array);
     }
 
@@ -743,7 +598,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactly" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactly(Refaster.asVarargs(elements));
     }
 
@@ -759,13 +614,13 @@ final class AssertJRules {
       S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrderElementsOf(iterable);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, ?, T, ?> before2(
-        Stream<S> stream, Collector<S, ?, ? extends Multiset<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrderElementsOf(iterable);
     }
 
@@ -780,13 +635,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsExactlyInAnyOrder<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrder(array);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, ?, T, ?> before2(
-        Stream<S> stream, Collector<S, ?, ? extends Multiset<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrder(array);
     }
 
@@ -802,7 +657,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector))
           .containsExactlyInAnyOrder(Refaster.asVarargs(elements));
     }
@@ -810,7 +665,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, ?, T, ?> before2(
-        Stream<S> stream, Collector<S, ?, ? extends Multiset<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector))
           .containsExactlyInAnyOrder(Refaster.asVarargs(elements));
     }
@@ -827,13 +682,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsSequence(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] iterable) {
+        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsSequence(iterable);
     }
 
@@ -849,7 +704,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsSequence" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsSequence(Refaster.asVarargs(elements));
     }
 
@@ -865,13 +720,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsSubsequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsSubsequence(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] iterable) {
+        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsSubsequence(iterable);
     }
 
@@ -887,7 +742,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsSubsequence" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector))
           .containsSubsequence(Refaster.asVarargs(elements));
     }
@@ -904,13 +759,13 @@ final class AssertJRules {
   static final class AssertThatStreamDoesNotContainAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContainAnyElementsOf(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContainAnyElementsOf(iterable);
     }
 
@@ -925,13 +780,13 @@ final class AssertJRules {
   static final class AssertThatStreamDoesNotContain<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContain(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContain(array);
     }
 
@@ -947,14 +802,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamDoesNotContain" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamDoesNotContain" /* Varargs converted to array. */)
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
     }
 
@@ -969,13 +824,13 @@ final class AssertJRules {
   static final class AssertThatStreamDoesNotContainSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContainSequence(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] iterable) {
+        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContainSequence(iterable);
     }
 
@@ -991,7 +846,7 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamDoesNotContainSequence" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector))
           .doesNotContainSequence(Refaster.asVarargs(elements));
     }
@@ -1008,13 +863,13 @@ final class AssertJRules {
   static final class AssertThatStreamHasSameElementsAs<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).hasSameElementsAs(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).hasSameElementsAs(iterable);
     }
 
@@ -1029,13 +884,13 @@ final class AssertJRules {
   static final class AssertThatStreamContainsOnly<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsOnly(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] array) {
+        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsOnly(array);
     }
 
@@ -1051,14 +906,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsOnly" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsOnly" /* Varargs converted to array. */)
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
     }
 
@@ -1073,25 +928,25 @@ final class AssertJRules {
   static final class AssertThatStreamIsSubsetOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(iterable);
     }
 
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, U[] iterable) {
+        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, Iterable<U> iterable) {
+        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, U[] iterable) {
+        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(iterable);
     }
 
@@ -1107,14 +962,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamIsSubsetOf" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, Collector<S, ?, ? extends Iterable<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamIsSubsetOf" /* Varargs converted to array. */)
     ListAssert<T> before2(
-        Stream<S> stream, Collector<S, ?, ? extends List<T>> collector, @Repeated U elements) {
+        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
     }
 
@@ -1205,824 +1060,6 @@ final class AssertJRules {
       assertThat(predicate).rejects(object);
     }
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  // BELOW: Generated code.
-
-  //
-  // ObjectEnumerableAssert: containsAnyOf
-  //
-
-  static final class ObjectEnumerableContainsAnyOfTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsAnyOf(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsAnyOfThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsAnyOf(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsAnyOfFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsAnyOf(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsAnyOfFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsAnyOf(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: contains
-  //
-
-  static final class ObjectEnumerableContainsTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsAll(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.contains(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsAll(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.contains(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsAll(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.contains(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsAll(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.contains(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: containsExactly
-  //
-
-  static final class ObjectEnumerableContainsExactlyTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsExactlyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsExactly(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsExactlyThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsExactlyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsExactly(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsExactlyFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsExactlyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsExactly(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsExactlyFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsExactlyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsExactly(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: containsExactlyInAnyOrder
-  //
-
-  static final class ObjectEnumerableContainsExactlyInAnyOrderTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsExactlyInAnyOrderElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsExactlyInAnyOrder(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsExactlyInAnyOrderThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsExactlyInAnyOrderElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsExactlyInAnyOrder(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsExactlyInAnyOrderFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsExactlyInAnyOrderElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsExactlyInAnyOrder(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsExactlyInAnyOrderFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsExactlyInAnyOrderElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsExactlyInAnyOrder(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: containsSequence
-  //
-
-  static final class ObjectEnumerableContainsSequenceTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsSequence(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsSequenceThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsSequence(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsSequenceFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsSequence(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsSequenceFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsSequence(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: containsSubsequence
-  //
-
-  static final class ObjectEnumerableContainsSubsequenceTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsSubsequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsSubsequence(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsSubsequenceThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsSubsequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsSubsequence(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsSubsequenceFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsSubsequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsSubsequence(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsSubsequenceFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsSubsequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsSubsequence(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: doesNotContain
-  //
-
-  static final class ObjectEnumerableDoesNotContainTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.doesNotContainAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.doesNotContain(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableDoesNotContainThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.doesNotContainAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.doesNotContain(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableDoesNotContainFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.doesNotContainAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.doesNotContain(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableDoesNotContainFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.doesNotContainAnyElementsOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.doesNotContain(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: doesNotContainSequence
-  //
-
-  static final class ObjectEnumerableDoesNotContainSequenceTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.doesNotContainSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.doesNotContainSequence(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableDoesNotContainSequenceThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.doesNotContainSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.doesNotContainSequence(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableDoesNotContainSequenceFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.doesNotContainSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.doesNotContainSequence(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableDoesNotContainSequenceFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.doesNotContainSequence(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.doesNotContainSequence(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: containsOnly
-  //
-
-  static final class ObjectEnumerableContainsOnlyTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.hasSameElementsAs(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.containsOnly(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableContainsOnlyThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.hasSameElementsAs(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.containsOnly(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableContainsOnlyFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.hasSameElementsAs(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.containsOnly(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableContainsOnlyFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.hasSameElementsAs(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.containsOnly(e1, e2, e3, e4, e5);
-    }
-  }
-
-  //
-  // ObjectEnumerableAssert: isSubsetOf
-  //
-
-  static final class ObjectEnumerableIsSubsetOfTwoElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.isSubsetOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2),
-              Arrays.asList(e1, e2),
-              ImmutableSet.of(e1, e2),
-              ImmutableMultiset.of(e1, e2)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2) {
-      return iterAssert.isSubsetOf(e1, e2);
-    }
-  }
-
-  static final class ObjectEnumerableIsSubsetOfThreeElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.isSubsetOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3),
-              Arrays.asList(e1, e2, e3),
-              ImmutableSet.of(e1, e2, e3),
-              ImmutableMultiset.of(e1, e2, e3)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3) {
-      return iterAssert.isSubsetOf(e1, e2, e3);
-    }
-  }
-
-  static final class ObjectEnumerableIsSubsetOfFourElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.isSubsetOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4),
-              Arrays.asList(e1, e2, e3, e4),
-              ImmutableSet.of(e1, e2, e3, e4),
-              ImmutableMultiset.of(e1, e2, e3, e4)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4) {
-      return iterAssert.isSubsetOf(e1, e2, e3, e4);
-    }
-  }
-
-  // XXX: Add variants for 6+ elements?
-  static final class ObjectEnumerableIsSubsetOfFiveElements<S, T extends S> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.isSubsetOf(
-          Refaster.anyOf(
-              ImmutableList.of(e1, e2, e3, e4, e5),
-              Arrays.asList(e1, e2, e3, e4, e5),
-              ImmutableSet.of(e1, e2, e3, e4, e5),
-              ImmutableMultiset.of(e1, e2, e3, e4, e5)));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    ObjectEnumerableAssert<?, S> after(
-        ObjectEnumerableAssert<?, S> iterAssert, T e1, T e2, T e3, T e4, T e5) {
-      return iterAssert.isSubsetOf(e1, e2, e3, e4, e5);
-    }
-  }
-
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  // Above: Generated code.
 
   ////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////////////////////////////

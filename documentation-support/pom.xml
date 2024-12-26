@@ -5,13 +5,14 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.11.2-SNAPSHOT</version>
+        <version>0.19.2-SNAPSHOT</version>
     </parent>
 
     <artifactId>documentation-support</artifactId>
 
     <name>Picnic :: Error Prone Support :: Documentation Support</name>
     <description>Data extraction support for the purpose of documentation generation.</description>
+    <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
         <dependency>
@@ -33,12 +34,29 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>error-prone-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>refaster-test-support</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.auto</groupId>
@@ -73,6 +91,8 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- XXX: Explicitly declared as a workaround for
+        https://github.com/pitest/pitest-junit5-plugin/issues/105. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>

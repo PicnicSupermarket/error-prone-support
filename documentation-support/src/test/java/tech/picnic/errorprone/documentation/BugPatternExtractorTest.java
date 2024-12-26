@@ -1,22 +1,17 @@
 package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.google.common.io.Resources;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.CompilationTestHelper;
-import com.google.errorprone.VisitorState;
-import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
-import com.google.errorprone.matchers.Description;
-import com.sun.source.tree.ClassTree;
-import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
 
 final class BugPatternExtractorTest {
   @Test
@@ -32,7 +27,7 @@ final class BugPatternExtractorTest {
   }
 
   @Test
-  void minimalBugPattern(@TempDir Path outputDirectory) throws IOException {
+  void minimalBugPattern(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "MinimalBugChecker.java",
@@ -45,14 +40,25 @@ final class BugPatternExtractorTest {
         "@BugPattern(summary = \"MinimalBugChecker summary\", severity = SeverityLevel.ERROR)",
         "public final class MinimalBugChecker extends BugChecker {}");
 
-    verifyFileMatchesResource(
+    verifyGeneratedFileContent(
         outputDirectory,
-        "bugpattern-MinimalBugChecker.json",
-        "bugpattern-documentation-minimal.json");
+        "MinimalBugChecker",
+        BugPatternDocumentation.create(
+            URI.create("file:///MinimalBugChecker.java"),
+            "pkg.MinimalBugChecker",
+            "MinimalBugChecker",
+            ImmutableList.of(),
+            "",
+            ImmutableList.of(),
+            "MinimalBugChecker summary",
+            "",
+            ERROR,
+            /* canDisable= */ true,
+            ImmutableList.of(SuppressWarnings.class.getCanonicalName())));
   }
 
   @Test
-  void completeBugPattern(@TempDir Path outputDirectory) throws IOException {
+  void completeBugPattern(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CompleteBugChecker.java",
@@ -76,14 +82,25 @@ final class BugPatternExtractorTest {
         "    suppressionAnnotations = {BugPattern.class, Test.class})",
         "public final class CompleteBugChecker extends BugChecker {}");
 
-    verifyFileMatchesResource(
+    verifyGeneratedFileContent(
         outputDirectory,
-        "bugpattern-CompleteBugChecker.json",
-        "bugpattern-documentation-complete.json");
+        "CompleteBugChecker",
+        BugPatternDocumentation.create(
+            URI.create("file:///CompleteBugChecker.java"),
+            "pkg.CompleteBugChecker",
+            "OtherName",
+            ImmutableList.of("Check"),
+            "https://error-prone.picnic.tech",
+            ImmutableList.of("Simplification"),
+            "CompleteBugChecker summary",
+            "Example explanation",
+            SUGGESTION,
+            /* canDisable= */ false,
+            ImmutableList.of(BugPattern.class.getCanonicalName(), "org.junit.jupiter.api.Test")));
   }
 
   @Test
-  void undocumentedSuppressionBugPattern(@TempDir Path outputDirectory) throws IOException {
+  void undocumentedSuppressionBugPattern(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "UndocumentedSuppressionBugPattern.java",
@@ -99,55 +116,27 @@ final class BugPatternExtractorTest {
         "    documentSuppression = false)",
         "public final class UndocumentedSuppressionBugPattern extends BugChecker {}");
 
-    verifyFileMatchesResource(
+    verifyGeneratedFileContent(
         outputDirectory,
-        "bugpattern-UndocumentedSuppressionBugPattern.json",
-        "bugpattern-documentation-undocumented-suppression.json");
-  }
-
-  @Test
-  void bugPatternAnnotationIsAbsent() {
-    CompilationTestHelper.newInstance(TestChecker.class, getClass())
-        .addSourceLines(
-            "TestChecker.java",
-            "import com.google.errorprone.bugpatterns.BugChecker;",
+        "UndocumentedSuppressionBugPattern",
+        BugPatternDocumentation.create(
+            URI.create("file:///UndocumentedSuppressionBugPattern.java"),
+            "pkg.UndocumentedSuppressionBugPattern",
+            "UndocumentedSuppressionBugPattern",
+            ImmutableList.of(),
             "",
-            "// BUG: Diagnostic contains: Can extract: false",
-            "public final class TestChecker extends BugChecker {}")
-        .doTest();
+            ImmutableList.of(),
+            "UndocumentedSuppressionBugPattern summary",
+            "",
+            WARNING,
+            /* canDisable= */ true,
+            ImmutableList.of()));
   }
 
-  private static void verifyFileMatchesResource(
-      Path outputDirectory, String fileName, String resourceName) throws IOException {
-    assertThat(outputDirectory.resolve(fileName))
-        .content(UTF_8)
-        .isEqualToIgnoringWhitespace(getResource(resourceName));
-  }
-
-  // XXX: Once we support only JDK 15+, drop this method in favour of including the resources as
-  // text blocks in this class. (This also requires renaming the `verifyFileMatchesResource`
-  // method.)
-  private static String getResource(String resourceName) throws IOException {
-    return Resources.toString(
-        Resources.getResource(BugPatternExtractorTest.class, resourceName), UTF_8);
-  }
-
-  /** A {@link BugChecker} that validates the {@link BugPatternExtractor}. */
-  @BugPattern(summary = "Validates `BugPatternExtractor` extraction", severity = ERROR)
-  public static final class TestChecker extends BugChecker implements ClassTreeMatcher {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public Description matchClass(ClassTree tree, VisitorState state) {
-      BugPatternExtractor extractor = new BugPatternExtractor();
-
-      assertThatThrownBy(() -> extractor.extract(tree, state.context))
-          .isInstanceOf(NullPointerException.class)
-          .hasMessage("BugPattern annotation must be present");
-
-      return buildDescription(tree)
-          .setMessage(String.format("Can extract: %s", extractor.canExtract(tree)))
-          .build();
-    }
+  private static void verifyGeneratedFileContent(
+      Path outputDirectory, String testClass, BugPatternDocumentation expected) {
+    assertThat(outputDirectory.resolve(String.format("bugpattern-%s.json", testClass)))
+        .exists()
+        .returns(expected, path -> Json.read(path, BugPatternDocumentation.class));
   }
 }

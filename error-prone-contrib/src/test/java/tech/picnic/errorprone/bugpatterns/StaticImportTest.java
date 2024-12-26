@@ -9,21 +9,24 @@ import org.junit.jupiter.api.Test;
 
 final class StaticImportTest {
   @Test
-  void candidateMethodsAreNotRedundant() {
+  void candidateTypesDoNotClash() {
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES)
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES);
+  }
+
+  @Test
+  void candidateMembersAreNotRedundant() {
     assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
   }
 
   @Test
-  void exemptedMembersAreNotVacuous() {
-    assertThat(StaticImport.STATIC_IMPORT_EXEMPTED_MEMBERS.keySet())
-        .isSubsetOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-  }
+  void candidateMembersDoNotClash() {
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
 
-  @Test
-  void exemptedMembersAreNotRedundant() {
-    assertThat(StaticImport.STATIC_IMPORT_EXEMPTED_MEMBERS.values())
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_EXEMPTED_IDENTIFIERS);
+    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values())
+        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
   }
 
   @Test
@@ -37,12 +40,14 @@ final class StaticImportTest {
             "import static java.util.function.Predicate.not;",
             "import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonCreator;",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableMultiset;",
             "import com.google.common.collect.ImmutableSet;",
             "import com.google.errorprone.refaster.ImportPolicy;",
             "import com.google.errorprone.refaster.annotation.UseImportPolicy;",
+            "import com.mongodb.client.model.Filters;",
             "import java.nio.charset.StandardCharsets;",
             "import java.time.ZoneOffset;",
             "import java.util.Optional;",
@@ -95,11 +100,19 @@ final class StaticImportTest {
             "    // BUG: Diagnostic contains:",
             "    MediaType t2 = MediaType.APPLICATION_JSON;",
             "",
+            "    // BUG: Diagnostic contains:",
+            "    Filters.empty();",
             "    Optional.empty();",
             "",
             "    // BUG: Diagnostic contains:",
             "    ZoneOffset zo1 = ZoneOffset.UTC;",
             "    ZoneOffset zo2 = ZoneOffset.MIN;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @JsonCreator(mode = JsonCreator.Mode.DELEGATING)",
+            "  private static A jsonCreator(int a) {",
+            "    return new A();",
             "  }",
             "",
             "  // BUG: Diagnostic contains:",
@@ -118,6 +131,7 @@ final class StaticImportTest {
             "A.java",
             "import static java.util.function.Predicate.not;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonCreator;",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableSet;",
@@ -174,6 +188,11 @@ final class StaticImportTest {
             "      @DateTimeFormat(iso = ISO.DATE_TIME) String dateTime,",
             "      @DateTimeFormat(iso = ISO.TIME) String time) {}",
             "",
+            "  @JsonCreator(mode = JsonCreator.Mode.DELEGATING)",
+            "  private static A jsonCreator(int a) {",
+            "    return new A();",
+            "  }",
+            "",
             "  @BugPattern(",
             "      summary = \"\",",
             "      linkType = BugPattern.LinkType.NONE,",
@@ -186,6 +205,7 @@ final class StaticImportTest {
             "}")
         .addOutputLines(
             "A.java",
+            "import static com.fasterxml.jackson.annotation.JsonCreator.Mode.DELEGATING;",
             "import static com.google.common.collect.ImmutableMap.toImmutableMap;",
             "import static com.google.common.collect.ImmutableSet.toImmutableSet;",
             "import static com.google.errorprone.BugPattern.LinkType.NONE;",
@@ -205,6 +225,7 @@ final class StaticImportTest {
             "import static org.springframework.http.MediaType.APPLICATION_XHTML_XML;",
             "import static org.springframework.http.MediaType.TEXT_HTML;",
             "",
+            "import com.fasterxml.jackson.annotation.JsonCreator;",
             "import com.google.common.base.Predicates;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableSet;",
@@ -257,6 +278,11 @@ final class StaticImportTest {
             "      @DateTimeFormat(iso = DATE) String date,",
             "      @DateTimeFormat(iso = DATE_TIME) String dateTime,",
             "      @DateTimeFormat(iso = TIME) String time) {}",
+            "",
+            "  @JsonCreator(mode = DELEGATING)",
+            "  private static A jsonCreator(int a) {",
+            "    return new A();",
+            "  }",
             "",
             "  @BugPattern(summary = \"\", linkType = NONE, severity = SUGGESTION, tags = SIMPLIFICATION)",
             "  static final class TestBugPattern {}",

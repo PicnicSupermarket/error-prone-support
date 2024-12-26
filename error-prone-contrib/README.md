@@ -125,9 +125,6 @@ The following is a list of checks we'd like to see implemented:
   statement. Idem for other exception types.
 - A Guava-specific check that replaces simple anonymous `CacheLoader` subclass
   declarations with `CacheLoader.from(someLambda)`.
-- A Spring-specific check that enforces that methods with the `@Scheduled`
-  annotation are also annotated with New Relic's `@Trace` annotation. Such
-  methods should ideally not also represent Spring MVC endpoints.
 - A Spring-specific check that enforces that `@RequestMapping` annotations,
   when applied to a method, explicitly specify one or more target HTTP methods.
 - A Spring-specific check that looks for classes in which all `@RequestMapping`

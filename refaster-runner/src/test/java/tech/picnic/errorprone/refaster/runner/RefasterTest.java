@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static com.google.common.base.Predicates.containsPattern;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
@@ -22,38 +21,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.picnic.errorprone.refaster.ErrorProneFork;
 
 final class RefasterTest {
-  private final CompilationTestHelper compilationHelper =
-      CompilationTestHelper.newInstance(Refaster.class, getClass())
-          .matchAllDiagnostics()
-          .expectErrorMessage(
-              "StringOfSizeZeroRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+"))
-          .expectErrorMessage(
-              "StringOfSizeOneRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
-                      + "A custom description about matching single-char strings\\s+.+\\s+"
-                      + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)"))
-          .expectErrorMessage(
-              "StringOfSizeTwoRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
-                      + "A custom subgroup description\\s+.+\\s+"
-                      + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)"))
-          .expectErrorMessage(
-              "StringOfSizeThreeRule",
-              containsPattern(
-                  "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
-                      + "A custom description about matching three-char strings\\s+.+\\s+"
-                      + "\\(see https://example.com/custom\\)"));
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_ZERO =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.StringOfSizeZeroRule: Refactoring opportunity\\s+.+\\s+");
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_ONE =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.StringOfSizeOneRule: "
+              + "A custom description about matching single-char strings\\s+.+\\s+"
+              + "\\(see https://error-prone.picnic.tech/refasterrules/FooRules#StringOfSizeOneRule\\)");
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_TWO =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeTwoRule: "
+              + "A custom subgroup description\\s+.+\\s+"
+              + "\\(see https://example.com/rule/FooRules#ExtraGrouping.StringOfSizeTwoRule\\)");
+  private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_THREE =
+      Pattern.compile(
+          "\\[Refaster Rule\\] FooRules\\.ExtraGrouping\\.StringOfSizeThreeRule: "
+              + "A custom description about matching three-char strings\\s+.+\\s+"
+              + "\\(see https://example.com/custom\\)");
 
   @Test
   void identification() {
-    compilationHelper
+    CompilationTestHelper.newInstance(Refaster.class, getClass())
+        .matchAllDiagnostics()
+        .expectErrorMessage("StringOfSizeZeroRule", DIAGNOSTIC_STRING_OF_SIZE_ZERO.asPredicate())
+        .expectErrorMessage("StringOfSizeOneRule", DIAGNOSTIC_STRING_OF_SIZE_ONE.asPredicate())
+        .expectErrorMessage("StringOfSizeTwoRule", DIAGNOSTIC_STRING_OF_SIZE_TWO.asPredicate())
+        .expectErrorMessage("StringOfSizeThreeRule", DIAGNOSTIC_STRING_OF_SIZE_THREE.asPredicate())
         .addSourceLines(
             "A.java",
             "class A {",
@@ -80,74 +76,66 @@ final class RefasterTest {
     SeverityLevel defaultSeverity = BugCheckerInfo.create(Refaster.class).defaultSeverity();
 
     /* { arguments, expectedSeverities } */
-    return Stream.concat(
-        Stream.of(
-            arguments(
-                ImmutableList.of(), ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
-            arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:DEFAULT"),
-                ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:WARN"),
-                ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:ERROR"),
-                ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
-            arguments(
-                ImmutableList.of("-XepAllErrorsAsWarnings"),
-                ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of()),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-            arguments(
-                ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
-                ImmutableList.of(WARNING, WARNING, WARNING, WARNING))),
-        ErrorProneFork.isErrorProneForkAvailable()
-            ? Stream.of(
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:OFF", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of()),
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:WARN", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-                arguments(
-                    ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:OFF",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of()),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:DEFAULT",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:WARN",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
-                arguments(
-                    ImmutableList.of(
-                        "-Xep:Refaster:ERROR",
-                        "-XepAllErrorsAsWarnings",
-                        "-XepAllSuggestionsAsWarnings"),
-                    ImmutableList.of(WARNING, WARNING, WARNING, WARNING)))
-            : Stream.empty());
+    return Stream.of(
+        arguments(
+            ImmutableList.of(), ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
+        arguments(ImmutableList.of("-Xep:Refaster:OFF"), ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT"),
+            ImmutableList.of(defaultSeverity, WARNING, ERROR, SUGGESTION)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR"), ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
+        arguments(
+            ImmutableList.of("-XepAllErrorsAsWarnings"),
+            ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings"), ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of(defaultSeverity, WARNING, WARNING, SUGGESTION)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:OFF", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of()),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:DEFAULT", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, ERROR, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:WARN", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of("-Xep:Refaster:ERROR", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(ERROR, ERROR, ERROR, ERROR)),
+        arguments(
+            ImmutableList.of("-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:OFF", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of()),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:DEFAULT", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:WARN", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)),
+        arguments(
+            ImmutableList.of(
+                "-Xep:Refaster:ERROR", "-XepAllErrorsAsWarnings", "-XepAllSuggestionsAsWarnings"),
+            ImmutableList.of(WARNING, WARNING, WARNING, WARNING)));
   }
 
   /**
@@ -162,7 +150,7 @@ final class RefasterTest {
   void severityAssignment(
       ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
     CompilationTestHelper compilationTestHelper =
-        compilationHelper
+        CompilationTestHelper.newInstance(Refaster.class, getClass())
             .setArgs(arguments)
             .addSourceLines(
                 "A.java",
@@ -176,13 +164,18 @@ final class RefasterTest {
                 "    };",
                 "  }",
                 "}");
-    assertThatThrownBy(compilationTestHelper::doTest)
-        .isInstanceOf(AssertionError.class)
-        .message()
-        .satisfies(
-            message ->
-                assertThat(extractRefasterSeverities("A.java", message))
-                    .containsExactlyElementsOf(expectedSeverities));
+
+    if (expectedSeverities.isEmpty()) {
+      compilationTestHelper.doTest();
+    } else {
+      assertThatThrownBy(compilationTestHelper::doTest)
+          .isInstanceOf(AssertionError.class)
+          .message()
+          .satisfies(
+              message ->
+                  assertThat(extractRefasterSeverities("A.java", message))
+                      .containsExactlyElementsOf(expectedSeverities));
+    }
   }
 
   private static ImmutableList<SeverityLevel> extractRefasterSeverities(
@@ -198,17 +191,14 @@ final class RefasterTest {
   }
 
   private static SeverityLevel toSeverityLevel(String compilerDiagnosticsPrefix) {
-    switch (compilerDiagnosticsPrefix) {
-      case "Note":
-        return SUGGESTION;
-      case "warning":
-        return WARNING;
-      case "error":
-        return ERROR;
-      default:
-        throw new IllegalStateException(
-            String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
-    }
+    return switch (compilerDiagnosticsPrefix) {
+      case "Note" -> SUGGESTION;
+      case "warning" -> WARNING;
+      case "error" -> ERROR;
+      default ->
+          throw new IllegalStateException(
+              String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
+    };
   }
 
   @Test

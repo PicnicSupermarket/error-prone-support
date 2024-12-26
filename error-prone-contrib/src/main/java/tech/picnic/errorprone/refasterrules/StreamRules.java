@@ -3,8 +3,8 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
-import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
 import static java.util.stream.Collectors.flatMapping;
@@ -20,10 +20,12 @@ import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -37,6 +39,7 @@ import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
@@ -45,10 +48,12 @@ import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
@@ -252,37 +257,59 @@ final class StreamRules {
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
-  static final class StreamIsEmpty<T> {
+  static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends Collection<?>> collector) {
+    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
       return Refaster.anyOf(
           stream.count() == 0,
           stream.count() <= 0,
           stream.count() < 1,
           stream.findFirst().isEmpty(),
-          stream.collect(collector).isEmpty());
+          stream.collect(collector).isEmpty(),
+          stream.collect(collectingAndThen(collector, C::isEmpty)));
+    }
+
+    @BeforeTemplate
+    boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> collector) {
+      return stream.collect(collectingAndThen(collector, M::isEmpty));
     }
 
     @AfterTemplate
+    @AlsoNegation
     boolean after(Stream<T> stream) {
       return stream.findAny().isEmpty();
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
-  static final class StreamIsNotEmpty<T> {
+  /**
+   * Prefer {@link Stream#findAny()} over {@link Stream#findFirst()} if one only cares whether the
+   * stream is nonempty.
+   */
+  static final class StreamFindAnyIsPresent<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream) {
-      return Refaster.anyOf(
-          stream.count() != 0,
-          stream.count() > 0,
-          stream.count() >= 1,
-          stream.findFirst().isPresent());
+      return stream.findFirst().isPresent();
     }
 
     @AfterTemplate
     boolean after(Stream<T> stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  /**
+   * Prefer an unconditional {@link Map#get(Object)} call followed by a {@code null} check over a
+   * call to {@link Map#containsKey(Object)}, as the former avoids a second lookup operation.
+   */
+  static final class StreamMapFilter<T, K, V> {
+    @BeforeTemplate
+    Stream<V> before(Stream<T> stream, Map<K, V> map) {
+      return stream.filter(map::containsKey).map(map::get);
+    }
+
+    @AfterTemplate
+    Stream<V> after(Stream<T> stream, Map<K, V> map) {
+      return stream.map(map::get).filter(Objects::nonNull);
     }
   }
 
@@ -355,6 +382,8 @@ final class StreamRules {
           stream.filter(predicate).findAny().isEmpty());
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -393,6 +422,8 @@ final class StreamRules {
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -413,6 +444,8 @@ final class StreamRules {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
     }
 
+    // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
+    // template's `Refaster.anyOf` usage.
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
@@ -630,13 +663,114 @@ final class StreamRules {
 
   static final class StreamsConcat<T> {
     @BeforeTemplate
-    Stream<T> before(@Repeated Stream<T> stream) {
-      return Stream.of(Refaster.asVarargs(stream)).flatMap(Refaster.anyOf(identity(), s -> s));
+    Stream<T> before(
+        @Repeated Stream<T> stream,
+        @Matches(IsIdentityOperation.class)
+            Function<? super Stream<T>, ? extends Stream<? extends T>> mapper) {
+      return Stream.of(Refaster.asVarargs(stream)).flatMap(mapper);
     }
 
     @AfterTemplate
     Stream<T> after(@Repeated Stream<T> stream) {
       return Streams.concat(Refaster.asVarargs(stream));
+    }
+  }
+
+  static final class StreamTakeWhile<T> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
+      return stream.takeWhile(predicate).filter(predicate);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream, Predicate<? super T> predicate) {
+      return stream.takeWhile(predicate);
+    }
+  }
+
+  /**
+   * Prefer {@link Stream#iterate(Object, Predicate, UnaryOperator)} over more contrived
+   * alternatives.
+   */
+  static final class StreamIterate<T> {
+    @BeforeTemplate
+    Stream<T> before(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+      return Stream.iterate(seed, next).takeWhile(hasNext);
+    }
+
+    @AfterTemplate
+    Stream<T> after(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+      return Stream.iterate(seed, hasNext, next);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object)} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf1<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1) {
+      return ImmutableList.of(e1).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1) {
+      return Stream.of(e1);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf2<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2) {
+      return ImmutableList.of(e1, e2).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2) {
+      return Stream.of(e1, e2);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf3<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3) {
+      return ImmutableList.of(e1, e2, e3).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3) {
+      return Stream.of(e1, e2, e3);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf4<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4) {
+      return ImmutableList.of(e1, e2, e3, e4).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4) {
+      return Stream.of(e1, e2, e3, e4);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf5<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5) {
+      return ImmutableList.of(e1, e2, e3, e4, e5).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5) {
+      return Stream.of(e1, e2, e3, e4, e5);
     }
   }
 }

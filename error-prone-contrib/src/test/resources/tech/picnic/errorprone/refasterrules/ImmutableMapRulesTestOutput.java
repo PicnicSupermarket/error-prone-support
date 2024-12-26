@@ -33,9 +33,17 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
     return ImmutableSet.of(
         Maps.toMap(ImmutableList.of(1), n -> n * 2),
-        Maps.toMap(ImmutableList.of(2)::iterator, Integer::valueOf),
-        Maps.toMap(ImmutableList.of(3).iterator(), n -> n.intValue()),
-        Maps.toMap(ImmutableSet.of(4), Integer::valueOf));
+        Maps.toMap(ImmutableList.of(2), n -> n * 2),
+        ImmutableList.of(3).stream().collect(toImmutableMap(k -> 0, n -> n * 2)),
+        Maps.toMap(ImmutableList.of(4)::iterator, Integer::valueOf),
+        Maps.toMap(ImmutableList.of(5)::iterator, Integer::valueOf),
+        Streams.stream(ImmutableList.of(6)::iterator)
+            .collect(toImmutableMap(k -> 0, Integer::valueOf)),
+        Maps.toMap(ImmutableList.of(7).iterator(), n -> n.intValue()),
+        Maps.toMap(ImmutableList.of(8).iterator(), n -> n.intValue()),
+        Streams.stream(ImmutableList.of(9).iterator())
+            .collect(toImmutableMap(k -> 0, n -> n.intValue())),
+        Maps.toMap(ImmutableSet.of(10), Integer::valueOf));
   }
 
   ImmutableSet<ImmutableMap<String, Integer>> testEntryIterableToImmutableMap() {
@@ -54,8 +62,16 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMap() {
     return ImmutableSet.of(
         Maps.uniqueIndex(ImmutableList.of(1), n -> n * 2),
-        Maps.uniqueIndex(ImmutableList.of(2)::iterator, Integer::valueOf),
-        Maps.uniqueIndex(ImmutableList.of(3).iterator(), n -> n.intValue()));
+        Maps.uniqueIndex(ImmutableList.of(2), n -> n * 2),
+        ImmutableList.of(3).stream().collect(toImmutableMap(n -> n * 2, v -> 0)),
+        Maps.uniqueIndex(ImmutableList.of(4)::iterator, Integer::valueOf),
+        Maps.uniqueIndex(ImmutableList.of(5)::iterator, Integer::valueOf),
+        Streams.stream(ImmutableList.of(6)::iterator)
+            .collect(toImmutableMap(Integer::valueOf, v -> 0)),
+        Maps.uniqueIndex(ImmutableList.of(7).iterator(), n -> n.intValue()),
+        Maps.uniqueIndex(ImmutableList.of(8).iterator(), n -> n.intValue()),
+        Streams.stream(ImmutableList.of(9).iterator())
+            .collect(toImmutableMap(n -> n.intValue(), v -> 0)));
   }
 
   ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {

@@ -75,6 +75,16 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return String.valueOf("foo");
   }
 
+  ImmutableSet<String> testNewStringFromCharArraySubSequence() {
+    return ImmutableSet.of(
+        new String(new char[] {'f', 'o', 'o'}, 0, 1), new String(new char[] {'b', 'a', 'r'}, 2, 3));
+  }
+
+  ImmutableSet<String> testNewStringFromCharArray() {
+    return ImmutableSet.of(
+        new String(new char[] {'f', 'o', 'o'}), new String(new char[] {'b', 'a', 'r'}));
+  }
+
   Function<Object, String> testStringValueOfMethodReference() {
     return String::valueOf;
   }
@@ -85,5 +95,33 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
 
   int testUtf8EncodedLength() {
     return Utf8.encodedLength("foo");
+  }
+
+  int testStringIndexOfChar() {
+    return Math.max(-1, "foo".indexOf('a', 1) - 1);
+  }
+
+  int testStringIndexOfString() {
+    return Math.max(-1, "foo".indexOf("bar", 1) - 1);
+  }
+
+  int testStringLastIndexOfChar() {
+    return Math.max(-1, "foo".lastIndexOf('a') - 1);
+  }
+
+  int testStringLastIndexOfString() {
+    return Math.max(-1, "foo".lastIndexOf("bar") - 1);
+  }
+
+  int testStringLastIndexOfCharWithIndex() {
+    return "foo".lastIndexOf('a', 2 - 1);
+  }
+
+  int testStringLastIndexOfStringWithIndex() {
+    return "foo".lastIndexOf("bar", 2 - 1);
+  }
+
+  boolean testStringStartsWith() {
+    return "foo".startsWith("bar", 1);
   }
 }

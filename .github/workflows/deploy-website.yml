@@ -1,0 +1,85 @@
+name: Update `error-prone.picnic.tech` website content
+on:
+  pull_request:
+  push:
+    branches: [ master, website ]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            api.github.com:443
+            bestpractices.coreinfrastructure.org:443
+            blog.picnic.nl:443
+            errorprone.info:443
+            github.com:443
+            img.shields.io:443
+            index.rubygems.org:443
+            jitpack.io:443
+            maven.apache.org:443
+            objects.githubusercontent.com:443
+            pitest.org:443
+            repo.maven.apache.org:443
+            rubygems.org:443
+            search.maven.org:443
+            securityscorecards.dev:443
+            sonarcloud.io:443
+            www.baeldung.com:443
+            www.bestpractices.dev:443
+            www.youtube.com:443
+            youtrack.jetbrains.com:443
+      - name: Check out code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@a2bbe5b1b236842c1cb7dd11e8e3b51e0a616acc # v1.202.0
+        with:
+          working-directory: ./website
+          bundler-cache: true
+      - name: Configure Github Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Generate documentation
+        run: ./generate-docs.sh
+      - name: Build website with Jekyll
+        working-directory: ./website
+        run: bundle exec jekyll build
+      - name: Validate HTML output
+        working-directory: ./website
+        # XXX: Drop `--disable_external true` once we fully adopted the
+        # "Refaster rules" terminology on our website and in the code.
+        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+      - name: Upload website as artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: ./website/_site
+  deploy:
+    if: github.ref == 'refs/heads/website'
+    needs: build
+    permissions:
+      id-token: write
+      pages: write
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

@@ -5,10 +5,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.verification.VerificationMode;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -48,6 +50,32 @@ final class MockitoRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     T after(T mock) {
       return verify(mock);
+    }
+  }
+
+  static final class InvocationOnMockGetArguments {
+    @BeforeTemplate
+    Object before(InvocationOnMock invocation, int i) {
+      return invocation.getArguments()[i];
+    }
+
+    @AfterTemplate
+    Object after(InvocationOnMock invocation, int i) {
+      return invocation.getArgument(i);
+    }
+  }
+
+  static final class InvocationOnMockGetArgumentsWithTypeParameter<T> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    T before(InvocationOnMock invocation, int i) {
+      return Refaster.anyOf(
+          invocation.getArgument(i, Refaster.<T>clazz()), (T) invocation.getArgument(i));
+    }
+
+    @AfterTemplate
+    T after(InvocationOnMock invocation, int i) {
+      return invocation.<T>getArgument(i);
     }
   }
 }

@@ -1,10 +1,13 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.filtering;
 import static java.util.stream.Collectors.flatMapping;
@@ -20,11 +23,15 @@ import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
+import java.util.List;
 import java.util.LongSummaryStatistics;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -36,8 +43,13 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
+        ImmutableList.class,
+        ImmutableMap.class,
+        List.class,
+        Map.class,
         Objects.class,
         Streams.class,
+        collectingAndThen(null, null),
         counting(),
         filtering(null, null),
         flatMapping(null, null),
@@ -52,7 +64,9 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         summarizingLong(null),
         summingDouble(null),
         summingInt(null),
-        summingLong(null));
+        summingLong(null),
+        toImmutableList(),
+        toImmutableMap(null, null));
   }
 
   String testJoining() {
@@ -106,21 +120,31 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of("bar").map(String::length).findFirst());
   }
 
-  ImmutableSet<Boolean> testStreamIsEmpty() {
+  ImmutableSet<Boolean> testStreamFindAnyIsEmpty() {
     return ImmutableSet.of(
         Stream.of(1).count() == 0,
         Stream.of(2).count() <= 0,
         Stream.of(3).count() < 1,
         Stream.of(4).findFirst().isEmpty(),
-        Stream.of(5).collect(toImmutableSet()).isEmpty());
+        Stream.of(5).collect(toImmutableSet()).isEmpty(),
+        Stream.of(6).collect(collectingAndThen(toImmutableList(), List::isEmpty)),
+        Stream.of(7).collect(collectingAndThen(toImmutableList(), ImmutableList::isEmpty)),
+        Stream.of(8).collect(collectingAndThen(toImmutableMap(k -> k, v -> v), Map::isEmpty)),
+        Stream.of(9)
+            .collect(collectingAndThen(toImmutableMap(k -> k, v -> v), ImmutableMap::isEmpty)),
+        Stream.of(10).count() != 0,
+        Stream.of(11).count() > 0,
+        Stream.of(12).count() >= 1);
   }
 
-  ImmutableSet<Boolean> testStreamIsNotEmpty() {
-    return ImmutableSet.of(
-        Stream.of(1).count() != 0,
-        Stream.of(2).count() > 0,
-        Stream.of(3).count() >= 1,
-        Stream.of(4).findFirst().isPresent());
+  boolean testStreamFindAnyIsPresent() {
+    return Stream.of(1).findFirst().isPresent();
+  }
+
+  Stream<Integer> testStreamMapFilter() {
+    return Stream.of("foo")
+        .filter(ImmutableMap.of(1, 2)::containsKey)
+        .map(ImmutableMap.of(1, 2)::get);
   }
 
   ImmutableSet<Optional<String>> testStreamMin() {
@@ -256,6 +280,35 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Stream<Integer>> testStreamsConcat() {
     return ImmutableSet.of(
         Stream.of(Stream.of(1), Stream.of(2)).flatMap(identity()),
-        Stream.of(Stream.of(3), Stream.of(4)).flatMap(v -> v));
+        Stream.of(Stream.of(3), Stream.of(4)).flatMap(v -> v),
+        Stream.of(Stream.of(5), Stream.of(6)).flatMap(v -> Stream.empty()));
+  }
+
+  Stream<Integer> testStreamTakeWhile() {
+    return Stream.of(1, 2, 3).takeWhile(i -> i < 2).filter(i -> i < 2);
+  }
+
+  Stream<Integer> testStreamIterate() {
+    return Stream.iterate(0, i -> i + 1).takeWhile(i -> i < 10);
+  }
+
+  Stream<Integer> testStreamOf1() {
+    return ImmutableList.of(1).stream();
+  }
+
+  Stream<Integer> testStreamOf2() {
+    return ImmutableList.of(1, 2).stream();
+  }
+
+  Stream<Integer> testStreamOf3() {
+    return ImmutableList.of(1, 2, 3).stream();
+  }
+
+  Stream<Integer> testStreamOf4() {
+    return ImmutableList.of(1, 2, 3, 4).stream();
+  }
+
+  Stream<Integer> testStreamOf5() {
+    return ImmutableList.of(1, 2, 3, 4, 5).stream();
   }
 }

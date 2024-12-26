@@ -7,7 +7,7 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.VerifyException;
@@ -17,10 +17,12 @@ import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -32,7 +34,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags {@code Comparator#comparing*} invocations that can be replaced
@@ -43,8 +45,9 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type"
-            + " of the provided function",
+        """
+        Ensure invocations of `Comparator#comparing{,Double,Int,Long}` match the return type of \
+        the provided function""",
     link = BUG_PATTERNS_BASE_URL + "PrimitiveComparison",
     linkType = CUSTOM,
     severity = WARNING,
@@ -55,21 +58,21 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
   private static final Matcher<ExpressionTree> STATIC_COMPARISON_METHOD =
       anyOf(
           staticMethod()
-              .onClass(Comparator.class.getName())
+              .onClass(Comparator.class.getCanonicalName())
               .namedAnyOf("comparingInt", "comparingLong", "comparingDouble"),
           staticMethod()
-              .onClass(Comparator.class.getName())
+              .onClass(Comparator.class.getCanonicalName())
               .named("comparing")
-              .withParameters(Function.class.getName()));
+              .withParameters(Function.class.getCanonicalName()));
   private static final Matcher<ExpressionTree> INSTANCE_COMPARISON_METHOD =
       anyOf(
           instanceMethod()
-              .onDescendantOf(Comparator.class.getName())
+              .onDescendantOf(Comparator.class.getCanonicalName())
               .namedAnyOf("thenComparingInt", "thenComparingLong", "thenComparingDouble"),
           instanceMethod()
-              .onDescendantOf(Comparator.class.getName())
+              .onDescendantOf(Comparator.class.getCanonicalName())
               .named("thenComparing")
-              .withParameters(Function.class.getName()));
+              .withParameters(Function.class.getCanonicalName()));
 
   /** Instantiates a new {@link PrimitiveComparison} instance. */
   public PrimitiveComparison() {}
@@ -146,37 +149,44 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     return isStatic ? "comparing" : "thenComparing";
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static Optional<Type> getPotentiallyBoxedReturnType(ExpressionTree tree) {
-    switch (tree.getKind()) {
-      case LAMBDA_EXPRESSION:
-        /* Return the lambda expression's actual return type. */
-        return Optional.ofNullable(ASTHelpers.getType(((LambdaExpressionTree) tree).getBody()));
-      case MEMBER_REFERENCE:
-        /* Return the method's declared return type. */
-        // XXX: Very fragile. Do better.
-        Type subType2 = ((JCMemberReference) tree).referentType;
-        return Optional.of(subType2.getReturnType());
-      default:
-        /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
-        return Optional.empty();
+    if (tree instanceof LambdaExpressionTree lambdaExpression) {
+      /* Return the lambda expression's actual return type. */
+      return Optional.ofNullable(ASTHelpers.getType(lambdaExpression.getBody()));
     }
+
+    // XXX: The match against a concrete type and reference to one of its fields is fragile. Do
+    // better.
+    if (tree instanceof JCMemberReference memberReference) {
+      /* Return the method's declared return type. */
+      Type subType = memberReference.referentType;
+      return Optional.of(subType.getReturnType());
+    }
+
+    /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
+    return Optional.empty();
   }
 
+  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static Fix suggestFix(
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
-    switch (expr.getKind()) {
-      case IDENTIFIER:
-        return SuggestedFix.builder()
-            .addStaticImport(Comparator.class.getName() + '.' + preferredMethodName)
-            .replace(expr, preferredMethodName)
-            .build();
-      case MEMBER_SELECT:
-        MemberSelectTree ms = (MemberSelectTree) tree.getMethodSelect();
-        return SuggestedFix.replace(
-            ms, SourceCode.treeToString(ms.getExpression(), state) + '.' + preferredMethodName);
-      default:
-        throw new VerifyException("Unexpected type of expression: " + expr.getKind());
+
+    if (expr instanceof IdentifierTree) {
+      SuggestedFix.Builder fix = SuggestedFix.builder();
+      String replacement =
+          SuggestedFixes.qualifyStaticImport(
+              Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
+      return fix.replace(expr, replacement).build();
     }
+
+    if (expr instanceof MemberSelectTree memberSelect) {
+      return SuggestedFix.replace(
+          memberSelect,
+          SourceCode.treeToString(memberSelect.getExpression(), state) + '.' + preferredMethodName);
+    }
+
+    throw new VerifyException("Unexpected type of expression: " + expr.getKind());
   }
 }

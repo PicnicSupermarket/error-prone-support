@@ -1,14 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.base.Predicates.and;
-import static com.google.common.base.Predicates.containsPattern;
-import static com.google.common.base.Predicates.not;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.THIRD;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Publisher;
 import reactor.core.CorePublisher;
@@ -20,10 +18,7 @@ final class FluxImplicitBlockTest {
     CompilationTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .expectErrorMessage(
             "X",
-            and(
-                containsPattern("SuppressWarnings"),
-                containsPattern("toImmutableList"),
-                containsPattern("toList")))
+            m -> Stream.of("SuppressWarnings", "toImmutableList", "toList").allMatch(m::contains))
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
@@ -63,7 +58,7 @@ final class FluxImplicitBlockTest {
   void identificationWithoutGuavaOnClasspath() {
     CompilationTestHelper.newInstance(FluxImplicitBlock.class, getClass())
         .withClasspath(CorePublisher.class, Flux.class, Publisher.class)
-        .expectErrorMessage("X", not(containsPattern("toImmutableList")))
+        .expectErrorMessage("X", m -> !m.contains("toImmutableList"))
         .addSourceLines(
             "A.java",
             "import reactor.core.publisher.Flux;",

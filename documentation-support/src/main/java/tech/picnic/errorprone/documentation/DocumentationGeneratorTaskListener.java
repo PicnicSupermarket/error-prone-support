@@ -1,24 +1,20 @@
 package tech.picnic.errorprone.documentation;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.TaskEvent;
 import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.api.JavacTrees;
 import com.sun.tools.javac.util.Context;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ServiceLoader;
 import javax.tools.JavaFileObject;
 
 /**
@@ -27,8 +23,12 @@ import javax.tools.JavaFileObject;
  */
 // XXX: Find a better name for this class; it doesn't generate documentation per se.
 final class DocumentationGeneratorTaskListener implements TaskListener {
-  private static final ObjectMapper OBJECT_MAPPER =
-      new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private static final ImmutableList<Extractor<?>> EXTRACTORS =
+      (ImmutableList)
+          ImmutableList.copyOf(
+              ServiceLoader.load(
+                  Extractor.class, DocumentationGeneratorTaskListener.class.getClassLoader()));
 
   private final Context context;
   private final Path docsPath;
@@ -51,19 +51,25 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
     JavaFileObject sourceFile = taskEvent.getSourceFile();
-    if (classTree == null || sourceFile == null) {
+    CompilationUnitTree compilationUnit = taskEvent.getCompilationUnit();
+    ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
+    if (sourceFile == null || compilationUnit == null || classTree == null) {
       return;
     }
 
-    ExtractorType.findMatchingType(classTree)
-        .ifPresent(
-            extractorType ->
-                writeToFile(
-                    extractorType.getIdentifier(),
-                    getSimpleClassName(sourceFile.toUri()),
-                    extractorType.getExtractor().extract(classTree, context)));
+    VisitorState state =
+        VisitorState.createForUtilityPurposes(context)
+            .withPath(new TreePath(new TreePath(compilationUnit), classTree));
+
+    for (Extractor<?> extractor : EXTRACTORS) {
+      extractor
+          .tryExtract(classTree, state)
+          .ifPresent(
+              data ->
+                  writeToFile(
+                      extractor.identifier(), getSimpleClassName(sourceFile.toUri()), data));
+    }
   }
 
   private void createDocsDirectory() {
@@ -76,16 +82,10 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private <T> void writeToFile(String identifier, String className, T data) {
-    File file = docsPath.resolve(String.format("%s-%s.json", identifier, className)).toFile();
-
-    try (FileWriter fileWriter = new FileWriter(file, UTF_8)) {
-      OBJECT_MAPPER.writeValue(fileWriter, data);
-    } catch (IOException e) {
-      throw new UncheckedIOException(String.format("Cannot write to file '%s'", file.getPath()), e);
-    }
+    Json.write(docsPath.resolve(String.format("%s-%s.json", identifier, className)), data);
   }
 
   private static String getSimpleClassName(URI path) {
-    return Paths.get(path).getFileName().toString().replace(".java", "");
+    return Path.of(path).getFileName().toString().replace(".java", "");
   }
 }

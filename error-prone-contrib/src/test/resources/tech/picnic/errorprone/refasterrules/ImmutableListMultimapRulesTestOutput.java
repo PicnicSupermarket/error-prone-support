@@ -64,9 +64,17 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
 
   ImmutableSet<ImmutableListMultimap<Integer, Integer>> testIndexIterableToImmutableListMultimap() {
     return ImmutableSet.of(
-        Multimaps.index(ImmutableList.of(1), n -> n * 2),
-        Multimaps.index(ImmutableList.of(2)::iterator, Integer::valueOf),
-        Multimaps.index(ImmutableList.of(3).iterator(), n -> n.intValue()));
+        Multimaps.index(ImmutableList.of(1).iterator(), n -> n * 2),
+        Multimaps.index(ImmutableList.of(2).iterator(), n -> n * 2),
+        Streams.stream(ImmutableList.of(3).iterator())
+            .collect(toImmutableListMultimap(n -> n * 2, v -> 0)),
+        Multimaps.index(ImmutableList.of(4)::iterator, Integer::valueOf),
+        Multimaps.index(ImmutableList.of(5)::iterator, Integer::valueOf),
+        Streams.stream(ImmutableList.of(6)::iterator)
+            .collect(toImmutableListMultimap(Integer::valueOf, v -> 0)),
+        Multimaps.index(ImmutableList.of(7), n -> n.intValue()),
+        Multimaps.index(ImmutableList.of(8), n -> n.intValue()),
+        ImmutableList.of(9).stream().collect(toImmutableListMultimap(n -> n.intValue(), v -> 0)));
   }
 
   ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {

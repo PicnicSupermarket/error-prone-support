@@ -10,9 +10,11 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.stream.Collectors.joining;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -30,10 +32,12 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.SimpleTreeVisitor;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags string concatenations that produce a format string; in such cases
@@ -59,6 +63,7 @@ import tech.picnic.errorprone.bugpatterns.util.SourceCode;
 public final class FormatStringConcatenation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
+
   /**
    * AssertJ exposes varargs {@code fail} methods with a {@link Throwable}-accepting overload, the
    * latter of which should not be flagged.
@@ -67,7 +72,8 @@ public final class FormatStringConcatenation extends BugChecker
       anyMethod()
           .anyClass()
           .withAnyName()
-          .withParameters(String.class.getName(), Throwable.class.getName());
+          .withParameters(String.class.getCanonicalName(), Throwable.class.getCanonicalName());
+
   // XXX: Drop some of these methods if we use Refaster to replace some with others.
   private static final Matcher<ExpressionTree> ASSERTJ_FORMAT_METHOD =
       anyOf(
@@ -116,14 +122,14 @@ public final class FormatStringConcatenation extends BugChecker
   private static final Matcher<ExpressionTree> GUAVA_FORMAT_METHOD =
       anyOf(
           staticMethod()
-              .onClass("com.google.common.base.Preconditions")
+              .onClass(Preconditions.class.getCanonicalName())
               .namedAnyOf("checkArgument", "checkNotNull", "checkState"),
-          staticMethod().onClass("com.google.common.base.Verify").named("verify"));
+          staticMethod().onClass(Verify.class.getCanonicalName()).named("verify"));
   // XXX: Add `PrintWriter`, maybe others.
   private static final Matcher<ExpressionTree> JDK_FORMAT_METHOD =
       anyOf(
-          staticMethod().onClass("java.lang.String").named("format"),
-          instanceMethod().onExactClass("java.util.Formatter").named("format"));
+          staticMethod().onClass(String.class.getCanonicalName()).named("format"),
+          instanceMethod().onExactClass(Formatter.class.getCanonicalName()).named("format"));
   private static final Matcher<ExpressionTree> SLF4J_FORMAT_METHOD =
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
@@ -198,12 +204,8 @@ public final class FormatStringConcatenation extends BugChecker
 
     ExpressionTree argument = ASTHelpers.stripParentheses(arguments.get(argPosition));
     return argument instanceof BinaryTree
-        && isStringTyped(argument, state)
+        && MoreASTHelpers.isStringTyped(argument, state)
         && ASTHelpers.constValue(argument, String.class) == null;
-  }
-
-  private static boolean isStringTyped(ExpressionTree tree, VisitorState state) {
-    return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
   }
 
   private static class ReplacementArgumentsConstructor
@@ -218,7 +220,7 @@ public final class FormatStringConcatenation extends BugChecker
 
     @Override
     public @Nullable Void visitBinary(BinaryTree tree, VisitorState state) {
-      if (tree.getKind() == Kind.PLUS && isStringTyped(tree, state)) {
+      if (tree.getKind() == Kind.PLUS && MoreASTHelpers.isStringTyped(tree, state)) {
         tree.getLeftOperand().accept(this, state);
         tree.getRightOperand().accept(this, state);
       } else {
@@ -240,8 +242,8 @@ public final class FormatStringConcatenation extends BugChecker
     }
 
     private void appendExpression(Tree tree) {
-      if (tree instanceof LiteralTree) {
-        formatString.append(((LiteralTree) tree).getValue());
+      if (tree instanceof LiteralTree literal) {
+        formatString.append(literal.getValue());
       } else {
         formatString.append(formatSpecifier);
         formatArguments.add(tree);

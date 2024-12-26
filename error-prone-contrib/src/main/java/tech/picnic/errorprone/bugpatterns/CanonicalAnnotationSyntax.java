@@ -3,7 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
@@ -19,14 +19,13 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.Tree.Kind;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags annotations that could be written more concisely. */
 @AutoService(BugChecker.class)
@@ -91,8 +90,8 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
     ExpressionTree arg = args.get(0);
     if (state.getSourceForNode(arg) == null) {
       /*
-       * The annotation argument isn't doesn't have a source representation, e.g. because `value`
-       * isn't assigned to explicitly.
+       * The annotation argument doesn't have a source representation, e.g. because `value` isn't
+       * assigned explicitly.
        */
       return Optional.empty();
     }
@@ -119,7 +118,7 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
        * the expression as a whole.
        */
       ExpressionTree value =
-          (arg.getKind() == Kind.ASSIGNMENT) ? ((AssignmentTree) arg).getExpression() : arg;
+          (arg instanceof AssignmentTree assignment) ? assignment.getExpression() : arg;
 
       /* Store a fix for each expression that was successfully simplified. */
       simplifyAttributeValue(value, state)
@@ -130,13 +129,10 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
   }
 
   private static Optional<String> simplifyAttributeValue(ExpressionTree expr, VisitorState state) {
-    if (expr.getKind() != Kind.NEW_ARRAY) {
-      /* There are no curly braces or commas to be dropped here. */
-      return Optional.empty();
-    }
-
-    NewArrayTree array = (NewArrayTree) expr;
-    return simplifySingletonArray(array, state).or(() -> dropTrailingComma(array, state));
+    /* Drop curly braces or commas if possible. */
+    return expr instanceof NewArrayTree newArray
+        ? simplifySingletonArray(newArray, state).or(() -> dropTrailingComma(newArray, state))
+        : Optional.empty();
   }
 
   /** Returns the expression describing the array's sole element, if any. */

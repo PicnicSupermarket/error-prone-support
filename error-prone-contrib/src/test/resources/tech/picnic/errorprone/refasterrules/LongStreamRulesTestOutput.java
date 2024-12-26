@@ -99,4 +99,8 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
   boolean testLongStreamAllMatch2() {
     return LongStream.of(1).allMatch(n -> n > 1);
   }
+
+  LongStream testLongStreamTakeWhile() {
+    return LongStream.of(1, 2, 3).takeWhile(i -> i < 2);
+  }
 }

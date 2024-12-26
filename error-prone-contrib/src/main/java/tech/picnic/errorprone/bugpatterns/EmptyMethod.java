@@ -7,7 +7,7 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isType;
-import static tech.picnic.errorprone.bugpatterns.util.Documentation.BUG_PATTERNS_BASE_URL;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -21,7 +21,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.util.Optional;
-import tech.picnic.errorprone.bugpatterns.util.SourceCode;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags empty methods that seemingly can simply be deleted. */
 @AutoService(BugChecker.class)
@@ -36,7 +36,9 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
   private static final Matcher<Tree> PERMITTED_ANNOTATION =
       annotations(
           AT_LEAST_ONE,
-          anyOf(isType("java.lang.Override"), isType("org.aspectj.lang.annotation.Pointcut")));
+          anyOf(
+              isType(Override.class.getCanonicalName()),
+              isType("org.aspectj.lang.annotation.Pointcut")));
 
   /** Instantiates a new {@link EmptyMethod} instance. */
   public EmptyMethod() {}
@@ -60,7 +62,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
   }
 
   private static boolean isInPossibleTestHelperClass(VisitorState state) {
-    return Optional.ofNullable(ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class))
+    return Optional.ofNullable(state.findEnclosing(ClassTree.class))
         .map(ClassTree::getSimpleName)
         .filter(name -> name.toString().contains("Test"))
         .isPresent();
