@@ -43,8 +43,7 @@ import java.util.stream.Stream;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags {@link String#format(String, Object...)}, {@link
- * String#format(Locale, String, Object...)} and {@link String#formatted(Object...)} invocations
+ * A {@link BugChecker} that flags {@link String#format} and {@link String#formatted} invocations
  * that can be omitted by delegating to another format method.
  */
 // XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see
@@ -53,6 +52,9 @@ import tech.picnic.errorprone.utils.SourceCode;
 // `RedundantStringConversion` checks. Look into deduplicating them.
 // XXX: Should we also simplify e.g. `LOG.error(String.join("sep", arg1, arg2), throwable)`? Perhaps
 // that's too obscure.
+// XXX: This check currently only flags string format expressions that are a direct argument to
+// another format-capable method invocation. Indirect cases, such as where the result is assigned to
+// a variable, are currently not covered.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "String formatting can be deferred",
