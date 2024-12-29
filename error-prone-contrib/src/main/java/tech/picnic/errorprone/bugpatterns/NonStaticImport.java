@@ -182,7 +182,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       }
     }
 
-    return imports.build();
+    return imports.buildOrThrow();
   }
 
   private static boolean shouldNotBeStaticallyImported(String type, String member) {

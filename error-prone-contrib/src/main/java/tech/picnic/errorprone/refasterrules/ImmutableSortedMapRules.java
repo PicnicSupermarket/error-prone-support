@@ -71,7 +71,7 @@ final class ImmutableSortedMapRules {
   static final class EmptyImmutableSortedMap<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before() {
-      return ImmutableSortedMap.<K, V>naturalOrder().build();
+      return ImmutableSortedMap.<K, V>naturalOrder().buildOrThrow();
     }
 
     @AfterTemplate
@@ -89,7 +89,7 @@ final class ImmutableSortedMapRules {
   static final class PairToImmutableSortedMap<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(K key, V value) {
-      return ImmutableSortedMap.<K, V>naturalOrder().put(key, value).build();
+      return ImmutableSortedMap.<K, V>naturalOrder().put(key, value).buildOrThrow();
     }
 
     @AfterTemplate
@@ -105,7 +105,7 @@ final class ImmutableSortedMapRules {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
       return Refaster.anyOf(
-          ImmutableSortedMap.<K, V>naturalOrder().put(entry).build(),
+          ImmutableSortedMap.<K, V>naturalOrder().put(entry).buildOrThrow(),
           Stream.of(entry)
               .collect(
                   toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
@@ -126,7 +126,7 @@ final class ImmutableSortedMapRules {
       return Refaster.anyOf(
           ImmutableSortedMap.copyOf(iterable, naturalOrder()),
           ImmutableSortedMap.copyOf(iterable.entrySet()),
-          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).build());
+          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).buildOrThrow());
     }
 
     @BeforeTemplate
@@ -134,7 +134,7 @@ final class ImmutableSortedMapRules {
         Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return Refaster.anyOf(
           ImmutableSortedMap.copyOf(iterable, naturalOrder()),
-          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).build(),
+          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).buildOrThrow(),
           Streams.stream(iterable)
               .collect(
                   toImmutableSortedMap(
