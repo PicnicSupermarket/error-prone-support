@@ -4459,6 +4459,15 @@
              "values from otel have precedence over builder",
              new TestCase()
                  .expectedProperties(
+@@ -113,7 +113,7 @@ class OtelAutoConfigTest {
+                         .put("otel.exporter.otlp.timeout", Optional.of("13s"))
+                         .put("otel.exporter.otlp.metrics.timeout", Optional.empty())
+                         .put("otel.service.name", Optional.of("otel-service"))
+-                        .build())
++                        .buildOrThrow())
+                 .expectedResourceAttributes(
+                     ImmutableMap.of(
+                         "key",
 @@ -128,7 +128,7 @@ class OtelAutoConfigTest {
                          "otel-version"))
                  .exporterBuilder(OtelAutoConfigTest::setBuilderValues)
@@ -4468,15 +4477,44 @@
              "values from prom properties have precedence over builder and otel",
              new TestCase()
                  .expectedProperties(
-@@ -177,7 +177,7 @@ class OtelAutoConfigTest {
+@@ -143,7 +143,7 @@ class OtelAutoConfigTest {
+                         .put("otel.exporter.otlp.metrics.timeout", Optional.of("23s"))
+                         .put("otel.exporter.otlp.timeout", Optional.of("13s"))
+                         .put("otel.service.name", Optional.of("prom-service"))
+-                        .build())
++                        .buildOrThrow())
+                 .expectedResourceAttributes(
+                     ImmutableMap.of(
+                         "key",
+@@ -176,8 +176,8 @@ class OtelAutoConfigTest {
+                         .put(
                              "io.prometheus.exporter.opentelemetry.resourceAttributes",
                              "key=prom-value")
-                         .build())),
+-                        .build())),
 -        Arguments.of(
++                        .buildOrThrow())),
 +        arguments(
              "values from prom properties builder have precedence over builder and otel",
              new TestCase()
                  .expectedProperties(
+@@ -192,7 +192,7 @@ class OtelAutoConfigTest {
+                         .put("otel.exporter.otlp.metrics.timeout", Optional.of("23s"))
+                         .put("otel.exporter.otlp.timeout", Optional.of("13s"))
+                         .put("otel.service.name", Optional.of("prom-service"))
+-                        .build())
++                        .buildOrThrow())
+                 .expectedResourceAttributes(
+                     ImmutableMap.of(
+                         "key",
+@@ -233,7 +233,7 @@ class OtelAutoConfigTest {
+         .put(
+             "otel.resource.attributes",
+             "key=otel-value,service.namespace=otel-namespace,service.instance.id=otel-instance,service.version=otel-version")
+-        .build();
++        .buildOrThrow();
+   }
+ 
+   private static void setBuilderValues(OpenTelemetryExporter.Builder builder) {
 @@ -250,8 +250,8 @@ class OtelAutoConfigTest {
          .resourceAttribute("key", "builder-value");
    }
@@ -4565,7 +4603,12 @@
  }
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
-@@ -7,7 +7,7 @@ import io.prometheus.metrics.model.snapshots.Unit;
+@@ -3,14 +3,15 @@ package io.prometheus.metrics.exporter.opentelemetry.otelmodel;
+ import static java.util.Map.entry;
+ import static org.junit.jupiter.api.Assertions.*;
+ 
++import com.google.common.collect.ImmutableMap;
+ import io.prometheus.metrics.model.snapshots.Unit;
  import java.util.Map;
  import org.junit.jupiter.api.Test;
  
@@ -4573,7 +4616,11 @@
 +final class PrometheusMetricDataTest {
  
    Map<Object, Object> translations =
-       Map.ofEntries(
+-      Map.ofEntries(
++      ImmutableMap.ofEntries(
+           entry("days", "d"),
+           entry("hours", "h"),
+           entry("minutes", "min"),
 --- a/prometheus-metrics-exporter-pushgateway/src/main/java/io/prometheus/metrics/exporter/pushgateway/DefaultJobLabelDetector.java
 +++ b/prometheus-metrics-exporter-pushgateway/src/main/java/io/prometheus/metrics/exporter/pushgateway/DefaultJobLabelDetector.java
 @@ -3,7 +3,6 @@ package io.prometheus.metrics.exporter.pushgateway;
