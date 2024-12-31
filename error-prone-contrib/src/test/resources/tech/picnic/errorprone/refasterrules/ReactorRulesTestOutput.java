@@ -325,6 +325,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(1).mapNotNull(n -> n * 2));
   }
 
+  Flux<String> testFluxMapNotNullMapOptional() {
+    return Flux.just(1).mapNotNull(x -> Optional.of(x.toString()).orElse(null));
+  }
+
+  Flux<Integer> testFluxMapNotNullOptional() {
+    return Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null));
+  }
+
   ImmutableSet<Flux<String>> testMonoFlux() {
     return ImmutableSet.of(
         Mono.just("foo").flux(), Mono.just("bar").flux(), Mono.just("baz").flux());

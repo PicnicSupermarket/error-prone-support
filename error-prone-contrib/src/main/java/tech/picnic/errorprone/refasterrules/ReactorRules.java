@@ -889,6 +889,37 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Flux#mapNotNull(Function)} over more contrived alternatives. */
+  abstract static class FluxMapNotNullMapOptional<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract Optional<S> transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux) {
+      return flux.map(x -> transformation(x))
+          .filter(Optional::isPresent)
+          .map(Optional::orElseThrow);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.mapNotNull(x -> transformation(x).orElse(null));
+    }
+  }
+
+  /** Prefer {@link Flux#mapNotNull(Function)} over more contrived alternatives. */
+  static final class FluxMapNotNullOptional<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<Optional<T>> flux) {
+      return flux.filter(Optional::isPresent).map(Optional::orElseThrow);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<Optional<T>> flux) {
+      return flux.mapNotNull(x -> x.orElse(null));
+    }
+  }
+
   /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
   static final class MonoFlux<T> {
     @BeforeTemplate
