@@ -896,9 +896,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     Flux<S> before(Flux<T> flux) {
-      return flux.map(x -> transformation(x))
-          .filter(Optional::isPresent)
-          .map(Optional::orElseThrow);
+      return flux.map(x -> transformation(x)).mapNotNull(x -> x.orElse(null));
     }
 
     @AfterTemplate

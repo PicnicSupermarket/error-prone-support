@@ -326,10 +326,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<String> testFluxMapNotNullMapOptional() {
-    return Flux.just(1)
-        .map(x -> Optional.of(x.toString()))
-        .filter(Optional::isPresent)
-        .map(Optional::orElseThrow);
+    return Flux.just(1).map(x -> Optional.of(x.toString())).mapNotNull(x -> x.orElse(null));
   }
 
   Flux<Integer> testFluxMapNotNullOptional() {
