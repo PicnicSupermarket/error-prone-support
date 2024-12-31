@@ -2,18 +2,19 @@ package tech.picnic.errorprone.refasterrules;
 
 import static java.util.Objects.requireNonNullElse;
 import static java.util.Objects.requireNonNullElseGet;
+import static java.util.function.Predicate.not;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class NullRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(MoreObjects.class, Optional.class);
+    return ImmutableSet.of(MoreObjects.class, Optional.class, not(null));
   }
 
   ImmutableSet<Boolean> testIsNull() {
@@ -32,11 +33,11 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return requireNonNullElseGet("foo", () -> "bar");
   }
 
-  long testIsNullFunction() {
-    return Stream.of("foo").filter(Objects::isNull).count();
+  ImmutableSet<Predicate<String>> testIsNullFunction() {
+    return ImmutableSet.of(Objects::isNull, Objects::isNull);
   }
 
-  long testNonNullFunction() {
-    return Stream.of("foo").filter(Objects::nonNull).count();
+  ImmutableSet<Predicate<String>> testNonNullFunction() {
+    return ImmutableSet.of(Objects::nonNull, Objects::nonNull);
   }
 }
