@@ -95,7 +95,10 @@ final class NullRules {
     }
   }
 
-  /** Prefer {@link Objects#isNull(Object)} over the equivalent lambda function. */
+  /**
+   * Prefer {@link Objects#isNull(Object)} over the equivalent lambda function or more contrived
+   * alternatives.
+   */
   static final class IsNullFunction<T> {
     @BeforeTemplate
     Predicate<T> before() {
@@ -108,7 +111,10 @@ final class NullRules {
     }
   }
 
-  /** Prefer {@link Objects#nonNull(Object)} over the equivalent lambda function. */
+  /**
+   * Prefer {@link Objects#nonNull(Object)} over the equivalent lambda function or more contrived
+   * alternatives.
+   */
   static final class NonNullFunction<T> {
     @BeforeTemplate
     Predicate<T> before() {
