@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.requireNonNullElse;
 import static java.util.Objects.requireNonNullElseGet;
+import static java.util.function.Predicate.not;
 
 import com.google.common.base.MoreObjects;
 import com.google.errorprone.refaster.Refaster;
@@ -98,7 +99,7 @@ final class NullRules {
   static final class IsNullFunction<T> {
     @BeforeTemplate
     Predicate<T> before() {
-      return o -> o == null;
+      return Refaster.anyOf(o -> o == null, not(Objects::nonNull));
     }
 
     @AfterTemplate
@@ -111,7 +112,7 @@ final class NullRules {
   static final class NonNullFunction<T> {
     @BeforeTemplate
     Predicate<T> before() {
-      return o -> o != null;
+      return Refaster.anyOf(o -> o != null, not(Objects::isNull));
     }
 
     @AfterTemplate
