@@ -14,11 +14,11 @@ jobs:
         distribution: [ temurin ]
         experimental: [ false ]
         include:
-          - os: macos-14
+          - os: macos-15
             jdk: 17.0.13
             distribution: temurin
             experimental: false
-          - os: windows-2022
+          - os: windows-2025
             jdk: 17.0.13
             distribution: temurin
             experimental: false
