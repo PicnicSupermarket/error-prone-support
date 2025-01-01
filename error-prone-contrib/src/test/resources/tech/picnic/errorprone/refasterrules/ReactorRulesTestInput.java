@@ -325,11 +325,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(1).switchMap(n -> Mono.fromSupplier(() -> n * 2)));
   }
 
-  Flux<String> testFluxMapNotNullMapOptional() {
+  Flux<String> testFluxMapNotNullTransformationOrElse() {
     return Flux.just(1).map(x -> Optional.of(x.toString())).mapNotNull(x -> x.orElse(null));
   }
 
-  Flux<Integer> testFluxMapNotNullOptional() {
+  Flux<Integer> testFluxMapNotNullOrElse() {
     return Flux.just(Optional.of(1)).filter(Optional::isPresent).map(Optional::orElseThrow);
   }
 
