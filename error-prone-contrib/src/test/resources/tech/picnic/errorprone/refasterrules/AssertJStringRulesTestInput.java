@@ -21,16 +21,8 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     assertThat("foo").isEqualTo("");
   }
 
-  void testAssertThatStringIsEmpty() {
-    assertThat("foo".isEmpty()).isTrue();
-  }
-
   AbstractStringAssert<?> testAbstractStringAssertStringIsNotEmpty() {
     return assertThat("foo").isNotEqualTo("");
-  }
-
-  AbstractAssert<?, ?> testAssertThatStringIsNotEmpty() {
-    return assertThat("foo".isEmpty()).isFalse();
   }
 
   AbstractAssert<?, ?> testAssertThatStringContains() {
