@@ -101,31 +101,80 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqual() {
-    assertThat(true).isEqualTo(true);
-    assertThat((byte) 0).isEqualTo((byte) 0);
-    assertThat((char) 0).isEqualTo((char) 0);
-    assertThat((short) 0).isEqualTo((short) 0);
-    assertThat(0).isEqualTo(0);
-    assertThat(0L).isEqualTo(0L);
-    assertThat(0.0F).isEqualTo(0.0F);
-    assertThat(0.0).isEqualTo(0.0);
-    assertThat(new Object()).isEqualTo(new Object());
+    assertThat(true).isEqualTo(false);
+    assertThat(true).isEqualTo(Boolean.FALSE);
+    assertThat(Boolean.TRUE).isEqualTo(false);
+    assertThat(Boolean.TRUE).isEqualTo(Boolean.FALSE);
+    assertThat((byte) 0).isEqualTo((byte) 1);
+    assertThat((byte) 0).isEqualTo(Byte.decode("1"));
+    assertThat(Byte.decode("0")).isEqualTo((byte) 1);
+    assertThat(Byte.decode("0")).isEqualTo(Byte.decode("1"));
+    assertThat('a').isEqualTo('b');
+    assertThat('a').isEqualTo(Character.valueOf('b'));
+    assertThat(Character.valueOf('a')).isEqualTo('b');
+    assertThat(Character.valueOf('a')).isEqualTo(Character.valueOf('b'));
+    assertThat((short) 0).isEqualTo((short) 1);
+    assertThat((short) 0).isEqualTo(Short.decode("1"));
+    assertThat(Short.decode("0")).isEqualTo((short) 1);
+    assertThat(Short.decode("0")).isEqualTo(Short.decode("1"));
+    assertThat(0).isEqualTo(1);
+    assertThat(0).isEqualTo(Integer.valueOf(1));
+    assertThat(Integer.valueOf(0)).isEqualTo(1);
+    assertThat(Integer.valueOf(0)).isEqualTo(Integer.valueOf(1));
+    assertThat(0L).isEqualTo(1L);
+    assertThat(0L).isEqualTo(Long.valueOf(1));
+    assertThat(Long.valueOf(0)).isEqualTo(1L);
+    assertThat(Long.valueOf(0)).isEqualTo(Long.valueOf(1));
+    assertThat(0.0F).isEqualTo(1.0F);
+    assertThat(0.0F).isEqualTo(Float.valueOf(1.0F));
+    assertThat(Float.valueOf(0.0F)).isEqualTo(1.0F);
+    assertThat(Float.valueOf(0.0F)).isEqualTo(Float.valueOf(1.0F));
+    assertThat(0.0).isEqualTo(1.0);
+    assertThat(0.0).isEqualTo(Double.valueOf(1.0));
+    assertThat(Double.valueOf(0.0)).isEqualTo(1.0);
+    assertThat(Double.valueOf(0.0)).isEqualTo(Double.valueOf(1.0));
+    assertThat(new Object()).isEqualTo(new StringBuilder());
     assertThat("actual").isEqualTo("expected");
-    assertThat(ImmutableMap.of()).isEqualTo(ImmutableMap.of());
+    assertThat(ImmutableMap.of()).isEqualTo(ImmutableMap.of(1, 2));
   }
 
   void testAssertEqualWithMessage() {
-    assertThat(true).withFailMessage("foo").isEqualTo(true);
-    assertThat((byte) 0).withFailMessage("bar").isEqualTo((byte) 0);
-    assertThat((char) 0).withFailMessage("baz").isEqualTo((char) 0);
-    assertThat((short) 0).withFailMessage("qux").isEqualTo((short) 0);
-    assertThat(0).withFailMessage("quux").isEqualTo(0);
-    assertThat(0L).withFailMessage("quuz").isEqualTo(0L);
-    assertThat(0.0F).withFailMessage("corge").isEqualTo(0.0F);
-    assertThat(0.0).withFailMessage("grault").isEqualTo(0.0);
-    assertThat(new Object()).withFailMessage("garply").isEqualTo(new Object());
-    assertThat("actual").withFailMessage("waldo").isEqualTo("expected");
-    assertThat(ImmutableMap.of()).withFailMessage("plugh").isEqualTo(ImmutableMap.of());
+    assertThat(true).withFailMessage("foo").isEqualTo(false);
+    assertThat(true).withFailMessage("bar").isEqualTo(Boolean.FALSE);
+    assertThat(Boolean.TRUE).withFailMessage("baz").isEqualTo(false);
+    assertThat(Boolean.TRUE).withFailMessage("qux").isEqualTo(Boolean.FALSE);
+    assertThat((byte) 0).withFailMessage("quux").isEqualTo((byte) 1);
+    assertThat((byte) 0).withFailMessage("corge").isEqualTo(Byte.decode("1"));
+    assertThat(Byte.decode("0")).withFailMessage("grault").isEqualTo((byte) 1);
+    assertThat(Byte.decode("0")).withFailMessage("garply").isEqualTo(Byte.decode("1"));
+    assertThat('a').withFailMessage("waldo").isEqualTo('b');
+    assertThat('a').withFailMessage("fred").isEqualTo(Character.valueOf('b'));
+    assertThat(Character.valueOf('a')).withFailMessage("plugh").isEqualTo('b');
+    assertThat(Character.valueOf('a')).withFailMessage("xyzzy").isEqualTo(Character.valueOf('b'));
+    assertThat((short) 0).withFailMessage("thud").isEqualTo((short) 1);
+    assertThat((short) 0).withFailMessage("foo").isEqualTo(Short.decode("1"));
+    assertThat(Short.decode("0")).withFailMessage("bar").isEqualTo((short) 1);
+    assertThat(Short.decode("0")).withFailMessage("baz").isEqualTo(Short.decode("1"));
+    assertThat(0).withFailMessage("qux").isEqualTo(1);
+    assertThat(0).withFailMessage("quux").isEqualTo(Integer.valueOf(1));
+    assertThat(Integer.valueOf(0)).withFailMessage("corge").isEqualTo(1);
+    assertThat(Integer.valueOf(0)).withFailMessage("grault").isEqualTo(Integer.valueOf(1));
+    assertThat(0L).withFailMessage("garply").isEqualTo(1L);
+    // XXX: Ambiguous method call, as the relevant overload is missing. See testng-team/testng#3199.
+    // assertEquals(0L, Long.valueOf(1), "waldo");
+    assertThat(Long.valueOf(0)).withFailMessage("fred").isEqualTo(1L);
+    assertThat(Long.valueOf(0)).withFailMessage("plugh").isEqualTo(Long.valueOf(1));
+    assertThat(0.0F).withFailMessage("xyzzy").isEqualTo(1.0F);
+    assertThat(0.0F).withFailMessage("thud").isEqualTo(Float.valueOf(1.0F));
+    assertThat(Float.valueOf(0.0F)).withFailMessage("foo").isEqualTo(1.0F);
+    assertThat(Float.valueOf(0.0F)).withFailMessage("bar").isEqualTo(Float.valueOf(1.0F));
+    assertThat(0.0).withFailMessage("baz").isEqualTo(1.0);
+    assertThat(0.0).withFailMessage("qux").isEqualTo(Double.valueOf(1.0));
+    assertThat(Double.valueOf(0.0)).withFailMessage("quux").isEqualTo(1.0);
+    assertThat(Double.valueOf(0.0)).withFailMessage("corge").isEqualTo(Double.valueOf(1.0));
+    assertThat(new Object()).withFailMessage("grault").isEqualTo(new StringBuilder());
+    assertThat("actual").withFailMessage("garply").isEqualTo("expected");
+    assertThat(ImmutableMap.of()).withFailMessage("waldo").isEqualTo(ImmutableMap.of(1, 2));
   }
 
   void testAssertEqualFloatsWithDelta() {
@@ -166,6 +215,22 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(new float[0]).withFailMessage("corge").containsExactly(new float[0]);
     assertThat(new double[0]).withFailMessage("grault").containsExactly(new double[0]);
     assertThat(new Object[0]).withFailMessage("garply").containsExactly(new Object[0]);
+  }
+
+  void testAssertEqualFloatArraysWithDelta() {
+    assertThat(new float[0]).containsExactly(new float[0], offset(0.0F));
+  }
+
+  void testAssertEqualFloatArraysWithDeltaWithMessage() {
+    assertThat(new float[0]).withFailMessage("foo").containsExactly(new float[0], offset(0.0F));
+  }
+
+  void testAssertEqualDoubleArraysWithDelta() {
+    assertThat(new double[0]).containsExactly(new double[0], offset(0.0));
+  }
+
+  void testAssertEqualDoubleArraysWithDeltaWithMessage() {
+    assertThat(new double[0]).withFailMessage("foo").containsExactly(new double[0], offset(0.0));
   }
 
   void testAssertEqualArraysIrrespectiveOfOrder() {
