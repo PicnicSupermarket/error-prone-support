@@ -889,6 +889,38 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer immediately unwrapping {@link Optional} transformation results inside {@link
+   * Flux#mapNotNull(Function)} over more contrived alternatives.
+   */
+  abstract static class FluxMapNotNullTransformationOrElse<T, S> {
+    @Placeholder(allowsIdentity = true)
+    abstract Optional<S> transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux) {
+      return flux.map(v -> transformation(v)).mapNotNull(o -> o.orElse(null));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.mapNotNull(x -> transformation(x).orElse(null));
+    }
+  }
+
+  /** Prefer {@link Flux#mapNotNull(Function)} over more contrived alternatives. */
+  static final class FluxMapNotNullOrElse<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<Optional<T>> flux) {
+      return flux.filter(Optional::isPresent).map(Optional::orElseThrow);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<Optional<T>> flux) {
+      return flux.mapNotNull(x -> x.orElse(null));
+    }
+  }
+
   /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
   static final class MonoFlux<T> {
     @BeforeTemplate
