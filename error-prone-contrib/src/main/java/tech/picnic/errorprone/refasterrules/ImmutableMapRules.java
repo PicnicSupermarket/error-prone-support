@@ -15,6 +15,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,12 +45,28 @@ final class ImmutableMapRules {
     }
   }
 
+  /**
+   * Prefer {@link ImmutableMap.Builder#buildOrThrow()} over the less explicit {@link
+   * ImmutableMap.Builder#build()}.
+   */
+  static final class ImmutableMapBuilderBuildOrThrow<K, V> {
+    @BeforeTemplate
+    ImmutableMap<K, V> before(ImmutableMap.Builder<K, V> builder) {
+      return builder.build();
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(ImmutableMap.Builder<K, V> builder) {
+      return builder.buildOrThrow();
+    }
+  }
+
   /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
   static final class EntryToImmutableMap<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
       return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().put(entry).build(),
+          ImmutableMap.<K, V>builder().put(entry).buildOrThrow(),
           Stream.of(entry).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
@@ -104,16 +121,17 @@ final class ImmutableMapRules {
   /** Prefer {@link ImmutableMap#copyOf(Iterable)} over more contrived alternatives. */
   static final class EntryIterableToImmutableMap<K, V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Map<? extends K, ? extends V> iterable) {
+    Map<K, V> before(Map<? extends K, ? extends V> iterable) {
       return Refaster.anyOf(
           ImmutableMap.copyOf(iterable.entrySet()),
-          ImmutableMap.<K, V>builder().putAll(iterable).build());
+          ImmutableMap.<K, V>builder().putAll(iterable).buildOrThrow(),
+          Map.copyOf(iterable));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().putAll(iterable).build(),
+          ImmutableMap.<K, V>builder().putAll(iterable).buildOrThrow(),
           Streams.stream(iterable).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
@@ -139,8 +157,6 @@ final class ImmutableMapRules {
     @Placeholder(allowsIdentity = true)
     abstract V valueFunction(@MayOptionallyUse E element);
 
-    // XXX: We could add variants in which the entry is created some other way, but we have another
-    // rule that covers canonicalization to `Map.entry`.
     @BeforeTemplate
     ImmutableMap<K, V> before(Stream<E> stream) {
       return stream
@@ -224,7 +240,11 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
-      return Refaster.anyOf(ImmutableMap.<K, V>builder().build(), emptyMap(), Map.of());
+      return Refaster.anyOf(
+          ImmutableMap.<K, V>builder().buildOrThrow(),
+          ImmutableMap.ofEntries(),
+          emptyMap(),
+          Map.of());
     }
 
     @AfterTemplate
@@ -243,7 +263,10 @@ final class ImmutableMapRules {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1) {
       return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().put(k1, v1).build(), singletonMap(k1, v1), Map.of(k1, v1));
+          ImmutableMap.<K, V>builder().put(k1, v1).buildOrThrow(),
+          ImmutableMap.ofEntries(Map.entry(k1, v1)),
+          singletonMap(k1, v1),
+          Map.of(k1, v1));
     }
 
     @AfterTemplate
@@ -261,7 +284,8 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf2<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2) {
-      return Map.of(k1, v1, k2, v2);
+      return Refaster.anyOf(
+          ImmutableMap.ofEntries(Map.entry(k1, v1), Map.entry(k2, v2)), Map.of(k1, v1, k2, v2));
     }
 
     @AfterTemplate
@@ -279,7 +303,9 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf3<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
-      return Map.of(k1, v1, k2, v2, k3, v3);
+      return Refaster.anyOf(
+          ImmutableMap.ofEntries(Map.entry(k1, v1), Map.entry(k2, v2), Map.entry(k3, v3)),
+          Map.of(k1, v1, k2, v2, k3, v3));
     }
 
     @AfterTemplate
@@ -299,7 +325,10 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf4<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-      return Map.of(k1, v1, k2, v2, k3, v3, k4, v4);
+      return Refaster.anyOf(
+          ImmutableMap.ofEntries(
+              Map.entry(k1, v1), Map.entry(k2, v2), Map.entry(k3, v3), Map.entry(k4, v4)),
+          Map.of(k1, v1, k2, v2, k3, v3, k4, v4));
     }
 
     @AfterTemplate
@@ -319,7 +348,14 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf5<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-      return Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
+      return Refaster.anyOf(
+          ImmutableMap.ofEntries(
+              Map.entry(k1, v1),
+              Map.entry(k2, v2),
+              Map.entry(k3, v3),
+              Map.entry(k4, v4),
+              Map.entry(k5, v5)),
+          Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
     }
 
     @AfterTemplate
@@ -367,6 +403,22 @@ final class ImmutableMapRules {
     @AfterTemplate
     ImmutableMap<K, V> after(Map<K, V> map) {
       return ImmutableMap.copyOf(Maps.filterValues(map, v -> valueFilter(v)));
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableMap#ofEntries(Map.Entry[])} over alternatives that don't communicate the
+   * immutability of the resulting map at the type level.
+   */
+  static final class ImmutableMapOfEntries<K, V> {
+    @BeforeTemplate
+    Map<K, V> before(@Repeated Map.Entry<? extends K, ? extends V> entries) {
+      return Map.ofEntries(entries);
+    }
+
+    @AfterTemplate
+    ImmutableMap<K, V> after(@Repeated Map.Entry<? extends K, ? extends V> entries) {
+      return ImmutableMap.ofEntries(entries);
     }
   }
 
