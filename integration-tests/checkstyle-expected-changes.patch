@@ -15402,7 +15402,7 @@
 -    if (name == null) {
 -      throw new IllegalArgumentException(String.format(Locale.ROOT, TOKEN_ID_EXCEPTION_FORMAT, id));
 -    }
-+    checkArgument(name != null, String.format(Locale.ROOT, TOKEN_ID_EXCEPTION_FORMAT, id));
++    checkArgument(name != null, TOKEN_ID_EXCEPTION_FORMAT, id);
      return name;
    }
  
@@ -15414,11 +15414,11 @@
 -      throw new IllegalArgumentException(
 -          String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
 -    }
-+    checkArgument(id != null, String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
++    checkArgument(id != null, TOKEN_NAME_EXCEPTION_FORMAT, name);
      return id;
    }
  
-@@ -165,10 +163,9 @@ public final class TokenUtil {
+@@ -165,10 +163,7 @@ public final class TokenUtil {
     * @throws IllegalArgumentException when name is unknown
     */
    public static String getShortDescription(String name) {
@@ -15426,13 +15426,11 @@
 -      throw new IllegalArgumentException(
 -          String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
 -    }
-+    checkArgument(
-+        TOKEN_NAME_TO_VALUE.containsKey(name),
-+        String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
++    checkArgument(TOKEN_NAME_TO_VALUE.containsKey(name), TOKEN_NAME_EXCEPTION_FORMAT, name);
  
      final String tokenTypes = "com.puppycrawl.tools.checkstyle.api.tokentypes";
      final ResourceBundle bundle = ResourceBundle.getBundle(tokenTypes, Locale.ROOT);
-@@ -344,7 +341,7 @@ public final class TokenUtil {
+@@ -344,7 +339,7 @@ public final class TokenUtil {
    public static BitSet asBitSet(String... tokens) {
      return Arrays.stream(tokens)
          .map(String::trim)

@@ -63,9 +63,11 @@ public final class SourceCode {
    *     found.
    * @return A non-{@code null} string.
    * @apiNote This method differs from {@link com.sun.tools.javac.util.Constants#format(Object)} in
-   *     that it does not superfluously escape single quote characters. It is different from {@link
+   *     that it does not superfluously escape single quote characters (the latter only does the
+   *     "clean thing" starting from JDK 23). It is different from {@link
    *     VisitorState#getConstantExpression(Object)} in that it is more performant and accepts any
    *     {@link CharSequence} instance.
+   * @see <a href="https://bugs.openjdk.org/browse/JDK-8325078">JDK-8325078</a>
    */
   // XXX: Drop this method if https://github.com/google/error-prone/pull/4586 is merged and released
   // with the proposed `CharSequence` compatibility change.

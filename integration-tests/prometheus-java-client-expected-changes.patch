@@ -5968,7 +5968,7 @@
  import static io.prometheus.metrics.instrumentation.dropwizard5.labels.MapperConfig.METRIC_GLOB_REGEX;
  
  import java.util.HashMap;
-@@ -32,10 +33,9 @@ class GraphiteNamePattern {
+@@ -32,10 +33,11 @@ class GraphiteNamePattern {
     * @param pattern The glob style pattern to be used.
     */
    GraphiteNamePattern(final String pattern) throws IllegalArgumentException {
@@ -5978,11 +5978,13 @@
 -    }
 +    checkArgument(
 +        VALIDATION_PATTERN.matcher(pattern).matches(),
-+        String.format("Provided pattern [%s] does not matches [%s]", pattern, METRIC_GLOB_REGEX));
++        "Provided pattern [%s] does not matches [%s]",
++        pattern,
++        METRIC_GLOB_REGEX);
      initializePattern(pattern);
    }
  
-@@ -84,7 +84,7 @@ class GraphiteNamePattern {
+@@ -84,7 +86,7 @@ class GraphiteNamePattern {
        escapedPattern.append("([^.]*)").append(quoted);
      }
  
@@ -6001,7 +6003,7 @@
  import java.util.HashMap;
  import java.util.Map;
  import java.util.regex.Pattern;
-@@ -106,21 +108,19 @@ public final class MapperConfig {
+@@ -106,21 +108,21 @@ public final class MapperConfig {
    }
  
    private void validateMatch(final String match) {
@@ -6013,9 +6015,9 @@
 -    }
 +    checkArgument(
 +        MATCH_EXPRESSION_PATTERN.matcher(match).matches(),
-+        String.format(
-+            "Match expression [%s] does not match required pattern %s",
-+            match, MATCH_EXPRESSION_PATTERN));
++        "Match expression [%s] does not match required pattern %s",
++        match,
++        MATCH_EXPRESSION_PATTERN);
    }
  
    private void validateLabels(final Map<String, String> labels) {
@@ -6027,11 +6029,13 @@
 -        }
 +        checkArgument(
 +            LABEL_PATTERN.matcher(key).matches(),
-+            String.format("Label [%s] does not match required pattern %s", match, LABEL_PATTERN));
++            "Label [%s] does not match required pattern %s",
++            match,
++            LABEL_PATTERN);
        }
      }
    }
-@@ -149,7 +149,6 @@ public final class MapperConfig {
+@@ -149,7 +151,6 @@ public final class MapperConfig {
    public int hashCode() {
      int result = match != null ? match.hashCode() : 0;
      result = 31 * result + (name != null ? name.hashCode() : 0);
