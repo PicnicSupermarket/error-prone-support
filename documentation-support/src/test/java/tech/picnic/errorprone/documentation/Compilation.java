@@ -14,21 +14,29 @@ import java.util.List;
 import javax.tools.Diagnostic;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
+import org.intellij.lang.annotations.Language;
 
 // XXX: Generalize and move this class so that it can also be used by `refaster-compiler`.
-// XXX: This class is supported by the `ErrorProneTestHelperSourceFormat` check, but until that
-// support is covered by unit tests, make sure to update that logic if this class or its methods are
+// XXX: This class is supported by the `TestHelperSourceFormat` check, but until that support is
+// covered by unit tests, make sure to update that logic if this class or its methods are
 // moved/renamed.
 public final class Compilation {
   private Compilation() {}
 
+  // XXX: Drop this method in favour of only supporting the text block-accepting variant.
   public static void compileWithDocumentationGenerator(
-      Path outputDirectory, String path, String... lines) {
-    compileWithDocumentationGenerator(outputDirectory.toAbsolutePath().toString(), path, lines);
+      Path outputDirectory, String path, @Language("JAVA") String... source) {
+    compileWithDocumentationGenerator(
+        outputDirectory.toAbsolutePath().toString(), path, String.join("\n", source));
   }
 
   public static void compileWithDocumentationGenerator(
-      String outputDirectory, String path, String... lines) {
+      Path outputDirectory, String path, @Language("JAVA") String source) {
+    compileWithDocumentationGenerator(outputDirectory.toAbsolutePath().toString(), path, source);
+  }
+
+  public static void compileWithDocumentationGenerator(
+      String outputDirectory, String path, @Language("JAVA") String source) {
     /*
      * The compiler options specified here largely match those used by Error Prone's
      * `CompilationTestHelper`. A key difference is the stricter linting configuration. When
@@ -49,7 +57,7 @@ public final class Compilation {
             "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory,
             "-XDdev",
             "-XDcompilePolicy=simple"),
-        FileObjects.forSourceLines(path, lines));
+        FileObjects.forSourceLines(path, source));
   }
 
   private static void compile(ImmutableList<String> options, JavaFileObject javaFileObject) {

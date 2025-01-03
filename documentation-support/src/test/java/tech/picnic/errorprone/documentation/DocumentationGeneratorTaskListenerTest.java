@@ -62,15 +62,26 @@ final class DocumentationGeneratorTaskListenerTest {
     assertThatThrownBy(
             () ->
                 Compilation.compileWithDocumentationGenerator(
-                    outputDirectory, "A.java", "class A {}"))
+                    outputDirectory,
+                    "A.java",
+                    """
+                    class A {}
+                    """))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith("Error while creating directory with path '%s'", outputDirectory);
   }
 
+  // XXX: For this case the text block conversion introduces too much indentation. (Possibly i.c.w.
+  // post-processing by GJF; TBD.)
   @Test
   void noClassNoOutput(@TempDir Path outputDirectory) {
-    Compilation.compileWithDocumentationGenerator(outputDirectory, "A.java", "package pkg;");
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "A.java",
+        """
+            package pkg;
+            """);
 
     assertThat(outputDirectory).isEmptyDirectory();
   }
@@ -81,7 +92,11 @@ final class DocumentationGeneratorTaskListenerTest {
     assertThatThrownBy(
             () ->
                 Compilation.compileWithDocumentationGenerator(
-                    actualOutputDirectory, "A.java", "package pkg;"))
+                    actualOutputDirectory,
+                    "A.java",
+                    """
+                    package pkg;
+                    """))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");
   }
@@ -91,7 +106,9 @@ final class DocumentationGeneratorTaskListenerTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "DocumentationGeneratorTaskListenerTestClass.java",
-        "class DocumentationGeneratorTaskListenerTestClass {}");
+        """
+        class DocumentationGeneratorTaskListenerTestClass {}
+        """);
 
     assertThat(
             outputDirectory.resolve(

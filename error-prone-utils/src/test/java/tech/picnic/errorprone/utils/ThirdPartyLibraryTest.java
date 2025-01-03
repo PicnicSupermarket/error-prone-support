@@ -24,8 +24,10 @@ final class ThirdPartyLibraryTest {
     CompilationTestHelper.newInstance(IsIntroductionAllowedTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, REACTOR: true",
-            "class A {}")
+            """
+            // BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, REACTOR: true
+            class A {}
+            """)
         .doTest();
   }
 
@@ -34,18 +36,20 @@ final class ThirdPartyLibraryTest {
     CompilationTestHelper.newInstance(IsIntroductionAllowedTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "import org.assertj.core.api.Assertions;",
-            "import reactor.core.publisher.Flux;",
-            "",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, REACTOR: true",
-            "class A {",
-            "  void m(Class<?> clazz) {",
-            "    m(Assertions.class);",
-            "    m(ImmutableList.class);",
-            "    m(Flux.class);",
-            "  }",
-            "}")
+            """
+            import com.google.common.collect.ImmutableList;
+            import org.assertj.core.api.Assertions;
+            import reactor.core.publisher.Flux;
+
+            // BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, REACTOR: true
+            class A {
+              void m(Class<?> clazz) {
+                m(Assertions.class);
+                m(ImmutableList.class);
+                m(Flux.class);
+              }
+            }
+            """)
         .doTest();
   }
 
@@ -55,8 +59,10 @@ final class ThirdPartyLibraryTest {
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, REACTOR: true",
-            "class A {}")
+            """
+            // BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, REACTOR: true
+            class A {}
+            """)
         .doTest();
   }
 
@@ -66,9 +72,11 @@ final class ThirdPartyLibraryTest {
         .withClasspath()
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, REACTOR:",
-            "// false",
-            "class A {}")
+            """
+            // BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, REACTOR:
+            // false
+            class A {}
+            """)
         .doTest();
   }
 
@@ -92,9 +100,11 @@ final class ThirdPartyLibraryTest {
     CompilationTestHelper.newInstance(CanIntroduceUsageTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: GUAVA_PUBLIC: true, GUAVA_PRIVATE: false, ERROR_PRONE_PUBLIC_NESTED:",
-            "// true",
-            "class A {}")
+            """
+            // BUG: Diagnostic contains: GUAVA_PUBLIC: true, GUAVA_PRIVATE: false, ERROR_PRONE_PUBLIC_NESTED:
+            // true
+            class A {}
+            """)
         .doTest();
   }
 

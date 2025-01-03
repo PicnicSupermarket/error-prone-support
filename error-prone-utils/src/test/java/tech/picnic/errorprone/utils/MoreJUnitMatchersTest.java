@@ -27,56 +27,58 @@ final class MoreJUnitMatchersTest {
     CompilationTestHelper.newInstance(MethodMatchersTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import static org.junit.jupiter.params.provider.Arguments.arguments;",
-            "",
-            "import java.util.stream.Stream;",
-            "import org.junit.jupiter.api.AfterAll;",
-            "import org.junit.jupiter.api.AfterEach;",
-            "import org.junit.jupiter.api.BeforeAll;",
-            "import org.junit.jupiter.api.BeforeEach;",
-            "import org.junit.jupiter.api.RepeatedTest;",
-            "import org.junit.jupiter.api.Test;",
-            "import org.junit.jupiter.params.ParameterizedTest;",
-            "import org.junit.jupiter.params.provider.Arguments;",
-            "import org.junit.jupiter.params.provider.MethodSource;",
-            "",
-            "class A {",
-            "  @BeforeAll",
-            "  // BUG: Diagnostic contains: SETUP_OR_TEARDOWN_METHOD",
-            "  public void beforeAll() {}",
-            "",
-            "  @BeforeEach",
-            "  @Test",
-            "  // BUG: Diagnostic contains: TEST_METHOD, SETUP_OR_TEARDOWN_METHOD",
-            "  protected void beforeEachAndTest() {}",
-            "",
-            "  @AfterEach",
-            "  // BUG: Diagnostic contains: SETUP_OR_TEARDOWN_METHOD",
-            "  private void afterEach() {}",
-            "",
-            "  @AfterAll",
-            "  // BUG: Diagnostic contains: SETUP_OR_TEARDOWN_METHOD",
-            "  private void afterAll() {}",
-            "",
-            "  @Test",
-            "  // BUG: Diagnostic contains: TEST_METHOD",
-            "  void test() {}",
-            "",
-            "  private static Stream<Arguments> booleanArgs() {",
-            "    return Stream.of(arguments(false), arguments(true));",
-            "  }",
-            "",
-            "  @ParameterizedTest",
-            "  @MethodSource(\"booleanArgs\")",
-            "  // BUG: Diagnostic contains: TEST_METHOD, HAS_METHOD_SOURCE",
-            "  void parameterizedTest(boolean b) {}",
-            "",
-            "  @RepeatedTest(2)",
-            "  // BUG: Diagnostic contains: TEST_METHOD",
-            "  private void repeatedTest() {}",
-            "",
-            "  private void unannotatedMethod() {}",
-            "}")
+            """
+            import static org.junit.jupiter.params.provider.Arguments.arguments;
+
+            import java.util.stream.Stream;
+            import org.junit.jupiter.api.AfterAll;
+            import org.junit.jupiter.api.AfterEach;
+            import org.junit.jupiter.api.BeforeAll;
+            import org.junit.jupiter.api.BeforeEach;
+            import org.junit.jupiter.api.RepeatedTest;
+            import org.junit.jupiter.api.Test;
+            import org.junit.jupiter.params.ParameterizedTest;
+            import org.junit.jupiter.params.provider.Arguments;
+            import org.junit.jupiter.params.provider.MethodSource;
+
+            class A {
+              @BeforeAll
+              // BUG: Diagnostic contains: SETUP_OR_TEARDOWN_METHOD
+              public void beforeAll() {}
+
+              @BeforeEach
+              @Test
+              // BUG: Diagnostic contains: TEST_METHOD, SETUP_OR_TEARDOWN_METHOD
+              protected void beforeEachAndTest() {}
+
+              @AfterEach
+              // BUG: Diagnostic contains: SETUP_OR_TEARDOWN_METHOD
+              private void afterEach() {}
+
+              @AfterAll
+              // BUG: Diagnostic contains: SETUP_OR_TEARDOWN_METHOD
+              private void afterAll() {}
+
+              @Test
+              // BUG: Diagnostic contains: TEST_METHOD
+              void test() {}
+
+              private static Stream<Arguments> booleanArgs() {
+                return Stream.of(arguments(false), arguments(true));
+              }
+
+              @ParameterizedTest
+              @MethodSource("booleanArgs")
+              // BUG: Diagnostic contains: TEST_METHOD, HAS_METHOD_SOURCE
+              void parameterizedTest(boolean b) {}
+
+              @RepeatedTest(2)
+              // BUG: Diagnostic contains: TEST_METHOD
+              private void repeatedTest() {}
+
+              private void unannotatedMethod() {}
+            }
+            """)
         .doTest();
   }
 
@@ -85,32 +87,34 @@ final class MoreJUnitMatchersTest {
     CompilationTestHelper.newInstance(MethodSourceFactoryNamesTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import org.junit.jupiter.params.provider.MethodSource;",
-            "",
-            "class A {",
-            "  @MethodSource",
-            "  // BUG: Diagnostic contains: [matchingMethodSource]",
-            "  void matchingMethodSource(boolean b) {}",
-            "",
-            "  @MethodSource(\"myValueFactory\")",
-            "  // BUG: Diagnostic contains: [myValueFactory]",
-            "  void singleCustomMethodSource(boolean b) {}",
-            "",
-            "  @MethodSource({",
-            "    \"nullary()\",",
-            "    \"nullary()\",",
-            "    \"\",",
-            "    \"withStringParam(java.lang.String)\",",
-            "    \"paramsUnspecified\"",
-            "  })",
-            "  // BUG: Diagnostic contains: [nullary, nullary, multipleMethodSources, withStringParam,",
-            "  // paramsUnspecified]",
-            "  void multipleMethodSources(boolean b) {}",
-            "",
-            "  @MethodSource({\"foo\", \"()\", \"bar\"})",
-            "  // BUG: Diagnostic contains: [foo, , bar]",
-            "  void methodSourceWithoutName(boolean b) {}",
-            "}")
+            """
+            import org.junit.jupiter.params.provider.MethodSource;
+
+            class A {
+              @MethodSource
+              // BUG: Diagnostic contains: [matchingMethodSource]
+              void matchingMethodSource(boolean b) {}
+
+              @MethodSource("myValueFactory")
+              // BUG: Diagnostic contains: [myValueFactory]
+              void singleCustomMethodSource(boolean b) {}
+
+              @MethodSource({
+                "nullary()",
+                "nullary()",
+                "",
+                "withStringParam(java.lang.String)",
+                "paramsUnspecified"
+              })
+              // BUG: Diagnostic contains: [nullary, nullary, multipleMethodSources, withStringParam,
+              // paramsUnspecified]
+              void multipleMethodSources(boolean b) {}
+
+              @MethodSource({"foo", "()", "bar"})
+              // BUG: Diagnostic contains: [foo, , bar]
+              void methodSourceWithoutName(boolean b) {}
+            }
+            """)
         .doTest();
   }
 
@@ -119,49 +123,51 @@ final class MoreJUnitMatchersTest {
     CompilationTestHelper.newInstance(MethodSourceFactoryDescriptorsTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "import org.junit.jupiter.params.provider.MethodSource;",
-            "",
-            "class A {",
-            "  @MethodSource",
-            "  // BUG: Diagnostic contains: [matchingMethodSource]",
-            "  void matchingMethodSource(boolean b) {}",
-            "",
-            "  @MethodSource()",
-            "  // BUG: Diagnostic contains: [matchingMethodSourceWithParens]",
-            "  void matchingMethodSourceWithParens(boolean b) {}",
-            "",
-            "  @MethodSource(\"\")",
-            "  // BUG: Diagnostic contains: [matchingMethodSourceMadeExplicit]",
-            "  void matchingMethodSourceMadeExplicit(boolean b) {}",
-            "",
-            "  @MethodSource({\"\"})",
-            "  // BUG: Diagnostic contains: [matchingMethodSourceMadeExplicitWithParens]",
-            "  void matchingMethodSourceMadeExplicitWithParens(boolean b) {}",
-            "",
-            "  @MethodSource({})",
-            "  // BUG: Diagnostic contains: []",
-            "  void noMethodSources(boolean b) {}",
-            "",
-            "  @MethodSource(\"myValueFactory\")",
-            "  // BUG: Diagnostic contains: [myValueFactory]",
-            "  void singleCustomMethodSource(boolean b) {}",
-            "",
-            "  @MethodSource({\"firstValueFactory\", \"secondValueFactory\"})",
-            "  // BUG: Diagnostic contains: [firstValueFactory, secondValueFactory]",
-            "  void twoCustomMethodSources(boolean b) {}",
-            "",
-            "  @MethodSource({\"myValueFactory\", \"\"})",
-            "  // BUG: Diagnostic contains: [myValueFactory, customAndMatchingMethodSources]",
-            "  void customAndMatchingMethodSources(boolean b) {}",
-            "",
-            "  @MethodSource({\"factory\", \"\", \"factory\", \"\"})",
-            "  // BUG: Diagnostic contains: [factory, repeatedMethodSources, factory, repeatedMethodSources]",
-            "  void repeatedMethodSources(boolean b) {}",
-            "",
-            "  @MethodSource({\"nullary()\", \"withStringParam(java.lang.String)\"})",
-            "  // BUG: Diagnostic contains: [nullary(), withStringParam(java.lang.String)]",
-            "  void methodSourcesWithParameterSpecification(boolean b) {}",
-            "}")
+            """
+            import org.junit.jupiter.params.provider.MethodSource;
+
+            class A {
+              @MethodSource
+              // BUG: Diagnostic contains: [matchingMethodSource]
+              void matchingMethodSource(boolean b) {}
+
+              @MethodSource()
+              // BUG: Diagnostic contains: [matchingMethodSourceWithParens]
+              void matchingMethodSourceWithParens(boolean b) {}
+
+              @MethodSource("")
+              // BUG: Diagnostic contains: [matchingMethodSourceMadeExplicit]
+              void matchingMethodSourceMadeExplicit(boolean b) {}
+
+              @MethodSource({""})
+              // BUG: Diagnostic contains: [matchingMethodSourceMadeExplicitWithParens]
+              void matchingMethodSourceMadeExplicitWithParens(boolean b) {}
+
+              @MethodSource({})
+              // BUG: Diagnostic contains: []
+              void noMethodSources(boolean b) {}
+
+              @MethodSource("myValueFactory")
+              // BUG: Diagnostic contains: [myValueFactory]
+              void singleCustomMethodSource(boolean b) {}
+
+              @MethodSource({"firstValueFactory", "secondValueFactory"})
+              // BUG: Diagnostic contains: [firstValueFactory, secondValueFactory]
+              void twoCustomMethodSources(boolean b) {}
+
+              @MethodSource({"myValueFactory", ""})
+              // BUG: Diagnostic contains: [myValueFactory, customAndMatchingMethodSources]
+              void customAndMatchingMethodSources(boolean b) {}
+
+              @MethodSource({"factory", "", "factory", ""})
+              // BUG: Diagnostic contains: [factory, repeatedMethodSources, factory, repeatedMethodSources]
+              void repeatedMethodSources(boolean b) {}
+
+              @MethodSource({"nullary()", "withStringParam(java.lang.String)"})
+              // BUG: Diagnostic contains: [nullary(), withStringParam(java.lang.String)]
+              void methodSourcesWithParameterSpecification(boolean b) {}
+            }
+            """)
         .doTest();
   }
 
