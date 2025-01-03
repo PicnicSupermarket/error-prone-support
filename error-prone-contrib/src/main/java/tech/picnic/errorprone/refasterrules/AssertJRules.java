@@ -362,13 +362,13 @@ final class AssertJRules {
 
   static final class AssertThatListsAreEqual<S, T extends S> {
     @BeforeTemplate
-    ListAssert<S> before(List<S> list1, List<T> list2) {
+    ListAssert<S> before(List<S> list1, Iterable<T> list2) {
       return assertThat(list1).isEqualTo(list2);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(List<S> list1, List<T> list2) {
+    ListAssert<S> after(List<S> list1, Iterable<T> list2) {
       return assertThat(list1).containsExactlyElementsOf(list2);
     }
   }
@@ -379,7 +379,7 @@ final class AssertJRules {
 
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Set<T> set2) {
+    AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Iterable<T> set2) {
       return Refaster.anyOf(
           assertThat(set1).isEqualTo(set2),
           assertThat(set1).containsExactlyInAnyOrderElementsOf(set2));
@@ -387,7 +387,7 @@ final class AssertJRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Set<T> set2) {
+    AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Iterable<T> set2) {
       return assertThat(set1).hasSameElementsAs(set2);
     }
   }
@@ -398,13 +398,13 @@ final class AssertJRules {
 
   static final class AssertThatMultisetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Multiset<T> multiset2) {
+    AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Iterable<T> multiset2) {
       return assertThat(multiset1).isEqualTo(multiset2);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Multiset<T> multiset2) {
+    AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Iterable<T> multiset2) {
       return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
     }
   }

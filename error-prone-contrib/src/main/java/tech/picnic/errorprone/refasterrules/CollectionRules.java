@@ -158,14 +158,14 @@ final class CollectionRules {
     }
   }
 
-  static final class SetRemoveAllCollection<T, S extends T> {
+  static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Set<T> removeFrom, Collection<S> elementsToRemove) {
+    void before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
       elementsToRemove.forEach(removeFrom::remove);
     }
 
     @BeforeTemplate
-    void before2(Set<T> removeFrom, Collection<S> elementsToRemove) {
+    void before2(Collection<T> removeFrom, Collection<S> elementsToRemove) {
       for (T element : elementsToRemove) {
         removeFrom.remove(element);
       }
@@ -175,14 +175,14 @@ final class CollectionRules {
     // that this is supported out of the box. After doing so, also drop the `S extends T` type
     // constraint; ideally this check applies to any `S`.
     @BeforeTemplate
-    void before3(Set<T> removeFrom, Collection<S> elementsToRemove) {
+    void before3(Collection<T> removeFrom, Collection<S> elementsToRemove) {
       for (S element : elementsToRemove) {
         removeFrom.remove(element);
       }
     }
 
     @AfterTemplate
-    void after(Set<T> removeFrom, Collection<S> elementsToRemove) {
+    void after(Collection<T> removeFrom, Collection<S> elementsToRemove) {
       removeFrom.removeAll(elementsToRemove);
     }
   }

@@ -121,18 +121,18 @@ final class AssortedRules {
    */
   static final class DisjointSets<T> {
     @BeforeTemplate
-    boolean before(Set<T> set1, Set<T> set2) {
-      return Sets.intersection(set1, set2).isEmpty();
+    boolean before(Set<T> collection1, Set<T> collection2) {
+      return Sets.intersection(collection1, collection2).isEmpty();
     }
 
     @BeforeTemplate
-    boolean before2(Set<T> set1, Set<T> set2) {
-      return set1.stream().noneMatch(set2::contains);
+    boolean before2(Collection<T> collection1, Collection<T> collection2) {
+      return collection1.stream().noneMatch(collection2::contains);
     }
 
     @AfterTemplate
-    boolean after(Set<T> set1, Set<T> set2) {
-      return disjoint(set1, set2);
+    boolean after(Collection<T> collection1, Collection<T> collection2) {
+      return disjoint(collection1, collection2);
     }
   }
 

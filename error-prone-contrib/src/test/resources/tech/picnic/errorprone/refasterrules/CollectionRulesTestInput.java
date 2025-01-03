@@ -62,7 +62,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return Iterables.removeAll(new ArrayList<>(), ImmutableSet.of("foo"));
   }
 
-  void testSetRemoveAllCollection() {
+  void testCollectionRemoveAllFromCollectionBlock() {
     ImmutableSet.of("foo").forEach(new HashSet<>()::remove);
     for (Number element : ImmutableList.of(1)) {
       new HashSet<Number>().remove(element);

@@ -373,14 +373,14 @@ final class ImmutableMapRules {
     abstract boolean keyFilter(@MayOptionallyUse K key);
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(ImmutableMap<K, V> map) {
+    ImmutableMap<K, V> before(Map<K, V> map) {
       return map.entrySet().stream()
           .filter(e -> keyFilter(e.getKey()))
           .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(ImmutableMap<K, V> map) {
+    ImmutableMap<K, V> after(Map<K, V> map) {
       return ImmutableMap.copyOf(Maps.filterKeys(map, k -> keyFilter(k)));
     }
   }
@@ -394,14 +394,14 @@ final class ImmutableMapRules {
     abstract boolean valueFilter(@MayOptionallyUse V value);
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(ImmutableMap<K, V> map) {
+    ImmutableMap<K, V> before(Map<K, V> map) {
       return map.entrySet().stream()
           .filter(e -> valueFilter(e.getValue()))
           .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(ImmutableMap<K, V> map) {
+    ImmutableMap<K, V> after(Map<K, V> map) {
       return ImmutableMap.copyOf(Maps.filterValues(map, v -> valueFilter(v)));
     }
   }

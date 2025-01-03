@@ -32,19 +32,6 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringIsEmpty {
-    @BeforeTemplate
-    void before(String string) {
-      assertThat(string.isEmpty()).isTrue();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(String string) {
-      assertThat(string).isEmpty();
-    }
-  }
-
   static final class AbstractStringAssertStringIsNotEmpty {
     @BeforeTemplate
     AbstractStringAssert<?> before(AbstractStringAssert<?> stringAssert) {
@@ -57,41 +44,28 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringIsNotEmpty {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(String string) {
-      return assertThat(string.isEmpty()).isFalse();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string) {
-      return assertThat(string).isNotEmpty();
-    }
-  }
-
   static final class AssertThatStringContains {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String substring) {
+    AbstractBooleanAssert<?> before(String string, CharSequence substring) {
       return assertThat(string.contains(substring)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String substring) {
+    AbstractStringAssert<?> after(String string, CharSequence substring) {
       return assertThat(string).contains(substring);
     }
   }
 
   static final class AssertThatStringDoesNotContain {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String substring) {
+    AbstractBooleanAssert<?> before(String string, CharSequence substring) {
       return assertThat(string.contains(substring)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String substring) {
+    AbstractStringAssert<?> after(String string, CharSequence substring) {
       return assertThat(string).doesNotContain(substring);
     }
   }
