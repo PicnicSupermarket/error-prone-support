@@ -5,13 +5,13 @@
         <profile>
             <!-- The build defines an optional `error-prone-fork` profile using
             which the code is built against a Picnic-managed fork of Error
-            Prone. This fork is hosted by Jitpack.io. See
-            https://jitpack.io/#PicnicSupermarket/error-prone. -->
+            Prone. This fork is hosted using GitHub Packages. See
+            https://github.com/PicnicSupermarket/error-prone/packages. -->
             <id>error-prone-fork</id>
             <repositories>
                 <repository>
-                    <id>jitpack.io</id>
-                    <url>https://jitpack.io</url>
+                    <id>error-prone-fork</id>
+                    <url>https://maven.pkg.github.com/PicnicSupermarket/error-prone</url>
                 </repository>
             </repositories>
         </profile>
@@ -29,4 +29,11 @@
         </profile>
     </profiles>
 
+    <servers>
+        <server>
+            <id>error-prone-fork</id>
+            <username>${env.GITHUB_ACTOR}</username>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+    </servers>
 </settings>

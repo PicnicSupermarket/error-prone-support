@@ -16,19 +16,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_check_api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_core</artifactId>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
         </dependency>
@@ -36,6 +23,19 @@
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_check_api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
