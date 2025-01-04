@@ -113,7 +113,7 @@
             -Xmx${argLine.xmx}
             <!-- Configure the Byte Buddy Java agent used by Mockito to create
             mocks. -->
-            -javaagent:${org.mockito:mockito-core:jar}
+            -javaagent:${project.build.directory}/test-agents/mockito-core.jar
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -1045,10 +1045,16 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>set-additional-properties</id>
+                            <id>copy-test-agents</id>
                             <goals>
-                                <goal>properties</goal>
+                                <goal>copy-dependencies</goal>
                             </goals>
+                            <configuration>
+                                <includeGroupIds>org.mockito</includeGroupIds>
+                                <includeArtifactIds>mockito-core</includeArtifactIds>
+                                <stripVersion>true</stripVersion>
+                                <outputDirectory>${project.build.directory}/test-agents</outputDirectory>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
