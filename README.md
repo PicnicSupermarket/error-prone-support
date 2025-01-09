@@ -235,8 +235,9 @@ Other highly relevant commands:
   against _all_ code in the current working directory. For more information
   check the [PIT Maven plugin][pitest-maven].
 
-When running the project's tests in IntelliJ IDEA, you might see the following
-error:
+Opening the project in IntelliJ IDEA may require running `mvn clean install`
+first. Additionally, when running the project's tests using the IDE, you might
+see the following error:
 
 ```
 java: exporting a package from system module jdk.compiler is not allowed with --release
