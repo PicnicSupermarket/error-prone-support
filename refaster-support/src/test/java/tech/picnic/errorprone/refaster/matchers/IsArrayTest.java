@@ -13,38 +13,40 @@ final class IsArrayTest {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "class A {",
-            "  Object negative1() {",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  String negative2() {",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  int negative3() {",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  Object[] positive1() {",
-            "    // BUG: Diagnostic contains:",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  String[] positive2() {",
-            "    // BUG: Diagnostic contains:",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  int[] positive3() {",
-            "    // BUG: Diagnostic contains:",
-            "    return alwaysNull();",
-            "  }",
-            "",
-            "  private static <T> T alwaysNull() {",
-            "    return null;",
-            "  }",
-            "}")
+            """
+            class A {
+              Object negative1() {
+                return alwaysNull();
+              }
+
+              String negative2() {
+                return alwaysNull();
+              }
+
+              int negative3() {
+                return alwaysNull();
+              }
+
+              Object[] positive1() {
+                // BUG: Diagnostic contains:
+                return alwaysNull();
+              }
+
+              String[] positive2() {
+                // BUG: Diagnostic contains:
+                return alwaysNull();
+              }
+
+              int[] positive3() {
+                // BUG: Diagnostic contains:
+                return alwaysNull();
+              }
+
+              private static <T> T alwaysNull() {
+                return null;
+              }
+            }
+            """)
         .doTest();
   }
 

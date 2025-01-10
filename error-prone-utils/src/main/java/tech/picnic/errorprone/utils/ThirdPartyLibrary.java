@@ -86,6 +86,10 @@ public enum ThirdPartyLibrary {
    *
    * <p>The {@link VisitorState}'s symbol table is consulted first. If the type has not yet been
    * loaded, then an attempt is made to do so.
+   *
+   * @param typeName The type of interest.
+   * @param state The context under consideration.
+   * @return {@code true} iff the indicated type is on the classpath.
    */
   private static boolean isKnownClass(String typeName, VisitorState state) {
     return isPublicClassInSymbolTable(typeName, state) || canLoadPublicClass(typeName, state);

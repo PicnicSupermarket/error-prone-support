@@ -465,6 +465,11 @@
                 <version>2.10.1</version>
             </dependency>
             <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>24.1.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq</artifactId>
                 <version>3.19.17</version>
@@ -1979,6 +1984,11 @@
                                     -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
+                                    <!-- XXX: This check makes vacuous
+                                    suggestions; investigate and report
+                                    upstream. Additionally, we have
+                                    `TestHelperSourceFormat`. -->
+                                    -Xep:MisformattedTestData:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
                                     <!-- We generally discourage `var` use. -->

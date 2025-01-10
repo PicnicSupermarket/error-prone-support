@@ -16,7 +16,11 @@ final class RefasterRuleCollectionTestExtractorTest {
   @Test
   void noRefasterRuleTest(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
-        outputDirectory, "NoRefasterRuleTest.java", "public final class NoRefasterRuleTest {}");
+        outputDirectory,
+        "NoRefasterRuleTest.java",
+        """
+        public final class NoRefasterRuleTest {}
+        """);
 
     assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
@@ -28,9 +32,11 @@ final class RefasterRuleCollectionTestExtractorTest {
                 Compilation.compileWithDocumentationGenerator(
                     outputDirectory,
                     "InvalidTestClassNameInput.java",
-                    "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-                    "",
-                    "final class InvalidTestClassName implements RefasterRuleCollectionTestCase {}"))
+                    """
+                    import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+
+                    final class InvalidTestClassName implements RefasterRuleCollectionTestCase {}
+                    """))
         .cause()
         .isInstanceOf(VerifyException.class)
         .hasMessage(
@@ -44,9 +50,11 @@ final class RefasterRuleCollectionTestExtractorTest {
                 Compilation.compileWithDocumentationGenerator(
                     outputDirectory,
                     "InvalidFileNameTest.java",
-                    "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-                    "",
-                    "final class InvalidFileNameTest implements RefasterRuleCollectionTestCase {}"))
+                    """
+                    import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+
+                    final class InvalidFileNameTest implements RefasterRuleCollectionTestCase {}
+                    """))
         .cause()
         .isInstanceOf(VerifyException.class)
         .hasMessage(
@@ -58,9 +66,11 @@ final class RefasterRuleCollectionTestExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "EmptyRefasterRuleCollectionTestInput.java",
-        "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-        "",
-        "final class EmptyRefasterRuleCollectionTest implements RefasterRuleCollectionTestCase {}");
+        """
+        import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+
+        final class EmptyRefasterRuleCollectionTest implements RefasterRuleCollectionTestCase {}
+        """);
 
     verifyGeneratedFileContent(
         outputDirectory,
@@ -77,13 +87,15 @@ final class RefasterRuleCollectionTestExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "SingletonRefasterRuleCollectionTestOutput.java",
-        "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-        "",
-        "final class SingletonRefasterRuleCollectionTest implements RefasterRuleCollectionTestCase {",
-        "  int testMyRule() {",
-        "    return 42;",
-        "  }",
-        "}");
+        """
+        import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+
+        final class SingletonRefasterRuleCollectionTest implements RefasterRuleCollectionTestCase {
+          int testMyRule() {
+            return 42;
+          }
+        }
+        """);
 
     verifyGeneratedFileContent(
         outputDirectory,
@@ -106,31 +118,33 @@ final class RefasterRuleCollectionTestExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "pkg/ComplexRefasterRuleCollectionTestInput.java",
-        "package pkg;",
-        "",
-        "import com.google.common.collect.ImmutableSet;",
-        "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-        "",
-        "final class ComplexRefasterRuleCollectionTest implements RefasterRuleCollectionTestCase {",
-        "  private static final String IGNORED_CONSTANT = \"constant\";",
-        "",
-        "  @Override",
-        "  public ImmutableSet<Object> elidedTypesAndStaticImports() {",
-        "    return ImmutableSet.of();",
-        "  }",
-        "",
-        "  /** Javadoc. */",
-        "  String testFirstRule() {",
-        "    return \"Don't panic\";",
-        "  }",
-        "",
-        "  // Comment.",
-        "  String testSecondRule() {",
-        "    return \"Carry a towel\";",
-        "  }",
-        "",
-        "  void testEmptyRule() {}",
-        "}");
+        """
+        package pkg;
+
+        import com.google.common.collect.ImmutableSet;
+        import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+
+        final class ComplexRefasterRuleCollectionTest implements RefasterRuleCollectionTestCase {
+          private static final String IGNORED_CONSTANT = "constant";
+
+          @Override
+          public ImmutableSet<Object> elidedTypesAndStaticImports() {
+            return ImmutableSet.of();
+          }
+
+          /** Javadoc. */
+          String testFirstRule() {
+            return "Don't panic";
+          }
+
+          // Comment.
+          String testSecondRule() {
+            return "Carry a towel";
+          }
+
+          void testEmptyRule() {}
+        }
+        """);
 
     verifyGeneratedFileContent(
         outputDirectory,
