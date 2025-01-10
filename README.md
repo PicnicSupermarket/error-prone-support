@@ -205,12 +205,13 @@ Relevant Maven build parameters:
   version of Error Prone. This is useful e.g. when testing a locally built
   Error Prone SNAPSHOT.
 - `-Perror-prone-fork` runs the build using Picnic's [Error Prone
-  fork][error-prone-fork-repo], hosted on [Jitpack][error-prone-fork-jitpack].
-  This fork generally contains a few changes on top of the latest Error Prone
-  release.
+  fork][error-prone-fork-repo], hosted using [GitHub
+  Packages][error-prone-fork-packages]. This fork generally contains a few
+  changes on top of the latest Error Prone release. Using this profile
+  generally requires passing `-s settings.xml`, with [suitably
+  configured][github-packages-auth] `GITHUB_ACTOR` and `GITHUB_TOKEN`
+  environment variables.
 - `-Pself-check` runs the checks defined by this project against itself.
-  Pending a release of [google/error-prone#3301][error-prone-pull-3301], this
-  flag must currently be used in combination with `-Perror-prone-fork`.
 
 Other highly relevant commands:
 
@@ -275,14 +276,14 @@ channel; please see our [security policy][security] for details.
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
 [contributing-pull-request]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-opening-a-pull-request
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
-[error-prone-fork-jitpack]: https://jitpack.io/#PicnicSupermarket/error-prone
+[error-prone-fork-packages]: https://github.com/PicnicSupermarket/error-prone/packages
 [error-prone-fork-repo]: https://github.com/PicnicSupermarket/error-prone
 [error-prone-gradle-installation-guide]: https://github.com/tbroyer/gradle-errorprone-plugin
 [error-prone-installation-guide]: https://errorprone.info/docs/installation#maven
 [error-prone-orig-repo]: https://github.com/google/error-prone
-[error-prone-pull-3301]: https://github.com/google/error-prone/pull/3301
 [github-actions-build-badge]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml/badge.svg
 [github-actions-build-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/build.yml?query=branch:master&event=push
+[github-packages-auth]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-to-github-packages
 [google-java-format]: https://github.com/google/google-java-format
 [idea-288052]: https://youtrack.jetbrains.com/issue/IDEA-288052
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support

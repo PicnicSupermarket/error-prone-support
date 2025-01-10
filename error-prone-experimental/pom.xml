@@ -16,26 +16,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_annotation</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_check_api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_test_helpers</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>error-prone-utils</artifactId>
             <scope>provided</scope>
@@ -43,6 +23,26 @@
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_check_api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_test_helpers</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

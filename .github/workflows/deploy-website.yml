@@ -21,6 +21,7 @@ jobs:
             api.github.com:443
             bestpractices.coreinfrastructure.org:443
             blog.picnic.nl:443
+            docs.github.com:443
             errorprone.info:443
             github.com:443
             img.shields.io:443
