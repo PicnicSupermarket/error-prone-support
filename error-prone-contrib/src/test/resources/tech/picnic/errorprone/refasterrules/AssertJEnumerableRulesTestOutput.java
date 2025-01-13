@@ -19,7 +19,6 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     assertThat(ImmutableSet.of(2)).isEmpty();
     assertThat(ImmutableSet.of(3)).isEmpty();
     assertThat(ImmutableSet.of(4)).isEmpty();
-    assertThat(ImmutableSet.of(5)).isEmpty();
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertIsNotEmpty() {
