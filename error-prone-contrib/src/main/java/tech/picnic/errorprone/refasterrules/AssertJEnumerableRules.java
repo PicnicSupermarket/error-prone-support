@@ -26,8 +26,7 @@ final class AssertJEnumerableRules {
 
     @BeforeTemplate
     void before(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
-      Refaster.anyOf(
-          enumAssert.size().isNotPositive(), enumAssert.size().isNotPositive().returnToIterable());
+      enumAssert.size().isNotPositive();
     }
 
     @AfterTemplate
