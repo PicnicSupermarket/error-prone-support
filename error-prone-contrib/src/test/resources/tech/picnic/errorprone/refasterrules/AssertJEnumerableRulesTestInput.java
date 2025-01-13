@@ -19,6 +19,7 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     assertThat(ImmutableSet.of(2)).hasSizeLessThanOrEqualTo(0);
     assertThat(ImmutableSet.of(3)).hasSizeLessThan(1);
     assertThat(ImmutableSet.of(4)).size().isNotPositive();
+    assertThat(ImmutableSet.of(5)).size().isNotPositive().returnToIterable();
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertIsNotEmpty() {
@@ -26,31 +27,45 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
         assertThat(ImmutableSet.of(1)).hasSizeGreaterThan(0),
         assertThat(ImmutableSet.of(2)).hasSizeGreaterThanOrEqualTo(1),
         assertThat(ImmutableSet.of(3)).size().isNotEqualTo(0),
-        assertThat(ImmutableSet.of(4)).size().isPositive());
+        assertThat(ImmutableSet.of(4)).size().isPositive(),
+        assertThat(ImmutableSet.of(5)).size().isNotEqualTo(0).returnToIterable(),
+        assertThat(ImmutableSet.of(6)).size().isPositive().returnToIterable());
   }
 
-  AbstractAssert<?, ?> testEnumerableAssertHasSize() {
-    return assertThat(ImmutableSet.of(1)).size().isEqualTo(2);
+  ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertHasSize() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).size().isEqualTo(2),
+        assertThat(ImmutableSet.of(3)).size().isEqualTo(4).returnToIterable());
   }
 
-  AbstractAssert<?, ?> testEnumerableAssertHasSizeLessThan() {
-    return assertThat(ImmutableSet.of(1)).size().isLessThan(2);
+  ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertHasSizeLessThan() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).size().isLessThan(2),
+        assertThat(ImmutableSet.of(3)).size().isLessThan(4).returnToIterable());
   }
 
-  AbstractAssert<?, ?> testEnumerableAssertHasSizeLessThanOrEqualTo() {
-    return assertThat(ImmutableSet.of(1)).size().isLessThanOrEqualTo(2);
+  ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertHasSizeLessThanOrEqualTo() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).size().isLessThanOrEqualTo(2),
+        assertThat(ImmutableSet.of(3)).size().isLessThanOrEqualTo(4).returnToIterable());
   }
 
-  AbstractAssert<?, ?> testEnumerableAssertHasSizeGreaterThan() {
-    return assertThat(ImmutableSet.of(1)).size().isGreaterThan(2);
+  ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertHasSizeGreaterThan() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).size().isGreaterThan(2),
+        assertThat(ImmutableSet.of(3)).size().isGreaterThan(4).returnToIterable());
   }
 
-  AbstractAssert<?, ?> testEnumerableAssertHasSizeGreaterThanOrEqualTo() {
-    return assertThat(ImmutableSet.of(1)).size().isGreaterThanOrEqualTo(2);
+  ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertHasSizeGreaterThanOrEqualTo() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).size().isGreaterThanOrEqualTo(2),
+        assertThat(ImmutableSet.of(3)).size().isGreaterThanOrEqualTo(4).returnToIterable());
   }
 
-  AbstractAssert<?, ?> testEnumerableAssertHasSizeBetween() {
-    return assertThat(ImmutableSet.of(1)).size().isBetween(2, 3);
+  ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertHasSizeBetween() {
+    return ImmutableSet.of(
+        assertThat(ImmutableSet.of(1)).size().isBetween(2, 3),
+        assertThat(ImmutableSet.of(4)).size().isBetween(5, 6).returnToIterable());
   }
 
   ImmutableSet<EnumerableAssert<?, Integer>> testEnumerableAssertHasSameSizeAs() {
