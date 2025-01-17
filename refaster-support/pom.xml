@@ -15,42 +15,35 @@
     <url>https://error-prone.picnic.tech</url>
 
     <dependencies>
-        <!-- This dependency is listed out-of-order so as not to confuse the
-        `maven-dependency-plugin` when the `error-prone-fork` profile is
-        enabled: the `error_prone_annotation` dependency pulls in the
-        non-forked `error_prone_annotations` artifact through a dependency on
-        Guava. -->
-        <?SORTPOM IGNORE?>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <?SORTPOM RESUME?>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_annotation</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_check_api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_core</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${groupId.error-prone}</groupId>
-            <artifactId>error_prone_test_helpers</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_check_api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_test_helpers</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

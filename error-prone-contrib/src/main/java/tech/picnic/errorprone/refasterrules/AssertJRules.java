@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -12,7 +11,6 @@ import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -22,9 +20,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
-import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
@@ -255,119 +251,18 @@ final class AssertJRules {
   }
 
   //
-  // Iterable
-  //
-
-  static final class AssertThatIterableIsEmpty<E> {
-    @BeforeTemplate
-    void before(Iterable<E> iterable) {
-      Refaster.anyOf(
-          assertThat(iterable).hasSize(0),
-          assertThat(iterable.iterator().hasNext()).isFalse(),
-          assertThat(Iterables.size(iterable)).isEqualTo(0L),
-          assertThat(Iterables.size(iterable)).isNotPositive());
-    }
-
-    @BeforeTemplate
-    void before(Collection<E> iterable) {
-      Refaster.anyOf(
-          assertThat(iterable.isEmpty()).isTrue(),
-          assertThat(iterable.size()).isEqualTo(0L),
-          assertThat(iterable.size()).isNotPositive());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Collection<E> iterable) {
-      assertThat(iterable).isEmpty();
-    }
-  }
-
-  static final class AssertThatIterableIsNotEmpty<E> {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Iterable<E> iterable) {
-      return Refaster.anyOf(
-          assertThat(iterable.iterator().hasNext()).isTrue(),
-          assertThat(Iterables.size(iterable)).isNotEqualTo(0),
-          assertThat(Iterables.size(iterable)).isPositive());
-    }
-
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Collection<E> iterable) {
-      return Refaster.anyOf(
-          assertThat(iterable.isEmpty()).isFalse(),
-          assertThat(iterable.size()).isNotEqualTo(0),
-          assertThat(iterable.size()).isPositive());
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<E> after(Iterable<E> iterable) {
-      return assertThat(iterable).isNotEmpty();
-    }
-  }
-
-  static final class AssertThatIterableHasSize<E> {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(Iterable<E> iterable, int length) {
-      return assertThat(Iterables.size(iterable)).isEqualTo(length);
-    }
-
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(Collection<E> iterable, int length) {
-      return assertThat(iterable.size()).isEqualTo(length);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<E> after(Iterable<E> iterable, int length) {
-      return assertThat(iterable).hasSize(length);
-    }
-  }
-
-  static final class AssertThatIterableHasOneElementEqualTo<S, T extends S> {
-    @BeforeTemplate
-    ObjectAssert<S> before(Iterable<S> iterable, T element) {
-      return assertThat(Iterables.getOnlyElement(iterable)).isEqualTo(element);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Iterable<S> iterable, T element) {
-      return assertThat(iterable).containsExactly(element);
-    }
-  }
-
-  // XXX: This overload is here because `assertThat` has an overload for `Comparable` types.
-  // Unfortunately this still doesn't convince Refaster to match this rule in the context of
-  // Comparable types. Figure out why! Note that this also affects the `AssertThatOptional` rule.
-  static final class AssertThatIterableHasOneComparableElementEqualTo<
-      S extends Comparable<? super S>, T extends S> {
-    @BeforeTemplate
-    AbstractComparableAssert<?, S> before(Iterable<S> iterable, T element) {
-      return assertThat(Iterables.getOnlyElement(iterable)).isEqualTo(element);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Iterable<S> iterable, T element) {
-      return assertThat(iterable).containsExactly(element);
-    }
-  }
-
-  //
   // List
   //
 
   static final class AssertThatListsAreEqual<S, T extends S> {
     @BeforeTemplate
-    ListAssert<S> before(List<S> list1, List<T> list2) {
+    ListAssert<S> before(List<S> list1, Iterable<T> list2) {
       return assertThat(list1).isEqualTo(list2);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(List<S> list1, List<T> list2) {
+    ListAssert<S> after(List<S> list1, Iterable<T> list2) {
       return assertThat(list1).containsExactlyElementsOf(list2);
     }
   }
@@ -378,7 +273,7 @@ final class AssertJRules {
 
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Set<T> set2) {
+    AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Iterable<T> set2) {
       return Refaster.anyOf(
           assertThat(set1).isEqualTo(set2),
           assertThat(set1).containsExactlyInAnyOrderElementsOf(set2));
@@ -386,7 +281,7 @@ final class AssertJRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Set<T> set2) {
+    AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Iterable<T> set2) {
       return assertThat(set1).hasSameElementsAs(set2);
     }
   }
@@ -397,13 +292,13 @@ final class AssertJRules {
 
   static final class AssertThatMultisetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Multiset<T> multiset2) {
+    AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Iterable<T> multiset2) {
       return assertThat(multiset1).isEqualTo(multiset2);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Multiset<T> multiset2) {
+    AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Iterable<T> multiset2) {
       return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
     }
   }

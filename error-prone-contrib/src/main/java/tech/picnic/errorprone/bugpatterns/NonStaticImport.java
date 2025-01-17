@@ -30,6 +30,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
 import java.time.Clock;
+import java.time.InstantSource;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Locale;
@@ -69,6 +70,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       ImmutableSet.of(
           ASTHelpers.class.getCanonicalName(),
           Clock.class.getCanonicalName(),
+          InstantSource.class.getCanonicalName(),
           Strings.class.getCanonicalName(),
           VisitorState.class.getCanonicalName(),
           ZoneOffset.class.getCanonicalName(),
@@ -129,6 +131,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "builder",
           "copyOf",
           "create",
+          "EPOCH",
           "from",
           "getDefaultInstance",
           "INSTANCE",
@@ -182,7 +185,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       }
     }
 
-    return imports.build();
+    return imports.buildOrThrow();
   }
 
   private static boolean shouldNotBeStaticallyImported(String type, String member) {

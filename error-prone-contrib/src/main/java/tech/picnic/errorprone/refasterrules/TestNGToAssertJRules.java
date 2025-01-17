@@ -53,65 +53,13 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 // XXX: As-is these rules do not result in a complete migration:
 // - Expressions containing comments are skipped due to a limitation of Refaster.
 // - Assertions inside lambda expressions are also skipped. Unclear why.
-// XXX: The `assertEquals` tests for this class generally use the same expression for `expected` and
+// XXX: Many of the test expressions for these rules use the same expression for `expected` and
 // `actual`, which makes the validation weaker than necessary; fix this. (And investigate whether we
 // can introduce validation for this.)
 @OnlineDocumentation
 @TypeMigration(
     of = Assert.class,
     unmigratedMethods = {
-      // XXX: Add migrations for the methods below.
-      "assertEquals(Boolean, Boolean)",
-      "assertEquals(Boolean, boolean)",
-      "assertEquals(boolean, Boolean)",
-      "assertEquals(Boolean, Boolean, String)",
-      "assertEquals(Boolean, boolean, String)",
-      "assertEquals(boolean, Boolean, String)",
-      "assertEquals(Byte, Byte)",
-      "assertEquals(Byte, byte)",
-      "assertEquals(byte, Byte)",
-      "assertEquals(Byte, Byte, String)",
-      "assertEquals(Byte, byte, String)",
-      "assertEquals(byte, Byte, String)",
-      "assertEquals(char, Character)",
-      "assertEquals(char, Character, String)",
-      "assertEquals(Character, char)",
-      "assertEquals(Character, char, String)",
-      "assertEquals(Character, Character)",
-      "assertEquals(Character, Character, String)",
-      "assertEquals(Double, Double)",
-      "assertEquals(Double, double)",
-      "assertEquals(double, Double)",
-      "assertEquals(Double, Double, String)",
-      "assertEquals(Double, double, String)",
-      "assertEquals(double, Double, String)",
-      "assertEquals(double[], double[], double)",
-      "assertEquals(double[], double[], double, String)",
-      "assertEquals(Float, Float)",
-      "assertEquals(Float, float)",
-      "assertEquals(float, Float)",
-      "assertEquals(Float, Float, String)",
-      "assertEquals(Float, float, String)",
-      "assertEquals(float, Float, String)",
-      "assertEquals(float[], float[], float)",
-      "assertEquals(float[], float[], float, String)",
-      "assertEquals(int, Integer)",
-      "assertEquals(int, Integer, String)",
-      "assertEquals(Integer, int)",
-      "assertEquals(Integer, int, String)",
-      "assertEquals(Integer, Integer)",
-      "assertEquals(Integer, Integer, String)",
-      "assertEquals(Long, Long)",
-      "assertEquals(Long, long)",
-      "assertEquals(long, Long)",
-      "assertEquals(Long, Long, String)",
-      "assertEquals(Long, long, String)",
-      "assertEquals(Short, Short)",
-      "assertEquals(Short, short)",
-      "assertEquals(short, Short)",
-      "assertEquals(Short, Short, String)",
-      "assertEquals(Short, short, String)",
-      "assertEquals(short, Short, String)",
       /*
        * These `assertEqualsDeep` methods cannot (easily) be expressed using AssertJ because they
        * mix regular equality and array equality:
@@ -358,7 +306,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(boolean actual, Boolean expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Boolean actual, boolean expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Boolean actual, Boolean expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
     void before(byte actual, byte expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(byte actual, Byte expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Byte actual, byte expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Byte actual, Byte expected) {
       assertEquals(actual, expected);
     }
 
@@ -368,7 +346,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(char actual, Character expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Character actual, char expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Character actual, Character expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
     void before(short actual, short expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(short actual, Short expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Short actual, short expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Short actual, Short expected) {
       assertEquals(actual, expected);
     }
 
@@ -378,7 +386,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(int actual, Integer expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Integer actual, int expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Integer actual, Integer expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
     void before(long actual, long expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(long actual, Long expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Long actual, long expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Long actual, Long expected) {
       assertEquals(actual, expected);
     }
 
@@ -388,7 +426,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(float actual, Float expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Float actual, float expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Float actual, Float expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
     void before(double actual, double expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(double actual, Double expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Double actual, double expected) {
+      assertEquals(actual, expected);
+    }
+
+    @BeforeTemplate
+    void before(Double actual, Double expected) {
       assertEquals(actual, expected);
     }
 
@@ -421,7 +489,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(boolean actual, String message, Boolean expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Boolean actual, String message, boolean expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Boolean actual, String message, Boolean expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
     void before(byte actual, String message, byte expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(byte actual, String message, Byte expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Byte actual, String message, byte expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Byte actual, String message, Byte expected) {
       assertEquals(actual, expected, message);
     }
 
@@ -431,7 +529,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(char actual, String message, Character expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Character actual, String message, char expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Character actual, String message, Character expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
     void before(short actual, String message, short expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(short actual, String message, Short expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Short actual, String message, short expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Short actual, String message, Short expected) {
       assertEquals(actual, expected, message);
     }
 
@@ -441,7 +569,32 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(int actual, String message, Integer expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Integer actual, String message, int expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Integer actual, String message, Integer expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
     void before(long actual, String message, long expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Long actual, String message, long expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Long actual, String message, Long expected) {
       assertEquals(actual, expected, message);
     }
 
@@ -451,7 +604,37 @@ final class TestNGToAssertJRules {
     }
 
     @BeforeTemplate
+    void before(float actual, String message, Float expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Float actual, String message, float expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Float actual, String message, Float expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
     void before(double actual, String message, double expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(double actual, String message, Double expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Double actual, String message, double expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(Double actual, String message, Double expected) {
       assertEquals(actual, expected, message);
     }
 
@@ -485,7 +668,7 @@ final class TestNGToAssertJRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(float actual, float expected, float delta) {
+    void after(Float actual, float expected, float delta) {
       assertThat(actual).isCloseTo(expected, offset(delta));
     }
   }
@@ -632,6 +815,58 @@ final class TestNGToAssertJRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     void after(Object[] actual, String message, Object[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
+    }
+  }
+
+  static final class AssertEqualFloatArraysWithDelta {
+    @BeforeTemplate
+    void before(float[] actual, float[] expected, float delta) {
+      assertEquals(actual, expected, delta);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, float[] expected, float delta) {
+      assertThat(actual).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertEqualFloatArraysWithDeltaWithMessage {
+    @BeforeTemplate
+    void before(float[] actual, String message, float[] expected, float delta) {
+      assertEquals(actual, expected, delta, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(float[] actual, String message, float[] expected, float delta) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertEqualDoubleArraysWithDelta {
+    @BeforeTemplate
+    void before(double[] actual, double[] expected, double delta) {
+      assertEquals(actual, expected, delta);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, double[] expected, double delta) {
+      assertThat(actual).containsExactly(expected, offset(delta));
+    }
+  }
+
+  static final class AssertEqualDoubleArraysWithDeltaWithMessage {
+    @BeforeTemplate
+    void before(double[] actual, String message, double[] expected, double delta) {
+      assertEquals(actual, expected, delta, message);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(double[] actual, String message, double[] expected, double delta) {
+      assertThat(actual).withFailMessage(message).containsExactly(expected, offset(delta));
     }
   }
 

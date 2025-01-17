@@ -18,6 +18,7 @@ final class AssertJCharSequenceRules {
     @BeforeTemplate
     void before(CharSequence charSequence) {
       Refaster.anyOf(
+          assertThat(charSequence.isEmpty()).isTrue(),
           assertThat(charSequence.length()).isEqualTo(0L),
           assertThat(charSequence.length()).isNotPositive());
     }
@@ -33,6 +34,7 @@ final class AssertJCharSequenceRules {
     @BeforeTemplate
     AbstractAssert<?, ?> before(CharSequence charSequence) {
       return Refaster.anyOf(
+          assertThat(charSequence.isEmpty()).isFalse(),
           assertThat(charSequence.length()).isNotEqualTo(0),
           assertThat(charSequence.length()).isPositive());
     }

@@ -113,7 +113,7 @@
             -Xmx${argLine.xmx}
             <!-- Configure the Byte Buddy Java agent used by Mockito to create
             mocks. -->
-            -javaagent:${org.mockito:mockito-core:jar}
+            -javaagent:${project.build.directory}/test-agents/mockito-core.jar
             <!-- This argument cannot be set through Surefire's
             'systemPropertyVariables' configuration setting. Setting the file
             encoding is necessary because forked unit test invocations
@@ -144,11 +144,6 @@
         specified. Used by the `patch` and `self-check` profiles. -->
         <error-prone.patch-args />
         <error-prone.self-check-args />
-        <!-- The Maven `groupId` under which Error Prone dependencies are
-        published. We use an official Error Prone release by default. This
-        property allows the `error-prone-fork` profile below to build the
-        project using Picnic's Error Prone fork instead. -->
-        <groupId.error-prone>com.google.errorprone</groupId.error-prone>
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
         <project.build.outputTimestamp>2024-11-03T15:58:19Z</project.build.outputTimestamp>
@@ -210,51 +205,26 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
-        <version.error-prone-fork>v${version.error-prone-orig}-picnic-1</version.error-prone-fork>
+        <version.error-prone-fork>${version.error-prone-orig}-picnic-2</version.error-prone-fork>
         <version.error-prone-orig>2.36.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
         <version.jmh>1.37</version.jmh>
         <version.maven>3.9.9</version.maven>
-        <version.mockito>5.14.2</version.mockito>
+        <version.mockito>5.15.2</version.mockito>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
-        <version.nullaway>0.12.2</version.nullaway>
+        <version.nullaway>0.12.3</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.rewrite-templating>1.20.1</version.rewrite-templating>
+        <version.rewrite-templating>1.21.0</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>${groupId.error-prone}</groupId>
-                <artifactId>error_prone_annotation</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId.error-prone}</groupId>
-                <artifactId>error_prone_annotations</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId.error-prone}</groupId>
-                <artifactId>error_prone_check_api</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId.error-prone}</groupId>
-                <artifactId>error_prone_core</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
-            <dependency>
-                <groupId>${groupId.error-prone}</groupId>
-                <artifactId>error_prone_test_helpers</artifactId>
-                <version>${version.error-prone}</version>
-            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>documentation-support</artifactId>
@@ -338,6 +308,31 @@
                 <version>${version.auto-value}</version>
             </dependency>
             <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotation</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_check_api</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_core</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_test_helpers</artifactId>
+                <version>${version.error-prone}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
                 <version>1.25.2</version>
@@ -377,14 +372,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.14.2</version>
+                <version>1.14.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.1</version>
+                <version>2024.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -396,7 +391,7 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>1.6.14</version>
+                <version>1.6.15</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
@@ -454,14 +449,14 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.26.3</version>
+                <version>3.27.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.48.3</version>
+                <version>3.48.4</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -476,7 +471,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq</artifactId>
-                <version>3.19.16</version>
+                <version>3.19.18</version>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
@@ -500,7 +495,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>5.2.1</version>
+                <version>5.3.0</version>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -520,7 +515,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>2.23.2</version>
+                <version>3.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -534,7 +529,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.2.1</version>
+                <version>6.2.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -950,7 +945,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.21.0</version>
+                            <version>10.21.1</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1076,10 +1071,16 @@
                     </configuration>
                     <executions>
                         <execution>
-                            <id>set-additional-properties</id>
+                            <id>copy-test-agents</id>
                             <goals>
-                                <goal>properties</goal>
+                                <goal>copy-dependencies</goal>
                             </goals>
+                            <configuration>
+                                <includeGroupIds>org.mockito</includeGroupIds>
+                                <includeArtifactIds>mockito-core</includeArtifactIds>
+                                <stripVersion>true</stripVersion>
+                                <outputDirectory>${project.build.directory}/test-agents</outputDirectory>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -1499,7 +1500,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>2.9.0</version>
+                    <version>3.0.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1560,7 +1561,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.17.3</version>
+                    <version>1.17.4</version>
                     <configuration>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
@@ -1638,52 +1639,8 @@
         <profile>
             <id>error-prone-fork</id>
             <properties>
-                <groupId.error-prone>com.github.PicnicSupermarket.error-prone</groupId.error-prone>
                 <version.error-prone>${version.error-prone-fork}</version.error-prone>
             </properties>
-            <dependencyManagement>
-                <!-- Even when we directly depend on the Picnic Error Prone
-                fork, some other dependencies depend on the official (i.e.,
-                non-forked) `error_prone_annotations`. Here we fix which
-                version is pulled in. -->
-                <dependencies>
-                    <dependency>
-                        <groupId>com.google.errorprone</groupId>
-                        <artifactId>error_prone_annotations</artifactId>
-                        <version>${version.error-prone-orig}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-enforcer-plugin</artifactId>
-                            <configuration>
-                                <rules>
-                                    <banDuplicateClasses>
-                                        <!-- The original
-                                        `error_prone_annotations` dependency
-                                        contains the same classes as those
-                                        provided by the corresponding Picnic
-                                        Error Prone fork artifact. -->
-                                        <dependencies combine.children="append">
-                                            <dependency>
-                                                <groupId>com.google.errorprone</groupId>
-                                                <artifactId>error_prone_annotations</artifactId>
-                                                <ignoreClasses>
-                                                    <ignoreClass>*</ignoreClass>
-                                                </ignoreClasses>
-                                            </dependency>
-                                        </dependencies>
-                                    </banDuplicateClasses>
-                                </rules>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
         </profile>
         <profile>
             <!-- Error Prone checks that are not available from Maven Central;
@@ -1933,7 +1890,7 @@
                                 declarations once properly supported. See
                                 https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                                 <path>
-                                    <groupId>${groupId.error-prone}</groupId>
+                                    <groupId>com.google.errorprone</groupId>
                                     <artifactId>error_prone_core</artifactId>
                                     <version>${version.error-prone}</version>
                                 </path>

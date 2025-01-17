@@ -22,16 +22,16 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     assertThat("foo").isEmpty();
   }
 
-  void testAssertThatStringIsEmpty() {
-    assertThat("foo").isEmpty();
-  }
-
   AbstractStringAssert<?> testAbstractStringAssertStringIsNotEmpty() {
     return assertThat("foo").isNotEmpty();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringIsNotEmpty() {
-    return assertThat("foo").isNotEmpty();
+  AbstractAssert<?, ?> testAssertThatStringContains() {
+    return assertThat("foo").contains("bar");
+  }
+
+  AbstractAssert<?, ?> testAssertThatStringDoesNotContain() {
+    return assertThat("foo").doesNotContain("bar");
   }
 
   AbstractAssert<?, ?> testAssertThatMatches() {

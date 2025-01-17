@@ -14,11 +14,11 @@ jobs:
         distribution: [ temurin ]
         experimental: [ false ]
         include:
-          - os: macos-14
+          - os: macos-15
             jdk: 17.0.13
             distribution: temurin
             experimental: false
-          - os: windows-2022
+          - os: windows-2025
             jdk: 17.0.13
             distribution: temurin
             experimental: false
@@ -26,14 +26,16 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
+        uses: step-security/harden-runner@c95a14d0e5bab51a9f56296a4eb0e416910cd350 # v2.10.3
         with:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443
+            github-registry-files.githubusercontent.com:443
             jitpack.io:443
+            maven.pkg.github.com:443
             objects.githubusercontent.com:443
             repo.maven.apache.org:443
       # We run the build twice for each supported JDK: once against the
@@ -42,7 +44,7 @@ jobs:
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@9a27433d289dd99d73851f653607c39d3444e8ba # v1.17.0
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
           java-version: ${{ matrix.jdk }}
           java-distribution: ${{ matrix.distribution }}
@@ -53,6 +55,8 @@ jobs:
         run: mvn -T1C install javadoc:jar
       - name: Build project with self-check against Error Prone fork
         run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
 

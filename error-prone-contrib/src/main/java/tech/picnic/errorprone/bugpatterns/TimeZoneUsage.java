@@ -16,10 +16,12 @@ import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.MemberReferenceTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.time.Clock;
 import java.time.Instant;
@@ -41,7 +43,8 @@ import java.time.ZonedDateTime;
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
-public final class TimeZoneUsage extends BugChecker implements MethodInvocationTreeMatcher {
+public final class TimeZoneUsage extends BugChecker
+    implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> BANNED_TIME_METHOD =
       anyOf(
@@ -60,6 +63,10 @@ public final class TimeZoneUsage extends BugChecker implements MethodInvocationT
                   "tickMinutes",
                   "tickSeconds"),
           staticMethod()
+              .onClassAny(Instant.class.getCanonicalName())
+              .named("now")
+              .withNoParameters(),
+          staticMethod()
               .onClassAny(
                   LocalDate.class.getCanonicalName(),
                   LocalDateTime.class.getCanonicalName(),
@@ -67,17 +74,22 @@ public final class TimeZoneUsage extends BugChecker implements MethodInvocationT
                   OffsetDateTime.class.getCanonicalName(),
                   OffsetTime.class.getCanonicalName(),
                   ZonedDateTime.class.getCanonicalName())
-              .named("now"),
-          staticMethod()
-              .onClassAny(Instant.class.getCanonicalName())
-              .named("now")
-              .withNoParameters());
+              .named("now"));
 
   /** Instantiates a new {@link TimeZoneUsage} instance. */
   public TimeZoneUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+    return getDescription(tree, state);
+  }
+
+  @Override
+  public Description matchMemberReference(MemberReferenceTree tree, VisitorState state) {
+    return getDescription(tree, state);
+  }
+
+  private Description getDescription(ExpressionTree tree, VisitorState state) {
     return BANNED_TIME_METHOD.matches(tree, state)
         ? buildDescription(tree).build()
         : Description.NO_MATCH;

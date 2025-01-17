@@ -14875,7 +14875,7 @@
        final String defaultValue = getDefaultValue(propertyName, field, instance);
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/SiteUtil.java
-@@ -19,6 +19,14 @@
+@@ -19,6 +19,15 @@
  
  package com.puppycrawl.tools.checkstyle.site;
  
@@ -14886,11 +14886,12 @@
 +
 +import com.google.common.base.Strings;
 +import com.google.common.collect.ImmutableList;
++import com.google.common.collect.ImmutableMap;
 +import com.google.common.collect.ImmutableSet;
  import com.google.common.collect.Lists;
  import com.puppycrawl.tools.checkstyle.Checker;
  import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-@@ -55,7 +63,6 @@ import java.net.URI;
+@@ -55,7 +64,6 @@ import java.net.URI;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.nio.file.Path;
@@ -14898,7 +14899,7 @@
  import java.util.ArrayDeque;
  import java.util.ArrayList;
  import java.util.Arrays;
-@@ -72,7 +79,6 @@ import java.util.Optional;
+@@ -72,7 +80,6 @@ import java.util.Optional;
  import java.util.Set;
  import java.util.TreeSet;
  import java.util.regex.Pattern;
@@ -14906,7 +14907,31 @@
  import java.util.stream.IntStream;
  import java.util.stream.Stream;
  import javax.annotation.Nullable;
-@@ -156,7 +162,7 @@ public final class SiteUtil {
+@@ -131,12 +138,17 @@ public final class SiteUtil {
+ 
+   /** Class name and their corresponding parent module name. */
+   private static final Map<Class<?>, String> CLASS_TO_PARENT_MODULE =
+-      Map.ofEntries(
+-          Map.entry(AbstractCheck.class, TreeWalker.class.getSimpleName()),
+-          Map.entry(TreeWalkerFilter.class, TreeWalker.class.getSimpleName()),
+-          Map.entry(AbstractFileSetCheck.class, Checker.class.getSimpleName()),
+-          Map.entry(Filter.class, Checker.class.getSimpleName()),
+-          Map.entry(BeforeExecutionFileFilter.class, Checker.class.getSimpleName()));
++      ImmutableMap.of(
++          AbstractCheck.class,
++          TreeWalker.class.getSimpleName(),
++          TreeWalkerFilter.class,
++          TreeWalker.class.getSimpleName(),
++          AbstractFileSetCheck.class,
++          Checker.class.getSimpleName(),
++          Filter.class,
++          Checker.class.getSimpleName(),
++          BeforeExecutionFileFilter.class,
++          Checker.class.getSimpleName());
+ 
+   /** Set of properties that every check has. */
+   private static final Set<String> CHECK_PROPERTIES = getProperties(AbstractCheck.class);
+@@ -156,7 +168,7 @@ public final class SiteUtil {
  
    /** Set of properties that are undocumented. Those are internal properties. */
    private static final Set<String> UNDOCUMENTED_PROPERTIES =
@@ -14915,7 +14940,7 @@
            "SuppressWithNearbyCommentFilter.fileContents", "SuppressionCommentFilter.fileContents");
  
    /** Properties that can not be gathered from class instance. */
-@@ -294,27 +300,25 @@ public final class SiteUtil {
+@@ -294,27 +306,25 @@ public final class SiteUtil {
  
    /** Path to main source code folder. */
    private static final String MAIN_FOLDER_PATH =
@@ -14932,16 +14957,16 @@
 +          new File(Path.of(MAIN_FOLDER_PATH, CHECKS, NAMING, "AbstractNameCheck.java").toString()),
            new File(
 -              Paths.get(MAIN_FOLDER_PATH, CHECKS, NAMING, "AbstractNameCheck.java").toString()),
--          new File(
--              Paths.get(MAIN_FOLDER_PATH, CHECKS, "javadoc", "AbstractJavadocCheck.java")
--                  .toString()),
--          new File(Paths.get(MAIN_FOLDER_PATH, "api", "AbstractFileSetCheck.java").toString()),
 +              Path.of(MAIN_FOLDER_PATH, CHECKS, "javadoc", "AbstractJavadocCheck.java").toString()),
 +          new File(Path.of(MAIN_FOLDER_PATH, "api", "AbstractFileSetCheck.java").toString()),
            new File(
--              Paths.get(MAIN_FOLDER_PATH, CHECKS, "header", "AbstractHeaderCheck.java").toString()),
+-              Paths.get(MAIN_FOLDER_PATH, CHECKS, "javadoc", "AbstractJavadocCheck.java")
+-                  .toString()),
+-          new File(Paths.get(MAIN_FOLDER_PATH, "api", "AbstractFileSetCheck.java").toString()),
 +              Path.of(MAIN_FOLDER_PATH, CHECKS, "header", "AbstractHeaderCheck.java").toString()),
            new File(
+-              Paths.get(MAIN_FOLDER_PATH, CHECKS, "header", "AbstractHeaderCheck.java").toString()),
+-          new File(
 -              Paths.get(MAIN_FOLDER_PATH, CHECKS, "metrics", "AbstractClassCouplingCheck.java")
 +              Path.of(MAIN_FOLDER_PATH, CHECKS, "metrics", "AbstractClassCouplingCheck.java")
                    .toString()),
@@ -14951,7 +14976,7 @@
                    .toString()));
  
    /** Private utility constructor. */
-@@ -475,7 +479,7 @@ public final class SiteUtil {
+@@ -475,7 +485,7 @@ public final class SiteUtil {
     * @throws MacroExecutionException if an I/O error occurs.
     */
    public static Set<Path> getXdocsTemplatesFilePaths() throws MacroExecutionException {
@@ -14960,7 +14985,7 @@
      try (Stream<Path> stream =
          Files.find(
              directory,
-@@ -483,7 +487,7 @@ public final class SiteUtil {
+@@ -483,7 +493,7 @@ public final class SiteUtil {
              (path, attr) -> {
                return attr.isRegularFile() && path.toString().endsWith(".xml.template");
              })) {
@@ -14969,7 +14994,7 @@
      } catch (IOException ioException) {
        throw new MacroExecutionException("Failed to find xdocs templates", ioException);
      }
-@@ -510,7 +514,7 @@ public final class SiteUtil {
+@@ -510,7 +520,7 @@ public final class SiteUtil {
      }
  
      // If parent class is not found, check interfaces
@@ -14978,7 +15003,7 @@
        final Class<?>[] interfaces = moduleClass.getInterfaces();
        for (Class<?> interfaceClass : interfaces) {
          parentModuleName = CLASS_TO_PARENT_MODULE.get(interfaceClass);
-@@ -520,7 +524,7 @@ public final class SiteUtil {
+@@ -520,7 +530,7 @@ public final class SiteUtil {
        }
      }
  
@@ -14987,7 +15012,7 @@
        final String message =
            String.format(
                Locale.ROOT, "Failed to find parent module for %s", moduleClass.getSimpleName());
-@@ -544,7 +548,7 @@ public final class SiteUtil {
+@@ -544,7 +554,7 @@ public final class SiteUtil {
                  prop -> {
                    return !isGlobalProperty(clss, prop) && !isUndocumentedProperty(clss, prop);
                  })
@@ -14996,7 +15021,7 @@
      properties.addAll(getNonExplicitProperties(instance, clss));
      return new TreeSet<>(properties);
    }
-@@ -663,7 +667,7 @@ public final class SiteUtil {
+@@ -663,7 +673,7 @@ public final class SiteUtil {
      treeWalkerConfig.addChild(scraperCheckConfig);
      try {
        checker.configure(defaultConfiguration);
@@ -15005,7 +15030,7 @@
        checker.process(filesToProcess);
        checker.destroy();
      } catch (CheckstyleException checkstyleException) {
-@@ -986,9 +990,7 @@ public final class SiteUtil {
+@@ -986,9 +996,7 @@ public final class SiteUtil {
      if (value != null && Array.getLength(value) > 0) {
        result =
            removeSquareBrackets(
@@ -15016,7 +15041,7 @@
      }
  
      if (result.isEmpty()) {
-@@ -1020,8 +1022,7 @@ public final class SiteUtil {
+@@ -1020,8 +1028,7 @@ public final class SiteUtil {
        result = "";
      } else {
        try (Stream<?> valuesStream = getValuesStream(value)) {
@@ -15026,7 +15051,7 @@
        }
      }
  
-@@ -1062,10 +1063,7 @@ public final class SiteUtil {
+@@ -1062,10 +1069,7 @@ public final class SiteUtil {
    private static String getIntArrayPropertyValue(Object value) {
      try (IntStream stream = getIntStream(value)) {
        String result =
@@ -15038,7 +15063,7 @@
        if (result.isEmpty()) {
          result = CURLY_BRACKETS;
        }
-@@ -1170,11 +1168,11 @@ public final class SiteUtil {
+@@ -1170,11 +1174,11 @@ public final class SiteUtil {
     */
    public static List<Integer> getDifference(int[] tokens, int... subtractions) {
      final Set<Integer> subtractionsSet =
@@ -15052,7 +15077,7 @@
    }
  
    /**
-@@ -1221,7 +1219,7 @@ public final class SiteUtil {
+@@ -1221,7 +1225,7 @@ public final class SiteUtil {
        throw new MacroExecutionException("Failed to get parent path for " + templatePath);
      }
      return templatePathParent
@@ -15377,7 +15402,7 @@
 -    if (name == null) {
 -      throw new IllegalArgumentException(String.format(Locale.ROOT, TOKEN_ID_EXCEPTION_FORMAT, id));
 -    }
-+    checkArgument(name != null, String.format(Locale.ROOT, TOKEN_ID_EXCEPTION_FORMAT, id));
++    checkArgument(name != null, TOKEN_ID_EXCEPTION_FORMAT, id);
      return name;
    }
  
@@ -15389,11 +15414,11 @@
 -      throw new IllegalArgumentException(
 -          String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
 -    }
-+    checkArgument(id != null, String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
++    checkArgument(id != null, TOKEN_NAME_EXCEPTION_FORMAT, name);
      return id;
    }
  
-@@ -165,10 +163,9 @@ public final class TokenUtil {
+@@ -165,10 +163,7 @@ public final class TokenUtil {
     * @throws IllegalArgumentException when name is unknown
     */
    public static String getShortDescription(String name) {
@@ -15401,13 +15426,11 @@
 -      throw new IllegalArgumentException(
 -          String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
 -    }
-+    checkArgument(
-+        TOKEN_NAME_TO_VALUE.containsKey(name),
-+        String.format(Locale.ROOT, TOKEN_NAME_EXCEPTION_FORMAT, name));
++    checkArgument(TOKEN_NAME_TO_VALUE.containsKey(name), TOKEN_NAME_EXCEPTION_FORMAT, name);
  
      final String tokenTypes = "com.puppycrawl.tools.checkstyle.api.tokentypes";
      final ResourceBundle bundle = ResourceBundle.getBundle(tokenTypes, Locale.ROOT);
-@@ -344,7 +341,7 @@ public final class TokenUtil {
+@@ -344,7 +339,7 @@ public final class TokenUtil {
    public static BitSet asBitSet(String... tokens) {
      return Arrays.stream(tokens)
          .map(String::trim)
@@ -15418,12 +15441,13 @@
    }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/utils/UnmodifiableCollectionUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/utils/UnmodifiableCollectionUtil.java
-@@ -19,13 +19,15 @@
+@@ -19,13 +19,16 @@
  
  package com.puppycrawl.tools.checkstyle.utils;
  
 +import static java.util.stream.Collectors.toUnmodifiableList;
 +
++import com.google.common.collect.ImmutableMap;
 +import com.google.common.collect.ImmutableSet;
  import java.util.Arrays;
  import java.util.Collection;
@@ -15435,7 +15459,7 @@
  
  /**
   * <div>Note: it simply wraps the existing JDK methods to provide a workaround for Pitest survival
-@@ -57,7 +59,7 @@ public final class UnmodifiableCollectionUtil {
+@@ -57,7 +60,7 @@ public final class UnmodifiableCollectionUtil {
     * @return An unmodifiable List containing elements of the specified type.
     */
    public static <S, T> List<T> unmodifiableList(Collection<S> items, Class<T> elementType) {
@@ -15444,7 +15468,16 @@
    }
  
    /**
-@@ -92,6 +94,6 @@ public final class UnmodifiableCollectionUtil {
+@@ -81,7 +84,7 @@ public final class UnmodifiableCollectionUtil {
+    * @return an immutable copy of the input map
+    */
+   public static <K, V> Map<K, V> copyOfMap(Map<? extends K, ? extends V> map) {
+-    return Map.copyOf(map);
++    return ImmutableMap.copyOf(map);
+   }
+ 
+   /**
+@@ -92,6 +95,6 @@ public final class UnmodifiableCollectionUtil {
     * @return immutable set
     */
    public static <T> Set<T> singleton(T obj) {
@@ -56937,6 +56970,15 @@
    private static final Map<String, Class<?>> FULLY_QUALIFIED_CLASS_NAMES =
        ImmutableMap.<String, Class<?>>builder()
            .put("int", int.class)
+@@ -97,7 +96,7 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
+           .put("URI", URI.class)
+           .put("WrapOption", WrapOption.class)
+           .put("PARAM_LITERAL", int[].class)
+-          .build();
++          .buildOrThrow();
+ 
+   private static final List<List<Node>> CHECK_PROPERTIES = new ArrayList<>();
+   private static final Map<String, String> CHECK_PROPERTY_DOC = new HashMap<>();
 @@ -115,14 +114,14 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
    }
  

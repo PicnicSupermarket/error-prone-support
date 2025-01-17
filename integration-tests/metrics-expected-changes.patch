@@ -3028,17 +3028,16 @@
                SharedMetricRegistries.getDefault();
              });
 -    assertTrue(exception.getMessage().contains("Default registry name has not been set."));
-+    assertThat(exception.getMessage().contains("Default registry name has not been set.")).isTrue();
++    assertThat(exception.getMessage()).contains("Default registry name has not been set.");
    }
  
    @Test
-@@ -81,7 +80,8 @@ class SharedMetricRegistriesTest {
+@@ -81,7 +80,7 @@ class SharedMetricRegistriesTest {
                SharedMetricRegistries.setDefault("foobah");
                SharedMetricRegistries.setDefault("borg");
              });
 -    assertTrue(exception.getMessage().contains("Default metric registry name is already set."));
-+    assertThat(exception.getMessage().contains("Default metric registry name is already set."))
-+        .isTrue();
++    assertThat(exception.getMessage()).contains("Default metric registry name is already set.");
    }
  
    @Test
@@ -4943,27 +4942,25 @@
                SharedHealthCheckRegistries.getDefault();
              });
 -    assertTrue(exception.getMessage().contains("Default registry name has not been set."));
-+    assertThat(exception.getMessage().contains("Default registry name has not been set.")).isTrue();
++    assertThat(exception.getMessage()).contains("Default registry name has not been set.");
    }
  
    @Test
-@@ -85,7 +84,8 @@ class SharedHealthCheckRegistriesTest {
+@@ -85,7 +84,7 @@ class SharedHealthCheckRegistriesTest {
                SharedHealthCheckRegistries.setDefault("default");
                SharedHealthCheckRegistries.setDefault("default");
              });
 -    assertTrue(exception.getMessage().contains("Default health check registry is already set."));
-+    assertThat(exception.getMessage().contains("Default health check registry is already set."))
-+        .isTrue();
++    assertThat(exception.getMessage()).contains("Default health check registry is already set.");
    }
  
    @Test
-@@ -97,6 +97,7 @@ class SharedHealthCheckRegistriesTest {
+@@ -97,6 +96,6 @@ class SharedHealthCheckRegistriesTest {
                SharedHealthCheckRegistries.setDefault("default", new HealthCheckRegistry());
                SharedHealthCheckRegistries.setDefault("default", new HealthCheckRegistry());
              });
 -    assertTrue(exception.getMessage().contains("Default health check registry is already set."));
-+    assertThat(exception.getMessage().contains("Default health check registry is already set."))
-+        .isTrue();
++    assertThat(exception.getMessage()).contains("Default health check registry is already set.");
    }
  }
 --- a/metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/jvm/ThreadDeadlockHealthCheckTest.java
@@ -5137,7 +5134,7 @@
 -    Mockito.verify(registry, Mockito.atLeast(1)).registerGauge(argumentCaptor.capture(), any());
 -    assertTrue(argumentCaptor.getValue().getKey().contains("some-other-name"));
 +    verify(registry, atLeast(1)).registerGauge(argumentCaptor.capture(), any());
-+    assertThat(argumentCaptor.getValue().getKey().contains("some-other-name")).isTrue();
++    assertThat(argumentCaptor.getValue().getKey()).contains("some-other-name");
    }
  }
 --- a/metrics-httpclient/src/test/java/io/dropwizard/metrics5/httpclient/InstrumentedHttpClientsTest.java
@@ -5215,7 +5212,7 @@
 -    Mockito.verify(registry, Mockito.atLeast(1)).registerGauge(argumentCaptor.capture(), any());
 -    assertTrue(argumentCaptor.getValue().getKey().contains("some-other-name"));
 +    verify(registry, atLeast(1)).registerGauge(argumentCaptor.capture(), any());
-+    assertThat(argumentCaptor.getValue().getKey().contains("some-other-name")).isTrue();
++    assertThat(argumentCaptor.getValue().getKey()).contains("some-other-name");
    }
  }
 --- a/metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpAsyncClientsTest.java
@@ -5305,7 +5302,7 @@
 -    Mockito.verify(registry, Mockito.atLeast(1)).registerGauge(argumentCaptor.capture(), any());
 -    assertTrue(argumentCaptor.getValue().getKey().contains("some-other-name"));
 +    verify(registry, atLeast(1)).registerGauge(argumentCaptor.capture(), any());
-+    assertThat(argumentCaptor.getValue().getKey().contains("some-other-name")).isTrue();
++    assertThat(argumentCaptor.getValue().getKey()).contains("some-other-name");
    }
  }
 --- a/metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientsTest.java

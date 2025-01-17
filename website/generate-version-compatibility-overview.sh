@@ -86,7 +86,7 @@ for eps_version in ${eps_versions}; do
         -Ppatch \
         -Pself-check \
         -Dverification.skip \
-        -Dversion.error-prone-orig="${ep_version}" \
+        -Dversion.error-prone="${ep_version}" \
       && echo "SUCCESS: { \"eps_version\": \"${eps_version}\", \"ep_version\": \"${ep_version}\" }" || true
     # Undo any changes applied by the checks.
     git checkout -- '*.java'

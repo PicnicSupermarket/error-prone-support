@@ -4459,6 +4459,15 @@
              "values from otel have precedence over builder",
              new TestCase()
                  .expectedProperties(
+@@ -113,7 +113,7 @@ class OtelAutoConfigTest {
+                         .put("otel.exporter.otlp.timeout", Optional.of("13s"))
+                         .put("otel.exporter.otlp.metrics.timeout", Optional.empty())
+                         .put("otel.service.name", Optional.of("otel-service"))
+-                        .build())
++                        .buildOrThrow())
+                 .expectedResourceAttributes(
+                     ImmutableMap.of(
+                         "key",
 @@ -128,7 +128,7 @@ class OtelAutoConfigTest {
                          "otel-version"))
                  .exporterBuilder(OtelAutoConfigTest::setBuilderValues)
@@ -4468,15 +4477,44 @@
              "values from prom properties have precedence over builder and otel",
              new TestCase()
                  .expectedProperties(
-@@ -177,7 +177,7 @@ class OtelAutoConfigTest {
+@@ -143,7 +143,7 @@ class OtelAutoConfigTest {
+                         .put("otel.exporter.otlp.metrics.timeout", Optional.of("23s"))
+                         .put("otel.exporter.otlp.timeout", Optional.of("13s"))
+                         .put("otel.service.name", Optional.of("prom-service"))
+-                        .build())
++                        .buildOrThrow())
+                 .expectedResourceAttributes(
+                     ImmutableMap.of(
+                         "key",
+@@ -176,8 +176,8 @@ class OtelAutoConfigTest {
+                         .put(
                              "io.prometheus.exporter.opentelemetry.resourceAttributes",
                              "key=prom-value")
-                         .build())),
+-                        .build())),
 -        Arguments.of(
++                        .buildOrThrow())),
 +        arguments(
              "values from prom properties builder have precedence over builder and otel",
              new TestCase()
                  .expectedProperties(
+@@ -192,7 +192,7 @@ class OtelAutoConfigTest {
+                         .put("otel.exporter.otlp.metrics.timeout", Optional.of("23s"))
+                         .put("otel.exporter.otlp.timeout", Optional.of("13s"))
+                         .put("otel.service.name", Optional.of("prom-service"))
+-                        .build())
++                        .buildOrThrow())
+                 .expectedResourceAttributes(
+                     ImmutableMap.of(
+                         "key",
+@@ -233,7 +233,7 @@ class OtelAutoConfigTest {
+         .put(
+             "otel.resource.attributes",
+             "key=otel-value,service.namespace=otel-namespace,service.instance.id=otel-instance,service.version=otel-version")
+-        .build();
++        .buildOrThrow();
+   }
+ 
+   private static void setBuilderValues(OpenTelemetryExporter.Builder builder) {
 @@ -250,8 +250,8 @@ class OtelAutoConfigTest {
          .resourceAttribute("key", "builder-value");
    }
@@ -4565,7 +4603,12 @@
  }
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
-@@ -7,7 +7,7 @@ import io.prometheus.metrics.model.snapshots.Unit;
+@@ -3,14 +3,15 @@ package io.prometheus.metrics.exporter.opentelemetry.otelmodel;
+ import static java.util.Map.entry;
+ import static org.junit.jupiter.api.Assertions.*;
+ 
++import com.google.common.collect.ImmutableMap;
+ import io.prometheus.metrics.model.snapshots.Unit;
  import java.util.Map;
  import org.junit.jupiter.api.Test;
  
@@ -4573,7 +4616,11 @@
 +final class PrometheusMetricDataTest {
  
    Map<Object, Object> translations =
-       Map.ofEntries(
+-      Map.ofEntries(
++      ImmutableMap.ofEntries(
+           entry("days", "d"),
+           entry("hours", "h"),
+           entry("minutes", "min"),
 --- a/prometheus-metrics-exporter-pushgateway/src/main/java/io/prometheus/metrics/exporter/pushgateway/DefaultJobLabelDetector.java
 +++ b/prometheus-metrics-exporter-pushgateway/src/main/java/io/prometheus/metrics/exporter/pushgateway/DefaultJobLabelDetector.java
 @@ -3,7 +3,6 @@ package io.prometheus.metrics.exporter.pushgateway;
@@ -5921,7 +5968,7 @@
  import static io.prometheus.metrics.instrumentation.dropwizard5.labels.MapperConfig.METRIC_GLOB_REGEX;
  
  import java.util.HashMap;
-@@ -32,10 +33,9 @@ class GraphiteNamePattern {
+@@ -32,10 +33,11 @@ class GraphiteNamePattern {
     * @param pattern The glob style pattern to be used.
     */
    GraphiteNamePattern(final String pattern) throws IllegalArgumentException {
@@ -5931,11 +5978,13 @@
 -    }
 +    checkArgument(
 +        VALIDATION_PATTERN.matcher(pattern).matches(),
-+        String.format("Provided pattern [%s] does not matches [%s]", pattern, METRIC_GLOB_REGEX));
++        "Provided pattern [%s] does not matches [%s]",
++        pattern,
++        METRIC_GLOB_REGEX);
      initializePattern(pattern);
    }
  
-@@ -84,7 +84,7 @@ class GraphiteNamePattern {
+@@ -84,7 +86,7 @@ class GraphiteNamePattern {
        escapedPattern.append("([^.]*)").append(quoted);
      }
  
@@ -5954,7 +6003,7 @@
  import java.util.HashMap;
  import java.util.Map;
  import java.util.regex.Pattern;
-@@ -106,21 +108,19 @@ public final class MapperConfig {
+@@ -106,21 +108,21 @@ public final class MapperConfig {
    }
  
    private void validateMatch(final String match) {
@@ -5966,9 +6015,9 @@
 -    }
 +    checkArgument(
 +        MATCH_EXPRESSION_PATTERN.matcher(match).matches(),
-+        String.format(
-+            "Match expression [%s] does not match required pattern %s",
-+            match, MATCH_EXPRESSION_PATTERN));
++        "Match expression [%s] does not match required pattern %s",
++        match,
++        MATCH_EXPRESSION_PATTERN);
    }
  
    private void validateLabels(final Map<String, String> labels) {
@@ -5980,11 +6029,13 @@
 -        }
 +        checkArgument(
 +            LABEL_PATTERN.matcher(key).matches(),
-+            String.format("Label [%s] does not match required pattern %s", match, LABEL_PATTERN));
++            "Label [%s] does not match required pattern %s",
++            match,
++            LABEL_PATTERN);
        }
      }
    }
-@@ -149,7 +149,6 @@ public final class MapperConfig {
+@@ -149,7 +151,6 @@ public final class MapperConfig {
    public int hashCode() {
      int result = match != null ? match.hashCode() : 0;
      result = 31 * result + (name != null ? name.hashCode() : 0);

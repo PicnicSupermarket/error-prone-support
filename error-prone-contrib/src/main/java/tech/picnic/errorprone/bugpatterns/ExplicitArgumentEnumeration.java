@@ -113,7 +113,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
           .put(OBJECT_ENUMERABLE_ASSERT, "doesNotContainAnyElementsOf", "doesNotContain")
           .put(OBJECT_ENUMERABLE_ASSERT, "hasSameElementsAs", "containsOnly")
           .put(STEP_VERIFIER_STEP, "expectNextSequence", "expectNext")
-          .build();
+          .buildOrThrow();
 
   /** Instantiates a new {@link ExplicitArgumentEnumeration} instance. */
   public ExplicitArgumentEnumeration() {}
