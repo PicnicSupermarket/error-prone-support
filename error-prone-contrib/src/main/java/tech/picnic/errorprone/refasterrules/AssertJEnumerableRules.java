@@ -47,6 +47,13 @@ final class AssertJEnumerableRules {
       return Refaster.anyOf(enumAssert.size().isNotEqualTo(0), enumAssert.size().isPositive());
     }
 
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
+      return Refaster.anyOf(
+          enumAssert.size().isNotEqualTo(0).returnToIterable(),
+          enumAssert.size().isPositive().returnToIterable());
+    }
+
     @AfterTemplate
     EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert) {
       return enumAssert.isNotEmpty();
@@ -58,6 +65,12 @@ final class AssertJEnumerableRules {
     AbstractIterableSizeAssert<?, ?, E, ?> before(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isEqualTo(size);
+    }
+
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isEqualTo(size).returnToIterable();
     }
 
     @AfterTemplate
@@ -73,6 +86,12 @@ final class AssertJEnumerableRules {
       return enumAssert.size().isLessThan(size);
     }
 
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isLessThan(size).returnToIterable();
+    }
+
     @AfterTemplate
     EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int size) {
       return enumAssert.hasSizeLessThan(size);
@@ -84,6 +103,12 @@ final class AssertJEnumerableRules {
     AbstractIterableSizeAssert<?, ?, E, ?> before(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isLessThanOrEqualTo(size);
+    }
+
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isLessThanOrEqualTo(size).returnToIterable();
     }
 
     @AfterTemplate
@@ -99,6 +124,12 @@ final class AssertJEnumerableRules {
       return enumAssert.size().isGreaterThan(size);
     }
 
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isGreaterThan(size).returnToIterable();
+    }
+
     @AfterTemplate
     EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int size) {
       return enumAssert.hasSizeGreaterThan(size);
@@ -112,6 +143,12 @@ final class AssertJEnumerableRules {
       return enumAssert.size().isGreaterThanOrEqualTo(size);
     }
 
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isGreaterThanOrEqualTo(size).returnToIterable();
+    }
+
     @AfterTemplate
     EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int size) {
       return enumAssert.hasSizeGreaterThanOrEqualTo(size);
@@ -123,6 +160,12 @@ final class AssertJEnumerableRules {
     AbstractIterableSizeAssert<?, ?, E, ?> before(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int lower, int upper) {
       return enumAssert.size().isBetween(lower, upper);
+    }
+
+    @BeforeTemplate
+    AbstractIterableAssert<?, ?, E, ?> before2(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int lower, int upper) {
+      return enumAssert.size().isBetween(lower, upper).returnToIterable();
     }
 
     @AfterTemplate
