@@ -44,7 +44,10 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Comparator<String>> testReverseOrder() {
     return ImmutableSet.of(
-        Comparator.reverseOrder(), Comparator.reverseOrder(), Comparator.reverseOrder());
+        Comparator.reverseOrder(),
+        Comparator.reverseOrder(),
+        Comparator.reverseOrder(),
+        Comparator.reverseOrder());
   }
 
   ImmutableSet<Comparator<String>> testCustomComparator() {
