@@ -43,7 +43,16 @@ final class AssertJEnumerableRules {
     }
 
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
+    AbstractIterableAssert<?, ?, E, ?> before(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
+      return Refaster.anyOf(
+          enumAssert.size().isNotEqualTo(0).returnToIterable(),
+          enumAssert.size().isPositive().returnToIterable());
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
       return Refaster.anyOf(enumAssert.size().isNotEqualTo(0), enumAssert.size().isPositive());
     }
 
@@ -55,7 +64,15 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertHasSize<E> {
     @BeforeTemplate
-    AbstractIterableSizeAssert<?, ?, E, ?> before(
+    AbstractIterableAssert<?, ?, E, ?> before(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isEqualTo(size).returnToIterable();
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIterableSizeAssert<?, ?, E, ?> before2(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isEqualTo(size);
     }
@@ -68,7 +85,15 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertHasSizeLessThan<E> {
     @BeforeTemplate
-    AbstractIterableSizeAssert<?, ?, E, ?> before(
+    AbstractIterableAssert<?, ?, E, ?> before(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isLessThan(size).returnToIterable();
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIterableSizeAssert<?, ?, E, ?> before2(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isLessThan(size);
     }
@@ -81,7 +106,15 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertHasSizeLessThanOrEqualTo<E> {
     @BeforeTemplate
-    AbstractIterableSizeAssert<?, ?, E, ?> before(
+    AbstractIterableAssert<?, ?, E, ?> before(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isLessThanOrEqualTo(size).returnToIterable();
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIterableSizeAssert<?, ?, E, ?> before2(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isLessThanOrEqualTo(size);
     }
@@ -94,7 +127,15 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertHasSizeGreaterThan<E> {
     @BeforeTemplate
-    AbstractIterableSizeAssert<?, ?, E, ?> before(
+    AbstractIterableAssert<?, ?, E, ?> before(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isGreaterThan(size).returnToIterable();
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIterableSizeAssert<?, ?, E, ?> before2(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isGreaterThan(size);
     }
@@ -107,7 +148,15 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertHasSizeGreaterThanOrEqualTo<E> {
     @BeforeTemplate
-    AbstractIterableSizeAssert<?, ?, E, ?> before(
+    AbstractIterableAssert<?, ?, E, ?> before(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
+      return enumAssert.size().isGreaterThanOrEqualTo(size).returnToIterable();
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIterableSizeAssert<?, ?, E, ?> before2(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int size) {
       return enumAssert.size().isGreaterThanOrEqualTo(size);
     }
@@ -120,7 +169,15 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertHasSizeBetween<E> {
     @BeforeTemplate
-    AbstractIterableSizeAssert<?, ?, E, ?> before(
+    AbstractIterableAssert<?, ?, E, ?> before(
+        AbstractIterableAssert<?, ?, E, ?> enumAssert, int lower, int upper) {
+      return enumAssert.size().isBetween(lower, upper).returnToIterable();
+    }
+
+    // XXX: If this template matches, then the expression's return type changes incompatibly.
+    // Consider moving this template to a separate block (statement) rule.
+    @BeforeTemplate
+    AbstractIterableSizeAssert<?, ?, E, ?> before2(
         AbstractIterableAssert<?, ?, E, ?> enumAssert, int lower, int upper) {
       return enumAssert.size().isBetween(lower, upper);
     }
