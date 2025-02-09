@@ -282,6 +282,8 @@ final class OptionalRules {
   // XXX: The rewritten `filter`/`map` expression may be more performant than its replacement. See
   // https://github.com/palantir/gradle-baseline/pull/2946. (There are plans to pair Refaster rules
   // with JMH benchmarks; this would be a great use case.)
+  // XXX: Perhaps `stream.mapMulti(Optional::ifPresent)` is what we should use. See
+  // https://github.com/palantir/gradle-baseline/pull/2996.
   static final class StreamFlatMapOptional<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
