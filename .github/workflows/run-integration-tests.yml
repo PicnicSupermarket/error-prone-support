@@ -22,14 +22,14 @@ jobs:
         integration-test: [ "checkstyle", "metrics", "prometheus-java-client" ]
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@c95a14d0e5bab51a9f56296a4eb0e416910cd350 # v2.10.3
+        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
         with:
           disable-sudo: true
           egress-policy: block
+          # XXX: After updating the validation build flags in
+          # `integration-tests/prometheus-java-client.sh`, review whether the
+          # Docker domains specified here can be dropped.
           allowed-endpoints: >
-            # XXX: After updating the validation build flags in
-            # `integration-tests/prometheus-java-client.sh`, review whether the
-            # Docker domains specified here can be dropped.
             api.adoptium.net:443
             auth.docker.io:443
             checkstyle.org:443

@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.19.2-SNAPSHOT</version>
+    <version>0.20.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -146,7 +146,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2024-11-03T15:58:19Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-02-02T12:19:40Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -219,7 +219,7 @@
         <version.nopen>1.0.1</version.nopen>
         <version.nullaway>0.12.3</version.nullaway>
         <version.pitest-git>1.1.4</version.pitest-git>
-        <version.rewrite-templating>1.21.0</version.rewrite-templating>
+        <version.rewrite-templating>1.22.1</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
@@ -280,7 +280,7 @@
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.1.8</version>
+                <version>3.2.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -396,7 +396,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.27</version>
+                <version>2.2.28</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -431,7 +431,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.15.11</version>
+                <version>1.17.0</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -449,14 +449,14 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.27.2</version>
+                <version>3.27.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.48.4</version>
+                <version>3.49.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -495,7 +495,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-core</artifactId>
-                <version>5.3.0</version>
+                <version>5.3.1</version>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -515,7 +515,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.0.1</version>
+                <version>3.2.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -536,7 +536,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -945,7 +945,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.21.1</version>
+                            <version>10.21.2</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1500,7 +1500,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1561,7 +1561,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.17.4</version>
+                    <version>1.18.0</version>
                     <configuration>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
