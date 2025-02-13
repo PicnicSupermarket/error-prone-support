@@ -9,8 +9,11 @@ import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import com.google.common.primitives.UnsignedBytes;
 import com.google.common.primitives.UnsignedInts;
 import com.google.common.primitives.UnsignedLongs;
+import java.util.Arrays;
+import java.util.Comparator;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
@@ -25,6 +28,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Ints.class,
         Longs.class,
         Shorts.class,
+        UnsignedBytes.class,
         UnsignedInts.class,
         UnsignedLongs.class);
   }
@@ -221,5 +225,17 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
 
   String testLongToUnsignedStringWithRadix() {
     return Long.toUnsignedString(1, 2);
+  }
+
+  Comparator<byte[]> testArraysCompareUnsignedBytes() {
+    return Arrays::compareUnsigned;
+  }
+
+  Comparator<int[]> testArraysCompareUnsignedInts() {
+    return Arrays::compareUnsigned;
+  }
+
+  Comparator<long[]> testArraysCompareUnsignedLongs() {
+    return Arrays::compareUnsigned;
   }
 }
