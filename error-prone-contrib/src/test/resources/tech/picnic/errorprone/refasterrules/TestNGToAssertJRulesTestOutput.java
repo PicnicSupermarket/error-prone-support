@@ -160,8 +160,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(Integer.valueOf(0)).withFailMessage("corge").isEqualTo(1);
     assertThat(Integer.valueOf(0)).withFailMessage("grault").isEqualTo(Integer.valueOf(1));
     assertThat(0L).withFailMessage("garply").isEqualTo(1L);
-    // XXX: Ambiguous method call, as the relevant overload is missing. See testng-team/testng#3199.
-    // assertEquals(0L, Long.valueOf(1), "waldo");
+    assertThat(0L).withFailMessage("waldo").isEqualTo(Long.valueOf(1));
     assertThat(Long.valueOf(0)).withFailMessage("fred").isEqualTo(1L);
     assertThat(Long.valueOf(0)).withFailMessage("plugh").isEqualTo(Long.valueOf(1));
     assertThat(0.0F).withFailMessage("xyzzy").isEqualTo(1.0F);

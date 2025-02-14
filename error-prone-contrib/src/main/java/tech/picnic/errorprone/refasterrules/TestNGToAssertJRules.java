@@ -66,6 +66,7 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
        */
       "assertEqualsDeep(Map<?, ?>, Map<?, ?>)",
       "assertEqualsDeep(Map<?, ?>, Map<?, ?>, String)",
+      "assertEqualsDeep(Set<?>, Set<?>)",
       "assertEqualsDeep(Set<?>, Set<?>, String)",
       // XXX: Add migrations for the methods below.
       "assertEqualsNoOrder(Collection<?>, Collection<?>)",
@@ -585,6 +586,11 @@ final class TestNGToAssertJRules {
 
     @BeforeTemplate
     void before(long actual, String message, long expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(long actual, String message, Long expected) {
       assertEquals(actual, expected, message);
     }
 
