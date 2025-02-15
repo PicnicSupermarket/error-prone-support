@@ -300,6 +300,7 @@ final class TestNGToAssertJRules {
     }
   }
 
+  @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
   static final class AssertEqual {
     @BeforeTemplate
     void before(boolean actual, boolean expected) {
