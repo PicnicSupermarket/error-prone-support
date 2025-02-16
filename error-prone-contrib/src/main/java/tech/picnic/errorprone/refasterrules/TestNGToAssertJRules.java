@@ -66,6 +66,7 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
        */
       "assertEqualsDeep(Map<?, ?>, Map<?, ?>)",
       "assertEqualsDeep(Map<?, ?>, Map<?, ?>, String)",
+      "assertEqualsDeep(Set<?>, Set<?>)",
       "assertEqualsDeep(Set<?>, Set<?>, String)",
       // XXX: Add migrations for the methods below.
       "assertEqualsNoOrder(Collection<?>, Collection<?>)",
@@ -299,6 +300,7 @@ final class TestNGToAssertJRules {
     }
   }
 
+  @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
   static final class AssertEqual {
     @BeforeTemplate
     void before(boolean actual, boolean expected) {
@@ -482,6 +484,7 @@ final class TestNGToAssertJRules {
     }
   }
 
+  @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
   static final class AssertEqualWithMessage {
     @BeforeTemplate
     void before(boolean actual, String message, boolean expected) {
@@ -585,6 +588,11 @@ final class TestNGToAssertJRules {
 
     @BeforeTemplate
     void before(long actual, String message, long expected) {
+      assertEquals(actual, expected, message);
+    }
+
+    @BeforeTemplate
+    void before(long actual, String message, Long expected) {
       assertEquals(actual, expected, message);
     }
 
