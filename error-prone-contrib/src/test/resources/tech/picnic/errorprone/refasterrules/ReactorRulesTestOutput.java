@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -717,6 +718,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<String> testMonoFromFutureAsyncLoadingCacheGet() {
     return Mono.fromFuture(() -> ((AsyncLoadingCache<Integer, String>) null).get(0), true);
+  }
+
+  Mono<Map<Integer, String>> testMonoFromFutureAsyncLoadingCacheGetAll() {
+    return Mono.fromFuture(
+        () -> ((AsyncLoadingCache<Integer, String>) null).getAll(ImmutableSet.of()), true);
   }
 
   Flux<Integer> testFluxFromStreamSupplier() {

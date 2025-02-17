@@ -2175,6 +2175,22 @@ final class ReactorRules {
   }
 
   /**
+   * Don't propagate {@link Mono} cancellations to an upstream cache value computation, as
+   * completion of such computations may benefit concurrent or subsequent cache usages.
+   */
+  static final class MonoFromFutureAsyncLoadingCacheGetAll<K1, K2 extends K1, V> {
+    @BeforeTemplate
+    Mono<Map<K1, V>> before(AsyncLoadingCache<K1, V> cache, Iterable<K2> key) {
+      return Mono.fromFuture(() -> cache.getAll(key));
+    }
+
+    @AfterTemplate
+    Mono<Map<K1, V>> after(AsyncLoadingCache<K1, V> cache, Iterable<K2> key) {
+      return Mono.fromFuture(() -> cache.getAll(key), /* suppressCancel= */ true);
+    }
+  }
+
+  /**
    * Prefer {@link Flux#fromStream(Supplier)} over {@link Flux#fromStream(Stream)}, as the former
    * yields a {@link Flux} that is more likely to behave as expected when subscribed to more than
    * once.
