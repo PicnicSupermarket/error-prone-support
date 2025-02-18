@@ -1085,7 +1085,8 @@ final class ReactorRules {
     Mono<Optional<T>> before(Mono<T> mono) {
       return Refaster.anyOf(
           mono.flux().collect(toOptional()),
-          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
+          mono.map(Optional::of),
+          mono.singleOptional().defaultIfEmpty(Optional.empty()),
           mono.transform(Mono::singleOptional));
     }
 
