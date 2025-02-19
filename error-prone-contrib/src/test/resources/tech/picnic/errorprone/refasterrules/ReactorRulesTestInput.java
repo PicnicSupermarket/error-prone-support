@@ -394,7 +394,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("foo").flux().collect(toOptional()),
         Mono.just("bar").map(Optional::of),
         Mono.just("baz").singleOptional().defaultIfEmpty(Optional.empty()),
-        Mono.just("quux").singleOptional().switchIfEmpty(Mono.empty()),
+        Mono.just("quux").singleOptional().switchIfEmpty(Mono.just(Optional.empty())),
         Mono.just("quuz").transform(Mono::singleOptional));
   }
 
