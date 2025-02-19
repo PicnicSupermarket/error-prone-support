@@ -17,6 +17,7 @@ final class StaticImportEdgeCaseRules {
     Map<K, V> before(K k1, V v1) {
       return Refaster.anyOf(
           //          ImmutableMap.<K, V>builder().put(k1, v1).buildOrThrow(),
+          // XXX: Simply remove the first of the `Refaster#anyOf` and it will match.
           ImmutableMap.ofEntries(Map.entry(k1, v1)), singletonMap(k1, v1));
       //          Map.of(k1, v1));
     }
