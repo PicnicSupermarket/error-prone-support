@@ -1082,11 +1082,12 @@ final class ReactorRules {
   // rule. Consider introducing an Error Prone check for this.
   static final class MonoSingleOptional<T> {
     @BeforeTemplate
-    Mono<Optional<T>> before(Mono<T> mono) {
+    Mono<Optional<T>> before(Mono<T> mono, Optional<T> optional, Mono<Optional<T>> alternate) {
       return Refaster.anyOf(
           mono.flux().collect(toOptional()),
           mono.map(Optional::of),
-          mono.singleOptional().defaultIfEmpty(Optional.empty()),
+          mono.singleOptional().defaultIfEmpty(optional),
+          mono.singleOptional().switchIfEmpty(alternate),
           mono.transform(Mono::singleOptional));
     }
 

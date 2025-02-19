@@ -389,7 +389,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("foo").singleOptional(),
         Mono.just("bar").singleOptional(),
         Mono.just("baz").singleOptional(),
-        Mono.just("quux").singleOptional());
+        Mono.just("quux").singleOptional(),
+        Mono.just("quuz").singleOptional());
   }
 
   Mono<Number> testMonoCast() {
