@@ -340,7 +340,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Mono<Void>> testMonoThen() {
-    return ImmutableSet.of(Mono.just("foo").then(), Mono.just("bar").then());
+    return ImmutableSet.of(
+        Mono.just("foo").then(), Mono.just("bar").then(), Mono.just("baz").then());
   }
 
   ImmutableSet<Mono<Void>> testFluxThen() {
