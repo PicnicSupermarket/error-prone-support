@@ -939,7 +939,7 @@ final class ReactorRules {
   static final class MonoThen<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Mono<T> mono) {
-      return Refaster.anyOf(mono.ignoreElement().then(), mono.flux().then());
+      return Refaster.anyOf(mono.ignoreElement().then(), mono.flux().then(), Mono.when(mono));
     }
 
     @AfterTemplate
