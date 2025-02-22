@@ -100,7 +100,10 @@ public final class EmptyPublisher extends BugChecker implements MethodInvocation
               "handle",
               "ignoreElement",
               "map",
-              "mapNotNull");
+              "mapNotNull",
+              "timestamp",
+              "zipWhen",
+              "zipWith");
 
   private static final Matcher<ExpressionTree> SUBSCRIBE =
       instanceMethod()
