@@ -1,21 +1,26 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class EmptyReactivePublisherTest {
+final class EmptyPublisherTest {
+  // XXX: Reorder test cases.
+  // XXX: Update numbering.
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(EmptyReactivePublisher.class, getClass())
+    CompilationTestHelper.newInstance(EmptyPublisher.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.common.collect.ImmutableSet;",
+            "import org.reactivestreams.Subscriber;",
             "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
-            "import reactor.util.context.Context;",
             "",
             "class A {",
             "  void m() {",
+            "    Mono.just(0).subscribe(i -> {});",
             "    Mono.just(1).doOnNext(i -> {});",
             "    Mono.just(2).filter(i -> true);",
             "    Mono.just(3).flatMap(Mono::just);",
@@ -71,21 +76,44 @@ final class EmptyReactivePublisherTest {
             "    // BUG: Diagnostic contains: map",
             "    Mono.just(14).then().map(i -> i);",
             "",
-            "    Mono.just(15).subscribe();",
-            "    Mono.just(16).subscribe(null, t -> {});",
+            "    Mono.just(15).then().subscribe();",
+            "    Mono.just(16).then().subscribe((Subscriber<Object>) null);",
+            "    Mono.just(17).then().subscribe(null, t -> {});",
             "",
             "    // BUG: Diagnostic contains:",
             "    Mono.just(17).then().subscribe(i -> {});",
             "    // BUG: Diagnostic contains:",
             "    Mono.just(18).then().subscribe(i -> {}, t -> {});",
-            "    // BUG: Diagnostic contains:",
-            "    Mono.just(19).then().subscribe(i -> {}, t -> {}, () -> {});",
-            "    // BUG: Diagnostic contains:",
-            "    Mono.just(20).then().subscribe(i -> {}, t -> {}, () -> {}, j -> {});",
-            "    // BUG: Diagnostic contains:",
-            "    Mono.just(21).then().subscribe(i -> {}, t -> {}, () -> {}, Context.empty());",
             "  }",
             "}")
         .doTest();
+  }
+
+  @Test
+  void replacement() {
+    BugCheckerRefactoringTestHelper.newInstance(EmptyPublisher.class, getClass())
+        .addInputLines(
+            "A.java",
+            "import reactor.core.publisher.Mono;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Mono.empty().map(i -> 1);",
+            "    Mono.empty().doOnNext(i -> {});",
+            "    Mono.empty().doOnNext(i -> {}).onErrorComplete();",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import reactor.core.publisher.Mono;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Mono.empty().map(i -> 1);",
+            "    Mono.empty();",
+            "    Mono.empty().onErrorComplete();",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
   }
 }

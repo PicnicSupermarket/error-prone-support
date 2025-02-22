@@ -551,7 +551,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
-      return Refaster.anyOf(mono.ignoreElement(), mono.then());
+      return mono.then();
     }
 
     // XXX: Replace this rule with an extension of the `IdentityConversion` rule, supporting
