@@ -374,9 +374,50 @@ final class ReactorRules {
           mono.then(Mono.just(object)));
     }
 
+    @BeforeTemplate
+    Mono<T> before2(@Matches(IsEmpty.class) Mono<T> mono, T object) {
+      return mono.defaultIfEmpty(object);
+    }
+
     @AfterTemplate
     Mono<S> after(Mono<T> mono, S object) {
       return mono.thenReturn(object);
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Mono#hasElement()} when the receiver is known to be empty;
+   * explicitly communicate the element emitted downstream instead.
+   */
+  // XXX: If we introduce an `IsNotEmpty` matcher, we can introduce a similar `MonoThenReturnTrue`
+  // rule.
+  static final class MonoThenReturnFalse<T> {
+    @BeforeTemplate
+    Mono<Boolean> before(@Matches(IsEmpty.class) Mono<T> mono) {
+      return mono.hasElement();
+    }
+
+    @AfterTemplate
+    Mono<Boolean> after(Mono<T> mono) {
+      return mono.thenReturn(false);
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Mono#singleOptional()} when the receiver is known to be
+   * empty; explicitly communicate the element emitted downstream instead.
+   */
+  // XXX: If we introduce an `IsNotEmpty` matcher, we can introduce a similar
+  // `MonoThenReturnOptionalOf` rule.
+  static final class MonoThenReturnOptionalEmpty<T> {
+    @BeforeTemplate
+    Mono<Optional<T>> before(@Matches(IsEmpty.class) Mono<T> mono) {
+      return mono.singleOptional();
+    }
+
+    @AfterTemplate
+    Mono<Optional<T>> after(Mono<T> mono) {
+      return mono.thenReturn(Optional.empty());
     }
   }
 
@@ -1029,6 +1070,11 @@ final class ReactorRules {
       return flux.ignoreElements().thenMany(publisher);
     }
 
+    @BeforeTemplate
+    Flux<T> before2(@Matches(IsEmpty.class) Flux<T> flux, Publisher<? extends T> publisher) {
+      return flux.switchIfEmpty(publisher);
+    }
+
     @AfterTemplate
     Flux<S> after(Flux<T> flux, Publisher<S> publisher) {
       return flux.thenMany(publisher);
@@ -1043,7 +1089,12 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
+    Mono<T> before2(@Matches(IsEmpty.class) Mono<T> mono1, Mono<? extends T> mono2) {
+      return mono1.switchIfEmpty(mono2);
+    }
+
+    @BeforeTemplate
+    Mono<@Nullable Void> before3(Mono<T> mono1, Mono<@Nullable Void> mono2) {
       return mono1.thenEmpty(mono2);
     }
 
@@ -1092,11 +1143,18 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#cast(Class)} over {@link Mono#map(Function)} with a cast. */
+  /** Prefer {@link Mono#cast(Class)} over more contrived alternatives. */
   static final class MonoCast<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono) {
       return mono.map(Refaster.<S>clazz()::cast);
+    }
+
+    // XXX: In cases where this template matches, often the `cast` operation can be avoided by
+    // passing an explicit type argument to the preceding reactive operator.
+    @BeforeTemplate
+    Mono<S> before2(@Matches(IsEmpty.class) Mono<T> mono) {
+      return mono.ofType(Refaster.<S>clazz());
     }
 
     @AfterTemplate
@@ -1105,11 +1163,18 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#cast(Class)} over {@link Flux#map(Function)} with a cast. */
+  /** Prefer {@link Flux#cast(Class)} over more contrived alternatives. */
   static final class FluxCast<T, S> {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux) {
       return flux.map(Refaster.<S>clazz()::cast);
+    }
+
+    // XXX: In cases where this template matches, often the `cast` operation can be avoided by
+    // passing an explicit type argument to the preceding reactive operator.
+    @BeforeTemplate
+    Flux<S> before2(@Matches(IsEmpty.class) Flux<T> flux) {
+      return flux.ofType(Refaster.<S>clazz());
     }
 
     @AfterTemplate

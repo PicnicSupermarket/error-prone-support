@@ -148,7 +148,16 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.just(1).thenReturn("foo"),
         Mono.just(2).thenReturn("bar"),
-        Mono.just(3).thenReturn("baz"));
+        Mono.just(3).thenReturn("baz"),
+        Mono.empty().thenReturn("qux"));
+  }
+
+  Mono<Boolean> testMonoThenReturnFalse() {
+    return Mono.empty().thenReturn(false);
+  }
+
+  Mono<Optional<Object>> testMonoThenReturnOptionalEmpty() {
+    return Mono.empty().thenReturn(Optional.empty());
   }
 
   Flux<Integer> testFluxTake() {
@@ -364,14 +373,17 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just("foo").then(Mono.just("bar")).flux();
   }
 
-  Flux<String> testFluxThenMany() {
-    return Flux.just("foo").thenMany(Flux.just("bar"));
+  ImmutableSet<Flux<String>> testFluxThenMany() {
+    return ImmutableSet.of(
+        Flux.just("foo").thenMany(Flux.just("bar")),
+        Flux.<String>empty().thenMany(Flux.just("baz", "qux")));
   }
 
   ImmutableSet<Mono<?>> testMonoThenMono() {
     return ImmutableSet.of(
         Mono.just("foo").then(Mono.just("bar")),
         Mono.just("baz").then(Mono.just("qux")),
+        Mono.empty().then(Mono.never()),
         Mono.just("quux").then(Mono.<Void>empty()));
   }
 
@@ -387,12 +399,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("baz").singleOptional());
   }
 
-  Mono<Number> testMonoCast() {
-    return Mono.just(1).cast(Number.class);
+  ImmutableSet<Mono<Number>> testMonoCast() {
+    return ImmutableSet.of(Mono.just(1).cast(Number.class), Mono.empty().cast(Number.class));
   }
 
-  Flux<Number> testFluxCast() {
-    return Flux.just(1).cast(Number.class);
+  ImmutableSet<Flux<Number>> testFluxCast() {
+    return ImmutableSet.of(Flux.just(1).cast(Number.class), Flux.empty().cast(Number.class));
   }
 
   Mono<Number> testMonoOfType() {

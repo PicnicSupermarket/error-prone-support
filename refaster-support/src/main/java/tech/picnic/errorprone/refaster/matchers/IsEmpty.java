@@ -10,18 +10,24 @@ import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
+import static com.google.errorprone.matchers.Matchers.typePredicateMatcher;
+import static tech.picnic.errorprone.utils.MoreTypePredicates.isSubTypeOf;
+import static tech.picnic.errorprone.utils.MoreTypes.generic;
+import static tech.picnic.errorprone.utils.MoreTypes.type;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,6 +63,7 @@ import java.util.stream.Stream;
 public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Integer ZERO = 0;
+  private static final Supplier<Type> VOID = type(Void.class.getCanonicalName());
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
   private static final Matcher<Tree> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT =
       anyOf(isPrimitiveType(), isSubtypeOf(Comparator.class));
@@ -73,7 +80,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
           isSameType(TreeMap.class),
           isSameType(TreeSet.class),
           isSameType(Vector.class));
-  private static final Matcher<ExpressionTree> EMPTY_INSTANCE_FACTORY =
+  private static final Matcher<ExpressionTree> EMPTY_INSTANCE =
       anyOf(
           staticField(Collections.class.getCanonicalName(), "EMPTY_LIST"),
           staticField(Collections.class.getCanonicalName(), "EMPTY_MAP"),
@@ -103,9 +110,10 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                               "reactor.core.publisher.Mono",
                               "reactor.util.context.Context")
                           .named("empty"),
-                      staticMethod()
-                          .onDescendantOf("reactor.core.publisher.Flux")
-                          .named("just")))));
+                      staticMethod().onDescendantOf("reactor.core.publisher.Flux").named("just")))),
+          // XXX: We could also match `Iterable<Void>` and `Stream<Void>` subtypes, but those are
+          // rarely or never seen in the wild.
+          typePredicateMatcher(isSubTypeOf(generic(type("org.reactivestreams.Publisher"), VOID))));
 
   /** Instantiates a new {@link IsEmpty} instance. */
   public IsEmpty() {}
@@ -113,7 +121,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
     return isEmptyArrayCreation(tree)
-        || EMPTY_INSTANCE_FACTORY.matches(tree, state)
+        || EMPTY_INSTANCE.matches(tree, state)
         || isEmptyCollectionConstructor(tree, state);
   }
 

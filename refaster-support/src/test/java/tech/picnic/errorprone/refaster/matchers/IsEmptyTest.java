@@ -429,6 +429,11 @@ final class IsEmptyTest {
             "    // BUG: Diagnostic contains:",
             "    return Flux.just();",
             "  }",
+            "",
+            "  Mono<Void> positive57() {",
+            "    // BUG: Diagnostic contains:",
+            "    return Mono.just(1).then();",
+            "  }",
             "}")
         .doTest();
   }

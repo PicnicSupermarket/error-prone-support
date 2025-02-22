@@ -143,7 +143,16 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.just(1).ignoreElement().thenReturn("foo"),
         Mono.just(2).then().thenReturn("bar"),
-        Mono.just(3).then(Mono.just("baz")));
+        Mono.just(3).then(Mono.just("baz")),
+        Mono.empty().thenReturn("qux"));
+  }
+
+  Mono<Boolean> testMonoThenReturnFalse() {
+    return Mono.empty().hasElement();
+  }
+
+  Mono<Optional<Object>> testMonoThenReturnOptionalEmpty() {
+    return Mono.empty().singleOptional();
   }
 
   Flux<Integer> testFluxTake() {
@@ -368,14 +377,17 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just("foo").thenMany(Mono.just("bar"));
   }
 
-  Flux<String> testFluxThenMany() {
-    return Flux.just("foo").ignoreElements().thenMany(Flux.just("bar"));
+  ImmutableSet<Flux<String>> testFluxThenMany() {
+    return ImmutableSet.of(
+        Flux.just("foo").ignoreElements().thenMany(Flux.just("bar")),
+        Flux.<String>empty().switchIfEmpty(Flux.just("baz", "qux")));
   }
 
   ImmutableSet<Mono<?>> testMonoThenMono() {
     return ImmutableSet.of(
         Mono.just("foo").ignoreElement().then(Mono.just("bar")),
         Mono.just("baz").flux().then(Mono.just("qux")),
+        Mono.empty().switchIfEmpty(Mono.never()),
         Mono.just("quux").thenEmpty(Mono.<Void>empty()));
   }
 
@@ -392,12 +404,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("baz").transform(Mono::singleOptional));
   }
 
-  Mono<Number> testMonoCast() {
-    return Mono.just(1).map(Number.class::cast);
+  ImmutableSet<Mono<Number>> testMonoCast() {
+    return ImmutableSet.of(Mono.just(1).map(Number.class::cast), Mono.empty().ofType(Number.class));
   }
 
-  Flux<Number> testFluxCast() {
-    return Flux.just(1).map(Number.class::cast);
+  ImmutableSet<Flux<Number>> testFluxCast() {
+    return ImmutableSet.of(Flux.just(1).map(Number.class::cast), Flux.empty().ofType(Number.class));
   }
 
   Mono<Number> testMonoOfType() {
