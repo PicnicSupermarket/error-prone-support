@@ -59,6 +59,7 @@ import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
+// For `@Matches(IsEmpty) {mono,flux}`, can `#takeUntilOther` and be replaced with `#or`?
 @OnlineDocumentation
 final class ReactorRules {
   private ReactorRules() {}
