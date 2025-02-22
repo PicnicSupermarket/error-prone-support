@@ -346,7 +346,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just("foo").ignoreElement().then(),
         Mono.just("bar").flux().then(),
         Mono.when(Mono.just("baz")),
-        Mono.when(Mono.just("qux")));
+        Mono.whenDelayError(Mono.just("qux")));
   }
 
   ImmutableSet<Mono<Void>> testFluxThen() {
