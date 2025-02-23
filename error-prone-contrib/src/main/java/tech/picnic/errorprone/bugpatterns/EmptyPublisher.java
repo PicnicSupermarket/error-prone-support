@@ -71,18 +71,95 @@ public final class EmptyPublisher extends BugChecker implements MethodInvocation
           staticMethod().onDescendantOf(MONO).namedAnyOf("empty", "never"),
           typePredicateMatcher(isSubTypeOf(generic(MONO, VOID))));
 
+  // XXX: Include `reduce` and `scan` in this list. Only the 1-arg variants are a no-op.
+  // XXX: Include the non-duration `take` variants in this list.
+  // XXX: Not a no-op, and may be dropped if types match:
+  // - all
+  // - any
+  // - count
+  // - reduce with two arguments (can be `startWith(x)`?)
+  // - reduceWith
+  // - scan with two arguments (can be `startWith(x)`?)
+  // - scanWith
+  // - last, single (+ others; see Refaster rules).
+  // XXX: The `collect*` (and possibly some of the `buffer*` and `window*`) operations below do
+  // change what's
+  // emitted. Handle differently.
+  // XXX: Should this list include `groupJoin`, `join`, `windowWhen`, `withLatestFrom`,
+  // `zipWith`...?
+  // XXX: The `onBackpressure*` and some `take` operators do influence how much is requested
+  // upstream, and may thus not be true no-ops; evaluate whether they should really be part of this
+  // list.
+  // XXX: What about `publish`?
+  // XXX: What about `toIterable()` and `toStream()`?
   private static final Matcher<ExpressionTree> VACUOUS_EMPTY_FLUX_OPERATORS =
       instanceMethod()
           .onDescendantOf(FLUX)
           .namedAnyOf(
+              "buffer",
+              "bufferTimeout",
+              "bufferUntil",
+              "bufferUntilChanged",
+              "bufferWhile",
+              "collect",
+              "collectList",
+              "collectMap",
+              "collectMultimap",
+              "collectSortedList",
               "concatMap",
+              "concatMapDelayError",
+              "concatMapIterable",
+              "delayElements",
+              "delaySequence",
+              "delayUntil",
+              "distinct",
+              "distinctUntilChanged",
               "doOnNext",
+              "elapsed",
+              "expand",
+              "expandDeep",
               "filter",
+              "filterWhen",
               "flatMap",
+              "flatMapDelayError",
               "flatMapIterable",
               "flatMapSequential",
+              "flatMapSequentialDelayError",
+              "groupBy",
               "handle",
-              "map");
+              "ignoreElements",
+              "index",
+              "limitRate",
+              "map",
+              "mapNotNull",
+              "next",
+              "ofType",
+              "onBackpressureBuffer",
+              "onBackpressureDrop",
+              "onBackpressureError",
+              "onBackpressureLatest",
+              "parallel",
+              "sample",
+              "sampleFirst",
+              "sampleTimeout",
+              "singleOrEmpty",
+              "skip",
+              "skipLast",
+              "skipUntil",
+              "skipWhile",
+              "sort",
+              "switchMap",
+              "take",
+              "takeLast",
+              "takeUntil",
+              "takeWhile",
+              "timed",
+              "timestamp",
+              "window",
+              "windowTimeout",
+              "windowUntil",
+              "windowUntilChanged",
+              "windowWhile", "zipWithIterable");
   private static final Matcher<ExpressionTree> VACUOUS_EMPTY_MONO_OPERATORS =
       instanceMethod()
           .onDescendantOf(MONO)
@@ -95,12 +172,13 @@ public final class EmptyPublisher extends BugChecker implements MethodInvocation
               "filter",
               "filterWhen",
               "flatMap",
-              "flatMapMany",
               "flatMapIterable",
+              "flatMapMany",
               "handle",
               "ignoreElement",
               "map",
               "mapNotNull",
+              "ofType",
               "timestamp",
               "zipWhen",
               "zipWith");
@@ -140,6 +218,8 @@ public final class EmptyPublisher extends BugChecker implements MethodInvocation
 
     if (EMPTY_FLUX.matches(receiver, state) && VACUOUS_EMPTY_FLUX_OPERATORS.matches(tree, state)) {
       // XXX: Do the same as for `Mono` below, and update the tests.
+      // XXX: Here and below: don't call it a no-op if the return type is changed. Test error
+      // messages!
       return buildDescription(tree)
           .setMessage(
               String.format(
