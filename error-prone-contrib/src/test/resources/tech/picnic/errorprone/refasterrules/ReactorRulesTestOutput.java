@@ -375,7 +375,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Flux<String>> testFluxThenMany() {
     return ImmutableSet.of(
         Flux.just("foo").thenMany(Flux.just("bar")),
-        Flux.<String>empty().thenMany(Flux.just("baz", "qux")));
+        Flux.<String>empty().thenMany(Mono.just("baz")),
+        Flux.<String>empty().thenMany(Flux.just("qux", "quux")));
   }
 
   ImmutableSet<Mono<?>> testMonoThenMono() {

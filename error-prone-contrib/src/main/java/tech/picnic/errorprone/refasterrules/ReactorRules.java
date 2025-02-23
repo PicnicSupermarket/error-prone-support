@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -59,7 +60,8 @@ import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
-// For `@Matches(IsEmpty) {mono,flux}`, can `#takeUntilOther` and be replaced with `#or`?
+// For `@Matches(IsEmpty) {mono,flux}`, can `#takeUntilOther` and `#skipUntilOther` be replaced with
+// `#or` or some other merge operator?
 @OnlineDocumentation
 final class ReactorRules {
   private ReactorRules() {}
@@ -401,6 +403,181 @@ final class ReactorRules {
     @AfterTemplate
     Mono<Boolean> after(Mono<T> mono) {
       return mono.thenReturn(false);
+    }
+  }
+
+  /**
+   * Avoid invocations of {@link Flux#elementAt(int, Object)}, {@link Flux#last(Object)} and {@link
+   * Flux#single(Object)} when the receiver is known to be empty; explicitly communicate the element
+   * emitted downstream instead.
+   */
+  static final class FluxThenMonoJust<T> {
+    @BeforeTemplate
+    Mono<T> before(@Matches(IsEmpty.class) Flux<T> flux, T value, int index) {
+      return Refaster.anyOf(flux.elementAt(index, value), flux.last(value), flux.single(value));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux, T value) {
+      return flux.then(Mono.just(value));
+    }
+  }
+
+  /**
+   * Avoid invocations of {@link Flux#defaultIfEmpty(Object)} when the receiver is known to be
+   * empty; explicitly communicate the element emitted downstream instead.
+   */
+  static final class FluxThenManyMonoJust<T> {
+    @BeforeTemplate
+    Flux<T> before(@Matches(IsEmpty.class) Flux<T> flux, T value) {
+      return flux.defaultIfEmpty(value);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, T value) {
+      // XXX: One could argue it'd even be clearer here to do `.then(...).flux()`, to indicate that
+      // this is really a `Mono` in disguise.
+      return flux.thenMany(Mono.just(value));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#any(Predicate)}, {@code Flux#hasElements} and {@link
+   * Flux#hasElement(Object)} when the receiver is known to be empty; explicitly communicate the
+   * element emitted downstream instead.
+   */
+  static final class FluxThenMonoJustFalse<T> {
+    @BeforeTemplate
+    Mono<Boolean> before(
+        @Matches(IsEmpty.class) Flux<T> flux, Predicate<? super T> predicate, T element) {
+      return Refaster.anyOf(flux.any(predicate), flux.hasElements(), flux.hasElement(element));
+    }
+
+    @AfterTemplate
+    Mono<Boolean> after(Flux<T> flux) {
+      return flux.then(Mono.just(false));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#all(Predicate)} when the receiver is known to be
+   * empty; explicitly communicate the element emitted downstream instead.
+   */
+  static final class FluxThenMonoJustTrue<T> {
+    @BeforeTemplate
+    Mono<Boolean> before(@Matches(IsEmpty.class) Flux<T> flux, Predicate<? super T> predicate) {
+      return flux.all(predicate);
+    }
+
+    @AfterTemplate
+    Mono<Boolean> after(Flux<T> flux) {
+      return flux.then(Mono.just(true));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#count()} when the receiver is known to be empty;
+   * explicitly communicate the element emitted downstream instead.
+   */
+  static final class FluxThenMonoJust0<T> {
+    @BeforeTemplate
+    Mono<Long> before(@Matches(IsEmpty.class) Flux<T> flux) {
+      return flux.count();
+    }
+
+    @AfterTemplate
+    Mono<Integer> after(Flux<T> flux) {
+      return flux.then(Mono.just(0));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#buffer} when the receiver is known to be empty;
+   * explicitly communicate the element emitted downstream instead.
+   */
+  // XXX: The replacement expression introduces an immutable list, where the original expression
+  // emits a mutable `ArrayList`. This fact isn't documented, though.
+  // XXX: Likely this rule will be replaced. Similarly handle `collectMap`, `collectMultimap`,
+  // `collectSortedList`
+  static final class FluxThenMonoJustImmutableListOf<T> {
+    @BeforeTemplate
+    Mono<List<T>> before(@Matches(IsEmpty.class) Flux<T> flux) {
+      return flux.collectList();
+    }
+
+    @AfterTemplate
+    Mono<List<T>> after(Flux<T> flux) {
+      return flux.then(Mono.just(ImmutableList.of()));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#buffer} when the receiver is known to be empty;
+   * explicitly communicate the element emitted downstream instead.
+   */
+  // XXX: The replacement expression introduces an immutable list, where the original expressions
+  // emit a mutable `ArrayList`. This fact isn't documented, though.
+  static final class FluxThenMonoJustImmutableListOfFlux<T> {
+    @BeforeTemplate
+    Flux<List<T>> before(@Matches(IsEmpty.class) Flux<T> flux, int maxSize, int skip) {
+      return Refaster.anyOf(flux.buffer(), flux.buffer(maxSize), flux.buffer(maxSize, skip));
+    }
+
+    @AfterTemplate
+    Flux<List<T>> after(Flux<T> flux) {
+      return flux.then(Mono.<List<T>>just(ImmutableList.of())).flux();
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#elementAt(int)} when the receiver is known to be
+   * empty; explicitly communicate that an {@link IndexOutOfBoundsException} will be emitted
+   * instead.
+   */
+  static final class FluxThenMonoErrorNewIndexOutOfBoundsException<T> {
+    @BeforeTemplate
+    Mono<T> before(@Matches(IsEmpty.class) Flux<T> flux, int index) {
+      return flux.elementAt(index);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux, int index) {
+      return flux.then(Mono.error(() -> new IndexOutOfBoundsException(index)));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#last()} and {@link Flux#single()} when the receiver is
+   * known to be empty; explicitly communicate that an {@link NoSuchElementException} will be
+   * emitted instead.
+   */
+  static final class FluxThenMonoErrorNoSuchElementExceptionNew<T> {
+    @BeforeTemplate
+    Mono<T> before(@Matches(IsEmpty.class) Flux<T> flux) {
+      return Refaster.anyOf(flux.last(), flux.single());
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return flux.then(Mono.error(NoSuchElementException::new));
+    }
+  }
+
+  /**
+   * Avoid vacuous invocations of {@link Flux#buffer} when the receiver is known to be empty;
+   * explicitly communicate the element emitted downstream instead.
+   */
+  static final class FluxThenMonoFromSupplierFlux<T, C extends Collection<? super T>> {
+    @BeforeTemplate
+    Flux<C> before(
+        @Matches(IsEmpty.class) Flux<T> flux, Supplier<C> bufferSupplier, int maxSize, int skip) {
+      return Refaster.anyOf(
+          flux.buffer(maxSize, bufferSupplier), flux.buffer(maxSize, skip, bufferSupplier));
+    }
+
+    @AfterTemplate
+    Flux<C> after(Flux<T> flux, Supplier<C> bufferSupplier) {
+      return flux.then(Mono.fromSupplier(bufferSupplier)).flux();
     }
   }
 
@@ -991,6 +1168,7 @@ final class ReactorRules {
   }
 
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  // XXX: Check whether there's a nice non-Void alternative to `emptyFlux#next()`.
   static final class FluxThen<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Flux<T> flux) {
@@ -1073,7 +1251,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     Flux<T> before2(@Matches(IsEmpty.class) Flux<T> flux, Publisher<? extends T> publisher) {
-      return flux.switchIfEmpty(publisher);
+      return Refaster.anyOf(flux.concatWith(publisher), flux.switchIfEmpty(publisher));
     }
 
     @AfterTemplate
