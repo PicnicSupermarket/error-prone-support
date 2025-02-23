@@ -159,7 +159,8 @@ public final class EmptyPublisher extends BugChecker implements MethodInvocation
               "windowTimeout",
               "windowUntil",
               "windowUntilChanged",
-              "windowWhile", "zipWithIterable");
+              "windowWhile",
+              "zipWithIterable");
   private static final Matcher<ExpressionTree> VACUOUS_EMPTY_MONO_OPERATORS =
       instanceMethod()
           .onDescendantOf(MONO)
