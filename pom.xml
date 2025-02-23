@@ -1306,6 +1306,7 @@
                         <properties>
                             <configurationParameters>junit.jupiter.execution.parallel.enabled=true
                                 junit.jupiter.execution.parallel.mode.default=concurrent
+                                junit.jupiter.execution.timeout.threaddump.enabled=true
                                 junit.platform.stacktrace.pruning.enabled=false</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
