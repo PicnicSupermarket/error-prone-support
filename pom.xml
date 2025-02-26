@@ -204,7 +204,7 @@
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
         <version.auto-value>1.11.0</version.auto-value>
-        <version.error-prone>${version.error-prone-orig}</version.error-prone>
+        <version.error-prone>1.999.2-test-speed-up-refaster</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-2</version.error-prone-fork>
         <version.error-prone-orig>2.36.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>

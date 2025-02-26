@@ -24,7 +24,8 @@ final class RefasterRuleCollectionTest {
         //        PartialTestMatchRules.class,
         //        RuleWithoutTestRules.class,
         //        ValidRules.class
-        StaticImportEdgeCaseRules.class
+        SingleRefasterAnyOfRules.class,
+        NestedRefasterAnyOfRules.class
       })
   void verifyRefasterRuleCollections(Class<?> clazz) {
     RefasterRuleCollection.validate(clazz);

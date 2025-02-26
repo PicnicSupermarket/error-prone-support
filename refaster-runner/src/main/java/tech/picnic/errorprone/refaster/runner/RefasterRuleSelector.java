@@ -26,6 +26,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.PackageTree;
 import com.sun.source.tree.Tree;
@@ -162,7 +163,13 @@ final class RefasterRuleSelector {
     for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
       if (template instanceof ExpressionTemplate) {
         UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
-        results.addAll(extractRuleIdentifiers(ImmutableList.of(expr)));
+        if (expr instanceof UAnyOf anyOfExpr) {
+          anyOfExpr.expressions().stream()
+              .map(e -> e)
+              .forEach(e -> results.addAll(extractRuleIdentifiers(ImmutableList.of(e))));
+        } else {
+          results.addAll(extractRuleIdentifiers(ImmutableList.of(expr)));
+        }
       } else if (template instanceof BlockTemplate) {
         ImmutableList<UStatement> statements =
             RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
@@ -361,6 +368,11 @@ final class RefasterRuleSelector {
       String id = node.getName().toString();
       identifierCombinations.forEach(ids -> ids.add(id));
       return null;
+    }
+
+    @Override
+    public @Nullable Void visitMethodInvocation(MethodInvocationTree node, List<Set<String>> sets) {
+      return super.visitMethodInvocation(node, sets);
     }
 
     @Override
