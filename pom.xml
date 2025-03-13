@@ -214,7 +214,7 @@
         <version.mockito>5.16.1</version.mockito>
         <version.nopen-checker>1.0.1</version.nopen-checker>
         <version.nullaway>0.12.4</version.nullaway>
-        <version.pitest-git>1.1.4</version.pitest-git>
+        <version.pitest-git>2.1.0</version.pitest-git>
         <version.rewrite-templating>1.24.0</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
@@ -576,12 +576,12 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>com.groupcdg</groupId>
+                    <groupId>com.arcmutate</groupId>
                     <artifactId>pitest-git-maven-plugin</artifactId>
                     <version>${version.pitest-git}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.groupcdg</groupId>
+                    <groupId>com.arcmutate</groupId>
                     <artifactId>pitest-github-maven-plugin</artifactId>
                     <version>${version.pitest-git}</version>
                 </plugin>
@@ -1547,19 +1547,19 @@
                     </configuration>
                     <dependencies>
                         <dependency>
-                            <groupId>com.groupcdg</groupId>
+                            <groupId>com.arcmutate</groupId>
                             <artifactId>pitest-git-plugin</artifactId>
                             <version>${version.pitest-git}</version>
                         </dependency>
                         <dependency>
-                            <groupId>com.groupcdg.arcmutate</groupId>
+                            <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.2.2</version>
+                            <version>1.3.2</version>
                         </dependency>
                         <dependency>
-                            <groupId>com.groupcdg.pitest</groupId>
+                            <groupId>com.arcmutate</groupId>
                             <artifactId>pitest-accelerator-junit5</artifactId>
-                            <version>1.0.6</version>
+                            <version>1.2.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.pitest</groupId>
