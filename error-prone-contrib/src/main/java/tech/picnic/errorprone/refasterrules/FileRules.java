@@ -143,9 +143,7 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer `File#mkdirs` before `Files#exists` to avoid concurrency issues.
-   */
+  /** Prefer `File#mkdirs` before `Files#exists` to avoid concurrency issues. */
   static final class MkdirsBeforeFilesExists {
     @BeforeTemplate
     boolean before(Path path) {
