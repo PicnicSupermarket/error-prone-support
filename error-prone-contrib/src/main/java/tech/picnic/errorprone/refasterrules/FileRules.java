@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
 import java.io.File;
@@ -139,6 +140,22 @@ final class FileRules {
     @AfterTemplate
     File after(File directory, String prefix, String suffix) throws IOException {
       return Files.createTempFile(directory.toPath(), prefix, suffix).toFile();
+    }
+  }
+
+  /**
+   * Prefer `File#mkdirs` before `Files#exists` to avoid concurrency issues.
+   */
+  static final class MkdirsBeforeFilesExists {
+    @BeforeTemplate
+    boolean before(Path path) {
+      return Files.exists(path) || path.toFile().mkdirs();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(Path path) {
+      return path.toFile().mkdirs() || Files.exists(path);
     }
   }
 }
