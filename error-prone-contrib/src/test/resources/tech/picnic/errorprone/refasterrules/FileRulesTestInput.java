@@ -39,4 +39,9 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
   File testFilesCreateTempFileInCustomDirectoryToFile() throws IOException {
     return File.createTempFile("foo", "bar", new File("baz"));
   }
+
+  boolean testMkdirsBeforeFilesExists() {
+    Path foo = Path.of("foo");
+    return !Files.exists(foo) && !foo.toFile().mkdirs();
+  }
 }
