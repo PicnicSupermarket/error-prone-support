@@ -492,7 +492,9 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<T> before(T value) {
       return Refaster.anyOf(
-          Mono.just(value).repeat().take(1), Flux.fromIterable(ImmutableList.of(value)));
+          Mono.just(value).repeat().take(1),
+          Flux.fromIterable(ImmutableList.of(value)),
+          Flux.fromIterable(ImmutableSet.of(value)));
     }
 
     @AfterTemplate
