@@ -156,4 +156,18 @@ final class FileRules {
       return path.toFile().mkdirs() || Files.exists(path);
     }
   }
+
+  /** Prefer {@link File#mkdirs} before {@link File#exists} to avoid concurrency issues. */
+  static final class FileMkDirsFileExists {
+    @BeforeTemplate
+    boolean before(File file) {
+      return file.exists() || file.mkdirs();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(File file) {
+      return file.mkdirs() || file.exists();
+    }
+  }
 }
