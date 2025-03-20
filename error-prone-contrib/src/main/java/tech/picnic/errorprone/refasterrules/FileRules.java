@@ -143,8 +143,8 @@ final class FileRules {
     }
   }
 
-  /** Prefer `File#mkdirs` before `Files#exists` to avoid concurrency issues. */
-  static final class MkdirsBeforeFilesExists {
+  /** Prefer {@link File#mkdirs} before {@link Files#exists} to avoid concurrency issues. */
+  static final class PathToFileMkDirsFilesExists {
     @BeforeTemplate
     boolean before(Path path) {
       return Files.exists(path) || path.toFile().mkdirs();
