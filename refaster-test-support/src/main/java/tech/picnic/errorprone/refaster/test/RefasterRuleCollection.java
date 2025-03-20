@@ -122,6 +122,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
    *
    * @param clazz The Refaster rule collection under test.
    */
+  @SuppressWarnings("deprecation")
+  // XXX: Fix this warning, simply pushing my changes for now.
   public static void validate(Class<?> clazz) {
     String className = clazz.getSimpleName();
 

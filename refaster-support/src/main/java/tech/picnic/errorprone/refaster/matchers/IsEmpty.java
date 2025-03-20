@@ -118,11 +118,12 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   }
 
   private boolean isEmptyCollectionConstructor(ExpressionTree tree, VisitorState state) {
-    if (!(tree instanceof NewClassTree) || !MUTABLE_COLLECTION_TYPE.matches(tree, state)) {
+    if (!(tree instanceof NewClassTree newClassTree)
+        || !MUTABLE_COLLECTION_TYPE.matches(tree, state)) {
       return false;
     }
 
-    List<? extends ExpressionTree> arguments = ((NewClassTree) tree).getArguments();
+    List<? extends ExpressionTree> arguments = newClassTree.getArguments();
     if (arguments.stream().allMatch(a -> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT.matches(a, state))) {
       /*
        * This is a default constructor, or a constructor that creates an empty collection using
