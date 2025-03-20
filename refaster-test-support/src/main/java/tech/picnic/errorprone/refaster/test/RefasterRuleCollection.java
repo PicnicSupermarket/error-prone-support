@@ -8,6 +8,7 @@ import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Comparator.naturalOrder;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -192,7 +193,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     for (Description description : matches) {
       String ruleName = extractRefasterRuleName(description);
       ImmutableSet<Replacement> replacements =
-          Iterables.getOnlyElement(description.fixes).getReplacements(endPositions);
+          requireNonNull(Iterables.getOnlyElement(description.fixes)).getReplacements(endPositions);
       for (Replacement replacement : replacements) {
         ruleMatches.put(replacement.range(), ruleName);
       }

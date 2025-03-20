@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
@@ -67,7 +68,7 @@ public final class OptionalOrElseGet extends BugChecker implements MethodInvocat
       return Description.NO_MATCH;
     }
 
-    ExpressionTree argument = Iterables.getOnlyElement(tree.getArguments());
+    ExpressionTree argument = requireNonNull(Iterables.getOnlyElement(tree.getArguments()));
     if (!REQUIRES_COMPUTATION.matches(argument, state)
         || REFASTER_METHOD.matches(argument, state)) {
       return Description.NO_MATCH;

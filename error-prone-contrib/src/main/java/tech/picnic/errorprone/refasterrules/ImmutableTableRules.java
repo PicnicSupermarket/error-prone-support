@@ -53,6 +53,7 @@ final class ImmutableTableRules {
   /** Prefer {@link ImmutableTable#of(Object, Object, Object)} over more contrived alternatives. */
   static final class CellToImmutableTable<R, C, V> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> before(Table.Cell<? extends R, ? extends C, ? extends V> cell) {
       return Refaster.anyOf(
           ImmutableTable.<R, C, V>builder().put(cell).buildOrThrow(),
@@ -63,6 +64,7 @@ final class ImmutableTableRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> after(Table.Cell<? extends R, ? extends C, ? extends V> cell) {
       return ImmutableTable.of(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
     }
@@ -83,6 +85,7 @@ final class ImmutableTableRules {
     abstract V valueFunction(@MayOptionallyUse E element);
 
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> before(Stream<E> stream) {
       return stream
           .map(e -> Tables.immutableCell(rowFunction(e), columnFunction(e), valueFunction(e)))
@@ -93,6 +96,7 @@ final class ImmutableTableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> after(Stream<E> stream) {
       return stream.collect(
           toImmutableTable(e -> rowFunction(e), e -> columnFunction(e), e -> valueFunction(e)));

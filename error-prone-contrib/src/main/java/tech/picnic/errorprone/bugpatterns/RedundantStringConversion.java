@@ -366,7 +366,7 @@ public final class RedundantStringConversion extends BugChecker
       return Optional.empty();
     }
 
-    return Optional.of(Iterables.getOnlyElement(methodInvocation.getArguments()));
+    return Optional.ofNullable(Iterables.getOnlyElement(methodInvocation.getArguments()));
   }
 
   private Description createDescription(Tree tree, Optional<SuggestedFix.Builder> fixes) {

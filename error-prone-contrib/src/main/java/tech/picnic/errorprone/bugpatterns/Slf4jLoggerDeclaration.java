@@ -98,7 +98,9 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
 
     ClassTree clazz = getEnclosingClass(state);
     ExpressionTree factoryArg =
-        Iterables.getOnlyElement(((MethodInvocationTree) initializer).getArguments());
+        requireNonNull(
+            Iterables.getOnlyElement(((MethodInvocationTree) initializer).getArguments()),
+            "`ExpressionTree` should have arguments");
 
     SuggestedFix.Builder fix = SuggestedFix.builder();
 

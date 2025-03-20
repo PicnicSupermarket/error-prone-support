@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -104,7 +105,7 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
       return trySuggestExplicitStringConversion(tree, state);
     }
 
-    String separator = Iterables.getOnlyElement(innerSeparators);
+    String separator = requireNonNull(Iterables.getOnlyElement(innerSeparators));
     if (separator.indexOf('%') >= 0) {
       /* The `%s` format specifiers are separated by another format specifier. */
       // XXX: Strictly speaking we could support `%%` by mapping it to a literal `%`, but that

@@ -936,6 +936,7 @@ final class ReactorRules {
   }
 
   /** Prefer direct invocation of {@link Mono#then()}} over more contrived alternatives. */
+  @SuppressWarnings("NullAway")
   static final class MonoThen<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Mono<T> mono) {
@@ -953,6 +954,7 @@ final class ReactorRules {
   }
 
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  @SuppressWarnings("NullAway")
   static final class FluxThen<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Flux<T> flux) {
@@ -971,6 +973,7 @@ final class ReactorRules {
   }
 
   /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  @SuppressWarnings("NullAway")
   static final class MonoThenEmpty<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
@@ -984,6 +987,7 @@ final class ReactorRules {
   }
 
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  @SuppressWarnings("NullAway")
   static final class FluxThenEmpty<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
@@ -1047,6 +1051,7 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     Mono<@Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
       return mono1.thenEmpty(mono2);
     }
@@ -1065,6 +1070,7 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     Mono<@Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
       return flux.thenEmpty(mono);
     }

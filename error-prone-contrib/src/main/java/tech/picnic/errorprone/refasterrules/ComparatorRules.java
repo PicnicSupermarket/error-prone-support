@@ -366,6 +366,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings("NullAway")
     T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.min(value1, value2, cmp);
     }
@@ -479,6 +480,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings("NullAway")
     T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.max(value1, value2, cmp);
     }
