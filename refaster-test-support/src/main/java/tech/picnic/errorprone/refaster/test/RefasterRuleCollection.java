@@ -6,6 +6,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.BugPattern.LinkType.NONE;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Comparator.naturalOrder;
 import static tech.picnic.errorprone.refaster.runner.Refaster.INCLUDED_RULES_PATTERN_FLAG;
 
@@ -17,6 +18,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
+import com.google.common.io.Resources;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
@@ -38,6 +40,9 @@ import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Position;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -122,17 +127,17 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
    *
    * @param clazz The Refaster rule collection under test.
    */
-  @SuppressWarnings("deprecation")
-  // XXX: Fix this warning, simply pushing my changes for now.
   public static void validate(Class<?> clazz) {
     String className = clazz.getSimpleName();
+    String inputResource = className + "TestInput.java";
+    String outputResource = className + "TestOutput.java";
 
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
         .setArgs(
             "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
             "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className)
-        .addInput(className + "TestInput.java")
-        .addOutput(className + "TestOutput.java")
+        .addInputLines(inputResource, loadResource(clazz, inputResource))
+        .addOutputLines(outputResource, loadResource(clazz, outputResource))
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -247,6 +252,15 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     int index = value.lastIndexOf(delimiter);
     checkState(index >= 0, "String '%s' does not contain character '%s'", value, delimiter);
     return value.substring(index + 1);
+  }
+
+  private static String loadResource(Class<?> contextClass, String resource) {
+    URL url = Resources.getResource(contextClass, resource);
+    try {
+      return Resources.toString(url, UTF_8);
+    } catch (IOException e) {
+      throw new UncheckedIOException("Cannot find resource: " + url, e);
+    }
   }
 
   private class UnexpectedMatchReporter extends TreeScanner<@Nullable Void, VisitorState> {

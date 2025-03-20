@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.Tree;
@@ -23,7 +24,7 @@ final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   SuggestedFix testSuggestedFixSwap() {
-    return SuggestedFix.swap((Tree) null, (ExpressionTree) null);
+    return SuggestedFix.swap((Tree) null, (ExpressionTree) null, (VisitorState) null);
   }
 
   SuggestedFix testSuggestedFixPrefixWith() {
