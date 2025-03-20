@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.FieldMatchers.staticField;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.packageStartsWith;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -86,7 +87,10 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
       return Description.NO_MATCH;
     }
 
-    AnnotationTree annotation = Iterables.getOnlyElement(bugPatternAnnotations);
+    AnnotationTree annotation =
+        requireNonNull(
+            Iterables.getOnlyElement(bugPatternAnnotations),
+            "`BugChecker` requires a `@BugPattern` annotation");
     if (isCompliant(annotation, tree.getSimpleName(), state)) {
       /* The bug checker is correctly configured. */
       return Description.NO_MATCH;
@@ -98,7 +102,7 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
   private static boolean isCompliant(
       AnnotationTree annotation, Name className, VisitorState state) {
     ExpressionTree linkType = AnnotationMatcherUtils.getArgument(annotation, "linkType");
-    if (IS_LINK_TYPE_NONE.matches(linkType, state)) {
+    if (linkType != null && IS_LINK_TYPE_NONE.matches(linkType, state)) {
       /* This bug checker explicitly declares that there is no link. */
       return true;
     }
