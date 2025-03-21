@@ -8,12 +8,15 @@ import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import com.google.common.primitives.UnsignedBytes;
 import com.google.common.primitives.UnsignedInts;
 import com.google.common.primitives.UnsignedLongs;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.Arrays;
+import java.util.Comparator;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with primitives. */
@@ -525,10 +528,7 @@ final class PrimitiveRules {
     }
   }
 
-  /**
-   * Prefer JDK's {@link Integer#toUnsignedString(int,int)} over third-party or more verbose
-   * alternatives.
-   */
+  /** Prefer JDK's {@link Integer#toUnsignedString(int,int)} over third-party alternatives. */
   static final class IntegerToUnsignedStringWithRadix {
     @BeforeTemplate
     String before(int i, int radix) {
@@ -541,10 +541,7 @@ final class PrimitiveRules {
     }
   }
 
-  /**
-   * Prefer JDK's {@link Long#toUnsignedString(long,int)} over third-party or more verbose
-   * alternatives.
-   */
+  /** Prefer JDK's {@link Long#toUnsignedString(long,int)} over third-party alternatives. */
   static final class LongToUnsignedStringWithRadix {
     @BeforeTemplate
     String before(long i, int radix) {
@@ -554,6 +551,51 @@ final class PrimitiveRules {
     @AfterTemplate
     String after(long i, int radix) {
       return Long.toUnsignedString(i, radix);
+    }
+  }
+
+  /** Prefer JDK's {@link Arrays#compareUnsigned(byte[], byte[])} over third-party alternatives. */
+  // XXX: This rule will yield non-compilable code if the result of the replaced expression is
+  // dereferenced. Investigate how to make this safe.
+  static final class ArraysCompareUnsignedBytes {
+    @BeforeTemplate
+    Comparator<byte[]> before() {
+      return UnsignedBytes.lexicographicalComparator();
+    }
+
+    @AfterTemplate
+    Comparator<byte[]> after() {
+      return Arrays::compareUnsigned;
+    }
+  }
+
+  /** Prefer JDK's {@link Arrays#compareUnsigned(int[], int[])} over third-party alternatives. */
+  // XXX: This rule will yield non-compilable code if the result of the replaced expression is
+  // dereferenced. Investigate how to make this safe.
+  static final class ArraysCompareUnsignedInts {
+    @BeforeTemplate
+    Comparator<int[]> before() {
+      return UnsignedInts.lexicographicalComparator();
+    }
+
+    @AfterTemplate
+    Comparator<int[]> after() {
+      return Arrays::compareUnsigned;
+    }
+  }
+
+  /** Prefer JDK's {@link Arrays#compareUnsigned(long[], long[])} over third-party alternatives. */
+  // XXX: This rule will yield non-compilable code if the result of the replaced expression is
+  // dereferenced. Investigate how to make this safe.
+  static final class ArraysCompareUnsignedLongs {
+    @BeforeTemplate
+    Comparator<long[]> before() {
+      return UnsignedLongs.lexicographicalComparator();
+    }
+
+    @AfterTemplate
+    Comparator<long[]> after() {
+      return Arrays::compareUnsigned;
     }
   }
 }

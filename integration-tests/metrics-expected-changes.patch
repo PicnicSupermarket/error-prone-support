@@ -89,15 +89,63 @@
        }
        return new CollectdReporter(
            registry,
-@@ -302,7 +297,7 @@ public class CollectdReporter extends ScheduledReporter {
+@@ -177,7 +172,7 @@ public class CollectdReporter extends ScheduledReporter {
+     }
+   }
+ 
+-  private static final Logger LOG = LoggerFactory.getLogger(CollectdReporter.class);
++  private static final Logger LOGGER = LoggerFactory.getLogger(CollectdReporter.class);
+   private static final String REPORTER_NAME = "collectd-reporter";
+   private static final String FALLBACK_HOST_NAME = "localhost";
+   private static final String COLLECTD_TYPE_GAUGE = "gauge";
+@@ -224,7 +219,7 @@ public class CollectdReporter extends ScheduledReporter {
+     try {
+       return InetAddress.getLocalHost().getHostName();
+     } catch (Exception e) {
+-      LOG.error("Failed to lookup local host name: {}", e.getMessage(), e);
++      LOGGER.error("Failed to lookup local host name: {}", e.getMessage(), e);
+       return FALLBACK_HOST_NAME;
+     }
+   }
+@@ -263,7 +258,7 @@ public class CollectdReporter extends ScheduledReporter {
+         serializeTimer(metaData.plugin(entry.getKey().getKey()), entry.getValue());
+       }
+     } catch (IOException e) {
+-      LOG.warn("Unable to report to Collectd", e);
++      LOGGER.warn("Unable to report to Collectd", e);
+     } finally {
+       disconnect(sender);
+     }
+@@ -279,7 +274,7 @@ public class CollectdReporter extends ScheduledReporter {
+     try {
+       sender.disconnect();
+     } catch (Exception e) {
+-      LOG.warn("Error disconnecting from Collectd", e);
++      LOGGER.warn("Error disconnecting from Collectd", e);
+     }
+   }
+ 
+@@ -302,9 +297,9 @@ public class CollectdReporter extends ScheduledReporter {
      try {
        writer.write(metaData, value);
      } catch (RuntimeException e) {
 -      LOG.warn("Failed to process metric '" + metaData.getPlugin() + "': " + e.getMessage());
-+      LOG.warn("Failed to process metric '{}': {}", metaData.getPlugin(), e.getMessage());
++      LOGGER.warn("Failed to process metric '{}': {}", metaData.getPlugin(), e.getMessage());
      } catch (IOException e) {
-       LOG.error("Failed to send metric to collectd", e);
+-      LOG.error("Failed to send metric to collectd", e);
++      LOGGER.error("Failed to send metric to collectd", e);
      }
+   }
+ 
+@@ -314,7 +309,7 @@ public class CollectdReporter extends ScheduledReporter {
+     } else if (metric.getValue() instanceof Boolean) {
+       write(metaData.typeInstance("value").get(), ((Boolean) metric.getValue()) ? 1 : 0);
+     } else {
+-      LOG.warn(
++      LOGGER.warn(
+           "Failed to process metric '{}'. Unsupported gauge of type: {} ",
+           metaData.get().getPlugin(),
+           metric.getValue().getClass().getName());
 @@ -336,9 +331,9 @@ public class CollectdReporter extends ScheduledReporter {
    private void serializeHistogram(MetaData.Builder metaData, Histogram metric) {
      final Snapshot snapshot = metric.getSnapshot();
@@ -476,26 +524,6 @@
      }
  
      /**
---- a/metrics-core/src/main/java/io/dropwizard/metrics5/CsvReporter.java
-+++ b/metrics-core/src/main/java/io/dropwizard/metrics5/CsvReporter.java
-@@ -179,7 +179,7 @@ public class CsvReporter extends ScheduledReporter {
-     }
-   }
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(CsvReporter.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(CsvReporter.class);
- 
-   private final File directory;
-   private final Locale locale;
-@@ -391,7 +391,7 @@ public class CsvReporter extends ScheduledReporter {
-         }
-       }
-     } catch (IOException e) {
--      LOGGER.warn("Error writing to {}", name, e);
-+      LOG.warn("Error writing to {}", name, e);
-     }
-   }
- 
 --- a/metrics-core/src/main/java/io/dropwizard/metrics5/ExponentialMovingAverages.java
 +++ b/metrics-core/src/main/java/io/dropwizard/metrics5/ExponentialMovingAverages.java
 @@ -17,9 +17,9 @@ public class ExponentialMovingAverages implements MovingAverages {
@@ -990,6 +1018,15 @@
  import java.util.Locale;
  import java.util.Set;
  import java.util.SortedMap;
+@@ -24,7 +27,7 @@ import org.slf4j.LoggerFactory;
+  */
+ public abstract class ScheduledReporter implements Closeable, Reporter {
+ 
+-  private static final Logger LOG = LoggerFactory.getLogger(ScheduledReporter.class);
++  private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledReporter.class);
+ 
+   /** A simple named thread factory. */
+   @SuppressWarnings("NullableProblems")
 @@ -128,7 +131,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
          durationUnit,
          executor,
@@ -1040,6 +1077,33 @@
    protected ScheduledFuture<?> getScheduledFuture(
        long initialDelay, long period, TimeUnit unit, Runnable runnable) {
      return getScheduledFuture(initialDelay, period, unit, runnable, this.executor);
+@@ -225,7 +224,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
+           try {
+             report();
+           } catch (Throwable ex) {
+-            LOG.error(
++            LOGGER.error(
+                 "Exception thrown from {}#report. Exception was suppressed.",
+                 ScheduledReporter.this.getClass().getSimpleName(),
+                 ex);
+@@ -250,7 +249,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
+       try {
+         report();
+       } catch (Exception e) {
+-        LOG.warn("Final reporting of metrics failed.", e);
++        LOGGER.warn("Final reporting of metrics failed.", e);
+       }
+     }
+ 
+@@ -261,7 +260,7 @@ public abstract class ScheduledReporter implements Closeable, Reporter {
+           executor.shutdownNow(); // Cancel currently executing tasks
+           // Wait a while for tasks to respond to being cancelled
+           if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+-            LOG.warn("ScheduledExecutorService did not terminate.");
++            LOGGER.warn("ScheduledExecutorService did not terminate.");
+           }
+         }
+       } catch (InterruptedException ie) {
 --- a/metrics-core/src/main/java/io/dropwizard/metrics5/SharedMetricRegistries.java
 +++ b/metrics-core/src/main/java/io/dropwizard/metrics5/SharedMetricRegistries.java
 @@ -1,5 +1,7 @@
@@ -1200,32 +1264,15 @@
  
  import java.util.ArrayList;
  import java.util.List;
-@@ -15,8 +14,8 @@ import org.junit.jupiter.api.Test;
+@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  
 -class CachedGaugeTest {
--  private static final Logger LOGGER = LoggerFactory.getLogger(CachedGaugeTest.class);
 +final class CachedGaugeTest {
-+  private static final Logger LOG = LoggerFactory.getLogger(CachedGaugeTest.class);
+   private static final Logger LOGGER = LoggerFactory.getLogger(CachedGaugeTest.class);
    private static final int THREAD_COUNT = 10;
    private static final long RUNNING_TIME_MILLIS = TimeUnit.SECONDS.toMillis(10);
- 
-@@ -100,12 +99,12 @@ class CachedGaugeTest {
-                   Integer newValue = shortTimeoutGauge.getValue();
- 
-                   if (newValue == null) {
--                    LOGGER.warn("Cached gauge returned null value");
-+                    LOG.warn("Cached gauge returned null value");
-                     return false;
-                   }
- 
-                   if (newValue < lastValue) {
--                    LOGGER.error(
-+                    LOG.error(
-                         "Cached gauge returned stale value, last: {}, new: {}",
-                         lastValue,
-                         newValue);
 @@ -122,7 +121,7 @@ class CachedGaugeTest {
      }
  
@@ -1899,29 +1946,16 @@
      assertThat(histogram.getSnapshot()).isEqualTo(snapshot);
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedExecutorServiceTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedExecutorServiceTest.java
-@@ -19,10 +19,9 @@ import org.junit.jupiter.api.Test;
+@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  
 -class InstrumentedExecutorServiceTest {
 +final class InstrumentedExecutorServiceTest {
  
--  private static final Logger LOGGER =
--      LoggerFactory.getLogger(InstrumentedExecutorServiceTest.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(InstrumentedExecutorServiceTest.class);
-   private ExecutorService executor;
-   private MetricRegistry registry;
-   private InstrumentedExecutorService instrumentedExecutorService;
-@@ -48,7 +47,7 @@ class InstrumentedExecutorServiceTest {
-   void tearDown() throws Exception {
-     instrumentedExecutorService.shutdown();
-     if (!instrumentedExecutorService.awaitTermination(2, TimeUnit.SECONDS)) {
--      LOGGER.error("InstrumentedExecutorService did not terminate.");
-+      LOG.error("InstrumentedExecutorService did not terminate.");
-     }
-   }
- 
-@@ -115,8 +114,8 @@ class InstrumentedExecutorServiceTest {
+   private static final Logger LOGGER =
+       LoggerFactory.getLogger(InstrumentedExecutorServiceTest.class);
+@@ -115,8 +115,8 @@ class InstrumentedExecutorServiceTest {
      assertThat(idle.getSnapshot().size()).isEqualTo(1);
    }
  
@@ -1931,7 +1965,7 @@
    void reportsTasksInformationForThreadPoolExecutor() throws Exception {
      executor =
          new ThreadPoolExecutor(4, 16, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
-@@ -180,7 +179,7 @@ class InstrumentedExecutorServiceTest {
+@@ -180,7 +180,7 @@ class InstrumentedExecutorServiceTest {
    }
  
    @Test
@@ -1940,7 +1974,7 @@
      executor =
          new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1));
      instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "tp");
-@@ -207,7 +206,7 @@ class InstrumentedExecutorServiceTest {
+@@ -207,7 +207,7 @@ class InstrumentedExecutorServiceTest {
    }
  
    @Test
@@ -1949,7 +1983,7 @@
      executor =
          new ThreadPoolExecutor(4, 16, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(32));
      instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "stp");
-@@ -236,8 +235,8 @@ class InstrumentedExecutorServiceTest {
+@@ -236,8 +236,8 @@ class InstrumentedExecutorServiceTest {
              MetricRegistry.name("stp", "tasks.capacity"));
    }
  
@@ -1959,7 +1993,7 @@
    void reportsTasksInformationForForkJoinPool() throws Exception {
      executor = Executors.newWorkStealingPool(4);
      instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "fjp");
-@@ -291,7 +290,7 @@ class InstrumentedExecutorServiceTest {
+@@ -291,7 +291,7 @@ class InstrumentedExecutorServiceTest {
    }
  
    @Test
@@ -1970,17 +2004,15 @@
  
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedScheduledExecutorServiceTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedScheduledExecutorServiceTest.java
-@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
+@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
  
 -class InstrumentedScheduledExecutorServiceTest {
--  private static final Logger LOGGER =
 +final class InstrumentedScheduledExecutorServiceTest {
-+  private static final Logger LOG =
+   private static final Logger LOGGER =
        LoggerFactory.getLogger(InstrumentedScheduledExecutorServiceTest.class);
  
-   private final ScheduledExecutorService scheduledExecutor =
 @@ -35,17 +35,17 @@ class InstrumentedScheduledExecutorServiceTest {
    private final Histogram percentOfPeriod = registry.histogram("xs.scheduled.percent-of-period");
  
@@ -2338,15 +2370,6 @@
      assertThat(completed.getCount()).isNotEqualTo(0);
      assertThat(duration.getCount()).isNotEqualTo(0);
      assertThat(duration.getSnapshot().size()).isNotEqualTo(0);
-@@ -322,7 +322,7 @@ class InstrumentedScheduledExecutorServiceTest {
-   void tearDown() throws Exception {
-     instrumentedScheduledExecutor.shutdown();
-     if (!instrumentedScheduledExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
--      LOGGER.error("InstrumentedScheduledExecutorService did not terminate.");
-+      LOG.error("InstrumentedScheduledExecutorService did not terminate.");
-     }
-   }
- }
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedThreadFactoryTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/InstrumentedThreadFactoryTest.java
 @@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
@@ -3801,15 +3824,6 @@
  import java.io.BufferedWriter;
  import java.io.IOException;
  import java.io.OutputStreamWriter;
-@@ -29,7 +32,7 @@ public class Graphite implements GraphiteSender {
-   private Writer writer;
-   private int failures;
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(Graphite.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(Graphite.class);
- 
-   /**
-    * Creates a new client which connects to the given address using the default {@link
 @@ -63,13 +66,9 @@ public class Graphite implements GraphiteSender {
     * @param charset the character set used by the server
     */
@@ -3837,24 +3851,6 @@
      InetSocketAddress address = this.address;
      // the previous dns retry logic did not work, as address.getAddress would always return the
      // cached value
-@@ -178,7 +175,7 @@ public class Graphite implements GraphiteSender {
-         writer.close();
-       }
-     } catch (IOException ex) {
--      LOGGER.debug("Error closing writer", ex);
-+      LOG.debug("Error closing writer", ex);
-     } finally {
-       this.writer = null;
-     }
-@@ -188,7 +185,7 @@ public class Graphite implements GraphiteSender {
-         socket.close();
-       }
-     } catch (IOException ex) {
--      LOGGER.debug("Error closing socket", ex);
-+      LOG.debug("Error closing socket", ex);
-     } finally {
-       this.socket = null;
-     }
 --- a/metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteRabbitMQ.java
 +++ b/metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteRabbitMQ.java
 @@ -1,5 +1,6 @@
@@ -3923,39 +3919,7 @@
        this.addMetricAttributesAsTags = false;
        this.floatingPointFormatter = DEFAULT_FP_FORMATTER;
      }
-@@ -249,7 +247,7 @@ public class GraphiteReporter extends ScheduledReporter {
-     }
-   }
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(GraphiteReporter.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(GraphiteReporter.class);
-   // the Carbon plaintext format is pretty underspecified, but it seems like it just wants
-   // US-formatted digits
-   private static final DoubleFunction<String> DEFAULT_FP_FORMATTER =
-@@ -430,12 +428,12 @@ public class GraphiteReporter extends ScheduledReporter {
-       }
-       graphite.flush();
-     } catch (IOException e) {
--      LOGGER.warn("Unable to report to Graphite", graphite, e);
-+      LOG.warn("Unable to report to Graphite", graphite, e);
-     } finally {
-       try {
-         graphite.close();
-       } catch (IOException e1) {
--        LOGGER.warn("Error closing Graphite", graphite, e1);
-+        LOG.warn("Error closing Graphite", graphite, e1);
-       }
-     }
-   }
-@@ -448,16 +446,16 @@ public class GraphiteReporter extends ScheduledReporter {
-       try {
-         graphite.close();
-       } catch (IOException e) {
--        LOGGER.debug("Error disconnecting from Graphite", graphite, e);
-+        LOG.debug("Error disconnecting from Graphite", graphite, e);
-       }
-     }
-   }
+@@ -455,9 +453,9 @@ public class GraphiteReporter extends ScheduledReporter {
  
    private void reportTimer(MetricName name, Timer timer, long timestamp) throws IOException {
      final Snapshot snapshot = timer.getSnapshot();
@@ -4017,15 +3981,6 @@
  import static java.nio.charset.StandardCharsets.UTF_8;
  
  import java.io.BufferedWriter;
-@@ -48,7 +49,7 @@ public class PickledGraphite implements GraphiteSender {
-       QUOTE = '\'',
-       LF = '\n';
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(PickledGraphite.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(PickledGraphite.class);
-   private static final int DEFAULT_BATCH_SIZE = 100;
- 
-   private int batchSize;
 @@ -173,9 +174,7 @@ public class PickledGraphite implements GraphiteSender {
  
    @Override
@@ -4046,17 +4001,6 @@
        try {
          byte[] payload = pickleMetrics(metrics);
          byte[] header = ByteBuffer.allocate(4).putInt(payload.length).array();
-@@ -260,8 +259,8 @@ public class PickledGraphite implements GraphiteSender {
-         outputStream.write(payload);
-         outputStream.flush();
- 
--        if (LOGGER.isDebugEnabled()) {
--          LOGGER.debug("Wrote {} metrics", metrics.size());
-+        if (LOG.isDebugEnabled()) {
-+          LOG.debug("Wrote {} metrics", metrics.size());
-         }
-       } catch (IOException e) {
-         this.failures++;
 --- a/metrics-graphite/src/test/java/io/dropwizard/metrics5/graphite/GraphiteRabbitMQTest.java
 +++ b/metrics-graphite/src/test/java/io/dropwizard/metrics5/graphite/GraphiteRabbitMQTest.java
 @@ -8,7 +8,6 @@ import static org.mockito.Mockito.anyString;
@@ -4475,15 +4419,6 @@
  import java.util.HashMap;
  import java.util.List;
  import java.util.Map;
-@@ -27,7 +29,7 @@ import org.slf4j.LoggerFactory;
- 
- /** A registry for health checks. */
- public class HealthCheckRegistry {
--  private static final Logger LOGGER = LoggerFactory.getLogger(HealthCheckRegistry.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(HealthCheckRegistry.class);
-   private static final int ASYNC_EXECUTOR_POOL_SIZE = 2;
- 
-   private final ConcurrentMap<String, HealthCheck> healthChecks;
 @@ -92,9 +94,8 @@ public class HealthCheckRegistry {
    public void register(String name, HealthCheck healthCheck) {
      HealthCheck registered;
@@ -4514,13 +4449,7 @@
    }
  
    /**
-@@ -217,12 +218,12 @@ public class HealthCheckRegistry {
-       try {
-         results.put(entry.getKey(), entry.getValue().get());
-       } catch (Exception e) {
--        LOGGER.warn("Error executing health check {}", entry.getKey(), e);
-+        LOG.warn("Error executing health check {}", entry.getKey(), e);
-         results.put(entry.getKey(), HealthCheck.Result.unhealthy(e));
+@@ -222,7 +223,7 @@ public class HealthCheckRegistry {
        }
      }
  
@@ -5357,39 +5286,6 @@
      }
  
      /**
-@@ -196,7 +196,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
-     }
-   }
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(InfluxDbReporter.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(InfluxDbReporter.class);
-   private static final String VALUE = "value";
- 
-   private final Clock clock;
-@@ -279,12 +279,12 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
-       }
-       sender.flush();
-     } catch (IOException e) {
--      LOGGER.warn("Unable to report to InfluxDb", sender, e);
-+      LOG.warn("Unable to report to InfluxDb", sender, e);
-     } finally {
-       try {
-         sender.disconnect();
-       } catch (IOException e) {
--        LOGGER.warn("Error disconnecting InfluxDb", sender, e);
-+        LOG.warn("Error disconnecting InfluxDb", sender, e);
-       }
-     }
-   }
-@@ -297,7 +297,7 @@ public class InfluxDbReporter extends GarbageFreeScheduledReporter {
-       try {
-         sender.close();
-       } catch (IOException e) {
--        LOGGER.debug("Error disconnecting from InfluxDb", e);
-+        LOG.debug("Error disconnecting from InfluxDb", e);
-       }
-     }
-   }
 --- a/metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbUdpSender.java
 +++ b/metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbUdpSender.java
 @@ -1,5 +1,7 @@
@@ -6065,15 +5961,6 @@
  import java.util.HashMap;
  import java.util.List;
  import java.util.Locale;
-@@ -33,7 +33,7 @@ public class JCacheGaugeSet implements MetricSet {
-   private static final String M_BEAN_COORDINATES =
-       "javax.cache:type=CacheStatistics,CacheManager=*,Cache=*";
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(JCacheGaugeSet.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(JCacheGaugeSet.class);
- 
-   @Override
-   public Map<MetricName, Metric> getMetrics() {
 @@ -52,7 +52,7 @@ public class JCacheGaugeSet implements MetricSet {
        }
      }
@@ -6083,15 +5970,6 @@
    }
  
    private Set<ObjectInstance> getCacheBeans() {
-@@ -60,7 +60,7 @@ public class JCacheGaugeSet implements MetricSet {
-       return ManagementFactory.getPlatformMBeanServer()
-           .queryMBeans(ObjectName.getInstance(M_BEAN_COORDINATES), null);
-     } catch (MalformedObjectNameException e) {
--      LOGGER.error("Unable to retrieve {}. Are JCache statistics enabled?", M_BEAN_COORDINATES);
-+      LOG.error("Unable to retrieve {}. Are JCache statistics enabled?", M_BEAN_COORDINATES);
-       throw new RuntimeException(e);
-     }
-   }
 --- a/metrics-jcache/src/test/java/JCacheGaugeSetTest.java
 +++ b/metrics-jcache/src/test/java/JCacheGaugeSetTest.java
 @@ -11,7 +11,7 @@ import org.junit.jupiter.api.AfterEach;
@@ -8461,11 +8339,11 @@
  
    private static final char[] QUOTABLE_CHARS = new char[] {',', '=', ':', '"'};
 -  private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(DefaultObjectNameFactory.class);
++  private static final Logger LOGGER = LoggerFactory.getLogger(DefaultObjectNameFactory.class);
  
    @Override
    public ObjectName createName(String type, String domain, MetricName name) {
-@@ -38,14 +38,13 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
+@@ -38,9 +38,8 @@ public class DefaultObjectNameFactory implements ObjectNameFactory {
            || shouldQuote(objectName.getKeyProperty("type"))) {
          properties.put("type", ObjectName.quote(type));
        }
@@ -8476,12 +8354,6 @@
      } catch (MalformedObjectNameException e) {
        try {
          return new ObjectName(domain, "name", ObjectName.quote(name.getKey()));
-       } catch (MalformedObjectNameException e1) {
--        LOGGER.warn("Unable to register {} {}", type, name, e1);
-+        LOG.warn("Unable to register {} {}", type, name, e1);
-         throw new RuntimeException(e1);
-       }
-     }
 --- a/metrics-jmx/src/main/java/io/dropwizard/metrics5/jmx/JmxReporter.java
 +++ b/metrics-jmx/src/main/java/io/dropwizard/metrics5/jmx/JmxReporter.java
 @@ -1,5 +1,9 @@
@@ -8542,147 +8414,6 @@
        return this;
      }
  
-@@ -159,7 +160,7 @@ public class JmxReporter implements Reporter, Closeable {
-     }
-   }
- 
--  private static final Logger LOGGER = LoggerFactory.getLogger(JmxReporter.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(JmxReporter.class);
- 
-   @SuppressWarnings("UnusedDeclaration")
-   public interface MetricMBean {
-@@ -570,9 +571,9 @@ public class JmxReporter implements Reporter, Closeable {
-           registerMBean(new JmxGauge(gauge, objectName), objectName);
-         }
-       } catch (InstanceAlreadyExistsException e) {
--        LOGGER.debug("Unable to register gauge", e);
-+        LOG.debug("Unable to register gauge", e);
-       } catch (JMException e) {
--        LOGGER.warn("Unable to register gauge", e);
-+        LOG.warn("Unable to register gauge", e);
-       }
-     }
- 
-@@ -582,9 +583,9 @@ public class JmxReporter implements Reporter, Closeable {
-         final ObjectName objectName = createName("gauges", name);
-         unregisterMBean(objectName);
-       } catch (InstanceNotFoundException e) {
--        LOGGER.debug("Unable to unregister gauge", e);
-+        LOG.debug("Unable to unregister gauge", e);
-       } catch (MBeanRegistrationException e) {
--        LOGGER.warn("Unable to unregister gauge", e);
-+        LOG.warn("Unable to unregister gauge", e);
-       }
-     }
- 
-@@ -596,9 +597,9 @@ public class JmxReporter implements Reporter, Closeable {
-           registerMBean(new JmxCounter(counter, objectName), objectName);
-         }
-       } catch (InstanceAlreadyExistsException e) {
--        LOGGER.debug("Unable to register counter", e);
-+        LOG.debug("Unable to register counter", e);
-       } catch (JMException e) {
--        LOGGER.warn("Unable to register counter", e);
-+        LOG.warn("Unable to register counter", e);
-       }
-     }
- 
-@@ -608,9 +609,9 @@ public class JmxReporter implements Reporter, Closeable {
-         final ObjectName objectName = createName("counters", name);
-         unregisterMBean(objectName);
-       } catch (InstanceNotFoundException e) {
--        LOGGER.debug("Unable to unregister counter", e);
-+        LOG.debug("Unable to unregister counter", e);
-       } catch (MBeanRegistrationException e) {
--        LOGGER.warn("Unable to unregister counter", e);
-+        LOG.warn("Unable to unregister counter", e);
-       }
-     }
- 
-@@ -622,9 +623,9 @@ public class JmxReporter implements Reporter, Closeable {
-           registerMBean(new JmxHistogram(histogram, objectName), objectName);
-         }
-       } catch (InstanceAlreadyExistsException e) {
--        LOGGER.debug("Unable to register histogram", e);
-+        LOG.debug("Unable to register histogram", e);
-       } catch (JMException e) {
--        LOGGER.warn("Unable to register histogram", e);
-+        LOG.warn("Unable to register histogram", e);
-       }
-     }
- 
-@@ -634,9 +635,9 @@ public class JmxReporter implements Reporter, Closeable {
-         final ObjectName objectName = createName("histograms", name);
-         unregisterMBean(objectName);
-       } catch (InstanceNotFoundException e) {
--        LOGGER.debug("Unable to unregister histogram", e);
-+        LOG.debug("Unable to unregister histogram", e);
-       } catch (MBeanRegistrationException e) {
--        LOGGER.warn("Unable to unregister histogram", e);
-+        LOG.warn("Unable to unregister histogram", e);
-       }
-     }
- 
-@@ -649,9 +650,9 @@ public class JmxReporter implements Reporter, Closeable {
-               new JmxMeter(meter, objectName, timeUnits.rateFor(name.getKey())), objectName);
-         }
-       } catch (InstanceAlreadyExistsException e) {
--        LOGGER.debug("Unable to register meter", e);
-+        LOG.debug("Unable to register meter", e);
-       } catch (JMException e) {
--        LOGGER.warn("Unable to register meter", e);
-+        LOG.warn("Unable to register meter", e);
-       }
-     }
- 
-@@ -661,9 +662,9 @@ public class JmxReporter implements Reporter, Closeable {
-         final ObjectName objectName = createName("meters", name);
-         unregisterMBean(objectName);
-       } catch (InstanceNotFoundException e) {
--        LOGGER.debug("Unable to unregister meter", e);
-+        LOG.debug("Unable to unregister meter", e);
-       } catch (MBeanRegistrationException e) {
--        LOGGER.warn("Unable to unregister meter", e);
-+        LOG.warn("Unable to unregister meter", e);
-       }
-     }
- 
-@@ -681,9 +682,9 @@ public class JmxReporter implements Reporter, Closeable {
-               objectName);
-         }
-       } catch (InstanceAlreadyExistsException e) {
--        LOGGER.debug("Unable to register timer", e);
-+        LOG.debug("Unable to register timer", e);
-       } catch (JMException e) {
--        LOGGER.warn("Unable to register timer", e);
-+        LOG.warn("Unable to register timer", e);
-       }
-     }
- 
-@@ -693,9 +694,9 @@ public class JmxReporter implements Reporter, Closeable {
-         final ObjectName objectName = createName("timers", name);
-         unregisterMBean(objectName);
-       } catch (InstanceNotFoundException e) {
--        LOGGER.debug("Unable to unregister timer", e);
-+        LOG.debug("Unable to unregister timer", e);
-       } catch (MBeanRegistrationException e) {
--        LOGGER.warn("Unable to unregister timer", e);
-+        LOG.warn("Unable to unregister timer", e);
-       }
-     }
- 
-@@ -708,9 +709,9 @@ public class JmxReporter implements Reporter, Closeable {
-         try {
-           unregisterMBean(name);
-         } catch (InstanceNotFoundException e) {
--          LOGGER.debug("Unable to unregister metric", e);
-+          LOG.debug("Unable to unregister metric", e);
-         } catch (MBeanRegistrationException e) {
--          LOGGER.warn("Unable to unregister metric", e);
-+          LOG.warn("Unable to unregister metric", e);
-         }
-       }
-       registered.clear();
 --- a/metrics-jmx/src/test/java/io/dropwizard/metrics5/jmx/DefaultObjectNameFactoryTest.java
 +++ b/metrics-jmx/src/test/java/io/dropwizard/metrics5/jmx/DefaultObjectNameFactoryTest.java
 @@ -7,7 +7,7 @@ import io.dropwizard.metrics5.MetricName;
@@ -9002,21 +8733,7 @@
  import java.util.HashMap;
  import java.util.Map;
  import javax.management.JMException;
-@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
-  * <p>These JMX objects are only available on Java 7 and above.
-  */
- public class BufferPoolMetricSet implements MetricSet {
--  private static final Logger LOGGER = LoggerFactory.getLogger(BufferPoolMetricSet.class);
-+  private static final Logger LOG = LoggerFactory.getLogger(BufferPoolMetricSet.class);
-   private static final String[] ATTRIBUTES = {"Count", "MemoryUsed", "TotalCapacity"};
-   private static final String[] NAMES = {"count", "used", "capacity"};
-   private static final String[] POOLS = {"direct", "mapped"};
-@@ -43,10 +44,10 @@ public class BufferPoolMetricSet implements MetricSet {
-           gauges.put(
-               MetricRegistry.name(pool, name), new JmxAttributeGauge(mBeanServer, on, attribute));
-         } catch (JMException ignored) {
--          LOGGER.debug("Unable to load buffer pool MBeans, possibly running on Java 6");
-+          LOG.debug("Unable to load buffer pool MBeans, possibly running on Java 6");
+@@ -47,6 +48,6 @@ public class BufferPoolMetricSet implements MetricSet {
          }
        }
      }

@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -65,16 +66,18 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#swap(Tree, Tree)} over more contrived alternatives. */
+  /**
+   * Prefer {@link SuggestedFix#swap(Tree, Tree, VisitorState)} over more contrived alternatives.
+   */
   static final class SuggestedFixSwap {
     @BeforeTemplate
-    SuggestedFix before(Tree tree1, Tree tree2) {
-      return SuggestedFix.builder().swap(tree1, tree2).build();
+    SuggestedFix before(Tree tree1, Tree tree2, VisitorState state) {
+      return SuggestedFix.builder().swap(tree1, tree2, state).build();
     }
 
     @AfterTemplate
-    SuggestedFix after(Tree tree1, Tree tree2) {
-      return SuggestedFix.swap(tree1, tree2);
+    SuggestedFix after(Tree tree1, Tree tree2, VisitorState state) {
+      return SuggestedFix.swap(tree1, tree2, state);
     }
   }
 
