@@ -46,7 +46,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Modifier;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -102,7 +101,8 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
     AnnotationTree migrationAnnotation = migrationAnnotations.onlyMatchingNode();
     AnnotationMirror annotationMirror = ASTHelpers.getAnnotationMirror(migrationAnnotation);
     TypeSymbol migratedType = getMigratedType(annotationMirror);
-    if (migratedType.asType().isPrimitive() || !(migratedType instanceof ClassSymbol)) {
+    if (migratedType.asType().isPrimitive()
+        || !(migratedType instanceof ClassSymbol migratedClass)) {
       return buildDescription(migrationAnnotation)
           .setMessage(String.format("Migration of type '%s' is unsupported", migratedType))
           .build();
@@ -111,7 +111,7 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
     ImmutableList<String> methodsClaimedUnmigrated = getMethodsClaimedUnmigrated(annotationMirror);
     ImmutableList<String> unmigratedMethods =
         getMethodsDefinitelyUnmigrated(
-            tree, (ClassSymbol) migratedType, signatureOrder(methodsClaimedUnmigrated), state);
+            tree, migratedClass, signatureOrder(methodsClaimedUnmigrated), state);
 
     if (unmigratedMethods.equals(methodsClaimedUnmigrated)) {
       return Description.NO_MATCH;
@@ -160,17 +160,11 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
         .getValue().stream().map(a -> a.getValue().toString()).collect(toImmutableList());
   }
 
-  // XXX: Once only JDK 14 and above are supported, change the
-  // `m.getModifiers().contains(Modifier.PUBLIC)` check to just `m.isPublic()`.
   private static ImmutableList<String> getMethodsDefinitelyUnmigrated(
       ClassTree tree, ClassSymbol migratedType, Comparator<String> comparator, VisitorState state) {
     Set<MethodSymbol> publicMethods =
         Streams.stream(
-                ASTHelpers.scope(migratedType.members())
-                    .getSymbols(
-                        m ->
-                            m.getModifiers().contains(Modifier.PUBLIC)
-                                && m instanceof MethodSymbol))
+                migratedType.members().getSymbols(m -> m.isPublic() && m instanceof MethodSymbol))
             .map(MethodSymbol.class::cast)
             .collect(toCollection(HashSet::new));
 
