@@ -17,13 +17,13 @@ final class RefasterRuleCollectionTest {
   @ParameterizedTest
   @ValueSource(
       classes = {
-        //        MatchInWrongMethodRules.class,
-        //        MethodWithoutPrefixRules.class,
-        //        MisnamedTestClassRules.class,
-        //        MissingTestAndWrongTestRules.class,
-        //        PartialTestMatchRules.class,
-        //        RuleWithoutTestRules.class,
-        //        ValidRules.class
+        MatchInWrongMethodRules.class,
+        MethodWithoutPrefixRules.class,
+        MisnamedTestClassRules.class,
+        MissingTestAndWrongTestRules.class,
+        PartialTestMatchRules.class,
+        RuleWithoutTestRules.class,
+        ValidRules.class,
         SingleRefasterAnyOfRules.class,
         NestedRefasterAnyOfRules.class
       })

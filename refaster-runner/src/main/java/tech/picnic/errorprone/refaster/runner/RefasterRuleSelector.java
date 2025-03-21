@@ -26,7 +26,6 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.PackageTree;
 import com.sun.source.tree.Tree;
@@ -133,14 +132,11 @@ final class RefasterRuleSelector {
   private static void collectRuleIdentifiers(
       CodeTransformer codeTransformer,
       Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers) {
-    if (codeTransformer instanceof CompositeCodeTransformer) {
-      for (CodeTransformer transformer :
-          ((CompositeCodeTransformer) codeTransformer).transformers()) {
+    if (codeTransformer instanceof CompositeCodeTransformer compositeCodeTransformer) {
+      for (CodeTransformer transformer : compositeCodeTransformer.transformers()) {
         collectRuleIdentifiers(transformer, identifiers);
       }
-    } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer) {
-      AnnotatedCompositeCodeTransformer annotatedTransformer =
-          (AnnotatedCompositeCodeTransformer) codeTransformer;
+    } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer annotatedTransformer) {
       for (Map.Entry<CodeTransformer, ImmutableSet<ImmutableSet<String>>> e :
           indexRuleIdentifiers(annotatedTransformer.transformers()).entrySet()) {
         identifiers.put(annotatedTransformer.withTransformers(e.getKey()), e.getValue());
@@ -161,18 +157,12 @@ final class RefasterRuleSelector {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
 
     for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
-      if (template instanceof ExpressionTemplate) {
-        UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
-        if (expr instanceof UAnyOf anyOfExpr) {
-          anyOfExpr.expressions().stream()
-              .map(e -> e)
-              .forEach(e -> results.addAll(extractRuleIdentifiers(ImmutableList.of(e))));
-        } else {
-          results.addAll(extractRuleIdentifiers(ImmutableList.of(expr)));
-        }
-      } else if (template instanceof BlockTemplate) {
+      if (template instanceof ExpressionTemplate expressionTemplate) {
+        UExpression expr = RefasterIntrospection.getExpression(expressionTemplate);
+        results.addAll(extractRuleIdentifiers(ImmutableList.of(expr)));
+      } else if (template instanceof BlockTemplate blockTemplate) {
         ImmutableList<UStatement> statements =
-            RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
+            RefasterIntrospection.getTemplateStatements(blockTemplate);
         results.addAll(extractRuleIdentifiers(statements));
       } else {
         throw new IllegalStateException(
@@ -340,8 +330,8 @@ final class RefasterRuleSelector {
           ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
           ids.add(getIdentifier(node));
         }
-      } else if (node instanceof UStaticIdent) {
-        IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
+      } else if (node instanceof UStaticIdent uStaticIdent) {
+        IdentifierTree subNode = RefasterIntrospection.getClassIdent(uStaticIdent);
         for (Set<String> ids : identifierCombinations) {
           ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
           ids.add(getIdentifier(subNode));
@@ -368,11 +358,6 @@ final class RefasterRuleSelector {
       String id = node.getName().toString();
       identifierCombinations.forEach(ids -> ids.add(id));
       return null;
-    }
-
-    @Override
-    public @Nullable Void visitMethodInvocation(MethodInvocationTree node, List<Set<String>> sets) {
-      return super.visitMethodInvocation(node, sets);
     }
 
     @Override
@@ -418,11 +403,11 @@ final class RefasterRuleSelector {
 
     @Override
     public @Nullable Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
-      if (node instanceof UAnyOf) {
+      if (node instanceof UAnyOf uAnyOf) {
         List<Set<String>> base = copy(identifierCombinations);
         identifierCombinations.clear();
 
-        for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
+        for (UExpression expr : RefasterIntrospection.getExpressions(uAnyOf)) {
           List<Set<String>> branch = copy(base);
           scan(expr, branch);
           identifierCombinations.addAll(branch);

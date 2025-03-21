@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.refaster.test;
 
-import java.util.Collections;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 /** Code to test the Refaster rules from {@link NestedRefasterAnyOfRules}. */

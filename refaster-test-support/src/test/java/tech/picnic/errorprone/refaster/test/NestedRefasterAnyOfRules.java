@@ -15,6 +15,7 @@ final class NestedRefasterAnyOfRules {
 
   static final class NestedRefasterAnyOf<K, V> {
     @BeforeTemplate
+    @SuppressWarnings({"ImmutableMapOf1", "MapEntry"} /* Similar rules for testing purposes. */)
     Map<K, V> before(K k1, V v1) {
       return Refaster.anyOf(
           ImmutableMap.ofEntries(

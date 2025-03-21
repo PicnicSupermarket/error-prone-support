@@ -14,6 +14,7 @@ final class SingleRefasterAnyOfRules {
 
   static final class SingleRefasterAnyOf<K, V> {
     @BeforeTemplate
+    @SuppressWarnings("ImmutableMapOf1" /* Similar rule for testing purposes. */)
     Map<K, V> before(K k1, V v1) {
       return Refaster.anyOf(ImmutableMap.ofEntries(Map.entry(k1, v1)), singletonMap(k1, v1));
     }
