@@ -9019,6 +9019,14 @@
  
    private static final MetricName PS_OLDGEN_TIME = MetricName.build("PS-OldGen.time");
    private static final MetricName PS_OLDGEN_COUNT = MetricName.build("PS-OldGen.count");
+@@ -46,6 +46,6 @@ class GarbageCollectorMetricSetTest {
+ 
+   @Test
+   void autoDiscoversGCs() {
+-    assertThat(new GarbageCollectorMetricSet().getMetrics().keySet()).isNotEmpty();
++    assertThat(new GarbageCollectorMetricSet().getMetrics()).isNotEmpty();
+   }
+ }
 --- a/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/JmxAttributeGaugeTest.java
 +++ b/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/JmxAttributeGaugeTest.java
 @@ -13,7 +13,7 @@ import org.junit.jupiter.api.AfterAll;
@@ -9097,6 +9105,14 @@
      when(nonHeap.getMax()).thenReturn(-1L);
      final Gauge gauge = (Gauge) gauges.getMetrics().get(NON_HEAP_USAGE);
  
+@@ -296,6 +296,6 @@ class MemoryUsageGaugeSetTest {
+ 
+   @Test
+   void autoDetectsMemoryUsageBeanAndMemoryPools() {
+-    assertThat(new MemoryUsageGaugeSet().getMetrics().keySet()).isNotEmpty();
++    assertThat(new MemoryUsageGaugeSet().getMetrics()).isNotEmpty();
+   }
+ }
 --- a/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadDeadlockDetectorTest.java
 +++ b/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadDeadlockDetectorTest.java
 @@ -11,8 +11,8 @@ import java.lang.management.ThreadMXBean;
