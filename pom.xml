@@ -1935,7 +1935,6 @@
                                     instead. -->
                                     -XepOpt:IdentifierName:AllowInitialismsInTypeName=true
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
-                                    -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true

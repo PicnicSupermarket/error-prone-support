@@ -95,8 +95,8 @@ final class ImmutableTableRules {
     }
 
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     @SuppressWarnings("NullAway")
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableTable<R, C, V> after(Stream<E> stream) {
       return stream.collect(
           toImmutableTable(e -> rowFunction(e), e -> columnFunction(e), e -> valueFunction(e)));
