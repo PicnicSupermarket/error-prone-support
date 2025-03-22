@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -48,10 +49,13 @@ public final class MockitoStubbing extends BugChecker implements MethodInvocatio
 
     SuggestedFix.Builder suggestedFix = SuggestedFix.builder();
     for (ExpressionTree arg : arguments) {
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       suggestedFix.replace(
           arg,
           SourceCode.treeToString(
-              Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments()), state));
+              requireNonNull(Iterables.getOnlyElement(((MethodInvocationTree) arg).getArguments())),
+              state));
     }
 
     return describeMatch(tree, suggestedFix.build());

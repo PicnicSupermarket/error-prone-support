@@ -2,6 +2,7 @@ package tech.picnic.errorprone.utils;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.HAS_METHOD_SOURCE;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.SETUP_OR_TEARDOWN_METHOD;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.TEST_METHOD;
@@ -204,8 +205,12 @@ final class MoreJUnitMatchersTest {
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       AnnotationTree annotation =
-          Iterables.getOnlyElement(HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes());
+          requireNonNull(
+              Iterables.getOnlyElement(
+                  HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes()));
 
       return buildDescription(tree)
           .setMessage(MoreJUnitMatchers.getMethodSourceFactoryNames(annotation, tree).toString())
@@ -224,8 +229,12 @@ final class MoreJUnitMatchersTest {
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       AnnotationTree annotation =
-          Iterables.getOnlyElement(HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes());
+          requireNonNull(
+              Iterables.getOnlyElement(
+                  HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes()));
 
       return buildDescription(tree)
           .setMessage(

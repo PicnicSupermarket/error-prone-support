@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.FieldMatchers.staticField;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.packageStartsWith;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -86,7 +87,9 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
       return Description.NO_MATCH;
     }
 
-    AnnotationTree annotation = Iterables.getOnlyElement(bugPatternAnnotations);
+    // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+    // `null`.
+    AnnotationTree annotation = requireNonNull(Iterables.getOnlyElement(bugPatternAnnotations));
     if (isCompliant(annotation, tree.getSimpleName(), state)) {
       /* The bug checker is correctly configured. */
       return Description.NO_MATCH;

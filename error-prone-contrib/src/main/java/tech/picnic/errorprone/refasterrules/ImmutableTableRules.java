@@ -62,7 +62,10 @@ final class ImmutableTableRules {
                       Table.Cell::getRowKey, Table.Cell::getColumnKey, Table.Cell::getValue)));
     }
 
+    // XXX: Drop the warning suppression annotation once NullAway understands that the `Cell`
+    // constituents are never `null`.
     @AfterTemplate
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> after(Table.Cell<? extends R, ? extends C, ? extends V> cell) {
       return ImmutableTable.of(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
     }
