@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.utils;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -117,12 +115,9 @@ public final class AnnotationAttributeMatcher implements Serializable {
   }
 
   private static String extractAttributeName(ExpressionTree expr) {
-    if (expr instanceof AssignmentTree assignment) {
-      return requireNonNull(ASTHelpers.getSymbol(assignment.getVariable()))
-          .getSimpleName()
-          .toString();
-    }
-    return "value";
+    return (expr instanceof AssignmentTree assignment)
+        ? ASTHelpers.getSymbol(assignment.getVariable()).getSimpleName().toString()
+        : "value";
   }
 
   // XXX: The caller of this method can be implemented more efficiently in case of a "wholeTypes"
