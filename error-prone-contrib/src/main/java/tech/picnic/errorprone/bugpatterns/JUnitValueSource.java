@@ -17,7 +17,6 @@ import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
@@ -130,8 +129,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
       return Description.NO_MATCH;
     }
 
-    Type parameterType =
-        requireNonNull(ASTHelpers.getType(Iterables.getOnlyElement(tree.getParameters())));
+    Type parameterType = ASTHelpers.getType(Iterables.getOnlyElement(tree.getParameters()));
 
     return findMethodSourceAnnotation(tree, state)
         .flatMap(
@@ -175,7 +173,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
 
   private static Optional<MethodTree> findMatchingSibling(
       MethodTree tree, Predicate<? super MethodTree> predicate, VisitorState state) {
-    return requireNonNull(state.findEnclosing(ClassTree.class)).getMembers().stream()
+    return state.findEnclosing(ClassTree.class).getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
         .filter(not(tree::equals))

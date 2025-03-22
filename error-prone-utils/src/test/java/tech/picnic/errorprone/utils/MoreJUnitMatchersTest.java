@@ -205,6 +205,8 @@ final class MoreJUnitMatchersTest {
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       AnnotationTree annotation =
           requireNonNull(
               Iterables.getOnlyElement(
@@ -227,6 +229,8 @@ final class MoreJUnitMatchersTest {
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       AnnotationTree annotation =
           requireNonNull(
               Iterables.getOnlyElement(

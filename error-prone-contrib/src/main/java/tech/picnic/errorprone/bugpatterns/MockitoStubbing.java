@@ -49,6 +49,8 @@ public final class MockitoStubbing extends BugChecker implements MethodInvocatio
 
     SuggestedFix.Builder suggestedFix = SuggestedFix.builder();
     for (ExpressionTree arg : arguments) {
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       suggestedFix.replace(
           arg,
           SourceCode.treeToString(

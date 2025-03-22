@@ -97,10 +97,11 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
     }
 
     ClassTree clazz = getEnclosingClass(state);
+    // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+    // `null`.
     ExpressionTree factoryArg =
         requireNonNull(
-            Iterables.getOnlyElement(((MethodInvocationTree) initializer).getArguments()),
-            "`ExpressionTree` should have arguments");
+            Iterables.getOnlyElement(((MethodInvocationTree) initializer).getArguments()));
 
     SuggestedFix.Builder fix = SuggestedFix.builder();
 

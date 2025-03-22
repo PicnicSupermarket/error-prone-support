@@ -366,6 +366,7 @@ public final class RedundantStringConversion extends BugChecker
       return Optional.empty();
     }
 
+    // XXX: Use `Optional#of` once NullAway understands that the argument is never `null`.
     return Optional.ofNullable(Iterables.getOnlyElement(methodInvocation.getArguments()));
   }
 

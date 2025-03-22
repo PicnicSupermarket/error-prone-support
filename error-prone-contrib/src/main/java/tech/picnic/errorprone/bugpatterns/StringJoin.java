@@ -105,6 +105,8 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
       return trySuggestExplicitStringConversion(tree, state);
     }
 
+    // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+    // `null`.
     String separator = requireNonNull(Iterables.getOnlyElement(innerSeparators));
     if (separator.indexOf('%') >= 0) {
       /* The `%s` format specifiers are separated by another format specifier. */

@@ -11,7 +11,6 @@ import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.returnStatement;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -80,8 +79,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
       return Description.NO_MATCH;
     }
 
-    Symbol variableSymbol =
-        requireNonNull(ASTHelpers.getSymbol(((ReturnTree) finalStatement).getExpression()));
+    Symbol variableSymbol = ASTHelpers.getSymbol(((ReturnTree) finalStatement).getExpression());
     StatementTree precedingStatement = statements.get(statements.size() - 2);
 
     return tryMatchAssignment(variableSymbol, precedingStatement)

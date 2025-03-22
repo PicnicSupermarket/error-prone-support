@@ -192,6 +192,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
     for (Description description : matches) {
       String ruleName = extractRefasterRuleName(description);
+      // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+      // `null`.
       ImmutableSet<Replacement> replacements =
           requireNonNull(Iterables.getOnlyElement(description.fixes)).getReplacements(endPositions);
       for (Replacement replacement : replacements) {

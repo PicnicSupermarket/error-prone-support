@@ -68,6 +68,8 @@ public final class OptionalOrElseGet extends BugChecker implements MethodInvocat
       return Description.NO_MATCH;
     }
 
+    // XXX: Drop the `requireNonNull` wrapper once NullAway understands that the value is never
+    // `null`.
     ExpressionTree argument = requireNonNull(Iterables.getOnlyElement(tree.getArguments()));
     if (!REQUIRES_COMPUTATION.matches(argument, state)
         || REFASTER_METHOD.matches(argument, state)) {

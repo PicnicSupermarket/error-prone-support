@@ -36,6 +36,7 @@ import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
@@ -365,9 +366,10 @@ final class ComparatorRules {
               cmp));
     }
 
+    // XXX: Drop the `@Nullable` annotation once NullAway understands that the return type is never
+    // `null`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    T after(T value1, T value2, Comparator<? super T> cmp) {
+    @Nullable T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.min(value1, value2, cmp);
     }
   }
@@ -479,9 +481,10 @@ final class ComparatorRules {
               cmp));
     }
 
+    // XXX: Drop the `@Nullable` annotation once NullAway understands that the return type is never
+    // `null`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    T after(T value1, T value2, Comparator<? super T> cmp) {
+    @Nullable T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.max(value1, value2, cmp);
     }
   }

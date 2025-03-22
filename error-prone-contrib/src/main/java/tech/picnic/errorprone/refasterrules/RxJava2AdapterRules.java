@@ -21,7 +21,6 @@ final class RxJava2AdapterRules {
   private RxJava2AdapterRules() {}
 
   /** Use the fluent API style when using {@link RxJava2Adapter#completableToMono}. */
-  @SuppressWarnings("NullAway")
   static final class CompletableToMono {
     @BeforeTemplate
     Mono<@Nullable Void> before(Completable completable) {

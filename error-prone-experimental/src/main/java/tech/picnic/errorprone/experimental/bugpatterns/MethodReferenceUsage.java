@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -30,7 +29,6 @@ import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.PackageSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Optional;
@@ -128,7 +126,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         return Optional.empty();
       }
 
-      Symbol sym = requireNonNull(ASTHelpers.getSymbol(methodSelect));
+      Symbol sym = ASTHelpers.getSymbol(methodSelect);
       return ASTHelpers.isStatic(sym)
           ? constructFix(lambdaExpr, sym.owner, methodSelect)
           : constructFix(lambdaExpr, "this", methodSelect);
@@ -147,7 +145,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       // XXX: Could be parenthesized. Handle. Also in other classes.
       /*
        * Only suggest a replacement if the method select's expression provably doesn't have
-       * side-effects. Otherwise, the replacement may not be behavior preserving.
+       * side-effects. Otherwise the replacement may not be behavior preserving.
        */
       return Optional.empty();
     }
@@ -202,8 +200,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     Name sName = target.getSimpleName();
     Optional<SuggestedFix.Builder> fix = constructFix(lambdaExpr, sName, methodName);
 
-    PackageSymbol packageSymbol = ASTHelpers.enclosingPackage(target);
-    if (packageSymbol != null && !"java.lang".equals(packageSymbol.toString())) {
+    if (!"java.lang".equals(ASTHelpers.enclosingPackage(target).toString())) {
       Name fqName = target.getQualifiedName();
       if (!sName.equals(fqName)) {
         return fix.map(b -> b.addImport(fqName.toString()));

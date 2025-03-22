@@ -87,10 +87,9 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
       return Description.NO_MATCH;
     }
 
-    AnnotationTree annotation =
-        requireNonNull(
-            Iterables.getOnlyElement(bugPatternAnnotations),
-            "`BugChecker` requires a `@BugPattern` annotation");
+    // XXX: Drop the `requireNonNull` wrapper once NullAway understands that its argument is never
+    // `null`.
+    AnnotationTree annotation = requireNonNull(Iterables.getOnlyElement(bugPatternAnnotations));
     if (isCompliant(annotation, tree.getSimpleName(), state)) {
       /* The bug checker is correctly configured. */
       return Description.NO_MATCH;
@@ -102,7 +101,7 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
   private static boolean isCompliant(
       AnnotationTree annotation, Name className, VisitorState state) {
     ExpressionTree linkType = AnnotationMatcherUtils.getArgument(annotation, "linkType");
-    if (linkType != null && IS_LINK_TYPE_NONE.matches(linkType, state)) {
+    if (IS_LINK_TYPE_NONE.matches(linkType, state)) {
       /* This bug checker explicitly declares that there is no link. */
       return true;
     }

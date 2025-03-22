@@ -5,7 +5,6 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -87,7 +86,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
       return Description.NO_MATCH;
     }
 
-    ExpressionTree receiver = requireNonNull(ASTHelpers.getReceiver(tree));
+    ExpressionTree receiver = ASTHelpers.getReceiver(tree);
     if (!NON_EMPTY_MONO.matches(receiver, state)) {
       return Description.NO_MATCH;
     }
