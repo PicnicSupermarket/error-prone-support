@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
@@ -143,7 +144,10 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link File#mkdirs} before {@link Files#exists} to avoid concurrency issues. */
+  /**
+   * Invoke {@link File#mkdirs()} before {@link Files#exists(Path, LinkOption...)} to avoid
+   * concurrency issues.
+   */
   static final class PathToFileMkDirsFilesExists {
     @BeforeTemplate
     boolean before(Path path) {
@@ -157,7 +161,7 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link File#mkdirs} before {@link File#exists} to avoid concurrency issues. */
+  /** Invoke {@link File#mkdirs()} before {@link File#exists()} to avoid concurrency issues. */
   static final class FileMkDirsFileExists {
     @BeforeTemplate
     boolean before(File file) {
