@@ -117,12 +117,15 @@ public final class AnnotationAttributeMatcher implements Serializable {
   }
 
   private static String extractAttributeName(ExpressionTree expr) {
-    if (expr instanceof AssignmentTree assignment) {
-      return requireNonNull(ASTHelpers.getSymbol(assignment.getVariable()))
-          .getSimpleName()
-          .toString();
+    if (!(expr instanceof AssignmentTree assignment)) {
+      return "value";
     }
-    return "value";
+
+    return requireNonNull(
+            ASTHelpers.getSymbol(assignment.getVariable()),
+            "Missing symbol for annotation attribute")
+        .getSimpleName()
+        .toString();
   }
 
   // XXX: The caller of this method can be implemented more efficiently in case of a "wholeTypes"
