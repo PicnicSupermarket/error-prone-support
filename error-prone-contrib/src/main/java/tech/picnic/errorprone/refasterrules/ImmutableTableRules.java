@@ -52,7 +52,10 @@ final class ImmutableTableRules {
 
   /** Prefer {@link ImmutableTable#of(Object, Object, Object)} over more contrived alternatives. */
   static final class CellToImmutableTable<R, C, V> {
+    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
+    // the method references do not have a nullable return type.
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> before(Table.Cell<? extends R, ? extends C, ? extends V> cell) {
       return Refaster.anyOf(
           ImmutableTable.<R, C, V>builder().put(cell).buildOrThrow(),
@@ -82,7 +85,10 @@ final class ImmutableTableRules {
     @Placeholder(allowsIdentity = true)
     abstract V valueFunction(@MayOptionallyUse E element);
 
+    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
+    // the method references do not have a nullable return type.
     @BeforeTemplate
+    @SuppressWarnings("NullAway")
     ImmutableTable<R, C, V> before(Stream<E> stream) {
       return stream
           .map(e -> Tables.immutableCell(rowFunction(e), columnFunction(e), valueFunction(e)))
