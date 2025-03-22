@@ -39,4 +39,16 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
   File testFilesCreateTempFileInCustomDirectoryToFile() throws IOException {
     return Files.createTempFile(new File("baz").toPath(), "foo", "bar").toFile();
   }
+
+  ImmutableSet<Boolean> testPathToFileMkDirsFilesExists() {
+    return ImmutableSet.of(
+        Path.of("foo").toFile().mkdirs() || Files.exists(Path.of("foo")),
+        !Path.of("bar").toFile().mkdirs() && !Files.exists(Path.of("bar")));
+  }
+
+  ImmutableSet<Boolean> testFileMkDirsFileExists() {
+    return ImmutableSet.of(
+        new File("foo").mkdirs() || new File("foo").exists(),
+        !new File("bar").mkdirs() && !new File("bar").exists());
+  }
 }
