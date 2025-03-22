@@ -303,6 +303,13 @@
                 <artifactId>auto-value-annotations</artifactId>
                 <version>${version.auto-value}</version>
             </dependency>
+            <!-- XXX: Drop this dependency version declaration once NullAway in
+            JSpecify mode no longer requires it. -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotation</artifactId>
@@ -1941,6 +1948,7 @@
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:Nullness:Conservative=false
+                                    -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
