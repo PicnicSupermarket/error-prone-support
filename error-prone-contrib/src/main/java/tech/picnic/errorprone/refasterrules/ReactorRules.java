@@ -489,9 +489,13 @@ final class ReactorRules {
       return Flux.range(value, 1);
     }
 
+    // XXX: Consider generalizing part of this template using an Error Prone check that covers any
+    // sequence of explicitly enumerated values passed to an iteration order-preserving collection
+    // factory method.
     @BeforeTemplate
     Flux<T> before(T value) {
       return Refaster.anyOf(
+          Mono.just(value).flux(),
           Mono.just(value).repeat().take(1),
           Flux.fromIterable(ImmutableList.of(value)),
           Flux.fromIterable(ImmutableSet.of(value)));

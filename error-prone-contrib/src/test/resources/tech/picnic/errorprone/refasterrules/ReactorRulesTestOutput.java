@@ -192,7 +192,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Flux<Integer>> testFluxJust() {
-    return ImmutableSet.of(Flux.just(0), Flux.just(2), Flux.just(3), Flux.just(4));
+    return ImmutableSet.of(Flux.just(0), Flux.just(2), Flux.just(3), Flux.just(4), Flux.just(5));
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
