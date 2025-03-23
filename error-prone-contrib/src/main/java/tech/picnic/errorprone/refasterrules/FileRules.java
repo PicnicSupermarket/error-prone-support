@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
 import java.io.File;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
@@ -139,6 +141,37 @@ final class FileRules {
     @AfterTemplate
     File after(File directory, String prefix, String suffix) throws IOException {
       return Files.createTempFile(directory.toPath(), prefix, suffix).toFile();
+    }
+  }
+
+  /**
+   * Invoke {@link File#mkdirs()} before {@link Files#exists(Path, LinkOption...)} to avoid
+   * concurrency issues.
+   */
+  static final class PathToFileMkDirsFilesExists {
+    @BeforeTemplate
+    boolean before(Path path) {
+      return Files.exists(path) || path.toFile().mkdirs();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(Path path) {
+      return path.toFile().mkdirs() || Files.exists(path);
+    }
+  }
+
+  /** Invoke {@link File#mkdirs()} before {@link File#exists()} to avoid concurrency issues. */
+  static final class FileMkDirsFileExists {
+    @BeforeTemplate
+    boolean before(File file) {
+      return file.exists() || file.mkdirs();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(File file) {
+      return file.mkdirs() || file.exists();
     }
   }
 }
