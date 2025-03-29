@@ -516,7 +516,8 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before2(Mono<@Nullable Void> mono) {
       return Refaster.anyOf(mono.ignoreElement(), mono.then());
     }
 
@@ -944,11 +945,9 @@ final class ReactorRules {
 
   /** Prefer direct invocation of {@link Mono#then()}} over more contrived alternatives. */
   static final class MonoThen<T> {
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before(Mono<T> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Mono<T> mono) {
       return Refaster.anyOf(
           mono.ignoreElement().then(),
           mono.flux().then(),
@@ -956,73 +955,60 @@ final class ReactorRules {
           Mono.whenDelayError(mono));
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> after(Mono<T> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Mono<T> mono) {
       return mono.then();
     }
   }
 
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
   static final class FluxThen<T> {
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before(Flux<T> flux) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Flux<T> flux) {
       return flux.ignoreElements().then();
     }
 
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Flux<@Nullable Void> flux) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before2(Flux<@Nullable Void> flux) {
       return flux.ignoreElements();
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> after(Flux<T> flux) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Flux<T> flux) {
       return flux.then();
     }
   }
 
   /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
   static final class MonoThenEmpty<T> {
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
       return mono.ignoreElement().thenEmpty(publisher);
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
       return mono.thenEmpty(publisher);
     }
   }
 
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
   static final class FluxThenEmpty<T> {
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
       return flux.ignoreElements().thenEmpty(publisher);
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
       return flux.thenEmpty(publisher);
     }
   }
@@ -1077,11 +1063,9 @@ final class ReactorRules {
       return Refaster.anyOf(mono1.ignoreElement().then(mono2), mono1.flux().then(mono2));
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
       return mono1.thenEmpty(mono2);
     }
 
@@ -1098,11 +1082,9 @@ final class ReactorRules {
       return flux.ignoreElements().then(mono);
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
       return flux.thenEmpty(mono);
     }
 
