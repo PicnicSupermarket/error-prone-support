@@ -62,13 +62,6 @@
             <artifactId>auto-value-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- XXX: Drop this dependency declaration once NullAway in JSpecify
-        mode no longer requires it when building with JDK 23+. -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_annotation</artifactId>

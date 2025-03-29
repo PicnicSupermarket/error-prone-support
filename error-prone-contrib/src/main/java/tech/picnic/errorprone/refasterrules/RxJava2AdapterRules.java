@@ -22,21 +22,17 @@ final class RxJava2AdapterRules {
 
   /** Use the fluent API style when using {@link RxJava2Adapter#completableToMono}. */
   static final class CompletableToMono {
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> before(Completable completable) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Completable completable) {
       return Refaster.anyOf(
           RxJava2Adapter.completableToMono(completable),
           completable.to(RxJava2Adapter::completableToMono));
     }
 
-    // XXX: Drop the warning suppression annotation once NullAway in JSpecify mode understands that
-    // `Mono<Void>` is a subtype of `Mono<@Nullable Void>`.
     @AfterTemplate
-    @SuppressWarnings("NullAway")
-    Mono<@Nullable Void> after(Completable completable) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Completable completable) {
       return completable.as(RxJava2Adapter::completableToMono);
     }
   }
