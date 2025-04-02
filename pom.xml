@@ -1940,6 +1940,7 @@
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
+                                    -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true
                                     <!-- Append additional custom arguments. -->
