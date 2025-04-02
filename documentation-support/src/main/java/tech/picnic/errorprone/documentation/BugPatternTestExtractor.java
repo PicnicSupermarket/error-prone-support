@@ -2,6 +2,7 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -167,7 +168,10 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
          * is safe, because this code is guarded by an earlier call to `#getClassUnderTest(..)`,
          * which ensures that `tree` is part of a longer method invocation chain.
          */
-        MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
+        MethodInvocationTree inputTree =
+            (MethodInvocationTree)
+                requireNonNull(
+                    ASTHelpers.getReceiver(tree), "Instance method invocation must have receiver");
 
         String path = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);
