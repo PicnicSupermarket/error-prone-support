@@ -29,6 +29,7 @@ import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.PackageSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Optional;
@@ -126,7 +127,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         return Optional.empty();
       }
 
-      Symbol sym = ASTHelpers.getSymbol(methodSelect);
+      Symbol sym = ASTHelpers.getSymbol(subTree);
       return ASTHelpers.isStatic(sym)
           ? constructFix(lambdaExpr, sym.owner, methodSelect)
           : constructFix(lambdaExpr, "this", methodSelect);
@@ -200,7 +201,8 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     Name sName = target.getSimpleName();
     Optional<SuggestedFix.Builder> fix = constructFix(lambdaExpr, sName, methodName);
 
-    if (!"java.lang".equals(ASTHelpers.enclosingPackage(target).toString())) {
+    PackageSymbol pkg = ASTHelpers.enclosingPackage(target);
+    if (pkg != null && !"java.lang".equals(pkg.toString())) {
       Name fqName = target.getQualifiedName();
       if (!sName.equals(fqName)) {
         return fix.map(b -> b.addImport(fqName.toString()));
