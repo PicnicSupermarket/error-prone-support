@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.20.1-SNAPSHOT</version>
+    <version>0.21.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -146,7 +146,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2025-02-02T12:19:40Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-03-24T10:41:07Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -217,9 +217,9 @@
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
-        <version.nullaway>0.12.4</version.nullaway>
-        <version.pitest-git>2.1.0</version.pitest-git>
-        <version.rewrite-templating>1.24.1</version.rewrite-templating>
+        <version.nullaway>0.12.5</version.nullaway>
+        <version.pitest-git>2.2.0</version.pitest-git>
+        <version.rewrite-templating>1.24.2</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
 
@@ -431,7 +431,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.17.2</version>
+                <version>1.17.4</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -494,8 +494,10 @@
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
-                <artifactId>mongodb-driver-core</artifactId>
-                <version>5.3.1</version>
+                <artifactId>mongodb-driver-bom</artifactId>
+                <version>5.4.0</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -536,7 +538,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.4.3</version>
+                <version>3.4.4</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -945,7 +947,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.21.4</version>
+                            <version>10.22.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1329,7 +1331,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.2</version>
+                    <version>3.5.3</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1586,7 +1588,7 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.3.2</version>
+                            <version>1.4.0</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
@@ -1616,7 +1618,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.0.0.4389</version>
+                    <version>5.1.0.4751</version>
                 </plugin>
             </plugins>
         </pluginManagement>
