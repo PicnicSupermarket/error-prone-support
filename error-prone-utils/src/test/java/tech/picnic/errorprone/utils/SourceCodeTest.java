@@ -303,14 +303,7 @@ final class SourceCodeTest {
 
     @Override
     public Description matchLiteral(LiteralTree tree, VisitorState state) {
-      // XXX: The character conversion is a workaround for the fact that `ASTHelpers#constValue`
-      // returns an `Integer` value for `char` constants.
       return Optional.ofNullable(ASTHelpers.constValue(tree))
-          .map(
-              constant ->
-                  ASTHelpers.isSubtype(ASTHelpers.getType(tree), state.getSymtab().charType, state)
-                      ? (char) (int) constant
-                      : constant)
           .map(constant -> describeMatch(tree, addComment(tree, constant, state)))
           .orElse(Description.NO_MATCH);
     }

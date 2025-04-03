@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -191,7 +192,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Flux<Integer>> testFluxJust() {
-    return ImmutableSet.of(Flux.just(0), Flux.just(2));
+    return ImmutableSet.of(Flux.just(0), Flux.just(2), Flux.just(3), Flux.just(4), Flux.just(5));
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
@@ -339,7 +340,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Mono<Void>> testMonoThen() {
-    return ImmutableSet.of(Mono.just("foo").then(), Mono.just("bar").then());
+    return ImmutableSet.of(
+        Mono.just("foo").then(),
+        Mono.just("bar").then(),
+        Mono.just("baz").then(),
+        Mono.just("qux").then());
   }
 
   ImmutableSet<Mono<Void>> testFluxThen() {
@@ -383,7 +388,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.just("foo").singleOptional(),
         Mono.just("bar").singleOptional(),
-        Mono.just("baz").singleOptional());
+        Mono.just("baz").singleOptional(),
+        Mono.just("quux").singleOptional(),
+        Mono.just("quuz").singleOptional());
   }
 
   Mono<Number> testMonoCast() {
@@ -717,6 +724,11 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<String> testMonoFromFutureAsyncLoadingCacheGet() {
     return Mono.fromFuture(() -> ((AsyncLoadingCache<Integer, String>) null).get(0), true);
+  }
+
+  Mono<Map<Integer, String>> testMonoFromFutureAsyncLoadingCacheGetAll() {
+    return Mono.fromFuture(
+        () -> ((AsyncLoadingCache<Integer, String>) null).getAll(ImmutableSet.of()), true);
   }
 
   Flux<Integer> testFluxFromStreamSupplier() {

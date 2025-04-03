@@ -489,9 +489,16 @@ final class ReactorRules {
       return Flux.range(value, 1);
     }
 
+    // XXX: Consider generalizing part of this template using an Error Prone check that covers any
+    // sequence of explicitly enumerated values passed to an iteration order-preserving collection
+    // factory method.
     @BeforeTemplate
     Flux<T> before(T value) {
-      return Mono.just(value).repeat().take(1);
+      return Refaster.anyOf(
+          Mono.just(value).flux(),
+          Mono.just(value).repeat().take(1),
+          Flux.fromIterable(ImmutableList.of(value)),
+          Flux.fromIterable(ImmutableSet.of(value)));
     }
 
     @AfterTemplate
@@ -939,7 +946,11 @@ final class ReactorRules {
   static final class MonoThen<T> {
     @BeforeTemplate
     Mono<@Nullable Void> before(Mono<T> mono) {
-      return Refaster.anyOf(mono.ignoreElement().then(), mono.flux().then());
+      return Refaster.anyOf(
+          mono.ignoreElement().then(),
+          mono.flux().then(),
+          Mono.when(mono),
+          Mono.whenDelayError(mono));
     }
 
     @AfterTemplate
@@ -1078,10 +1089,12 @@ final class ReactorRules {
   // rule. Consider introducing an Error Prone check for this.
   static final class MonoSingleOptional<T> {
     @BeforeTemplate
-    Mono<Optional<T>> before(Mono<T> mono) {
+    Mono<Optional<T>> before(Mono<T> mono, Optional<T> optional, Mono<Optional<T>> alternate) {
       return Refaster.anyOf(
           mono.flux().collect(toOptional()),
-          mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
+          mono.map(Optional::of),
+          mono.singleOptional().defaultIfEmpty(optional),
+          mono.singleOptional().switchIfEmpty(alternate),
           mono.transform(Mono::singleOptional));
     }
 
@@ -2171,6 +2184,22 @@ final class ReactorRules {
     @AfterTemplate
     Mono<V> after(AsyncLoadingCache<K, V> cache, K key) {
       return Mono.fromFuture(() -> cache.get(key), /* suppressCancel= */ true);
+    }
+  }
+
+  /**
+   * Don't propagate {@link Mono} cancellations to upstream cache value computations, as completion
+   * of such computations may benefit concurrent or subsequent cache usages.
+   */
+  static final class MonoFromFutureAsyncLoadingCacheGetAll<K1, K2 extends K1, V> {
+    @BeforeTemplate
+    Mono<Map<K1, V>> before(AsyncLoadingCache<K1, V> cache, Iterable<K2> keys) {
+      return Mono.fromFuture(() -> cache.getAll(keys));
+    }
+
+    @AfterTemplate
+    Mono<Map<K1, V>> after(AsyncLoadingCache<K1, V> cache, Iterable<K2> keys) {
+      return Mono.fromFuture(() -> cache.getAll(keys), /* suppressCancel= */ true);
     }
   }
 
