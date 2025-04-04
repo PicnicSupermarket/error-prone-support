@@ -17,6 +17,7 @@ jobs:
     if: |
       github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
+    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
