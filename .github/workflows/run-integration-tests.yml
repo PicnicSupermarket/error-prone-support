@@ -18,6 +18,7 @@ jobs:
       github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         integration-test: [ "checkstyle", "metrics", "prometheus-java-client" ]
     steps:
