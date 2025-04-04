@@ -132,14 +132,11 @@ final class RefasterRuleSelector {
   private static void collectRuleIdentifiers(
       CodeTransformer codeTransformer,
       Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers) {
-    if (codeTransformer instanceof CompositeCodeTransformer) {
-      for (CodeTransformer transformer :
-          ((CompositeCodeTransformer) codeTransformer).transformers()) {
+    if (codeTransformer instanceof CompositeCodeTransformer compositeCodeTransformer) {
+      for (CodeTransformer transformer : compositeCodeTransformer.transformers()) {
         collectRuleIdentifiers(transformer, identifiers);
       }
-    } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer) {
-      AnnotatedCompositeCodeTransformer annotatedTransformer =
-          (AnnotatedCompositeCodeTransformer) codeTransformer;
+    } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer annotatedTransformer) {
       for (Map.Entry<CodeTransformer, ImmutableSet<ImmutableSet<String>>> e :
           indexRuleIdentifiers(annotatedTransformer.transformers()).entrySet()) {
         identifiers.put(annotatedTransformer.withTransformers(e.getKey()), e.getValue());
@@ -160,12 +157,12 @@ final class RefasterRuleSelector {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
 
     for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
-      if (template instanceof ExpressionTemplate) {
-        UExpression expr = RefasterIntrospection.getExpression((ExpressionTemplate) template);
+      if (template instanceof ExpressionTemplate expressionTemplate) {
+        UExpression expr = RefasterIntrospection.getExpression(expressionTemplate);
         results.addAll(extractRuleIdentifiers(ImmutableList.of(expr)));
-      } else if (template instanceof BlockTemplate) {
+      } else if (template instanceof BlockTemplate blockTemplate) {
         ImmutableList<UStatement> statements =
-            RefasterIntrospection.getTemplateStatements((BlockTemplate) template);
+            RefasterIntrospection.getTemplateStatements(blockTemplate);
         results.addAll(extractRuleIdentifiers(statements));
       } else {
         throw new IllegalStateException(
@@ -333,8 +330,8 @@ final class RefasterRuleSelector {
           ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
           ids.add(getIdentifier(node));
         }
-      } else if (node instanceof UStaticIdent) {
-        IdentifierTree subNode = RefasterIntrospection.getClassIdent((UStaticIdent) node);
+      } else if (node instanceof UStaticIdent uStaticIdent) {
+        IdentifierTree subNode = RefasterIntrospection.getClassIdent(uStaticIdent);
         for (Set<String> ids : identifierCombinations) {
           ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
           ids.add(getIdentifier(subNode));
@@ -406,11 +403,11 @@ final class RefasterRuleSelector {
 
     @Override
     public @Nullable Void visitOther(Tree node, List<Set<String>> identifierCombinations) {
-      if (node instanceof UAnyOf) {
+      if (node instanceof UAnyOf uAnyOf) {
         List<Set<String>> base = copy(identifierCombinations);
         identifierCombinations.clear();
 
-        for (UExpression expr : RefasterIntrospection.getExpressions((UAnyOf) node)) {
+        for (UExpression expr : RefasterIntrospection.getExpressions(uAnyOf)) {
           List<Set<String>> branch = copy(base);
           scan(expr, branch);
           identifierCombinations.addAll(branch);
