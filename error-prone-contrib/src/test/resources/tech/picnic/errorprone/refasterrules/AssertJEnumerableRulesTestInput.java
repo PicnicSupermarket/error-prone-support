@@ -67,10 +67,11 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
         assertThat(ImmutableSet.of(4)).size().isBetween(5, 6));
   }
 
-  ImmutableSet<EnumerableAssert<?, Integer>> testEnumerableAssertHasSameSizeAs() {
+  ImmutableSet<EnumerableAssert<?, Character>> testEnumerableAssertHasSameSizeAs() {
     return ImmutableSet.of(
-        assertThat(ImmutableSet.of(1)).hasSize(Iterables.size(ImmutableSet.of(2))),
-        assertThat(ImmutableSet.of(3)).hasSize(ImmutableSet.of(4).size()),
-        assertThat(ImmutableSet.of(5)).hasSize(new Integer[0].length));
+        assertThat("foo").hasSize(Iterables.size(ImmutableSet.of(1))),
+        assertThat("bar").hasSize(ImmutableSet.of(2).size()),
+        assertThat("baz").hasSize(new Integer[0].length),
+        assertThat("qux").hasSize("quux".length()));
   }
 }

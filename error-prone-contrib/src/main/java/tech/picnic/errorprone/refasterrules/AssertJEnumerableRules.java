@@ -204,6 +204,11 @@ final class AssertJEnumerableRules {
       return enumAssert.hasSize(iterable.length);
     }
 
+    @BeforeTemplate
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, CharSequence iterable) {
+      return enumAssert.hasSize(iterable.length());
+    }
+
     @AfterTemplate
     EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<E> iterable) {
       return enumAssert.hasSameSizeAs(iterable);
