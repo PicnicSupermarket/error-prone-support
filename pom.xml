@@ -212,7 +212,7 @@
         <version.jdk>17</version.jdk>
         <version.jmh>1.37</version.jmh>
         <version.maven>3.9.9</version.maven>
-        <version.mockito>5.16.1</version.mockito>
+        <version.mockito>5.17.0</version.mockito>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
@@ -335,7 +335,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.25.2</version>
+                <version>1.26.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -431,7 +431,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.17.4</version>
+                <version>1.17.5</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -517,7 +517,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -629,7 +629,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.8</version>
+                    <version>3.9</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -1167,7 +1167,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.9.0</version>
+                            <version>1.10.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1534,7 +1534,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.12</version>
+                    <version>0.8.13</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
