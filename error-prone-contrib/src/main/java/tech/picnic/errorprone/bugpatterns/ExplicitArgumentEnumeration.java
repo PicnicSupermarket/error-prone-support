@@ -33,6 +33,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javac.code.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -181,9 +182,9 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     /*
      * If all overloads have a single parameter, and at least one of them is a varargs method, then
      * we assume that unwrapping the iterable argument will cause a suitable overload to be invoked.
-     * (Note that there may be multiple varargs overloads, either with different parameter types, or
-     * due to method overriding; this check does not attempt to determine which exact method or
-     * overload will be invoked as a result of the suggested simplification.)
+     * (Note that there may be multiple varargs overloads due to method overriding; this check does
+     * not attempt to determine which exact method or overload will be invoked as a result of the
+     * suggested simplification.)
      *
      * Note that this is a (highly!) imperfect heuristic, but it is sufficient to prevent e.g.
      * unwrapping of arguments to `org.jooq.impl.DSL#row`, which can cause the expression's return
@@ -195,11 +196,35 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     // XXX: Ideally we validate that eligible overloads have compatible return types.
     boolean hasLikelySuitableVarargsOverload =
         overloads.stream().allMatch(m -> m.params().size() == 1)
-            && overloads.stream().anyMatch(MethodSymbol::isVarArgs);
+            && hasVarArgsOverLoadOfSameParameterType(overloads, method, state);
 
     return hasLikelySuitableVarargsOverload
         ? Optional.of(SourceCode.unwrapMethodInvocation(argument, state))
         : Optional.empty();
+  }
+
+  /**
+   * Return true when at least one of the overloads accepts varargs parameter that is of the same
+   * parameter type as the original method's.
+   */
+  private static boolean hasVarArgsOverLoadOfSameParameterType(
+      ImmutableList<MethodSymbol> overloads, MethodSymbol method, VisitorState state) {
+    return overloads.stream()
+        .filter(MethodSymbol::isVarArgs)
+        .anyMatch(
+            overload ->
+                isSubtype(
+                    method.getParameters().get(0).type,
+                    overload.getParameters().get(0).type,
+                    state));
+  }
+
+  private static boolean isSubtype(
+      Type methodParameterType, Type overloadArgumentType, VisitorState state) {
+    return ASTHelpers.isSubtype(
+        methodParameterType.getTypeArguments().get(0),
+        state.getTypes().elemtype(overloadArgumentType),
+        state);
   }
 
   private static Optional<SuggestedFix> trySuggestCallingCustomAlternative(
