@@ -303,6 +303,16 @@
                 <artifactId>auto-value-annotations</artifactId>
                 <version>${version.auto-value}</version>
             </dependency>
+            <!-- XXX: JSR-305 (meta-)annotation usage by some dependencies
+            triggers NullAway to attempt to load said annotations. As such
+            some modules require these annotations to be on the classpath.
+            Periodically review whether we can drop this dependeny version
+            declaration. See https://github.com/uber/NullAway/issues/1171. -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotation</artifactId>
@@ -341,7 +351,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.4.0-jre</version>
+                <version>33.4.7-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
