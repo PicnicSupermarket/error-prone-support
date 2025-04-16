@@ -1596,11 +1596,6 @@
             profile. Necessary for dealing with plugins that default to failing
             the build upon encountering a violation. -->
             <id>avoid-errors</id>
-            <activation>
-                <property>
-                    <name>verification.warn</name>
-                </property>
-            </activation>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1621,11 +1616,6 @@
             that they can be disabled during development. See also the
             `error-prone` profile defined below. -->
             <id>build-checks</id>
-            <activation>
-                <property>
-                    <name>!verification.skip</name>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>
@@ -1862,11 +1852,6 @@
             This profile allows one to collect all violations without failing
             the build. -->
             <id>disallow-warnings</id>
-            <activation>
-                <property>
-                    <name>!verification.warn</name>
-                </property>
-            </activation>
             <build>
                 <pluginManagement>
                     <plugins>
