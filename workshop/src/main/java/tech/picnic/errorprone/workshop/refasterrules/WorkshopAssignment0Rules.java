@@ -2,7 +2,6 @@ package tech.picnic.errorprone.workshop.refasterrules;
 
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import org.springframework.context.annotation.Bean;
 
 /** Refaster rule used as example for the assignments of the workshop. */
 final class WorkshopAssignment0Rules {
