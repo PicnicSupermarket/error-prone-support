@@ -904,30 +904,30 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualIteratorIterationOrder {
+  static final class AssertEqualIteratorIterationOrder<S, T extends S> {
     @BeforeTemplate
-    void before(Iterator<?> actual, Iterator<?> expected) {
+    void before(Iterator<S> actual, Iterator<T> expected) {
       assertEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Iterator<S> actual, Iterator<T> expected) {
+    void after(Iterator<S> actual, Iterator<T> expected) {
       // XXX: This is not `null`-safe.
       // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
       assertThat(actual).toIterable().containsExactlyElementsOf(ImmutableList.copyOf(expected));
     }
   }
 
-  static final class AssertEqualIteratorIterationOrderWithMessage {
+  static final class AssertEqualIteratorIterationOrderWithMessage<S, T extends S> {
     @BeforeTemplate
-    void before(Iterator<?> actual, String message, Iterator<?> expected) {
+    void before(Iterator<S> actual, String message, Iterator<T> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Iterator<S> actual, String message, Iterator<T> expected) {
+    void after(Iterator<S> actual, String message, Iterator<T> expected) {
       // XXX: This is not `null`-safe.
       // XXX: The `ImmutableList.copyOf` should actually *not* be imported statically.
       assertThat(actual)
@@ -939,64 +939,64 @@ final class TestNGToAssertJRules {
 
   // XXX This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
   // `assertThat(Path)` does not support `.containsExactlyElementsOf`.
-  static final class AssertEqualIterableIterationOrder {
+  static final class AssertEqualIterableIterationOrder<S, T extends S> {
     @BeforeTemplate
-    void before(Iterable<?> actual, Iterable<?> expected) {
+    void before(Iterable<S> actual, Iterable<T> expected) {
       assertEquals(actual, expected);
     }
 
     @BeforeTemplate
-    void before(Collection<?> actual, Collection<?> expected) {
+    void before(Collection<S> actual, Collection<T> expected) {
       assertEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Iterable<S> actual, Iterable<T> expected) {
+    void after(Iterable<S> actual, Iterable<T> expected) {
       assertThat(actual).containsExactlyElementsOf(expected);
     }
   }
 
-  static final class AssertEqualIterableIterationOrderWithMessage {
+  static final class AssertEqualIterableIterationOrderWithMessage<S, T extends S> {
     @BeforeTemplate
-    void before(Iterable<?> actual, String message, Iterable<?> expected) {
+    void before(Iterable<S> actual, String message, Iterable<T> expected) {
       assertEquals(actual, expected, message);
     }
 
     @BeforeTemplate
-    void before(Collection<?> actual, String message, Collection<?> expected) {
+    void before(Collection<S> actual, String message, Collection<T> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Iterable<S> actual, String message, Iterable<T> expected) {
+    void after(Iterable<S> actual, String message, Iterable<T> expected) {
       assertThat(actual).withFailMessage(message).containsExactlyElementsOf(expected);
     }
   }
 
-  static final class AssertEqualSets {
+  static final class AssertEqualSets<S, T extends S> {
     @BeforeTemplate
-    void before(Set<?> actual, Set<?> expected) {
+    void before(Set<S> actual, Set<T> expected) {
       assertEquals(actual, expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Set<S> actual, Set<T> expected) {
+    void after(Set<S> actual, Set<T> expected) {
       assertThat(actual).hasSameElementsAs(expected);
     }
   }
 
-  static final class AssertEqualSetsWithMessage {
+  static final class AssertEqualSetsWithMessage<S, T extends S> {
     @BeforeTemplate
-    void before(Set<?> actual, String message, Set<?> expected) {
+    void before(Set<S> actual, String message, Set<T> expected) {
       assertEquals(actual, expected, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    <S, T extends S> void after(Set<S> actual, String message, Set<T> expected) {
+    void after(Set<S> actual, String message, Set<T> expected) {
       assertThat(actual).withFailMessage(message).hasSameElementsAs(expected);
     }
   }

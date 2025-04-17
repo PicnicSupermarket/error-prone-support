@@ -239,6 +239,9 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(
         Iterators.unmodifiableIterator(new ArrayList<>().iterator()),
         Iterators.unmodifiableIterator(new ArrayList<>().iterator()));
+    assertEquals(
+        Iterators.unmodifiableIterator(new ArrayList<String>().iterator()),
+        Iterators.unmodifiableIterator(new ArrayList<Number>().iterator()));
   }
 
   void testAssertEqualIteratorIterationOrderWithMessage() {
@@ -255,6 +258,9 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(
         Collections.synchronizedCollection(new ArrayList<>()),
         Collections.synchronizedCollection(new ArrayList<>()));
+    assertEquals(
+        Collections.synchronizedCollection(new ArrayList<String>()),
+        Collections.synchronizedCollection(new ArrayList<Number>()));
   }
 
   void testAssertEqualIterableIterationOrderWithMessage() {
