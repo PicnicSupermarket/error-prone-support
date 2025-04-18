@@ -10,16 +10,16 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-24.04 ]
-        jdk: [ 17.0.14, 21.0.6, 24.0.0 ]
+        jdk: [ 17.0.15, 21.0.7, 24.0.1 ]
         distribution: [ temurin ]
         experimental: [ false ]
         include:
           - os: macos-15
-            jdk: 17.0.14
+            jdk: 17.0.15
             distribution: temurin
             experimental: false
           - os: windows-2025
-            jdk: 17.0.14
+            jdk: 17.0.15
             distribution: temurin
             experimental: false
     runs-on: ${{ matrix.os }}
