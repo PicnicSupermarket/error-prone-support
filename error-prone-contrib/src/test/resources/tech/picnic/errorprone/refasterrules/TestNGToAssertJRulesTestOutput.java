@@ -261,8 +261,8 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   void testAssertEqualIterableIterationOrder() {
     assertThat(Iterables.unmodifiableIterable(new ArrayList<>()))
         .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<>()));
-    assertThat(Collections.synchronizedCollection(new ArrayList<>()))
-        .containsExactlyElementsOf(Collections.synchronizedCollection(new ArrayList<>()));
+    assertThat(Collections.synchronizedCollection(new ArrayList<Number>()))
+        .containsExactlyElementsOf(Collections.synchronizedCollection(new ArrayList<Integer>()));
     assertEquals(
         Collections.synchronizedCollection(new ArrayList<String>()),
         Collections.synchronizedCollection(new ArrayList<Number>()));
