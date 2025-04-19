@@ -12,8 +12,6 @@
 # incompatibilities.
 name: Error Prone compatibility check
 on:
-  # XXX: Drop `pull_request` trigger.
-  pull_request:
   push:
     branches: [ master ]
   schedule:
