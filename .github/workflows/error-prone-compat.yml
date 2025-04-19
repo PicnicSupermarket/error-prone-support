@@ -6,6 +6,10 @@
 # thorough as the validation performed by
 # `website/generate-version-compatibility-overview.sh`. Consider unifying these
 # approaches.
+# XXX: Instead of the `LATEST` release, this workflow could also attempt to
+# build against the `1.0-HEAD-SNAPSHOT` version published to the Sonatype
+# snapshot repository. This would enable advance notification of upcoming
+# incompatibilities.
 name: Error Prone compatibility check
 on:
   # XXX: Drop `pull_request` trigger.
