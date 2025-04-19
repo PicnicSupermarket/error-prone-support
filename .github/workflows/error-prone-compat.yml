@@ -1,0 +1,36 @@
+# Validates compatibility with the latest Error Prone release.
+#
+# XXX: This workflow compiles the code against the `LATEST` Error Prone release
+# as determined by Maven, and subsequently runs the unit tests. No other checks
+# are performed. This guards against false positives, but is not quite as
+# thorough as the validation performed by
+# `website/generate-version-compatibility-overview.sh`. Consider unifying these
+# approaches.
+name: Error Prone compatibility check
+on:
+  # XXX: Drop `pull_request` trigger.
+  pull_request:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * *'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          disable-sudo: true
+          # XXX: Replace with `block` policy.
+          egress-policy: audit
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        with:
+          java-version: 17.0.13
+          java-distribution: temurin
+          maven-version: 3.9.9
+      - name: Build project against the latest Error Prone release
+        run: mvn -T1C clean install -Dverification.skip -Dversion.error-prone=LATEST
