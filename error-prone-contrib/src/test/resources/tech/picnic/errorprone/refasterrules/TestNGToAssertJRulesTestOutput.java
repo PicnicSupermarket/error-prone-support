@@ -245,6 +245,9 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         .toIterable()
         .containsExactlyElementsOf(
             copyOf(Iterators.unmodifiableIterator(new ArrayList<>().iterator())));
+    assertEquals(
+        Iterators.unmodifiableIterator(new ArrayList<String>().iterator()),
+        Iterators.unmodifiableIterator(new ArrayList<Number>().iterator()));
   }
 
   void testAssertEqualIteratorIterationOrderWithMessage() {
@@ -258,8 +261,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   void testAssertEqualIterableIterationOrder() {
     assertThat(Iterables.unmodifiableIterable(new ArrayList<>()))
         .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<>()));
-    assertThat(Collections.synchronizedCollection(new ArrayList<>()))
-        .containsExactlyElementsOf(Collections.synchronizedCollection(new ArrayList<>()));
+    assertThat(Collections.synchronizedCollection(new ArrayList<Number>()))
+        .containsExactlyElementsOf(Collections.synchronizedCollection(new ArrayList<Integer>()));
+    assertEquals(
+        Collections.synchronizedCollection(new ArrayList<String>()),
+        Collections.synchronizedCollection(new ArrayList<Number>()));
   }
 
   void testAssertEqualIterableIterationOrderWithMessage() {
