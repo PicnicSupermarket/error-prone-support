@@ -294,23 +294,17 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
                         <annotationProcessorPaths combine.children="append">
-                            <!-- XXX: Drop the version declarations once
-                            properly supported. See
-                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>documentation-support</artifactId>
-                                <version>${project.version}</version>
                             </path>
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-compiler</artifactId>
-                                <version>${project.version}</version>
                             </path>
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-support</artifactId>
-                                <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">
