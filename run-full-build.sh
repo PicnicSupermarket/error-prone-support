@@ -16,6 +16,5 @@ mvn clean install \
 mvn clean install \
   -s "${settings}" \
   -Perror-prone-fork \
-  -Pnon-maven-central \
   -Pself-check \
   $@
