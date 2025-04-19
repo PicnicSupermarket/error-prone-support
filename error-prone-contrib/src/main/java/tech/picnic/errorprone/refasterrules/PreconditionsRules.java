@@ -9,6 +9,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
+import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -30,7 +31,7 @@ final class PreconditionsRules {
     }
 
     @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    @UseImportPolicy(ImportPolicy.STATIC_IMPORT_ALWAYS)
     void after(boolean condition) {
       checkArgument(!condition);
     }
