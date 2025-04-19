@@ -206,7 +206,7 @@
         <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.37.0</version.error-prone-orig>
+        <version.error-prone-orig>2.38.0</version.error-prone-orig>
         <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
         <version.guava-beta-checker>1.0</version.guava-beta-checker>
         <version.jdk>17</version.jdk>
@@ -1891,8 +1891,6 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
-                                    <!-- We don't target JDK 7. -->
-                                    -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- We don't target Android. -->
@@ -1908,6 +1906,7 @@
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
                                     <!-- XXX: Consider renaming flagged types
                                     instead. -->
+                                    -XepOpt:ConstantExpressions:ConsiderAllMethodsPure=true
                                     -XepOpt:IdentifierName:AllowInitialismsInTypeName=true
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
@@ -1915,7 +1914,6 @@
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
-                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
