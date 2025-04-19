@@ -33,7 +33,7 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.util.ASTHelpers;
-import com.google.errorprone.util.ASTHelpers.TargetType;
+import com.google.errorprone.util.TargetType;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -106,7 +106,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
     ExpressionTree sourceTree = arguments.get(0);
     Type sourceType = ASTHelpers.getType(sourceTree);
     Type resultType = ASTHelpers.getType(tree);
-    TargetType targetType = ASTHelpers.targetType(state);
+    TargetType targetType = TargetType.targetType(state);
     if (sourceType == null || resultType == null || targetType == null) {
       return Description.NO_MATCH;
     }
