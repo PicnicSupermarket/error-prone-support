@@ -15,18 +15,6 @@
                 </repository>
             </repositories>
         </profile>
-        <profile>
-            <!-- The build defines an optional `non-maven-central` profile
-            using which additional Error Prone checks not available on Maven
-            Central are enabled. -->
-            <id>non-maven-central</id>
-            <repositories>
-                <repository>
-                    <id>jitpack.io</id>
-                    <url>https://jitpack.io</url>
-                </repository>
-            </repositories>
-        </profile>
     </profiles>
 
     <servers>
