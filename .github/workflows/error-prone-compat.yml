@@ -24,8 +24,12 @@ jobs:
         uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
         with:
           disable-sudo: true
-          # XXX: Replace with `block` policy.
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            github.com:443
+            objects.githubusercontent.com:443
+            repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
