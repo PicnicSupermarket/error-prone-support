@@ -904,6 +904,8 @@ final class TestNGToAssertJRules {
     }
   }
 
+  // XXX: TestNG's `assertEquals` accepts arbitrary `Iterator<?>` arguments. As such some
+  // expressions will not be rewritten.
   static final class AssertEqualIteratorIterationOrder<S, T extends S> {
     @BeforeTemplate
     void before(Iterator<S> actual, Iterator<T> expected) {
@@ -919,6 +921,8 @@ final class TestNGToAssertJRules {
     }
   }
 
+  // XXX: TestNG's `assertEquals` accepts arbitrary `Iterator<?>` arguments. As such some
+  // expressions will not be rewritten.
   static final class AssertEqualIteratorIterationOrderWithMessage<S, T extends S> {
     @BeforeTemplate
     void before(Iterator<S> actual, String message, Iterator<T> expected) {
@@ -939,6 +943,8 @@ final class TestNGToAssertJRules {
 
   // XXX This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
   // `assertThat(Path)` does not support `.containsExactlyElementsOf`.
+  // XXX: TestNG's `assertEquals` accepts arbitrary `Iterable<?>` and `Collection<?>` arguments. As
+  // such some expressions will not be rewritten.
   static final class AssertEqualIterableIterationOrder<S, T extends S> {
     @BeforeTemplate
     void before(Iterable<S> actual, Iterable<T> expected) {
@@ -957,6 +963,10 @@ final class TestNGToAssertJRules {
     }
   }
 
+  // XXX This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
+  // `assertThat(Path)` does not support `.containsExactlyElementsOf`.
+  // XXX: TestNG's `assertEquals` accepts arbitrary `Iterable<?>` and `Collection<?>` arguments. As
+  // such some expressions will not be rewritten.
   static final class AssertEqualIterableIterationOrderWithMessage<S, T extends S> {
     @BeforeTemplate
     void before(Iterable<S> actual, String message, Iterable<T> expected) {
@@ -975,6 +985,8 @@ final class TestNGToAssertJRules {
     }
   }
 
+  // XXX: TestNG's `assertEquals` accepts arbitrary `Set<?>` arguments. As such some expressions
+  // will not be rewritten.
   static final class AssertEqualSets<S, T extends S> {
     @BeforeTemplate
     void before(Set<S> actual, Set<T> expected) {
@@ -988,6 +1000,8 @@ final class TestNGToAssertJRules {
     }
   }
 
+  // XXX: TestNG's `assertEquals` accepts arbitrary `Set<?>` arguments. As such some expressions
+  // will not be rewritten.
   static final class AssertEqualSetsWithMessage<S, T extends S> {
     @BeforeTemplate
     void before(Set<S> actual, String message, Set<T> expected) {
