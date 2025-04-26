@@ -1,0 +1,7 @@
+# XXX: This doesn't work.
+# XXX: Could move full commands here. Pro: consistent local and remote setup.
+# Con: Seems awkward.
+#runner:
+#  javac:
+#    errorformat:
+#      - '[WARNING] %f:[%l,%c] %m'
