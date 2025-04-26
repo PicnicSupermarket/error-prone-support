@@ -82,7 +82,7 @@ public final class NonEmptyMono extends BugChecker implements MethodInvocationTr
   public NonEmptyMono() {}
 
   @Override
-  public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+  public Description matchMethodInvocation(final MethodInvocationTree tree, VisitorState state) {
     if (!MONO_SIZE_CHECK.matches(tree, state)) {
       return Description.NO_MATCH;
     }

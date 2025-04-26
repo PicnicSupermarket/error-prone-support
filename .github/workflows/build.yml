@@ -18,10 +18,14 @@ jobs:
             jdk: 17.0.13
             distribution: temurin
             experimental: false
-          - os: windows-2025
-            jdk: 17.0.13
-            distribution: temurin
-            experimental: false
+# XXX: Re-enable Windows.
+#          - os: windows-2025
+#            jdk: 17.0.13
+#            distribution: temurin
+#            experimental: false
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     steps:
@@ -30,13 +34,17 @@ jobs:
         with:
           disable-sudo-and-containers: true
           egress-policy: block
+          # XXX: Check whether `api.github.com` is necessary in final PR.
+          # XXX: Check whether `raw.githubusercontent.com` could remain blocked.
           allowed-endpoints: >
             api.adoptium.net:443
+            api.github.com:443
             github.com:443
             github-registry-files.githubusercontent.com:443
             hosted-compute-watchdog-prod-*.githubapp.com:443
             maven.pkg.github.com:443
             objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
             repo.maven.apache.org:443
       # We run the build twice for each supported JDK: once against the
       # original Error Prone release, using only Error Prone checks available
@@ -51,12 +59,40 @@ jobs:
           maven-version: 3.9.9
       - name: Display build environment details
         run: mvn --version
+      - name: Set up Reviewdog
+        uses: reviewdog/action-setup@e04ffabe3898a0af8d0fb1af00c188831c4b5893 # v1.3.2
+        with:
+          # XXX: Configure Renovate to maintain this version.
+          reviewdog_version: v0.20.3
       - name: Build project against vanilla Error Prone, compile Javadoc
-        run: mvn -T1C install javadoc:jar
-      - name: Build project with self-check against Error Prone fork
-        run: mvn -T1C clean verify -Perror-prone-fork -Pself-check -s settings.xml
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # XXX: Here and below: reorder flags?
+        # XXX: Here and below: Drop `-name` flag?
+        # XXX: Here and below: Also include Surefire results?
+        # XXX: Here and below: !!! This way Maven's exit code isn't respected!
+        # XXX: Instead, make analysis conditional, and only apply to the second
+        # run. Analyze stdout, defer error exit.
+        run: |
+          mvn -T1C install javadoc:jar \
+            | reviewdog \
+                -name=javac \
+                -efm='[WARNING] %f:[%l,%c] %m' \
+                -filter-mode=file \
+                -reporter=github-pr-review \
+                -tee
+      - name: Build project with self-check and annotate Error-Prone warnings
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mvn -T1C clean verify -Perror-prone-fork -Pself-check -s settings.xml \
+            | reviewdog \
+                -name=javac \
+                -efm='[WARNING] %f:[%l,%c] %m' \
+                -filter-mode=file \
+                -reporter=github-pr-review \
+                -tee
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
 
