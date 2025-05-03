@@ -311,7 +311,7 @@ final class AssertJRules {
   // `assertThat` overload. Consider defining a `BugChecker` instead.
   static final class AssertThatMapContainsEntry<K, V> {
     @BeforeTemplate
-    ObjectAssert<?> before(Map<K, V> map, K key, V value) {
+    ObjectAssert<V> before(Map<K, V> map, K key, V value) {
       return assertThat(map.get(key)).isEqualTo(value);
     }
 

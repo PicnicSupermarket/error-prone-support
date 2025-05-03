@@ -158,6 +158,11 @@ final class AssertJMapRules {
       return assertThat(map.containsKey(key)).isTrue();
     }
 
+    @BeforeTemplate
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before2(Map<K, V> map, K key) {
+      return assertThat(map.keySet()).contains(key);
+    }
+
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key) {
@@ -171,10 +176,28 @@ final class AssertJMapRules {
       return assertThat(map.containsKey(key)).isFalse();
     }
 
+    @BeforeTemplate
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before2(Map<K, V> map, K key) {
+      return assertThat(map.keySet()).doesNotContain(key);
+    }
+
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, K key) {
       return assertThat(map).doesNotContainKey(key);
+    }
+  }
+
+  static final class AssertThatMapContainsOnlyKey<K, V> {
+    @BeforeTemplate
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before2(Map<K, V> map, K key) {
+      return assertThat(map.keySet()).containsOnly(key);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    MapAssert<K, V> after(Map<K, V> map, K key) {
+      return assertThat(map).containsOnlyKeys(key);
     }
   }
 
@@ -198,6 +221,11 @@ final class AssertJMapRules {
       return assertThat(map.containsValue(value)).isTrue();
     }
 
+    @BeforeTemplate
+    AbstractCollectionAssert<?, Collection<? extends V>, V, ?> before2(Map<K, V> map, V value) {
+      return assertThat(map.values()).contains(value);
+    }
+
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     MapAssert<K, V> after(Map<K, V> map, V value) {
@@ -209,6 +237,11 @@ final class AssertJMapRules {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Map<K, V> map, V value) {
       return assertThat(map.containsValue(value)).isFalse();
+    }
+
+    @BeforeTemplate
+    AbstractCollectionAssert<?, Collection<? extends V>, V, ?> before2(Map<K, V> map, V value) {
+      return assertThat(map.values()).doesNotContain(value);
     }
 
     @AfterTemplate

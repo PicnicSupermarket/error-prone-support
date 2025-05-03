@@ -111,6 +111,10 @@ final class AssertJMapRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(ImmutableMap.of(1, 2).containsKey(3)).isFalse();
   }
 
+  AbstractAssert<?, ?> testAssertThatMapContainsOnlyKey() {
+    return assertThat(ImmutableMap.of(1, 2).keySet()).containsOnly(3);
+  }
+
   AbstractAssert<?, ?> testAssertThatMapContainsOnlyKeys() {
     return assertThat(ImmutableMap.of(1, 2).keySet()).hasSameElementsAs(ImmutableSet.of(3));
   }
