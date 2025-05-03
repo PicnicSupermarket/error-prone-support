@@ -11,9 +11,11 @@ set -e -u -o pipefail
 settings="$(dirname "${0}")/settings.xml"
 
 mvn clean install \
+  -T1C \
   -s "${settings}" \
   $@
 mvn clean install \
+  -T1C \
   -s "${settings}" \
   -Perror-prone-fork \
   -Pself-check \
