@@ -58,6 +58,7 @@ final class RefasterRulesTest {
           ImmutableTableRules.class,
           InputStreamRules.class,
           IntStreamRules.class,
+          JacksonRules.class,
           JUnitRules.class,
           JUnitToAssertJRules.class,
           LongStreamRules.class,
