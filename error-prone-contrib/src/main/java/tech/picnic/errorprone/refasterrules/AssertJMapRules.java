@@ -12,7 +12,6 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.Map;
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
@@ -154,13 +153,9 @@ final class AssertJMapRules {
 
   static final class AssertThatMapContainsKey<K, V> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
-      return assertThat(map.containsKey(key)).isTrue();
-    }
-
-    @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before2(Map<K, V> map, K key) {
-      return assertThat(map.keySet()).contains(key);
+    AbstractAssert<?, ?> before(Map<K, V> map, K key) {
+      return Refaster.anyOf(
+          assertThat(map.containsKey(key)).isTrue(), assertThat(map.keySet()).contains(key));
     }
 
     @AfterTemplate
@@ -172,13 +167,9 @@ final class AssertJMapRules {
 
   static final class AssertThatMapDoesNotContainKey<K, V> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Map<K, V> map, K key) {
-      return assertThat(map.containsKey(key)).isFalse();
-    }
-
-    @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before2(Map<K, V> map, K key) {
-      return assertThat(map.keySet()).doesNotContain(key);
+    AbstractAssert<?, ?> before(Map<K, V> map, K key) {
+      return Refaster.anyOf(
+          assertThat(map.containsKey(key)).isFalse(), assertThat(map.keySet()).doesNotContain(key));
     }
 
     @AfterTemplate
@@ -188,10 +179,13 @@ final class AssertJMapRules {
     }
   }
 
+  // XXX: Strictly speaking this rule could be merged into `AssertThatMapContainsOnlyKeys` below,
+  // but that rule targets another `containsOnlyKeys` overload. Review how cases like this should
+  // impact the preferred naming scheme.
   static final class AssertThatMapContainsOnlyKey<K, V> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before2(Map<K, V> map, K key) {
-      return assertThat(map.keySet()).containsOnly(key);
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(Map<K, V> map, K key) {
+      return assertThat(map.keySet()).containsExactly(key);
     }
 
     @AfterTemplate
@@ -217,13 +211,10 @@ final class AssertJMapRules {
 
   static final class AssertThatMapContainsValue<K, V> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Map<K, V> map, V value) {
-      return assertThat(map.containsValue(value)).isTrue();
-    }
-
-    @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends V>, V, ?> before2(Map<K, V> map, V value) {
-      return assertThat(map.values()).contains(value);
+    AbstractAssert<? extends AbstractAssert<?, ?>, ? extends Object> before(
+        Map<K, V> map, V value) {
+      return Refaster.anyOf(
+          assertThat(map.containsValue(value)).isTrue(), assertThat(map.values()).contains(value));
     }
 
     @AfterTemplate
@@ -235,13 +226,10 @@ final class AssertJMapRules {
 
   static final class AssertThatMapDoesNotContainValue<K, V> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Map<K, V> map, V value) {
-      return assertThat(map.containsValue(value)).isFalse();
-    }
-
-    @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends V>, V, ?> before2(Map<K, V> map, V value) {
-      return assertThat(map.values()).doesNotContain(value);
+    AbstractAssert<?, ?> before(Map<K, V> map, V value) {
+      return Refaster.anyOf(
+          assertThat(map.containsValue(value)).isFalse(),
+          assertThat(map.values()).doesNotContain(value));
     }
 
     @AfterTemplate
