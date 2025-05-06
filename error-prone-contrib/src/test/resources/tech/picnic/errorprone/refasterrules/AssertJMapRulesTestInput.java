@@ -103,24 +103,36 @@ final class AssertJMapRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(ImmutableMap.of(1, 2)).hasSize(ImmutableMap.of(3, 4).size());
   }
 
-  AbstractAssert<?, ?> testAssertThatMapContainsKey() {
-    return assertThat(ImmutableMap.of(1, 2).containsKey(3)).isTrue();
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapContainsKey() {
+    return ImmutableSet.of(
+        assertThat(ImmutableMap.of(1, 2).containsKey(3)).isTrue(),
+        assertThat(ImmutableMap.of(4, 5).keySet()).contains(6));
   }
 
-  AbstractAssert<?, ?> testAssertThatMapDoesNotContainKey() {
-    return assertThat(ImmutableMap.of(1, 2).containsKey(3)).isFalse();
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapDoesNotContainKey() {
+    return ImmutableSet.of(
+        assertThat(ImmutableMap.of(1, 2).containsKey(3)).isFalse(),
+        assertThat(ImmutableMap.of(4, 5).keySet()).doesNotContain(6));
+  }
+
+  AbstractAssert<?, ?> testAssertThatMapContainsOnlyKey() {
+    return assertThat(ImmutableMap.of(1, 2).keySet()).containsExactly(3);
   }
 
   AbstractAssert<?, ?> testAssertThatMapContainsOnlyKeys() {
     return assertThat(ImmutableMap.of(1, 2).keySet()).hasSameElementsAs(ImmutableSet.of(3));
   }
 
-  AbstractAssert<?, ?> testAssertThatMapContainsValue() {
-    return assertThat(ImmutableMap.of(1, 2).containsValue(3)).isTrue();
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapContainsValue() {
+    return ImmutableSet.of(
+        assertThat(ImmutableMap.of(1, 2).containsValue(3)).isTrue(),
+        assertThat(ImmutableMap.of(4, 5).values()).contains(6));
   }
 
-  AbstractAssert<?, ?> testAssertThatMapDoesNotContainValue() {
-    return assertThat(ImmutableMap.of(1, 2).containsValue(3)).isFalse();
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapDoesNotContainValue() {
+    return ImmutableSet.of(
+        assertThat(ImmutableMap.of(1, 2).containsValue(3)).isFalse(),
+        assertThat(ImmutableMap.of(4, 5).values()).doesNotContain(6));
   }
 
   AbstractObjectAssert<?, ?> testAssertThatMapContainsEntry() {
