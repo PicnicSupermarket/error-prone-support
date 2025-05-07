@@ -13642,7 +13642,7 @@
            "org.junit.Rule",
            "org.junit.ClassRule",
            "com.google.common.annotations.VisibleForTesting");
-@@ -685,7 +687,7 @@ public class VisibilityModifierCheck extends AbstractCheck {
+@@ -689,7 +691,7 @@ public class VisibilityModifierCheck extends AbstractCheck {
    private static Set<String> getClassShortNames(Set<String> canonicalClassNames) {
      return canonicalClassNames.stream()
          .map(CommonUtil::baseClassName)
@@ -56996,7 +56996,7 @@
      final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
  
      for (Path path : XdocUtil.getXdocsConfigFilePaths(XdocUtil.getXdocsFilePaths())) {
-@@ -527,7 +526,7 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
+@@ -531,7 +530,7 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
          value =
              currentXdocPath
                  .getParent()
@@ -57264,7 +57264,7 @@
      }
      return result;
    }
-@@ -1762,7 +1763,7 @@ public class XdocsPagesTest {
+@@ -1766,7 +1767,7 @@ public class XdocsPagesTest {
    }
  
    @Test
@@ -57273,7 +57273,7 @@
      for (Path path : XdocUtil.getXdocsStyleFilePaths(XdocUtil.getXdocsFilePaths())) {
        final String fileName = path.getFileName().toString();
        final String styleName = fileName.substring(0, fileName.lastIndexOf('_'));
-@@ -2234,7 +2235,7 @@ public class XdocsPagesTest {
+@@ -2238,7 +2239,7 @@ public class XdocsPagesTest {
    }
  
    @Test
