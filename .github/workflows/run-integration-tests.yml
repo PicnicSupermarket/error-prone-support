@@ -24,7 +24,10 @@ jobs:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
-          disable-sudo-and-containers: true
+          # We can't use `disable-sudo-and-containers` here, as some
+          # integration test projects have unit tests that start Docker
+          # containers.
+          disable-sudo: true
           egress-policy: block
           # XXX: After updating the validation build flags in
           # `integration-tests/prometheus-java-client.sh`, review whether the
