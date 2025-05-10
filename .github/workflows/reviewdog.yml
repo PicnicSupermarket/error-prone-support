@@ -14,8 +14,16 @@ jobs:
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
           disable-sudo-and-containers: true
-          # XXX: Configure `allowed-endpoints` instead.
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            api.github.com:443
+            github-registry-files.githubusercontent.com:443
+            github.com:443
+            maven.pkg.github.com:443
+            objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
+            repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
@@ -29,13 +37,13 @@ jobs:
           reviewdog_version: v0.20.3
       - name: Install project to local Maven repository
         # XXX: Consider configuring Reviewdog such that it reports build
-        # errors. When doing so, make sure that a nonzero `mvn` exit code does
-        # abort this workflow.
+        # errors during this step. When doing so, make sure that a nonzero
+        # `mvn` exit code does abort this workflow.
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Build project with self-check and report issues
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # XXX: Cover additional warning formats, besides Checkstyle and javac.
+        # XXX: Cover additional output formats, besides Checkstyle and javac.
         # XXX: Run with `-Dmaven.test.failure.ignore` instead of `-DskipTests`,
         # and also report Surefire test failures.
         run: |
