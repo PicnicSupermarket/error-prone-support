@@ -42,7 +42,7 @@ jobs:
         # XXX: Run `mvn clean test -Dmaven.test.failure.ignore` instead, and
         # also report Surefire test failures.
         run: |
-          mvn -T1C clean test-compile -Perror-prone -Pself-check -Dverification.warn
+          mvn -T1C clean test-compile -Perror-prone -Pself-check -Dverification.warn \
             | reviewdog \
                 -name=javac \
                 -efm='[WARNING] %f:[%l,%c] %m' \
