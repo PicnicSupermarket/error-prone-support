@@ -43,6 +43,10 @@ jobs:
       - name: Build project with self-check and report issues
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # XXX: Replace the Error Prone/javac diagnostics extraction with a more
+        # robust approach once available. See:
+        # - https://github.com/google/error-prone/issues/3766
+        # - https://github.com/google/error-prone/issues/444
         # XXX: Cover additional output formats, besides Checkstyle and javac.
         # XXX: Run with `-Dmaven.test.failure.ignore` instead of `-DskipTests`,
         # and also report Surefire test failures.
