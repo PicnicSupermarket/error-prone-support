@@ -54,9 +54,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
       return Description.NO_MATCH;
     }
 
-    if (ASTHelpers.methodCanBeOverridden(ASTHelpers.getSymbol(tree))) {
-      return Description.NO_MATCH;
-    }
+    if (ASTHelpers.methodCanBeOverridden(ASTHelpers.getSymbol(tree))) return Description.NO_MATCH;
 
     return describeMatch(tree, SourceCode.deleteWithTrailingWhitespace(tree, state));
   }
