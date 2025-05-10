@@ -496,7 +496,7 @@
             <dependency>
                 <groupId>org.openrewrite</groupId>
                 <artifactId>rewrite-templating</artifactId>
-                <version>1.26.2</version>
+                <version>1.27.0</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
