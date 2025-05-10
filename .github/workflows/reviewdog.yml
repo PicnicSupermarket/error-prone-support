@@ -35,20 +35,20 @@ jobs:
       - name: Build project with self-check and report issues
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # XXX: Reorder flags?
-        # XXX: Change `-name` flag?`
-        # XXX: Run `mvn clean verify -DskipTests` instead, and also report
-        # non-Error Prone issues.
-        # XXX: Run `mvn clean test -Dmaven.test.failure.ignore` instead, and
-        # also report Surefire test failures.
+        # XXX: Cover additional warning formats, besides Checkstyle and javac.
+        # XXX: Run with `-Dmaven.test.failure.ignore` instead of `-DskipTests`,
+        # and also report Surefire test failures.
         run: |
-          mvn -T1C clean test-compile -Perror-prone -Pself-check -Dverification.warn \
+          mvn -T1C clean verify -Pself-check -DskipTests -Dverification.warn \
             | reviewdog \
                 -name=javac \
                 -efm='[WARNING] %f:[%l,%c] %m' \
                 -filter-mode=file \
                 -reporter=github-pr-review \
                 -tee
+          find -name checkstyle-result.json -exec sh -c '
+            reviewdog -name=Checkstyle -f=sarif -reporter=github-pr-review < {}
+          ' \;
       - name: Apply Error Prone suggestions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

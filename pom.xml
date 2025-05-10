@@ -923,6 +923,8 @@
                         files are not excluded by the `excludeGeneratedSources`
                         setting. Consider filing an issue for this. -->
                         <resourceExcludes>THIRD-PARTY.txt</resourceExcludes>
+                        <outputFile>${project.build.directory}/checkstyle-result.json</outputFile>
+                        <outputFileFormat>sarif</outputFileFormat>
                     </configuration>
                     <dependencies>
                         <dependency>
