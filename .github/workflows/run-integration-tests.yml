@@ -17,10 +17,20 @@ jobs:
     if: |
       github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        integration-test: [ "checkstyle", "metrics", "prometheus-java-client" ]
     steps:
+      - name: Parse comment for build selection
+        id: parse_comment
+        run: |
+          # Default test if no specific test is requested.
+          BUILD_TO_RUN="checkstyle"
+          COMMENT="${{ github.event.comment.body }}"
+          # Loop through possible builds and check if mentioned in comment.
+          for BUILD in "checkstyle" "metrics" "prometheus-java-client"; do
+            if [[ "$COMMENT" == *"/integration-test $BUILD"* ]]; then
+              BUILD_TO_RUN="$BUILD"
+              break # Stop at the first match
+            fi
+          done
       - name: Install Harden-Runner
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
         with:
@@ -55,12 +65,13 @@ jobs:
       - name: Install project to local Maven repository
         run: mvn -T1C install -DskipTests -Dverification.skip
       - name: Run integration test
-        run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
+        run: |
+          xvfb-run "./integration-tests/${{ steps.parse_comment.outputs.BUILD_TO_RUN }}.sh" "${{ runner.temp }}/artifacts"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: "integration-test-${{ matrix.integration-test }}"
+          name: "integration-test-${{ steps.parse_comment.outputs.BUILD_TO_RUN }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
