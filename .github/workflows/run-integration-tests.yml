@@ -9,11 +9,6 @@ name: "Integration tests"
 on:
   issue_comment:
     types: [ created ]
-  workflow_dispatch:
-    inputs:
-      builds:
-        description: 'A JSON array of integration builds to run.'
-        default: '[ "checkstyle", "metrics", "prometheus-java-client" ]'
 permissions:
   contents: read
 jobs:
@@ -24,10 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        # Dynamically set the 'integration-test' matrix based on the event.
-        # If workflow_dispatch, parse the 'builds' input string into a JSON array.
-        # Otherwise (e.g., issue_comment), use the default list of all integration tests.
-        integration-test: ${{ github.event_name == 'workflow_dispatch' && fromJSON(inputs.builds) }}
+        integration-test: [ "checkstyle", "metrics", "prometheus-java-client" ]
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
