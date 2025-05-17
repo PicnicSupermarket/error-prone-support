@@ -1083,6 +1083,18 @@
                                             <ignoreClass>org.checkerframework.dataflow.qual.*</ignoreClass>
                                         </ignoreClasses>
                                     </dependency>
+                                    <dependency>
+                                        <groupId>org.openrewrite</groupId>
+                                        <artifactId>rewrite-java-*</artifactId>
+                                        <!-- Testing generated OpenRewrite
+                                        recipes using the oldest and newest
+                                        supported JDKs requires multiple
+                                        `rewrite-java-*` dependencies on the
+                                        classpath. -->
+                                        <ignoreClasses>
+                                            <ignoreClass>org.openrewrite.java.isolated.package-info</ignoreClass>
+                                        </ignoreClasses>
+                                    </dependency>
                                 </dependencies>
                                 <findAllDuplicates>true</findAllDuplicates>
                             </banDuplicateClasses>
@@ -1094,6 +1106,10 @@
                             </banDynamicVersions>
                             <dependencyConvergence />
                             <enforceBytecodeVersion>
+                                <ignoredScopes>
+                                    <ignoredScope>provided</ignoredScope>
+                                    <ignoredScope>test</ignoredScope>
+                                </ignoredScopes>
                                 <maxJdkVersion>${version.jdk}</maxJdkVersion>
                             </enforceBytecodeVersion>
                             <requireEncoding>
@@ -1102,7 +1118,7 @@
                                 <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
                             </requireEncoding>
                             <requireJavaVersion>
-                                <version>${version.jdk}</version>
+                                <version>21</version>
                             </requireJavaVersion>
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
@@ -2082,6 +2098,29 @@
                         </configuration>
                     </plugin>
                 </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>custom-test-runtime</id>
+            <activation>
+                <property>
+                    <name>surefire.jdk-toolchain-version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <jdkToolchain>
+                                    <version>${surefire.jdk-toolchain-version}</version>
+                                </jdkToolchain>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
     </profiles>

@@ -36,7 +36,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          java-version: 17.0.13
+          java-version: 21.0.5
           java-distribution: temurin
           maven-version: 3.9.9
       - name: Build project against the latest Error Prone release
