@@ -34,10 +34,7 @@ jobs:
             api.adoptium.net:443
             github.com:443
             github-registry-files.githubusercontent.com:443
-            hosted-compute-watchdog-prod-eus-01.githubapp.com:443
-            hosted-compute-watchdog-prod-eus-02.githubapp.com:443
-            hosted-compute-watchdog-prod-iad-01.githubapp.com:443
-            hosted-compute-watchdog-prod-iad-02.githubapp.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             maven.pkg.github.com:443
             objects.githubusercontent.com:443
             repo.maven.apache.org:443
