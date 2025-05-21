@@ -6,6 +6,8 @@
   </picture>
 </div>
 
+# For the workshop, go to the README *in* the workshop module [here](./workshop/README.md).
+
 # Error Prone Support
 
 Error Prone Support is a [Picnic][picnic-blog]-opinionated extension of
