@@ -43,6 +43,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1891,6 +1892,93 @@ final class ReactorRules {
     @AfterTemplate
     void after(PublisherProbe<T> probe) {
       probe.assertWasNotRequested();
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link
+   * PublisherProbe#wasSubscribed()} to over more verbose alternatives.
+   */
+  static final class PublisherProbeAssertThatWasSubscribed<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasSubscribed) {
+      if (wasSubscribed) {
+        probe.assertWasSubscribed();
+      } else {
+        probe.assertWasNotSubscribed();
+      }
+    }
+
+    @BeforeTemplate
+    void before2(PublisherProbe<T> probe, boolean wasSubscribed) {
+      if (!wasSubscribed) {
+        probe.assertWasNotSubscribed();
+      } else {
+        probe.assertWasSubscribed();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasSubscribed) {
+      assertThat(probe.wasSubscribed()).isEqualTo(wasSubscribed);
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link
+   * PublisherProbe#wasCancelled()} to over more verbose alternatives.
+   */
+  static final class PublisherProbeAssertThatWasCancelled<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasCancelled) {
+      if (wasCancelled) {
+        probe.assertWasCancelled();
+      } else {
+        probe.assertWasNotCancelled();
+      }
+    }
+
+    @BeforeTemplate
+    void before2(PublisherProbe<T> probe, boolean wasCancelled) {
+      if (!wasCancelled) {
+        probe.assertWasNotCancelled();
+      } else {
+        probe.assertWasCancelled();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasCancelled) {
+      assertThat(probe.wasCancelled()).isEqualTo(wasCancelled);
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link
+   * PublisherProbe#wasRequested()} to over more verbose alternatives.
+   */
+  static final class PublisherProbeAssertThatWasRequested<T> {
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasRequested) {
+      if (wasRequested) {
+        probe.assertWasRequested();
+      } else {
+        probe.assertWasNotRequested();
+      }
+    }
+
+    @BeforeTemplate
+    void before2(PublisherProbe<T> probe, boolean wasRequested) {
+      if (!wasRequested) {
+        probe.assertWasNotRequested();
+      } else {
+        probe.assertWasRequested();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasRequested) {
+      assertThat(probe.wasRequested()).isEqualTo(wasRequested);
     }
   }
 
