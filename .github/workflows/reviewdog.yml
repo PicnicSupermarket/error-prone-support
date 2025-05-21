@@ -55,7 +55,7 @@ jobs:
                 -reporter=github-pr-review \
                 -tee
           find -name checkstyle-result.json -exec sh -c '
-            reviewdog -name=Checkstyle -f=sarif -reporter=github-pr-review < {}
+            reviewdog -name=Checkstyle -f=sarif -reporter=github-pr-review < "{}"
           ' \;
       - name: Apply Error Prone suggestions
         env:
