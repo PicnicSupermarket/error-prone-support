@@ -1,0 +1,56 @@
+# Description: This workflow runs OpenRewrite recipes against opened pull request and upload the patch.
+# Since this pull request receives untrusted code, we should **NOT** have any secrets in the environment.
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+---
+name: receive-pr
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - master
+permissions:
+  actions: read
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  upload-patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: XXX add name.
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@489441643219d2b93ee2a127b2402eb640a1b947 # v1.13.0
+        with:
+          java-version: 17.0.10
+          java-distribution: temurin
+          maven-version: 3.9.9
+
+      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#using-data-from-the-triggering-workflow
+      - name: Capture the PR number.
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - name: Upload `pr_number.txt`.
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: pr_number
+          path: pr_number.txt
+      - name: Remove pr_number.txt
+        run: rm -f pr_number.txt
+
+      - name: Run Error Prone and Error Prone Support.
+        run: ./apply-error-prone-suggestions.sh
+
+      - name: Capture the diff and create the patch.
+        run: |
+          git diff | tee git-diff.patch
+      - name: Upload the diff.
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: patch
+          path: git-diff.patch
