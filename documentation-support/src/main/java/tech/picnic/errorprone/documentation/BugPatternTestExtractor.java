@@ -112,7 +112,9 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
                   List<TestEntry> entries = new ArrayList<>();
                   if (isReplacementTest) {
                     extractReplacementBugPatternTestCases(node, entries, state);
-                  } else extractIdentificationBugPatternTestCases(node, entries, state);
+                  } else {
+                    extractIdentificationBugPatternTestCases(node, entries, state);
+                  }
 
                   if (!entries.isEmpty()) {
                     collectedBugPatternTestCases.add(
