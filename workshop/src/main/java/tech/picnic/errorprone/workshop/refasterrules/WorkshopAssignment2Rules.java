@@ -14,5 +14,6 @@ final class WorkshopAssignment2Rules {
   static final class ImmutableListOfOne<T> {
     // XXX: Implement this Refaster rule, preferably by using only one `@BeforeTemplate`.
     // Tip: use the type argument.
+    // Tip: check the associated input and output files in test resources.
   }
 }

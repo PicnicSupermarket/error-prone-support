@@ -7,5 +7,6 @@ final class WorkshopAssignment1Rules {
   /** Prefer {@link String#String(char[])} over {@link String#copyValueOf(char[])}. */
   static final class NewStringCharArray {
     // XXX: Implement this Refaster rule.
+    // Tip: check the associated input and output files in test resources.
   }
 }

@@ -39,4 +39,10 @@ final class WorkshopRefasterRulesTest {
   void validateFifthWorkshopAssignment() {
     RefasterRuleCollection.validate(WorkshopAssignment5Rules.class);
   }
+
+  @Disabled("Needs to be implemented in `WorkshopAssignment6Rules.java`.")
+  @Test
+  void validateSixthWorkshopAssignment() {
+    RefasterRuleCollection.validate(WorkshopAssignment6Rules.class);
+  }
 }
