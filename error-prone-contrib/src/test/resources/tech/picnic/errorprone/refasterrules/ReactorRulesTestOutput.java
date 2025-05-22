@@ -622,22 +622,22 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     PublisherProbe.empty().assertWasNotRequested();
   }
 
-  void testPublisherProbeAssertThatWasSubscribed() {
-    PublisherProbe<Integer> probe = PublisherProbe.of(Mono.just(1));
-    boolean wasSubscribed = true;
-    assertThat(probe.wasSubscribed()).isEqualTo(wasSubscribed);
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasSubscribed() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isEqualTo(true);
+    assertThat(PublisherProbe.of(Mono.just(2)).wasSubscribed()).isEqualTo(false);
   }
 
-  void testPublisherProbeAssertThatWasCancelled() {
-    PublisherProbe<Integer> probe = PublisherProbe.of(Mono.just(1));
-    boolean wasCancelled = true;
-    assertThat(probe.wasCancelled()).isEqualTo(wasCancelled);
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasCancelled() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasCancelled()).isEqualTo(true);
+    assertThat(PublisherProbe.of(Mono.just(2)).wasCancelled()).isEqualTo(false);
   }
 
-  void testPublisherProbeAssertThatWasRequested() {
-    PublisherProbe<Integer> probe = PublisherProbe.of(Mono.just(1));
-    boolean wasRequested = true;
-    assertThat(probe.wasRequested()).isEqualTo(wasRequested);
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasRequested() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasRequested()).isEqualTo(true);
+    assertThat(PublisherProbe.of(Mono.just(2)).wasRequested()).isEqualTo(false);
   }
 
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {

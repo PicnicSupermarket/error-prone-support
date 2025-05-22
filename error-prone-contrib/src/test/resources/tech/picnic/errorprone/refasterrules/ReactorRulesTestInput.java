@@ -639,33 +639,45 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(PublisherProbe.empty().wasRequested()).isFalse();
   }
 
-  void testPublisherProbeAssertThatWasSubscribed() {
-    PublisherProbe<Integer> probe = PublisherProbe.of(Mono.just(1));
-    boolean wasSubscribed = true;
-    if (wasSubscribed) {
-      probe.assertWasSubscribed();
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasSubscribed() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasSubscribed();
     } else {
-      probe.assertWasNotSubscribed();
+      PublisherProbe.of(Mono.just(1)).assertWasNotSubscribed();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotSubscribed();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasSubscribed();
     }
   }
 
-  void testPublisherProbeAssertThatWasCancelled() {
-    PublisherProbe<Integer> probe = PublisherProbe.of(Mono.just(1));
-    boolean wasCancelled = true;
-    if (wasCancelled) {
-      probe.assertWasCancelled();
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasCancelled() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasCancelled();
     } else {
-      probe.assertWasNotCancelled();
+      PublisherProbe.of(Mono.just(1)).assertWasNotCancelled();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotCancelled();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasCancelled();
     }
   }
 
-  void testPublisherProbeAssertThatWasRequested() {
-    PublisherProbe<Integer> probe = PublisherProbe.of(Mono.just(1));
-    boolean wasRequested = true;
-    if (wasRequested) {
-      probe.assertWasRequested();
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasRequested() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasRequested();
     } else {
-      probe.assertWasNotRequested();
+      PublisherProbe.of(Mono.just(1)).assertWasNotRequested();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotRequested();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasRequested();
     }
   }
 

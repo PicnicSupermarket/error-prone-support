@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -1896,25 +1897,17 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link
-   * PublisherProbe#wasSubscribed()} to over more verbose alternatives.
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasSubscribed() subscribed to}, over more verbose alternatives.
    */
-  static final class PublisherProbeAssertThatWasSubscribed<T> {
+  static final class AssertThatPublisherProbeWasSubscribed<T> {
+    @AlsoNegation
     @BeforeTemplate
     void before(PublisherProbe<T> probe, boolean wasSubscribed) {
       if (wasSubscribed) {
         probe.assertWasSubscribed();
       } else {
         probe.assertWasNotSubscribed();
-      }
-    }
-
-    @BeforeTemplate
-    void before2(PublisherProbe<T> probe, boolean wasSubscribed) {
-      if (!wasSubscribed) {
-        probe.assertWasNotSubscribed();
-      } else {
-        probe.assertWasSubscribed();
       }
     }
 
@@ -1925,25 +1918,17 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link
-   * PublisherProbe#wasCancelled()} to over more verbose alternatives.
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasCancelled() cancelled}, over more verbose alternatives.
    */
-  static final class PublisherProbeAssertThatWasCancelled<T> {
+  static final class AssertThatPublisherProbeWasCancelled<T> {
+    @AlsoNegation
     @BeforeTemplate
     void before(PublisherProbe<T> probe, boolean wasCancelled) {
       if (wasCancelled) {
         probe.assertWasCancelled();
       } else {
         probe.assertWasNotCancelled();
-      }
-    }
-
-    @BeforeTemplate
-    void before2(PublisherProbe<T> probe, boolean wasCancelled) {
-      if (!wasCancelled) {
-        probe.assertWasNotCancelled();
-      } else {
-        probe.assertWasCancelled();
       }
     }
 
@@ -1954,25 +1939,17 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link
-   * PublisherProbe#wasRequested()} to over more verbose alternatives.
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasRequested() requested}, over more verbose alternatives.
    */
-  static final class PublisherProbeAssertThatWasRequested<T> {
+  static final class AssertThatPublisherProbeWasRequested<T> {
+    @AlsoNegation
     @BeforeTemplate
     void before(PublisherProbe<T> probe, boolean wasRequested) {
       if (wasRequested) {
         probe.assertWasRequested();
       } else {
         probe.assertWasNotRequested();
-      }
-    }
-
-    @BeforeTemplate
-    void before2(PublisherProbe<T> probe, boolean wasRequested) {
-      if (!wasRequested) {
-        probe.assertWasNotRequested();
-      } else {
-        probe.assertWasRequested();
       }
     }
 
