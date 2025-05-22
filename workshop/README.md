@@ -101,4 +101,4 @@ to `Reload All Maven projects`.
 
 [eps-github]: https://github.com/PicnicSupermarket/error-prone-support
 
-[eps-workshop-slides]: https://docs.google.com/presentation/d/16MnDk6eW5dxKrLfG7TNUKAX-UVDJwbMz55UvKUkzeHc/edit?usp=sharing
+[eps-workshop-slides]: https://docs.google.com/presentation/d/1vVyoGb1hJULYz8lxgpR5rgxiwTQZALN9inm89m4Xd4E/edit?usp=sharing
