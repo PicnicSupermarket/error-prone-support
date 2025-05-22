@@ -622,6 +622,24 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     PublisherProbe.empty().assertWasNotRequested();
   }
 
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasSubscribed() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isEqualTo(true);
+    assertThat(PublisherProbe.of(Mono.just(2)).wasSubscribed()).isEqualTo(false);
+  }
+
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasCancelled() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasCancelled()).isEqualTo(true);
+    assertThat(PublisherProbe.of(Mono.just(2)).wasCancelled()).isEqualTo(false);
+  }
+
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasRequested() {
+    assertThat(PublisherProbe.of(Mono.just(1)).wasRequested()).isEqualTo(true);
+    assertThat(PublisherProbe.of(Mono.just(2)).wasRequested()).isEqualTo(false);
+  }
+
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
     return ImmutableSet.of(
         Mono.just(1).as(StepVerifier::create), Mono.just(2).as(StepVerifier::create));
