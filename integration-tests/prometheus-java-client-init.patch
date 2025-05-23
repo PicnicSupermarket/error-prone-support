@@ -1,3 +1,14 @@
+--- a/integration-tests/it-common/src/test/java/io/prometheus/client/it/common/ExporterTest.java
++++ b/integration-tests/it-common/src/test/java/io/prometheus/client/it/common/ExporterTest.java
+@@ -34,7 +34,7 @@ public abstract class ExporterTest {
+         Volume.create("it-exporter")
+             .copy("../../it-" + sampleApp + "/target/" + sampleApp + ".jar");
+     this.sampleAppContainer =
+-        new GenericContainer<>("openjdk:17")
++        new GenericContainer<>("openjdk:21")
+             .withFileSystemBind(sampleAppVolume.getHostPath(), "/app", BindMode.READ_ONLY)
+             .withWorkingDirectory("/app")
+             .withLogConsumer(LogConsumer.withPrefix(sampleApp))
 --- a/pom.xml
 +++ b/pom.xml
 @@ -99,7 +99,6 @@
