@@ -39,7 +39,7 @@
    }
 --- a/integration-tests/it-exporter/it-exporter-test/src/test/java/io/prometheus/metrics/it/exporter/test/ExporterIT.java
 +++ b/integration-tests/it-exporter/it-exporter-test/src/test/java/io/prometheus/metrics/it/exporter/test/ExporterIT.java
-@@ -87,12 +87,12 @@ abstract class ExporterIT extends ExporterTest {
+@@ -89,12 +89,12 @@ abstract class ExporterIT extends ExporterTest {
      assertThat(metrics.get(2).getName()).isEqualTo("uptime_seconds_total");
    }
  
@@ -54,7 +54,7 @@
    public void testPrometheusProtobufDebugFormat(String format, String expected) throws IOException {
      start();
      Response response = scrape("GET", "debug=" + format);
-@@ -147,7 +147,7 @@ abstract class ExporterIT extends ExporterTest {
+@@ -149,7 +149,7 @@ abstract class ExporterIT extends ExporterTest {
      start();
      Response fullResponse = scrape("GET", "");
      int size = fullResponse.body.length;
@@ -525,7 +525,7 @@
    private static ExporterOpenTelemetryProperties load(Map<String, String> map) {
 --- a/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/ExporterPropertiesTest.java
 +++ b/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/ExporterPropertiesTest.java
-@@ -1,40 +1,45 @@
+@@ -1,41 +1,46 @@
  package io.prometheus.metrics.config;
  
  import static org.assertj.core.api.Assertions.assertThat;
@@ -568,7 +568,8 @@
 +                            "io.prometheus.exporter.includeCreatedTimestamps", "invalid"))))
 +        .isInstanceOf(PrometheusPropertiesException.class)
 +        .hasMessage(
-             "io.prometheus.exporter.includeCreatedTimestamps: Expecting 'true' or 'false'. Found: invalid");
+             "io.prometheus.exporter.includeCreatedTimestamps: Expecting 'true' or 'false'. Found:"
+                 + " invalid");
 -    assertThatExceptionOfType(PrometheusPropertiesException.class)
 -        .isThrownBy(
 +    assertThatThrownBy(
@@ -581,9 +582,9 @@
 +                            "io.prometheus.exporter.exemplarsOnAllMetricTypes", "invalid"))))
 +        .isInstanceOf(PrometheusPropertiesException.class)
 +        .hasMessage(
-             "io.prometheus.exporter.exemplarsOnAllMetricTypes: Expecting 'true' or 'false'. Found: invalid");
+             "io.prometheus.exporter.exemplarsOnAllMetricTypes: Expecting 'true' or 'false'. Found:"
+                 + " invalid");
    }
- 
 --- a/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/ExporterPushgatewayPropertiesTest.java
 +++ b/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/ExporterPushgatewayPropertiesTest.java
 @@ -1,30 +1,35 @@
@@ -628,9 +629,9 @@
 +            () -> load(ImmutableMap.of("io.prometheus.exporter.pushgateway.scheme", "foo")))
 +        .isInstanceOf(PrometheusPropertiesException.class)
 +        .hasMessage(
-             "io.prometheus.exporter.pushgateway.scheme: Illegal value. Expecting 'http' or 'https'. Found: foo");
+             "io.prometheus.exporter.pushgateway.scheme: Illegal value. Expecting 'http' or 'https'."
+                 + " Found: foo");
    }
- 
 --- a/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/MetricsPropertiesTest.java
 +++ b/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/MetricsPropertiesTest.java
 @@ -1,11 +1,11 @@
@@ -656,7 +657,7 @@
      assertThat(
              MetricsProperties.builder()
                  .summaryQuantiles(0.2)
-@@ -43,38 +43,38 @@ class MetricsPropertiesTest {
+@@ -43,39 +43,39 @@ class MetricsPropertiesTest {
                  .summaryNumberOfAgeBuckets(1)
                  .build()
                  .getSummaryNumberOfAgeBuckets())
@@ -683,7 +684,8 @@
 +    assertThatThrownBy(() -> MetricsProperties.builder().summaryQuantileErrors(0.9).build())
 +        .isInstanceOf(PrometheusPropertiesException.class)
 +        .hasMessage(
-             ".summaryQuantileErrors: Can't configure summaryQuantileErrors without configuring summaryQuantiles");
+             ".summaryQuantileErrors: Can't configure summaryQuantileErrors without configuring"
+                 + " summaryQuantiles");
  
 -    assertThatExceptionOfType(PrometheusPropertiesException.class)
 -        .isThrownBy(
@@ -711,7 +713,7 @@
    }
  
    @Test
-@@ -84,7 +84,7 @@ class MetricsPropertiesTest {
+@@ -85,7 +85,7 @@ class MetricsPropertiesTest {
                  .histogramNativeInitialSchema(1)
                  .build()
                  .getHistogramNativeInitialSchema())
@@ -720,7 +722,7 @@
      assertThat(
              MetricsProperties.builder()
                  .histogramNativeMinZeroThreshold(.1)
-@@ -102,53 +102,55 @@ class MetricsPropertiesTest {
+@@ -103,53 +103,55 @@ class MetricsPropertiesTest {
                  .histogramNativeMaxNumberOfBuckets(1)
                  .build()
                  .getHistogramNativeMaxNumberOfBuckets())
@@ -797,9 +799,9 @@
 -        .withMessage(
 +        .isInstanceOf(PrometheusPropertiesException.class)
 +        .hasMessage(
-             ".histogramNativeMinZeroThreshold cannot be greater than .histogramNativeMaxZeroThreshold");
+             ".histogramNativeMinZeroThreshold cannot be greater than"
+                 + " .histogramNativeMaxZeroThreshold");
    }
- }
 --- a/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/PrometheusPropertiesLoaderTest.java
 +++ b/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/PrometheusPropertiesLoaderTest.java
 @@ -1,17 +1,17 @@
@@ -823,7 +825,7 @@
      PrometheusProperties prometheusProperties = PrometheusPropertiesLoader.load();
      assertThat(prometheusProperties.getDefaultMetricProperties().getHistogramClassicUpperBounds())
          .hasSize(11);
-@@ -24,20 +24,20 @@ class PrometheusPropertiesLoaderTest {
+@@ -24,21 +24,21 @@ class PrometheusPropertiesLoaderTest {
          .isTrue();
    }
  
@@ -840,7 +842,8 @@
 -        .withMessage(
 +        .isInstanceOf(PrometheusPropertiesException.class)
 +        .hasMessage(
-             "Failed to read Prometheus properties from nonexistent.properties: nonexistent.properties");
+             "Failed to read Prometheus properties from nonexistent.properties:"
+                 + " nonexistent.properties");
    }
  
    @Test
@@ -1590,6 +1593,54 @@
        return new StateSet(this, properties);
      }
  
+--- a/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/metrics/StatefulMetric.java
++++ b/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/metrics/StatefulMetric.java
+@@ -1,7 +1,9 @@
+ package io.prometheus.metrics.core.metrics;
+ 
++import static com.google.common.base.Preconditions.checkArgument;
+ import static java.lang.Boolean.FALSE;
+ import static java.lang.Boolean.TRUE;
++import static java.util.Collections.unmodifiableList;
+ 
+ import io.prometheus.metrics.config.MetricsProperties;
+ import io.prometheus.metrics.config.PrometheusProperties;
+@@ -10,7 +12,6 @@ import io.prometheus.metrics.model.snapshots.Labels;
+ import io.prometheus.metrics.model.snapshots.MetricSnapshot;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.concurrent.ConcurrentHashMap;
+@@ -117,13 +118,11 @@ abstract class StatefulMetric<D extends DataPoint, T extends D> extends MetricWi
+         Arrays.asList(labelValues),
+         l -> {
+           for (int i = 0; i < l.size(); i++) {
+-            if (l.get(i) == null) {
+-              throw new IllegalArgumentException(
+-                  "null label value for metric "
+-                      + getMetadata().getName()
+-                      + " and label "
+-                      + labelNames[i]);
+-            }
++            checkArgument(
++                l.get(i) != null,
++                "null label value for metric %s and label %s",
++                getMetadata().getName(),
++                labelNames[i]);
+           }
+           return newDataPoint();
+         });
+@@ -139,7 +138,7 @@ abstract class StatefulMetric<D extends DataPoint, T extends D> extends MetricWi
+ 
+   /** Remove the data points when the given function. */
+   public void removeIf(Function<List<String>, Boolean> f) {
+-    data.entrySet().removeIf(entry -> f.apply(Collections.unmodifiableList(entry.getKey())));
++    data.entrySet().removeIf(entry -> f.apply(unmodifiableList(entry.getKey())));
+   }
+ 
+   /** Reset the metric (remove all data points). */
 --- a/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/metrics/Summary.java
 +++ b/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/metrics/Summary.java
 @@ -1,5 +1,9 @@
@@ -1730,7 +1781,7 @@
      @Override
 --- a/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/util/Scheduler.java
 +++ b/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/util/Scheduler.java
-@@ -22,11 +22,11 @@ public class Scheduler {
+@@ -28,11 +28,11 @@ public class Scheduler {
      }
    }
  
@@ -2124,14 +2175,15 @@
              () ->
                  CounterWithCallback.builder()
                      .name("c")
-@@ -17,11 +16,11 @@ class CallbackMetricTest {
+@@ -17,12 +16,12 @@ class CallbackMetricTest {
                      .labelNames("label1", "label2")
                      .build()
                      .makeLabels("foo"))
 -        .withMessage(
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "CounterWithCallback was created with 2 label names, but the callback was called with 1 label values.");
+             "CounterWithCallback was created with 2 label names, but the callback was called with 1"
+                 + " label values.");
  
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(
@@ -2139,14 +2191,15 @@
              () ->
                  CounterWithCallback.builder()
                      .name("c")
-@@ -29,18 +28,19 @@ class CallbackMetricTest {
+@@ -30,19 +29,20 @@ class CallbackMetricTest {
                      .labelNames("label1", "label2")
                      .build()
                      .makeLabels((String[]) null))
 -        .withMessage(
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "CounterWithCallback was created with label names, but the callback was called without label values.");
+             "CounterWithCallback was created with label names, but the callback was called without"
+                 + " label values.");
  
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(
@@ -2160,9 +2213,9 @@
 -        .withMessage(
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "Cannot pass label values to a CounterWithCallback that was created without label names.");
+             "Cannot pass label values to a CounterWithCallback that was created without label"
+                 + " names.");
    }
- }
 --- a/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/CounterTest.java
 +++ b/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/CounterTest.java
 @@ -2,7 +2,7 @@ package io.prometheus.metrics.core.metrics;
@@ -2303,7 +2356,7 @@
      Exemplar exemplar1 = Exemplar.builder().value(2.0).traceId("abc").spanId("123").build();
      Exemplar exemplar2 = Exemplar.builder().value(1.0).traceId("def").spanId("456").build();
      Exemplar exemplar3 = Exemplar.builder().value(1.0).traceId("123").spanId("abc").build();
-@@ -258,34 +259,34 @@ class CounterTest {
+@@ -248,34 +249,34 @@ class CounterTest {
      Counter counter = Counter.builder().name("count_total").build();
  
      SpanContextSupplier.setSpanContext(spanContext);
@@ -2345,7 +2398,7 @@
  
      counter.incWithExemplar(
          Labels.of(
-@@ -326,7 +327,7 @@ class CounterTest {
+@@ -316,7 +317,7 @@ class CounterTest {
    }
  
    @Test
@@ -2354,7 +2407,7 @@
      Counter counter =
          Counter.builder()
              // .withExemplarSampler((inc, prev) -> {throw new RuntimeException("unexpected call to
-@@ -341,26 +342,26 @@ class CounterTest {
+@@ -331,26 +332,26 @@ class CounterTest {
    }
  
    @Test
@@ -2536,7 +2589,7 @@
      Exemplar exemplar1 = Exemplar.builder().value(2.0).traceId("abc").spanId("123").build();
      Exemplar exemplar2 = Exemplar.builder().value(6.5).traceId("def").spanId("456").build();
      Exemplar exemplar3 = Exemplar.builder().value(7.0).traceId("123").spanId("abc").build();
-@@ -161,35 +161,35 @@ class GaugeTest {
+@@ -151,35 +151,35 @@ class GaugeTest {
          };
      Gauge gauge = Gauge.builder().name("my_gauge").build();
  
@@ -2579,7 +2632,7 @@
  
      gauge.incWithExemplar(
          Labels.of(
-@@ -230,7 +230,7 @@ class GaugeTest {
+@@ -220,7 +220,7 @@ class GaugeTest {
    }
  
    @Test
@@ -2709,7 +2762,7 @@
      GolangTestCase[] testCases =
          new GolangTestCase[] {
            new GolangTestCase(
-@@ -762,7 +761,7 @@ class HistogramTest {
+@@ -764,7 +763,7 @@ class HistogramTest {
  
    /** Additional tests that are not part of client_golang's test suite. */
    @Test
@@ -2718,7 +2771,7 @@
      GolangTestCase[] testCases =
          new GolangTestCase[] {
            new GolangTestCase(
-@@ -796,7 +795,7 @@ class HistogramTest {
+@@ -798,7 +797,7 @@ class HistogramTest {
     * <p>This test is ported from client_golang's TestGetLe().
     */
    @Test
@@ -2727,7 +2780,7 @@
        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
      int[] indexes = new int[] {-1, 0, 1, 512, 513, -1, 0, 1, 1024, 1025, -1, 0, 1, 4096, 4097};
      int[] schemas = new int[] {-1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2};
-@@ -828,7 +827,7 @@ class HistogramTest {
+@@ -830,7 +829,7 @@ class HistogramTest {
        Histogram.DataPoint histogramData = histogram.newDataPoint();
        double result = (double) method.invoke(histogramData, schemas[i], indexes[i]);
        assertThat(result)
@@ -2736,7 +2789,7 @@
            .isCloseTo(expectedUpperBounds[i], offset(0.0000000000001));
      }
    }
-@@ -838,7 +837,7 @@ class HistogramTest {
+@@ -840,7 +839,7 @@ class HistogramTest {
     * findBucketIndex()
     */
    @Test
@@ -2745,7 +2798,7 @@
        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
      Random rand = new Random();
      Method findBucketIndex =
-@@ -865,17 +864,8 @@ class HistogramTest {
+@@ -867,17 +866,8 @@ class HistogramTest {
                        histogram.getNoLabels(), schema, bucketIndex);
            assertThat(lowerBound < value && upperBound >= value)
                .as(
@@ -2765,7 +2818,7 @@
                .isTrue();
          }
        }
-@@ -883,7 +873,7 @@ class HistogramTest {
+@@ -885,7 +875,7 @@ class HistogramTest {
    }
  
    @Test
@@ -2774,7 +2827,7 @@
      Histogram histogram = Histogram.builder().name("test").build();
      histogram.observe(0.5);
      HistogramSnapshot snapshot = histogram.collect();
-@@ -951,7 +941,7 @@ class HistogramTest {
+@@ -955,7 +945,7 @@ class HistogramTest {
    }
  
    @Test
@@ -2783,7 +2836,7 @@
      SpanContext spanContext =
          new SpanContext() {
            int callCount = 0;
-@@ -1095,7 +1085,7 @@ class HistogramTest {
+@@ -1099,7 +1089,7 @@ class HistogramTest {
    }
  
    @Test
@@ -2792,7 +2845,7 @@
        throws InterruptedException, NoSuchFieldException, IllegalAccessException {
  
      // TODO: This was copied from the old simpleclient, can probably be refactored.
-@@ -1150,11 +1140,11 @@ class HistogramTest {
+@@ -1154,11 +1144,11 @@ class HistogramTest {
      }
      Exemplar exemplar = data.getExemplars().get(lowerBound, upperBound);
      assertThat(exemplar)
@@ -2806,7 +2859,7 @@
          .isEqualTo(labels.length / 2);
      for (int i = 0; i < labels.length; i += 2) {
        assertThat(exemplar.getLabels().getName(i / 2)).isEqualTo(labels[i]);
-@@ -1163,7 +1153,7 @@ class HistogramTest {
+@@ -1167,7 +1157,7 @@ class HistogramTest {
    }
  
    @Test
@@ -2815,7 +2868,7 @@
  
      SpanContext spanContext =
          new SpanContext() {
-@@ -1206,17 +1196,17 @@ class HistogramTest {
+@@ -1210,17 +1200,17 @@ class HistogramTest {
  
      histogram.labelValues("/hello").observe(3.11);
      histogram.labelValues("/world").observe(3.12);
@@ -2836,7 +2889,7 @@
      assertExemplarEquals(
          ex1, getData(histogram, "path", "/hello").getExemplars().iterator().next());
      assertThat(getData(histogram, "path", "/world").getExemplars().size()).isEqualTo(2);
-@@ -1225,86 +1215,85 @@ class HistogramTest {
+@@ -1229,86 +1219,85 @@ class HistogramTest {
      for (Exemplar exemplar : exemplars) {
        exemplarList.add(exemplar);
      }
@@ -2953,7 +3006,7 @@
      Histogram histogram =
          Histogram.builder()
              .name("test")
-@@ -1313,47 +1302,46 @@ class HistogramTest {
+@@ -1317,47 +1306,46 @@ class HistogramTest {
      List<Double> upperBounds =
          getData(histogram).getClassicBuckets().stream()
              .map(ClassicHistogramBucket::getUpperBound)
@@ -3017,7 +3070,7 @@
      assertThat(getData(noLabels).getSum()).isEqualTo(0.0);
    }
  
-@@ -1365,26 +1353,26 @@ class HistogramTest {
+@@ -1369,26 +1357,26 @@ class HistogramTest {
    }
  
    @Test
@@ -3056,7 +3109,7 @@
      Histogram histogram =
          Histogram.builder()
              .name("histogram")
-@@ -1405,27 +1393,27 @@ class HistogramTest {
+@@ -1409,27 +1397,27 @@ class HistogramTest {
      List<Long> actualBucketCounts =
          getData(histogram).getClassicBuckets().stream()
              .map(ClassicHistogramBucket::getCount)
@@ -3095,7 +3148,7 @@
      Histogram histogram =
          Histogram.builder()
              .name("test")
-@@ -1441,20 +1429,19 @@ class HistogramTest {
+@@ -1445,20 +1433,19 @@ class HistogramTest {
          getData(histogram, "env", "prod", "path", "/hello", "status", "500");
      assertThat(data200.getCount()).isEqualTo(2);
      assertThat(data200.getSum()).isCloseTo(0.31, offset(0.0000001));
@@ -3119,7 +3172,7 @@
      // Hard to test concurrency, but let's run a couple of observations in parallel and assert none
      // gets lost.
      Histogram histogram = Histogram.builder().name("test").labelNames("status").build();
-@@ -1485,7 +1472,7 @@ class HistogramTest {
+@@ -1489,7 +1476,7 @@ class HistogramTest {
        List<HistogramSnapshot> snapshots = future.get(5, TimeUnit.SECONDS);
        long count = 0;
        for (HistogramSnapshot snapshot : snapshots) {
@@ -3138,7 +3191,7 @@
 +import static org.assertj.core.api.Assertions.assertThatThrownBy;
  
  import io.prometheus.metrics.expositionformats.OpenMetricsTextFormatWriter;
- import io.prometheus.metrics.expositionformats.generated.com_google_protobuf_4_29_1.Metrics;
+ import io.prometheus.metrics.expositionformats.generated.com_google_protobuf_4_31_0.Metrics;
 @@ -15,10 +15,10 @@ import java.io.IOException;
  import java.nio.charset.StandardCharsets;
  import org.junit.jupiter.api.Test;
@@ -3152,7 +3205,7 @@
      for (String name :
          new String[] {
            "jvm.runtime", "jvm_runtime",
-@@ -37,7 +37,7 @@ class InfoTest {
+@@ -38,7 +38,7 @@ class InfoTest {
    }
  
    @Test
@@ -3161,7 +3214,7 @@
      Info info = Info.builder().name("test_info").labelNames("a", "b").build();
      assertThat(info.collect().getDataPoints()).isEmpty();
      info.addLabelValues("val1", "val2");
-@@ -53,14 +53,14 @@ class InfoTest {
+@@ -54,15 +54,15 @@ class InfoTest {
      info.remove("val2", "val2");
      assertThat(info.collect().getDataPoints()).isEmpty();
  
@@ -3171,7 +3224,8 @@
 +    assertThatThrownBy(() -> info.addLabelValues("val1", "val2", "extra"))
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "Info test was created with 2 label names, but you called addLabelValues() with 3 label values.");
+             "Info test was created with 2 label names, but you called addLabelValues() with 3 label"
+                 + " values.");
    }
  
    @Test
@@ -3180,8 +3234,8 @@
      Info info =
          Info.builder()
              .name("target_info")
-@@ -75,19 +75,19 @@ class InfoTest {
-         "target_info{service_instance_id=\"123\",service_name=\"test\",service_version=\"2.0.0\"} 1\n",
+@@ -78,21 +78,21 @@ class InfoTest {
+             + " 1\n",
          info);
  
 -    assertThatExceptionOfType(IllegalArgumentException.class)
@@ -3190,7 +3244,8 @@
 +    assertThatThrownBy(() -> info.setLabelValues("2.0.0", "extra"))
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "Info target was created with 1 label names, but you called setLabelValues() with 2 label values.");
+             "Info target was created with 1 label names, but you called setLabelValues() with 2"
+                 + " label values.");
  
 -    assertThatExceptionOfType(IllegalArgumentException.class)
 -        .isThrownBy(() -> info.remove("2.0.0", "extra"))
@@ -3198,7 +3253,8 @@
 +    assertThatThrownBy(() -> info.remove("2.0.0", "extra"))
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "Info target was created with 1 label names, but you called remove() with 2 label values.");
+             "Info target was created with 1 label names, but you called remove() with 2 label"
+                 + " values.");
    }
  
    @Test
@@ -3207,7 +3263,7 @@
      Info info =
          Info.builder()
              .name("target_info")
-@@ -99,23 +99,23 @@ class InfoTest {
+@@ -104,23 +104,23 @@ class InfoTest {
  
    @Test
    void unit() {
@@ -3277,7 +3333,7 @@
      startTime = System.currentTimeMillis();
      currentTimeMillis.set(startTime);
      ringBuffer =
-@@ -53,7 +49,7 @@ class SlidingWindowTest {
+@@ -57,7 +53,7 @@ class SlidingWindowTest {
    }
  
    @Test
@@ -3286,7 +3342,7 @@
      for (int i = 0; i < ageBuckets; i++) {
        currentTimeMillis.addAndGet(timeBetweenRotateMillis);
        ringBuffer.observe(1.0);
-@@ -72,7 +68,7 @@ class SlidingWindowTest {
+@@ -76,7 +72,7 @@ class SlidingWindowTest {
    }
  
    @Test
@@ -3342,10 +3398,10 @@
 +    assertThatThrownBy(() -> StateSet.builder().name("state1").states("state1", "state2").build())
 +        .isInstanceOf(IllegalArgumentException.class)
 +        .hasMessage(
-             "Label name state1 is illegal (can't use the metric name as label name in state set metrics)");
+             "Label name state1 is illegal (can't use the metric name as label name in state set"
+                 + " metrics)");
    }
- 
-@@ -82,8 +82,8 @@ class StateSetTest {
+@@ -83,8 +83,8 @@ class StateSetTest {
    }
  
    @Test
@@ -3359,7 +3415,16 @@
  }
 --- a/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/StatefulMetricTest.java
 +++ b/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/StatefulMetricTest.java
-@@ -6,10 +6,10 @@ import java.lang.reflect.Field;
+@@ -1,7 +1,7 @@
+ package io.prometheus.metrics.core.metrics;
+ 
+ import static org.assertj.core.api.Assertions.assertThat;
+-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
++import static org.assertj.core.api.Assertions.assertThatThrownBy;
+ 
+ import java.lang.reflect.Field;
+ import java.util.Arrays;
+@@ -9,10 +9,10 @@ import java.util.List;
  import java.util.Map;
  import org.junit.jupiter.api.Test;
  
@@ -3372,7 +3437,19 @@
      Counter counter = Counter.builder().name("test").labelNames("label1", "label2").build();
      Field data = counter.getClass().getSuperclass().getDeclaredField("data");
      data.setAccessible(true);
-@@ -35,7 +35,7 @@ class StatefulMetricTest {
+@@ -37,9 +37,9 @@ class StatefulMetricTest {
+     }
+   }
+ 
+-  @Test
+   @SuppressWarnings("unchecked")
+-  public void testLabelRemoveIf() throws Exception {
++  @Test
++  void labelRemoveIf() throws Exception {
+     Counter counter =
+         Counter.builder().name("testLabelRemoveIf").labelNames("label1", "label2").build();
+     Field data = counter.getClass().getSuperclass().getDeclaredField("data");
+@@ -61,7 +61,7 @@ class StatefulMetricTest {
    }
  
    @Test
@@ -3381,7 +3458,7 @@
      Counter counter = Counter.builder().name("test").labelNames("label1", "label2").build();
      counter.labelValues("a", "b").inc(3.0);
      counter.labelValues("c", "d").inc(3.0);
-@@ -50,7 +50,7 @@ class StatefulMetricTest {
+@@ -76,7 +76,7 @@ class StatefulMetricTest {
    }
  
    @Test
@@ -3390,6 +3467,21 @@
      Counter counter = Counter.builder().name("test").build();
      counter.inc();
      assertThat(counter.collect().getDataPoints()).hasSize(1);
+@@ -95,10 +95,10 @@ class StatefulMetricTest {
+   }
+ 
+   @Test
+-  public void testNullLabel() {
++  void nullLabel() {
+     Counter counter = Counter.builder().name("test").labelNames("l1", "l2").build();
+-    assertThatExceptionOfType(IllegalArgumentException.class)
+-        .isThrownBy(() -> counter.labelValues("l1", null))
+-        .withMessage("null label value for metric test and label l2");
++    assertThatThrownBy(() -> counter.labelValues("l1", null))
++        .isInstanceOf(IllegalArgumentException.class)
++        .hasMessage("null label value for metric test and label l2");
+   }
+ }
 --- a/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/SummaryTest.java
 +++ b/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/SummaryTest.java
 @@ -1,7 +1,7 @@
@@ -3641,7 +3733,7 @@
  
  /** Handler for the / endpoint */
  public class DefaultHandler implements HttpHandler {
-@@ -66,7 +67,7 @@ public class DefaultHandler implements HttpHandler {
+@@ -65,7 +66,7 @@ public class DefaultHandler implements HttpHandler {
              + "header for indicating which format it accepts.\n"
              + "</body>\n"
              + "</html>\n";
@@ -4549,7 +4641,7 @@
        testCase.systemProperties.keySet().forEach(System::clearProperty);
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusInstrumentationScopeTest.java
-@@ -1,38 +1,38 @@
+@@ -1,39 +1,39 @@
  package io.prometheus.metrics.exporter.opentelemetry;
  
 -import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -4585,7 +4677,8 @@
 +        .isInstanceOf(IllegalStateException.class)
 +        .rootCause()
 +        .hasMessage(
-             "Prometheus metrics library initialization error: name not found in instrumentationScope.properties in classpath.");
+             "Prometheus metrics library initialization error: name not found in"
+                 + " instrumentationScope.properties in classpath.");
  
 -    assertThatExceptionOfType(IllegalStateException.class)
 -        .isThrownBy(
@@ -4598,9 +4691,9 @@
 +        .isInstanceOf(IllegalStateException.class)
 +        .rootCause()
 +        .hasMessage(
-             "Prometheus metrics library initialization error: version not found in instrumentationScope.properties in classpath.");
+             "Prometheus metrics library initialization error: version not found in"
+                 + " instrumentationScope.properties in classpath.");
    }
- }
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusMetricDataTest.java
 @@ -3,14 +3,15 @@ package io.prometheus.metrics.exporter.opentelemetry.otelmodel;
@@ -4662,16 +4755,16 @@
  import java.util.HashMap;
  import java.util.Map;
  import java.util.TreeMap;
-@@ -92,7 +93,7 @@ public class PushGateway {
-       Map<String, String> requestHeaders) {
+@@ -94,7 +95,7 @@ public class PushGateway {
+       boolean prometheusTimestampsInMs) {
      this.registry = registry;
      this.url = url;
 -    this.requestHeaders = Collections.unmodifiableMap(new HashMap<>(requestHeaders));
 +    this.requestHeaders = unmodifiableMap(new HashMap<>(requestHeaders));
      this.connectionFactory = connectionFactory;
+     this.prometheusTimestampsInMs = prometheusTimestampsInMs;
      writer = getWriter(format);
-     if (!writer.isAvailable()) {
-@@ -275,9 +276,7 @@ public class PushGateway {
+@@ -282,9 +283,7 @@ public class PushGateway {
  
      /** Default is {@link Format#PROMETHEUS_PROTOBUF}. */
      public Builder format(Format format) {
@@ -4682,7 +4775,7 @@
        this.format = format;
        return this;
      }
-@@ -288,9 +287,7 @@ public class PushGateway {
+@@ -295,9 +294,7 @@ public class PushGateway {
       * property.
       */
      public Builder address(String address) {
@@ -4693,7 +4786,7 @@
        this.address = address;
        return this;
      }
-@@ -300,7 +297,7 @@ public class PushGateway {
+@@ -307,7 +304,7 @@ public class PushGateway {
        if (user == null || password == null) {
          throw new NullPointerException();
        }
@@ -4702,7 +4795,7 @@
        String encoded = Base64.getEncoder().encodeToString(credentialsBytes);
        requestHeaders.put("Authorization", String.format("Basic %s", encoded));
        return this;
-@@ -308,9 +305,7 @@ public class PushGateway {
+@@ -315,9 +312,7 @@ public class PushGateway {
  
      /** Bearer token authorization when pushing to the Pushgateway. */
      public Builder bearerToken(String token) {
@@ -4713,7 +4806,7 @@
        requestHeaders.put("Authorization", String.format("Bearer %s", token));
        return this;
      }
-@@ -320,9 +315,7 @@ public class PushGateway {
+@@ -327,9 +322,7 @@ public class PushGateway {
       * at runtime with the {@code io.prometheus.exporter.pushgateway.scheme} property.
       */
      public Builder scheme(Scheme scheme) {
@@ -4724,7 +4817,7 @@
        this.scheme = scheme;
        return this;
      }
-@@ -334,9 +327,7 @@ public class PushGateway {
+@@ -341,9 +334,7 @@ public class PushGateway {
       * of a custom connection factory that skips SSL certificate validation for HTTPS connections.
       */
      public Builder connectionFactory(HttpConnectionFactory connectionFactory) {
@@ -4735,7 +4828,7 @@
        this.connectionFactory = connectionFactory;
        return this;
      }
-@@ -347,9 +338,7 @@ public class PushGateway {
+@@ -354,9 +345,7 @@ public class PushGateway {
       * io.prometheus.exporter.pushgateway.job} property.
       */
      public Builder job(String job) {
@@ -4746,7 +4839,7 @@
        this.job = job;
        return this;
      }
-@@ -373,9 +362,7 @@ public class PushGateway {
+@@ -380,9 +369,7 @@ public class PushGateway {
  
      /** Push metrics from this registry instead of {@link PrometheusRegistry#defaultRegistry}. */
      public Builder registry(PrometheusRegistry registry) {
@@ -4757,7 +4850,7 @@
        this.registry = registry;
        return this;
      }
-@@ -443,7 +430,7 @@ public class PushGateway {
+@@ -465,7 +452,7 @@ public class PushGateway {
  
      private String base64url(String v) {
        return Base64.getEncoder()
@@ -4786,7 +4879,7 @@
      mockServerClient = ClientAndServer.startClientAndServer(0);
      registry = new PrometheusRegistry();
      gauge = Gauge.builder().name("g").help("help").build();
-@@ -39,7 +39,7 @@ class BasicAuthPushGatewayTest {
+@@ -40,7 +40,7 @@ class BasicAuthPushGatewayTest {
    }
  
    @Test
@@ -5058,353 +5151,36 @@
 +        .hasMessage("ftp: Unsupported scheme. Expecting 'http' or 'https'.");
    }
  }
---- a/prometheus-metrics-exposition-formats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
-+++ b/prometheus-metrics-exposition-formats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
-@@ -30,7 +30,7 @@ import java.io.ByteArrayOutputStream;
- import java.io.IOException;
- import org.junit.jupiter.api.Test;
- 
--class ExpositionFormatsTest {
-+final class ExpositionFormatsTest {
- 
-   private final String exemplar1String =
-       "{env=\"prod\",span_id=\"12345\",trace_id=\"abcde\"} 1.7 1672850685.829";
-@@ -107,7 +107,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testCounterComplete() throws IOException {
-+  void counterComplete() throws IOException {
-     String openMetricsText =
-         "# TYPE service_time_seconds counter\n"
-             + "# UNIT service_time_seconds seconds\n"
-@@ -235,7 +235,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testCounterMinimal() throws IOException {
-+  void counterMinimal() throws IOException {
-     String openMetricsText = "# TYPE my_counter counter\n" + "my_counter_total 1.1\n" + "# EOF\n";
-     String prometheusText = "# TYPE my_counter_total counter\n" + "my_counter_total 1.1\n";
-     String prometheusProtobuf =
-@@ -253,7 +253,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testCounterWithDots() throws IOException {
-+  void counterWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE my_request_count counter\n"
-             + "my_request_count_total{http_path=\"/hello\"} 3.0 # "
-@@ -293,7 +293,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testGaugeComplete() throws IOException {
-+  void gaugeComplete() throws IOException {
-     String openMetricsText =
-         "# TYPE disk_usage_ratio gauge\n"
-             + "# UNIT disk_usage_ratio ratio\n"
-@@ -374,7 +374,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testGaugeMinimal() throws IOException {
-+  void gaugeMinimal() throws IOException {
-     String openMetricsText =
-         "# TYPE temperature_centigrade gauge\n" + "temperature_centigrade 22.3\n" + "# EOF\n";
-     String prometheusText =
-@@ -394,7 +394,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testGaugeWithDots() throws IOException {
-+  void gaugeWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE my_temperature_celsius gauge\n"
-             + "# UNIT my_temperature_celsius celsius\n"
-@@ -446,7 +446,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryComplete() throws IOException {
-+  void summaryComplete() throws IOException {
-     String openMetricsText =
-         "# TYPE http_request_duration_seconds summary\n"
-             + "# UNIT http_request_duration_seconds seconds\n"
-@@ -739,7 +739,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryWithoutQuantiles() throws IOException {
-+  void summaryWithoutQuantiles() throws IOException {
-     String openMetricsText =
-         "# TYPE latency_seconds summary\n"
-             + "# UNIT latency_seconds seconds\n"
-@@ -779,7 +779,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryNoCountAndSum() throws IOException {
-+  void summaryNoCountAndSum() throws IOException {
-     String openMetricsText =
-         "# TYPE latency_seconds summary\n"
-             + "latency_seconds{quantile=\"0.95\"} 200.0\n"
-@@ -812,7 +812,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryJustCount() throws IOException {
-+  void summaryJustCount() throws IOException {
-     String openMetricsText =
-         "# TYPE latency_seconds summary\n" + "latency_seconds_count 1\n" + "# EOF\n";
-     String prometheusText = "# TYPE latency_seconds summary\n" + "latency_seconds_count 1\n";
-@@ -839,7 +839,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryJustSum() throws IOException {
-+  void summaryJustSum() throws IOException {
-     String openMetricsText =
-         "# TYPE latency_seconds summary\n" + "latency_seconds_sum 12.3\n" + "# EOF\n";
-     String prometheusText = "# TYPE latency_seconds summary\n" + "latency_seconds_sum 12.3\n";
-@@ -866,7 +866,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryEmptyData() throws IOException {
-+  void summaryEmptyData() throws IOException {
-     // SummaryData can be present but empty (no count, no sum, no quantiles).
-     // This should be treated like no data is present.
-     SummarySnapshot summary =
-@@ -884,7 +884,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryEmptyAndNonEmpty() throws IOException {
-+  void summaryEmptyAndNonEmpty() throws IOException {
-     String openMetricsText =
-         "# TYPE latency_seconds summary\n"
-             + "latency_seconds_count{path=\"/v2\"} 2\n"
-@@ -926,7 +926,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testSummaryWithDots() throws IOException {
-+  void summaryWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE my_request_duration_seconds summary\n"
-             + "# UNIT my_request_duration_seconds seconds\n"
-@@ -980,7 +980,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicHistogramComplete() throws Exception {
-+  void classicHistogramComplete() throws Exception {
-     String openMetricsText =
-         "# TYPE response_size_bytes histogram\n"
-             + "# UNIT response_size_bytes bytes\n"
-@@ -1286,7 +1286,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicHistogramMinimal() throws Exception {
-+  void classicHistogramMinimal() throws Exception {
-     // In OpenMetrics a histogram can have a _count if and only if it has a _sum.
-     // In Prometheus format, a histogram can have a _count without a _sum.
-     String openMetricsText =
-@@ -1330,7 +1330,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicHistogramCountAndSum() throws Exception {
-+  void classicHistogramCountAndSum() throws Exception {
-     String openMetricsText =
-         "# TYPE request_latency_seconds histogram\n"
-             + "request_latency_seconds_bucket{le=\"+Inf\"} 2\n"
-@@ -1377,7 +1377,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicGaugeHistogramComplete() throws IOException {
-+  void classicGaugeHistogramComplete() throws IOException {
-     String openMetricsText =
-         "# TYPE cache_size_bytes gaugehistogram\n"
-             + "# UNIT cache_size_bytes bytes\n"
-@@ -1673,7 +1673,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicGaugeHistogramMinimal() throws IOException {
-+  void classicGaugeHistogramMinimal() throws IOException {
-     // In OpenMetrics a histogram can have a _count if and only if it has a _sum.
-     // In Prometheus format, a histogram can have a _count without a _sum.
-     String openMetricsText =
-@@ -1719,7 +1719,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicGaugeHistogramCountAndSum() throws IOException {
-+  void classicGaugeHistogramCountAndSum() throws IOException {
-     String openMetricsText =
-         "# TYPE queue_size_bytes gaugehistogram\n"
-             + "queue_size_bytes_bucket{le=\"+Inf\"} 130\n"
-@@ -1769,7 +1769,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testClassicHistogramWithDots() throws IOException {
-+  void classicHistogramWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE my_request_duration_seconds histogram\n"
-             + "# UNIT my_request_duration_seconds seconds\n"
-@@ -1839,7 +1839,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testNativeHistogramComplete() throws IOException {
-+  void nativeHistogramComplete() throws IOException {
-     String openMetricsText =
-         "# TYPE response_size_bytes histogram\n"
-             + "# UNIT response_size_bytes bytes\n"
-@@ -2150,7 +2150,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testNativeHistogramMinimal() throws IOException {
-+  void nativeHistogramMinimal() throws IOException {
-     String openMetricsText =
-         "# TYPE latency_seconds histogram\n"
-             + "latency_seconds_bucket{le=\"+Inf\"} 0\n"
-@@ -2184,7 +2184,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testNativeHistogramWithDots() throws IOException {
-+  void nativeHistogramWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE my_request_duration_seconds histogram\n"
-             + "# UNIT my_request_duration_seconds seconds\n"
-@@ -2261,7 +2261,7 @@ class ExpositionFormatsTest {
-   // TODO: Gauge Native Histogram
- 
-   @Test
--  public void testInfo() throws IOException {
-+  void info() throws IOException {
-     String openMetrics =
-         "# TYPE version info\n"
-             + "# HELP version version information\n"
-@@ -2287,7 +2287,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testInfoWithDots() throws IOException {
-+  void infoWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE jvm_status info\n"
-             + "# HELP jvm_status JVM status info\n"
-@@ -2322,7 +2322,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testStateSetComplete() throws IOException {
-+  void stateSetComplete() throws IOException {
-     String openMetrics =
-         "# TYPE state stateset\n"
-             + "# HELP state complete state set example\n"
-@@ -2380,7 +2380,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testStateSetMinimal() throws IOException {
-+  void stateSetMinimal() throws IOException {
-     String openMetrics =
-         "# TYPE state stateset\n"
-             + "state{state=\"a\"} 1\n"
-@@ -2404,7 +2404,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testStateSetWithDots() throws IOException {
-+  void stateSetWithDots() throws IOException {
-     String openMetricsText =
-         "# TYPE my_application_state stateset\n"
-             + "# HELP my_application_state My application state\n"
-@@ -2448,7 +2448,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testUnknownComplete() throws IOException {
-+  void unknownComplete() throws IOException {
-     String openMetrics =
-         "# TYPE my_special_thing_bytes unknown\n"
-             + "# UNIT my_special_thing_bytes bytes\n"
-@@ -2513,7 +2513,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testUnknownMinimal() throws IOException {
-+  void unknownMinimal() throws IOException {
-     String openMetrics = "# TYPE other unknown\n" + "other 22.3\n" + "# EOF\n";
-     String prometheus = "# TYPE other untyped\n" + "other 22.3\n";
-     UnknownSnapshot unknown =
-@@ -2528,7 +2528,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testUnknownWithDots() throws IOException {
-+  void unknownWithDots() throws IOException {
-     String openMetrics =
-         "# TYPE some_unknown_metric_bytes unknown\n"
-             + "# UNIT some_unknown_metric_bytes bytes\n"
-@@ -2577,7 +2577,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testHelpEscape() throws IOException {
-+  void helpEscape() throws IOException {
-     String openMetrics =
-         "# TYPE test counter\n"
-             + "# HELP test Some text and \\n some \\\" escaping\n"
-@@ -2600,7 +2600,7 @@ class ExpositionFormatsTest {
-   }
- 
-   @Test
--  public void testLabelValueEscape() throws IOException {
-+  void labelValueEscape() throws IOException {
-     String openMetrics =
-         "# TYPE test counter\n"
-             + "test_total{a=\"x\",b=\"escaping\\\" example \\n \"} 1.0\n"
 --- a/prometheus-metrics-exposition-textformats/src/main/java/io/prometheus/metrics/expositionformats/OpenMetricsTextFormatWriter.java
 +++ b/prometheus-metrics-exposition-textformats/src/main/java/io/prometheus/metrics/expositionformats/OpenMetricsTextFormatWriter.java
 @@ -5,7 +5,9 @@ import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeEscape
  import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeLabels;
  import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeLong;
- import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeTimestamp;
+ import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeOpenMetricsTimestamp;
 +import static java.nio.charset.StandardCharsets.UTF_8;
  
 +import com.google.common.base.Strings;
  import io.prometheus.metrics.model.snapshots.ClassicHistogramBuckets;
  import io.prometheus.metrics.model.snapshots.CounterSnapshot;
  import io.prometheus.metrics.model.snapshots.DataPointSnapshot;
-@@ -26,7 +28,6 @@ import io.prometheus.metrics.model.snapshots.UnknownSnapshot;
- import java.io.IOException;
+@@ -28,7 +30,6 @@ import java.io.IOException;
  import java.io.OutputStream;
  import java.io.OutputStreamWriter;
+ import java.io.Writer;
 -import java.nio.charset.StandardCharsets;
  import java.util.List;
  
  /**
-@@ -65,7 +66,7 @@ public class OpenMetricsTextFormatWriter implements ExpositionFormatWriter {
+@@ -104,7 +105,7 @@ public class OpenMetricsTextFormatWriter implements ExpositionFormatWriter {
  
    @Override
    public void write(OutputStream out, MetricSnapshots metricSnapshots) throws IOException {
--    OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
-+    OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
+-    Writer writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
++    Writer writer = new BufferedWriter(new OutputStreamWriter(out, UTF_8));
      for (MetricSnapshot snapshot : metricSnapshots) {
        if (!snapshot.getDataPoints().isEmpty()) {
          if (snapshot instanceof CounterSnapshot) {
-@@ -368,7 +369,7 @@ public class OpenMetricsTextFormatWriter implements ExpositionFormatWriter {
+@@ -401,7 +402,7 @@ public class OpenMetricsTextFormatWriter implements ExpositionFormatWriter {
        writeEscapedLabelValue(writer, metadata.getUnit().toString());
        writer.write('\n');
      }
@@ -5418,14 +5194,14 @@
 @@ -5,7 +5,9 @@ import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeEscape
  import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeLabels;
  import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeLong;
- import static io.prometheus.metrics.expositionformats.TextFormatUtil.writeTimestamp;
+ import static io.prometheus.metrics.expositionformats.TextFormatUtil.writePrometheusTimestamp;
 +import static java.nio.charset.StandardCharsets.UTF_8;
  
 +import com.google.common.base.Strings;
  import io.prometheus.metrics.model.snapshots.ClassicHistogramBuckets;
  import io.prometheus.metrics.model.snapshots.CounterSnapshot;
  import io.prometheus.metrics.model.snapshots.DataPointSnapshot;
-@@ -24,7 +26,6 @@ import java.io.IOException;
+@@ -25,7 +27,6 @@ import java.io.IOException;
  import java.io.OutputStream;
  import java.io.OutputStreamWriter;
  import java.io.Writer;
@@ -5433,69 +5209,397 @@
  
  /**
   * Write the Prometheus text format. This is the default if you view a Prometheus endpoint with your
-@@ -59,9 +60,9 @@ public class PrometheusTextFormatWriter implements ExpositionFormatWriter {
+@@ -106,7 +107,7 @@ public class PrometheusTextFormatWriter implements ExpositionFormatWriter {
      // See https://prometheus.io/docs/instrumenting/exposition_formats/
      // "unknown", "gauge", "counter", "stateset", "info", "histogram", "gaugehistogram", and
      // "summary".
--    OutputStreamWriter writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
-+    OutputStreamWriter writer = new OutputStreamWriter(out, UTF_8);
+-    Writer writer = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
++    Writer writer = new BufferedWriter(new OutputStreamWriter(out, UTF_8));
      for (MetricSnapshot snapshot : metricSnapshots) {
--      if (snapshot.getDataPoints().size() > 0) {
-+      if (!snapshot.getDataPoints().isEmpty()) {
+       if (!snapshot.getDataPoints().isEmpty()) {
          if (snapshot instanceof CounterSnapshot) {
-           writeCounter(writer, (CounterSnapshot) snapshot);
-         } else if (snapshot instanceof GaugeSnapshot) {
-@@ -81,7 +82,7 @@ public class PrometheusTextFormatWriter implements ExpositionFormatWriter {
-     }
-     if (writeCreatedTimestamps) {
-       for (MetricSnapshot snapshot : metricSnapshots) {
--        if (snapshot.getDataPoints().size() > 0) {
-+        if (!snapshot.getDataPoints().isEmpty()) {
-           if (snapshot instanceof CounterSnapshot) {
-             writeCreated(writer, snapshot);
-           } else if (snapshot instanceof HistogramSnapshot) {
-@@ -113,7 +114,7 @@ public class PrometheusTextFormatWriter implements ExpositionFormatWriter {
+@@ -369,7 +370,7 @@ public class PrometheusTextFormatWriter implements ExpositionFormatWriter {
  
-   private void writeCounter(OutputStreamWriter writer, CounterSnapshot snapshot)
-       throws IOException {
--    if (snapshot.getDataPoints().size() > 0) {
-+    if (!snapshot.getDataPoints().isEmpty()) {
-       MetricMetadata metadata = snapshot.getMetadata();
-       writeMetadata(writer, "_total", "counter", metadata);
-       for (CounterSnapshot.CounterDataPointSnapshot data : snapshot.getDataPoints()) {
-@@ -329,7 +330,7 @@ public class PrometheusTextFormatWriter implements ExpositionFormatWriter {
    private void writeMetadata(
-       OutputStreamWriter writer, String suffix, String typeString, MetricMetadata metadata)
-       throws IOException {
+       Writer writer, String suffix, String typeString, MetricMetadata metadata) throws IOException {
 -    if (metadata.getHelp() != null && !metadata.getHelp().isEmpty()) {
 +    if (!Strings.isNullOrEmpty(metadata.getHelp())) {
        writer.write("# HELP ");
        writer.write(metadata.getPrometheusName());
        if (suffix != null) {
+--- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatWriterTest.java
++++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatWriterTest.java
+@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
+ import io.prometheus.metrics.model.snapshots.MetricSnapshots;
+ import org.junit.jupiter.api.Test;
+ 
+-class ExpositionFormatWriterTest {
++final class ExpositionFormatWriterTest {
+ 
+   private final ExpositionFormatWriter writer = OpenMetricsTextFormatWriter.create();
+ 
+--- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
++++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
+@@ -106,7 +106,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testCounterComplete() throws IOException {
++  void counterComplete() throws IOException {
+     String openMetricsText =
+         "# TYPE service_time_seconds counter\n"
+             + "# UNIT service_time_seconds seconds\n"
+@@ -234,7 +234,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testCounterMinimal() throws IOException {
++  void counterMinimal() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE my_counter counter
+@@ -261,7 +261,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testCounterWithDots() throws IOException {
++  void counterWithDots() throws IOException {
+     String openMetricsText =
+         "# TYPE my_request_count counter\n"
+             + "my_request_count_total{http_path=\"/hello\"} 3.0 # "
+@@ -303,7 +303,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testGaugeComplete() throws IOException {
++  void gaugeComplete() throws IOException {
+     String openMetricsText =
+         "# TYPE disk_usage_ratio gauge\n"
+             + "# UNIT disk_usage_ratio ratio\n"
+@@ -384,7 +384,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testGaugeMinimal() throws IOException {
++  void gaugeMinimal() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE temperature_centigrade gauge
+@@ -411,7 +411,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testGaugeWithDots() throws IOException {
++  void gaugeWithDots() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE my_temperature_celsius gauge
+@@ -467,7 +467,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryComplete() throws IOException {
++  void summaryComplete() throws IOException {
+     String openMetricsText =
+         "# TYPE http_request_duration_seconds summary\n"
+             + "# UNIT http_request_duration_seconds seconds\n"
+@@ -760,7 +760,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryWithoutQuantiles() throws IOException {
++  void summaryWithoutQuantiles() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE latency_seconds summary
+@@ -804,7 +804,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryNoCountAndSum() throws IOException {
++  void summaryNoCountAndSum() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE latency_seconds summary
+@@ -842,7 +842,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryJustCount() throws IOException {
++  void summaryJustCount() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE latency_seconds summary
+@@ -877,7 +877,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryJustSum() throws IOException {
++  void summaryJustSum() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE latency_seconds summary
+@@ -912,7 +912,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryEmptyData() throws IOException {
++  void summaryEmptyData() throws IOException {
+     // SummaryData can be present but empty (no count, no sum, no quantiles).
+     // This should be treated like no data is present.
+     SummarySnapshot summary =
+@@ -930,7 +930,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryEmptyAndNonEmpty() throws IOException {
++  void summaryEmptyAndNonEmpty() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE latency_seconds summary
+@@ -976,7 +976,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testSummaryWithDots() throws IOException {
++  void summaryWithDots() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE my_request_duration_seconds summary
+@@ -1034,7 +1034,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicHistogramComplete() throws Exception {
++  void classicHistogramComplete() throws Exception {
+     String openMetricsText =
+         "# TYPE response_size_bytes histogram\n"
+             + "# UNIT response_size_bytes bytes\n"
+@@ -1340,7 +1340,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicHistogramMinimal() throws Exception {
++  void classicHistogramMinimal() throws Exception {
+     // In OpenMetrics a histogram can have a _count if and only if it has a _sum.
+     // In Prometheus format, a histogram can have a _count without a _sum.
+     String openMetricsText =
+@@ -1388,7 +1388,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicHistogramCountAndSum() throws Exception {
++  void classicHistogramCountAndSum() throws Exception {
+     String openMetricsText =
+         """
+         # TYPE request_latency_seconds histogram
+@@ -1439,7 +1439,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicGaugeHistogramComplete() throws IOException {
++  void classicGaugeHistogramComplete() throws IOException {
+     String openMetricsText =
+         "# TYPE cache_size_bytes gaugehistogram\n"
+             + "# UNIT cache_size_bytes bytes\n"
+@@ -1735,7 +1735,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicGaugeHistogramMinimal() throws IOException {
++  void classicGaugeHistogramMinimal() throws IOException {
+     // In OpenMetrics a histogram can have a _count if and only if it has a _sum.
+     // In Prometheus format, a histogram can have a _count without a _sum.
+     String openMetricsText =
+@@ -1785,7 +1785,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicGaugeHistogramCountAndSum() throws IOException {
++  void classicGaugeHistogramCountAndSum() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE queue_size_bytes gaugehistogram
+@@ -1839,7 +1839,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testClassicHistogramWithDots() throws IOException {
++  void classicHistogramWithDots() throws IOException {
+     String openMetricsText =
+         "# TYPE my_request_duration_seconds histogram\n"
+             + "# UNIT my_request_duration_seconds seconds\n"
+@@ -1911,7 +1911,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testNativeHistogramComplete() throws IOException {
++  void nativeHistogramComplete() throws IOException {
+     String openMetricsText =
+         "# TYPE response_size_bytes histogram\n"
+             + "# UNIT response_size_bytes bytes\n"
+@@ -2222,7 +2222,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testNativeHistogramMinimal() throws IOException {
++  void nativeHistogramMinimal() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE latency_seconds histogram
+@@ -2260,7 +2260,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testNativeHistogramWithDots() throws IOException {
++  void nativeHistogramWithDots() throws IOException {
+     String openMetricsText =
+         "# TYPE my_request_duration_seconds histogram\n"
+             + "# UNIT my_request_duration_seconds seconds\n"
+@@ -2339,7 +2339,7 @@ class ExpositionFormatsTest {
+   // TODO: Gauge Native Histogram
+ 
+   @Test
+-  public void testInfo() throws IOException {
++  void info() throws IOException {
+     String openMetrics =
+         """
+         # TYPE version info
+@@ -2369,7 +2369,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testInfoWithDots() throws IOException {
++  void infoWithDots() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE jvm_status info
+@@ -2408,7 +2408,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testStateSetComplete() throws IOException {
++  void stateSetComplete() throws IOException {
+     String openMetrics =
+         "# TYPE state stateset\n"
+             + "# HELP state complete state set example\n"
+@@ -2466,7 +2466,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testStateSetMinimal() throws IOException {
++  void stateSetMinimal() throws IOException {
+     String openMetrics =
+         """
+         # TYPE state stateset
+@@ -2496,7 +2496,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testStateSetWithDots() throws IOException {
++  void stateSetWithDots() throws IOException {
+     String openMetricsText =
+         """
+         # TYPE my_application_state stateset
+@@ -2544,7 +2544,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testUnknownComplete() throws IOException {
++  void unknownComplete() throws IOException {
+     String openMetrics =
+         "# TYPE my_special_thing_bytes unknown\n"
+             + "# UNIT my_special_thing_bytes bytes\n"
+@@ -2609,7 +2609,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testUnknownMinimal() throws IOException {
++  void unknownMinimal() throws IOException {
+     String openMetrics =
+         """
+         # TYPE other unknown
+@@ -2633,7 +2633,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testUnknownWithDots() throws IOException {
++  void unknownWithDots() throws IOException {
+     String openMetrics =
+         """
+         # TYPE some_unknown_metric_bytes unknown
+@@ -2686,7 +2686,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testHelpEscape() throws IOException {
++  void helpEscape() throws IOException {
+     String openMetrics =
+         """
+         # TYPE test counter
+@@ -2713,7 +2713,7 @@ class ExpositionFormatsTest {
+   }
+ 
+   @Test
+-  public void testLabelValueEscape() throws IOException {
++  void labelValueEscape() throws IOException {
+     String openMetrics =
+         """
+         # TYPE test counter
+--- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/PrometheusProtobufWriterTest.java
++++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/PrometheusProtobufWriterTest.java
+@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
+ 
+ import org.junit.jupiter.api.Test;
+ 
+-class PrometheusProtobufWriterTest {
++final class PrometheusProtobufWriterTest {
+ 
+   private final PrometheusProtobufWriter writer = new PrometheusProtobufWriter();
+ 
+--- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/TextFormatUtilTest.java
++++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/TextFormatUtilTest.java
+@@ -7,7 +7,7 @@ import java.io.IOException;
+ import java.io.StringWriter;
+ import org.junit.jupiter.api.Test;
+ 
+-class TextFormatUtilTest {
++final class TextFormatUtilTest {
+ 
+   @Test
+   void writeEscapedLabelValue() throws IOException {
 --- a/prometheus-metrics-instrumentation-caffeine/src/main/java/io/prometheus/metrics/instrumentation/caffeine/CacheMetricsCollector.java
 +++ b/prometheus-metrics-instrumentation-caffeine/src/main/java/io/prometheus/metrics/instrumentation/caffeine/CacheMetricsCollector.java
-@@ -1,9 +1,12 @@
+@@ -1,10 +1,14 @@
  package io.prometheus.metrics.instrumentation.caffeine;
  
++import static com.google.common.collect.ImmutableList.toImmutableList;
 +import static java.util.Collections.unmodifiableList;
 +
  import com.github.benmanes.caffeine.cache.AsyncCache;
  import com.github.benmanes.caffeine.cache.Cache;
  import com.github.benmanes.caffeine.cache.LoadingCache;
+ import com.github.benmanes.caffeine.cache.Policy;
  import com.github.benmanes.caffeine.cache.stats.CacheStats;
 +import com.google.common.collect.ImmutableList;
  import io.prometheus.metrics.model.registry.MultiCollector;
  import io.prometheus.metrics.model.snapshots.CounterSnapshot;
  import io.prometheus.metrics.model.snapshots.GaugeSnapshot;
-@@ -11,7 +14,6 @@ import io.prometheus.metrics.model.snapshots.Labels;
+@@ -12,13 +16,11 @@ import io.prometheus.metrics.model.snapshots.Labels;
  import io.prometheus.metrics.model.snapshots.MetricSnapshots;
  import io.prometheus.metrics.model.snapshots.SummarySnapshot;
  import java.util.Arrays;
 -import java.util.Collections;
  import java.util.List;
  import java.util.Map;
+ import java.util.Optional;
  import java.util.concurrent.ConcurrentHashMap;
-@@ -67,7 +69,7 @@ public class CacheMetricsCollector implements MultiCollector {
+ import java.util.concurrent.ConcurrentMap;
+-import java.util.stream.Collectors;
+ 
+ /**
+  * Collect metrics from Caffeine's com.github.benmanes.caffeine.cache.Cache.
+@@ -71,7 +73,7 @@ public class CacheMetricsCollector implements MultiCollector {
        "caffeine_cache_load_duration_seconds";
  
    private static final List<String> ALL_METRIC_NAMES =
@@ -5504,7 +5608,7 @@
            Arrays.asList(
                METRIC_NAME_CACHE_HIT,
                METRIC_NAME_CACHE_MISS,
-@@ -168,7 +170,7 @@ public class CacheMetricsCollector implements MultiCollector {
+@@ -210,7 +212,7 @@ public class CacheMetricsCollector implements MultiCollector {
              .help("Cache load duration: both success and failures");
  
      for (final Map.Entry<String, Cache<?, ?>> c : children.entrySet()) {
@@ -5513,22 +5617,51 @@
        final Labels labels = Labels.of(labelNames, cacheName);
  
        final CacheStats stats = c.getValue().stats();
+@@ -318,7 +320,7 @@ public class CacheMetricsCollector implements MultiCollector {
+     if (!collectWeightedSize) {
+       return ALL_METRIC_NAMES.stream()
+           .filter(s -> !METRIC_NAME_CACHE_WEIGHTED_SIZE.equals(s))
+-          .collect(Collectors.toList());
++          .collect(toImmutableList());
+     }
+     return ALL_METRIC_NAMES;
+   }
 --- a/prometheus-metrics-instrumentation-caffeine/src/test/java/io/prometheus/metrics/instrumentation/caffeine/CacheMetricsCollectorTest.java
 +++ b/prometheus-metrics-instrumentation-caffeine/src/test/java/io/prometheus/metrics/instrumentation/caffeine/CacheMetricsCollectorTest.java
-@@ -24,10 +24,10 @@ import java.util.List;
- import org.junit.jupiter.api.Test;
+@@ -27,7 +27,7 @@ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.EnumSource;
  
  @SuppressWarnings("CheckReturnValue")
 -class CacheMetricsCollectorTest {
 +final class CacheMetricsCollectorTest {
+   // This enum was added to simplify test parametrization on argument options.
+   public enum Options {
+     LEGACY(false, false),
+@@ -44,9 +44,9 @@ class CacheMetricsCollectorTest {
+     }
+   }
  
-   @Test
--  public void cacheExposesMetricsForHitMissAndEviction() {
-+  void cacheExposesMetricsForHitMissAndEviction() {
+-  @ParameterizedTest
+   @EnumSource
+-  public void cacheExposesMetricsForHitMissAndEviction(Options options) {
++  @ParameterizedTest
++  void cacheExposesMetricsForHitMissAndEviction(Options options) {
      // Run cleanup in same thread, to remove async behavior with evictions
      final Cache<String, String> cache =
          Caffeine.newBuilder().maximumSize(2).recordStats().executor(Runnable::run).build();
-@@ -79,8 +79,8 @@ class CacheMetricsCollectorTest {
+@@ -117,9 +117,9 @@ caffeine_cache_eviction_weight{cache="users"} 2.0
+     assertThat(convertToOpenMetricsFormat(registry)).isEqualTo(expected);
+   }
+ 
+-  @ParameterizedTest
+   @EnumSource
+-  public void weightedCacheExposesMetricsForHitMissAndEvictionWeightedSize(Options options) {
++  @ParameterizedTest
++  void weightedCacheExposesMetricsForHitMissAndEvictionWeightedSize(Options options) {
+     // Run cleanup in same thread, to remove async behavior with evictions
+     final Cache<String, String> cache =
+         Caffeine.newBuilder()
+@@ -209,8 +209,8 @@ caffeine_cache_eviction_weight{cache="users"} 31.0
  
    @SuppressWarnings("unchecked")
    @Test
@@ -5539,7 +5672,7 @@
      when(loader.load(anyString()))
          .thenReturn("First User")
          .thenThrow(new RuntimeException("Seconds time fails"))
-@@ -114,11 +114,11 @@ class CacheMetricsCollectorTest {
+@@ -244,12 +244,12 @@ caffeine_cache_eviction_weight{cache="users"} 31.0
              getDataPointSnapshot(registry, "caffeine_cache_load_duration_seconds", "loadingusers");
  
      assertThat(loadDuration.getCount()).isEqualTo(3);
@@ -5547,21 +5680,26 @@
 +    assertThat(loadDuration.getSum()).isPositive();
    }
  
-   @Test
--  public void getPrometheusNamesHasSameSizeAsMetricSizeWhenScraping() {
-+  void getPrometheusNamesHasSameSizeAsMetricSizeWhenScraping() {
-     final CacheMetricsCollector collector = new CacheMetricsCollector();
- 
-     final PrometheusRegistry registry = new PrometheusRegistry();
-@@ -131,7 +131,7 @@ class CacheMetricsCollectorTest {
+-  @ParameterizedTest
+   @EnumSource
+-  public void getPrometheusNamesHasSameSizeAsMetricSizeWhenScraping(Options options) {
++  @ParameterizedTest
++  void getPrometheusNamesHasSameSizeAsMetricSizeWhenScraping(Options options) {
+     final CacheMetricsCollector collector =
+         CacheMetricsCollector.builder()
+             .collectEvictionWeightAsCounter(options.collectEvictionWeightAsCounter)
+@@ -265,9 +265,9 @@ caffeine_cache_eviction_weight{cache="users"} 31.0
+     assertThat(prometheusNames).hasSize(metricSnapshots.size());
    }
  
-   @Test
--  public void collectedMetricNamesAreKnownPrometheusNames() {
-+  void collectedMetricNamesAreKnownPrometheusNames() {
-     final CacheMetricsCollector collector = new CacheMetricsCollector();
- 
-     final PrometheusRegistry registry = new PrometheusRegistry();
+-  @ParameterizedTest
+   @EnumSource
+-  public void collectedMetricNamesAreKnownPrometheusNames(Options options) {
++  @ParameterizedTest
++  void collectedMetricNamesAreKnownPrometheusNames(Options options) {
+     final CacheMetricsCollector collector =
+         CacheMetricsCollector.builder()
+             .collectEvictionWeightAsCounter(options.collectEvictionWeightAsCounter)
 --- a/prometheus-metrics-instrumentation-dropwizard/src/main/java/io/prometheus/metrics/instrumentation/dropwizard/DropwizardExports.java
 +++ b/prometheus-metrics-instrumentation-dropwizard/src/main/java/io/prometheus/metrics/instrumentation/dropwizard/DropwizardExports.java
 @@ -1,5 +1,7 @@
@@ -5577,18 +5715,18 @@
  import com.codahale.metrics.Snapshot;
  import com.codahale.metrics.Timer;
 +import com.google.common.collect.ImmutableList;
+ import io.prometheus.metrics.instrumentation.dropwizard5.InvalidMetricHandler;
  import io.prometheus.metrics.instrumentation.dropwizard5.labels.CustomLabelMapper;
  import io.prometheus.metrics.model.registry.MultiCollector;
- import io.prometheus.metrics.model.registry.PrometheusRegistry;
-@@ -20,7 +23,6 @@ import io.prometheus.metrics.model.snapshots.MetricSnapshots;
+@@ -21,7 +24,6 @@ import io.prometheus.metrics.model.snapshots.MetricSnapshots;
  import io.prometheus.metrics.model.snapshots.PrometheusNaming;
  import io.prometheus.metrics.model.snapshots.Quantiles;
  import io.prometheus.metrics.model.snapshots.SummarySnapshot;
 -import java.util.Collections;
+ import java.util.Map;
  import java.util.Optional;
  import java.util.concurrent.TimeUnit;
- import java.util.logging.Level;
-@@ -28,7 +30,7 @@ import java.util.logging.Logger;
+@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  
  /** Collect Dropwizard metrics from a MetricRegistry. */
  public class DropwizardExports implements MultiCollector {
@@ -5597,7 +5735,7 @@
    private final MetricRegistry registry;
    private final MetricFilter metricFilter;
    private final Optional<CustomLabelMapper> labelMapper;
-@@ -76,7 +78,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -99,7 +101,8 @@ public class DropwizardExports implements MultiCollector {
    }
  
    private MetricMetadata getMetricMetaData(String metricName, Metric metric) {
@@ -5607,7 +5745,7 @@
      return new MetricMetadata(
          PrometheusNaming.sanitizeMetricName(name), getHelpMessage(metricName, metric));
    }
-@@ -93,9 +96,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -116,9 +119,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5619,7 +5757,7 @@
    }
  
    /** Export gauge as a prometheus gauge. */
-@@ -107,7 +109,7 @@ public class DropwizardExports implements MultiCollector {
+@@ -130,7 +132,7 @@ public class DropwizardExports implements MultiCollector {
      } else if (obj instanceof Boolean) {
        value = ((Boolean) obj) ? 1 : 0;
      } else {
@@ -5628,7 +5766,7 @@
            Level.FINE,
            String.format(
                "Invalid type for Gauge %s: %s",
-@@ -121,9 +123,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -144,9 +146,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5640,7 +5778,18 @@
    }
  
    /**
-@@ -153,9 +154,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -170,7 +171,9 @@ public class DropwizardExports implements MultiCollector {
+             .build();
+ 
+     String name =
+-        labelMapper.isPresent() ? labelMapper.get().getName(dropwizardName) : dropwizardName;
++        labelMapper.isPresent()
++            ? labelMapper.orElseThrow().getName(dropwizardName)
++            : dropwizardName;
+     MetricMetadata metadata =
+         new MetricMetadata(PrometheusNaming.sanitizeMetricName(name), helpMessage);
+     SummarySnapshot.SummaryDataPointSnapshot.Builder dataPointBuilder =
+@@ -178,9 +181,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5652,7 +5801,7 @@
    }
  
    /** Convert histogram snapshot. */
-@@ -186,9 +186,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -211,9 +213,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5664,7 +5813,7 @@
    }
  
    @Override
-@@ -252,9 +251,7 @@ public class DropwizardExports implements MultiCollector {
+@@ -283,9 +284,7 @@ public class DropwizardExports implements MultiCollector {
      }
  
      DropwizardExports build() {
@@ -5672,9 +5821,9 @@
 -        throw new IllegalArgumentException("MetricRegistry must be set");
 -      }
 +      checkArgument(registry != null, "MetricRegistry must be set");
-       if (labelMapper == null) {
-         return new DropwizardExports(registry, metricFilter);
-       } else {
+       return new DropwizardExports(registry, metricFilter, labelMapper, invalidMetricHandler);
+     }
+ 
 --- a/prometheus-metrics-instrumentation-dropwizard/src/test/java/io/prometheus/metrics/instrumentation/dropwizard/DropwizardExportsTest.java
 +++ b/prometheus-metrics-instrumentation-dropwizard/src/test/java/io/prometheus/metrics/instrumentation/dropwizard/DropwizardExportsTest.java
 @@ -1,5 +1,6 @@
@@ -5684,7 +5833,7 @@
  import static org.assertj.core.api.Assertions.assertThat;
  import static org.assertj.core.api.Assertions.assertThatCode;
  import static org.assertj.core.api.Assertions.assertThatThrownBy;
-@@ -10,18 +11,17 @@ import io.prometheus.metrics.model.registry.PrometheusRegistry;
+@@ -11,18 +12,17 @@ import io.prometheus.metrics.model.registry.PrometheusRegistry;
  import io.prometheus.metrics.model.snapshots.SummarySnapshot;
  import java.io.ByteArrayOutputStream;
  import java.io.IOException;
@@ -5705,7 +5854,7 @@
      metricRegistry = new MetricRegistry();
      DropwizardExports.builder()
          .dropwizardRegistry(metricRegistry)
-@@ -30,21 +30,21 @@ class DropwizardExportsTest {
+@@ -31,21 +31,21 @@ class DropwizardExportsTest {
    }
  
    @Test
@@ -5729,8 +5878,8 @@
 +  void counter() {
      metricRegistry.counter("foo.bar").inc(1);
      String expected =
-         """
-@@ -58,7 +58,7 @@ class DropwizardExportsTest {
+ """
+@@ -59,7 +59,7 @@ foo_bar_total 1.0
    }
  
    @Test
@@ -5739,7 +5888,7 @@
      // don't convert to lambda, as we need to test the type
      Gauge<Integer> integerGauge =
          new Gauge<Integer>() {
-@@ -126,7 +126,7 @@ class DropwizardExportsTest {
+@@ -127,7 +127,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -5748,7 +5897,7 @@
      Gauge<String> invalidGauge = () -> "foobar";
  
      metricRegistry.register("invalid_gauge", invalidGauge);
-@@ -136,7 +136,7 @@ class DropwizardExportsTest {
+@@ -137,7 +137,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -5757,7 +5906,7 @@
      Gauge<String> invalidGauge = () -> null;
      metricRegistry.register("invalid_gauge", invalidGauge);
      String expected = "# EOF\n";
-@@ -144,7 +144,7 @@ class DropwizardExportsTest {
+@@ -145,7 +145,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -5766,7 +5915,7 @@
      // just test the standard mapper
      final MetricRegistry metricRegistry = new MetricRegistry();
      PrometheusRegistry pmRegistry = new PrometheusRegistry();
-@@ -197,7 +197,7 @@ class DropwizardExportsTest {
+@@ -198,7 +198,7 @@ hist_count 100
    }
  
    @Test
@@ -5775,7 +5924,7 @@
      Meter meter = metricRegistry.meter("meter");
      meter.mark();
      meter.mark();
-@@ -213,7 +213,7 @@ class DropwizardExportsTest {
+@@ -214,7 +214,7 @@ meter_total 2.0
    }
  
    @Test
@@ -5784,7 +5933,7 @@
      final MetricRegistry metricRegistry = new MetricRegistry();
      DropwizardExports exports = new DropwizardExports(metricRegistry);
      Timer t = metricRegistry.timer("timer");
-@@ -232,12 +232,12 @@ class DropwizardExportsTest {
+@@ -233,12 +233,12 @@ meter_total 2.0
                dataPointSnapshot
                    .getQuantiles()
                    .forEach(i -> assertThat(i.getValue()).isGreaterThan(timeSpentMillis / 1000d));
@@ -5799,7 +5948,7 @@
      metricRegistry.timer("my.application.namedTimer1");
      metricRegistry.counter("my.application.namedCounter1");
      metricRegistry.meter("my.application.namedMeter1");
-@@ -290,7 +290,7 @@ class DropwizardExportsTest {
+@@ -341,7 +341,7 @@ my_application_namedCounter2_total 10.0
      OpenMetricsTextFormatWriter writer = new OpenMetricsTextFormatWriter(true, true);
      try {
        writer.write(out, _registry.scrape());
@@ -5827,7 +5976,7 @@
  import java.util.Map;
  import java.util.Optional;
  import java.util.concurrent.TimeUnit;
-@@ -30,7 +32,7 @@ import java.util.logging.Logger;
+@@ -31,7 +33,7 @@ import java.util.logging.Logger;
  
  /** Collect Dropwizard metrics from a MetricRegistry. */
  public class DropwizardExports implements MultiCollector {
@@ -5836,7 +5985,7 @@
    private final MetricRegistry registry;
    private final MetricFilter metricFilter;
    private final Optional<CustomLabelMapper> labelMapper;
-@@ -78,7 +80,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -99,7 +101,8 @@ public class DropwizardExports implements MultiCollector {
    }
  
    private MetricMetadata getMetricMetaData(String metricName, Metric metric) {
@@ -5846,7 +5995,7 @@
      return new MetricMetadata(
          PrometheusNaming.sanitizeMetricName(name), getHelpMessage(metricName, metric));
    }
-@@ -95,9 +98,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -116,9 +119,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5858,7 +6007,7 @@
    }
  
    /** Export gauge as a prometheus gauge. */
-@@ -109,7 +111,7 @@ public class DropwizardExports implements MultiCollector {
+@@ -130,7 +132,7 @@ public class DropwizardExports implements MultiCollector {
      } else if (obj instanceof Boolean) {
        value = ((Boolean) obj) ? 1 : 0;
      } else {
@@ -5867,7 +6016,7 @@
            Level.FINE,
            String.format(
                "Invalid type for Gauge %s: %s",
-@@ -123,9 +125,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -144,9 +146,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5879,7 +6028,18 @@
    }
  
    /**
-@@ -155,9 +156,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -170,7 +171,9 @@ public class DropwizardExports implements MultiCollector {
+             .build();
+ 
+     String name =
+-        labelMapper.isPresent() ? labelMapper.get().getName(dropwizardName) : dropwizardName;
++        labelMapper.isPresent()
++            ? labelMapper.orElseThrow().getName(dropwizardName)
++            : dropwizardName;
+     MetricMetadata metadata =
+         new MetricMetadata(PrometheusNaming.sanitizeMetricName(name), helpMessage);
+     SummarySnapshot.SummaryDataPointSnapshot.Builder dataPointBuilder =
+@@ -178,9 +181,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5891,7 +6051,7 @@
    }
  
    /** Convert histogram snapshot. */
-@@ -188,9 +188,8 @@ public class DropwizardExports implements MultiCollector {
+@@ -211,9 +213,8 @@ public class DropwizardExports implements MultiCollector {
      labelMapper.ifPresent(
          mapper ->
              dataPointBuilder.labels(
@@ -5903,7 +6063,7 @@
    }
  
    @Override
-@@ -246,9 +245,7 @@ public class DropwizardExports implements MultiCollector {
+@@ -283,9 +284,7 @@ public class DropwizardExports implements MultiCollector {
      }
  
      DropwizardExports build() {
@@ -5911,9 +6071,9 @@
 -        throw new IllegalArgumentException("MetricRegistry must be set");
 -      }
 +      checkArgument(registry != null, "MetricRegistry must be set");
-       if (labelMapper == null) {
-         return new DropwizardExports(registry, metricFilter);
-       } else {
+       return new DropwizardExports(registry, metricFilter, labelMapper, invalidMetricHandler);
+     }
+ 
 --- a/prometheus-metrics-instrumentation-dropwizard5/src/main/java/io/prometheus/metrics/instrumentation/dropwizard5/labels/CustomLabelMapper.java
 +++ b/prometheus-metrics-instrumentation-dropwizard5/src/main/java/io/prometheus/metrics/instrumentation/dropwizard5/labels/CustomLabelMapper.java
 @@ -1,5 +1,7 @@
@@ -6046,7 +6206,7 @@
  }
 --- a/prometheus-metrics-instrumentation-dropwizard5/src/test/java/io/prometheus/metrics/instrumentation/dropwizard5/DropwizardExportsTest.java
 +++ b/prometheus-metrics-instrumentation-dropwizard5/src/test/java/io/prometheus/metrics/instrumentation/dropwizard5/DropwizardExportsTest.java
-@@ -16,19 +16,19 @@ import java.util.concurrent.TimeUnit;
+@@ -17,19 +17,19 @@ import java.util.concurrent.TimeUnit;
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;
  
@@ -6068,8 +6228,8 @@
 +  void counter() {
      metricRegistry.counter("foo.bar").inc(1);
      String expected =
-         "# TYPE foo_bar counter\n"
-@@ -40,7 +40,7 @@ class DropwizardExportsTest {
+ """
+@@ -43,7 +43,7 @@ foo_bar_total 1.0
    }
  
    @Test
@@ -6078,7 +6238,7 @@
      // don't convert to lambda, as we need to test the type
      Gauge<Integer> integerGauge =
          new Gauge<Integer>() {
-@@ -106,7 +106,7 @@ class DropwizardExportsTest {
+@@ -111,7 +111,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -6087,7 +6247,7 @@
      Gauge<String> invalidGauge = () -> "foobar";
  
      metricRegistry.register("invalid_gauge", invalidGauge);
-@@ -116,7 +116,7 @@ class DropwizardExportsTest {
+@@ -121,7 +121,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -6096,7 +6256,7 @@
      Gauge<String> invalidGauge = () -> null;
      metricRegistry.register("invalid_gauge", invalidGauge);
      String expected = "# EOF\n";
-@@ -124,7 +124,7 @@ class DropwizardExportsTest {
+@@ -129,7 +129,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -6105,7 +6265,7 @@
      // just test the standard mapper
      final MetricRegistry metricRegistry = new MetricRegistry();
      PrometheusRegistry pmRegistry = new PrometheusRegistry();
-@@ -169,13 +169,13 @@ class DropwizardExportsTest {
+@@ -174,14 +174,14 @@ long_gauge 1234.0
      // The following asserts the values, but allows an error of 1.0 for quantile values.
  
      MetricSnapshots snapshots = pmRegistry.scrape(name -> name.equals("hist"));
@@ -6115,13 +6275,14 @@
      assertThat(snapshot.getMetadata().getName()).isEqualTo("hist");
      assertThat(snapshot.getMetadata().getHelp())
          .isEqualTo(
-             "Generated from Dropwizard metric import (metric=hist, type=io.dropwizard.metrics5.Histogram)");
+             "Generated from Dropwizard metric import (metric=hist,"
+                 + " type=io.dropwizard.metrics5.Histogram)");
 -    assertThat(snapshot.getDataPoints().size()).isOne();
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
      SummarySnapshot.SummaryDataPointSnapshot dataPoint = snapshot.getDataPoints().get(0);
      assertThat(dataPoint.hasCount()).isTrue();
      assertThat(dataPoint.getCount()).isEqualTo(100);
-@@ -197,7 +197,7 @@ class DropwizardExportsTest {
+@@ -203,7 +203,7 @@ long_gauge 1234.0
    }
  
    @Test
@@ -6130,7 +6291,7 @@
      Meter meter = metricRegistry.meter("meter");
      meter.mark();
      meter.mark();
-@@ -211,7 +211,7 @@ class DropwizardExportsTest {
+@@ -219,7 +219,7 @@ meter_total 2.0
    }
  
    @Test
@@ -6139,7 +6300,7 @@
      final MetricRegistry metricRegistry = new MetricRegistry();
      DropwizardExports exports = new DropwizardExports(metricRegistry);
      Timer t = metricRegistry.timer("timer");
-@@ -233,11 +233,11 @@ class DropwizardExportsTest {
+@@ -241,11 +241,11 @@ meter_total 2.0
                System.out.println(i.getQuantile() + " : " + i.getValue());
                assertThat(i.getValue()).isGreaterThan(timeSpentMillis / 1000d);
              });
@@ -6195,7 +6356,7 @@
      final List<MapperConfig> mapperConfigs =
          Arrays.asList(
              new MapperConfig("client-nope.*.*.*"),
-@@ -53,7 +54,7 @@ class CustomLabelMapperTest {
+@@ -55,7 +56,7 @@ app_okhttpclient_client_HttpClient_service_total 1.0
    }
  
    @Test
@@ -6204,7 +6365,7 @@
      final Map<String, String> labels = new HashMap<String, String>();
      labels.put("service", "${0}");
      final MapperConfig mapperConfig =
-@@ -81,7 +82,7 @@ class CustomLabelMapperTest {
+@@ -85,7 +86,7 @@ app_okhttpclient_client_HttpClient_total{service="greatService"} 1.0
    }
  
    @Test
@@ -6213,7 +6374,7 @@
      final Map<String, String> labels = new HashMap<>();
      labels.put("service", "${0}");
      final MapperConfig mapperConfig =
-@@ -110,7 +111,7 @@ class CustomLabelMapperTest {
+@@ -116,7 +117,7 @@ app_okhttpclient_client_HttpClient_total{service="greatService"} 1.0
    }
  
    @Test
@@ -6222,7 +6383,7 @@
      final Map<String, String> labels = new LinkedHashMap<>();
      labels.put("service", "${0}");
      labels.put("status", "${1}");
-@@ -145,7 +146,7 @@ class CustomLabelMapperTest {
+@@ -153,7 +154,7 @@ app_okhttpclient_client_HttpClient_total{service="greatService",status="400"} 1.
    }
  
    @Test
@@ -6231,7 +6392,7 @@
      final Map<String, String> labels = new LinkedHashMap<>();
      labels.put("service", "${0}_${1}");
      labels.put("status", "s_${1}");
-@@ -176,7 +177,7 @@ class CustomLabelMapperTest {
+@@ -186,7 +187,7 @@ app_okhttpclient_client_HttpClient_greatService_total{service="greatService_400"
    }
  
    @Test
@@ -6523,7 +6684,7 @@
      final Cache<String, String> cache =
          CacheBuilder.newBuilder().maximumSize(2).recordStats().build();
  
-@@ -74,8 +74,8 @@ class CacheMetricsCollectorTest {
+@@ -76,8 +76,8 @@ class CacheMetricsCollectorTest {
  
    @SuppressWarnings("unchecked")
    @Test
@@ -6534,7 +6695,7 @@
      when(loader.load(anyString()))
          .thenReturn("First User")
          .thenThrow(new RuntimeException("Seconds time fails"))
-@@ -109,11 +109,11 @@ class CacheMetricsCollectorTest {
+@@ -111,11 +111,11 @@ class CacheMetricsCollectorTest {
              getDataPointSnapshot(registry, "guava_cache_load_duration_seconds", "loadingusers");
  
      assertThat(loadDuration.getCount()).isEqualTo(3);
@@ -6548,7 +6709,7 @@
      final CacheMetricsCollector collector = new CacheMetricsCollector();
  
      final PrometheusRegistry registry = new PrometheusRegistry();
-@@ -126,7 +126,7 @@ class CacheMetricsCollectorTest {
+@@ -128,7 +128,7 @@ class CacheMetricsCollectorTest {
    }
  
    @Test
@@ -6657,7 +6818,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      JvmBufferPoolMetrics.builder()
          .bufferPoolBeans(Arrays.asList(mappedBuffer, directBuffer))
-@@ -62,7 +62,7 @@ class JvmBufferPoolMetricsTest {
+@@ -64,7 +64,7 @@ class JvmBufferPoolMetricsTest {
    }
  
    @Test
@@ -6666,7 +6827,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder().nameMustNotBeEqualTo("jvm_buffer_pool_used_bytes").build();
  
-@@ -72,9 +72,9 @@ class JvmBufferPoolMetricsTest {
+@@ -74,9 +74,9 @@ class JvmBufferPoolMetricsTest {
          .register(registry);
      registry.scrape(filter);
  
@@ -6718,7 +6879,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      JvmClassLoadingMetrics.builder().classLoadingBean(mockClassLoadingBean).register(registry);
      MetricSnapshots snapshots = registry.scrape();
-@@ -48,7 +48,7 @@ class JvmClassLoadingMetricsTest {
+@@ -50,7 +50,7 @@ jvm_classes_unloaded_total 500.0
    }
  
    @Test
@@ -6727,7 +6888,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder().nameMustNotBeEqualTo("jvm_classes_currently_loaded").build();
  
-@@ -56,7 +56,7 @@ class JvmClassLoadingMetricsTest {
+@@ -58,7 +58,7 @@ jvm_classes_unloaded_total 500.0
      JvmClassLoadingMetrics.builder().classLoadingBean(mockClassLoadingBean).register(registry);
      registry.scrape(filter);
  
@@ -6772,7 +6933,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      JvmCompilationMetrics.builder().compilationBean(mockCompilationBean).register(registry);
      MetricSnapshots snapshots = registry.scrape();
-@@ -42,7 +42,7 @@ class JvmCompilationMetricsTest {
+@@ -44,7 +44,7 @@ jvm_compilation_time_seconds_total 10.0
    }
  
    @Test
@@ -6781,7 +6942,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder()
              .nameMustNotBeEqualTo("jvm_compilation_time_seconds_total")
-@@ -53,6 +53,6 @@ class JvmCompilationMetricsTest {
+@@ -55,6 +55,6 @@ jvm_compilation_time_seconds_total 10.0
      MetricSnapshots snapshots = registry.scrape(filter);
  
      verify(mockCompilationBean, times(0)).getTotalCompilationTime();
@@ -6830,7 +6991,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      JvmGarbageCollectorMetrics.builder()
          .garbageCollectorBeans(Arrays.asList(mockGcBean1, mockGcBean2))
-@@ -54,7 +54,7 @@ class JvmGarbageCollectorMetricsTest {
+@@ -56,7 +56,7 @@ class JvmGarbageCollectorMetricsTest {
    }
  
    @Test
@@ -6839,7 +7000,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder().nameMustNotBeEqualTo("jvm_gc_collection_seconds").build();
  
-@@ -64,8 +64,8 @@ class JvmGarbageCollectorMetricsTest {
+@@ -66,8 +66,8 @@ class JvmGarbageCollectorMetricsTest {
          .register(registry);
      MetricSnapshots snapshots = registry.scrape(filter);
  
@@ -6906,7 +7067,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      JvmMemoryMetrics.builder()
          .withMemoryBean(mockMemoryBean)
-@@ -157,7 +157,7 @@ class JvmMemoryMetricsTest {
+@@ -159,7 +159,7 @@ jvm_memory_used_bytes{area="nonheap"} 6.0
    }
  
    @Test
@@ -6915,7 +7076,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder().nameMustNotBeEqualTo("jvm_memory_pool_used_bytes").build();
  
-@@ -168,9 +168,9 @@ class JvmMemoryMetricsTest {
+@@ -170,9 +170,9 @@ jvm_memory_used_bytes{area="nonheap"} 6.0
          .register(registry);
      registry.scrape(filter);
  
@@ -7059,7 +7220,7 @@
 +    JvmNativeMemoryMetrics.PlatformMBeanServerAdapter adapter = mock();
      when(adapter.vmNativeMemorySummaryInBytes())
          .thenReturn(
-             "Native Memory Tracking:\n"
+             """
 --- a/prometheus-metrics-instrumentation-jvm/src/test/java/io/prometheus/metrics/instrumentation/jvm/JvmRuntimeInfoMetricTest.java
 +++ b/prometheus-metrics-instrumentation-jvm/src/test/java/io/prometheus/metrics/instrumentation/jvm/JvmRuntimeInfoMetricTest.java
 @@ -8,10 +8,10 @@ import io.prometheus.metrics.model.snapshots.MetricSnapshots;
@@ -7120,7 +7281,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      JvmThreadsMetrics.builder().threadBean(mockThreadsBean).isNativeImage(false).register(registry);
      MetricSnapshots snapshots = registry.scrape();
-@@ -87,7 +87,7 @@ class JvmThreadsMetricsTest {
+@@ -89,7 +89,7 @@ jvm_threads_state{state="WAITING"} 0.0
    }
  
    @Test
@@ -7129,7 +7290,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder().nameMustNotBeEqualTo("jvm_threads_deadlocked").build();
  
-@@ -95,12 +95,12 @@ class JvmThreadsMetricsTest {
+@@ -97,12 +97,12 @@ jvm_threads_state{state="WAITING"} 0.0
      JvmThreadsMetrics.builder().threadBean(mockThreadsBean).isNativeImage(false).register(registry);
      registry.scrape(filter);
  
@@ -7194,7 +7355,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      ProcessMetrics.builder()
          .osBean(sunOsBean)
-@@ -89,7 +87,7 @@ class ProcessMetricsTest {
+@@ -97,7 +95,7 @@ class ProcessMetricsTest {
    }
  
    @Test
@@ -7203,7 +7364,7 @@
      PrometheusRegistry registry = new PrometheusRegistry();
      ProcessMetrics.builder()
          .osBean(javaOsBean)
-@@ -109,7 +107,7 @@ class ProcessMetricsTest {
+@@ -119,7 +117,7 @@ class ProcessMetricsTest {
    }
  
    @Test
@@ -7212,7 +7373,7 @@
      MetricNameFilter filter =
          MetricNameFilter.builder().nameMustNotBeEqualTo("process_max_fds").build();
  
-@@ -121,7 +119,7 @@ class ProcessMetricsTest {
+@@ -131,7 +129,7 @@ class ProcessMetricsTest {
          .register(registry);
      registry.scrape(filter);
  
@@ -9026,35 +9187,35 @@
      long scrapeTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
      long exemplarTimestamp = System.currentTimeMillis();
 @@ -115,7 +115,7 @@ class HistogramSnapshotTest {
-           break;
-         case 2:
+         }
+         case 2 -> {
            assertThat(bucket.getUpperBound()).isEqualTo(Double.POSITIVE_INFINITY);
 -          assertThat(bucket.getCount()).isZero();
 +          assertThat(bucket.getCount()).isEqualTo(0);
-           break;
+         }
        }
      }
 @@ -129,7 +129,7 @@ class HistogramSnapshotTest {
      for (NativeHistogramBucket bucket : data.getNativeBucketsForPositiveValues()) {
        switch (i++) {
-         case 0:
+         case 0 -> {
 -          assertThat(bucket.getBucketIndex()).isOne();
 +          assertThat(bucket.getBucketIndex()).isEqualTo(1);
            assertThat(bucket.getCount()).isEqualTo(12);
-           break;
-         case 1:
+         }
+         case 1 -> {
 @@ -149,10 +149,10 @@ class HistogramSnapshotTest {
        switch (i++) {
-         case 0:
+         case 0 -> {
            assertThat(bucket.getBucketIndex()).isEqualTo(-1);
 -          assertThat(bucket.getCount()).isOne();
 +          assertThat(bucket.getCount()).isEqualTo(1);
-           break;
-         case 1:
+         }
+         case 1 -> {
 -          assertThat(bucket.getBucketIndex()).isZero();
 +          assertThat(bucket.getBucketIndex()).isEqualTo(0);
            assertThat(bucket.getCount()).isEqualTo(2);
-           break;
+         }
        }
 @@ -165,23 +165,23 @@ class HistogramSnapshotTest {
      // native histogram 2 (it's ok that this is incomplete, because we covered it with the other
