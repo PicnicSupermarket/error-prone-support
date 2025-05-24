@@ -47,15 +47,11 @@ jobs:
           maven-version: 3.9.9
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn -T1C install javadoc:jar
-      - name: Build project with self-check against Error Prone fork
-        run: mvn -T1C clean verify -Perror-prone-fork -Pself-check -s settings.xml
+      # Note that the `-D` argument is quoted for compatibility with the
+      # Windows build.
+      - name: Build project with self-check against Error Prone fork, test using the targeted JDK
+        run: mvn -T1C clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # The build requires a more recent JDK than the oldest JDK supported. We
-      # rerun the unit tests using the latter JDK to validate compatibility.
-      # Note that the `-D` arguments are quoted for compatibility with the
-      # Windows build.
-      - name: Test project using the targeted JDK against vanilla Error Prone
-        run: mvn -T1C test '-Dverification.skip' '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
