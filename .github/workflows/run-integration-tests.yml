@@ -15,7 +15,7 @@ on:
   issue_comment:
     types: [ created ]
   push:
-    branches: [ master, sschroevers/also-run-integration-tests-on-master ]
+    branches: [ master ]
 permissions:
   contents: read
 jobs:
@@ -58,7 +58,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          checkout-ref: ${{ !github.event.issue.pull_request && format('refs/pull/{0}/head', '1559') || github.ref }}
+          checkout-ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
           java-version: 17.0.13
           java-distribution: temurin
           maven-version: 3.9.9
