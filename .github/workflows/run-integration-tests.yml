@@ -1,5 +1,10 @@
-# If requested by means of a pull request comment, runs integration tests
-# against the project, using the code found on the pull request branch.
+# Runs integration tests against the project.
+# 
+# The tests run in the following scenrios:
+# - Any time code is pushed to the default branch.
+# - When a user leaves a pull request comment containing the string
+#   `/integration-test`.
+#
 # XXX: Review whether then build matrix should also vary JDK or OS versions.
 # XXX: Support `/integration-test [name...]` comment syntax to specify the
 # subset of integration tests to run.
@@ -9,13 +14,15 @@ name: "Integration tests"
 on:
   issue_comment:
     types: [ created ]
+  push:
+    branches: [ master, sschroevers/also-run-integration-tests-on-master ]
 permissions:
   contents: read
 jobs:
   run-integration-tests:
-    name: On-demand integration test
+    name: Integration test
     if: |
-      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+      !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -48,7 +55,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
+          checkout-ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
           java-version: 17.0.13
           java-distribution: temurin
           maven-version: 3.9.9
