@@ -1,5 +1,5 @@
 # Runs integration tests against the project.
-# 
+#
 # The tests run in the following scenrios:
 # - Any time code is pushed to the default branch.
 # - When a user leaves a pull request comment containing the string
@@ -26,7 +26,10 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        integration-test: [ "checkstyle", "metrics", "prometheus-java-client" ]
+        integration-test:
+          - checkstyle
+          - metrics
+          - prometheus-java-client
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
@@ -55,7 +58,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          checkout-ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
+          checkout-ref: ${{ !github.event.issue.pull_request && format('refs/pull/{0}/head', '1559') || github.ref }}
           java-version: 17.0.13
           java-distribution: temurin
           maven-version: 3.9.9
