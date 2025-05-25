@@ -187,7 +187,8 @@ rules][refaster-rules].
 ## 👷 Developing Error Prone Support
 
 This is a [Maven][maven] project, so running `mvn clean install` performs a
-full clean build and installs the library to your local Maven repository.
+full clean build and installs the library to your local Maven repository. While
+the project targets JDK 17, building it requires JDK 21.
 
 Once you've made changes, the build may fail due to a warning or error emitted
 by static code analysis. The flags and commands listed below allow you to
@@ -212,6 +213,10 @@ Relevant Maven build parameters:
   configured][github-packages-auth] `GITHUB_ACTOR` and `GITHUB_TOKEN`
   environment variables.
 - `-Pself-check` runs the checks defined by this project against itself.
+- `-Dsurefire.jdk-toolchain-version=some-version` uses [Maven
+  Toolchains][maven-toolchains] to run the unit tests with the specified
+  version of Java, provided that said version is specified in
+  `~/.m2/toolchains.xml`.
 
 Other highly relevant commands:
 
@@ -291,6 +296,7 @@ channel; please see our [security policy][security] for details.
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
 [maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
+[maven-toolchains]: https://maven.apache.org/guides/mini/guide-using-toolchains.html
 [openssf-best-practices-badge]: https://bestpractices.coreinfrastructure.org/projects/7199/badge
 [openssf-best-practices-checklist]: https://bestpractices.coreinfrastructure.org/projects/7199
 [openssf-scorecard-badge]: https://img.shields.io/ossf-scorecard/github.com/PicnicSupermarket/error-prone-support?label=openssf%20scorecard
