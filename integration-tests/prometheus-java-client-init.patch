@@ -1,36 +1,47 @@
 --- a/pom.xml
 +++ b/pom.xml
-@@ -128,7 +128,6 @@
-         <dependency>
-             <groupId>com.google.guava</groupId>
-             <artifactId>guava</artifactId>
--            <scope>test</scope>
-         </dependency>
-         <dependency>
-             <groupId>org.slf4j</groupId>
-@@ -370,13 +369,24 @@
-                             -Xep:LongDoubleConversion:OFF
-                             -Xep:StringSplitter:OFF
-                             -XepExcludedPaths:.*/generated/.*
-+                            ${error-prone.configuration-args}
-                         </arg>
-                     </compilerArgs>
-                     <annotationProcessorPaths>
-                         <path>
-                             <groupId>com.google.errorprone</groupId>
-                             <artifactId>error_prone_core</artifactId>
--                            <version>2.36.0</version>
-+                            <version>${error-prone.version}</version>
-+                        </path>
-+                        <path>
-+                            <groupId>tech.picnic.error-prone-support</groupId>
-+                            <artifactId>error-prone-contrib</artifactId>
-+                            <version>${error-prone-support.version}</version>
-+                        </path>
-+                        <path>
-+                            <groupId>tech.picnic.error-prone-support</groupId>
-+                            <artifactId>refaster-runner</artifactId>
-+                            <version>${error-prone-support.version}</version>
-                         </path>
-                         <!-- Other annotation processors go here.
+@@ -99,7 +99,6 @@
+       <groupId>com.google.guava</groupId>
+       <artifactId>guava</artifactId>
+       <version>${guava.version}</version>
+-      <scope>test</scope>
+     </dependency>
+     <dependency>
+       <groupId>org.slf4j</groupId>
+@@ -320,13 +319,24 @@
+               -Xep:LongDoubleConversion:OFF
+               -Xep:StringSplitter:OFF
+               -XepExcludedPaths:.*/generated/.*
++              ${error-prone.configuration-args}
+             </arg>
+           </compilerArgs>
+           <annotationProcessorPaths>
+             <path>
+               <groupId>com.google.errorprone</groupId>
+               <artifactId>error_prone_core</artifactId>
+-              <version>2.38.0</version>
++              <version>${error-prone.version}</version>
++            </path>
++            <path>
++              <groupId>tech.picnic.error-prone-support</groupId>
++              <artifactId>error-prone-contrib</artifactId>
++              <version>${error-prone-support.version}</version>
++            </path>
++            <path>
++              <groupId>tech.picnic.error-prone-support</groupId>
++              <artifactId>refaster-runner</artifactId>
++              <version>${error-prone-support.version}</version>
+             </path>
+             <!-- Other annotation processors go here.
  
+--- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
++++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
+@@ -27,6 +27,8 @@ import java.io.ByteArrayOutputStream;
+ import java.io.IOException;
+ import org.junit.jupiter.api.Test;
+ 
++// This class is extended by another test class.
++@SuppressWarnings("JUnitClassModifiers")
+ class ExpositionFormatsTest {
+ 
+   private final String exemplar1String =
