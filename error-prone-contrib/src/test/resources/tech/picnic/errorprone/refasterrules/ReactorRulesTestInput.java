@@ -639,6 +639,48 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(PublisherProbe.empty().wasRequested()).isFalse();
   }
 
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasSubscribed() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasSubscribed();
+    } else {
+      PublisherProbe.of(Mono.just(1)).assertWasNotSubscribed();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotSubscribed();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasSubscribed();
+    }
+  }
+
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasCancelled() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasCancelled();
+    } else {
+      PublisherProbe.of(Mono.just(1)).assertWasNotCancelled();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotCancelled();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasCancelled();
+    }
+  }
+
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasRequested() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasRequested();
+    } else {
+      PublisherProbe.of(Mono.just(1)).assertWasNotRequested();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotRequested();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasRequested();
+    }
+  }
+
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
     return ImmutableSet.of(
         StepVerifier.create(Mono.just(1)), Mono.just(2).flux().as(StepVerifier::create));

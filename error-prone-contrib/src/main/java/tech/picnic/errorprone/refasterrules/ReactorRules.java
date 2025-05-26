@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -43,6 +44,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -1891,6 +1893,69 @@ final class ReactorRules {
     @AfterTemplate
     void after(PublisherProbe<T> probe) {
       probe.assertWasNotRequested();
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasSubscribed() subscribed to}, over more verbose alternatives.
+   */
+  static final class AssertThatPublisherProbeWasSubscribed<T> {
+    @AlsoNegation
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasSubscribed) {
+      if (wasSubscribed) {
+        probe.assertWasSubscribed();
+      } else {
+        probe.assertWasNotSubscribed();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasSubscribed) {
+      assertThat(probe.wasSubscribed()).isEqualTo(wasSubscribed);
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasCancelled() cancelled}, over more verbose alternatives.
+   */
+  static final class AssertThatPublisherProbeWasCancelled<T> {
+    @AlsoNegation
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasCancelled) {
+      if (wasCancelled) {
+        probe.assertWasCancelled();
+      } else {
+        probe.assertWasNotCancelled();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasCancelled) {
+      assertThat(probe.wasCancelled()).isEqualTo(wasCancelled);
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasRequested() requested}, over more verbose alternatives.
+   */
+  static final class AssertThatPublisherProbeWasRequested<T> {
+    @AlsoNegation
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasRequested) {
+      if (wasRequested) {
+        probe.assertWasRequested();
+      } else {
+        probe.assertWasNotRequested();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasRequested) {
+      assertThat(probe.wasRequested()).isEqualTo(wasRequested);
     }
   }
 
