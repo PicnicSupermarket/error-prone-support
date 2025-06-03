@@ -4,12 +4,16 @@ import com.google.common.collect.Iterables;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import java.util.Collection;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractIterableAssert;
 import org.assertj.core.api.AbstractIterableSizeAssert;
+import org.assertj.core.api.Assert;
 import org.assertj.core.api.EnumerableAssert;
+import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 @OnlineDocumentation
 final class AssertJEnumerableRules {
@@ -17,11 +21,29 @@ final class AssertJEnumerableRules {
 
   static final class EnumerableAssertIsEmpty<E> {
     @BeforeTemplate
-    void before(EnumerableAssert<?, E> enumAssert) {
+    void before(
+        EnumerableAssert<?, E> enumAssert, @Matches(IsEmpty.class) Iterable<?> emptyIterable) {
       Refaster.anyOf(
           enumAssert.hasSize(0),
           enumAssert.hasSizeLessThanOrEqualTo(0),
-          enumAssert.hasSizeLessThan(1));
+          enumAssert.hasSizeLessThan(1),
+          enumAssert.hasSameSizeAs(emptyIterable));
+    }
+
+    @BeforeTemplate
+    @SuppressWarnings("unchecked")
+    void before(
+        ObjectEnumerableAssert<?, E> enumAssert,
+        @Matches(IsEmpty.class) Iterable<? extends E> emptyIterable) {
+      Refaster.anyOf(
+          enumAssert.containsExactlyElementsOf(emptyIterable),
+          enumAssert.containsExactlyInAnyOrderElementsOf(emptyIterable),
+          enumAssert.hasSameElementsAs(emptyIterable),
+          enumAssert.isSubsetOf(emptyIterable),
+          enumAssert.containsExactly(),
+          enumAssert.containsExactlyInAnyOrder(),
+          enumAssert.containsOnly(),
+          enumAssert.isSubsetOf());
     }
 
     @BeforeTemplate
@@ -31,6 +53,21 @@ final class AssertJEnumerableRules {
 
     @AfterTemplate
     void after(EnumerableAssert<?, E> enumAssert) {
+      enumAssert.isEmpty();
+    }
+  }
+
+  // XXX: This rule assumes that the rewritten assertion aims to compare the contents of two
+  // iterables, rather than other semantics (such as `Set` vs. `List`).
+  static final class AssertAndEnumerableAssertIsEmpty<
+      E, A extends Assert<?, ? extends Iterable<? extends E>> & EnumerableAssert<?, E>> {
+    @BeforeTemplate
+    void before(A enumAssert, @Matches(IsEmpty.class) Iterable<?> emptyIterable) {
+      enumAssert.isEqualTo(emptyIterable);
+    }
+
+    @AfterTemplate
+    void after(A enumAssert) {
       enumAssert.isEmpty();
     }
   }
