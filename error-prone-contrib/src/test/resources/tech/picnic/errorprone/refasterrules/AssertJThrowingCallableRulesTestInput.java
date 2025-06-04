@@ -220,8 +220,7 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
             .withFailMessage(String.format("foo %s %s", "bar", 1)));
   }
 
-  ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
-      testAbstractThrowableAssertHasCauseReference() {
+  AbstractThrowableAssert<?, ? extends Throwable> testAbstractThrowableAssertHasCauseReference() {
     IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
     IllegalStateException illegalStateException =
         new IllegalStateException(illegalArgumentException);
