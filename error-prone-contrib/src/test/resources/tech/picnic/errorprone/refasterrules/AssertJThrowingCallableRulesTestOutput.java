@@ -252,6 +252,7 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
             .withFailMessage("foo %s %s", "bar", 1));
   }
 
+  @SuppressWarnings("deprecation" /* Support migration away from deprecated API */)
   AbstractThrowableAssert<?, ? extends Throwable> testAbstractThrowableAssertHasCauseReference() {
     IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
     IllegalStateException illegalStateException =
