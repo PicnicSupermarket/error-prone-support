@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIOException;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -249,5 +250,13 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
             .withFailMessage("foo %s %s", "bar", 1));
+  }
+
+  ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
+      testAbstractThrowableAssertHasCauseReference() {
+    IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
+    IllegalStateException illegalStateException =
+        new IllegalStateException(illegalArgumentException);
+    return assertThat(illegalStateException).cause().isSameAs(illegalArgumentException);
   }
 }
