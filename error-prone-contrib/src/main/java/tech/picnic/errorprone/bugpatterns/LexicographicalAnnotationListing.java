@@ -16,13 +16,17 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
 import java.util.Comparator;
@@ -33,13 +37,18 @@ import tech.picnic.errorprone.utils.SourceCode;
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
  *
+ * <p>The checker operates on:
+ *
+ * <ul>
+ *   <li>Class-level annotations
+ *   <li>Method-level annotations
+ *   <li>Field-level annotations
+ *   <li>Parameter-level annotations
+ * </ul>
+ *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same annotation.
  */
-// XXX: Currently this checker only flags method-level annotations. It should likely also flag
-// type-, field- and parameter-level annotations.
-// XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
-// flags duplicates.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
@@ -48,7 +57,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     severity = SUGGESTION,
     tags = STYLE)
 public final class LexicographicalAnnotationListing extends BugChecker
-    implements MethodTreeMatcher {
+    implements ClassTreeMatcher, MethodTreeMatcher, VariableTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -69,14 +78,31 @@ public final class LexicographicalAnnotationListing extends BugChecker
   public LexicographicalAnnotationListing() {}
 
   @Override
+  public Description matchClass(ClassTree tree, VisitorState state) {
+    return matchAnnotations(
+        tree.getModifiers().getAnnotations(), ASTHelpers.getSymbol(tree), state);
+  }
+
+  @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
-    List<? extends AnnotationTree> originalOrdering = tree.getModifiers().getAnnotations();
+    return matchAnnotations(
+        tree.getModifiers().getAnnotations(), ASTHelpers.getSymbol(tree), state);
+  }
+
+  @Override
+  public Description matchVariable(VariableTree tree, VisitorState state) {
+    return matchAnnotations(
+        tree.getModifiers().getAnnotations(), ASTHelpers.getSymbol(tree), state);
+  }
+
+  private Description matchAnnotations(
+      List<? extends AnnotationTree> originalOrdering, Symbol symbol, VisitorState state) {
     if (originalOrdering.size() < 2) {
       return Description.NO_MATCH;
     }
 
     ImmutableList<? extends AnnotationTree> sortedAnnotations =
-        sort(originalOrdering, ASTHelpers.getSymbol(tree), state);
+        sort(originalOrdering, symbol, state);
     if (originalOrdering.equals(sortedAnnotations)) {
       return Description.NO_MATCH;
     }
