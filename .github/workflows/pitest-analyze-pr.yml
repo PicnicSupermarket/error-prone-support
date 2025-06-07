@@ -28,7 +28,7 @@ jobs:
           checkout-fetch-depth: 2
           java-version: 17.0.13
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.10
       - name: Run Pitest
         # By running with features `+GIT(from[HEAD~1]), +gitci`, Pitest only
         # analyzes lines changed in the associated pull request, as GitHub
