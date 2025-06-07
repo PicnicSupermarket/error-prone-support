@@ -44,7 +44,7 @@ jobs:
             ${{ matrix.target-jdk }}
             ${{ matrix.build-jdk }}
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.10
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn -T1C install javadoc:jar
       # Note that the `-D` argument is quoted for compatibility with the
