@@ -323,7 +323,7 @@ final class LexicographicalAnnotationListingTest {
             @interface Bar {
               String[] value() default {};
             }
-            
+
             @Target(ElementType.TYPE_USE)
             @interface FooTypeUse {
               String[] value() default {};
@@ -380,32 +380,32 @@ final class LexicographicalAnnotationListingTest {
               @interface Foo {
                 String[] value() default {};
               }
-  
+
               @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
               @interface Bar {
                 String[] value() default {};
               }
-  
+
               @interface Foos {
                 Foo[] value();
               }
-  
+
               @Foo
               @Bar
               class UnsortedClassAnnotations {}
-  
+
               class MethodTestClass {
                 @Foo
                 @Bar
                 void unsortedMethodAnnotations() {}
               }
-  
+
               class FieldTestClass {
                 @Foo
                 @Bar
                 private String unsortedFieldAnnotations;
               }
-  
+
               class ParameterTestClass {
                 void methodWithUnsortedParameterAnnotations(
                     @Foo
@@ -426,32 +426,32 @@ final class LexicographicalAnnotationListingTest {
               @interface Foo {
                 String[] value() default {};
               }
-  
+
               @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
               @interface Bar {
                 String[] value() default {};
               }
-  
+
               @interface Foos {
                 Foo[] value();
               }
-  
+
               @Bar
               @Foo
               class UnsortedClassAnnotations {}
-  
+
               class MethodTestClass {
                 @Bar
                 @Foo
                 void unsortedMethodAnnotations() {}
               }
-  
+
               class FieldTestClass {
                 @Bar
                 @Foo
                 private String unsortedFieldAnnotations;
               }
-  
+
               class ParameterTestClass {
                 void methodWithUnsortedParameterAnnotations(
                     @Bar
@@ -480,25 +480,25 @@ final class LexicographicalAnnotationListingTest {
                 int[] ints() default {};
                 Bar[] anns() default {};
               }
-  
+
               @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
               @interface Bar {
                 String[] value() default {};
               }
-  
+
               @interface Baz {
                 String[] str() default {};
               }
-  
+
               @interface Foos {
                 Foo[] value();
               }
-  
+
               @Target(ElementType.TYPE_USE)
               @interface FooTypeUse {
                 String[] value() default {};
               }
-  
+
               @Target(ElementType.TYPE_USE)
               @interface BarTypeUse {
                 String[] value() default {};
@@ -535,25 +535,25 @@ final class LexicographicalAnnotationListingTest {
                 int[] ints() default {};
                 Bar[] anns() default {};
               }
-  
+
               @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
               @interface Bar {
                 String[] value() default {};
               }
-  
+
               @interface Baz {
                 String[] str() default {};
               }
-  
+
               @interface Foos {
                 Foo[] value();
               }
-  
+
               @Target(ElementType.TYPE_USE)
               @interface FooTypeUse {
                 String[] value() default {};
               }
-  
+
               @Target(ElementType.TYPE_USE)
               @interface BarTypeUse {
                 String[] value() default {};
