@@ -7,7 +7,6 @@ import com.google.common.collect.Multiset;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -34,7 +33,6 @@ import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
-import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate
@@ -65,8 +63,7 @@ import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 // XXX: `assertThat(optional.map(fun)).hasValue(v)` ->
 // `assertThat(optional).get().extracting(fun).isEqualTo(v)` (if the get fails the map was useless)
 // XXX: `someAssert.extracting(pred).isEqualTo(true)` -> `someAssert.matches(pred)`
-// XXX: `assertThat(someString.contains(s)).isTrue()` -> assertThat(someString).contains(s)` -> Also
-// for collections
+// XXX: `assertThat(someCollection.contains(s)).isTrue()` -> assertThat(someCollection).contains(s)`
 // XXX: `assertThat(someString.matches(s)).isTrue()` -> assertThat(someString).matches(s)`
 // XXX: `assertThat(n > k).isTrue()` -> assertThat(n).isGreaterThan(k)` (etc. Also `==`!)
 // XXX: `assertThat(n > k && n < m).isTrue()` -> assertThat(n).isStrictlyBetween(k, m)` (etc.)
@@ -165,31 +162,6 @@ final class AssertJRules {
   //
   // ObjectEnumerable
   //
-
-  static final class AssertThatObjectEnumerableIsEmpty<E> {
-    @BeforeTemplate
-    @SuppressWarnings("unchecked")
-    void before(
-        ObjectEnumerableAssert<?, E> enumAssert,
-        @Matches(IsEmpty.class) Iterable<? extends E> wellTypedIterable,
-        @Matches(IsEmpty.class) Iterable<?> arbitrarilyTypedIterable) {
-      Refaster.anyOf(
-          enumAssert.containsExactlyElementsOf(wellTypedIterable),
-          enumAssert.containsExactlyInAnyOrderElementsOf(wellTypedIterable),
-          enumAssert.hasSameElementsAs(wellTypedIterable),
-          enumAssert.hasSameSizeAs(arbitrarilyTypedIterable),
-          enumAssert.isSubsetOf(wellTypedIterable),
-          enumAssert.containsExactly(),
-          enumAssert.containsExactlyInAnyOrder(),
-          enumAssert.containsOnly(),
-          enumAssert.isSubsetOf());
-    }
-
-    @AfterTemplate
-    void after(ObjectEnumerableAssert<?, E> enumAssert) {
-      enumAssert.isEmpty();
-    }
-  }
 
   static final class ObjectEnumerableContainsOneElement<S, T extends S> {
     @BeforeTemplate
