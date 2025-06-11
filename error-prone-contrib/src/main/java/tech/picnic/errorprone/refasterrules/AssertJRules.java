@@ -159,6 +159,10 @@ final class AssertJRules {
     }
   }
 
+  //
+  // ObjectEnumerable
+  //
+
   static final class ObjectEnumerableContainsOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked")
