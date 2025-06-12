@@ -53,6 +53,7 @@ jobs:
             production.cloudflare.docker.com:443
             raw.githubusercontent.com:443
             registry-1.docker.io:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             repository.sonatype.org:443
       - name: Check out code and set up JDK and Maven
