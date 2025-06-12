@@ -9,21 +9,14 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-24.04 ]
-        jdk: [ 17.0.13, 21.0.5, 23.0.1 ]
-        distribution: [ temurin ]
-        experimental: [ false ]
+        os: [ ubuntu-24.04, macos-15, windows-2025 ]
+        build-jdk: [ 21.0.5 ]
+        target-jdk: [ 17.0.13 ]
         include:
-          - os: macos-15
-            jdk: 17.0.13
-            distribution: temurin
-            experimental: false
-          - os: windows-2025
-            jdk: 17.0.13
-            distribution: temurin
-            experimental: false
+          - os: ubuntu-24.04
+            build-jdk: 23.0.1
+            target-jdk: 17.0.13
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
@@ -47,18 +40,18 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          java-version: ${{ matrix.jdk }}
-          java-distribution: ${{ matrix.distribution }}
+          java-version: |
+            ${{ matrix.target-jdk }}
+            ${{ matrix.build-jdk }}
+          java-distribution: temurin
           maven-version: 3.9.9
-      - name: Display build environment details
-        run: mvn --version
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn -T1C install javadoc:jar
-      - name: Build project with self-check against Error Prone fork
-        run: mvn -T1C clean verify -Perror-prone-fork -Pself-check -s settings.xml
+      # Note that the `-D` argument is quoted for compatibility with the
+      # Windows build.
+      - name: Build project with self-check against Error Prone fork, test using the targeted JDK
+        run: mvn -T1C clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
-
-# XXX: Enable Codecov once we "go public".
