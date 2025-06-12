@@ -32,6 +32,7 @@ jobs:
             github.com:443
             hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             uploads.github.com:443
       - name: Check out code and set up JDK and Maven
