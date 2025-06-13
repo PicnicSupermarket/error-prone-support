@@ -26,8 +26,8 @@ import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocume
 /**
  * An {@link Extractor} that describes how to extract data from a {@code @BugPattern} annotation.
  */
-@Immutable
 @AutoService(Extractor.class)
+@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
   /** Instantiates a new {@link BugPatternExtractor} instance. */

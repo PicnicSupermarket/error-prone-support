@@ -109,8 +109,8 @@ final class DocumentationGeneratorTaskListenerTest {
             """);
   }
 
-  @Immutable
   @AutoService(Extractor.class)
+  @Immutable
   @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
   public static final class TestExtractor implements Extractor<ExtractionParameters> {
     @Override

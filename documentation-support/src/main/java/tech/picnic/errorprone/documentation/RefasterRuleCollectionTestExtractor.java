@@ -30,8 +30,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // XXX: Drop this extractor if/when the Refaster test framework is reimplemented such that tests can
 // be located alongside rules, rather than in two additional resource files as currently required by
 // `RefasterRuleCollection`.
-@Immutable
 @AutoService(Extractor.class)
+@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public final class RefasterRuleCollectionTestExtractor implements Extractor<RefasterTestCases> {
   private static final Matcher<ClassTree> IS_REFASTER_RULE_COLLECTION_TEST_CASE =
