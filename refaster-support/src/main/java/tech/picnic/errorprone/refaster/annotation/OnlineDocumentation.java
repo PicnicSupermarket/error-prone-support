@@ -15,8 +15,8 @@ import java.lang.annotation.Target;
  * website. Annotations on nested classes override the documentation URL associated with any
  * enclosing class.
  */
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface OnlineDocumentation {
   /**
    * The URL placeholder value that will be replaced with the name of the top-level class in which
