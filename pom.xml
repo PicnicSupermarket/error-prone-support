@@ -895,6 +895,7 @@
                                         <property name="aliasList" value="com.puppycrawl.tools.checkstyle.checks.coding.UnusedLocalVariableCheck=unused" />
                                     </module>
                                     <module name="TrailingComment" />
+                                    <module name="UnnecessaryNullCheckWithInstanceOf" />
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
@@ -925,7 +926,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.24.0</version>
+                            <version>10.25.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
