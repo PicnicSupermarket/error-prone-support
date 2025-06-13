@@ -464,8 +464,10 @@
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jooq</artifactId>
-                <version>3.19.18</version>
+                <artifactId>jooq-bom</artifactId>
+                <version>3.20.5</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>

@@ -1,9 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static org.junit.jupiter.api.condition.JRE.JAVA_21;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
 
 final class ExplicitArgumentEnumerationTest {
   @Test
@@ -18,7 +21,6 @@ final class ExplicitArgumentEnumerationTest {
             "import com.google.errorprone.bugpatterns.BugChecker;",
             "import io.micrometer.core.instrument.Counter;",
             "import io.micrometer.core.instrument.Tag;",
-            "import org.jooq.impl.DSL;",
             "import reactor.core.publisher.Flux;",
             "import reactor.test.StepVerifier;",
             "",
@@ -31,8 +33,6 @@ final class ExplicitArgumentEnumerationTest {
             "    assertThat(ImmutableList.of()).containsAnyElementsOf(list);",
             "",
             "    ImmutableList.<ImmutableList<String>>builder().add(ImmutableList.of());",
-            "",
-            "    DSL.row(ImmutableList.of(1, 2));",
             "",
             "    Counter.builder(\"foo\").tags(ImmutableList.of(Tag.of(\"bar\", \"baz\")));",
             "",
@@ -85,6 +85,23 @@ final class ExplicitArgumentEnumerationTest {
             "",
             "  private void binaryMethod(Integer... args) {",
             "    binaryMethod(ImmutableList.copyOf(args), 0);",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @EnabledForJreRange(min = JAVA_21)
+  @Test
+  void identificationJre21() {
+    CompilationTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "import org.jooq.impl.DSL;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    DSL.row(ImmutableList.of(1, 2));",
             "  }",
             "}")
         .doTest();
