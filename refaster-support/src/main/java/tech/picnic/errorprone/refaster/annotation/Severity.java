@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
  * be controlled explicitly by running Error Prone with e.g. {@code -Xep:Refaster:WARN}. Annotations
  * on nested classes override the severity associated with any enclosing class.
  */
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface Severity {
   /**
    * The expected severity of any match of the annotated Refaster rule(s).
