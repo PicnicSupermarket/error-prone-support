@@ -53,6 +53,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // XXX: In some places we declare a `@SuppressWarnings` annotation with a final value of
 // `key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict`. That entry must stay
 // last. Consider adding (generic?) support for such cases.
+// XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
+// flags duplicates.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Where possible, sort annotation array attributes lexicographically",

@@ -35,18 +35,14 @@ import tech.picnic.errorprone.utils.SourceCode;
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
  *
- * <p>The checker operates on:
- *
- * <ul>
- *   <li>Class-level annotations
- *   <li>Method-level annotations
- *   <li>Field-level annotations
- *   <li>Parameter-level annotations
- * </ul>
+ * <p>The checker currently considers only annotations that are part of a {@link ModifiersTree},
+ * such as class-, field-, method- and parameter-level annotations.
  *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same annotation.
  */
+// XXX: Consider also flagging annotations that aren't part of a `ModifiersTree`, such as those on
+//  `AnnotatedTypeTree`, `ModuleTree`, `NewArrayTree`, `PackageTree` and `TypeParameterTree`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
