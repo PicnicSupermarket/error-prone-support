@@ -104,45 +104,35 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            @Repeatable(Foos.class)
-            @interface Foo {
-              String[] value() default {};
-            }
-
-            @Target({ElementType.FIELD})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @interface Foos {
-              Foo[] value();
-            }
-
-            class FieldTestClass {
-              // BUG: Diagnostic contains:
-              @Foo
-              @Bar
-              private String unsortedFieldAnnotations;
-
-              @Bar
-              @Foo
-              private String sortedFieldAnnotations;
-
-              // BUG: Diagnostic contains:
-              @Foo()
-              @Bar()
-              private String unsortedFieldAnnotationsWithParens;
-
-              @Bar()
-              @Foo()
-              private String sortedFieldAnnotationsWithParens;
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Repeatable(Foos.class)",
+            "@interface Foo {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@Target({ElementType.FIELD})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Foos {",
+            "  Foo[] value();",
+            "}",
+            "",
+            "class FieldTestClass {",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo @Bar private String unsortedFieldAnnotations;",
+            "",
+            "  @Bar @Foo private String sortedFieldAnnotations;",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo() @Bar() private String unsortedFieldAnnotationsWithParens;",
+            "",
+            "  @Bar() @Foo() private String sortedFieldAnnotationsWithParens;",
+            "}")
         .doTest();
   }
 
@@ -151,63 +141,44 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            @Repeatable(Foos.class)
-            @interface Foo {
-              String[] value() default {};
-            }
-
-            @Target({ElementType.PARAMETER})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @interface Baz {
-              String[] str() default {};
-            }
-
-            @interface Foos {
-              Foo[] value();
-            }
-
-            class ParameterTestClass {
-              void methodWithUnsortedParameterAnnotations(
-                  // BUG: Diagnostic contains:
-                  @Foo
-                  @Bar
-                  String param1,
-
-                  // BUG: Diagnostic contains:
-                  @Foo()
-                  @Bar()
-                  String param2,
-
-                  @Bar
-                  @Foo
-                  String param3,
-
-                  // BUG: Diagnostic contains:
-                  @Foo
-                  @Baz
-                  @Bar
-                  String param4,
-
-                  // BUG: Diagnostic contains:
-                  @Bar
-                  @Foo()
-                  @Baz
-                  String param5,
-
-                  @Bar
-                  @Baz
-                  @Foo()
-                  String param6) {}
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Repeatable(Foos.class)",
+            "@interface Foo {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@Target({ElementType.PARAMETER})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Baz {",
+            "  String[] str() default {};",
+            "}",
+            "",
+            "@interface Foos {",
+            "  Foo[] value();",
+            "}",
+            "",
+            "class ParameterTestClass {",
+            "  void methodWithUnsortedParameterAnnotations(",
+            "      // BUG: Diagnostic contains:",
+            "      @Foo @Bar String param1,",
+            "",
+            "      // BUG: Diagnostic contains:",
+            "      @Foo() @Bar() String param2,",
+            "      @Bar @Foo String param3,",
+            "",
+            "      // BUG: Diagnostic contains:",
+            "      @Foo @Baz @Bar String param4,",
+            "",
+            "      // BUG: Diagnostic contains:",
+            "      @Bar @Foo() @Baz String param5,",
+            "      @Bar @Baz @Foo() String param6) {}",
+            "}")
         .doTest();
   }
 
@@ -216,55 +187,55 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            @Repeatable(Foos.class)
-            @interface Foo {
-              String[] value() default {};
-              int[] ints() default {};
-              Bar[] anns() default {};
-            }
-
-            @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @interface Baz {
-              String[] str() default {};
-            }
-
-            @interface Foos {
-              Foo[] value();
-            }
-
-            class ComplexTestClass {
-              // BUG: Diagnostic contains:
-              @Foo({"b"})
-              @Bar({"a"})
-              private String unsortedWithStringAttributes;
-
-              // BUG: Diagnostic contains:
-              @Baz(str = {"a", "b"})
-              @Foo(ints = {1, 0})
-              @Bar
-              private String unsortedWithAttributes;
-
-              // BUG: Diagnostic contains:
-              @Bar
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              @Baz
-              private String unsortedWithNestedBar;
-
-              @Bar
-              @Baz
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              private String sortedWithNestedBar;
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Repeatable(Foos.class)",
+            "@interface Foo {",
+            "  String[] value() default {};",
+            "",
+            "  int[] ints() default {};",
+            "",
+            "  Bar[] anns() default {};",
+            "}",
+            "",
+            "@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Baz {",
+            "  String[] str() default {};",
+            "}",
+            "",
+            "@interface Foos {",
+            "  Foo[] value();",
+            "}",
+            "",
+            "class ComplexTestClass {",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo({\"b\"})",
+            "  @Bar({\"a\"})",
+            "  private String unsortedWithStringAttributes;",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Baz(str = {\"a\", \"b\"})",
+            "  @Foo(ints = {1, 0})",
+            "  @Bar",
+            "  private String unsortedWithAttributes;",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Bar",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  @Baz",
+            "  private String unsortedWithNestedBar;",
+            "",
+            "  @Bar",
+            "  @Baz",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  private String sortedWithNestedBar;",
+            "}")
         .doTest();
   }
 
@@ -273,40 +244,40 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            @Repeatable(Foos.class)
-            @interface Foo {
-              String[] value() default {};
-              int[] ints() default {};
-              Bar[] anns() default {};
-            }
-
-            @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @interface Foos {
-              Foo[] value();
-            }
-
-            class RepeatableTestClass {
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              @Foo(ints = {1, 2})
-              @Foo({"b"})
-              private String sortedRepeatableAnnotation;
-
-              // BUG: Diagnostic contains:
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              @Bar
-              @Foo(ints = {1, 2})
-              private String unsortedRepeatableAnnotation;
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Repeatable(Foos.class)",
+            "@interface Foo {",
+            "  String[] value() default {};",
+            "",
+            "  int[] ints() default {};",
+            "",
+            "  Bar[] anns() default {};",
+            "}",
+            "",
+            "@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Foos {",
+            "  Foo[] value();",
+            "}",
+            "",
+            "class RepeatableTestClass {",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  @Foo(ints = {1, 2})",
+            "  @Foo({\"b\"})",
+            "  private String sortedRepeatableAnnotation;",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  @Bar",
+            "  @Foo(ints = {1, 2})",
+            "  private String unsortedRepeatableAnnotation;",
+            "}")
         .doTest();
   }
 
@@ -315,53 +286,39 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Target;
-
-            @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @Target(ElementType.TYPE_USE)
-            @interface FooTypeUse {
-              String[] value() default {};
-            }
-
-            @Target(ElementType.TYPE_USE)
-            @interface BarTypeUse {
-              String[] value() default {};
-            }
-
-            @interface Baz {
-              String[] str() default {};
-            }
-
-            class TypeUseTestClass {
-              // BUG: Diagnostic contains:
-              @FooTypeUse
-              @BarTypeUse
-              private String unsortedTypeAnnotations;
-
-              // BUG: Diagnostic contains:
-              @Baz
-              @Bar
-              @FooTypeUse
-              @BarTypeUse
-              private String unsortedTypeUseAndOtherAnnotations;
-
-              @BarTypeUse
-              @FooTypeUse
-              private String sortedTypeAnnotations;
-
-              @Bar
-              @Baz
-              @BarTypeUse
-              @FooTypeUse
-              private String sortedTypeUseAndOtherAnnotations;
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@Target(ElementType.TYPE_USE)",
+            "@interface FooTypeUse {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@Target(ElementType.TYPE_USE)",
+            "@interface BarTypeUse {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Baz {",
+            "  String[] str() default {};",
+            "}",
+            "",
+            "class TypeUseTestClass {",
+            "  // BUG: Diagnostic contains:",
+            "  @FooTypeUse @BarTypeUse private String unsortedTypeAnnotations;",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Baz @Bar @FooTypeUse @BarTypeUse private String unsortedTypeUseAndOtherAnnotations;",
+            "",
+            "  @BarTypeUse @FooTypeUse private String sortedTypeAnnotations;",
+            "",
+            "  @Bar @Baz @BarTypeUse @FooTypeUse private String sortedTypeUseAndOtherAnnotations;",
+            "}")
         .doTest();
   }
 
@@ -370,96 +327,82 @@ final class LexicographicalAnnotationListingTest {
     BugCheckerRefactoringTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addInputLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            class SimpleTestClass {
-              @Repeatable(Foos.class)
-              @interface Foo {
-                String[] value() default {};
-              }
-
-              @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-              @interface Bar {
-                String[] value() default {};
-              }
-
-              @interface Foos {
-                Foo[] value();
-              }
-
-              @Foo
-              @Bar
-              class UnsortedClassAnnotations {}
-
-              class MethodTestClass {
-                @Foo
-                @Bar
-                void unsortedMethodAnnotations() {}
-              }
-
-              class FieldTestClass {
-                @Foo
-                @Bar
-                private String unsortedFieldAnnotations;
-              }
-
-              class ParameterTestClass {
-                void methodWithUnsortedParameterAnnotations(
-                    @Foo
-                    @Bar
-                    String param1) {}
-              }
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "class SimpleTestClass {",
+            "  @Repeatable(Foos.class)",
+            "  @interface Foo {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "  @interface Bar {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @interface Foos {",
+            "    Foo[] value();",
+            "  }",
+            "",
+            "  @Foo",
+            "  @Bar",
+            "  class UnsortedClassAnnotations {}",
+            "",
+            "  class MethodTestClass {",
+            "    @Foo",
+            "    @Bar",
+            "    void unsortedMethodAnnotations() {}",
+            "  }",
+            "",
+            "  class FieldTestClass {",
+            "    @Foo @Bar private String unsortedFieldAnnotations;",
+            "  }",
+            "",
+            "  class ParameterTestClass {",
+            "    void methodWithUnsortedParameterAnnotations(@Foo @Bar String param1) {}",
+            "  }",
+            "}")
         .addOutputLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            class SimpleTestClass {
-              @Repeatable(Foos.class)
-              @interface Foo {
-                String[] value() default {};
-              }
-
-              @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-              @interface Bar {
-                String[] value() default {};
-              }
-
-              @interface Foos {
-                Foo[] value();
-              }
-
-              @Bar
-              @Foo
-              class UnsortedClassAnnotations {}
-
-              class MethodTestClass {
-                @Bar
-                @Foo
-                void unsortedMethodAnnotations() {}
-              }
-
-              class FieldTestClass {
-                @Bar
-                @Foo
-                private String unsortedFieldAnnotations;
-              }
-
-              class ParameterTestClass {
-                void methodWithUnsortedParameterAnnotations(
-                    @Bar
-                    @Foo
-                    String param1) {}
-              }
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "class SimpleTestClass {",
+            "  @Repeatable(Foos.class)",
+            "  @interface Foo {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "  @interface Bar {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @interface Foos {",
+            "    Foo[] value();",
+            "  }",
+            "",
+            "  @Bar",
+            "  @Foo",
+            "  class UnsortedClassAnnotations {}",
+            "",
+            "  class MethodTestClass {",
+            "    @Bar",
+            "    @Foo",
+            "    void unsortedMethodAnnotations() {}",
+            "  }",
+            "",
+            "  class FieldTestClass {",
+            "    @Bar @Foo private String unsortedFieldAnnotations;",
+            "  }",
+            "",
+            "  class ParameterTestClass {",
+            "    void methodWithUnsortedParameterAnnotations(@Bar @Foo String param1) {}",
+            "  }",
+            "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -468,114 +411,106 @@ final class LexicographicalAnnotationListingTest {
     BugCheckerRefactoringTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addInputLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            class ComplexTestClass {
-              @Repeatable(Foos.class)
-              @interface Foo {
-                String[] value() default {};
-                int[] ints() default {};
-                Bar[] anns() default {};
-              }
-
-              @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-              @interface Bar {
-                String[] value() default {};
-              }
-
-              @interface Baz {
-                String[] str() default {};
-              }
-
-              @interface Foos {
-                Foo[] value();
-              }
-
-              @Target(ElementType.TYPE_USE)
-              @interface FooTypeUse {
-                String[] value() default {};
-              }
-
-              @Target(ElementType.TYPE_USE)
-              @interface BarTypeUse {
-                String[] value() default {};
-              }
-
-              @Baz(str = {"a", "b"})
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              @Bar({"b"})
-              private String unsortedAnnotationsWithAttributes;
-
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              @Bar
-              @Foo(ints = {1, 2})
-              private String unsortedRepeatableAnnotation;
-
-              @Baz
-              @Bar
-              @FooTypeUse
-              @BarTypeUse
-              private String unsortedWithTypeUseAnnotations;
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "class ComplexTestClass {",
+            "  @Repeatable(Foos.class)",
+            "  @interface Foo {",
+            "    String[] value() default {};",
+            "",
+            "    int[] ints() default {};",
+            "",
+            "    Bar[] anns() default {};",
+            "  }",
+            "",
+            "  @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "  @interface Bar {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @interface Baz {",
+            "    String[] str() default {};",
+            "  }",
+            "",
+            "  @interface Foos {",
+            "    Foo[] value();",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface FooTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface BarTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Baz(str = {\"a\", \"b\"})",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  @Bar({\"b\"})",
+            "  private String unsortedAnnotationsWithAttributes;",
+            "",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  @Bar",
+            "  @Foo(ints = {1, 2})",
+            "  private String unsortedRepeatableAnnotation;",
+            "",
+            "  @Baz @Bar @FooTypeUse @BarTypeUse private String unsortedWithTypeUseAnnotations;",
+            "}")
         .addOutputLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            class ComplexTestClass {
-              @Repeatable(Foos.class)
-              @interface Foo {
-                String[] value() default {};
-                int[] ints() default {};
-                Bar[] anns() default {};
-              }
-
-              @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
-              @interface Bar {
-                String[] value() default {};
-              }
-
-              @interface Baz {
-                String[] str() default {};
-              }
-
-              @interface Foos {
-                Foo[] value();
-              }
-
-              @Target(ElementType.TYPE_USE)
-              @interface FooTypeUse {
-                String[] value() default {};
-              }
-
-              @Target(ElementType.TYPE_USE)
-              @interface BarTypeUse {
-                String[] value() default {};
-              }
-
-              @Bar({"b"})
-              @Baz(str = {"a", "b"})
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              private String unsortedAnnotationsWithAttributes;
-
-              @Bar
-              @Foo(anns = {@Bar("b"), @Bar("a")})
-              @Foo(ints = {1, 2})
-              private String unsortedRepeatableAnnotation;
-
-              @Bar
-              @Baz
-              @BarTypeUse
-              @FooTypeUse
-              private String unsortedWithTypeUseAnnotations;
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "class ComplexTestClass {",
+            "  @Repeatable(Foos.class)",
+            "  @interface Foo {",
+            "    String[] value() default {};",
+            "",
+            "    int[] ints() default {};",
+            "",
+            "    Bar[] anns() default {};",
+            "  }",
+            "",
+            "  @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})",
+            "  @interface Bar {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @interface Baz {",
+            "    String[] str() default {};",
+            "  }",
+            "",
+            "  @interface Foos {",
+            "    Foo[] value();",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface FooTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Target(ElementType.TYPE_USE)",
+            "  @interface BarTypeUse {",
+            "    String[] value() default {};",
+            "  }",
+            "",
+            "  @Bar({\"b\"})",
+            "  @Baz(str = {\"a\", \"b\"})",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  private String unsortedAnnotationsWithAttributes;",
+            "",
+            "  @Bar",
+            "  @Foo(anns = {@Bar(\"b\"), @Bar(\"a\")})",
+            "  @Foo(ints = {1, 2})",
+            "  private String unsortedRepeatableAnnotation;",
+            "",
+            "  @Bar @Baz @BarTypeUse @FooTypeUse private String unsortedWithTypeUseAnnotations;",
+            "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 }
