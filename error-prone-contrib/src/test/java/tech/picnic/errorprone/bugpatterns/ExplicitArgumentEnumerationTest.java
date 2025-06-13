@@ -1,11 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static org.junit.jupiter.api.condition.JRE.JAVA_21;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
-import org.junit.jupiter.api.condition.JRE;
 
 final class ExplicitArgumentEnumerationTest {
   @Test
@@ -89,7 +90,7 @@ final class ExplicitArgumentEnumerationTest {
         .doTest();
   }
 
-  @EnabledForJreRange(min = JRE.JAVA_21)
+  @EnabledForJreRange(min = JAVA_21)
   @Test
   void identificationJre21() {
     CompilationTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
