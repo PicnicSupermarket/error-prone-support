@@ -5,7 +5,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("MisformattedTestData")
 final class LexicographicalAnnotationListingTest {
   @Test
   void classLevelAnnotations() {
