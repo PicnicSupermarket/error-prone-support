@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.DECLARATION;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.TYPE;
 import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -16,17 +17,14 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
-import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
-import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.ModifiersTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.VariableTree;
+import com.sun.source.tree.ModifiersTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
 import java.util.Comparator;
@@ -57,7 +55,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     severity = SUGGESTION,
     tags = STYLE)
 public final class LexicographicalAnnotationListing extends BugChecker
-    implements ClassTreeMatcher, MethodTreeMatcher, VariableTreeMatcher {
+    implements ModifiersTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -78,28 +76,16 @@ public final class LexicographicalAnnotationListing extends BugChecker
   public LexicographicalAnnotationListing() {}
 
   @Override
-  public Description matchClass(ClassTree tree, VisitorState state) {
-    return matchAnnotations(
-        tree.getModifiers().getAnnotations(), ASTHelpers.getSymbol(tree), state);
-  }
-
-  @Override
-  public Description matchMethod(MethodTree tree, VisitorState state) {
-    return matchAnnotations(
-        tree.getModifiers().getAnnotations(), ASTHelpers.getSymbol(tree), state);
-  }
-
-  @Override
-  public Description matchVariable(VariableTree tree, VisitorState state) {
-    return matchAnnotations(
-        tree.getModifiers().getAnnotations(), ASTHelpers.getSymbol(tree), state);
-  }
-
-  private Description matchAnnotations(
-      List<? extends AnnotationTree> originalOrdering, Symbol symbol, VisitorState state) {
+  public Description matchModifiers(ModifiersTree tree, VisitorState state) {
+    List<? extends AnnotationTree> originalOrdering = tree.getAnnotations();
     if (originalOrdering.size() < 2) {
       return Description.NO_MATCH;
     }
+
+    Symbol symbol =
+        requireNonNull(
+            ASTHelpers.getSymbol(ASTHelpers.findEnclosingNode(state.getPath(), Tree.class)),
+            "Cannot find enclosing symbol");
 
     ImmutableList<? extends AnnotationTree> sortedAnnotations =
         sort(originalOrdering, symbol, state);
