@@ -11,43 +11,41 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            @Repeatable(Foos.class)
-            @interface Foo {
-              String[] value() default {};
-            }
-
-            @Target({ElementType.TYPE})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @interface Foos {
-              Foo[] value();
-            }
-
-            // BUG: Diagnostic contains:
-            @Foo
-            @Bar
-            class UnsortedClassAnnotations {}
-
-            @Bar
-            @Foo
-            class SortedClassAnnotations {}
-
-            // BUG: Diagnostic contains:
-            @Foo()
-            @Bar()
-            class UnsortedClassAnnotationsWithParens {}
-
-            @Bar()
-            @Foo()
-            class SortedClassAnnotationsWithParens {}
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Repeatable(Foos.class)",
+            "@interface Foo {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@Target({ElementType.TYPE})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Foos {",
+            "  Foo[] value();",
+            "}",
+            "",
+            "// BUG: Diagnostic contains:",
+            "@Foo",
+            "@Bar",
+            "class UnsortedClassAnnotations {}",
+            "",
+            "@Bar",
+            "@Foo",
+            "class SortedClassAnnotations {}",
+            "",
+            "// BUG: Diagnostic contains:",
+            "@Foo()",
+            "@Bar()",
+            "class UnsortedClassAnnotationsWithParens {}",
+            "",
+            "@Bar()",
+            "@Foo()",
+            "class SortedClassAnnotationsWithParens {}")
         .doTest();
   }
 
@@ -56,45 +54,43 @@ final class LexicographicalAnnotationListingTest {
     CompilationTestHelper.newInstance(LexicographicalAnnotationListing.class, getClass())
         .addSourceLines(
             "A.java",
-            """
-            import java.lang.annotation.ElementType;
-            import java.lang.annotation.Repeatable;
-            import java.lang.annotation.Target;
-
-            @Repeatable(Foos.class)
-            @interface Foo {
-              String[] value() default {};
-            }
-
-            @Target({ElementType.METHOD})
-            @interface Bar {
-              String[] value() default {};
-            }
-
-            @interface Foos {
-              Foo[] value();
-            }
-
-            class MethodTestClass {
-              // BUG: Diagnostic contains:
-              @Foo
-              @Bar
-              void unsortedMethodAnnotations() {}
-
-              @Bar
-              @Foo
-              void sortedMethodAnnotations() {}
-
-              // BUG: Diagnostic contains:
-              @Foo()
-              @Bar()
-              void unsortedMethodAnnotationsWithParens() {}
-
-              @Bar()
-              @Foo()
-              void sortedMethodAnnotationsWithParens() {}
-            }
-            """)
+            "import java.lang.annotation.ElementType;",
+            "import java.lang.annotation.Repeatable;",
+            "import java.lang.annotation.Target;",
+            "",
+            "@Repeatable(Foos.class)",
+            "@interface Foo {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@Target({ElementType.METHOD})",
+            "@interface Bar {",
+            "  String[] value() default {};",
+            "}",
+            "",
+            "@interface Foos {",
+            "  Foo[] value();",
+            "}",
+            "",
+            "class MethodTestClass {",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo",
+            "  @Bar",
+            "  void unsortedMethodAnnotations() {}",
+            "",
+            "  @Bar",
+            "  @Foo",
+            "  void sortedMethodAnnotations() {}",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  @Foo()",
+            "  @Bar()",
+            "  void unsortedMethodAnnotationsWithParens() {}",
+            "",
+            "  @Bar()",
+            "  @Foo()",
+            "  void sortedMethodAnnotationsWithParens() {}",
+            "}")
         .doTest();
   }
 
