@@ -759,4 +759,19 @@ final class AssertJThrowingCallableRules {
       return abstractThrowableAssert.withFailMessage(message, args);
     }
   }
+
+  static final class AbstractThrowableAssertHasCauseReference {
+    @BeforeTemplate
+    @SuppressWarnings("deprecation" /* Support migration away from deprecated API */)
+    AbstractThrowableAssert<?, ? extends Throwable> before(
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
+      return throwableAssert.hasCauseReference(expected);
+    }
+
+    @AfterTemplate
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
+      return throwableAssert.cause().isSameAs(expected);
+    }
+  }
 }
