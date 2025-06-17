@@ -1558,7 +1558,7 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>pitest-accelerator-junit5</artifactId>
-                            <version>1.2.0</version>
+                            <version>1.2.2</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
