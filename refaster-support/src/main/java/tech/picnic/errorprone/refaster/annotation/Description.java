@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
  *
  * <p>Annotations on nested classes override the description associated with any enclosing class.
  */
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface Description {
   /**
    * A description of the annotated Refaster rule(s).
