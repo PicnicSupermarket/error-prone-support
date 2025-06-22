@@ -20,6 +20,7 @@ jobs:
             api.github.com:443
             github-registry-files.githubusercontent.com:443
             github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             maven.pkg.github.com:443
             objects.githubusercontent.com:443
             raw.githubusercontent.com:443
