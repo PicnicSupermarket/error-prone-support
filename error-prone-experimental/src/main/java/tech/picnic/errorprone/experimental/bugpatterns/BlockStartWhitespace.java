@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.VerifyException;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
@@ -47,7 +48,7 @@ public final class BlockStartWhitespace extends BugChecker
     return match(classTree, state);
   }
 
-  @SuppressWarnings({"LoopOverCharArray"})
+  @SuppressWarnings("LoopOverCharArray")
   private Description match(Tree tree, VisitorState state) {
     String source = requireNonNull(state.getSourceForNode(tree), "Source code");
 
@@ -63,15 +64,18 @@ public final class BlockStartWhitespace extends BugChecker
         continue;
       }
       switch (source.charAt(pos)) {
-        // TODO: Windows? 🤢
-        case '\n':
+        case '\n' -> {
+          // TODO: Windows? 🤢
           newLineCount++;
           lastNewLinePos = pos;
           continue;
-        case ' ', '\t':
+        }
+        case ' ', '\t' -> {
           continue;
-        default:
+        }
+        default -> {
           break source_loop;
+        }
       }
     }
 
@@ -80,7 +84,7 @@ public final class BlockStartWhitespace extends BugChecker
     }
 
     if (lastNewLinePos == -1) {
-      throw new RuntimeException("Big oof (lastNewLinePos == -1)");
+      throw new VerifyException("Big oof (lastNewLinePos == -1)");
     }
 
     // TODO: Do we the source with the correctly formatted one, or do we replace the redundant

@@ -148,7 +148,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
       }
     }
 
-    return sortTypeMembers(members, typeMemberSource.build());
+    return sortTypeMembers(members, typeMemberSource.buildOrThrow());
   }
 
   /** Returns all members that can be moved or may lay between movable ones. */
