@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.experimental.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +37,7 @@ final class BlockStartWhitespaceTest {
   }
 
   @Test
-  void classBodyBlock() {
+  void replacementClassBodyBlock() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
         .addInputLines(
             "Nested.java",
@@ -84,7 +85,7 @@ final class BlockStartWhitespaceTest {
             "    private static final int foo = 1;",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 
   @Test
@@ -136,6 +137,6 @@ final class BlockStartWhitespaceTest {
             "    return 1;",
             "  }",
             "}")
-        .doTest(BugCheckerRefactoringTestHelper.TestMode.TEXT_MATCH);
+        .doTest(TestMode.TEXT_MATCH);
   }
 }
