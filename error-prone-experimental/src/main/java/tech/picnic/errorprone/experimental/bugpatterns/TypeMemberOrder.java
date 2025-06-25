@@ -180,6 +180,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
    * Returns the preferred ordinal of the given member, or empty if it's unmovable for any reason,
    * including it lacking a preferred ordinal.
    */
+  // XXX: Comment about future fixing Nested.
   private Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
     if (isSuppressed(tree, state) || isEnumeratorDefinition(tree)) {
       return Optional.empty();
@@ -188,7 +189,10 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
       case VARIABLE -> Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
       case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
       case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
-      case CLASS, INTERFACE, ENUM -> Optional.of(7);
+      case CLASS, INTERFACE, ENUM ->
+          ASTHelpers.hasAnnotation(tree, "org.junit.jupiter.api.Nested", state)
+              ? Optional.of(6)
+              : Optional.of(7);
       default -> Optional.empty();
     };
   }
