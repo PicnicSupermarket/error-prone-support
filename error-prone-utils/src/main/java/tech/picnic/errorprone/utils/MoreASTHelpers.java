@@ -80,16 +80,6 @@ public final class MoreASTHelpers {
   }
 
   /**
-   * Tells whether a given tree is a generated constructor.
-   *
-   * @param tree The tree of interest.
-   * @return Whether the specified tree is a generated constructor.
-   */
-  public static boolean isGeneratedConstructor(Tree tree) {
-    return tree instanceof MethodTree methodTree && ASTHelpers.isGeneratedConstructor(methodTree);
-  }
-
-  /**
    * Tells whether the given tree is of type {@link String}.
    *
    * @param tree The tree of interest.
