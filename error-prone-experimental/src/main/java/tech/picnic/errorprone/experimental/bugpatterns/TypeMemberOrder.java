@@ -120,6 +120,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
       return nestedSuggestedFixes.build();
     }
 
+    // XXX: Consider using `SourceCode#treeToString` instead of `VisitorState.getSourceCode()`.
     CharSequence source = requireNonNull(state.getSourceCode(), "Source code");
     ImmutableMap.Builder<TypeMember, String> typeMemberSource = ImmutableMap.builder();
 
