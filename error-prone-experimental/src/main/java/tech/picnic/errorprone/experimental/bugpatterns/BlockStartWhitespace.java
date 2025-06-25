@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.VerifyException;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
@@ -66,13 +65,11 @@ public final class BlockStartWhitespace extends BugChecker
       switch (source.charAt(pos)) {
         case '\n' -> {
           // TODO: Windows? 🤢
+          // XXX: System.lineSeparator();
           newLineCount++;
           lastNewLinePos = pos;
-          continue;
         }
-        case ' ', '\t' -> {
-          continue;
-        }
+        case ' ', '\t' -> {}
         default -> {
           break source_loop;
         }
@@ -81,10 +78,6 @@ public final class BlockStartWhitespace extends BugChecker
 
     if (newLineCount < 2) {
       return Description.NO_MATCH;
-    }
-
-    if (lastNewLinePos == -1) {
-      throw new VerifyException("Big oof (lastNewLinePos == -1)");
     }
 
     // TODO: Do we the source with the correctly formatted one, or do we replace the redundant
