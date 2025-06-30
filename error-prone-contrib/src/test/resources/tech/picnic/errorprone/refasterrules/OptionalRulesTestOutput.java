@@ -61,10 +61,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         .filter(v -> v.length() <= 5);
   }
 
-  ImmutableSet<Boolean> testMapOptionalToBoolean() {
-    return ImmutableSet.of(
-        Optional.of("foo").filter(String::isEmpty).isPresent(),
-        Optional.of("bar").filter(s -> s.isEmpty()).isPresent());
+  boolean testMapOptionalToBoolean() {
+    return Optional.of("foo").filter(String::isEmpty).isPresent();
   }
 
   ImmutableSet<Optional<String>> testMapToNullable() {

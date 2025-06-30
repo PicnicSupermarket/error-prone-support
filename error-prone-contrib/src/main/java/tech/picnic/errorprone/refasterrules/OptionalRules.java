@@ -190,9 +190,8 @@ final class OptionalRules {
    */
   static final class MapOptionalToBoolean<T> {
     @BeforeTemplate
-    @SuppressWarnings("OptionalOrElseGet" /* Rule is confused by `Refaster#anyOf` usage. */)
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
-      return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
+      return optional.map(predicate).orElse(false);
     }
 
     @AfterTemplate

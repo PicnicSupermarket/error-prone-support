@@ -42,10 +42,10 @@ import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.predicates.TypePredicates;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
@@ -215,7 +215,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
     return parentTree instanceof MethodInvocationTree methodInvocation
         ? methodInvocation.getTypeArguments().isEmpty()
-        : (parentTree.getKind() != Kind.IMPORT && parentTree.getKind() != Kind.MEMBER_SELECT);
+        : !(parentTree instanceof ImportTree) && !(parentTree instanceof MemberSelectTree);
   }
 
   private static boolean isCandidate(MemberSelectTree tree) {
