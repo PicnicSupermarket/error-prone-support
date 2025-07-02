@@ -215,7 +215,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
     return parentTree instanceof MethodInvocationTree methodInvocation
         ? methodInvocation.getTypeArguments().isEmpty()
-        : !(parentTree instanceof ImportTree) && !(parentTree instanceof MemberSelectTree);
+        : !(parentTree instanceof ImportTree || parentTree instanceof MemberSelectTree);
   }
 
   private static boolean isCandidate(MemberSelectTree tree) {
