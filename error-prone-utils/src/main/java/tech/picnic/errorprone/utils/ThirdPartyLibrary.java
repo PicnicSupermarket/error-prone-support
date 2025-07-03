@@ -124,6 +124,6 @@ public enum ThirdPartyLibrary {
         .errorProneOptions()
         .getFlags()
         .getBoolean(IGNORE_CLASSPATH_COMPAT_FLAG)
-        .orElse(Boolean.FALSE);
+        .orElse(false);
   }
 }

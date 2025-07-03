@@ -74,7 +74,7 @@ public final class ConflictDetection {
                * Don't descend into static type definitions: in those context, any unqualified
                * method invocation cannot refer to a method in the outer scope.
                */
-              return Boolean.FALSE;
+              return false;
             }
 
             return super.visitClass(tree, null);
