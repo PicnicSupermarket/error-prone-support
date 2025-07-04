@@ -74,6 +74,7 @@ final class RefasterRulesTest {
           PrimitiveRules.class,
           ReactorRules.class,
           RxJava2AdapterRules.class,
+          SpringTestRules.class,
           StreamRules.class,
           StringRules.class,
           SuggestedFixRules.class,
