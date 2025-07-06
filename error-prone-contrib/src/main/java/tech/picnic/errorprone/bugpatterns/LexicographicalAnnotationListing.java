@@ -7,6 +7,7 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.DECLARATION;
 import static com.sun.tools.javac.code.TypeAnnotations.AnnotationType.TYPE;
 import static java.util.Comparator.comparing;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -16,13 +17,14 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.ModifiersTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ModifiersTree;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.TypeAnnotations.AnnotationType;
 import java.util.Comparator;
@@ -33,13 +35,14 @@ import tech.picnic.errorprone.utils.SourceCode;
 /**
  * A {@link BugChecker} that flags annotations that are not lexicographically sorted.
  *
+ * <p>The checker currently considers only annotations that are part of a {@link ModifiersTree},
+ * such as class-, field-, method- and parameter-level annotations.
+ *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution, and can even avoid it if two branches add the same annotation.
  */
-// XXX: Currently this checker only flags method-level annotations. It should likely also flag
-// type-, field- and parameter-level annotations.
-// XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
-// flags duplicates.
+// XXX: Consider also flagging annotations that aren't part of a `ModifiersTree`, such as those on
+//  `AnnotatedTypeTree`, `ModuleTree`, `NewArrayTree`, `PackageTree` and `TypeParameterTree`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Sort annotations lexicographically where possible",
@@ -48,7 +51,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     severity = SUGGESTION,
     tags = STYLE)
 public final class LexicographicalAnnotationListing extends BugChecker
-    implements MethodTreeMatcher {
+    implements ModifiersTreeMatcher {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -69,14 +72,19 @@ public final class LexicographicalAnnotationListing extends BugChecker
   public LexicographicalAnnotationListing() {}
 
   @Override
-  public Description matchMethod(MethodTree tree, VisitorState state) {
-    List<? extends AnnotationTree> originalOrdering = tree.getModifiers().getAnnotations();
+  public Description matchModifiers(ModifiersTree tree, VisitorState state) {
+    List<? extends AnnotationTree> originalOrdering = tree.getAnnotations();
     if (originalOrdering.size() < 2) {
       return Description.NO_MATCH;
     }
 
+    Symbol symbol =
+        requireNonNull(
+            ASTHelpers.getSymbol(ASTHelpers.findEnclosingNode(state.getPath(), Tree.class)),
+            "Cannot find enclosing symbol");
+
     ImmutableList<? extends AnnotationTree> sortedAnnotations =
-        sort(originalOrdering, ASTHelpers.getSymbol(tree), state);
+        sort(originalOrdering, symbol, state);
     if (originalOrdering.equals(sortedAnnotations)) {
       return Description.NO_MATCH;
     }
