@@ -26,6 +26,10 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         Arrays.class, Joiner.class, Objects.class, Stream.class, Streams.class, joining(), UTF_8);
   }
 
+  String testStringLiteral() {
+    return "foo";
+  }
+
   ImmutableSet<Boolean> testStringIsEmpty() {
     return ImmutableSet.of(
         "foo".isEmpty(),

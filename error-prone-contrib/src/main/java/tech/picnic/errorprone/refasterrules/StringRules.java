@@ -28,6 +28,19 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class StringRules {
   private StringRules() {}
 
+  /** Prefer string literals over the more verbose alternative. */
+  static final class StringLiteral {
+    @BeforeTemplate
+    String before(String str) {
+      return new String(str);
+    }
+
+    @AfterTemplate
+    String after(String str) {
+      return str;
+    }
+  }
+
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects
