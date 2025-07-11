@@ -89,6 +89,10 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return Objects::toString;
   }
 
+  String testEmptyStringLiteral() {
+    return new String("");
+  }
+
   String testSubstringRemainder() {
     return "foo".substring(1, "foo".length());
   }
