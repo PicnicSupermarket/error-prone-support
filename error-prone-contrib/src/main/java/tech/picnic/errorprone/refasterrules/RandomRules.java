@@ -13,12 +13,12 @@ final class RandomRules {
   /** Prefer {@link Random#nextInt(int)} over casting a scaled random double to int. */
   static final class RandomNextInt {
     @BeforeTemplate
-    int nextDouble(Random random, int bound) {
+    int before(Random random, int bound) {
       return (int) (random.nextDouble() * bound);
     }
 
     @BeforeTemplate
-    int nextDoubleWithRound(Random random, int bound) {
+    int before2(Random random, int bound) {
       return (int) Math.round(random.nextDouble() * bound);
     }
 
