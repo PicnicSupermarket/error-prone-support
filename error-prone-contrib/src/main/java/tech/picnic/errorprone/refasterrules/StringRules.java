@@ -222,6 +222,19 @@ final class StringRules {
     }
   }
 
+  /** Prefer empty string literals over creating new empty String objects. */
+  static final class EmptyStringLiteral {
+    @BeforeTemplate
+    String before() {
+      return new String("");
+    }
+
+    @AfterTemplate
+    String after() {
+      return "";
+    }
+  }
+
   /** Don't unnecessarily use the two-argument {@link String#substring(int, int)}. */
   static final class SubstringRemainder {
     @BeforeTemplate
