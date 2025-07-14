@@ -17,7 +17,9 @@ final class RandomGeneratorRules {
     @SuppressWarnings("RandomGeneratorNextLong" /* This is a more specific template. */)
     int before(RandomGenerator random, int bound) {
       return Refaster.anyOf(
-          (int) (random.nextDouble() * bound), (int) Math.round(random.nextDouble() * bound));
+          (int) random.nextDouble(bound),
+          (int) (random.nextDouble() * bound),
+          (int) Math.round(random.nextDouble() * bound));
     }
 
     @AfterTemplate
@@ -33,10 +35,19 @@ final class RandomGeneratorRules {
    * {@code long} values from being generated.
    */
   static final class RandomGeneratorNextLong {
+    // XXX: By including expressions with and without a cast from `long` to `double`, we cater both
+    // to expressions that adhere to Error Prone's `LongDoubleConversion` check, and to expressions
+    // that don't.
     @BeforeTemplate
+    @SuppressWarnings("LongDoubleConversion" /* This violation will be rewritten. */)
     long before(RandomGenerator random, long bound) {
       return Refaster.anyOf(
-          (long) (random.nextDouble() * bound), Math.round(random.nextDouble() * bound));
+          (long) random.nextDouble((double) bound),
+          Math.round(random.nextDouble((double) bound)),
+          (long) random.nextDouble(bound),
+          Math.round(random.nextDouble(bound)),
+          (long) (random.nextDouble() * bound),
+          Math.round(random.nextDouble() * bound));
     }
 
     @AfterTemplate
