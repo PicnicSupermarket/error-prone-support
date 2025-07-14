@@ -11,15 +11,29 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class RandomGeneratorRules {
   private RandomGeneratorRules() {}
 
+  /**
+   * Prefer {@link RandomGenerator#nextDouble(double)} over alternatives that yield a smaller domain
+   * of values and may result in {@link Double#isInfinite() inifinity}.
+   */
+  static final class RandomGeneratorNextDouble {
+    @BeforeTemplate
+    double before(RandomGenerator random, double bound) {
+      return random.nextDouble() * bound;
+    }
+
+    @AfterTemplate
+    double after(RandomGenerator random, double bound) {
+      return random.nextDouble(bound);
+    }
+  }
+
   /** Prefer {@link RandomGenerator#nextInt(int)} over more contrived alternatives. */
   static final class RandomGeneratorNextInt {
     @BeforeTemplate
     @SuppressWarnings("RandomGeneratorNextLong" /* This is a more specific template. */)
     int before(RandomGenerator random, int bound) {
       return Refaster.anyOf(
-          (int) random.nextDouble(bound),
-          (int) (random.nextDouble() * bound),
-          (int) Math.round(random.nextDouble() * bound));
+          (int) random.nextDouble(bound), (int) Math.round(random.nextDouble(bound)));
     }
 
     @AfterTemplate
@@ -45,9 +59,7 @@ final class RandomGeneratorRules {
           (long) random.nextDouble((double) bound),
           Math.round(random.nextDouble((double) bound)),
           (long) random.nextDouble(bound),
-          Math.round(random.nextDouble(bound)),
-          (long) (random.nextDouble() * bound),
-          Math.round(random.nextDouble() * bound));
+          Math.round(random.nextDouble(bound)));
     }
 
     @AfterTemplate
