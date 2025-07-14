@@ -72,7 +72,7 @@ final class RefasterRulesTest {
           PatternRules.class,
           PreconditionsRules.class,
           PrimitiveRules.class,
-          RandomRules.class,
+          RandomGeneratorRules.class,
           ReactorRules.class,
           RxJava2AdapterRules.class,
           StreamRules.class,
