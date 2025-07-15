@@ -48,6 +48,7 @@ jobs:
             checkstyle.org:443
             example.com:80
             github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
             oss.sonatype.org:443
             production.cloudflare.docker.com:443
