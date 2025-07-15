@@ -14618,16 +14618,6 @@
    }
  
    /** Reset the module detail store of any previous information. */
-@@ -673,7 +675,7 @@ public class JavadocMetadataScraper extends AbstractJavadocCheck {
-     return getFirstChildOfType(ast, JavadocTokenTypes.TEXT, 0)
-         .map(DetailNode::getText)
-         .map(pattern::matcher)
--        .map(Matcher::matches)
--        .orElse(Boolean.FALSE);
-+        .filter(Matcher::matches)
-+        .isPresent();
-   }
- }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/meta/MetadataGeneratorUtil.java
 @@ -19,6 +19,8 @@
