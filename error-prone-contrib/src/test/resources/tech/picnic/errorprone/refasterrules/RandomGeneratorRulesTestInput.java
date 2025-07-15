@@ -11,7 +11,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Double> testRandomGeneratorNextDouble() {
     return ImmutableSet.of(
         new Random().nextDouble() * 1,
-        new SplittableRandom().nextDouble() * 2L,
+        2L * new SplittableRandom().nextDouble(),
         new SecureRandom().nextDouble() * 3.0);
   }
 

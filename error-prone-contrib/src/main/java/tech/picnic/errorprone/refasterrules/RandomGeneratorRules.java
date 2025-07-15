@@ -7,6 +7,10 @@ import java.util.random.RandomGenerator;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with {@link RandomGenerator} instances. */
+// XXX: Consider introducing an Error Prone bug pattern that identifies expressions of the form `c +
+// r.next{Int,Long,Double}(b)` for literals `c` and `b`, and replaces them with
+// `r.next{Int,Long,Double}(c, s)` where `s = c + b`. Similarly with the operands commuted, and
+// for the latter variant also for operator `-`.
 @OnlineDocumentation
 final class RandomGeneratorRules {
   private RandomGeneratorRules() {}
@@ -18,7 +22,7 @@ final class RandomGeneratorRules {
   static final class RandomGeneratorNextDouble {
     @BeforeTemplate
     double before(RandomGenerator random, double bound) {
-      return random.nextDouble() * bound;
+      return Refaster.anyOf(random.nextDouble() * bound, bound * random.nextDouble());
     }
 
     @AfterTemplate
