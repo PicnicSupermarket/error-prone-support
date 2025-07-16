@@ -11,7 +11,7 @@ final class ImplicitVarUsageTest {
         .addSourceLines(
             "Test.java",
             "import java.util.List;",
-            "import java.util.Optional;",
+            "",
             "class Test {",
             "  void test() {",
             "    // BUG: Diagnostic contains:",
@@ -32,8 +32,14 @@ final class ImplicitVarUsageTest {
             "    // Should NOT be flagged - constructor reference",
             "    var constructorReference = getList().stream().map(String::new).findFirst();",
             "  }",
-            "  private List<String> getList() { return null; }",
-            "  private <T> T getForType(Class<T> clazz) { return null; }",
+            "",
+            "  private List<String> getList() {",
+            "    return null;",
+            "  }",
+            "",
+            "  private <T> T getForType(Class<T> clazz) {",
+            "    return null;",
+            "  }",
             "}")
         .doTest();
   }
@@ -44,24 +50,30 @@ final class ImplicitVarUsageTest {
         .addInputLines(
             "Test.java",
             "import java.util.List;",
-            "import java.util.Optional;",
+            "",
             "class Test {",
             "  void test() {",
             "    var methodCall = getList();",
             "    var chainedMethodCall = getList().stream().filter(s -> s.length() > 2).toList();",
             "  }",
-            "  private List<String> getList() { return null; }",
+            "",
+            "  private List<String> getList() {",
+            "    return null;",
+            "  }",
             "}")
         .addOutputLines(
             "Test.java",
             "import java.util.List;",
-            "import java.util.Optional;",
+            "",
             "class Test {",
             "  void test() {",
             "    List<String> methodCall = getList();",
             "    List<String> chainedMethodCall = getList().stream().filter(s -> s.length() > 2).toList();",
             "  }",
-            "  private List<String> getList() { return null; }",
+            "",
+            "  private List<String> getList() {",
+            "    return null;",
+            "  }",
             "}")
         .doTest();
   }

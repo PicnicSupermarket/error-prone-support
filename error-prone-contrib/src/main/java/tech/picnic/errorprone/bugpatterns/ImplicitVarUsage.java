@@ -4,9 +4,6 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Description.NO_MATCH;
-import static com.google.errorprone.util.ASTHelpers.getSymbol;
-import static com.google.errorprone.util.ASTHelpers.getType;
-import static com.google.errorprone.util.ASTHelpers.hasImplicitType;
 import static javax.lang.model.element.ElementKind.LOCAL_VARIABLE;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -18,6 +15,7 @@ import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.TypeCastTree;
@@ -41,8 +39,8 @@ public final class ImplicitVarUsage extends BugChecker implements VariableTreeMa
   @Override
   public Description matchVariable(VariableTree variableTree, VisitorState visitorState) {
     // Only check local variables with implicit 'var' type
-    if (!getSymbol(variableTree).getKind().equals(LOCAL_VARIABLE)
-        || !hasImplicitType(variableTree, visitorState)) {
+    if (ASTHelpers.getSymbol(variableTree).getKind() != LOCAL_VARIABLE
+        || !ASTHelpers.hasImplicitType(variableTree, visitorState)) {
       return NO_MATCH;
     }
 
@@ -78,7 +76,7 @@ public final class ImplicitVarUsage extends BugChecker implements VariableTreeMa
     }
 
     // Get the actual type for suggestion
-    Type type = getType(initializer);
+    Type type = ASTHelpers.getType(initializer);
     if (type == null) {
       return NO_MATCH;
     }
