@@ -760,9 +760,9 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  static final class AbstractThrowableAssertHasCauseReference {
+  static final class AbstractThrowableAssertCauseIsSameAs {
     @BeforeTemplate
-    @SuppressWarnings("deprecation" /* Support migration away from deprecated API */)
+    @SuppressWarnings("deprecation" /* Migrates away from deprecated API. */)
     AbstractThrowableAssert<?, ? extends Throwable> before(
         AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
       return throwableAssert.hasCauseReference(expected);
