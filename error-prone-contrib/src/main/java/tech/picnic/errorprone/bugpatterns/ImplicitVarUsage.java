@@ -17,10 +17,14 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Types;
+import javax.lang.model.element.Modifier;
 
 /** A {@link BugChecker} that flags usages of {@code var} keyword when the type is not explicit. */
 @AutoService(BugChecker.class)
@@ -75,6 +79,11 @@ public final class ImplicitVarUsage extends BugChecker implements VariableTreeMa
       return NO_MATCH;
     }
 
+    // Allow static constructor methods
+    if (isStaticConstructorMethod(initializer, visitorState)) {
+      return NO_MATCH;
+    }
+
     // Get the actual type for suggestion
     Type type = ASTHelpers.getType(initializer);
     if (type == null) {
@@ -92,5 +101,25 @@ public final class ImplicitVarUsage extends BugChecker implements VariableTreeMa
     fixBuilder.replace(variableTree, replacement);
 
     return describeMatch(variableTree, fixBuilder.build());
+  }
+
+  /** Checks if the expression is a static constructor method call (like ImmutableList.of()). */
+  private static boolean isStaticConstructorMethod(ExpressionTree initializer, VisitorState state) {
+    if (!(initializer instanceof MethodInvocationTree methodInvocation)) {
+      return false;
+    }
+
+    // Get the method symbol and check if it's static
+    Symbol.MethodSymbol methodSymbol = ASTHelpers.getSymbol(methodInvocation);
+    if (methodSymbol == null || !methodSymbol.getModifiers().contains(Modifier.STATIC)) {
+      return false;
+    }
+
+    Type expressionType = ASTHelpers.getType(initializer);
+    Type ownerType = methodSymbol.owner.type;
+
+    Types types = state.getTypes();
+
+    return types.isSameType(expressionType, ownerType);
   }
 }
