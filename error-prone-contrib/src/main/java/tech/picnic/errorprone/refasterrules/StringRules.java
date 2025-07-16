@@ -28,6 +28,42 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class StringRules {
   private StringRules() {}
 
+  /**
+   * Avoid unnecessary creation of new empty {@link String} objects; use the empty string literal
+   * instead.
+   */
+  static final class EmptyString {
+    @BeforeTemplate
+    String before() {
+      return Refaster.anyOf(
+          new String(),
+          new String(new byte[0], UTF_8),
+          new String(new byte[] {}, UTF_8),
+          new String(new char[0]),
+          new String(new char[] {}));
+    }
+
+    @AfterTemplate
+    String after() {
+      return "";
+    }
+  }
+
+  /** Avoid unnecessary creation of new {@link String} objects. */
+  // XXX: Once `IdentityConversion` supports flagging constructor invocations, use that bug pattern
+  // instead of this Refaster rule.
+  static final class StringIdentity {
+    @BeforeTemplate
+    String before(String str) {
+      return new String(str);
+    }
+
+    @AfterTemplate
+    String after(String str) {
+      return str;
+    }
+  }
+
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects

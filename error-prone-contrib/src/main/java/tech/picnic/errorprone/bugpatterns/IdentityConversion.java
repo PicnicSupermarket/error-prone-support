@@ -53,6 +53,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // XXX: Also flag nullary instance method invocations that represent an identity conversion, such as
 // `Boolean#booleanValue()`, `Byte#byteValue()` and friends.
 // XXX: Also flag redundant round-trip conversions such as `path.toFile().toPath()`.
+// XXX: Add support for constructor invocations such as `new String(String)`, then drop the
+// `StringIdentity` Refaster rule.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
