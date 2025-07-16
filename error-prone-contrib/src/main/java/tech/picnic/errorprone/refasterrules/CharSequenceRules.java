@@ -19,6 +19,7 @@ final class CharSequenceRules {
   // below.
   static final class CharSequenceIsEmpty {
     @BeforeTemplate
+    @SuppressWarnings("java:S7158" /* This violation will be rewritten. */)
     boolean before(CharSequence charSequence) {
       return Refaster.anyOf(
           charSequence.length() == 0, charSequence.length() <= 0, charSequence.length() < 1);

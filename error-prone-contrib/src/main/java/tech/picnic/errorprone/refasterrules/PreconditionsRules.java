@@ -13,6 +13,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster templates related to statements dealing with {@link Preconditions}. */
@@ -89,7 +90,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
-  static final class RequireNonNullStatement<T> {
+  static final class RequireNonNullStatement<T extends @Nullable Object> {
     @BeforeTemplate
     @SuppressWarnings("java:S1695" /* This violation will be rewritten. */)
     void before(T object) {
@@ -120,7 +121,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
-  static final class RequireNonNullWithMessageStatement<T> {
+  static final class RequireNonNullWithMessageStatement<T extends @Nullable Object> {
     @BeforeTemplate
     @SuppressWarnings("java:S1695" /* This violation will be rewritten. */)
     void before(T object, String message) {
