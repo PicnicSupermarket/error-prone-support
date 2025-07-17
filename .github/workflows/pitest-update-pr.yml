@@ -36,7 +36,7 @@ jobs:
         with:
           java-version: 21.0.7
           java-distribution: temurin
-          maven-version: 3.9.10
+          maven-version: 3.9.11
       - name: Download Pitest analysis artifact
         uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # v3.1.4
         with:
