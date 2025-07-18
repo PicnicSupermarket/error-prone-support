@@ -220,11 +220,9 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
             .withFailMessage(String.format("foo %s %s", "bar", 1)));
   }
 
-  @SuppressWarnings("deprecation" /* Migrates away from deprecated API. */)
+  @SuppressWarnings("deprecation" /* Rule targets deprecated API. */)
   AbstractThrowableAssert<?, ? extends Throwable> testAbstractThrowableAssertCauseIsSameAs() {
-    IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
-    IllegalStateException illegalStateException =
-        new IllegalStateException(illegalArgumentException);
-    return assertThat(illegalStateException).hasCauseReference(illegalArgumentException);
+    return assertThat(new IllegalStateException())
+        .hasCauseReference(new IllegalArgumentException());
   }
 }
