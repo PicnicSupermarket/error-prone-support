@@ -34,6 +34,7 @@ final class StringRules {
    */
   static final class EmptyString {
     @BeforeTemplate
+    @SuppressWarnings("java:S2129" /* This violation will be rewritten. */)
     String before() {
       return Refaster.anyOf(
           new String(),
@@ -54,6 +55,7 @@ final class StringRules {
   // instead of this Refaster rule.
   static final class StringIdentity {
     @BeforeTemplate
+    @SuppressWarnings("java:S2129" /* This violation will be rewritten. */)
     String before(String str) {
       return new String(str);
     }
@@ -72,7 +74,11 @@ final class StringRules {
   // rule selection based on some annotation, or a separate Maven module.
   static final class StringIsEmpty {
     @BeforeTemplate
-    @SuppressWarnings("CharSequenceIsEmpty" /* This is a more specific template. */)
+    @SuppressWarnings({
+      "CharSequenceIsEmpty" /* This is a more specific template. */,
+      "java:S7158" /* This violation will be rewritten. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     boolean before(String str) {
       return Refaster.anyOf(str.length() == 0, str.length() <= 0, str.length() < 1);
     }
