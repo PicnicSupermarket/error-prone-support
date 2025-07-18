@@ -2798,6 +2798,15 @@
        throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
      Random rand = new Random();
      Method findBucketIndex =
+@@ -855,7 +854,7 @@ class HistogramTest {
+           Histogram.builder().nativeOnly().name("test").nativeInitialSchema(schema).build();
+       for (int i = 0; i < 10_000; i++) {
+         for (int zeros = -5; zeros <= 10; zeros++) {
+-          double value = rand.nextDouble() * Math.pow(10, zeros);
++          double value = rand.nextDouble(Math.pow(10, zeros));
+           int bucketIndex = (int) findBucketIndex.invoke(histogram.getNoLabels(), value);
+           double lowerBound =
+               (double)
 @@ -867,17 +866,8 @@ class HistogramTest {
                        histogram.getNoLabels(), schema, bucketIndex);
            assertThat(lowerBound < value && upperBound >= value)
