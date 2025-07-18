@@ -40,7 +40,7 @@ jobs:
         with:
           java-version: 21.0.7
           java-distribution: temurin
-          maven-version: 3.9.10
+          maven-version: 3.9.11
       - name: Initialize CodeQL
         uses: github/codeql-action/init@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
         with:

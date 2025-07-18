@@ -38,6 +38,6 @@ jobs:
         with:
           java-version: 21.0.7
           java-distribution: temurin
-          maven-version: 3.9.10
+          maven-version: 3.9.11
       - name: Build project against the latest Error Prone release
         run: mvn -T1C clean install -Dverification.skip -Dversion.error-prone=LATEST
