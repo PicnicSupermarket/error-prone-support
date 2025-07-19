@@ -60,6 +60,12 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         getClass().getName() != null && !getClass().getName().isEmpty());
   }
 
+  ImmutableSet<Boolean> testStringIsBlank() {
+    return ImmutableSet.of(
+        "foo".trim().length() == 0,
+        "bar".trim().length() != 0);
+  }
+
   ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
     return ImmutableSet.of(
         Strings.isNullOrEmpty(toString()) ? Optional.empty() : Optional.of(toString()),
