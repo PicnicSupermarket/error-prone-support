@@ -70,7 +70,7 @@ final class StringRules {
   static final class StringIsBlank {
     @BeforeTemplate
     boolean before(String str) {
-      return str.trim().length() == 0;
+      return Refaster.anyOf(str.trim().length() == 0, str.trim().length() < 1);
     }
 
     @AfterTemplate
