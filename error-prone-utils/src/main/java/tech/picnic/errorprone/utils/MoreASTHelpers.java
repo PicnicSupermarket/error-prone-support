@@ -10,6 +10,10 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.TypeVar;
+import com.sun.tools.javac.code.TypeTag;
+import com.sun.tools.javac.code.Types;
 import java.util.Optional;
 
 /**
@@ -89,5 +93,31 @@ public final class MoreASTHelpers {
    */
   public static boolean isStringTyped(Tree tree, VisitorState state) {
     return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
+  }
+
+  /**
+   * Returns the lower bound of a type if it has one, or the type itself if not. Correctly handles
+   * wildcards and capture variables.
+   *
+   * @param type The type to get the lower bound of.
+   * @param types The {@link Types} instance to use for type erasure.
+   * @return The lower bound of the type, or the type itself if it has no lower bound.
+   * @see ASTHelpers#getUpperBound(Type, Types)
+   */
+  public static Type getLowerBound(Type type, Types types) {
+    if (type.hasTag(TypeTag.WILDCARD)) {
+      return types.wildLowerBound(type);
+    }
+
+    if (type.hasTag(TypeTag.TYPEVAR) && ((TypeVar) type).isCaptured()) {
+      return types.cvarLowerBound(type);
+    }
+
+    if (type.getLowerBound() != null) {
+      return type.getLowerBound();
+    }
+
+    // concrete type, e.g. java.lang.String, or a case we haven't considered
+    return type;
   }
 }
