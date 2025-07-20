@@ -5,39 +5,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractInstantAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJInstantRulesTest implements RefasterRuleCollectionTestCase {
-  @Override
-  public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Instant.class);
+  AbstractAssert<?, ?> testAssertThatIsAfter() {
+    return assertThat(Instant.MIN.isAfter(Instant.MAX)).isTrue();
   }
 
-  AbstractAssert<?, ?> testAbstractInstantAssertIsAfter() {
-    return assertThat(Instant.now().isAfter(Instant.EPOCH)).isTrue();
+  AbstractAssert<?, ?> testAssertThatIsBeforeOrEqualTo() {
+    return assertThat(Instant.MIN.isAfter(Instant.MAX)).isFalse();
   }
 
-  AbstractAssert<?, ?> testAbstractInstantAssertIsNotAfter() {
-    return assertThat(Instant.EPOCH.isAfter(Instant.now())).isFalse();
+  AbstractAssert<?, ?> testAssertThatIsBefore() {
+    return assertThat(Instant.MIN.isBefore(Instant.MAX)).isTrue();
   }
 
-  AbstractAssert<?, ?> testAbstractInstantAssertIsBefore() {
-    return assertThat(Instant.EPOCH.isBefore(Instant.now())).isTrue();
+  AbstractAssert<?, ?> testAssertThatIsAfterOrEqualTo() {
+    return assertThat(Instant.MIN.isBefore(Instant.MAX)).isFalse();
   }
 
-  AbstractAssert<?, ?> testAbstractInstantAssertIsNotBefore() {
-    return assertThat(Instant.now().isBefore(Instant.EPOCH)).isFalse();
+  ImmutableSet<AbstractInstantAssert<?>> testAssertThatIsBetween() {
+    return ImmutableSet.of(
+        assertThat(Instant.EPOCH).isAfterOrEqualTo(Instant.MIN).isBeforeOrEqualTo(Instant.MAX),
+        assertThat(Instant.ofEpochMilli(0))
+            .isBeforeOrEqualTo(Instant.ofEpochMilli(1))
+            .isAfterOrEqualTo(Instant.ofEpochMilli(2)));
   }
 
-  AbstractAssert<?, ?> testAbstractInstantAssertIsBetween() {
-    return assertThat(Instant.ofEpochSecond(100))
-        .isAfterOrEqualTo(Instant.EPOCH)
-        .isBeforeOrEqualTo(Instant.ofEpochSecond(200));
-  }
-
-  AbstractAssert<?, ?> testAbstractInstantAssertIsStrictlyBetween() {
-    return assertThat(Instant.ofEpochSecond(100))
-        .isAfter(Instant.EPOCH)
-        .isBefore(Instant.ofEpochSecond(200));
+  ImmutableSet<AbstractInstantAssert<?>> testAssertThatIsStrictlyBetween() {
+    return ImmutableSet.of(
+        assertThat(Instant.EPOCH).isAfter(Instant.MIN).isBefore(Instant.MAX),
+        assertThat(Instant.ofEpochMilli(0))
+            .isBefore(Instant.ofEpochMilli(1))
+            .isAfter(Instant.ofEpochMilli(2)));
   }
 }

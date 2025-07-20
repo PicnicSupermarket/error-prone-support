@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.time.Instant;
@@ -12,82 +13,86 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 /**
  * Refaster rules related to AssertJ assertions over {@link Instant}s.
  *
- * <p>These rules simplify and improve the readability of Instant assertions by using the more
- * specific AssertJ Instant assertion methods instead of generic assertions.
+ * <p>These rules simplify and improve the readability of tests by using {@link Instant}-specific
+ * AssertJ assertion methods instead of generic assertions.
  */
 @OnlineDocumentation
 final class AssertJInstantRules {
   private AssertJInstantRules() {}
 
-  static final class AbstractInstantAssertIsAfter {
+  static final class AssertThatIsAfter {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Instant instant, Instant other) {
-      return assertThat(instant.isAfter(other)).isTrue();
+    AbstractBooleanAssert<?> before(Instant actual, Instant other) {
+      return assertThat(actual.isAfter(other)).isTrue();
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant other) {
-      return assertThat(instant).isAfter(other);
+    AbstractInstantAssert<?> after(Instant actual, Instant other) {
+      return assertThat(actual).isAfter(other);
     }
   }
 
-  static final class AbstractInstantAssertIsNotAfter {
+  static final class AssertThatIsBeforeOrEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Instant instant, Instant other) {
-      return assertThat(instant.isAfter(other)).isFalse();
+    AbstractBooleanAssert<?> before(Instant actual, Instant other) {
+      return assertThat(actual.isAfter(other)).isFalse();
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant other) {
-      return assertThat(instant).isBeforeOrEqualTo(other);
+    AbstractInstantAssert<?> after(Instant actual, Instant other) {
+      return assertThat(actual).isBeforeOrEqualTo(other);
     }
   }
 
-  static final class AbstractInstantAssertIsBefore {
+  static final class AssertThatIsBefore {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Instant instant, Instant other) {
-      return assertThat(instant.isBefore(other)).isTrue();
+    AbstractBooleanAssert<?> before(Instant actual, Instant other) {
+      return assertThat(actual.isBefore(other)).isTrue();
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant other) {
-      return assertThat(instant).isBefore(other);
+    AbstractInstantAssert<?> after(Instant actual, Instant other) {
+      return assertThat(actual).isBefore(other);
     }
   }
 
-  static final class AbstractInstantAssertIsNotBefore {
+  static final class AssertThatIsAfterOrEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Instant instant, Instant other) {
-      return assertThat(instant.isBefore(other)).isFalse();
+    AbstractBooleanAssert<?> before(Instant actual, Instant other) {
+      return assertThat(actual.isBefore(other)).isFalse();
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant other) {
-      return assertThat(instant).isAfterOrEqualTo(other);
+    AbstractInstantAssert<?> after(Instant actual, Instant other) {
+      return assertThat(actual).isAfterOrEqualTo(other);
     }
   }
 
-  static final class AbstractInstantAssertIsBetween {
+  static final class AssertThatIsBetween {
     @BeforeTemplate
-    AbstractInstantAssert<?> before(Instant instant, Instant start, Instant end) {
-      return assertThat(instant).isAfterOrEqualTo(start).isBeforeOrEqualTo(end);
+    AbstractInstantAssert<?> before(Instant actual, Instant start, Instant end) {
+      return Refaster.anyOf(
+          assertThat(actual).isAfterOrEqualTo(start).isBeforeOrEqualTo(end),
+          assertThat(actual).isBeforeOrEqualTo(end).isAfterOrEqualTo(start));
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant start, Instant end) {
-      return assertThat(instant).isBetween(start, end);
+    AbstractInstantAssert<?> after(Instant actual, Instant start, Instant end) {
+      return assertThat(actual).isBetween(start, end);
     }
   }
 
-  static final class AbstractInstantAssertIsStrictlyBetween {
+  static final class AssertThatIsStrictlyBetween {
     @BeforeTemplate
-    AbstractInstantAssert<?> before(Instant instant, Instant start, Instant end) {
-      return assertThat(instant).isAfter(start).isBefore(end);
+    AbstractInstantAssert<?> before(Instant actual, Instant start, Instant end) {
+      return Refaster.anyOf(
+          assertThat(actual).isAfter(start).isBefore(end),
+          assertThat(actual).isBefore(end).isAfter(start));
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant start, Instant end) {
-      return assertThat(instant).isStrictlyBetween(start, end);
+    AbstractInstantAssert<?> after(Instant actual, Instant start, Instant end) {
+      return assertThat(actual).isStrictlyBetween(start, end);
     }
   }
 }
