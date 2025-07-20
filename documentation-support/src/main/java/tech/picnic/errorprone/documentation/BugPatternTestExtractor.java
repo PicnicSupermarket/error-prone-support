@@ -38,8 +38,8 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTe
 // - Indicate which custom arguments are specified, if any.
 // - For replacement tests, indicate which `FixChooser` is used.
 // - ... (We don't use all optional features; TBD what else to support.)
-@Immutable
 @AutoService(Extractor.class)
+@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public final class BugPatternTestExtractor implements Extractor<BugPatternTestCases> {
   /** Instantiates a new {@link BugPatternTestExtractor} instance. */
@@ -239,13 +239,13 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
     abstract ImmutableList<TestEntry> entries();
   }
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonPropertyOrder("type")
   @JsonSubTypes({
     @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_IdentificationTestEntry.class),
     @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_ReplacementTestEntry.class)
   })
   @JsonTypeInfo(include = As.EXISTING_PROPERTY, property = "type", use = JsonTypeInfo.Id.DEDUCTION)
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPropertyOrder("type")
   interface TestEntry {
     TestType type();
 
