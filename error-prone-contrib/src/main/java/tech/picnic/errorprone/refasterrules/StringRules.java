@@ -66,20 +66,6 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#isBlank()} over alternatives that check trimmed length. */
-  static final class StringIsBlank {
-    @BeforeTemplate
-    boolean before(String str) {
-      return str.trim().isEmpty();
-    }
-
-    @AfterTemplate
-    @AlsoNegation
-    boolean after(String str) {
-      return str.isBlank();
-    }
-  }
-
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects
@@ -150,6 +136,22 @@ final class StringRules {
     @AlsoNegation
     boolean after(String str) {
       return Strings.isNullOrEmpty(str);
+    }
+  }
+
+  /** Prefer {@link String#isBlank()} over less efficient alternatives. */
+  // XXX: Note that this rule changes semantics, as `isBlank()` considers whitespace characters
+  // beyond U+0020, while `trim()` does not.
+  static final class StringIsBlank {
+    @BeforeTemplate
+    boolean before(String str) {
+      return str.trim().isEmpty();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(String str) {
+      return str.isBlank();
     }
   }
 
