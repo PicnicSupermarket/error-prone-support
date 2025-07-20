@@ -120,4 +120,32 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1.0 >= 2.0).isTrue(),
         assertThat(1.0 < 2.0).isFalse());
   }
+
+  void testAssertThatArrayIsEmpty() {
+    assertThat(new String[0].length).isZero();
+  }
+
+  AbstractAssert<?, ?> testAssertThatArrayHasSize() {
+    return assertThat(new String[7].length).isEqualTo(7);
+  }
+
+  AbstractAssert<?, ?> testAssertThatArrayHasSameSizeAs() {
+    return assertThat(new String[3].length).isEqualTo(new Integer[3].length);
+  }
+
+  AbstractAssert<?, ?> testAssertThatArrayHasSizeLessThanOrEqualTo() {
+    return assertThat(new String[2].length).isLessThanOrEqualTo(2);
+  }
+
+  AbstractAssert<?, ?> testAssertThatArrayHasSizeLessThan() {
+    return assertThat(new String[4].length).isLessThan(5);
+  }
+
+  AbstractAssert<?, ?> testAssertThatArrayHasSizeGreaterThan() {
+    return assertThat(new String[5].length).isGreaterThan(4);
+  }
+
+  AbstractAssert<?, ?> testAssertThatArrayHasSizeGreaterThanOrEqualTo() {
+    return assertThat(new String[1].length).isGreaterThanOrEqualTo(1);
+  }
 }

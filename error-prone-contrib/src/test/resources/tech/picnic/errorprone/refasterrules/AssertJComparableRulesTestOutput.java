@@ -11,6 +11,10 @@ final class AssertJComparableRulesTest implements RefasterRuleCollectionTestCase
     return assertThat(BigDecimal.ZERO).isEqualByComparingTo(BigDecimal.ONE);
   }
 
+  AbstractComparableAssert<?, ?> testAssertThatIsEqualByComparingToWithZero() {
+    return assertThat(BigDecimal.ZERO).isEqualByComparingTo(BigDecimal.ONE);
+  }
+
   AbstractComparableAssert<?, ?> testAssertThatIsNotEqualByComparingTo() {
     return assertThat(BigDecimal.ZERO).isNotEqualByComparingTo(BigDecimal.ONE);
   }
