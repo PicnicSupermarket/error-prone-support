@@ -32,6 +32,7 @@ final class RefasterRulesTest {
           AssertJNumberRules.class,
           AssertJObjectRules.class,
           AssertJOptionalRules.class,
+          AssertJPathRules.class,
           AssertJPrimitiveRules.class,
           AssertJRules.class,
           AssertJShortRules.class,
