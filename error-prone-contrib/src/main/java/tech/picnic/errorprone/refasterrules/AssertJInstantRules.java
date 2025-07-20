@@ -67,30 +67,6 @@ final class AssertJInstantRules {
     }
   }
 
-  static final class AbstractInstantAssertIsBeforeOrEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(Instant instant, Instant other) {
-      return assertThat(instant.compareTo(other) <= 0).isTrue();
-    }
-
-    @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant other) {
-      return assertThat(instant).isBeforeOrEqualTo(other);
-    }
-  }
-
-  static final class AbstractInstantAssertIsAfterOrEqualTo {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(Instant instant, Instant other) {
-      return assertThat(instant.compareTo(other) >= 0).isTrue();
-    }
-
-    @AfterTemplate
-    AbstractInstantAssert<?> after(Instant instant, Instant other) {
-      return assertThat(instant).isAfterOrEqualTo(other);
-    }
-  }
-
   static final class AbstractInstantAssertIsBetween {
     @BeforeTemplate
     AbstractInstantAssert<?> before(Instant instant, Instant start, Instant end) {

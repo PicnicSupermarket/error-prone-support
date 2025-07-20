@@ -29,14 +29,6 @@ final class AssertJInstantRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(Instant.now().isBefore(Instant.EPOCH)).isFalse();
   }
 
-  AbstractAssert<?, ?> testAbstractInstantAssertIsBeforeOrEqualTo() {
-    return assertThat(Instant.EPOCH.compareTo(Instant.now()) <= 0).isTrue();
-  }
-
-  AbstractAssert<?, ?> testAbstractInstantAssertIsAfterOrEqualTo() {
-    return assertThat(Instant.now().compareTo(Instant.EPOCH) >= 0).isTrue();
-  }
-
   AbstractAssert<?, ?> testAbstractInstantAssertIsBetween() {
     return assertThat(Instant.ofEpochSecond(100))
         .isAfterOrEqualTo(Instant.EPOCH)
