@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -14,68 +14,71 @@ final class AssertJPathRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Files.class);
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertExists() {
-    return assertThat(Paths.get("/tmp")).exists();
+  AbstractAssert<?, ?> testAssertThatExists() {
+    return assertThat(Path.of("foo")).exists();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertDoesNotExist() {
-    return assertThat(Paths.get("/nonexistent")).doesNotExist();
+  AbstractAssert<?, ?> testAssertThatDoesNotExist() {
+    return assertThat(Path.of("foo")).doesNotExist();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsRegularFile() {
-    return assertThat(Paths.get("/tmp/file.txt")).isRegularFile();
+  AbstractAssert<?, ?> testAssertThatIsRegularFile() {
+    return assertThat(Path.of("foo")).isRegularFile();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsDirectory() {
-    return assertThat(Paths.get("/tmp")).isDirectory();
+  AbstractAssert<?, ?> testAssertThatIsDirectory() {
+    return assertThat(Path.of("foo")).isDirectory();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsSymbolicLink() {
-    return assertThat(Paths.get("/tmp/link")).isSymbolicLink();
+  AbstractAssert<?, ?> testAssertThatIsSymbolicLink() {
+    return assertThat(Path.of("foo")).isSymbolicLink();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsAbsolute() {
-    return assertThat(Paths.get("/tmp")).isAbsolute();
+  AbstractAssert<?, ?> testAssertThatIsAbsolute() {
+    return assertThat(Path.of("foo")).isAbsolute();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsRelative() {
-    return assertThat(Paths.get("tmp")).isRelative();
+  AbstractAssert<?, ?> testAssertThatIsRelative() {
+    return assertThat(Path.of("foo")).isRelative();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsReadable() {
-    return assertThat(Paths.get("/tmp")).isReadable();
+  AbstractAssert<?, ?> testAssertThatIsReadable() {
+    return assertThat(Path.of("foo")).isReadable();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsWritable() {
-    return assertThat(Paths.get("/tmp")).isWritable();
+  AbstractAssert<?, ?> testAssertThatIsWritable() {
+    return assertThat(Path.of("foo")).isWritable();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertIsExecutable() {
-    return assertThat(Paths.get("/bin/sh")).isExecutable();
+  AbstractAssert<?, ?> testAssertThatIsExecutable() {
+    return assertThat(Path.of("foo")).isExecutable();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertHasFileName() {
-    return assertThat(Paths.get("/tmp/file.txt")).hasFileName("file.txt");
+  AbstractAssert<?, ?> testAssertThatHasFileName() {
+    return assertThat(Path.of("foo")).hasFileName("bar");
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertHasParent() {
-    return assertThat(Paths.get("/tmp/file.txt")).hasParent(Paths.get("/tmp"));
+  AbstractAssert<?, ?> testAssertThatHasParentRaw() {
+    return assertThat(Path.of("foo")).hasParentRaw(Path.of("bar"));
   }
 
-  void testAbstractPathAssertHasNoParent() {
-    assertThat(Paths.get("/")).hasNoParent();
+  void testAssertThatHasNoParent() {
+    assertThat(Path.of("foo")).hasNoParent();
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertStartsWith() {
-    return assertThat(Paths.get("/tmp/file.txt")).startsWith(Paths.get("/tmp"));
+  AbstractAssert<?, ?> testAssertThatStartsWithRaw() {
+    return assertThat(Path.of("foo")).startsWithRaw(Path.of("bar"));
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertEndsWith() {
-    return assertThat(Paths.get("/tmp/file.txt")).endsWith(Paths.get("file.txt"));
+  AbstractAssert<?, ?> testAssertThatEndsWithRaw() {
+    return assertThat(Path.of("foo")).endsWithRaw(Path.of("bar"));
   }
 
-  AbstractAssert<?, ?> testAbstractPathAssertHasExtension() {
-    String ext = "txt";
-    return assertThat(Paths.get("/tmp/file.txt")).hasExtension(ext);
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatHasExtension() {
+    return ImmutableSet.of(
+        assertThat(Path.of("foo")).hasExtension("bar"),
+        assertThat(Path.of("baz")).hasExtension("qux"),
+        assertThat(Path.of("quux")).hasExtension(toString()),
+        assertThat(Path.of("corge")).hasExtension(getClass().toString()));
   }
 }

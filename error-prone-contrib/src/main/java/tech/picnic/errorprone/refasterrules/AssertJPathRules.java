@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.nio.file.Files;
@@ -14,203 +15,208 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 /**
  * Refaster rules related to AssertJ assertions over {@link Path}s.
  *
- * <p>These rules simplify and improve the readability of Path assertions by using the more specific
- * AssertJ Path assertion methods instead of generic assertions.
+ * <p>These rules simplify and improve the readability of tests by using {@link Path}-specific
+ * AssertJ assertion methods instead of generic assertions.
  */
 @OnlineDocumentation
 final class AssertJPathRules {
   private AssertJPathRules() {}
 
-  static final class AbstractPathAssertExists {
+  static final class AssertThatExists {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.exists(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.exists(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).exists();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).exists();
     }
   }
 
-  static final class AbstractPathAssertDoesNotExist {
+  static final class AssertThatDoesNotExist {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.exists(path)).isFalse();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.exists(actual)).isFalse();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).doesNotExist();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).doesNotExist();
     }
   }
 
-  static final class AbstractPathAssertIsRegularFile {
+  static final class AssertThatIsRegularFile {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.isRegularFile(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.isRegularFile(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isRegularFile();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isRegularFile();
     }
   }
 
-  static final class AbstractPathAssertIsDirectory {
+  static final class AssertThatIsDirectory {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.isDirectory(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.isDirectory(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isDirectory();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isDirectory();
     }
   }
 
-  static final class AbstractPathAssertIsSymbolicLink {
+  static final class AssertThatIsSymbolicLink {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.isSymbolicLink(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.isSymbolicLink(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isSymbolicLink();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isSymbolicLink();
     }
   }
 
-  static final class AbstractPathAssertIsAbsolute {
+  static final class AssertThatIsAbsolute {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(path.isAbsolute()).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(actual.isAbsolute()).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isAbsolute();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isAbsolute();
     }
   }
 
-  static final class AbstractPathAssertIsRelative {
+  static final class AssertThatIsRelative {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(path.isAbsolute()).isFalse();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(actual.isAbsolute()).isFalse();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isRelative();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isRelative();
     }
   }
 
-  static final class AbstractPathAssertIsReadable {
+  static final class AssertThatIsReadable {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.isReadable(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.isReadable(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isReadable();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isReadable();
     }
   }
 
-  static final class AbstractPathAssertIsWritable {
+  static final class AssertThatIsWritable {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.isWritable(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.isWritable(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isWritable();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isWritable();
     }
   }
 
-  static final class AbstractPathAssertIsExecutable {
+  static final class AssertThatIsExecutable {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path) {
-      return assertThat(Files.isExecutable(path)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual) {
+      return assertThat(Files.isExecutable(actual)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path) {
-      return assertThat(path).isExecutable();
+    AbstractPathAssert<?> after(Path actual) {
+      return assertThat(actual).isExecutable();
     }
   }
 
-  static final class AbstractPathAssertHasFileName {
+  // XXX: This rule changes the `Path` against which subsequent assertions are made.
+  static final class AssertThatHasFileName {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatHasToString")
-    AbstractStringAssert<?> before(Path path, String fileName) {
-      return assertThat(path.getFileName().toString()).isEqualTo(fileName);
+    AbstractPathAssert<?> before(Path actual, String fileName) {
+      return assertThat(actual.getFileName()).hasToString(fileName);
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path, String fileName) {
-      return assertThat(path).hasFileName(fileName);
+    AbstractPathAssert<?> after(Path actual, String fileName) {
+      return assertThat(actual).hasFileName(fileName);
     }
   }
 
-  static final class AbstractPathAssertHasParent {
+  static final class AssertThatHasParentRaw {
     @BeforeTemplate
-    AbstractPathAssert<?> before(Path path, Path parent) {
-      return assertThat(path.getParent()).isEqualTo(parent);
+    AbstractPathAssert<?> before(Path actual, Path expected) {
+      return assertThat(actual.getParent()).isEqualTo(expected);
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path, Path parent) {
-      return assertThat(path).hasParent(parent);
+    AbstractPathAssert<?> after(Path actual, Path expected) {
+      return assertThat(actual).hasParentRaw(expected);
     }
   }
 
-  static final class AbstractPathAssertHasNoParent {
+  static final class AssertThatHasNoParent {
     @BeforeTemplate
-    void before(Path path) {
-      assertThat(path.getParent()).isNull();
+    void before(Path actual) {
+      assertThat(actual.getParent()).isNull();
     }
 
     @AfterTemplate
-    void after(Path path) {
-      assertThat(path).hasNoParent();
+    void after(Path actual) {
+      assertThat(actual).hasNoParent();
     }
   }
 
-  static final class AbstractPathAssertStartsWith {
+  static final class AssertThatStartsWithRaw {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path, Path other) {
-      return assertThat(path.startsWith(other)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual, Path other) {
+      return assertThat(actual.startsWith(other)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path, Path other) {
-      return assertThat(path).startsWith(other);
+    AbstractPathAssert<?> after(Path actual, Path other) {
+      return assertThat(actual).startsWithRaw(other);
     }
   }
 
-  static final class AbstractPathAssertEndsWith {
+  static final class AssertThatEndsWithRaw {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path, Path other) {
-      return assertThat(path.endsWith(other)).isTrue();
+    AbstractBooleanAssert<?> before(Path actual, Path other) {
+      return assertThat(actual.endsWith(other)).isTrue();
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path, Path other) {
-      return assertThat(path).endsWith(other);
+    AbstractPathAssert<?> after(Path actual, Path other) {
+      return assertThat(actual).endsWithRaw(other);
     }
   }
 
-  static final class AbstractPathAssertHasExtension {
+  /**
+   * Prefer using {@link AbstractPathAssert#hasExtension(String)} over more verbose and less
+   * accurate alternatives.
+   */
+  static final class AssertThatHasExtension {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Path path, String extension) {
-      return assertThat(path.toString().endsWith("." + extension)).isTrue();
+    AbstractStringAssert<?> before(Path actual, String expectedExtension) {
+      return assertThat(Refaster.anyOf(actual.getFileName().toString(), actual.toString()))
+          .endsWith(Refaster.anyOf('.' + expectedExtension, "." + expectedExtension));
     }
 
     @AfterTemplate
-    AbstractPathAssert<?> after(Path path, String extension) {
-      return assertThat(path).hasExtension(extension);
+    AbstractPathAssert<?> after(Path actual, String expectedExtension) {
+      return assertThat(actual).hasExtension(expectedExtension);
     }
   }
 }
