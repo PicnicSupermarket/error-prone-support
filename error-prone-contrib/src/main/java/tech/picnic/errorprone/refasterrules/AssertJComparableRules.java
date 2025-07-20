@@ -27,19 +27,6 @@ final class AssertJComparableRules {
     }
   }
 
-  static final class AssertThatIsEqualByComparingToWithZero<T extends Comparable<? super T>> {
-    @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isZero();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
-      return assertThat(actual).isEqualByComparingTo(expected);
-    }
-  }
-
   static final class AssertThatIsNotEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
