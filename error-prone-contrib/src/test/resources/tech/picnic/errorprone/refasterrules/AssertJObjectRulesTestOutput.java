@@ -2,11 +2,16 @@ package tech.picnic.errorprone.refasterrules;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
   AbstractAssert<?, ?> testAssertThatIsInstanceOf() {
+    return assertThat("foo").isInstanceOf(String.class);
+  }
+
+  AbstractAssert<?, ?> testAssertThatIsInstanceOf2() {
     return assertThat("foo").isInstanceOf(String.class);
   }
 
@@ -26,27 +31,25 @@ final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(new Object()).hasToString("foo");
   }
 
-  AbstractAssert<?, ?> testAssertThatIsSameAs() {
-    return assertThat("foo").isSameAs("bar");
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsSameAs() {
+    return ImmutableSet.of(assertThat("foo").isSameAs("bar"), assertThat("baz").isSameAs("qux"));
   }
 
-  AbstractAssert<?, ?> testAssertThatIsNotSameAs() {
-    return assertThat("foo").isNotSameAs("bar");
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotSameAs() {
+    return ImmutableSet.of(
+        assertThat("foo").isNotSameAs("bar"), assertThat("baz").isNotSameAs("qux"));
   }
 
   void testAssertThatIsNull() {
     assertThat("foo").isNull();
+    assertThat("bar").isNull();
   }
 
-  void testAssertThatIsNotNull() {
-    assertThat("foo").isNotNull();
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotNull() {
+    return ImmutableSet.of(assertThat("foo").isNotNull(), assertThat("bar").isNotNull());
   }
 
   AbstractAssert<?, ?> testAssertThatHasSameHashCodeAs() {
     return assertThat("foo").hasSameHashCodeAs("bar");
-  }
-
-  AbstractAssert<?, ?> testAssertThatObjectIsInstanceOf() {
-    return assertThat("foo").isInstanceOf(String.class);
   }
 }

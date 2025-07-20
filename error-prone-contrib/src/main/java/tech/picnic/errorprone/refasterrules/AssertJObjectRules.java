@@ -30,6 +30,19 @@ final class AssertJObjectRules {
     }
   }
 
+  static final class AssertThatIsInstanceOf2<S, T> {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(T object, Class<S> clazz) {
+      return assertThat(clazz.isInstance(object)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    ObjectAssert<T> after(T object, Class<S> clazz) {
+      return assertThat(object).isInstanceOf(clazz);
+    }
+  }
+
   static final class AssertThatIsNotInstanceOf<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object) {
@@ -85,7 +98,8 @@ final class AssertJObjectRules {
   static final class AssertThatIsSameAs<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T object1, T object2) {
-      return assertThat(object1 == object2).isTrue();
+      return Refaster.anyOf(
+          assertThat(object1 == object2).isTrue(), assertThat(object1 != object2).isFalse());
     }
 
     @AfterTemplate
@@ -98,7 +112,8 @@ final class AssertJObjectRules {
   static final class AssertThatIsNotSameAs<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T object1, T object2) {
-      return assertThat(object1 == object2).isFalse();
+      return Refaster.anyOf(
+          assertThat(object1 == object2).isFalse(), assertThat(object1 != object2).isTrue());
     }
 
     @AfterTemplate
@@ -108,10 +123,19 @@ final class AssertJObjectRules {
     }
   }
 
+  // XXX This rule is redundant when the `AssertThatIsSameAs` rule is used in combination with the
+  // `AssertJIsNull` check. It's retained for use with OpenRewrite.
   static final class AssertThatIsNull<T> {
     @BeforeTemplate
+    @SuppressWarnings("AssertThatIsSameAs" /* This is a more specific template. */)
     void before(T object) {
       assertThat(object == null).isTrue();
+    }
+
+    @BeforeTemplate
+    @SuppressWarnings("AssertThatIsSameAs" /* This is a more specific template. */)
+    void before2(T object) {
+      assertThat(object != null).isFalse();
     }
 
     @AfterTemplate
@@ -121,16 +145,20 @@ final class AssertJObjectRules {
     }
   }
 
+  // XXX This rule is redundant when the `AssertThatIsNotSameAs` rule is used in combination with
+  // the `AssertJIsNull` check. It's retained for use with OpenRewrite.
   static final class AssertThatIsNotNull<T> {
     @BeforeTemplate
-    void before(T object) {
-      assertThat(object == null).isFalse();
+    @SuppressWarnings("AssertThatIsNotSameAs" /* This is a more specific template. */)
+    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(T object) {
+      return Refaster.anyOf(
+          assertThat(object == null).isFalse(), assertThat(object != null).isTrue());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(T object) {
-      assertThat(object).isNotNull();
+    ObjectAssert<T> after(T object) {
+      return assertThat(object).isNotNull();
     }
   }
 
@@ -144,19 +172,6 @@ final class AssertJObjectRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ObjectAssert<T> after(T object1, T object2) {
       return assertThat(object1).hasSameHashCodeAs(object2);
-    }
-  }
-
-  static final class AssertThatObjectIsInstanceOf<T> {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(T object, Class<?> clazz) {
-      return assertThat(clazz.isInstance(object)).isTrue();
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ObjectAssert<T> after(T object, Class<?> clazz) {
-      return assertThat(object).isInstanceOf(clazz);
     }
   }
 }
