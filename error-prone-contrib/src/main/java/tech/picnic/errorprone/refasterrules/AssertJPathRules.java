@@ -143,6 +143,7 @@ final class AssertJPathRules {
 
   static final class AbstractPathAssertHasFileName {
     @BeforeTemplate
+    @SuppressWarnings("AssertThatHasToString")
     AbstractStringAssert<?> before(Path path, String fileName) {
       return assertThat(path.getFileName().toString()).isEqualTo(fileName);
     }
