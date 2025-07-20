@@ -44,6 +44,58 @@ final class AssertJStringRules {
     }
   }
 
+  static final class AssertThatStringStartsWith {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String prefix) {
+      return assertThat(string.startsWith(prefix)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String prefix) {
+      return assertThat(string).startsWith(prefix);
+    }
+  }
+
+  static final class AssertThatStringDoesNotStartWith {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String prefix) {
+      return assertThat(string.startsWith(prefix)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String prefix) {
+      return assertThat(string).doesNotStartWith(prefix);
+    }
+  }
+
+  static final class AssertThatStringEndsWith {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String prefix) {
+      return assertThat(string.endsWith(prefix)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String prefix) {
+      return assertThat(string).endsWith(prefix);
+    }
+  }
+
+  static final class AssertThatStringDoesNotEndWith {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String prefix) {
+      return assertThat(string.endsWith(prefix)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String prefix) {
+      return assertThat(string).doesNotEndWith(prefix);
+    }
+  }
+
   static final class AssertThatStringContains {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {
