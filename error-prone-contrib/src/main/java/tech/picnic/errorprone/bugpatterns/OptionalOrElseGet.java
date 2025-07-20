@@ -83,8 +83,7 @@ public final class OptionalOrElseGet extends BugChecker implements MethodInvocat
 
     /* Construct the suggested fix, replacing the method invocation and its argument. */
     SuggestedFix fix =
-        SuggestedFix.builder()
-            .merge(SuggestedFixes.renameMethodInvocation(tree, "orElseGet", state))
+        SuggestedFixes.renameMethodInvocation(tree, "orElseGet", state).toBuilder()
             .replace(argument, newArgument)
             .build();
 
