@@ -13,15 +13,14 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 /**
  * Refaster rules related to AssertJ assertions over {@link Duration}s.
  *
- * <p>These rules simplify and improve the readability of Duration assertions by using the more
- * specific AssertJ Duration assertion methods instead of generic assertions on the Duration's
- * numeric values.
+ * <p>These rules simplify and improve the readability of tests by using {@link Duration}-specific
+ * AssertJ assertion methods instead of generic assertions.
  */
 @OnlineDocumentation
 final class AssertJDurationRules {
   private AssertJDurationRules() {}
 
-  static final class AbstractDurationAssertHasNanos {
+  static final class AssertThatHasNanos {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long nanos) {
       return assertThat(duration.toNanos()).isEqualTo(nanos);
@@ -33,7 +32,7 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertHasMillis {
+  static final class AssertThatHasMillis {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long millis) {
       return assertThat(duration.toMillis()).isEqualTo(millis);
@@ -45,7 +44,7 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertHasSeconds {
+  static final class AssertThatHasSeconds {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long seconds) {
       return assertThat(duration.toSeconds()).isEqualTo(seconds);
@@ -57,7 +56,7 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertHasMinutes {
+  static final class AssertThatHasMinutes {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long minutes) {
       return assertThat(duration.toMinutes()).isEqualTo(minutes);
@@ -69,7 +68,7 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertHasHours {
+  static final class AssertThatHasHours {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long hours) {
       return assertThat(duration.toHours()).isEqualTo(hours);
@@ -81,7 +80,7 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertHasDays {
+  static final class AssertThatHasDays {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long days) {
       return assertThat(duration.toDays()).isEqualTo(days);
@@ -93,10 +92,18 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertIsZero {
+  static final class AssertThatIsZero {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Duration duration) {
       return assertThat(duration.isZero()).isTrue();
+    }
+
+    // XXX: This method can be folded into the preceding method using `Refaster#anyOf`, but by
+    // keeping it separate, we show that this rule, contrary to the other one, retains the correct
+    // return type.
+    @BeforeTemplate
+    AbstractDurationAssert<?> before2(Duration duration) {
+      return assertThat(duration).isEqualTo(Duration.ZERO);
     }
 
     @AfterTemplate
@@ -105,10 +112,32 @@ final class AssertJDurationRules {
     }
   }
 
-  static final class AbstractDurationAssertIsNegative {
+  // XXX: Once we build against JDK 18+, update this rule to also rewrite
+  // `assertThat(duration.isPositive()).isTrue()`
+  static final class AssertThatIsPositive {
+    @BeforeTemplate
+    AbstractDurationAssert<?> before(Duration duration) {
+      return assertThat(duration).isGreaterThan(Duration.ZERO);
+    }
+
+    @AfterTemplate
+    AbstractDurationAssert<?> after(Duration duration) {
+      return assertThat(duration).isPositive();
+    }
+  }
+
+  static final class AssertThatIsNegative {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Duration duration) {
       return assertThat(duration.isNegative()).isTrue();
+    }
+
+    // XXX: This method can be folded into the preceding method using `Refaster#anyOf`, but by
+    // keeping it separate, we show that this rule, contrary to the other one, retains the correct
+    // return type.
+    @BeforeTemplate
+    AbstractDurationAssert<?> before2(Duration duration) {
+      return assertThat(duration).isLessThan(Duration.ZERO);
     }
 
     @AfterTemplate

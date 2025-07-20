@@ -5,44 +5,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.AbstractComparableAssert;
+import org.assertj.core.api.AbstractDurationAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJDurationRulesTest implements RefasterRuleCollectionTestCase {
-  @Override
-  public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Duration.class);
+  AbstractAssert<?, ?> testAssertThatHasNanos() {
+    return assertThat(Duration.ZERO.toNanos()).isEqualTo(0L);
   }
 
-  AbstractComparableAssert<?, ?> testAbstractDurationAssertHasNanos() {
-    return assertThat(Duration.ofNanos(1000).toNanos()).isEqualTo(1000L);
+  AbstractAssert<?, ?> testAssertThatHasMillis() {
+    return assertThat(Duration.ZERO.toMillis()).isEqualTo(0L);
   }
 
-  AbstractComparableAssert<?, ?> testAbstractDurationAssertHasMillis() {
-    return assertThat(Duration.ofMillis(1000).toMillis()).isEqualTo(1000L);
+  AbstractAssert<?, ?> testAssertThatHasSeconds() {
+    return assertThat(Duration.ZERO.toSeconds()).isEqualTo(0L);
   }
 
-  AbstractComparableAssert<?, ?> testAbstractDurationAssertHasSeconds() {
-    return assertThat(Duration.ofSeconds(60).toSeconds()).isEqualTo(60L);
+  AbstractAssert<?, ?> testAssertThatHasMinutes() {
+    return assertThat(Duration.ZERO.toMinutes()).isEqualTo(0L);
   }
 
-  AbstractComparableAssert<?, ?> testAbstractDurationAssertHasMinutes() {
-    return assertThat(Duration.ofMinutes(5).toMinutes()).isEqualTo(5L);
+  AbstractAssert<?, ?> testAssertThatHasHours() {
+    return assertThat(Duration.ZERO.toHours()).isEqualTo(0L);
   }
 
-  AbstractComparableAssert<?, ?> testAbstractDurationAssertHasHours() {
-    return assertThat(Duration.ofHours(2).toHours()).isEqualTo(2L);
+  AbstractAssert<?, ?> testAssertThatHasDays() {
+    return assertThat(Duration.ZERO.toDays()).isEqualTo(0L);
   }
 
-  AbstractComparableAssert<?, ?> testAbstractDurationAssertHasDays() {
-    return assertThat(Duration.ofDays(7).toDays()).isEqualTo(7L);
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsZero() {
+    return ImmutableSet.of(
+        assertThat(Duration.ofMillis(0).isZero()).isTrue(),
+        assertThat(Duration.ofMillis(1)).isEqualTo(Duration.ZERO));
   }
 
-  AbstractAssert<?, ?> testAbstractDurationAssertIsZero() {
-    return assertThat(Duration.ZERO.isZero()).isTrue();
+  AbstractDurationAssert<?> testAssertThatIsPositive() {
+    return assertThat(Duration.ofMillis(0)).isGreaterThan(Duration.ZERO);
   }
 
-  AbstractAssert<?, ?> testAbstractDurationAssertIsNegative() {
-    return assertThat(Duration.ofSeconds(-1).isNegative()).isTrue();
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNegative() {
+    return ImmutableSet.of(
+        assertThat(Duration.ofMillis(0).isNegative()).isTrue(),
+        assertThat(Duration.ofMillis(1)).isLessThan(Duration.ZERO));
   }
 }
