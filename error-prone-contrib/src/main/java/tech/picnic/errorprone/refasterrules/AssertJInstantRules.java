@@ -7,7 +7,6 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.time.Instant;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractInstantAssert;
-import org.assertj.core.api.AbstractLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /**
