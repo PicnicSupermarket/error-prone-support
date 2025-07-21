@@ -124,7 +124,7 @@ final class AssertJObjectRules {
   }
 
   // XXX This rule is redundant when the `AssertThatIsSameAs` rule is used in combination with the
-  // `AssertJIsNull` check. It's retained for use with OpenRewrite.
+  // `AssertJNullnessAssertion` check. It's retained for use with OpenRewrite.
   static final class AssertThatIsNull<T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsSameAs" /* This is a more specific template. */)
@@ -146,7 +146,7 @@ final class AssertJObjectRules {
   }
 
   // XXX This rule is redundant when the `AssertThatIsNotSameAs` rule is used in combination with
-  // the `AssertJIsNull` check. It's retained for use with OpenRewrite.
+  // the `AssertJNullnessAssertion` check. It's retained for use with OpenRewrite.
   static final class AssertThatIsNotNull<T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsNotSameAs" /* This is a more specific template. */)
