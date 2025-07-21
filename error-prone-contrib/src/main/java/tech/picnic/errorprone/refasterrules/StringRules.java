@@ -139,6 +139,22 @@ final class StringRules {
     }
   }
 
+  /** Prefer {@link String#isBlank()} over less efficient alternatives. */
+  // XXX: Note that this rule changes semantics, as `isBlank()` considers whitespace characters
+  // beyond U+0020, while `trim()` does not.
+  static final class StringIsBlank {
+    @BeforeTemplate
+    boolean before(String str) {
+      return str.trim().isEmpty();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(String str) {
+      return str.isBlank();
+    }
+  }
+
   /** Don't use the ternary operator to create an optionally-absent string. */
   // XXX: This is a special case of `TernaryOperatorOptionalNegativeFiltering`.
   static final class OptionalNonEmptyString {
