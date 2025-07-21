@@ -54,7 +54,7 @@ public final class AssertJIsNull extends BugChecker implements MethodInvocationT
     }
 
     SuggestedFix.Builder fix =
-        SuggestedFix.builder().merge(SuggestedFixes.renameMethodInvocation(tree, "isNull", state));
+        SuggestedFixes.renameMethodInvocation(tree, "isNull", state).toBuilder();
     tree.getArguments().forEach(arg -> fix.merge(SuggestedFix.delete(arg)));
 
     return describeMatch(tree, fix.build());

@@ -237,8 +237,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
             alternatives.get(ASTHelpers.getSymbol(tree).getSimpleName().toString()))
         .map(
             replacement ->
-                SuggestedFix.builder()
-                    .merge(SuggestedFixes.renameMethodInvocation(tree, replacement, state))
+                SuggestedFixes.renameMethodInvocation(tree, replacement, state).toBuilder()
                     .merge(SourceCode.unwrapMethodInvocation(argument, state))
                     .build());
   }
