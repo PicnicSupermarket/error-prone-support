@@ -6,16 +6,8 @@ import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJArrayRulesTest implements RefasterRuleCollectionTestCase {
-  void testAssertThatArrayIsEmpty() {
-    assertThat(new String[0]).isEmpty();
-  }
-
   AbstractAssert<?, ?> testAssertThatArrayHasSize() {
     return assertThat(new String[7]).hasSize(7);
-  }
-
-  AbstractAssert<?, ?> testAssertThatArrayHasSameSizeAs() {
-    return assertThat(new String[3]).hasSameSizeAs(new Integer[3]);
   }
 
   AbstractAssert<?, ?> testAssertThatArrayHasSizeLessThanOrEqualTo() {
