@@ -13,6 +13,7 @@ final class RefasterRulesTest {
   /** The names of all Refaster rule groups defined in this module. */
   private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
       ImmutableSet.of(
+          AssertJArrayRules.class,
           AssertJBigDecimalRules.class,
           AssertJBigIntegerRules.class,
           AssertJBooleanRules.class,
