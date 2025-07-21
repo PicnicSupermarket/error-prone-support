@@ -7,7 +7,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJArrayRulesTest implements RefasterRuleCollectionTestCase {
   void testAssertThatArrayIsEmpty() {
-    assertThat(new String[0].length).isZero();
+    assertThat(new String[0].length).isEqualTo(0);
   }
 
   AbstractAssert<?, ?> testAssertThatArrayHasSize() {
@@ -15,7 +15,7 @@ final class AssertJArrayRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   AbstractAssert<?, ?> testAssertThatArrayHasSameSizeAs() {
-    return assertThat(new String[3].length).isEqualTo(new Integer[3].length);
+    return assertThat(new String[3]).hasSize(new Integer[3].length);
   }
 
   AbstractAssert<?, ?> testAssertThatArrayHasSizeLessThanOrEqualTo() {
