@@ -19,7 +19,7 @@
      </dependency>
      <dependency>
        <groupId>org.slf4j</groupId>
-@@ -312,13 +311,24 @@
+@@ -320,13 +319,24 @@
                -Xep:LongDoubleConversion:OFF
                -Xep:StringSplitter:OFF
                -XepExcludedPaths:.*/generated/.*

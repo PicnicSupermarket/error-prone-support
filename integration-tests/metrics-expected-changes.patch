@@ -1,3 +1,63 @@
+--- a/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/Counted.java
++++ b/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/Counted.java
+@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
+  *
+  * @since 3.1
+  */
+-@Inherited
+ @Documented
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target({
+   ElementType.TYPE,
+--- a/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/ExceptionMetered.java
++++ b/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/ExceptionMetered.java
+@@ -38,8 +38,8 @@ import java.lang.annotation.Target;
+  * <p>A meter named {@code fancyName.exceptions} will be created and marked every time an exception
+  * is thrown.
+  */
+-@Inherited
+ @Documented
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target({
+   ElementType.TYPE,
+--- a/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/Metered.java
++++ b/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/Metered.java
+@@ -22,8 +22,8 @@ import java.lang.annotation.Target;
+  * <p>A meter for the defining class with the name {@code fancyName} will be created and each time
+  * the {@code #fancyName(String)} method is invoked, the meter will be marked.
+  */
+-@Inherited
+ @Documented
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target({
+   ElementType.TYPE,
+--- a/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/ResponseMetered.java
++++ b/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/ResponseMetered.java
+@@ -23,8 +23,8 @@ import java.lang.annotation.Target;
+  * codes based on the ResponseMeteredLevel selected. Each time the {@code #fancyName(String)} method
+  * is invoked, the appropriate response meter will be marked.
+  */
+-@Inherited
+ @Documented
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target({
+   ElementType.TYPE,
+--- a/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/Timed.java
++++ b/metrics-annotation/src/main/java/io/dropwizard/metrics5/annotation/Timed.java
+@@ -22,8 +22,8 @@ import java.lang.annotation.Target;
+  * <p>A timer for the defining class with the name {@code fancyName} will be created and each time
+  * the {@code #fancyName(String)} method is invoked, the method's execution will be timed.
+  */
+-@Inherited
+ @Documented
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target({
+   ElementType.TYPE,
 --- a/metrics-benchmarks/src/main/java/io/dropwizard/metrics5/benchmarks/SlidingTimeWindowReservoirsBenchmark.java
 +++ b/metrics-benchmarks/src/main/java/io/dropwizard/metrics5/benchmarks/SlidingTimeWindowReservoirsBenchmark.java
 @@ -2,7 +2,6 @@ package io.dropwizard.metrics5.benchmarks;
@@ -4962,11 +5022,14 @@
  import static org.mockito.ArgumentMatchers.any;
  import static org.mockito.Mockito.mock;
  import static org.mockito.Mockito.never;
-@@ -29,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
+@@ -27,9 +27,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
+ import org.mockito.Mock;
+ import org.mockito.junit.jupiter.MockitoExtension;
  
- @ExtendWith(MockitoExtension.class)
+-@ExtendWith(MockitoExtension.class)
  @Disabled("The tests are flaky")
 -class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
++@ExtendWith(MockitoExtension.class)
 +final class InstrumentedHttpClientsTimerTest extends HttpClientTestBase {
  
    private HttpAsyncClient asyncHttpClient;
@@ -5996,6 +6059,47 @@
    }
  
    @AfterEach
+--- a/metrics-jcstress/src/main/java/io/dropwizard/metrics5/SlidingTimeWindowArrayReservoirTrimReadTest.java
++++ b/metrics-jcstress/src/main/java/io/dropwizard/metrics5/SlidingTimeWindowArrayReservoirTrimReadTest.java
+@@ -20,16 +20,16 @@ import org.openjdk.jcstress.infra.results.L_Result;
+     expect = Expect.ACCEPTABLE,
+     desc = "Actor2 made trim before Actor1 even started")
+ @Outcome(
+-    id = "\\[244, 245, 246, 247, 248, 249\\]",
++    id = "\\[243, 244, 245, 246, 247, 248\\]",
+     expect = Expect.ACCEPTABLE,
+     desc =
+-        "Actor1 made trim, then Actor2 started trim and made startIndex change, "
+-            + "before Actor1 concurrent read.")
++        "Actor1 made trim, then Actor2 started trim, but not finished startIndex change, before Actor1 concurrent read.")
+ @Outcome(
+-    id = "\\[243, 244, 245, 246, 247, 248\\]",
++    id = "\\[244, 245, 246, 247, 248, 249\\]",
+     expect = Expect.ACCEPTABLE,
+     desc =
+-        "Actor1 made trim, then Actor2 started trim, but not finished startIndex change, before Actor1 concurrent read.")
++        "Actor1 made trim, then Actor2 started trim and made startIndex change, "
++            + "before Actor1 concurrent read.")
+ @State
+ public class SlidingTimeWindowArrayReservoirTrimReadTest {
+   private final AtomicLong ticks = new AtomicLong(0);
+--- a/metrics-jcstress/src/main/java/io/dropwizard/metrics5/SlidingTimeWindowArrayReservoirWriteReadTest.java
++++ b/metrics-jcstress/src/main/java/io/dropwizard/metrics5/SlidingTimeWindowArrayReservoirWriteReadTest.java
+@@ -10,11 +10,11 @@ import org.openjdk.jcstress.annotations.State;
+ import org.openjdk.jcstress.infra.results.L_Result;
+ 
+ @JCStressTest
+-@Outcome(id = "\\[\\]", expect = Expect.ACCEPTABLE)
+-@Outcome(id = "\\[31\\]", expect = Expect.ACCEPTABLE)
++@Outcome(id = "\\[15, 31\\]", expect = Expect.ACCEPTABLE)
+ @Outcome(id = "\\[15\\]", expect = Expect.ACCEPTABLE)
+ @Outcome(id = "\\[31, 15\\]", expect = Expect.ACCEPTABLE)
+-@Outcome(id = "\\[15, 31\\]", expect = Expect.ACCEPTABLE)
++@Outcome(id = "\\[31\\]", expect = Expect.ACCEPTABLE)
++@Outcome(id = "\\[\\]", expect = Expect.ACCEPTABLE)
+ @State
+ public class SlidingTimeWindowArrayReservoirWriteReadTest {
+ 
 --- a/metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/strategies/DefaultNameStrategy.java
 +++ b/metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/strategies/DefaultNameStrategy.java
 @@ -1,5 +1,6 @@
@@ -6512,7 +6616,7 @@
    public String timed() {
      return "yay";
    }
-@@ -34,8 +34,8 @@ public class InstrumentedResource {
+@@ -34,10 +34,10 @@ public class InstrumentedResource {
      return "woo";
    }
  
@@ -6520,8 +6624,11 @@
    @ExceptionMetered(cause = IOException.class)
 +  @GET
    @Path("/exception-metered")
-   public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
        throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
 @@ -46,46 +46,46 @@ public class InstrumentedResource {
    }
  
@@ -6530,7 +6637,8 @@
    @Path("/response-metered-detailed")
 +  @ResponseMetered(level = DETAILED)
    public Response responseMeteredDetailed(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -6539,7 +6647,8 @@
    @Path("/response-metered-coarse")
 +  @ResponseMetered(level = COARSE)
    public Response responseMeteredCoarse(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -6548,7 +6657,8 @@
    @Path("/response-metered-all")
 +  @ResponseMetered(level = ALL)
    public Response responseMeteredAll(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -6575,6 +6685,43 @@
    public Response response5xxMetered() {
      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
    }
+--- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedResourceExceptionMeteredPerClass.java
+@@ -16,7 +16,7 @@ public class InstrumentedResourceExceptionMeteredPerClass {
+ 
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedResourceResponseMeteredPerClass.java
++++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedResourceResponseMeteredPerClass.java
+@@ -9,9 +9,9 @@ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.Response;
+ 
+-@ResponseMetered
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered
+ public class InstrumentedResourceResponseMeteredPerClass {
+ 
+   @GET
+--- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedResourceTimedPerClass.java
++++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedResourceTimedPerClass.java
+@@ -6,9 +6,9 @@ import javax.ws.rs.Path;
+ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedResourceTimedPerClass {
+ 
+   @GET
 --- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResource.java
 +++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResource.java
 @@ -10,8 +10,8 @@ import javax.ws.rs.core.MediaType;
@@ -6587,6 +6734,41 @@
    public String timed() {
      return "yay";
    }
+--- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
+@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
+ public class InstrumentedSubResourceExceptionMeteredPerClass {
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResourceResponseMeteredPerClass.java
++++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResourceResponseMeteredPerClass.java
+@@ -9,8 +9,8 @@ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ import javax.ws.rs.core.Response;
+ 
+-@ResponseMetered(level = ALL)
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered(level = ALL)
+ public class InstrumentedSubResourceResponseMeteredPerClass {
+   @GET
+   @Path("/responseMeteredPerClass")
+--- a/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResourceTimedPerClass.java
++++ b/metrics-jersey2/src/test/java/io/dropwizard/metrics5/jersey2/resources/InstrumentedSubResourceTimedPerClass.java
+@@ -6,8 +6,8 @@ import javax.ws.rs.Path;
+ import javax.ws.rs.Produces;
+ import javax.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedSubResourceTimedPerClass {
+   @GET
+   @Path("/timedPerClass")
 --- a/metrics-jersey3/src/main/java/io/dropwizard/metrics5/jersey3/InstrumentedResourceMethodApplicationListener.java
 +++ b/metrics-jersey3/src/main/java/io/dropwizard/metrics5/jersey3/InstrumentedResourceMethodApplicationListener.java
 @@ -4,7 +4,11 @@ import static io.dropwizard.metrics5.MetricRegistry.name;
@@ -7002,7 +7184,7 @@
    public String timed() {
      return "yay";
    }
-@@ -34,8 +34,8 @@ public class InstrumentedResource {
+@@ -34,10 +34,10 @@ public class InstrumentedResource {
      return "woo";
    }
  
@@ -7010,8 +7192,11 @@
    @ExceptionMetered(cause = IOException.class)
 +  @GET
    @Path("/exception-metered")
-   public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
        throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
 @@ -46,46 +46,46 @@ public class InstrumentedResource {
    }
  
@@ -7020,7 +7205,8 @@
    @Path("/response-metered-detailed")
 +  @ResponseMetered(level = DETAILED)
    public Response responseMeteredDetailed(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -7029,7 +7215,8 @@
    @Path("/response-metered-coarse")
 +  @ResponseMetered(level = COARSE)
    public Response responseMeteredCoarse(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -7038,7 +7225,8 @@
    @Path("/response-metered-all")
 +  @ResponseMetered(level = ALL)
    public Response responseMeteredAll(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -7065,6 +7253,43 @@
    public Response response5xxMetered() {
      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
    }
+--- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedResourceExceptionMeteredPerClass.java
+@@ -16,7 +16,7 @@ public class InstrumentedResourceExceptionMeteredPerClass {
+ 
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedResourceResponseMeteredPerClass.java
++++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedResourceResponseMeteredPerClass.java
+@@ -9,9 +9,9 @@ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ import jakarta.ws.rs.core.Response;
+ 
+-@ResponseMetered
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered
+ public class InstrumentedResourceResponseMeteredPerClass {
+ 
+   @GET
+--- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedResourceTimedPerClass.java
++++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedResourceTimedPerClass.java
+@@ -6,9 +6,9 @@ import jakarta.ws.rs.Path;
+ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedResourceTimedPerClass {
+ 
+   @GET
 --- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResource.java
 +++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResource.java
 @@ -10,8 +10,8 @@ import jakarta.ws.rs.core.MediaType;
@@ -7077,6 +7302,41 @@
    public String timed() {
      return "yay";
    }
+--- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
+@@ -14,7 +14,7 @@ import java.io.IOException;
+ public class InstrumentedSubResourceExceptionMeteredPerClass {
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResourceResponseMeteredPerClass.java
++++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResourceResponseMeteredPerClass.java
+@@ -9,8 +9,8 @@ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ import jakarta.ws.rs.core.Response;
+ 
+-@ResponseMetered(level = ALL)
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered(level = ALL)
+ public class InstrumentedSubResourceResponseMeteredPerClass {
+   @GET
+   @Path("/responseMeteredPerClass")
+--- a/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResourceTimedPerClass.java
++++ b/metrics-jersey3/src/test/java/io/dropwizard/metrics5/jersey3/resources/InstrumentedSubResourceTimedPerClass.java
+@@ -6,8 +6,8 @@ import jakarta.ws.rs.Path;
+ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedSubResourceTimedPerClass {
+   @GET
+   @Path("/timedPerClass")
 --- a/metrics-jersey31/src/main/java/io/dropwizard/metrics5/jersey31/InstrumentedResourceMethodApplicationListener.java
 +++ b/metrics-jersey31/src/main/java/io/dropwizard/metrics5/jersey31/InstrumentedResourceMethodApplicationListener.java
 @@ -4,7 +4,11 @@ import static io.dropwizard.metrics5.MetricRegistry.name;
@@ -7515,7 +7775,7 @@
    public String timed() {
      return "yay";
    }
-@@ -34,8 +34,8 @@ public class InstrumentedResource {
+@@ -34,10 +34,10 @@ public class InstrumentedResource {
      return "woo";
    }
  
@@ -7523,8 +7783,11 @@
    @ExceptionMetered(cause = IOException.class)
 +  @GET
    @Path("/exception-metered")
-   public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
        throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
 @@ -46,46 +46,46 @@ public class InstrumentedResource {
    }
  
@@ -7533,7 +7796,8 @@
    @Path("/response-metered-detailed")
 +  @ResponseMetered(level = DETAILED)
    public Response responseMeteredDetailed(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -7542,7 +7806,8 @@
    @Path("/response-metered-coarse")
 +  @ResponseMetered(level = COARSE)
    public Response responseMeteredCoarse(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -7551,7 +7816,8 @@
    @Path("/response-metered-all")
 +  @ResponseMetered(level = ALL)
    public Response responseMeteredAll(
-       @QueryParam("status_code") @DefaultValue("200") int statusCode) {
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
      return Response.status(Response.Status.fromStatusCode(statusCode)).build();
    }
  
@@ -7578,6 +7844,43 @@
    public Response response5xxMetered() {
      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
    }
+--- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedResourceExceptionMeteredPerClass.java
+@@ -16,7 +16,7 @@ public class InstrumentedResourceExceptionMeteredPerClass {
+ 
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedResourceResponseMeteredPerClass.java
++++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedResourceResponseMeteredPerClass.java
+@@ -9,9 +9,9 @@ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ import jakarta.ws.rs.core.Response;
+ 
+-@ResponseMetered
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered
+ public class InstrumentedResourceResponseMeteredPerClass {
+ 
+   @GET
+--- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedResourceTimedPerClass.java
++++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedResourceTimedPerClass.java
+@@ -6,9 +6,9 @@ import jakarta.ws.rs.Path;
+ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedResourceTimedPerClass {
+ 
+   @GET
 --- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResource.java
 +++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResource.java
 @@ -10,8 +10,8 @@ import jakarta.ws.rs.core.MediaType;
@@ -7590,6 +7893,41 @@
    public String timed() {
      return "yay";
    }
+--- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
+@@ -14,7 +14,7 @@ import java.io.IOException;
+ public class InstrumentedSubResourceExceptionMeteredPerClass {
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceResponseMeteredPerClass.java
++++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceResponseMeteredPerClass.java
+@@ -8,8 +8,8 @@ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ import jakarta.ws.rs.core.Response;
+ 
+-@ResponseMetered(level = ResponseMeteredLevel.ALL)
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered(level = ResponseMeteredLevel.ALL)
+ public class InstrumentedSubResourceResponseMeteredPerClass {
+   @GET
+   @Path("/responseMeteredPerClass")
+--- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceTimedPerClass.java
++++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceTimedPerClass.java
+@@ -6,8 +6,8 @@ import jakarta.ws.rs.Path;
+ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedSubResourceTimedPerClass {
+   @GET
+   @Path("/timedPerClass")
 --- a/metrics-jetty10/src/main/java/io/dropwizard/metrics5/jetty10/InstrumentedHandler.java
 +++ b/metrics-jetty10/src/main/java/io/dropwizard/metrics5/jetty10/InstrumentedHandler.java
 @@ -4,7 +4,10 @@ import static io.dropwizard.metrics5.MetricRegistry.name;
