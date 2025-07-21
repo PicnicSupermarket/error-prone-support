@@ -14,19 +14,6 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJArrayRules {
   private AssertJArrayRules() {}
 
-  static final class AssertThatArrayIsEmpty<T> {
-    @BeforeTemplate
-    void before(T[] array) {
-      assertThat(array.length).isEqualTo(0);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(T[] array) {
-      assertThat(array).isEmpty();
-    }
-  }
-
   static final class AssertThatArrayHasSize<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T[] array, int size) {
@@ -37,19 +24,6 @@ final class AssertJArrayRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractObjectArrayAssert<?, T> after(T[] array, int size) {
       return assertThat(array).hasSize(size);
-    }
-  }
-
-  static final class AssertThatArrayHasSameSizeAs<T, U> {
-    @BeforeTemplate
-    AbstractObjectArrayAssert<?, T> before(T[] array1, U[] array2) {
-      return assertThat(array1).hasSize(array2.length);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array1, U[] array2) {
-      return assertThat(array1).hasSameSizeAs(array2);
     }
   }
 
