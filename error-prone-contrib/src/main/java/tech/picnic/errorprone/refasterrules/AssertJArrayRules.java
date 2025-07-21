@@ -17,7 +17,7 @@ final class AssertJArrayRules {
   static final class AssertThatArrayIsEmpty<T> {
     @BeforeTemplate
     void before(T[] array) {
-      assertThat(array.length).isZero();
+      assertThat(array.length).isEqualTo(0);
     }
 
     @AfterTemplate
@@ -42,8 +42,8 @@ final class AssertJArrayRules {
 
   static final class AssertThatArrayHasSameSizeAs<T, U> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T[] array1, U[] array2) {
-      return assertThat(array1.length).isEqualTo(array2.length);
+    AbstractObjectArrayAssert<?, T> before(T[] array1, U[] array2) {
+      return assertThat(array1).hasSize(array2.length);
     }
 
     @AfterTemplate
