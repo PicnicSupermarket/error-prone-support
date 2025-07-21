@@ -11907,6 +11907,32 @@
            "com.puppycrawl.tools.checkstyle.meta.JavadocMetadataScraper",
            "com.puppycrawl.tools.checkstyle.site.ClassAndPropertiesSettersJavadocScraper");
  
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/FileStatefulCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/FileStatefulCheck.java
+@@ -43,9 +43,9 @@ import java.lang.annotation.Target;
+  * @noinspection ClassIndependentOfModule
+  * @noinspectionreason ClassIndependentOfModule - we keep this annotation at top level by design
+  */
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target(ElementType.TYPE)
+-@Inherited
+ public @interface FileStatefulCheck {
+ 
+   // this annotation does not have properties
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/GlobalStatefulCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/GlobalStatefulCheck.java
+@@ -40,9 +40,9 @@ import java.lang.annotation.Target;
+  * @noinspectionreason ClassIndependentOfModule - we keep this annotation at top level by design
+  * @noinspectionreason ClassOnlyUsedInOnePackage - checks live in one package by design
+  */
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target(ElementType.TYPE)
+-@Inherited
+ public @interface GlobalStatefulCheck {
+ 
+   // this annotation does not have properties
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/JavaAstVisitor.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/JavaAstVisitor.java
 @@ -19,19 +19,21 @@
@@ -12466,6 +12492,19 @@
      }
    }
  }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/StatelessCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/StatelessCheck.java
+@@ -35,9 +35,9 @@ import java.lang.annotation.Target;
+  * @noinspection ClassIndependentOfModule
+  * @noinspectionreason ClassIndependentOfModule - we keep this annotation at top level by design
+  */
++@Inherited
+ @Retention(RetentionPolicy.RUNTIME)
+ @Target(ElementType.TYPE)
+-@Inherited
+ public @interface StatelessCheck {
+ 
+   // this annotation does not have properties
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/SuppressionsStringPrinter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/SuppressionsStringPrinter.java
 @@ -19,6 +19,8 @@
