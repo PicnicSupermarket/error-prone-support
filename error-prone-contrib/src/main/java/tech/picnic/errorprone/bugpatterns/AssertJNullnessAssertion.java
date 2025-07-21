@@ -36,11 +36,12 @@ import com.sun.source.tree.MethodInvocationTree;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `.isNull()` and `.isNotNull()` over more verbose alternatives",
-    link = BUG_PATTERNS_BASE_URL + "AssertJIsNull",
+    link = BUG_PATTERNS_BASE_URL + "AssertJNullnessAssertion",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class AssertJIsNull extends BugChecker implements MethodInvocationTreeMatcher {
+public final class AssertJNullnessAssertion extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final ImmutableSet<String> POSITIVE_ASSERTION_METHODS =
       ImmutableSet.of("isEqualTo", "isSameAs");
@@ -54,8 +55,8 @@ public final class AssertJIsNull extends BugChecker implements MethodInvocationT
           argumentCount(1),
           argument(0, nullLiteral()));
 
-  /** Instantiates a new {@link AssertJIsNull} instance. */
-  public AssertJIsNull() {}
+  /** Instantiates a new {@link AssertJNullnessAssertion} instance. */
+  public AssertJNullnessAssertion() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

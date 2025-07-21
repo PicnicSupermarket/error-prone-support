@@ -5,10 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class AssertJIsNullTest {
+final class AssertJNullnessAssertionTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(AssertJIsNull.class, getClass())
+    CompilationTestHelper.newInstance(AssertJNullnessAssertion.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.assertj.core.api.Assertions.assertThat;",
@@ -34,7 +34,7 @@ final class AssertJIsNullTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(AssertJIsNull.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(AssertJNullnessAssertion.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.assertj.core.api.Assertions.assertThat;",
