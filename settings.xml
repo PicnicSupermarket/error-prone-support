@@ -19,6 +19,11 @@
 
     <servers>
         <server>
+            <id>central</id>
+            <username>${env.MAVEN_CENTRAL_USER}</username>
+            <password>${env.MAVEN_CENTRAL_PASS}</password>
+        </server>
+        <server>
             <id>error-prone-fork</id>
             <username>${env.GITHUB_ACTOR}</username>
             <password>${env.GITHUB_TOKEN}</password>
