@@ -1053,6 +1053,7 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.1.4</version>
                     <configuration>
+                        <deployAtEnd>true</deployAtEnd>
                         <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
                     </configuration>
                 </plugin>
@@ -1156,6 +1157,9 @@
                             <goals>
                                 <goal>sign</goal>
                             </goals>
+                            <configuration>
+                                <signer>bc</signer>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -1882,9 +1886,9 @@
                                     <!-- XXX: Enable once there are fewer
                                     false-positives.
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
+                                    -XepOpt:ConstantExpressions:ConsiderAllMethodsPure=true
                                     <!-- XXX: Consider renaming flagged types
                                     instead. -->
-                                    -XepOpt:ConstantExpressions:ConsiderAllMethodsPure=true
                                     -XepOpt:IdentifierName:AllowInitialismsInTypeName=true
                                     -XepOpt:InlineMe:SkipInliningsWithComments=false
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
@@ -2077,7 +2081,7 @@
             </build>
         </profile>
         <profile>
-            <!-- This profile is auto-activated when performing a release. -->
+            <!-- This profile is activated when performing a release. -->
             <id>release</id>
             <build>
                 <plugins>
@@ -2085,16 +2089,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                     </plugin>
-                    <!-- Lexicographically this plugin is listed out-of-order
-                    because it must be executed after the
-                    `maven-javadoc-plugin`; otherwise not all artifacts will be
-                    signed. -->
-                    <?SORTPOM IGNORE?>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                    <?SORTPOM RESUME?>
                     <plugin>
                         <groupId>org.kordamp.maven</groupId>
                         <artifactId>pomchecker-maven-plugin</artifactId>
@@ -2130,6 +2124,24 @@
                         </plugin>
                     </plugins>
                 </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <!-- Signs build artifacts if a GPG key is configured. This is
+            required when deploying a release, and optional otherwise. -->
+            <id>sign</id>
+            <activation>
+                <property>
+                    <name>env.MAVEN_GPG_KEY</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                </plugins>
             </build>
         </profile>
     </profiles>
