@@ -32,12 +32,11 @@ final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsSameAs() {
-    return ImmutableSet.of(assertThat("foo").isSameAs("bar"), assertThat("baz").isSameAs("qux"));
+    return ImmutableSet.of(assertThat("foo").isSameAs("bar"), assertThat(0).isSameAs(1));
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotSameAs() {
-    return ImmutableSet.of(
-        assertThat("foo").isNotSameAs("bar"), assertThat("baz").isNotSameAs("qux"));
+    return ImmutableSet.of(assertThat("foo").isNotSameAs("bar"), assertThat(0).isNotSameAs(1));
   }
 
   void testAssertThatIsNull() {
