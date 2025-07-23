@@ -98,6 +98,7 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
 // See how we can combine these things. Do note that (at present) their Refaster rules don't
 // show up as Error Prone checks. So we'd have to build an integration for that.
+// XXX: Cover all cases listed by https://rules.sonarsource.com/java/RSPEC-5838/
 @OnlineDocumentation
 final class AssertJRules {
   private AssertJRules() {}
