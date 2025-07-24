@@ -62,8 +62,9 @@ jobs:
       - name: Validate HTML output
         working-directory: ./website
         # XXX: Bealdung and StackOverflow return HTTP 403 responses when run on
-        # a GitHub Action node.
-        run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' --ignore-urls '/^https:\/\/(www\.baeldung\.com|stackoverflow\.com)\/.*/' --ignore-status-codes 429 ./_site
+        # a GitHub Action node. Similarly, the Picnic blog blocks connections
+        # from a GitHub Action node.
+        run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' --ignore-urls '/^https:\/\/(www\.baeldung\.com|blog.picnic.nl|stackoverflow\.com)(\/.*|$)/' --ignore-status-codes 429 ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
