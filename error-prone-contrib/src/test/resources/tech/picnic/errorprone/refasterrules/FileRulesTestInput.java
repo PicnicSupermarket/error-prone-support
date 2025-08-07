@@ -1,8 +1,11 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -50,5 +53,23 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         new File("foo").exists() || new File("foo").mkdirs(),
         !new File("bar").exists() && !new File("bar").mkdirs());
+  }
+
+  BufferedReader testFilesNewBufferedReaderFromStringPath() throws IOException {
+    return new BufferedReader(new InputStreamReader(new FileInputStream("foo.txt")));
+  }
+
+  BufferedReader testFilesNewBufferedReaderFromFilePath() throws IOException {
+    return new BufferedReader(new InputStreamReader(new FileInputStream(new File("bar.txt"))));
+  }
+
+  BufferedReader testFilesNewBufferedReaderFromStringPathWithCharset() throws IOException {
+    return new BufferedReader(
+        new InputStreamReader(new FileInputStream("baz.txt"), StandardCharsets.ISO_8859_1));
+  }
+
+  BufferedReader testFilesNewBufferedReaderFromFilePathWithCharset() throws IOException {
+    return new BufferedReader(
+        new InputStreamReader(new FileInputStream(new File("qux.txt")), StandardCharsets.UTF_16));
   }
 }
