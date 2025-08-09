@@ -14,6 +14,11 @@ import java.nio.file.Paths;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class FileRulesTest implements RefasterRuleCollectionTestCase {
+  @Override
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(FileInputStream.class, InputStreamReader.class);
+  }
+
   Path testPathOfUri() {
     return Paths.get(URI.create("foo"));
   }
