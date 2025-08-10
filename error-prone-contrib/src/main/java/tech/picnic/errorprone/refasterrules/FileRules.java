@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -178,15 +179,16 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer {@link Files#newBufferedReader(Path)} over creating a {@link BufferedReader} from a
-   * {@link FileInputStream} for a string path.
-   */
-  static final class FilesNewBufferedReaderFromStringPath {
+  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
+  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
+  // code uses UTF-8 rather than the default charset.
+  static final class FilesNewBufferedReaderPathOf {
     @BeforeTemplate
     @SuppressWarnings("DefaultCharset" /* This violation will be rewritten. */)
     BufferedReader before(String path) throws IOException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+      return Refaster.anyOf(
+          Files.newBufferedReader(Path.of(path), UTF_8),
+          new BufferedReader(new InputStreamReader(new FileInputStream(path))));
     }
 
     @AfterTemplate
@@ -195,15 +197,16 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer {@link Files#newBufferedReader(Path)} over creating a {@link BufferedReader} from a
-   * {@link FileInputStream} for a file path.
-   */
-  static final class FilesNewBufferedReaderFromFilePath {
+  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
+  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
+  // code uses UTF-8 rather than the default charset.
+  static final class FilesNewBufferedReaderToPath {
     @BeforeTemplate
     @SuppressWarnings("DefaultCharset" /* This violation will be rewritten. */)
     BufferedReader before(File file) throws IOException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+      return Refaster.anyOf(
+          Files.newBufferedReader(file.toPath(), UTF_8),
+          new BufferedReader(new InputStreamReader(new FileInputStream(file))));
     }
 
     @AfterTemplate
@@ -212,13 +215,10 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer {@link Files#newBufferedReader(Path, Charset)} over creating a {@link BufferedReader}
-   * from a {@link FileInputStream} for a string path with charset.
-   */
-  static final class FilesNewBufferedReaderFromStringPathWithCharset {
+  /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
+  static final class FilesNewBufferedReaderPathOfWithCharset {
     @BeforeTemplate
-    BufferedReader before(String path, Charset charset) throws IOException {
+    BufferedReader before(String path, Charset charset) throws FileNotFoundException {
       return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
     }
 
@@ -228,13 +228,10 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer {@link Files#newBufferedReader(Path, Charset)} over creating a {@link BufferedReader}
-   * from a {@link FileInputStream} for a file path with charset.
-   */
-  static final class FilesNewBufferedReaderFromFilePathWithCharset {
+  /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
+  static final class FilesNewBufferedReaderToPathWithCharset {
     @BeforeTemplate
-    BufferedReader before(File file, Charset charset) throws IOException {
+    BufferedReader before(File file, Charset charset) throws FileNotFoundException {
       return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
     }
 

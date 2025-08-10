@@ -60,21 +60,25 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
         !new File("bar").exists() && !new File("bar").mkdirs());
   }
 
-  BufferedReader testFilesNewBufferedReaderFromStringPath() throws IOException {
-    return new BufferedReader(new InputStreamReader(new FileInputStream("foo.txt")));
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderPathOf() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8),
+        new BufferedReader(new InputStreamReader(new FileInputStream("bar"))));
   }
 
-  BufferedReader testFilesNewBufferedReaderFromFilePath() throws IOException {
-    return new BufferedReader(new InputStreamReader(new FileInputStream(new File("bar.txt"))));
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderToPath() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedReader(new File("foo").toPath(), StandardCharsets.UTF_8),
+        new BufferedReader(new InputStreamReader(new FileInputStream(new File("bar")))));
   }
 
-  BufferedReader testFilesNewBufferedReaderFromStringPathWithCharset() throws IOException {
+  BufferedReader testFilesNewBufferedReaderPathOfWithCharset() throws IOException {
     return new BufferedReader(
-        new InputStreamReader(new FileInputStream("baz.txt"), StandardCharsets.ISO_8859_1));
+        new InputStreamReader(new FileInputStream("foo"), StandardCharsets.UTF_8));
   }
 
-  BufferedReader testFilesNewBufferedReaderFromFilePathWithCharset() throws IOException {
+  BufferedReader testFilesNewBufferedReaderToPathWithCharset() throws IOException {
     return new BufferedReader(
-        new InputStreamReader(new FileInputStream(new File("qux.txt")), StandardCharsets.UTF_16));
+        new InputStreamReader(new FileInputStream(new File("foo")), StandardCharsets.UTF_8));
   }
 }
