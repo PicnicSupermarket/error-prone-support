@@ -6,23 +6,27 @@ import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJArrayRulesTest implements RefasterRuleCollectionTestCase {
-  AbstractAssert<?, ?> testAssertThatArrayHasSize() {
-    return assertThat(new String[7].length).isEqualTo(7);
+  AbstractAssert<?, ?> testAssertThatHasSize() {
+    return assertThat(new String[0].length).isEqualTo(1);
   }
 
-  AbstractAssert<?, ?> testAssertThatArrayHasSizeLessThanOrEqualTo() {
-    return assertThat(new String[2].length).isLessThanOrEqualTo(2);
+  AbstractAssert<?, ?> testAssertThatHasSizeLessThan() {
+    return assertThat(new String[0].length).isLessThan(1);
   }
 
-  AbstractAssert<?, ?> testAssertThatArrayHasSizeLessThan() {
-    return assertThat(new String[4].length).isLessThan(5);
+  AbstractAssert<?, ?> testAssertThatHasSizeLessThanOrEqualTo() {
+    return assertThat(new String[0].length).isLessThanOrEqualTo(1);
   }
 
-  AbstractAssert<?, ?> testAssertThatArrayHasSizeGreaterThan() {
-    return assertThat(new String[5].length).isGreaterThan(4);
+  AbstractAssert<?, ?> testAssertThatHasSizeGreaterThan() {
+    return assertThat(new String[0].length).isGreaterThan(1);
   }
 
-  AbstractAssert<?, ?> testAssertThatArrayHasSizeGreaterThanOrEqualTo() {
-    return assertThat(new String[1].length).isGreaterThanOrEqualTo(1);
+  AbstractAssert<?, ?> testAssertThatHasSizeGreaterThanOrEqualTo() {
+    return assertThat(new String[0].length).isGreaterThanOrEqualTo(1);
+  }
+
+  AbstractAssert<?, ?> testAssertThatHasSizeBetween() {
+    return assertThat(new String[0].length).isBetween(1, 2);
   }
 }
