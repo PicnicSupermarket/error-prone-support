@@ -752,4 +752,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   Flux<Integer> testFluxFromStreamSupplier() {
     return Flux.fromStream(() -> Stream.of(1));
   }
+
+  Mono<String> testMonoFromFluxJustToMonoJust() {
+    return Mono.just("A");
+  }
 }

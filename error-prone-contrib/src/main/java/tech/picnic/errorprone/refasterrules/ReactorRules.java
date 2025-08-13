@@ -2308,4 +2308,20 @@ final class ReactorRules {
       return Flux.fromStream(() -> stream);
     }
   }
+
+  /**
+   * Simplifies {@code Mono.from(Flux.just(x))} to the more direct and efficient {@code
+   * Mono.just(x)}, avoiding the creation of an intermediate {@link Flux}.
+   */
+  static final class MonoFromFluxJustToMonoJust<T> {
+    @BeforeTemplate
+    Mono<T> before(T item) {
+      return Mono.from(Flux.just(item));
+    }
+
+    @AfterTemplate
+    Mono<T> after(T item) {
+      return Mono.just(item);
+    }
+  }
 }
