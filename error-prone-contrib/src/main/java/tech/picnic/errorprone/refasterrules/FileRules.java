@@ -186,7 +186,8 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
-      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */,
+      "java:S1943" /* This violation will be rewritten. */,
+      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(String path) throws IOException {
@@ -208,7 +209,8 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
-      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */,
+      "java:S1943" /* This violation will be rewritten. */,
+      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(File file) throws IOException {
