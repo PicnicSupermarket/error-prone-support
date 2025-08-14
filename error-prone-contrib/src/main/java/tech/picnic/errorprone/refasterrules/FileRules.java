@@ -186,7 +186,8 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
-      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */
+      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(String path) throws IOException {
       return Refaster.anyOf(
@@ -207,7 +208,8 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
-      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */
+      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */,
+      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(File file) throws IOException {
       return Refaster.anyOf(
