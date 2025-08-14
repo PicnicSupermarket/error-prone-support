@@ -184,7 +184,10 @@ final class FileRules {
   // code uses UTF-8 rather than the default charset.
   static final class FilesNewBufferedReaderPathOf {
     @BeforeTemplate
-    @SuppressWarnings("DefaultCharset" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "DefaultCharset" /* This violation will be rewritten. */,
+      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */
+    })
     BufferedReader before(String path) throws IOException {
       return Refaster.anyOf(
           Files.newBufferedReader(Path.of(path), UTF_8),
@@ -202,7 +205,10 @@ final class FileRules {
   // code uses UTF-8 rather than the default charset.
   static final class FilesNewBufferedReaderToPath {
     @BeforeTemplate
-    @SuppressWarnings("DefaultCharset" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "DefaultCharset" /* This violation will be rewritten. */,
+      "java:S2095" /* This resource doesn't need to be closed as it is not actually executed. */
+    })
     BufferedReader before(File file) throws IOException {
       return Refaster.anyOf(
           Files.newBufferedReader(file.toPath(), UTF_8),

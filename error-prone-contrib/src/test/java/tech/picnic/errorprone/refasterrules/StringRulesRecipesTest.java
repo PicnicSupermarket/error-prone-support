@@ -21,6 +21,7 @@ final class StringRulesRecipesTest implements RewriteTest {
     spec.recipe(new StringRulesRecipes());
   }
 
+  @SuppressWarnings("java:S2699" /* The `rewriteRun` does the asserting. */)
   @Test
   void stringValueOf() {
     // XXX: Use text blocks once supported.
@@ -41,6 +42,7 @@ final class StringRulesRecipesTest implements RewriteTest {
   }
 
   @Disabled("Not all rules are currently supported")
+  @SuppressWarnings("java:S2699" /* The `rewriteRun` does the asserting. */)
   @Test
   void allRules() throws IOException {
     rewriteRun(
