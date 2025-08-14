@@ -97,6 +97,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#just(Object)} over more contrived alternatives. */
   static final class MonoJust<T> {
     @BeforeTemplate
+    @SuppressWarnings("FluxNext" /* This is a more specific template. */)
     Mono<T> before(T value) {
       return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Mono.from(Flux.just(value)));
     }
@@ -512,6 +513,7 @@ final class ReactorRules {
   /** Don't unnecessarily transform a {@link Mono} to an equivalent instance. */
   static final class MonoIdentity<T> {
     @BeforeTemplate
+    @SuppressWarnings("IdentityConversion" /* This is a more specific template. */)
     Mono<T> before(Mono<T> mono) {
       return Refaster.anyOf(
           mono.switchIfEmpty(Mono.empty()),
@@ -2313,9 +2315,9 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer fluent {@code flux.singleOrEmpty()} over {@code Mono.from(flux)}.
+   * Prefer fluent {@code Flux.next()} over {@code Mono.from(flux)} to take only the first element.
    *
-   * <p>The {@code singleOrEmpty()} style is preferred for its improved readability and for keeping
+   * <p>The {@code next()} style is preferred for its improved readability and for keeping
    * operations within a natural, fluent {@code Flux} chain.
    */
   static final class FluxNext<T> {
