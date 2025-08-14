@@ -2309,12 +2309,7 @@ final class ReactorRules {
     }
   }
 
-  /**
-   * Prefer fluent {@code Flux.next()} over {@code Mono.from(flux)} to take only the first element.
-   *
-   * <p>The {@code next()} style is preferred for its improved readability and for keeping
-   * operations within a natural, fluent {@code Flux} chain.
-   */
+  /** Prefer fluent {@link Flux#next()} over less explicit alternatives. */
   static final class FluxNext<T> {
     @BeforeTemplate
     Mono<T> before(Flux<T> flux) {
