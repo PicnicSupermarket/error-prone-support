@@ -202,8 +202,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just(3),
         Mono.<Void>empty(),
         Mono.<Void>empty(),
-        Mono.<ImmutableList<String>>empty(),
-        Mono.just(1));
+        Mono.<ImmutableList<String>>empty());
   }
 
   Mono<Integer> testMonoSingle() {

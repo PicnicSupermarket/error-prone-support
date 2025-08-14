@@ -97,9 +97,8 @@ final class ReactorRules {
   /** Prefer {@link Mono#just(Object)} over more contrived alternatives. */
   static final class MonoJust<T> {
     @BeforeTemplate
-    @SuppressWarnings("FluxNext" /* This is a more specific template. */)
     Mono<T> before(T value) {
-      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Mono.from(Flux.just(value)));
+      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Flux.just(value).next());
     }
 
     @AfterTemplate
@@ -513,13 +512,9 @@ final class ReactorRules {
   /** Don't unnecessarily transform a {@link Mono} to an equivalent instance. */
   static final class MonoIdentity<T> {
     @BeforeTemplate
-    @SuppressWarnings("IdentityConversion" /* This is a more specific template. */)
     Mono<T> before(Mono<T> mono) {
       return Refaster.anyOf(
-          mono.switchIfEmpty(Mono.empty()),
-          mono.flux().next(),
-          mono.flux().singleOrEmpty(),
-          Mono.from(mono));
+          mono.switchIfEmpty(Mono.empty()), mono.flux().next(), mono.flux().singleOrEmpty());
     }
 
     // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
