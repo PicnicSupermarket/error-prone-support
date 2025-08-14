@@ -7,7 +7,7 @@ import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.bugpatterns.BugChecker;
 import org.junit.jupiter.api.Test;
 
-final class IsArrayTest {
+final class IsMultidimensionalArrayTest {
   @Test
   void matches() {
     CompilationTestHelper.newInstance(MatcherTestChecker.class, getClass())
@@ -22,12 +22,20 @@ final class IsArrayTest {
             "    return alwaysNull();",
             "  }",
             "",
-            "  String[] positive1() {",
+            "  String[] negative3() {",
+            "    return alwaysNull();",
+            "  }",
+            "",
+            "  int[] negative4() {",
+            "    return alwaysNull();",
+            "  }",
+            "",
+            "  String[][] positive1() {",
             "    // BUG: Diagnostic contains:",
             "    return alwaysNull();",
             "  }",
             "",
-            "  int[] positive2() {",
+            "  int[][][] positive2() {",
             "    // BUG: Diagnostic contains:",
             "    return alwaysNull();",
             "  }",
@@ -39,8 +47,8 @@ final class IsArrayTest {
         .doTest();
   }
 
-  /** A {@link BugChecker} that simply delegates to {@link IsArray}. */
-  @BugPattern(summary = "Flags expressions matched by `IsArray`", severity = ERROR)
+  /** A {@link BugChecker} that simply delegates to {@link IsMultidimensionalArray}. */
+  @BugPattern(summary = "Flags expressions matched by `IsMultidimensionalArray`", severity = ERROR)
   public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;
 
@@ -48,7 +56,7 @@ final class IsArrayTest {
     // https://github.com/checkstyle/checkstyle/issues/10161#issuecomment-1242732120.
     @SuppressWarnings("RedundantModifier")
     public MatcherTestChecker() {
-      super(new IsArray());
+      super(new IsMultidimensionalArray());
     }
   }
 }
