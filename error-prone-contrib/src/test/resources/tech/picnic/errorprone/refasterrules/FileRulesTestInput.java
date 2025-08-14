@@ -1,8 +1,11 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,6 +14,11 @@ import java.nio.file.Paths;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class FileRulesTest implements RefasterRuleCollectionTestCase {
+  @Override
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(FileInputStream.class, InputStreamReader.class);
+  }
+
   Path testPathOfUri() {
     return Paths.get(URI.create("foo"));
   }
@@ -50,5 +58,27 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         new File("foo").exists() || new File("foo").mkdirs(),
         !new File("bar").exists() && !new File("bar").mkdirs());
+  }
+
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderPathOf() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8),
+        new BufferedReader(new InputStreamReader(new FileInputStream("bar"))));
+  }
+
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderToPath() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedReader(new File("foo").toPath(), StandardCharsets.UTF_8),
+        new BufferedReader(new InputStreamReader(new FileInputStream(new File("bar")))));
+  }
+
+  BufferedReader testFilesNewBufferedReaderPathOfWithCharset() throws IOException {
+    return new BufferedReader(
+        new InputStreamReader(new FileInputStream("foo"), StandardCharsets.UTF_8));
+  }
+
+  BufferedReader testFilesNewBufferedReaderToPathWithCharset() throws IOException {
+    return new BufferedReader(
+        new InputStreamReader(new FileInputStream(new File("foo")), StandardCharsets.UTF_8));
   }
 }

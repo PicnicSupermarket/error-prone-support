@@ -7,8 +7,12 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -172,6 +176,68 @@ final class FileRules {
     @AlsoNegation
     boolean after(File file) {
       return file.mkdirs() || file.exists();
+    }
+  }
+
+  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
+  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
+  // code uses UTF-8 rather than the default charset.
+  static final class FilesNewBufferedReaderPathOf {
+    @BeforeTemplate
+    @SuppressWarnings("DefaultCharset" /* This violation will be rewritten. */)
+    BufferedReader before(String path) throws IOException {
+      return Refaster.anyOf(
+          Files.newBufferedReader(Path.of(path), UTF_8),
+          new BufferedReader(new InputStreamReader(new FileInputStream(path))));
+    }
+
+    @AfterTemplate
+    BufferedReader after(String path) throws IOException {
+      return Files.newBufferedReader(Path.of(path));
+    }
+  }
+
+  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
+  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
+  // code uses UTF-8 rather than the default charset.
+  static final class FilesNewBufferedReaderToPath {
+    @BeforeTemplate
+    @SuppressWarnings("DefaultCharset" /* This violation will be rewritten. */)
+    BufferedReader before(File file) throws IOException {
+      return Refaster.anyOf(
+          Files.newBufferedReader(file.toPath(), UTF_8),
+          new BufferedReader(new InputStreamReader(new FileInputStream(file))));
+    }
+
+    @AfterTemplate
+    BufferedReader after(File file) throws IOException {
+      return Files.newBufferedReader(file.toPath());
+    }
+  }
+
+  /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
+  static final class FilesNewBufferedReaderPathOfWithCharset {
+    @BeforeTemplate
+    BufferedReader before(String path, Charset charset) throws FileNotFoundException {
+      return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
+    }
+
+    @AfterTemplate
+    BufferedReader after(String path, Charset charset) throws IOException {
+      return Files.newBufferedReader(Path.of(path), charset);
+    }
+  }
+
+  /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
+  static final class FilesNewBufferedReaderToPathWithCharset {
+    @BeforeTemplate
+    BufferedReader before(File file, Charset charset) throws FileNotFoundException {
+      return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
+    }
+
+    @AfterTemplate
+    BufferedReader after(File file, Charset charset) throws IOException {
+      return Files.newBufferedReader(file.toPath(), charset);
     }
   }
 }
