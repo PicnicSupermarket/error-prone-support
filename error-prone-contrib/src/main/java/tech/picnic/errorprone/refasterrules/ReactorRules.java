@@ -98,7 +98,7 @@ final class ReactorRules {
   static final class MonoJust<T> {
     @BeforeTemplate
     Mono<T> before(T value) {
-      return Mono.justOrEmpty(Optional.of(value));
+      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Mono.from(Flux.just(value)));
     }
 
     @AfterTemplate
@@ -514,7 +514,10 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
       return Refaster.anyOf(
-          mono.switchIfEmpty(Mono.empty()), mono.flux().next(), mono.flux().singleOrEmpty());
+          mono.switchIfEmpty(Mono.empty()),
+          mono.flux().next(),
+          mono.flux().singleOrEmpty(),
+          Mono.from(mono));
     }
 
     // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
@@ -2310,18 +2313,20 @@ final class ReactorRules {
   }
 
   /**
-   * Simplifies {@code Mono.from(Flux.just(x))} to the more direct and efficient {@code
-   * Mono.just(x)}, avoiding the creation of an intermediate {@link Flux}.
+   * Prefer fluent {@code flux.singleOrEmpty()} over {@code Mono.from(flux)}.
+   *
+   * <p>The {@code singleOrEmpty()} style is preferred for its improved readability and for keeping
+   * operations within a natural, fluent {@code Flux} chain.
    */
-  static final class MonoFromFluxJustToMonoJust<T> {
+  static final class FluxNext<T> {
     @BeforeTemplate
-    Mono<T> before(T item) {
-      return Mono.from(Flux.just(item));
+    Mono<T> before(Flux<T> flux) {
+      return Mono.from(flux);
     }
 
     @AfterTemplate
-    Mono<T> after(T item) {
-      return Mono.just(item);
+    Mono<T> after(Flux<T> flux) {
+      return flux.next();
     }
   }
 }
