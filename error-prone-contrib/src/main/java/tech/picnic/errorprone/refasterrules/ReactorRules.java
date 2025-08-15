@@ -98,7 +98,7 @@ final class ReactorRules {
   static final class MonoJust<T> {
     @BeforeTemplate
     Mono<T> before(T value) {
-      return Mono.justOrEmpty(Optional.of(value));
+      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Flux.just(value).next());
     }
 
     @AfterTemplate
@@ -2306,6 +2306,19 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Stream<T> stream) {
       return Flux.fromStream(() -> stream);
+    }
+  }
+
+  /** Prefer fluent {@link Flux#next()} over less explicit alternatives. */
+  static final class FluxNext<T> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux) {
+      return Mono.from(flux);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return flux.next();
     }
   }
 }

@@ -71,8 +71,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Mono.empty(), Mono.empty());
   }
 
-  Mono<Integer> testMonoJust() {
-    return Mono.just(1);
+  ImmutableSet<Mono<Integer>> testMonoJust() {
+    return ImmutableSet.of(Mono.just(1), Mono.just(2));
   }
 
   Mono<Integer> testMonoJustOrEmptyObject() {
@@ -751,5 +751,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Flux<Integer> testFluxFromStreamSupplier() {
     return Flux.fromStream(() -> Stream.of(1));
+  }
+
+  Mono<String> testFluxNext() {
+    return Flux.just("foo").next();
   }
 }
