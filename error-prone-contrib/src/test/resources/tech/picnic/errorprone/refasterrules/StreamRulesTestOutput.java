@@ -75,8 +75,18 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").collect(joining());
   }
 
-  Stream<String> testEmptyStream() {
-    return Stream.empty();
+  ImmutableSet<Stream<?>> testEmptyStream() {
+    return ImmutableSet.of(
+        Stream.empty(),
+        Stream.empty(),
+        Stream.empty(),
+        ImmutableList.of("foo").reverse().stream(),
+        Stream.empty(),
+        Streams.stream(ImmutableSet.of("bar")::iterator),
+        Stream.empty(),
+        Streams.stream(ImmutableSet.of("baz").iterator()),
+        Stream.empty(),
+        Arrays.stream(new String[] {"qux"}));
   }
 
   ImmutableSet<Stream<String>> testStreamOfNullable() {
