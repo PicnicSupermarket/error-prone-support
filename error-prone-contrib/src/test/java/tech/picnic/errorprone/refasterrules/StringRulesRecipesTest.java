@@ -21,6 +21,10 @@ final class StringRulesRecipesTest implements RewriteTest {
     spec.recipe(new StringRulesRecipes());
   }
 
+  // XXX: Instead of suppressing `S2699`, consider registering
+  // `org.openrewrite.test.RewriteTest#rewriteRun` and related methods with
+  // https://github.com/SonarSource/sonar-java.
+  @SuppressWarnings("java:S2699" /* The `rewriteRun` method performs an assertion. */)
   @Test
   void stringValueOf() {
     // XXX: Use text blocks once supported.
@@ -40,7 +44,11 @@ final class StringRulesRecipesTest implements RewriteTest {
                 + '}'));
   }
 
+  // XXX: Instead of suppressing `S2699`, consider registering
+  // `org.openrewrite.test.RewriteTest#rewriteRun` and related methods with
+  // https://github.com/SonarSource/sonar-java.
   @Disabled("Not all rules are currently supported")
+  @SuppressWarnings("java:S2699" /* The `rewriteRun` method performs an assertion. */)
   @Test
   void allRules() throws IOException {
     rewriteRun(
