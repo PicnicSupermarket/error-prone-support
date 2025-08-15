@@ -90,11 +90,10 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                   .named("copyOf"),
               symbolMatcher(
                   (symbol, state) ->
-                      state
-                          .getSymtab()
-                          .arrayClass
-                          .equals(((MethodSymbol) symbol).params().get(0).type.tsym))),
+                      state.getTypes().isArray(((MethodSymbol) symbol).params().get(0).type))),
           staticMethod().onClass(Arrays.class.getCanonicalName()).named("asList"));
+  private static final Matcher<ExpressionTree> FLUX =
+      staticMethod().onDescendantOf("reactor.core.publisher.Flux");
   private static final Matcher<ExpressionTree> IMMUTABLE_COLLECTION_BUILDER =
       instanceMethod().onDescendantOf(ImmutableCollection.Builder.class.getCanonicalName());
   private static final Matcher<ExpressionTree> OBJECT_ENUMERABLE_ASSERT =
@@ -103,6 +102,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       instanceMethod().onDescendantOf("reactor.test.StepVerifier.Step");
   private static final ImmutableTable<Matcher<ExpressionTree>, String, String> ALTERNATIVE_METHODS =
       ImmutableTable.<Matcher<ExpressionTree>, String, String>builder()
+          .put(FLUX, "fromIterable", "just")
           .put(IMMUTABLE_COLLECTION_BUILDER, "addAll", "add")
           .put(OBJECT_ENUMERABLE_ASSERT, "containsAnyElementsOf", "containsAnyOf")
           .put(OBJECT_ENUMERABLE_ASSERT, "containsAll", "contains")
