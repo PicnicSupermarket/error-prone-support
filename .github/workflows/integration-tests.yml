@@ -25,6 +25,7 @@ jobs:
       !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         integration-test:
           - checkstyle
@@ -46,7 +47,6 @@ jobs:
             api.adoptium.net:443
             auth.docker.io:443
             checkstyle.org:443
-            example.com:80
             github.com:443
             hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
