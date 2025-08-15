@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -164,6 +165,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<?>> testFluxEmpty() {
     return ImmutableSet.of(
+        Flux.zip(v -> v),
+        Flux.zip(v -> v, 1),
         Flux.concat(),
         Flux.concatDelayError(),
         Flux.firstWithSignal(),
@@ -180,8 +183,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.mergeSequential(),
         Flux.mergeSequential(1),
         Flux.mergeSequentialDelayError(1),
-        Flux.zip(v -> v),
-        Flux.zip(v -> v, 1),
+        Flux.fromArray(new String[0]),
+        Flux.fromArray(new String[] {"foo"}),
+        Flux.fromIterable(ImmutableList.of()),
+        Flux.fromIterable(Iterables.cycle("bar")),
+        Flux.fromStream(() -> Stream.empty()),
+        Flux.fromStream(() -> Stream.generate(() -> "baz")),
         Flux.combineLatest(v -> v),
         Flux.combineLatest(v -> v, 1),
         Flux.mergeComparing(),

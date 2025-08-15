@@ -433,17 +433,19 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#empty()} over more contrived alternatives. */
-  // XXX: In combination with the `IsEmpty` matcher introduced by
-  // https://github.com/PicnicSupermarket/error-prone-support/pull/744, the non-varargs overloads of
-  // most methods referenced here can be rewritten as well. Additionally, some invocations of
-  // methods such as `Flux#fromIterable`, `Flux#fromArray` and `Flux#justOrEmpty` can also be
-  // rewritten.
+  // XXX: Using `@Matches(IsEmpty.class)`, the non-varargs overloads of most methods referenced here
+  // can be rewritten as well. That would require adding a bunch more suitably-typed parameters.
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
+    // XXX: The methods enumerated here are not ordered entirely lexicographically, to accommodate a
+    // conflict between the `InconsistentOverloads` and `RefasterMethodParameterOrder` checks.
     @BeforeTemplate
     Flux<T> before(
         Function<? super Object[], ? extends T> combinator,
         int prefetch,
-        Comparator<? super T> comparator) {
+        Comparator<? super T> comparator,
+        @Matches(IsEmpty.class) T[] emptyArray,
+        @Matches(IsEmpty.class) Iterable<T> emptyIterable,
+        @Matches(IsEmpty.class) Stream<T> emptyStream) {
       return Refaster.anyOf(
           Flux.zip(combinator),
           Flux.zip(combinator, prefetch),
@@ -462,7 +464,10 @@ final class ReactorRules {
           Flux.mergePriorityDelayError(prefetch, comparator),
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
-          Flux.mergeSequentialDelayError(prefetch));
+          Flux.mergeSequentialDelayError(prefetch),
+          Flux.fromArray(emptyArray),
+          Flux.fromIterable(emptyIterable),
+          Flux.fromStream(() -> emptyStream));
     }
 
     @BeforeTemplate

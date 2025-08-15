@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -186,6 +187,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.empty(),
         Flux.empty(),
         Flux.empty(),
+        Flux.empty(),
+        Flux.fromArray(new String[] {"foo"}),
+        Flux.empty(),
+        Flux.fromIterable(Iterables.cycle("bar")),
+        Flux.empty(),
+        Flux.fromStream(() -> Stream.generate(() -> "baz")),
         Flux.empty(),
         Flux.empty(),
         Flux.empty(),
