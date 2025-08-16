@@ -165,6 +165,59 @@ final class MoreJUnitMatchersTest {
         .doTest();
   }
 
+  @Test
+  void findMethodSourceAnnotation() {
+    CompilationTestHelper.newInstance(MethodSourceAnnotationTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import org.junit.jupiter.params.provider.MethodSource;",
+            "",
+            "class A {",
+            "  void noMatchedAnnotation(boolean b) {}",
+            "",
+            "  @MethodSource",
+            "  // BUG: Diagnostic contains: [matchingMethodSource]",
+            "  void matchingMethodSource(boolean b) {}",
+            "",
+            "  @MethodSource()",
+            "  // BUG: Diagnostic contains: [matchingMethodSourceWithParens]",
+            "  void matchingMethodSourceWithParens(boolean b) {}",
+            "",
+            "  @MethodSource(\"\")",
+            "  // BUG: Diagnostic contains: [matchingMethodSourceMadeExplicit]",
+            "  void matchingMethodSourceMadeExplicit(boolean b) {}",
+            "",
+            "  @MethodSource({\"\"})",
+            "  // BUG: Diagnostic contains: [matchingMethodSourceMadeExplicitWithParens]",
+            "  void matchingMethodSourceMadeExplicitWithParens(boolean b) {}",
+            "",
+            "  @MethodSource({})",
+            "  // BUG: Diagnostic contains: []",
+            "  void noMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource(\"myValueFactory\")",
+            "  // BUG: Diagnostic contains: [myValueFactory]",
+            "  void singleCustomMethodSource(boolean b) {}",
+            "",
+            "  @MethodSource({\"firstValueFactory\", \"secondValueFactory\"})",
+            "  // BUG: Diagnostic contains: [firstValueFactory, secondValueFactory]",
+            "  void twoCustomMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource({\"myValueFactory\", \"\"})",
+            "  // BUG: Diagnostic contains: [myValueFactory, customAndMatchingMethodSources]",
+            "  void customAndMatchingMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource({\"factory\", \"\", \"factory\", \"\"})",
+            "  // BUG: Diagnostic contains: [factory, repeatedMethodSources, factory, repeatedMethodSources]",
+            "  void repeatedMethodSources(boolean b) {}",
+            "",
+            "  @MethodSource({\"nullary()\", \"withStringParam(java.lang.String)\"})",
+            "  // BUG: Diagnostic contains: [nullary, withStringParam]",
+            "  void methodSourcesWithParameterSpecification(boolean b) {}",
+            "}")
+        .doTest();
+  }
+
   /**
    * A {@link BugChecker} that flags methods matched by {@link Matcher}s of {@link MethodTree}s
    * exposed by {@link MoreJUnitMatchers}.
@@ -231,6 +284,26 @@ final class MoreJUnitMatchersTest {
           .setMessage(
               MoreJUnitMatchers.getMethodSourceFactoryDescriptors(annotation, tree).toString())
           .build();
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that finds the {@link AnnotationTree} of the associated JUnit's {@code
+   * MethodTree}.
+   */
+  @BugPattern(summary = "Interacts with `MoreJUnitMatchers` for testing purposes", severity = ERROR)
+  public static final class MethodSourceAnnotationTestChecker extends BugChecker
+      implements MethodTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethod(MethodTree tree, VisitorState state) {
+      return MoreJUnitMatchers.findMethodSourceAnnotation(tree, state)
+          .map(annotation -> MoreJUnitMatchers.getMethodSourceFactoryNames(annotation, tree))
+          .map(
+              methodSourceFactoryNames ->
+                  buildDescription(tree).setMessage(methodSourceFactoryNames.toString()).build())
+          .orElse(Description.NO_MATCH);
     }
   }
 }
