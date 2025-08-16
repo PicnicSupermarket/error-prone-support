@@ -69,14 +69,13 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Generic parameter used in the provided @MethodSource is not applicable with accepted types.",
+        "Generic parameter used in the provided `@MethodSource` is not applicable with accepted types",
     linkType = CUSTOM,
     link = BUG_PATTERNS_BASE_URL + "JUnitMethodSourceGenericParams",
     severity = ERROR,
     tags = LIKELY_ERROR)
 public final class JUnitMethodSourceGenericParams extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-
   private static final String ARGUMENT_SET = "argumentSet";
   private static final Matcher<ExpressionTree> ARGUMENTS_FACTORY_METHODS =
       staticMethod()
