@@ -79,6 +79,8 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
   private static final Matcher<Tree> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT =
       anyOf(isPrimitiveType(), isSubtypeOf(Comparator.class));
+  // XXX: Add `Flux` and `Mono` to this predicate once the `EMPTY_DERIVATIVE` matcher below supports
+  // those types.
   private static final TypePredicate CONTAINER_TYPE =
       anyOf(
           isDescendantOfAny(
@@ -86,6 +88,8 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                   BaseStream.class.getCanonicalName(),
                   Iterable.class.getCanonicalName(),
                   Iterator.class.getCanonicalName(),
+                  // XXX: Add test for this case!
+                  Map.class.getCanonicalName(),
                   Multimap.class.getCanonicalName(),
                   Optional.class.getCanonicalName(),
                   OptionalDouble.class.getCanonicalName(),
@@ -107,6 +111,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
           isSameType(Vector.class));
   // XXX: The `empty()` and `of()` matchers below can be collapsed without risk of over-matching. If
   // we do this, also reorder the associated test cases.
+  // XXX: Or just reuse `CONTAINER_TYPE` and explain why this is a safe heuristic in practice.
   private static final Matcher<ExpressionTree> EMPTY_INSTANCE_FACTORY =
       anyOf(
           staticField(Collections.class.getCanonicalName(), "EMPTY_LIST"),
@@ -120,31 +125,23 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                       staticMethod()
                           .onDescendantOfAny(
                               BaseStream.class.getCanonicalName(),
-                              Optional.class.getCanonicalName(),
-                              OptionalDouble.class.getCanonicalName(),
-                              OptionalInt.class.getCanonicalName(),
-                              OptionalLong.class.getCanonicalName())
-                          .named("empty"),
-                      staticMethod()
-                          .onClass(Collections.class.getCanonicalName())
-                          .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN),
-                      staticMethod()
-                          .onDescendantOfAny(
-                              BaseStream.class.getCanonicalName(),
                               ImmutableCollection.class.getCanonicalName(),
                               ImmutableMap.class.getCanonicalName(),
                               ImmutableMultimap.class.getCanonicalName(),
                               List.class.getCanonicalName(),
                               Map.class.getCanonicalName(),
-                              Set.class.getCanonicalName())
-                          .named("of"),
-                      staticMethod()
-                          .onClassAny(
+                              Optional.class.getCanonicalName(),
+                              OptionalDouble.class.getCanonicalName(),
+                              OptionalInt.class.getCanonicalName(),
+                              OptionalLong.class.getCanonicalName(),
+                              Set.class.getCanonicalName(),
                               "reactor.core.publisher.Flux",
                               "reactor.core.publisher.Mono",
                               "reactor.util.context.Context")
-                          .named("empty"),
-                      staticMethod().onClass("reactor.core.publisher.Flux").named("just")))));
+                          .namedAnyOf("empty", "just", "of"),
+                      staticMethod()
+                          .onClass(Collections.class.getCanonicalName())
+                          .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN)))));
 
   /**
    * A matcher of operations on empty container expressions that yield (another) empty instance.
