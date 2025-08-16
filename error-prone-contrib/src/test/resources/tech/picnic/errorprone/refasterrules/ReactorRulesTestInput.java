@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         ArrayList.class,
+        Arrays.class,
         Collection.class,
         HashMap.class,
         List.class,
@@ -191,9 +193,20 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.range(0, 1),
         Mono.just(2).flux(),
-        Mono.just(3).repeat().take(1),
-        Flux.fromIterable(ImmutableList.of(4)),
-        Flux.fromIterable(ImmutableSet.of(5)));
+        Flux.fromStream(() -> Stream.of(3)),
+        Mono.just(4).repeat().take(1));
+  }
+
+  ImmutableSet<Flux<String>> testFluxJustArray() {
+    return ImmutableSet.of(
+        Flux.fromStream(() -> Stream.of("foo", "bar")),
+        Flux.fromStream(() -> Stream.of("baz", "qux", "quux")));
+  }
+
+  ImmutableSet<Flux<String>> testFluxFromArray() {
+    return ImmutableSet.of(
+        Flux.just(new String[] {"foo"}),
+        Flux.fromStream(() -> Arrays.stream(new String[] {"bar"})));
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
