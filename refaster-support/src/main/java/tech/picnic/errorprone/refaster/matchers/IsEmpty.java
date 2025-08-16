@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.isPrimitiveType;
 import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
+import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.receiverOfInvocation;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.symbolMatcher;
@@ -17,11 +18,9 @@ import static com.google.errorprone.predicates.TypePredicates.anyOf;
 import static com.google.errorprone.predicates.TypePredicates.isArray;
 import static com.google.errorprone.predicates.TypePredicates.isDescendantOfAny;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets.SetView;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.predicates.TypePredicate;
@@ -49,7 +48,6 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -79,9 +77,8 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
   private static final Matcher<Tree> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT =
       anyOf(isPrimitiveType(), isSubtypeOf(Comparator.class));
-  // XXX: Add `Flux` and `Mono` to this predicate once the `EMPTY_DERIVATIVE` matcher below supports
-  // those types.
-  private static final TypePredicate CONTAINER_TYPE =
+  // XXX: Add `Spliterator`. and `Spliterators.empty*`.
+  private static final TypePredicate REGULAR_CONTAINER_TYPE =
       anyOf(
           isDescendantOfAny(
               ImmutableList.of(
@@ -96,6 +93,16 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                   OptionalInt.class.getCanonicalName(),
                   OptionalLong.class.getCanonicalName())),
           isArray());
+  private static final TypePredicate REACTOR_CONTAINER_TYPE =
+      anyOf(
+          isDescendantOfAny(
+              ImmutableList.of(
+                  "reactor.core.publisher.Flux",
+                  "reactor.core.publisher.Mono",
+                  "reactor.util.context.Context")),
+          isArray());
+  private static final TypePredicate CONTAINER_TYPE =
+      anyOf(REGULAR_CONTAINER_TYPE, REACTOR_CONTAINER_TYPE);
   // XXX: Extend this list to include additional JDK collection types with a public constructor.
   private static final Matcher<ExpressionTree> MUTABLE_COLLECTION_TYPE =
       anyOf(
@@ -109,9 +116,8 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
           isSameType(TreeMap.class),
           isSameType(TreeSet.class),
           isSameType(Vector.class));
-  // XXX: The `empty()` and `of()` matchers below can be collapsed without risk of over-matching. If
-  // we do this, also reorder the associated test cases.
-  // XXX: Or just reuse `CONTAINER_TYPE` and explain why this is a safe heuristic in practice.
+  // XXX: Reorder test cases.
+  // XXX: Document assumed heuristic
   private static final Matcher<ExpressionTree> EMPTY_INSTANCE_FACTORY =
       anyOf(
           staticField(Collections.class.getCanonicalName(), "EMPTY_LIST"),
@@ -122,23 +128,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
               allOf(
                   argumentCount(0),
                   anyOf(
-                      staticMethod()
-                          .onDescendantOfAny(
-                              BaseStream.class.getCanonicalName(),
-                              ImmutableCollection.class.getCanonicalName(),
-                              ImmutableMap.class.getCanonicalName(),
-                              ImmutableMultimap.class.getCanonicalName(),
-                              List.class.getCanonicalName(),
-                              Map.class.getCanonicalName(),
-                              Optional.class.getCanonicalName(),
-                              OptionalDouble.class.getCanonicalName(),
-                              OptionalInt.class.getCanonicalName(),
-                              OptionalLong.class.getCanonicalName(),
-                              Set.class.getCanonicalName(),
-                              "reactor.core.publisher.Flux",
-                              "reactor.core.publisher.Mono",
-                              "reactor.util.context.Context")
-                          .namedAnyOf("empty", "just", "of"),
+                      staticMethod().onClass(CONTAINER_TYPE).namedAnyOf("empty", "just", "of"),
                       staticMethod()
                           .onClass(Collections.class.getCanonicalName())
                           .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN)))));
@@ -164,8 +154,11 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   // `ImmutableSet.copyOf(emptyIterable)`, `ImmutableList.sortedCopyOf(emptyIterable)`,
   // `Sets.immutableEnumSet(emptyIterable)`, and `Flux.fromIterable(emptyIterable)` are also
   // recognized. See Refaster rules with `@Matches(IsEmpty.class)` for possible candidates.
-  // XXX: Add tests for `Context`. (Should fail because we didn't list
-  // `"reactor.util.context.Context"` as a container type.)
+  // XXX: Add tests for `Context`.
+  // XXX: Add tests for `copyInto`.
+  // XXX: Update documented heuristic, as it's now a bit more wonky. Document that this is a
+  // trade-off between correctness and maintainability.
+  // XXX: Add test cases that flag tricky `Flux` and `Mono` invocations.
   private static final Matcher<ExpressionTree> EMPTY_DERIVATIVE =
       toType(
           MethodInvocationTree.class,
@@ -174,7 +167,11 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                   (symbol, state) ->
                       CONTAINER_TYPE.apply(((MethodSymbol) symbol).getReturnType(), state)),
               anyOf(
-                  instanceMethod().onClass(CONTAINER_TYPE),
+                  instanceMethod().onClass(REGULAR_CONTAINER_TYPE),
+                  not(
+                      instanceMethod()
+                          .onDescendantOf(SetView.class.getCanonicalName())
+                          .named("copyInto")),
                   instanceMethod()
                       .onDescendantOf("reactor.util.context.Context")
                       .namedAnyOf("readOnly", "delete")),
