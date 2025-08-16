@@ -13,10 +13,8 @@ import static tech.picnic.errorprone.utils.MoreJUnitMatchers.getMethodSourceFact
 import static tech.picnic.errorprone.utils.SourceCode.treeToString;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -36,10 +34,13 @@ import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
@@ -84,12 +85,14 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
   private static final Matcher<ExpressionTree> SUPPORTED_METHOD_SOURCE_PROVIDERS =
       staticMethod()
           .onDescendantOfAny(
-              ImmutableCollection.class.getCanonicalName(),
-              ImmutableMap.class.getCanonicalName(),
-              ImmutableMultimap.class.getCanonicalName(),
               List.class.getCanonicalName(),
-              Map.class.getCanonicalName(),
+              ImmutableList.class.getCanonicalName(),
+              ImmutableSet.class.getCanonicalName(),
               Set.class.getCanonicalName(),
+              EnumSet.class.getCanonicalName(),
+              IntStream.class.getCanonicalName(),
+              LongStream.class.getCanonicalName(),
+              DoubleStream.class.getCanonicalName(),
               Stream.class.getCanonicalName())
           .named("of");
 
@@ -102,13 +105,10 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
       return Description.NO_MATCH;
     }
 
-    Optional<AnnotationTree> methodSourceAnnotation = findMethodSourceAnnotation(tree, state);
-    if (methodSourceAnnotation.isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
+    // In practice, the method source annotation is always found because of the earlier matcher.
+    AnnotationTree methodSourceAnnotation = findMethodSourceAnnotation(tree, state).orElseThrow();
     ImmutableList<Optional<MethodTree>> offendingMethodSourceProviders =
-        getOffendingMethodSourceProviders(methodSourceAnnotation.orElseThrow(), tree, state);
+        getOffendingMethodSourceProviders(methodSourceAnnotation, tree, state);
     if (offendingMethodSourceProviders.stream().noneMatch(Optional::isPresent)) {
       return Description.NO_MATCH;
     }
@@ -202,6 +202,8 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
           getPotentialOffendingProvider(
               potentialOffendingProviders, methodInvocationTree.getArguments(), state);
         }
+        // Else, the method source provider is not supported. Ignore it as JUnit this will be
+        // compile-time checked from MethodArgumentsProvider#isFactoryMethod.
       }
     } else if (tree instanceof NewArrayTree newArrayTree) {
       List<? extends ExpressionTree> arrayInitializers = newArrayTree.getInitializers();
