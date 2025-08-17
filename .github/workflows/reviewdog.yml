@@ -3,6 +3,9 @@ on:
   pull_request:
 permissions:
   contents: read
+env:
+  # XXX: Test: doesn't `-Dstyle.color=always` interfere with ReviewDog?
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     permissions:
@@ -41,7 +44,7 @@ jobs:
         # XXX: Consider configuring Reviewdog such that it reports build
         # errors during this step. When doing so, make sure that a nonzero
         # `mvn` exit code does abort this workflow.
-        run: mvn -T1C install -DskipTests -Dverification.skip
+        run: mvn install -DskipTests -Dverification.skip
       - name: Build project with self-check and report issues
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,7 +52,7 @@ jobs:
         # XXX: Run with `-Dmaven.test.failure.ignore` instead of `-DskipTests`,
         # and also report Surefire test failures.
         run: |
-          mvn -T1C clean verify -Pself-check -DskipTests -Dverification.warn \
+          mvn clean verify -Pself-check -DskipTests -Dverification.warn \
             | reviewdog \
                 -name=javac \
                 -efm='[WARNING] %f:[%l,%c] %m' \

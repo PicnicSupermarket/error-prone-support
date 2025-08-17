@@ -11,10 +11,9 @@ jobs:
   build:
     strategy:
       matrix:
-        # XXX: Re-enable.
-        # XXX: os: [ ubuntu-24.04, macos-15, windows-2025 ]
-        # XXX: build-jdk: [ 21.0.7 ]
-        # XXX: target-jdk: [ 17.0.15 ]
+        os: [ ubuntu-24.04, macos-15, windows-2025 ]
+        build-jdk: [ 21.0.7 ]
+        target-jdk: [ 17.0.15 ]
         include:
           - os: ubuntu-24.04
             build-jdk: 24.0.1

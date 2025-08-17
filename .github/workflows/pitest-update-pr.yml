@@ -9,6 +9,8 @@ on:
       - completed
 permissions:
   actions: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   update-pr:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}

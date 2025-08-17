@@ -18,6 +18,8 @@ on:
     - cron: '0 4 * * *'
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   validate:
     runs-on: ubuntu-24.04
@@ -40,4 +42,4 @@ jobs:
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Build project against the latest Error Prone release
-        run: mvn -T1C clean install -Dverification.skip -Dversion.error-prone=LATEST
+        run: mvn clean install -Dverification.skip -Dversion.error-prone=LATEST
