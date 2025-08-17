@@ -61,6 +61,9 @@ import tech.picnic.errorprone.utils.SourceCode;
  * href="https://immutables.github.io/immutable.html#copy-methods">Immutables-generated {@code
  * with*}</a> methods to be simplified.
  */
+// XXX: Besides explicitly enumerated iterables, consider also simplifying expressions that contain
+// explicitly enumerated `Stream`s, defined using `Stream.of(...)` or `() -> Stream.of(...)`. This
+// would allow simplifying e.g. invocations of `Flux#fromStream` to `Flux#just`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Iterable creation can be avoided by using a varargs alternative method",

@@ -60,6 +60,7 @@ import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
+import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -510,20 +511,20 @@ final class ReactorRules {
   /** Prefer {@link Flux#just(Object[])} over more contrived alternatives. */
   static final class FluxJustArray<T> {
     @BeforeTemplate
-    Flux<T> before(T value, @Repeated T values) {
-      return Flux.fromStream(() -> Stream.of(value, values));
+    Flux<T> before(@Repeated T values) {
+      return Flux.fromStream(() -> Stream.of(Refaster.asVarargs(values)));
     }
 
     @AfterTemplate
-    Flux<T> after(T value, @Repeated T values) {
-      return Flux.just(value, values);
+    Flux<T> after(@Repeated T values) {
+      return Flux.just(values);
     }
   }
 
   /** Prefer {@link Flux#fromArray(Object[])}} over more ambiguous or contrived alternatives. */
   static final class FluxFromArray<T> {
     @BeforeTemplate
-    Flux<T> before(T[] array) {
+    Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
       return Refaster.anyOf(Flux.just(array), Flux.fromStream(() -> Arrays.stream(array)));
     }
 
