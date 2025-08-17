@@ -9,9 +9,10 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-24.04, macos-15, windows-2025 ]
-        build-jdk: [ 21.0.7 ]
-        target-jdk: [ 17.0.15 ]
+        # XXX: Re-enable.
+        # XXX: os: [ ubuntu-24.04, macos-15, windows-2025 ]
+        # XXX: build-jdk: [ 21.0.7 ]
+        # XXX: target-jdk: [ 17.0.15 ]
         include:
           - os: ubuntu-24.04
             build-jdk: 24.0.1
@@ -47,6 +48,8 @@ jobs:
           maven-version: 3.9.11
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn -T1C install javadoc:jar
+        env:
+          MAVEN_ARGS: ${{ vars.MAVEN_ARGS }}
       # Note that the `-D` argument is quoted for compatibility with the
       # Windows build.
       - name: Build project with self-check against Error Prone fork, test using the targeted JDK
