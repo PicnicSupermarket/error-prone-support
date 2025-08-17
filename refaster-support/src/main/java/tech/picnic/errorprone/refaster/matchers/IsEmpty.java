@@ -61,7 +61,9 @@ import java.util.stream.BaseStream;
  */
 // XXX: Also match (effectively) final variables that reference provably-empty objects.
 // XXX: Also recognize null-hostile "container" expression types that can only reference empty
-// instances, such as `ImmutableCollection<Void>` and `Flux<Void>`.
+// instances, such as `ImmutableCollection<Void>`.
+// XXX: Consider recognizing constructs such as `{anyMono,anyFlux}.then()` and types such as
+// `{Mono,Flux}<Void>`. Those won't emit values (and are thus "empty"), but may have side-effects.
 // XXX: Also recognize `emptyCollection::iterator`, perhaps only if the targeted functional
 // interface is in fact `Iterable`.
 // XXX: Also recognize `EnumSet.noneOf(...)`.
@@ -72,6 +74,8 @@ import java.util.stream.BaseStream;
 // Refaster rules (such as `FluxEmpty` and `EmptyStream`) into this matcher, and use it as the
 // foundation for an Error Prone check that simplifies any "empty" expression with an
 // identically-typed canonical representation. All those Refaster rules can then be dropped.
+// (Warning: if side-effectful `Publishers` are recognized as empty, then the canonical replacement
+// would change semantics. That's clearly undesirable.)
 public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
   private static final Integer ZERO = 0;
