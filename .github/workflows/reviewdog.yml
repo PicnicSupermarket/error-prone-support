@@ -4,7 +4,6 @@ on:
 permissions:
   contents: read
 env:
-  # XXX: Test: doesn't `-Dstyle.color=always` interfere with ReviewDog?
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
@@ -51,8 +50,12 @@ jobs:
         # XXX: Cover additional output formats, besides Checkstyle and javac.
         # XXX: Run with `-Dmaven.test.failure.ignore` instead of `-DskipTests`,
         # and also report Surefire test failures.
+        # XXX: Distribute these commands across three steps?
         run: |
-          mvn clean verify -Pself-check -DskipTests -Dverification.warn \
+          mvn clean verify -Pself-check -DskipTests -Dverification.warn | tee /tmp/build.log
+          # The ANSI escape sequences that color the build output are dropped
+          # before passing the build log to Reviewdog.
+          sed 's/\x1b\[[0-9;]*m//g' < /tmp/build.log \
             | reviewdog \
                 -name=javac \
                 -efm='[WARNING] %f:[%l,%c] %m' \
