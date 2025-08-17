@@ -75,7 +75,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       anyOf(
           staticMethod()
               .onClassAny(
-                  "com.google.common.collect.ImmutableList",
+                  ImmutableList.class.getCanonicalName(),
                   ImmutableMultiset.class.getCanonicalName(),
                   ImmutableSet.class.getCanonicalName(),
                   List.class.getCanonicalName(),
