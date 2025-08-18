@@ -11,6 +11,8 @@ on:
     - cron: '0 4 * * 1'
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     strategy:
@@ -47,7 +49,7 @@ jobs:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
         if: matrix.language == 'java'
-        run: mvn -T1C clean package -DskipTests -Dverification.skip
+        run: mvn clean package -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@76621b61decf072c1cee8dd1ce2d2a82d33c17ed # v3.29.8
         with:

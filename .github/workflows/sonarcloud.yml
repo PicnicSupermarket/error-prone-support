@@ -9,6 +9,8 @@ on:
     - cron: '0 4 * * 1'
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     # Analysis of code in forked repositories is skipped, as such workflow runs
@@ -47,4 +49,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -T1C jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support
+        run: mvn jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support
