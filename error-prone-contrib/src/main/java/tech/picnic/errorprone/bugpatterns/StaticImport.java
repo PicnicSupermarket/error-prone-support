@@ -185,7 +185,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           .put(Sets.class.getCanonicalName(), "toImmutableEnumSet")
           .put(UUID.class.getCanonicalName(), "randomUUID")
           .put(ZoneOffset.class.getCanonicalName(), "UTC")
-          .put("org.junit.jupiter.params.provider.Arguments", "arguments")
+          .putAll("org.junit.jupiter.params.provider.Arguments", "argumentSet", "arguments")
           .build();
 
   /** Instantiates a new {@link StaticImport} instance. */

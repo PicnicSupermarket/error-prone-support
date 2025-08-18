@@ -75,6 +75,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // c).map(Arguments::argument)`.
 // XXX: Support simplification of test methods that accept additional injected parameters such as
 // `TestInfo`; such parameters should be ignored for the purpose of this check.
+// XXX: Support simplification of `argumentSet("name", singleValue)` sequences. Consider making
+// this togglable using a flag, as the removal of test case names may be controversial.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `@ValueSource` over a `@MethodSource` where possible and reasonable",
