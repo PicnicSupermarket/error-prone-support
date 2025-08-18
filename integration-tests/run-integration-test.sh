@@ -8,10 +8,6 @@
 
 set -e -u -o pipefail
 
-# Make sure that callers with a customized `MAVEN_ARGS` environment variable do
-# not influence the test result.
-export MAVEN_ARGS=
-
 integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
