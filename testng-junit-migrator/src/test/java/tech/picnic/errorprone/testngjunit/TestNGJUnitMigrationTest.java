@@ -5,7 +5,8 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("ErrorProneTestHelperSourceFormat" /* We have to allow for some incorrect formatting for the JDK. */)
+@SuppressWarnings(
+    "ErrorProneTestHelperSourceFormat" /* We have to allow for some incorrect formatting for the JDK. */)
 final class TestNGJUnitMigrationTest {
   @Test
   void identification() {
