@@ -1,7 +1,7 @@
 before_install:
   - source "${HOME}/.sdkman/bin/sdkman-init.sh"
   - sdk update
-  - sdk install java 17.0.10-tem
-  - sdk use java 17.0.10-tem
-  - sdk install maven 3.9.8
-  - sdk use maven 3.9.8
+  - sdk install java 21.0.7-tem
+  - sdk use java 21.0.7-tem
+  - sdk install maven 3.9.11
+  - sdk use maven 3.9.11
