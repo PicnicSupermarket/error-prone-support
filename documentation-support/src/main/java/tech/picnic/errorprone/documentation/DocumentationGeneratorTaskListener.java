@@ -9,6 +9,7 @@ import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.api.JavacTrees;
+import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
 import java.io.IOException;
 import java.net.URI;
@@ -47,7 +48,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
 
   @Override
   public void finished(TaskEvent taskEvent) {
-    if (taskEvent.getKind() != Kind.ANALYZE) {
+    if (taskEvent.getKind() != Kind.ANALYZE || JavaCompiler.instance(context).errorCount() > 0) {
       return;
     }
 
