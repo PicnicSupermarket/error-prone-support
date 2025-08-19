@@ -16,24 +16,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_annotation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_check_api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.errorprone</groupId>
-            <artifactId>error_prone_test_helpers</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-compiler</artifactId>
             <scope>provided</scope>
@@ -63,17 +45,35 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_check_api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_test_helpers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
