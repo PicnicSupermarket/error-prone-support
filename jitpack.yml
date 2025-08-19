@@ -1,7 +1,9 @@
 before_install:
+  - mvn -version
   - source "${HOME}/.sdkman/bin/sdkman-init.sh"
   - sdk update
   - sdk install java 21.0.7-tem
   - sdk use java 21.0.7-tem
   - sdk install maven 3.9.11
   - sdk use maven 3.9.11
+  - mvn org.apache.maven.plugins:maven-wrapper-plugin:3.3.2:wrapper -Dmaven=3.9.11
