@@ -26,9 +26,11 @@ import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -58,6 +60,7 @@ import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
+import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -491,21 +494,43 @@ final class ReactorRules {
       return Flux.range(value, 1);
     }
 
-    // XXX: Consider generalizing part of this template using an Error Prone check that covers any
-    // sequence of explicitly enumerated values passed to an iteration order-preserving collection
-    // factory method.
     @BeforeTemplate
     Flux<T> before(T value) {
       return Refaster.anyOf(
           Mono.just(value).flux(),
-          Mono.just(value).repeat().take(1),
-          Flux.fromIterable(ImmutableList.of(value)),
-          Flux.fromIterable(ImmutableSet.of(value)));
+          Flux.fromStream(() -> Stream.of(value)),
+          Mono.just(value).repeat().take(1));
     }
 
     @AfterTemplate
     Flux<T> after(T value) {
       return Flux.just(value);
+    }
+  }
+
+  /** Prefer {@link Flux#just(Object[])} over more contrived alternatives. */
+  static final class FluxJustArray<T> {
+    @BeforeTemplate
+    Flux<T> before(@Repeated T values) {
+      return Flux.fromStream(() -> Stream.of(Refaster.asVarargs(values)));
+    }
+
+    @AfterTemplate
+    Flux<T> after(@Repeated T values) {
+      return Flux.just(values);
+    }
+  }
+
+  /** Prefer {@link Flux#fromArray(Object[])}} over more ambiguous or contrived alternatives. */
+  static final class FluxFromArray<T> {
+    @BeforeTemplate
+    Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
+      return Refaster.anyOf(Flux.just(array), Flux.fromStream(() -> Arrays.stream(array)));
+    }
+
+    @AfterTemplate
+    Flux<T> after(T[] array) {
+      return Flux.fromArray(array);
     }
   }
 
