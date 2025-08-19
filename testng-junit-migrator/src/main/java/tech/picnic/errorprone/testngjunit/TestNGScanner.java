@@ -90,7 +90,7 @@ final class TestNGScanner extends TreeScanner<@Nullable Void, TestNgMetadata.Bui
   public ImmutableMap<ClassTree, TestNgMetadata> collectMetadataForClasses(
       CompilationUnitTree tree) {
     scan(tree, null);
-    return metadataBuilder.build();
+    return metadataBuilder.buildOrThrow();
   }
 
   @CanIgnoreReturnValue

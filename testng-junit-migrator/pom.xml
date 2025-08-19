@@ -5,7 +5,7 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.16.2-SNAPSHOT</version>
+        <version>0.24.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>testng-junit-migrator</artifactId>
@@ -16,20 +16,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>${groupId.error-prone}</groupId>
+            <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_annotation</artifactId>
         </dependency>
         <dependency>
-            <groupId>${groupId.error-prone}</groupId>
+            <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${groupId.error-prone}</groupId>
+            <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_check_api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${groupId.error-prone}</groupId>
+            <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
             <scope>test</scope>
         </dependency>
@@ -69,6 +69,11 @@
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

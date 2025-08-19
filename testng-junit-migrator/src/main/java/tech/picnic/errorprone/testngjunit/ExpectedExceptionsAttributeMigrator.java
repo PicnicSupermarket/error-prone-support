@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.testngjunit;
 
 import static com.google.auto.common.MoreStreams.toImmutableList;
-import static com.sun.source.tree.Tree.Kind.MEMBER_SELECT;
-import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
@@ -12,6 +10,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
@@ -87,14 +86,13 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
 
   private static Optional<String> getExpectedException(
       ExpressionTree expectedExceptions, VisitorState state) {
-    if (expectedExceptions.getKind() == NEW_ARRAY) {
-      NewArrayTree arrayTree = (NewArrayTree) expectedExceptions;
+    if (expectedExceptions instanceof NewArrayTree arrayTree) {
       if (arrayTree.getInitializers().isEmpty()) {
         return Optional.empty();
       }
 
       return Optional.of(SourceCode.treeToString(arrayTree.getInitializers().get(0), state));
-    } else if (expectedExceptions.getKind() == MEMBER_SELECT) {
+    } else if (expectedExceptions instanceof MemberSelectTree) {
       return Optional.of(SourceCode.treeToString(expectedExceptions, state));
     }
 
@@ -103,11 +101,10 @@ final class ExpectedExceptionsAttributeMigrator implements AttributeMigrator {
 
   private static ImmutableList<String> getRemovedExceptions(
       ExpressionTree expectedExceptions, VisitorState state) {
-    if (expectedExceptions.getKind() != NEW_ARRAY) {
+    if (!(expectedExceptions instanceof NewArrayTree arrayTree)) {
       return ImmutableList.of();
     }
 
-    NewArrayTree arrayTree = (NewArrayTree) expectedExceptions;
     return arrayTree.getInitializers().subList(1, arrayTree.getInitializers().size()).stream()
         .map(initializer -> SourceCode.treeToString(initializer, state))
         .collect(toImmutableList());

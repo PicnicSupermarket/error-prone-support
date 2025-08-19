@@ -124,7 +124,7 @@ public final class TestNGJUnitMigration extends BugChecker implements Compilatio
             if (dpAnnotation != null) {
               //  state.reportMatch(describeMatch(dpAnnotation,
               // SuggestedFix.delete(dpAnnotation)));
-              // XXX: VERY UGLY WAY TO FIX THIS THE OPENJDK empty line problem.
+              // XXX: VERY HACKY WAY TO FIX THIS THE OPENJDK empty line problem.
               state.reportMatch(
                   describeMatch(
                       dpAnnotation,

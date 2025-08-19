@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.testngjunit;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static com.sun.source.tree.Tree.Kind.NEW_ARRAY;
 import static java.util.stream.Collectors.joining;
 
 import com.google.common.collect.ImmutableList;
@@ -9,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.util.ASTHelpers;
+import com.google.errorprone.util.ErrorProneComment;
 import com.google.errorprone.util.ErrorProneToken;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -16,7 +16,6 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.ReturnTree;
-import com.sun.tools.javac.parser.Tokens.Comment;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -90,12 +89,12 @@ final class DataProviderMigrator {
   }
 
   private static Optional<NewArrayTree> getDataProviderReturnTree(ReturnTree returnTree) {
-    if (returnTree.getExpression().getKind() != NEW_ARRAY
-        || ((NewArrayTree) returnTree.getExpression()).getInitializers().isEmpty()) {
+    if (!(returnTree.getExpression() instanceof NewArrayTree newArrayTree)
+        || newArrayTree.getInitializers().isEmpty()) {
       return Optional.empty();
     }
 
-    return Optional.of((NewArrayTree) returnTree.getExpression());
+    return Optional.of(newArrayTree);
   }
 
   private static String buildMethodSource(
@@ -141,7 +140,7 @@ final class DataProviderMigrator {
       String className, NewArrayTree newArrayTree, VisitorState state) {
     int startPos = ASTHelpers.getStartPosition(newArrayTree);
     int endPos = state.getEndPosition(newArrayTree);
-    ImmutableMap<Integer, List<Comment>> comments =
+    ImmutableMap<Integer, ImmutableList<ErrorProneComment>> comments =
         state.getOffsetTokens(startPos, endPos).stream()
             .collect(toImmutableMap(ErrorProneToken::pos, ErrorProneToken::comments));
 
@@ -172,14 +171,14 @@ final class DataProviderMigrator {
    * <p>Drops curly braces from array initialisation values.
    */
   private static String wrapTestValueWithArguments(
-      ExpressionTree tree, List<Comment> comments, VisitorState state) {
+      ExpressionTree tree, List<ErrorProneComment> comments, VisitorState state) {
     String source = SourceCode.treeToString(tree, state);
 
     String argumentValue =
-        tree.getKind() == NEW_ARRAY ? source.substring(1, source.length() - 1) : source;
+        tree instanceof NewArrayTree ? source.substring(1, source.length() - 1) : source;
 
     return String.format(
         "\t\t%s%n\t\targuments(%s)",
-        comments.stream().map(Comment::getText).collect(joining("\n")), argumentValue);
+        comments.stream().map(ErrorProneComment::getText).collect(joining("\n")), argumentValue);
   }
 }

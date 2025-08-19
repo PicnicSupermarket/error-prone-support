@@ -17,6 +17,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -54,8 +55,9 @@ abstract class TestNgMetadata {
                             return false;
                           }
 
-                          return ASTHelpers.constValue(dataProviderNameExpression, String.class)
-                              .equals(entry.getKey());
+                          return Objects.equals(
+                              ASTHelpers.constValue(dataProviderNameExpression, String.class),
+                              entry.getKey());
                         }))
         .map(Map.Entry::getValue)
         .collect(toImmutableList());

@@ -186,6 +186,7 @@ final class TestNGScannerTest {
     }
 
     @Override
+    @SuppressWarnings("NullAway" /* False positive on `classTree`. */)
     public Description matchMethod(MethodTree tree, VisitorState state) {
       ClassTree classTree = state.findEnclosing(ClassTree.class);
       Optional<TestNgMetadata> metadata = Optional.ofNullable(classTree).map(classMetaData::get);
