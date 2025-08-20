@@ -357,7 +357,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
-                <version>0.12.8</version>
+                <version>0.12.9</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
