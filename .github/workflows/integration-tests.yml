@@ -10,7 +10,7 @@
 # subset of integration tests to run.
 # See this example of a dynamic build matrix:
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
-name: "Integration tests"
+name: Integration tests
 on:
   issue_comment:
     types: [ created ]
