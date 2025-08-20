@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.documentation;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
@@ -52,10 +54,11 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    JavaFileObject sourceFile = taskEvent.getSourceFile();
-    CompilationUnitTree compilationUnit = taskEvent.getCompilationUnit();
+    JavaFileObject sourceFile = requireNonNull(taskEvent.getSourceFile(), "No source file");
+    CompilationUnitTree compilationUnit =
+        requireNonNull(taskEvent.getCompilationUnit(), "No compilation unit");
     ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (sourceFile == null || compilationUnit == null || classTree == null) {
+    if (classTree == null) {
       return;
     }
 

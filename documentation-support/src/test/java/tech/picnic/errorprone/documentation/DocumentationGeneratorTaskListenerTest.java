@@ -105,6 +105,14 @@ final class DocumentationGeneratorTaskListenerTest {
   }
 
   @Test
+  void skipPackageInfo(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory, "package-info.java", "package pkg;");
+
+    assertThat(outputDirectory).isEmptyDirectory();
+  }
+
+  @Test
   void extraction(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
