@@ -54,18 +54,18 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       return;
     }
 
-    JavaFileObject sourceFile = requireNonNull(taskEvent.getSourceFile(), "No source file");
-    CompilationUnitTree compilationUnit =
-        requireNonNull(taskEvent.getCompilationUnit(), "No compilation unit");
     ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
     if (classTree == null) {
       return;
     }
 
+    CompilationUnitTree compilationUnit =
+        requireNonNull(taskEvent.getCompilationUnit(), "No compilation unit");
     VisitorState state =
         VisitorState.createForUtilityPurposes(context)
             .withPath(new TreePath(new TreePath(compilationUnit), classTree));
 
+    JavaFileObject sourceFile = requireNonNull(taskEvent.getSourceFile(), "No source file");
     for (Extractor<?> extractor : EXTRACTORS) {
       extractor
           .tryExtract(classTree, state)
