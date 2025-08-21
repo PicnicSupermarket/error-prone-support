@@ -196,7 +196,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
-    //  XXX: Once we target JDK 21+, use a type switch here.
+    // XXX: Once we target JDK 21+, use a type switch here.
     return isEmptyArrayCreation(tree)
         || isEmptyCollectionConstructor(tree, state)
         || EMPTY_INSTANCE_FACTORY.matches(tree, state)
