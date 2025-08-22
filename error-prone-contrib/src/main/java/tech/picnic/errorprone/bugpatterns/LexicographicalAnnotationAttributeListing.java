@@ -51,7 +51,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  * resolution, and can even avoid it if two branches add the same entry.
  */
 // XXX: In some places we declare a `@SuppressWarnings` annotation with a final value of
-// `key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict`. That entry must stay
+// `z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict`. That entry must stay
 // last. Consider adding (generic?) support for such cases.
 // XXX: Duplicate entries are often a mistake. Consider introducing a similar `BugChecker` that
 // flags duplicates.

@@ -108,6 +108,10 @@ public final class MoreJUnitMatchers {
         .collect(toImmutableList());
   }
 
+  // XXX: Drop this suppression once SonarCloud is able to infer that this method will not return
+  // `null`.
+  @SuppressWarnings(
+      "java:S2637" /* SonarCloud incorrectly thinks this that method may return `null`. */)
   private static String toMethodSourceFactoryDescriptor(
       @Nullable ExpressionTree tree, String annotatedMethodName) {
     return requireNonNullElse(

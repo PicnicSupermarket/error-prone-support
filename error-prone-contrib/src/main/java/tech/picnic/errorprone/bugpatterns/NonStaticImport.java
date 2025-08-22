@@ -55,6 +55,8 @@ import tech.picnic.errorprone.utils.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
+@SuppressWarnings(
+    "javaarchitecture:S7027" /* `StaticImport` and `NonStaticImport` ensure mutual exclusivity. */)
 public final class NonStaticImport extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
 

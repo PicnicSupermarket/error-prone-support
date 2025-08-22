@@ -111,7 +111,7 @@ final class FileRules {
     @SuppressWarnings({
       "FilesCreateTempFileInCustomDirectoryToFile" /* This is a more specific template. */,
       "java:S5443" /* This violation will be rewritten. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     File before(String prefix, String suffix) throws IOException {
       return Refaster.anyOf(
@@ -188,7 +188,7 @@ final class FileRules {
       "DefaultCharset" /* This violation will be rewritten. */,
       "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(String path) throws IOException {
       return Refaster.anyOf(
@@ -211,7 +211,7 @@ final class FileRules {
       "DefaultCharset" /* This violation will be rewritten. */,
       "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(File file) throws IOException {
       return Refaster.anyOf(
