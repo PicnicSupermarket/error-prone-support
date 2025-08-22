@@ -91,8 +91,14 @@ final class PreconditionsRules {
 
   /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
   static final class RequireNonNullStatement<T extends @Nullable Object> {
+    // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
+    // annotations.
     @BeforeTemplate
-    @SuppressWarnings("java:S1695" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "java:S1695" /* This violation will be rewritten. */,
+      "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     void before(T object) {
       if (object == null) {
         throw new NullPointerException();
@@ -122,8 +128,14 @@ final class PreconditionsRules {
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
   static final class RequireNonNullWithMessageStatement<T extends @Nullable Object> {
+    // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
+    // annotations.
     @BeforeTemplate
-    @SuppressWarnings("java:S1695" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "java:S1695" /* This violation will be rewritten. */,
+      "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     void before(T object, String message) {
       if (object == null) {
         throw new NullPointerException(message);

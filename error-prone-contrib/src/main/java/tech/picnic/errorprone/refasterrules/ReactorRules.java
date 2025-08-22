@@ -552,7 +552,7 @@ final class ReactorRules {
     @SuppressWarnings({
       "java:S2637" /* False positive: result is never `null`. */,
       "java:S4968" /* Result may be `Mono<Void>`. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     Mono<? extends @Nullable Void> before2(Mono<@Nullable Void> mono) {
       return Refaster.anyOf(mono.ignoreElement(), mono.then());
@@ -1012,7 +1012,7 @@ final class ReactorRules {
     @SuppressWarnings({
       "java:S2637" /* False positive: result is never `null`. */,
       "java:S4968" /* Result may be `Mono<Void>`. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     Mono<? extends @Nullable Void> before2(Flux<@Nullable Void> flux) {
       return flux.ignoreElements();

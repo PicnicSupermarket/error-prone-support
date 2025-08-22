@@ -27,21 +27,24 @@ final class StringRulesRecipesTest implements RewriteTest {
   @SuppressWarnings("java:S2699" /* The `rewriteRun` method performs an assertion. */)
   @Test
   void stringValueOf() {
-    // XXX: Use text blocks once supported.
     rewriteRun(
         java(
-            "import java.util.Objects;\n"
-                + '\n'
-                + "class Test {\n"
-                + "  String test(Object object) {\n"
-                + "    return Objects.toString(object);\n"
-                + "  }\n"
-                + '}',
-            "class Test {\n"
-                + "  String test(Object object) {\n"
-                + "    return String.valueOf(object);\n"
-                + "  }\n"
-                + '}'));
+            """
+            import java.util.Objects;
+
+            class Test {
+              String test(Object object) {
+                return Objects.toString(object);
+              }
+            }
+            """,
+            """
+            class Test {
+              String test(Object object) {
+                return String.valueOf(object);
+              }
+            }
+            """));
   }
 
   // XXX: Instead of suppressing `S2699`, consider registering
