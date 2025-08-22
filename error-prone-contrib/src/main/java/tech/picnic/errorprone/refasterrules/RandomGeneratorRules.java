@@ -57,7 +57,11 @@ final class RandomGeneratorRules {
     // to expressions that adhere to Error Prone's `LongDoubleConversion` check, and to expressions
     // that don't.
     @BeforeTemplate
-    @SuppressWarnings("LongDoubleConversion" /* This violation will be rewritten. */)
+    @SuppressWarnings({
+      "java:S1905" /* This violation will be rewritten. */,
+      "LongDoubleConversion" /* This violation will be rewritten. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     long before(RandomGenerator random, long bound) {
       return Refaster.anyOf(
           (long) random.nextDouble((double) bound),

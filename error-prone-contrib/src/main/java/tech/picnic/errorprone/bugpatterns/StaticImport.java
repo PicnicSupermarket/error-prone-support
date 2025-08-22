@@ -74,6 +74,8 @@ import java.util.stream.Collectors;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
+@SuppressWarnings(
+    "javaarchitecture:S7027" /* `StaticImport` and `NonStaticImport` ensure mutual exclusivity. */)
 public final class StaticImport extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 
