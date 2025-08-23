@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
@@ -318,5 +319,13 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamOf5() {
     return Stream.of(1, 2, 3, 4, 5);
+  }
+
+  Stream<String> testIterableStream() {
+    return Streams.stream(List.of("foo", "bar"));
+  }
+
+  Stream<String> testCollectionParallelStream() {
+    return List.of("foo", "bar").parallelStream();
   }
 }
