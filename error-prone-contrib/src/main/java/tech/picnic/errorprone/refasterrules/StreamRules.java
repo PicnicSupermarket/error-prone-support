@@ -790,6 +790,10 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer {@link Streams#stream(Iterable)} over manually wrapping an {@link Iterable}
+   * with {@link StreamSupport#stream(java.util.Spliterator, boolean)} using {@code parallel = false}.
+   */
   static final class IterableStream<T> {
     @BeforeTemplate
     Stream<T> before(Iterable<T> iterable) {
@@ -802,6 +806,10 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer {@link Collection#parallelStream()} over explicitly creating a parallel stream
+   * through {@link StreamSupport#stream(java.util.Spliterator, boolean)} with {@code parallel = true}.
+   */
   static final class CollectionParallelStream<T> {
     @BeforeTemplate
     Stream<T> before(Collection<T> collection) {
