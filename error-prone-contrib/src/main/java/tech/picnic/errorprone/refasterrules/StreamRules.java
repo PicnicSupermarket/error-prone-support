@@ -788,4 +788,17 @@ final class StreamRules {
       return Stream.of(e1, e2, e3, e4, e5);
     }
   }
+
+  // This improves performance by avoiding a full sort before removing duplicates.
+  static final class StreamSortedThenDistinct<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream) {
+      return stream.sorted().distinct();
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream) {
+      return stream.distinct().sorted();
+    }
+  }
 }
