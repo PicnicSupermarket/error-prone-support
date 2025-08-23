@@ -53,6 +53,9 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.junit.After;
+
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -786,6 +789,19 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(T e1, T e2, T e3, T e4, T e5) {
       return Stream.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  // This improves performance by avoiding a full sort before removing duplicates.
+  static final class StreamSortedThenDistinct<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream) {
+      return stream.sorted().distinct();
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream) {
+      return stream.distinct().sorted();
     }
   }
 }
