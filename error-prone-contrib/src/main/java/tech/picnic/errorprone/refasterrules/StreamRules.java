@@ -53,6 +53,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -786,6 +787,30 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(T e1, T e2, T e3, T e4, T e5) {
       return Stream.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  static final class IterableStream<T> {
+    @BeforeTemplate
+    Stream<T> before(Iterable<T> iterable) {
+      return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Iterable<T> iterable) {
+      return Streams.stream(iterable);
+    }
+  }
+
+  static final class CollectionParallelStream<T> {
+    @BeforeTemplate
+    Stream<T> before(Collection<T> collection) {
+      return StreamSupport.stream(collection.spliterator(), true);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Collection<T> collection) {
+      return collection.parallelStream();
     }
   }
 }
