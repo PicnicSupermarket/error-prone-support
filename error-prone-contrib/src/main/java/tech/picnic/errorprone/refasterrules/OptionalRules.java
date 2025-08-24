@@ -86,7 +86,8 @@ final class OptionalRules {
     @BeforeTemplate
     @SuppressWarnings({
       "java:S3655" /* Matched expressions are in practice embedded in a larger context. */,
-      "NullAway"
+      "NullAway" /* Matched expressions are in practice embedded in a larger context. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     T before(Optional<T> optional) {
       return optional.get();
@@ -228,7 +229,6 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     Optional<S> before(Optional<T> optional) {
       return optional.map(v -> toOptionalFunction(v).orElseThrow());
     }
@@ -241,13 +241,11 @@ final class OptionalRules {
 
   static final class OrOrElseThrow<T> {
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     T before(Optional<T> o1, Optional<T> o2) {
       return o1.orElseGet(() -> o2.orElseThrow());
     }
 
     @AfterTemplate
-    @SuppressWarnings("NullAway")
     T after(Optional<T> o1, Optional<T> o2) {
       return o1.or(() -> o2).orElseThrow();
     }
@@ -312,7 +310,6 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     Stream<S> before(Stream<T> stream) {
       return stream.map(e -> toOptionalFunction(e).orElseThrow());
     }
