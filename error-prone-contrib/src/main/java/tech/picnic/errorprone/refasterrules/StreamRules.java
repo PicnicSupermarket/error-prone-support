@@ -53,6 +53,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -786,6 +787,38 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(T e1, T e2, T e3, T e4, T e5) {
       return Stream.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  /**
+   * Prefer {@link Streams#stream(Iterable)} over manually wrapping an {@link Iterable}
+   * with {@link StreamSupport#stream(java.util.Spliterator, boolean)} using {@code parallel = false}.
+   */
+  static final class IterableStream<T> {
+    @BeforeTemplate
+    Stream<T> before(Iterable<T> iterable) {
+      return StreamSupport.stream(iterable.spliterator(), /* parallel= */ false);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Iterable<T> iterable) {
+      return Streams.stream(iterable);
+    }
+  }
+
+  /**
+   * Prefer {@link Collection#parallelStream()} over explicitly creating a parallel stream
+   * through {@link StreamSupport#stream(java.util.Spliterator, boolean)} with {@code parallel = true}.
+   */
+  static final class CollectionParallelStream<T> {
+    @BeforeTemplate
+    Stream<T> before(Collection<T> collection) {
+      return StreamSupport.stream(collection.spliterator(), /* parallel= */ true);
+    }
+
+    @AfterTemplate
+    Stream<T> after(Collection<T> collection) {
+      return collection.parallelStream();
     }
   }
 }
