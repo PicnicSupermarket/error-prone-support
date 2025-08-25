@@ -31,7 +31,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          java-version: 17.0.15
+          java-version: 17.0.16
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Set up Reviewdog
