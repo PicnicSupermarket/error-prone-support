@@ -1,42 +1,18 @@
 package tech.picnic.errorprone.experimental.bugpatterns;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import org.junit.jupiter.api.Test;
 
-final class TypeMemberOrderClassTest {
+final class TypeMemberOrderTest {
   @Test
-  void identification() {
+  void identificationClass() {
     CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addSourceLines(
             "A.java",
             "// BUG: Diagnostic contains:",
             "class A {",
-            "  class InnerClass {}",
-            "",
-            "  interface InnerInterface {}",
-            "",
-            "  enum InnerEnum {}",
-            "",
-            "  int foo() {",
-            "    return foo;",
-            "  }",
-            "",
-            "  A() {}",
-            "",
-            "  {",
-            "    System.out.println(\"bar\");",
-            "  }",
-            "",
-            "  static {",
-            "    System.out.println(\"foo\");",
-            "  }",
-            "",
             "  private final int bar = 2;",
             "  private static final int foo = 1;",
             "}")
@@ -45,115 +21,274 @@ final class TypeMemberOrderClassTest {
             "class B {",
             "  private static final int foo = 1;",
             "  private final int bar = 2;",
-            "",
-            "  static {",
-            "    System.out.println(\"foo\");",
-            "  }",
-            "",
-            "  {",
-            "    System.out.println(\"bar\");",
-            "  }",
-            "",
-            "  B() {}",
-            "",
-            "  int foo() {",
-            "    return foo;",
-            "  }",
-            "",
-            "  class InnerClass {}",
-            "",
-            "  interface InnerInterface {}",
-            "",
-            "  enum InnerEnum {}",
             "}")
-        .addSourceLines(
-            "C.java",
-            "class C {",
-            "  @SuppressWarnings({\"foo\", \"all\", \"bar\"})",
-            "  void unorderedMethod() {}",
-            "",
-            "  C() {}",
-            "}")
-        .addSourceLines(
-            "D.java",
-            "class D {",
-            "  @SuppressWarnings(\"TypeMemberOrder\")",
-            "  void unorderedMethod() {}",
-            "",
-            "  D() {}",
-            "}")
-        .addSourceLines(
-            "E.java",
-            "@SuppressWarnings(\"TypeMemberOrder\")",
-            "class E {",
-            "  void unorderedMethod() {}",
-            "",
-            "  E() {}",
-            "}")
-        .addSourceLines("F.java", "class F {}")
         .doTest();
   }
 
   @Test
-  void replacement() {
+  void identificationInterface() {
+    CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains:",
+            "interface A {",
+            "  void bar();",
+            "",
+            "  static final int foo = 1;",
+            "}")
+        .addSourceLines(
+            "B.java", "interface B {", "  static final int foo = 1;", "", "  void bar();", "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationEnum() {
+    CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains:",
+            "enum A {",
+            "  FOO;",
+            "  final int baz = 2;",
+            "  static final int BAR = 1;",
+            "}")
+        .addSourceLines(
+            "B.java",
+            "enum B {",
+            "  FOO;",
+            "  static final int BAR = 1;",
+            "  final int baz = 2;",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationAnnotation() {
+    CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addSourceLines(
+            "A.java", "@interface A {", "  final int baz = 2;", "  static final int BAR = 1;", "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationRecord() {
+    CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addSourceLines(
+            "A.java", "record A() {", "  void baz() {}", "", "  static final int BAR = 1;", "}")
+        .doTest();
+  }
+
+  @Test
+  // TODO: Extend case with @Nested
+  void replacementClass() {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",
-            "  class Inner {",
-            "    int innerFoo() {",
-            "      return 1;",
-            "    }",
+            "  // `InnerClass` comment",
+            "  class InnerClass {}",
             "",
-            "    private final int innerBar = 2;",
-            "  }",
+            "  // dangling comment 1",
+            "  ;",
             "",
-            "  int foo() {",
-            "    return foo;",
+            "  interface InnerInterface {}",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  void baz() {",
+            "    System.out.println(\"hello, world!\");",
             "  }",
             "",
             "  A() {}",
             "",
             "  {",
-            "    System.out.println(\"bar\");",
+            "    System.out.println(\"hello, world!\");",
             "  }",
             "",
             "  static {",
-            "    System.out.println(\"foo\");",
+            "    System.out.println(\"hello, world!\");",
             "  }",
             "",
-            "  private final int bar = 2;",
-            "  private static final int foo = 1;",
+            "  final int bar = 2;",
+            "",
+            "  static final int foo = 1;",
+            "",
+            "  // dangling comment 2",
             "}")
         .addOutputLines(
             "A.java",
             "class A {",
-            "  private static final int foo = 1;",
             "",
-            "  private final int bar = 2;",
+            "  static final int foo = 1;",
+            "",
+            "  final int bar = 2;",
             "",
             "  static {",
-            "    System.out.println(\"foo\");",
+            "    System.out.println(\"hello, world!\");",
             "  }",
             "",
             "  {",
-            "    System.out.println(\"bar\");",
+            "    System.out.println(\"hello, world!\");",
             "  }",
             "",
             "  A() {}",
             "",
-            "  int foo() {",
-            "    return foo;",
+            "  void baz() {",
+            "    System.out.println(\"hello, world!\");",
             "  }",
             "",
-            "  class Inner {",
+            "  // `InnerClass` comment",
+            "  class InnerClass {}",
             "",
-            "    private final int innerBar = 2;",
+            "  // dangling comment 1",
+            "  ;",
             "",
-            "    int innerFoo() {",
-            "      return 1;",
-            "    }",
+            "  interface InnerInterface {}",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  // dangling comment 2",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementInterface() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "interface A {",
+            "  // `InnerClass` comment",
+            "  class InnerClass {}",
+            "",
+            "  // dangling comment 1",
+            "  ;",
+            "",
+            "  interface InnerInterface {}",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  default void baz() {",
+            "    System.out.println(\"hello, world!\");",
             "  }",
+            "",
+            "  void qux();",
+            "",
+            "  static final int foo = 1;",
+            "",
+            "  // dangling comment 2",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "interface A {",
+            "",
+            "  static final int foo = 1;",
+            "",
+            "  default void baz() {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  void qux();",
+            "",
+            "  // `InnerClass` comment",
+            "  class InnerClass {}",
+            "",
+            "  // dangling comment 1",
+            "  ;",
+            "",
+            "  interface InnerInterface {}",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  // dangling comment 2",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementEnum() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "enum A {",
+            "  // E1 comment",
+            "  E1,",
+            "  E2,",
+            "  // E3 comment",
+            "  E3",
+            "// dangling comment 1",
+            ";",
+            "",
+            "  // `InnerClass` comment",
+            "  class InnerClass {}",
+            "",
+            "  // dangling comment 2",
+            "  ;",
+            "",
+            "  interface InnerInterface {}",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  void baz() {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  A() {}",
+            "",
+            "  {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  static {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  final int bar = 2;",
+            "",
+            "  static final int foo = 1;",
+            "",
+            "  // dangling comment 3",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "enum A {",
+            "  // E1 comment",
+            "  E1,",
+            "  E2,",
+            "  // E3 comment",
+            "  E3",
+            "// dangling comment 1",
+            ";",
+            "",
+            "  static final int foo = 1;",
+            "",
+            "  final int bar = 2;",
+            "",
+            "  static {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  A() {}",
+            "",
+            "  void baz() {",
+            "    System.out.println(\"hello, world!\");",
+            "  }",
+            "",
+            "  // `InnerClass` comment",
+            "  class InnerClass {}",
+            "",
+            "  // dangling comment 2",
+            "  ;",
+            "",
+            "  interface InnerInterface {}",
+            "",
+            "  enum InnerEnum {}",
+            "",
+            "  // dangling comment 3",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
@@ -163,27 +298,27 @@ final class TypeMemberOrderClassTest {
     BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addInputLines(
             "A.java",
-            // XXX: Use dedicated helper method to read test files here and below.
-            new BufferedReader(
-                    new InputStreamReader(
-                        this.getClass()
-                            .getClassLoader()
-                            .getResourceAsStream(
-                                "TypeMemberOrderNestedCompilationUnitTestInput.java"),
-                        UTF_8))
-                .lines()
-                .toArray(String[]::new))
+            "class A {",
+            "  class InnerClass {",
+            "    int baz;",
+            "",
+            "    static int bar;",
+            "  }",
+            "",
+            "  static int foo;",
+            "}")
         .addOutputLines(
             "A.java",
-            new BufferedReader(
-                    new InputStreamReader(
-                        this.getClass()
-                            .getClassLoader()
-                            .getResourceAsStream(
-                                "TypeMemberOrderNestedCompilationUnitTestOutput.java"),
-                        UTF_8))
-                .lines()
-                .toArray(String[]::new))
+            "class A {",
+            "",
+            "  static int foo;",
+            "",
+            "  class InnerClass {",
+            "",
+            "    static int bar;",
+            "    int baz;",
+            "  }",
+            "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 
@@ -216,54 +351,6 @@ final class TypeMemberOrderClassTest {
             "  void baz() {}",
             "",
             "  static class InnerClass {}",
-            "}")
-        .doTest(TestMode.TEXT_MATCH);
-  }
-
-  @Test
-  void replacementUnmovableMembers() {
-    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
-        .addInputLines(
-            "A.java",
-            "class A {",
-            "  @SuppressWarnings(\"TypeMemberOrder\")",
-            "  int foo() {",
-            "    return foo;",
-            "  }",
-            "",
-            "  {",
-            "    System.out.println(\"bar\");",
-            "  }",
-            "",
-            "  static {",
-            "    System.out.println(\"foo\");",
-            "  }",
-            "",
-            "  private final int bar = 2;",
-            "",
-            "  @SuppressWarnings(\"TypeMemberOrder\")",
-            "  private static final int foo = 1;",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "class A {",
-            "  @SuppressWarnings(\"TypeMemberOrder\")",
-            "  int foo() {",
-            "    return foo;",
-            "  }",
-            "",
-            "  private final int bar = 2;",
-            "",
-            "  static {",
-            "    System.out.println(\"foo\");",
-            "  }",
-            "",
-            "  {",
-            "    System.out.println(\"bar\");",
-            "  }",
-            "",
-            "  @SuppressWarnings(\"TypeMemberOrder\")",
-            "  private static final int foo = 1;",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
@@ -422,6 +509,44 @@ final class TypeMemberOrderClassTest {
             "    private static final int foo = 1;",
             "    String bar;",
             "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void replacementJUnitNestedAnnotation() {
+    BugCheckerRefactoringTestHelper.newInstance(TypeMemberOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "class A {",
+            "",
+            "  void foo () {}",
+            "",
+            "  @org.junit.jupiter.api.Nested",
+            "  class JUnitNested1 {}",
+            "",
+            "  void bar () {}",
+            "",
+            "  class NormalClass {}",
+            "",
+            "  @org.junit.jupiter.api.Nested",
+            "  class JUnitNested2 {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A {",
+            "",
+            "  void foo () {}",
+            "",
+            "  @org.junit.jupiter.api.Nested",
+            "  class JUnitNested1 {}",
+            "",
+            "  void bar () {}",
+            "",
+            "  @org.junit.jupiter.api.Nested",
+            "  class JUnitNested2 {}",
+            "",
+            "  class NormalClass {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

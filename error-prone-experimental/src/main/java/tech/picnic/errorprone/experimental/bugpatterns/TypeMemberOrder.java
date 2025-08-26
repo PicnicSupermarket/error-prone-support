@@ -8,7 +8,6 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
@@ -32,6 +31,7 @@ import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.parser.Tokens.TokenKind;
 import com.sun.tools.javac.tree.JCTree;
+import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.tree.JCTree.JCVariableDecl;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
@@ -49,16 +49,24 @@ import javax.lang.model.element.Modifier;
  *   <li>Static initializer blocks
  *   <li>Instance initializer blocks
  *   <li>Constructors
- *   <li>Methods
+ *   <li>Methods, Classes annotated with {@code org.junit.jupiter.api.Nested}
  *   <li>Nested classes, interfaces and enums
  * </ol>
+ *
+ * <p>Moving members as bug checker fixes introduces a relatively large number of line changes.
+ * These changes should conflict with other fixes. To prevent the `TypeMemberOrder` checker from
+ * conflicting with itself, it matches compilation units rather than types, and it merges its fixes
+ * within the given compilation unit before reporting it as a single fix.
+ *
+ * <p>This should guarantee that the `TypeMemberOrder` can be run on any code-base as an individual
+ * check. If it's conflicting with other bug checkers, one can run the `TypeMemberOrder` and all
+ * other checks in two separate steps.
  *
  * @see <a
  *     href="https://checkstyle.sourceforge.io/apidocs/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.html">Checkstyle's
  *     {@code DeclarationOrderCheck}</a>
  */
-// XXX: Consider introducing support for ordering members in records or annotation definitions.
-// XXX: Exclude checkstyle from running against (this checker's) test files.
+// XXX: Consider introducing support for ordering members in records and annotation definitions.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Type members should be defined in a canonical order",
@@ -77,9 +85,9 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
       CompilationUnitTree compilationUnitTree, VisitorState state) {
     SuggestedFix.Builder suggestedFixes = SuggestedFix.builder();
     for (Tree tree : compilationUnitTree.getTypeDecls()) {
-      if (!isSuppressed(tree, state) && tree instanceof ClassTree classTree) {
+      if (tree instanceof ClassTree classTree) {
         suggestedFixes.merge(
-            matchClass(classTree, state, (JCTree.JCCompilationUnit) compilationUnitTree));
+            matchClass(classTree, requireNonNull(state.getSourceCode(), "Source code"), state));
       }
     }
     SuggestedFix suggestedFix = suggestedFixes.build();
@@ -89,19 +97,19 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
     return describeMatch(compilationUnitTree, suggestedFix);
   }
 
-  private SuggestedFix matchClass(
-      ClassTree tree, VisitorState state, JCTree.JCCompilationUnit compilationUnit) {
-    Kind treeKind = tree.getKind();
-    if (treeKind != Kind.CLASS && treeKind != Kind.INTERFACE && treeKind != Kind.ENUM) {
-      return SuggestedFix.emptyFix();
-    }
-
+  private SuggestedFix matchClass(ClassTree tree, CharSequence source, VisitorState state) {
+    boolean isTreeKindSupported =
+        tree.getKind() == Kind.CLASS
+            || tree.getKind() == Kind.INTERFACE
+            || tree.getKind() == Kind.ENUM;
     int bodyStartPos = getBodyStartPos(tree, state);
-    if (bodyStartPos == Position.NOPOS) {
+    if (isSuppressed(tree, state) || !isTreeKindSupported || bodyStartPos == Position.NOPOS) {
       /*
-       * We can't determine the type body's start position in the source code. This generally means
-       * that (part of) its code was generated. Even if the source code for a subset of its members
-       * is available, dealing with this edge case is not worth the trouble.
+       * In case the tree is suppressed or unsupported, we skip sorting it.
+       *
+       * Otherwise, its body's position is unknown in the source code. This generally means that
+       * (part of) its code was generated. Even if the source code for a subset of its members is
+       * available, dealing with this edge case is not worth the trouble.
        */
       return SuggestedFix.emptyFix();
     }
@@ -113,26 +121,33 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
       SuggestedFix.Builder nestedSuggestedFixes = SuggestedFix.builder();
       for (TypeMember member : members) {
         if (member.tree() instanceof ClassTree memberClassTree) {
-          SuggestedFix other = matchClass(memberClassTree, state, compilationUnit);
-          nestedSuggestedFixes.merge(other);
+          nestedSuggestedFixes.merge(matchClass(memberClassTree, source, state));
         }
       }
       return nestedSuggestedFixes.build();
     }
 
-    // XXX: Consider using `SourceCode#treeToString` instead of `VisitorState.getSourceCode()`.
-    CharSequence source = requireNonNull(state.getSourceCode(), "Source code");
+    /*
+     * Find and pair each type member with its source code. For nested types, apply their nested
+     * fixes first, and only propagate their fixed source codes.
+     */
     ImmutableMap.Builder<TypeMember, String> typeMemberSource = ImmutableMap.builder();
-
     for (TypeMember member : members) {
       if (member.tree() instanceof ClassTree memberClassTree) {
-        SuggestedFix suggestedFix = matchClass(memberClassTree, state, compilationUnit);
+        SuggestedFix memberClassTreeFix = matchClass(memberClassTree, source, state);
         @Var
         String memberSource =
             source.subSequence(member.startPosition(), member.endPosition()).toString();
-        // Diff between memberSource and replacement positions.
+        /*
+         * Apply nested fixes "manually". The positions of the fixes' replacements are based on the
+         * compilation unit's _original_ source code, while applying it we need to compensate for
+         * (1) the member's own position, and (2) the change in length between the original and the
+         * fixed source codes.
+         */
         @Var int diff = -member.startPosition();
-        for (Replacement replacement : suggestedFix.getReplacements(compilationUnit.endPositions)) {
+        for (Replacement replacement :
+            memberClassTreeFix.getReplacements(
+                ((JCCompilationUnit) state.getPath().getCompilationUnit()).endPositions)) {
           memberSource =
               memberSource.subSequence(0, replacement.startPosition() + diff)
                   + replacement.replaceWith()
@@ -152,44 +167,43 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
     return sortTypeMembers(members, typeMemberSource.buildOrThrow());
   }
 
-  /** Returns all members that can be moved or may lay between movable ones. */
-  private ImmutableList<TypeMember> getAllTypeMembers(
+  /**
+   * Returns all members that may be moved, i.e. members that have positions and not enumeration
+   * constants.
+   */
+  private static ImmutableList<TypeMember> getAllTypeMembers(
       ClassTree tree, int bodyStartPos, VisitorState state) {
     ImmutableList.Builder<TypeMember> builder = ImmutableList.builder();
     @Var int currentStartPos = bodyStartPos;
     for (Tree member : tree.getMembers()) {
-      if (state.getEndPosition(member) == Position.NOPOS) {
+      if (state.getEndPosition(member) == Position.NOPOS || isEnumeratorConstant(member)) {
         continue;
       }
 
       int treeStartPos = currentStartPos;
       getMemberTypeOrdinal(member, state)
           .ifPresent(
-              e ->
+              memberTypeOrdinal ->
                   builder.add(
-                      new AutoValue_TypeMemberOrder_TypeMember(
-                          member, treeStartPos, state.getEndPosition(member), e)));
-
-      /* XXX: Write explanation about this enum. */
-      currentStartPos = Math.max(currentStartPos, state.getEndPosition(member));
+                      new TypeMember(
+                          member, treeStartPos, state.getEndPosition(member), memberTypeOrdinal)));
+      currentStartPos = state.getEndPosition(member);
     }
     return builder.build();
   }
 
-  /**
-   * Returns the preferred ordinal of the given member, or empty if it's unmovable for any reason,
-   * including it lacking a preferred ordinal.
-   */
-  // XXX: Comment about future fixing Nested.
-  private Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
-    if (isSuppressed(tree, state) || isEnumeratorDefinition(tree)) {
-      return Optional.empty();
-    }
+  /** Returns the preferred ordinal of the given member if any. */
+  private static Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
     return switch (tree.getKind()) {
       case VARIABLE -> Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
       case BLOCK -> Optional.of(isStatic((BlockTree) tree) ? 3 : 4);
       case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
       case CLASS, INTERFACE, ENUM ->
+          /*
+           * XXX: To enable a Picnic specific preference, we order @Nested test classes as they were
+           * methods. This could be replaced with a plugin system where downstream projects could
+           * specify their own "canonical member type order".
+           */
           ASTHelpers.hasAnnotation(tree, "org.junit.jupiter.api.Nested", state)
               ? Optional.of(6)
               : Optional.of(7);
@@ -240,7 +254,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
    *
    * @see com.sun.tools.javac.code.Flags#ENUM
    */
-  private static boolean isEnumeratorDefinition(Tree tree) {
+  private static boolean isEnumeratorConstant(Tree tree) {
     return tree instanceof JCVariableDecl variableDecl && (variableDecl.mods.flags & ENUM) != 0;
   }
 
@@ -283,16 +297,8 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
     return ASTHelpers.getSymbol(methodTree).isConstructor();
   }
 
-  @AutoValue
-  abstract static class TypeMember implements Comparable<TypeMember> {
-    abstract Tree tree();
-
-    abstract int startPosition();
-
-    abstract int endPosition();
-
-    abstract int preferredOrdinal();
-
+  record TypeMember(Tree tree, int startPosition, int endPosition, int preferredOrdinal)
+      implements Comparable<TypeMember> {
     @Override
     public int compareTo(TypeMemberOrder.TypeMember o) {
       return Integer.compare(preferredOrdinal(), o.preferredOrdinal());
