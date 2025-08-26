@@ -15,8 +15,6 @@ final class BlockStartWhitespaceTest {
             "class A {",
             "",
             "  private static final int foo = 1;",
-            // XXX: Check whitespace in-between members. Enforce different clustering based on the
-            // members modifiers, e.g. empty line between static and non-static fields.
             "",
             "  // BUG: Diagnostic contains:",
             "  void method(String foo) {",
@@ -37,6 +35,7 @@ final class BlockStartWhitespaceTest {
   }
 
   @Test
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   void replacementClassBodyBlock() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
         .addInputLines(
@@ -135,6 +134,29 @@ final class BlockStartWhitespaceTest {
             "    // comment",
             "",
             "    return 1;",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
+
+  @Test
+  void rename_me_overlapping_fixes() {
+    BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
+        .addInputLines(
+            "Nested.java",
+            "class Nested {",
+            "",
+            "  static final class A {",
+            "",
+            "    private static final int foo = 1;",
+            "  }",
+            "}")
+        .addOutputLines(
+            "Nested.java",
+            "class Nested {",
+            "  static final class A {",
+            "    private static final int foo = 1;",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
