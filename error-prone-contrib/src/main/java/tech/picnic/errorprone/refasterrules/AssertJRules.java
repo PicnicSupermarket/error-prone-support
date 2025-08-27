@@ -99,6 +99,9 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // See how we can combine these things. Do note that (at present) their Refaster rules don't
 // show up as Error Prone checks. So we'd have to build an integration for that.
 // XXX: Cover all cases listed by https://rules.sonarsource.com/java/RSPEC-5838/
+// XXX: For `E extends Comparable<? super E>`, rewrite
+// `assertThat(iterable).isEqualTo(Refaster.<Object>anyOf(ImmutableSortedSet.of(expected),
+// ImmutableSortedMultiset.of(expected)))` to `assertThat(iterable).containsExactly(expected)`.
 @OnlineDocumentation
 final class AssertJRules {
   private AssertJRules() {}
@@ -927,28 +930,4 @@ final class AssertJRules {
       assertThat(predicate).rejects(object);
     }
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  // Organize the code below.
-
-  // XXX: Do the "single Comparable" match shown below.
-  //    static final class AssertThatOnlyComparableElementIsEqualTo<E extends Comparable<? super E>>
-  // {
-  //        @BeforeTemplate
-  //        AbstractAssert<?, ?> before(Iterable<E> iterable, E expected) {
-  //            return assertThat(iterable)
-  //                    .isEqualTo(
-  //                            Refaster.<Object>anyOf(
-  //                                    ImmutableSortedSet.of(expected),
-  //                                    ImmutableSortedMultiset.of(expected)));
-  //        }
-  //
-  //        @AfterTemplate
-  //        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-  //        IterableAssert<E> after(Iterable<E> iterable, E expected) {
-  //            return assertThat(iterable).containsExactly(expected);
-  //        }
-  //    }
-  //
 }

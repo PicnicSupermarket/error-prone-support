@@ -49,6 +49,8 @@ import java.util.Optional;
 // XXX: GJF guesses the line separator to be used by inspecting the source. When using text blocks
 // this may cause the current unconditional use of `\n` not to be sufficient when building on
 // Windows; TBD.
+// XXX: Once we support text blocks, also format arguments to
+// `org.openrewrite.test.RewriteTest#rewriteRun`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Test code should follow the Google Java style",

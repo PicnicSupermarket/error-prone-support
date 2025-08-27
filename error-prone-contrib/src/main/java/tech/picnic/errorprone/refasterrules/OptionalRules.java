@@ -378,7 +378,7 @@ final class OptionalRules {
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
       "NestedOptionals" /* This violation will be rewritten. */,
       "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if

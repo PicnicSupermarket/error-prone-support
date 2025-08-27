@@ -77,7 +77,7 @@ final class StringRules {
     @SuppressWarnings({
       "CharSequenceIsEmpty" /* This is a more specific template. */,
       "java:S7158" /* This violation will be rewritten. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     boolean before(String str) {
       return Refaster.anyOf(str.length() == 0, str.length() <= 0, str.length() < 1);
