@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.documentation.models;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -9,19 +7,10 @@ import com.google.common.collect.ImmutableList;
  * serialization.
  */
 // XXX: This class is not yet used.
-@AutoValue
-@JsonDeserialize(as = AutoValue_RefasterTemplateCollectionData.class)
-abstract class RefasterTemplateCollectionData {
+record RefasterTemplateCollectionData(
+    String name, String description, String link, ImmutableList<RefasterTemplateData> templates) {
   static RefasterTemplateCollectionData create(
       String name, String description, String link, ImmutableList<RefasterTemplateData> templates) {
-    return new AutoValue_RefasterTemplateCollectionData(name, description, link, templates);
+    return new RefasterTemplateCollectionData(name, description, link, templates);
   }
-
-  abstract String name();
-
-  abstract String description();
-
-  abstract String link();
-
-  abstract ImmutableList<RefasterTemplateData> templates();
 }
