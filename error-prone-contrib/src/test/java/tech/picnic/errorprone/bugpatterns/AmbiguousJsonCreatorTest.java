@@ -5,7 +5,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class AmbiguousJsonCreatorTest {
+public final class AmbiguousJsonCreatorTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(AmbiguousJsonCreator.class, getClass())
