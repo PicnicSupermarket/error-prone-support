@@ -119,7 +119,7 @@ final class AnnotatedCompositeCodeTransformerTest {
       ImmutableSet<? extends Annotation> delegateAnnotations,
       Description expectedDescription) {
     CodeTransformer codeTransformer =
-        AnnotatedCompositeCodeTransformer.create(
+        new AnnotatedCompositeCodeTransformer(
             packageName,
             ImmutableList.of(
                 delegateCodeTransformer(

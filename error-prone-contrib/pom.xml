@@ -62,11 +62,6 @@
             <artifactId>auto-service-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.auto.value</groupId>
-            <artifactId>auto-value-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!-- XXX: When compiling with JDK 23+, JSR-305 (meta-)annotation usage
         by dependencies, such as Project Reactor, triggers NullAway to attempt
         to load said annotations. As such some modules require these

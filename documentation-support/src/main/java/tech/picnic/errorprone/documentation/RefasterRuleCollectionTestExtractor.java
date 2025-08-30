@@ -4,9 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static java.util.stream.Collectors.joining;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
 import com.google.common.base.VerifyException;
@@ -59,7 +57,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
 
     URI sourceFile = state.getPath().getCompilationUnit().getSourceFile().toUri();
     return Optional.of(
-        RefasterTestCases.create(
+        new RefasterTestCases(
             sourceFile,
             getRuleCollectionName(tree),
             isInputFile(sourceFile),
@@ -104,7 +102,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
   private static Optional<RefasterTestCase> tryExtractRefasterTestCase(
       MethodTree method, VisitorState state) {
     return tryExtractPatternGroup(method.getName().toString(), TEST_METHOD_NAME_PATTERN)
-        .map(name -> RefasterTestCase.create(name, getFormattedSource(method, state)));
+        .map(name -> new RefasterTestCase(name, getFormattedSource(method, state)));
   }
 
   /**
@@ -141,36 +139,11 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
     return () -> new VerifyException(String.format(format, args));
   }
 
-  @AutoValue
-  @JsonDeserialize(as = AutoValue_RefasterRuleCollectionTestExtractor_RefasterTestCases.class)
-  abstract static class RefasterTestCases {
-    static RefasterTestCases create(
-        URI source,
-        String ruleCollection,
-        boolean isInput,
-        ImmutableList<RefasterTestCase> testCases) {
-      return new AutoValue_RefasterRuleCollectionTestExtractor_RefasterTestCases(
-          source, ruleCollection, isInput, testCases);
-    }
+  record RefasterTestCases(
+      URI source,
+      String ruleCollection,
+      boolean isInput,
+      ImmutableList<RefasterTestCase> testCases) {}
 
-    abstract URI source();
-
-    abstract String ruleCollection();
-
-    abstract boolean isInput();
-
-    abstract ImmutableList<RefasterTestCase> testCases();
-  }
-
-  @AutoValue
-  @JsonDeserialize(as = AutoValue_RefasterRuleCollectionTestExtractor_RefasterTestCase.class)
-  abstract static class RefasterTestCase {
-    static RefasterTestCase create(String name, String content) {
-      return new AutoValue_RefasterRuleCollectionTestExtractor_RefasterTestCase(name, content);
-    }
-
-    abstract String name();
-
-    abstract String content();
-  }
+  record RefasterTestCase(String name, String content) {}
 }

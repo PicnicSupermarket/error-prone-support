@@ -11,9 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Immutable;
@@ -60,7 +58,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
         .filter(not(ImmutableList::isEmpty))
         .map(
             tests ->
-                new AutoValue_BugPatternTestExtractor_BugPatternTestCases(
+                new BugPatternTestCases(
                     state.getPath().getCompilationUnit().getSourceFile().toUri(),
                     ASTHelpers.getSymbol(tree).className(),
                     tests));
@@ -118,7 +116,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
 
                   if (!entries.isEmpty()) {
                     collectedBugPatternTestCases.add(
-                        new AutoValue_BugPatternTestExtractor_BugPatternTestCase(
+                        new BugPatternTestCase(
                             classUnderTest, ImmutableList.copyOf(entries).reverse()));
                   }
                 });
@@ -148,9 +146,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
         Optional<String> sourceCode =
             getSourceCode(tree).filter(s -> s.contains("// BUG: Diagnostic"));
         if (path != null && sourceCode.isPresent()) {
-          sink.add(
-              new AutoValue_BugPatternTestExtractor_IdentificationTestEntry(
-                  path, sourceCode.orElseThrow()));
+          sink.add(new IdentificationTestEntry(path, sourceCode.orElseThrow()));
         }
       }
 
@@ -181,8 +177,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
 
           if (outputCode.isPresent() && !inputCode.equals(outputCode)) {
             sink.add(
-                new AutoValue_BugPatternTestExtractor_ReplacementTestEntry(
-                    path, inputCode.orElseThrow(), outputCode.orElseThrow()));
+                new ReplacementTestEntry(path, inputCode.orElseThrow(), outputCode.orElseThrow()));
           }
         }
       }
@@ -211,39 +206,16 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
     }
   }
 
-  @AutoValue
-  @JsonDeserialize(as = AutoValue_BugPatternTestExtractor_BugPatternTestCases.class)
-  abstract static class BugPatternTestCases {
-    static BugPatternTestCases create(
-        URI source, String testClass, ImmutableList<BugPatternTestCase> testCases) {
-      return new AutoValue_BugPatternTestExtractor_BugPatternTestCases(
-          source, testClass, testCases);
-    }
+  record BugPatternTestCases(
+      URI source, String testClass, ImmutableList<BugPatternTestCase> testCases) {}
 
-    abstract URI source();
-
-    abstract String testClass();
-
-    abstract ImmutableList<BugPatternTestCase> testCases();
-  }
-
-  @AutoValue
-  @JsonDeserialize(as = AutoValue_BugPatternTestExtractor_BugPatternTestCase.class)
-  abstract static class BugPatternTestCase {
-    static BugPatternTestCase create(String classUnderTest, ImmutableList<TestEntry> entries) {
-      return new AutoValue_BugPatternTestExtractor_BugPatternTestCase(classUnderTest, entries);
-    }
-
-    abstract String classUnderTest();
-
-    abstract ImmutableList<TestEntry> entries();
-  }
+  record BugPatternTestCase(String classUnderTest, ImmutableList<TestEntry> entries) {}
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   @JsonPropertyOrder("type")
   @JsonSubTypes({
-    @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_IdentificationTestEntry.class),
-    @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_ReplacementTestEntry.class)
+    @JsonSubTypes.Type(IdentificationTestEntry.class),
+    @JsonSubTypes.Type(ReplacementTestEntry.class)
   })
   @JsonTypeInfo(include = As.EXISTING_PROPERTY, property = "type", use = JsonTypeInfo.Id.DEDUCTION)
   interface TestEntry {
@@ -257,35 +229,19 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
     }
   }
 
-  @AutoValue
-  abstract static class IdentificationTestEntry implements TestEntry {
-    static IdentificationTestEntry create(String path, String code) {
-      return new AutoValue_BugPatternTestExtractor_IdentificationTestEntry(path, code);
-    }
-
+  record IdentificationTestEntry(String path, String code) implements TestEntry {
     @JsonProperty
     @Override
-    public final TestType type() {
+    public TestType type() {
       return TestType.IDENTIFICATION;
     }
-
-    abstract String code();
   }
 
-  @AutoValue
-  abstract static class ReplacementTestEntry implements TestEntry {
-    static ReplacementTestEntry create(String path, String input, String output) {
-      return new AutoValue_BugPatternTestExtractor_ReplacementTestEntry(path, input, output);
-    }
-
+  record ReplacementTestEntry(String path, String input, String output) implements TestEntry {
     @JsonProperty
     @Override
-    public final TestType type() {
+    public TestType type() {
       return TestType.REPLACEMENT;
     }
-
-    abstract String input();
-
-    abstract String output();
   }
 }

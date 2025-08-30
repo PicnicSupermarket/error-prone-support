@@ -65,7 +65,7 @@ final class RefasterRuleCollectionTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "EmptyRefasterRuleCollectionTestInput",
-        RefasterTestCases.create(
+        new RefasterTestCases(
             URI.create("file:///EmptyRefasterRuleCollectionTestInput.java"),
             "EmptyRefasterRuleCollection",
             /* isInput= */ true,
@@ -88,12 +88,12 @@ final class RefasterRuleCollectionTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingletonRefasterRuleCollectionTestOutput",
-        RefasterTestCases.create(
+        new RefasterTestCases(
             URI.create("file:///SingletonRefasterRuleCollectionTestOutput.java"),
             "SingletonRefasterRuleCollection",
             /* isInput= */ false,
             ImmutableList.of(
-                RefasterTestCase.create(
+                new RefasterTestCase(
                     "MyRule",
                     """
                     int testMyRule() {
@@ -135,24 +135,24 @@ final class RefasterRuleCollectionTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "ComplexRefasterRuleCollectionTestInput",
-        RefasterTestCases.create(
+        new RefasterTestCases(
             URI.create("file:///pkg/ComplexRefasterRuleCollectionTestInput.java"),
             "ComplexRefasterRuleCollection",
             /* isInput= */ true,
             ImmutableList.of(
-                RefasterTestCase.create(
+                new RefasterTestCase(
                     "FirstRule",
                     """
                     String testFirstRule() {
                       return "Don't panic";
                     }"""),
-                RefasterTestCase.create(
+                new RefasterTestCase(
                     "SecondRule",
                     """
                     String testSecondRule() {
                       return "Carry a towel";
                     }"""),
-                RefasterTestCase.create("EmptyRule", "void testEmptyRule() {}"))));
+                new RefasterTestCase("EmptyRule", "void testEmptyRule() {}"))));
   }
 
   private static void verifyGeneratedFileContent(

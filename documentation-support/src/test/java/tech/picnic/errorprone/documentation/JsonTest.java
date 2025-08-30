@@ -4,8 +4,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -15,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 final class JsonTest {
-  private static final TestObject TEST_OBJECT = new AutoValue_JsonTest_TestObject("foo", 42);
+  private static final TestObject TEST_OBJECT = new TestObject("foo", 42);
   private static final String TEST_JSON = "{\"string\":\"foo\",\"number\":42}";
 
   @Test
@@ -52,11 +50,5 @@ final class JsonTest {
         .hasCauseInstanceOf(FileNotFoundException.class);
   }
 
-  @AutoValue
-  @JsonDeserialize(as = AutoValue_JsonTest_TestObject.class)
-  abstract static class TestObject {
-    abstract String string();
-
-    abstract int number();
-  }
+  private record TestObject(String string, int number) {}
 }

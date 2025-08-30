@@ -7,7 +7,6 @@ import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CAND
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
@@ -181,7 +180,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           imports.put(
               type,
               member,
-              new AutoValue_NonStaticImport_UndesiredStaticImport(
+              new UndesiredStaticImport(
                   importTree, SuggestedFix.builder().removeStaticImport(type + '.' + member)));
         }
       }
@@ -220,10 +219,5 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
     }.scan(tree, null);
   }
 
-  @AutoValue
-  abstract static class UndesiredStaticImport {
-    abstract ImportTree importTree();
-
-    abstract SuggestedFix.Builder fixBuilder();
-  }
+  private record UndesiredStaticImport(ImportTree importTree, SuggestedFix.Builder fixBuilder) {}
 }
