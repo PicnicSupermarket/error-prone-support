@@ -18,7 +18,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -184,7 +183,7 @@ public final class JekyllCollectionGenerator {
       return bugPatterns.stream()
           .map(
               b ->
-                  new AutoValue_JekyllCollectionGenerator_JekyllBugPatternDescription(
+                  new JekyllBugPatternDescription(
                       b.name(),
                       b.name(),
                       b.summary(),
@@ -216,7 +215,7 @@ public final class JekyllCollectionGenerator {
       return refasterTests.rowMap().entrySet().stream()
           .map(
               c ->
-                  new AutoValue_JekyllCollectionGenerator_JekyllRefasterRuleCollectionDescription(
+                  new JekyllRefasterRuleCollectionDescription(
                       c.getKey(),
                       c.getKey(),
                       // XXX: Derive severity from input.
@@ -239,7 +238,7 @@ public final class JekyllCollectionGenerator {
       return Sets.intersection(inputs.keySet(), outputs.keySet()).stream()
           .map(
               name ->
-                  new AutoValue_JekyllCollectionGenerator_JekyllRefasterRuleCollectionDescription_Rule(
+                  new JekyllRefasterRuleCollectionDescription.Rule(
                       name,
                       // XXX: Derive severity from input.
                       SUGGESTION,
@@ -278,55 +277,29 @@ public final class JekyllCollectionGenerator {
     }
   }
 
-  @AutoValue
-  abstract static class JekyllBugPatternDescription {
-    // XXX: Make this a derived property?
-    abstract String title();
+  record JekyllBugPatternDescription(
+      // XXX: Make this a derived property?
+      String title,
+      String name,
+      String summary,
+      SeverityLevel severity,
+      ImmutableList<String> tags,
+      // XXX: The documentation could link to the original test code. Perhaps even with the correct
+      // line numbers.
+      String source,
+      ImmutableList<String> identification,
+      ImmutableList<String> replacement) {}
 
-    abstract String name();
-
-    abstract String summary();
-
-    abstract SeverityLevel severity();
-
-    abstract ImmutableList<String> tags();
-
-    // XXX: The documentation could link to the original test code. Perhaps even with the correct
-    // line numbers.
-    abstract String source();
-
-    // XXX: The `identification` and `replacement` fields have odd names.
-    abstract ImmutableList<String> identification();
-
-    abstract ImmutableList<String> replacement();
-  }
-
-  @AutoValue
-  abstract static class JekyllRefasterRuleCollectionDescription {
-    // XXX: Make this a derived property?
-    abstract String title();
-
-    abstract String name();
-
-    abstract SeverityLevel severity();
-
-    abstract ImmutableList<String> tags();
-
-    // XXX: The documentation could link to the original test code. Perhaps even with the correct
-    // line numbers. If we do this, we should do the same for individual rules.
-    abstract String source();
-
-    abstract ImmutableList<Rule> rules();
-
-    @AutoValue
-    abstract static class Rule {
-      abstract String name();
-
-      abstract SeverityLevel severity();
-
-      abstract ImmutableList<String> tags();
-
-      abstract String diff();
-    }
+  record JekyllRefasterRuleCollectionDescription(
+      // XXX: Make this a derived property?
+      String title,
+      String name,
+      SeverityLevel severity,
+      ImmutableList<String> tags,
+      // XXX: The documentation could link to the original test code. Perhaps even with the correct
+      // line numbers. If we do this, we should do the same for individual rules.
+      String source,
+      ImmutableList<Rule> rules) {
+    record Rule(String name, SeverityLevel severity, ImmutableList<String> tags, String diff) {}
   }
 }
