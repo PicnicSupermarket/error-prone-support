@@ -39,7 +39,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
@@ -322,7 +321,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Stream<String> testStreamsStream() {
-    return Streams.stream(ImmutableList.of("foo", "bar"));
+    Iterable<String> iterable = ImmutableList.of("foo", "bar");
+    return Streams.stream(iterable);
   }
 
   Stream<String> testCollectionParallelStream() {
