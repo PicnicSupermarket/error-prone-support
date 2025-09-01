@@ -321,7 +321,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1, 2, 3, 4, 5);
   }
 
-  Stream<String> testIterableStream() {
+  Stream<String> testStreamsStream() {
     return Streams.stream(List.of("foo", "bar"));
   }
 

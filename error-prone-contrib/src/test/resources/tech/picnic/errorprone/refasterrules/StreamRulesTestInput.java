@@ -324,11 +324,11 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableList.of(1, 2, 3, 4, 5).stream();
   }
 
-  Stream<String> testIterableStream() {
-    return StreamSupport.stream(List.of("foo", "bar").spliterator(), false);
+  Stream<String> testStreamsStream() {
+    return StreamSupport.stream(ImmutableList.of("foo", "bar").spliterator(), false);
   }
 
   Stream<String> testCollectionParallelStream() {
-    return StreamSupport.stream(List.of("foo", "bar").spliterator(), true);
+    return StreamSupport.stream(ImmutableList.of("foo", "bar").spliterator(), true);
   }
 }
