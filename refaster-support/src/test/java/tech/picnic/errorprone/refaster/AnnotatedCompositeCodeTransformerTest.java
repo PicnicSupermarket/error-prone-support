@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.auto.value.AutoAnnotation;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -63,9 +62,9 @@ final class AnnotatedCompositeCodeTransformerTest {
             CUSTOM_PACKAGE,
             CUSTOM_PACKAGE + '.' + SIMPLE_CLASS_NAME,
             ImmutableSet.of(
-                descriptionAnnotation("Composite description"),
-                documentationAnnotation("https://example.com"),
-                severityAnnotation(ERROR)),
+                new DescriptionAnnotation("Composite description"),
+                new DocumentationAnnotation("https://example.com"),
+                new SeverityAnnotation(ERROR)),
             ImmutableSet.of(),
             description(
                 SIMPLE_CLASS_NAME,
@@ -78,9 +77,9 @@ final class AnnotatedCompositeCodeTransformerTest {
             SIMPLE_CLASS_NAME,
             ImmutableSet.of(),
             ImmutableSet.of(
-                descriptionAnnotation("Rule description"),
-                documentationAnnotation("https://example.com/rule/${topLevelClassName}"),
-                severityAnnotation(WARNING)),
+                new DescriptionAnnotation("Rule description"),
+                new DocumentationAnnotation("https://example.com/rule/${topLevelClassName}"),
+                new SeverityAnnotation(WARNING)),
             description(
                 SIMPLE_CLASS_NAME,
                 Optional.of("https://example.com/rule/" + SIMPLE_CLASS_NAME),
@@ -91,14 +90,14 @@ final class AnnotatedCompositeCodeTransformerTest {
             CUSTOM_PACKAGE,
             CUSTOM_PACKAGE + '.' + SIMPLE_CLASS_NAME + ".SomeInnerClass.NestedEvenDeeper",
             ImmutableSet.of(
-                descriptionAnnotation("Some description"),
-                documentationAnnotation("https://example.com"),
-                severityAnnotation(ERROR)),
+                new DescriptionAnnotation("Some description"),
+                new DocumentationAnnotation("https://example.com"),
+                new SeverityAnnotation(ERROR)),
             ImmutableSet.of(
-                descriptionAnnotation("Overriding description"),
-                documentationAnnotation(
+                new DescriptionAnnotation("Overriding description"),
+                new DocumentationAnnotation(
                     "https://example.com/rule/${topLevelClassName}/${nestedClassName}"),
-                severityAnnotation(SUGGESTION)),
+                new SeverityAnnotation(SUGGESTION)),
             description(
                 SIMPLE_CLASS_NAME + ".SomeInnerClass.NestedEvenDeeper",
                 Optional.of(
@@ -188,19 +187,24 @@ final class AnnotatedCompositeCodeTransformerTest {
     return context;
   }
 
-  @AutoAnnotation
-  private static tech.picnic.errorprone.refaster.annotation.Description descriptionAnnotation(
-      String value) {
-    return new AutoAnnotation_AnnotatedCompositeCodeTransformerTest_descriptionAnnotation(value);
+  private record DescriptionAnnotation(String value, Class<? extends Annotation> annotationType)
+      implements tech.picnic.errorprone.refaster.annotation.Description {
+    DescriptionAnnotation(String value) {
+      this(value, tech.picnic.errorprone.refaster.annotation.Description.class);
+    }
   }
 
-  @AutoAnnotation
-  private static OnlineDocumentation documentationAnnotation(String value) {
-    return new AutoAnnotation_AnnotatedCompositeCodeTransformerTest_documentationAnnotation(value);
+  record DocumentationAnnotation(String value, Class<? extends Annotation> annotationType)
+      implements OnlineDocumentation {
+    DocumentationAnnotation(String value) {
+      this(value, OnlineDocumentation.class);
+    }
   }
 
-  @AutoAnnotation
-  private static Severity severityAnnotation(SeverityLevel value) {
-    return new AutoAnnotation_AnnotatedCompositeCodeTransformerTest_severityAnnotation(value);
+  record SeverityAnnotation(SeverityLevel value, Class<? extends Annotation> annotationType)
+      implements Severity {
+    SeverityAnnotation(SeverityLevel value) {
+      this(value, Severity.class);
+    }
   }
 }
