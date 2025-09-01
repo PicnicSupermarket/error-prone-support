@@ -796,7 +796,7 @@ final class StreamRules {
   static final class StreamsStream<T> {
     @BeforeTemplate
     Stream<T> before(Iterable<T> iterable) {
-      return StreamSupport.stream(iterable.spliterator(), /* parallel= */ false);
+      return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     @AfterTemplate
