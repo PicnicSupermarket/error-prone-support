@@ -322,10 +322,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Stream<String> testStreamsStream() {
-    return Streams.stream(List.of("foo", "bar"));
+    return Streams.stream(ImmutableList.of("foo", "bar"));
   }
 
   Stream<String> testCollectionParallelStream() {
-    return List.of("foo", "bar").parallelStream();
+    return ImmutableList.of("foo", "bar").parallelStream();
   }
 }
