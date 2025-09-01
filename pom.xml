@@ -924,7 +924,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>11.0.0</version>
+                            <version>11.0.1</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
