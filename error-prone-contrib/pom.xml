@@ -68,10 +68,11 @@
             <scope>provided</scope>
         </dependency>
         <!-- XXX: When compiling with JDK 23+, JSR-305 (meta-)annotation usage
-        by dependencies such as Project Reactor triggers NullAway to attempt to
-        load said annotations. As such some modules require these annotations
-        to be on the classpath. Periodically review whether we can drop this
-        dependeny declaration. See https://github.com/uber/NullAway/issues/1171. -->
+        by dependencies, such as Project Reactor, triggers NullAway to attempt
+        to load said annotations. As such some modules require these
+        annotations to be on the classpath. Periodically review whether we can
+        drop this dependency declaration. See
+        https://github.com/uber/NullAway/issues/1171. -->
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
