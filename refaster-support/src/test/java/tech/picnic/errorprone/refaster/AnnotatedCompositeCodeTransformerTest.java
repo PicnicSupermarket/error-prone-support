@@ -194,14 +194,14 @@ final class AnnotatedCompositeCodeTransformerTest {
     }
   }
 
-  record DocumentationAnnotation(String value, Class<? extends Annotation> annotationType)
+  private record DocumentationAnnotation(String value, Class<? extends Annotation> annotationType)
       implements OnlineDocumentation {
     DocumentationAnnotation(String value) {
       this(value, OnlineDocumentation.class);
     }
   }
 
-  record SeverityAnnotation(SeverityLevel value, Class<? extends Annotation> annotationType)
+  private record SeverityAnnotation(SeverityLevel value, Class<? extends Annotation> annotationType)
       implements Severity {
     SeverityAnnotation(SeverityLevel value) {
       this(value, Severity.class);
