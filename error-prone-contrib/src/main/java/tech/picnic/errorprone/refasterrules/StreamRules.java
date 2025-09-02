@@ -84,7 +84,7 @@ final class StreamRules {
 
   /** Prefer {@link Stream#empty()} over less clear alternatives. */
   // XXX: We can additionally introduce a rule that maps `OptionalInt.empty().stream()` to
-  // `Intstream.empty()`, and likewise for `OptionalLong` and `OptionalDouble`, but those
+  // `IntStream.empty()`, and likewise for `OptionalLong` and `OptionalDouble`, but those
   // expressions are highly unlikely to be seen in the wild.
   static final class EmptyStream<T> {
     @BeforeTemplate
