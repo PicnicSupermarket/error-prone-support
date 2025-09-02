@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
@@ -49,6 +50,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         List.class,
         Map.class,
         Objects.class,
+        StreamSupport.class,
         Streams.class,
         collectingAndThen(null, null),
         counting(),
@@ -324,12 +326,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Stream<String> testStreamsStream() {
-    Iterable<String> iterable = ImmutableList.of("foo", "bar");
-    return java.util.stream.StreamSupport.stream(iterable.spliterator(), false);
+    return StreamSupport.stream(((Iterable<String>) ImmutableList.of("foo")).spliterator(), false);
   }
 
   Stream<String> testCollectionParallelStream() {
-    return java.util.stream.StreamSupport.stream(
-        ImmutableList.of("foo", "bar").spliterator(), true);
+    return StreamSupport.stream(ImmutableList.of("foo").spliterator(), true);
   }
 }
