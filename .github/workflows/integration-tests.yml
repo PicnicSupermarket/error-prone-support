@@ -1,31 +1,50 @@
-# If requested by means of a pull request comment, runs integration tests
-# against the project, using the code found on the pull request branch.
+# Runs integration tests against the project.
+#
+# The tests run in the following scenrios:
+# - Any time code is pushed to the default branch.
+# - When a user leaves a pull request comment containing the string
+#   `/integration-test`.
+#
 # XXX: Review whether then build matrix should also vary JDK or OS versions.
 # XXX: Support `/integration-test [name...]` comment syntax to specify the
 # subset of integration tests to run.
 # See this example of a dynamic build matrix:
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
-name: "Integration tests"
+name: Integration tests
 on:
 #  issue_comment:
 #    types: [ created ]
   pull_request:
+  issue_comment:
+    types: [ created ]
+  push:
+    branches: [ master ]
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   run-integration-tests:
-    name: On-demand integration test
 #    if: |
 #      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    name: Integration test
+    if: |
+      !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        integration-test: [ "metrics", "prometheus-java-client" ] # XXX: Dropped checkstyle.
+        integration-test:
+          - checkstyle
+          - metrics
+          - prometheus-java-client
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
+          # We can't use `disable-sudo-and-containers` here, as some
+          # integration test projects have unit tests that start Docker
+          # containers.
           disable-sudo: true
           egress-policy: block
           # XXX: After updating the validation build flags in
@@ -35,24 +54,25 @@ jobs:
             api.adoptium.net:443
             auth.docker.io:443
             checkstyle.org:443
-            example.com:80
             github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
             oss.sonatype.org:443
             production.cloudflare.docker.com:443
             raw.githubusercontent.com:443
             registry-1.docker.io:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             repository.sonatype.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-#          checkout-ref: "refs/pull/${{ github.event.issue.number }}/head"
-          java-version: 17.0.13
+          checkout-ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
+          java-version: 21.0.8
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.11
       - name: Install project to local Maven repository
-        run: mvn -T1C install -DskipTests -Dverification.skip
+        run: mvn install -DskipTests -Dverification.skip
       - name: Run integration test
         continue-on-error: true
         run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"

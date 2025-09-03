@@ -87,6 +87,32 @@ final class DocumentationGeneratorTaskListenerTest {
   }
 
   @Test
+  void skipOnError(@TempDir Path outputDirectory) {
+    assertThatThrownBy(
+            () ->
+                Compilation.compileWithDocumentationGenerator(
+                    outputDirectory,
+                    "A.java",
+                    "class A {",
+                    "  void m() {",
+                    "    nonExistentMethod();",
+                    "  }",
+                    "}"))
+        .isInstanceOf(AssertionError.class)
+        .hasMessageContainingAll("error: cannot find symbol", "nonExistentMethod()");
+
+    assertThat(outputDirectory).isEmptyDirectory();
+  }
+
+  @Test
+  void skipPackageInfo(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory, "package-info.java", "package pkg;");
+
+    assertThat(outputDirectory).isEmptyDirectory();
+  }
+
+  @Test
   void extraction(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
@@ -109,8 +135,8 @@ final class DocumentationGeneratorTaskListenerTest {
             """);
   }
 
-  @Immutable
   @AutoService(Extractor.class)
+  @Immutable
   @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
   public static final class TestExtractor implements Extractor<ExtractionParameters> {
     @Override

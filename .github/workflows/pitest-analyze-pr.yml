@@ -2,32 +2,36 @@
 # uploads the results. The associated PR is subsequently updated by the
 # `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
 # for details.
-name: "Mutation testing"
+name: Mutation testing
 on:
   pull_request:
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze-pr:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
-          disable-sudo: true
+          disable-sudo-and-containers: true
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
           checkout-fetch-depth: 2
-          java-version: 17.0.13
+          java-version: 21.0.8
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.11
       - name: Run Pitest
         # By running with features `+GIT(from[HEAD~1]), +gitci`, Pitest only
         # analyzes lines changed in the associated pull request, as GitHub

@@ -1,3 +1,10 @@
+# XXX: Once we've merged the remaining work on the `website` branch into
+# `master`, merge the `deploy-website.yml` workflow into this file and deploy
+# the website only if all builds pass. When doing this, also review which other
+# workflow files can be combined. Also use that opportunity to revisit file
+# names and workflow names.
+# XXX: Let website deployment also depend on successful SNAPSHOT deployment.
+# Then update the website to describe how users can use SNAPSHOTs.
 name: Build and verify
 on:
   pull_request:
@@ -5,38 +12,34 @@ on:
     branches: [ master ]
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   build:
     strategy:
       matrix:
-        os: [ ubuntu-24.04 ]
-        jdk: [ 17.0.13, 21.0.5, 23.0.1 ]
-        distribution: [ temurin ]
-        experimental: [ false ]
+        os: [ ubuntu-24.04, macos-15, windows-2025 ]
+        build-jdk: [ 21.0.8 ]
+        target-jdk: [ 17.0.16 ]
         include:
-          - os: macos-15
-            jdk: 17.0.13
-            distribution: temurin
-            experimental: false
-          - os: windows-2025
-            jdk: 17.0.13
-            distribution: temurin
-            experimental: false
+          - os: ubuntu-24.04
+            build-jdk: 24.0.2
+            target-jdk: 17.0.16
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.experimental }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
-          disable-sudo: true
+          disable-sudo-and-containers: true
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443
             github-registry-files.githubusercontent.com:443
-            jitpack.io:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             maven.pkg.github.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       # We run the build twice for each supported JDK: once against the
       # original Error Prone release, using only Error Prone checks available
@@ -46,18 +49,48 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          java-version: ${{ matrix.jdk }}
-          java-distribution: ${{ matrix.distribution }}
-          maven-version: 3.9.9
-      - name: Display build environment details
-        run: mvn --version
+          java-version: |
+            ${{ matrix.target-jdk }}
+            ${{ matrix.build-jdk }}
+          java-distribution: temurin
+          maven-version: 3.9.11
       - name: Build project against vanilla Error Prone, compile Javadoc
-        run: mvn -T1C install javadoc:jar
-      - name: Build project with self-check against Error Prone fork
-        run: mvn -T1C clean verify -Perror-prone-fork -Pnon-maven-central -Pself-check -s settings.xml
+        run: mvn install javadoc:jar
+      # Note that the `-D` argument is quoted for compatibility with the
+      # Windows build.
+      - name: Build project with self-check against Error Prone fork, test using the targeted JDK
+        run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
-
-# XXX: Enable Codecov once we "go public".
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: maven-deploy
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            central.sonatype.com:443
+            github.com:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        with:
+          java-version: 21.0.8
+          java-distribution: temurin
+          maven-version: 3.9.11
+      - name: Build and deploy
+        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
+        env:
+          MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+          MAVEN_CENTRAL_PASS: ${{ secrets.MAVEN_CENTRAL_PASS }}
+          MAVEN_GPG_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}

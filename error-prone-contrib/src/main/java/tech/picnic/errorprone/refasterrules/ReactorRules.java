@@ -20,14 +20,17 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Placeholder;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -43,6 +46,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
@@ -56,6 +60,7 @@ import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
+import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -96,7 +101,7 @@ final class ReactorRules {
   static final class MonoJust<T> {
     @BeforeTemplate
     Mono<T> before(T value) {
-      return Mono.justOrEmpty(Optional.of(value));
+      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Flux.just(value).next());
     }
 
     @AfterTemplate
@@ -428,17 +433,19 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#empty()} over more contrived alternatives. */
-  // XXX: In combination with the `IsEmpty` matcher introduced by
-  // https://github.com/PicnicSupermarket/error-prone-support/pull/744, the non-varargs overloads of
-  // most methods referenced here can be rewritten as well. Additionally, some invocations of
-  // methods such as `Flux#fromIterable`, `Flux#fromArray` and `Flux#justOrEmpty` can also be
-  // rewritten.
+  // XXX: Using `@Matches(IsEmpty.class)`, the non-varargs overloads of most methods referenced here
+  // can be rewritten as well. That would require adding a bunch more suitably-typed parameters.
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
+    // XXX: The methods enumerated here are not ordered entirely lexicographically, to accommodate a
+    // conflict between the `InconsistentOverloads` and `RefasterMethodParameterOrder` checks.
     @BeforeTemplate
     Flux<T> before(
         Function<? super Object[], ? extends T> combinator,
         int prefetch,
-        Comparator<? super T> comparator) {
+        Comparator<? super T> comparator,
+        @Matches(IsEmpty.class) T[] emptyArray,
+        @Matches(IsEmpty.class) Iterable<T> emptyIterable,
+        @Matches(IsEmpty.class) Stream<T> emptyStream) {
       return Refaster.anyOf(
           Flux.zip(combinator),
           Flux.zip(combinator, prefetch),
@@ -457,7 +464,10 @@ final class ReactorRules {
           Flux.mergePriorityDelayError(prefetch, comparator),
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
-          Flux.mergeSequentialDelayError(prefetch));
+          Flux.mergeSequentialDelayError(prefetch),
+          Flux.fromArray(emptyArray),
+          Flux.fromIterable(emptyIterable),
+          Flux.fromStream(() -> emptyStream));
     }
 
     @BeforeTemplate
@@ -489,21 +499,43 @@ final class ReactorRules {
       return Flux.range(value, 1);
     }
 
-    // XXX: Consider generalizing part of this template using an Error Prone check that covers any
-    // sequence of explicitly enumerated values passed to an iteration order-preserving collection
-    // factory method.
     @BeforeTemplate
     Flux<T> before(T value) {
       return Refaster.anyOf(
           Mono.just(value).flux(),
-          Mono.just(value).repeat().take(1),
-          Flux.fromIterable(ImmutableList.of(value)),
-          Flux.fromIterable(ImmutableSet.of(value)));
+          Flux.fromStream(() -> Stream.of(value)),
+          Mono.just(value).repeat().take(1));
     }
 
     @AfterTemplate
     Flux<T> after(T value) {
       return Flux.just(value);
+    }
+  }
+
+  /** Prefer {@link Flux#just(Object[])} over more contrived alternatives. */
+  static final class FluxJustArray<T> {
+    @BeforeTemplate
+    Flux<T> before(@Repeated T values) {
+      return Flux.fromStream(() -> Stream.of(Refaster.asVarargs(values)));
+    }
+
+    @AfterTemplate
+    Flux<T> after(@Repeated T values) {
+      return Flux.just(values);
+    }
+  }
+
+  /** Prefer {@link Flux#fromArray(Object[])}} over more ambiguous or contrived alternatives. */
+  static final class FluxFromArray<T> {
+    @BeforeTemplate
+    Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
+      return Refaster.anyOf(Flux.just(array), Flux.fromStream(() -> Arrays.stream(array)));
+    }
+
+    @AfterTemplate
+    Flux<T> after(T[] array) {
+      return Flux.fromArray(array);
     }
   }
 
@@ -515,8 +547,14 @@ final class ReactorRules {
           mono.switchIfEmpty(Mono.empty()), mono.flux().next(), mono.flux().singleOrEmpty());
     }
 
+    // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
+    @SuppressWarnings({
+      "java:S2637" /* False positive: result is never `null`. */,
+      "java:S4968" /* Result may be `Mono<Void>`. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
+    Mono<? extends @Nullable Void> before2(Mono<@Nullable Void> mono) {
       return Refaster.anyOf(mono.ignoreElement(), mono.then());
     }
 
@@ -945,7 +983,8 @@ final class ReactorRules {
   /** Prefer direct invocation of {@link Mono#then()}} over more contrived alternatives. */
   static final class MonoThen<T> {
     @BeforeTemplate
-    Mono<@Nullable Void> before(Mono<T> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Mono<T> mono) {
       return Refaster.anyOf(
           mono.ignoreElement().then(),
           mono.flux().then(),
@@ -954,7 +993,8 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    Mono<@Nullable Void> after(Mono<T> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Mono<T> mono) {
       return mono.then();
     }
   }
@@ -962,17 +1002,25 @@ final class ReactorRules {
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
   static final class FluxThen<T> {
     @BeforeTemplate
-    Mono<@Nullable Void> before(Flux<T> flux) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Flux<T> flux) {
       return flux.ignoreElements().then();
     }
 
+    // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Flux<@Nullable Void> flux) {
+    @SuppressWarnings({
+      "java:S2637" /* False positive: result is never `null`. */,
+      "java:S4968" /* Result may be `Mono<Void>`. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
+    Mono<? extends @Nullable Void> before2(Flux<@Nullable Void> flux) {
       return flux.ignoreElements();
     }
 
     @AfterTemplate
-    Mono<@Nullable Void> after(Flux<T> flux) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Flux<T> flux) {
       return flux.then();
     }
   }
@@ -980,12 +1028,14 @@ final class ReactorRules {
   /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
   static final class MonoThenEmpty<T> {
     @BeforeTemplate
-    Mono<@Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
       return mono.ignoreElement().thenEmpty(publisher);
     }
 
     @AfterTemplate
-    Mono<@Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
       return mono.thenEmpty(publisher);
     }
   }
@@ -993,12 +1043,14 @@ final class ReactorRules {
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
   static final class FluxThenEmpty<T> {
     @BeforeTemplate
-    Mono<@Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
       return flux.ignoreElements().thenEmpty(publisher);
     }
 
     @AfterTemplate
-    Mono<@Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
       return flux.thenEmpty(publisher);
     }
   }
@@ -1054,7 +1106,8 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
       return mono1.thenEmpty(mono2);
     }
 
@@ -1072,7 +1125,8 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
-    Mono<@Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
+    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
+    Mono<? extends @Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
       return flux.thenEmpty(mono);
     }
 
@@ -1872,6 +1926,69 @@ final class ReactorRules {
     }
   }
 
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasSubscribed() subscribed to}, over more verbose alternatives.
+   */
+  static final class AssertThatPublisherProbeWasSubscribed<T> {
+    @AlsoNegation
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasSubscribed) {
+      if (wasSubscribed) {
+        probe.assertWasSubscribed();
+      } else {
+        probe.assertWasNotSubscribed();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasSubscribed) {
+      assertThat(probe.wasSubscribed()).isEqualTo(wasSubscribed);
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasCancelled() cancelled}, over more verbose alternatives.
+   */
+  static final class AssertThatPublisherProbeWasCancelled<T> {
+    @AlsoNegation
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasCancelled) {
+      if (wasCancelled) {
+        probe.assertWasCancelled();
+      } else {
+        probe.assertWasNotCancelled();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasCancelled) {
+      assertThat(probe.wasCancelled()).isEqualTo(wasCancelled);
+    }
+  }
+
+  /**
+   * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
+   * {@link PublisherProbe#wasRequested() requested}, over more verbose alternatives.
+   */
+  static final class AssertThatPublisherProbeWasRequested<T> {
+    @AlsoNegation
+    @BeforeTemplate
+    void before(PublisherProbe<T> probe, boolean wasRequested) {
+      if (wasRequested) {
+        probe.assertWasRequested();
+      } else {
+        probe.assertWasNotRequested();
+      }
+    }
+
+    @AfterTemplate
+    void after(PublisherProbe<T> probe, boolean wasRequested) {
+      assertThat(probe.wasRequested()).isEqualTo(wasRequested);
+    }
+  }
+
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
@@ -2219,6 +2336,19 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Stream<T> stream) {
       return Flux.fromStream(() -> stream);
+    }
+  }
+
+  /** Prefer fluent {@link Flux#next()} over less explicit alternatives. */
+  static final class FluxNext<T> {
+    @BeforeTemplate
+    Mono<T> before(Flux<T> flux) {
+      return Mono.from(flux);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Flux<T> flux) {
+      return flux.next();
     }
   }
 }

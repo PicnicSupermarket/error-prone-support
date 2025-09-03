@@ -33,7 +33,7 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.util.ASTHelpers;
-import com.google.errorprone.util.ASTHelpers.TargetType;
+import com.google.errorprone.util.TargetType;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
@@ -53,6 +53,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // XXX: Also flag nullary instance method invocations that represent an identity conversion, such as
 // `Boolean#booleanValue()`, `Byte#byteValue()` and friends.
 // XXX: Also flag redundant round-trip conversions such as `path.toFile().toPath()`.
+// XXX: Add support for constructor invocations such as `new String(String)`, then drop the
+// `StringIdentity` Refaster rule.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid or clarify identity conversions",
@@ -106,7 +108,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
     ExpressionTree sourceTree = arguments.get(0);
     Type sourceType = ASTHelpers.getType(sourceTree);
     Type resultType = ASTHelpers.getType(tree);
-    TargetType targetType = ASTHelpers.targetType(state);
+    TargetType targetType = TargetType.targetType(state);
     if (sourceType == null || resultType == null || targetType == null) {
       return Description.NO_MATCH;
     }

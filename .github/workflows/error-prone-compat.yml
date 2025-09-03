@@ -1,0 +1,45 @@
+# Validates compatibility with the latest Error Prone release.
+#
+# XXX: This workflow compiles the code against the `LATEST` Error Prone release
+# as determined by Maven, and subsequently runs the unit tests. No other checks
+# are performed. This guards against false positives, but is not quite as
+# thorough as the validation performed by
+# `website/generate-version-compatibility-overview.sh`. Consider unifying these
+# approaches.
+# XXX: Instead of the `LATEST` release, this workflow could also attempt to
+# build against the `1.0-HEAD-SNAPSHOT` version published to the Sonatype
+# snapshot repository. This would enable advance notification of upcoming
+# incompatibilities.
+name: Error Prone compatibility check
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * *'
+permissions:
+  contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            github.com:443
+            objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        with:
+          java-version: 21.0.8
+          java-distribution: temurin
+          maven-version: 3.9.11
+      - name: Build project against the latest Error Prone release
+        run: mvn clean install -Dverification.skip -Dversion.error-prone=LATEST

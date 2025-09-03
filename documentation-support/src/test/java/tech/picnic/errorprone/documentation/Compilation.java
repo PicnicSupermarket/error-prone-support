@@ -48,7 +48,8 @@ public final class Compilation {
             "-Xlint:all,-serial",
             "-Xplugin:DocumentationGenerator -XoutputDirectory=" + outputDirectory,
             "-XDdev",
-            "-XDcompilePolicy=simple"),
+            "-XDcompilePolicy=simple",
+            "--should-stop=ifError=FLOW"),
         FileObjects.forSourceLines(path, lines));
   }
 

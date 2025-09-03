@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.documentation;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.sun.source.tree.ClassTree;
@@ -9,6 +11,7 @@ import com.sun.source.util.TaskEvent.Kind;
 import com.sun.source.util.TaskListener;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.api.JavacTrees;
+import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
 import java.io.IOException;
 import java.net.URI;
@@ -47,21 +50,22 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
 
   @Override
   public void finished(TaskEvent taskEvent) {
-    if (taskEvent.getKind() != Kind.ANALYZE) {
+    if (taskEvent.getKind() != Kind.ANALYZE || JavaCompiler.instance(context).errorCount() > 0) {
       return;
     }
 
-    JavaFileObject sourceFile = taskEvent.getSourceFile();
-    CompilationUnitTree compilationUnit = taskEvent.getCompilationUnit();
     ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
-    if (sourceFile == null || compilationUnit == null || classTree == null) {
+    if (classTree == null) {
       return;
     }
 
+    CompilationUnitTree compilationUnit =
+        requireNonNull(taskEvent.getCompilationUnit(), "No compilation unit");
     VisitorState state =
         VisitorState.createForUtilityPurposes(context)
             .withPath(new TreePath(new TreePath(compilationUnit), classTree));
 
+    JavaFileObject sourceFile = requireNonNull(taskEvent.getSourceFile(), "No source file");
     for (Extractor<?> extractor : EXTRACTORS) {
       extractor
           .tryExtract(classTree, state)

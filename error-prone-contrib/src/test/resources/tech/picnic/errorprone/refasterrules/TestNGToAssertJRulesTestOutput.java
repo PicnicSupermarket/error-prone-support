@@ -19,9 +19,7 @@ import static org.testng.Assert.assertTrue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import java.util.ArrayList;
-import java.util.Collections;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
@@ -241,42 +239,54 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqualIteratorIterationOrder() {
-    assertThat(Iterators.unmodifiableIterator(new ArrayList<>().iterator()))
+    assertThat(new ArrayList<Number>().iterator())
         .toIterable()
-        .containsExactlyElementsOf(
-            copyOf(Iterators.unmodifiableIterator(new ArrayList<>().iterator())));
+        .containsExactlyElementsOf(copyOf(new ArrayList<Integer>().iterator()));
+    assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator());
   }
 
   void testAssertEqualIteratorIterationOrderWithMessage() {
-    assertThat(Iterators.unmodifiableIterator(new ArrayList<>().iterator()))
+    assertThat(new ArrayList<Number>().iterator())
         .toIterable()
         .withFailMessage("foo")
-        .containsExactlyElementsOf(
-            copyOf(Iterators.unmodifiableIterator(new ArrayList<>().iterator())));
+        .containsExactlyElementsOf(copyOf(new ArrayList<Integer>().iterator()));
+    assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator(), "bar");
   }
 
   void testAssertEqualIterableIterationOrder() {
-    assertThat(Iterables.unmodifiableIterable(new ArrayList<>()))
-        .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<>()));
-    assertThat(Collections.synchronizedCollection(new ArrayList<>()))
-        .containsExactlyElementsOf(Collections.synchronizedCollection(new ArrayList<>()));
+    assertThat(Iterables.unmodifiableIterable(new ArrayList<Number>()))
+        .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<Integer>()));
+    assertEquals(
+        Iterables.unmodifiableIterable(new ArrayList<Number>()),
+        Iterables.unmodifiableIterable(new ArrayList<String>()));
+    assertThat(new ArrayList<Number>()).containsExactlyElementsOf(new ArrayList<Integer>());
+    assertEquals(new ArrayList<Number>(), new ArrayList<String>());
   }
 
   void testAssertEqualIterableIterationOrderWithMessage() {
-    assertThat(Iterables.unmodifiableIterable(new ArrayList<>()))
+    assertThat(Iterables.unmodifiableIterable(new ArrayList<Number>()))
         .withFailMessage("foo")
-        .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<>()));
-    assertThat(Collections.synchronizedCollection(new ArrayList<>()))
-        .withFailMessage("bar")
-        .containsExactlyElementsOf(Collections.synchronizedCollection(new ArrayList<>()));
+        .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<Integer>()));
+    assertEquals(
+        Iterables.unmodifiableIterable(new ArrayList<Number>()),
+        Iterables.unmodifiableIterable(new ArrayList<String>()),
+        "bar");
+    assertThat(new ArrayList<Number>())
+        .withFailMessage("baz")
+        .containsExactlyElementsOf(new ArrayList<Integer>());
+    assertEquals(new ArrayList<Number>(), new ArrayList<String>(), "qux");
   }
 
   void testAssertEqualSets() {
-    assertThat(ImmutableSet.of()).hasSameElementsAs(ImmutableSet.of());
+    assertThat(ImmutableSet.<Number>of()).hasSameElementsAs(ImmutableSet.<Integer>of());
+    assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of());
   }
 
   void testAssertEqualSetsWithMessage() {
-    assertThat(ImmutableSet.of()).withFailMessage("foo").hasSameElementsAs(ImmutableSet.of());
+    assertThat(ImmutableSet.<Number>of())
+        .withFailMessage("foo")
+        .hasSameElementsAs(ImmutableSet.<Integer>of());
+    assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of(), "bar");
   }
 
   void testAssertUnequal() {

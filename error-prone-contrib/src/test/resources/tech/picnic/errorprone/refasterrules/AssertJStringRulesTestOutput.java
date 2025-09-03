@@ -26,6 +26,22 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat("foo").isNotEmpty();
   }
 
+  AbstractAssert<?, ?> testAssertThatStringStartsWith() {
+    return assertThat("foo").startsWith("bar");
+  }
+
+  AbstractAssert<?, ?> testAssertThatStringDoesNotStartWith() {
+    return assertThat("foo").doesNotStartWith("bar");
+  }
+
+  AbstractAssert<?, ?> testAssertThatStringEndsWith() {
+    return assertThat("foo").endsWith("bar");
+  }
+
+  AbstractAssert<?, ?> testAssertThatStringDoesNotEndWith() {
+    return assertThat("foo").doesNotEndWith("bar");
+  }
+
   AbstractAssert<?, ?> testAssertThatStringContains() {
     return assertThat("foo").contains("bar");
   }

@@ -2,6 +2,7 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -37,8 +38,8 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTe
 // - Indicate which custom arguments are specified, if any.
 // - For replacement tests, indicate which `FixChooser` is used.
 // - ... (We don't use all optional features; TBD what else to support.)
-@Immutable
 @AutoService(Extractor.class)
+@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public final class BugPatternTestExtractor implements Extractor<BugPatternTestCases> {
   /** Instantiates a new {@link BugPatternTestExtractor} instance. */
@@ -167,7 +168,10 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
          * is safe, because this code is guarded by an earlier call to `#getClassUnderTest(..)`,
          * which ensures that `tree` is part of a longer method invocation chain.
          */
-        MethodInvocationTree inputTree = (MethodInvocationTree) ASTHelpers.getReceiver(tree);
+        MethodInvocationTree inputTree =
+            (MethodInvocationTree)
+                requireNonNull(
+                    ASTHelpers.getReceiver(tree), "Instance method invocation must have receiver");
 
         String path = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);
@@ -235,13 +239,13 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
     abstract ImmutableList<TestEntry> entries();
   }
 
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  @JsonPropertyOrder("type")
   @JsonSubTypes({
     @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_IdentificationTestEntry.class),
     @JsonSubTypes.Type(AutoValue_BugPatternTestExtractor_ReplacementTestEntry.class)
   })
   @JsonTypeInfo(include = As.EXISTING_PROPERTY, property = "type", use = JsonTypeInfo.Id.DEDUCTION)
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPropertyOrder("type")
   interface TestEntry {
     TestType type();
 

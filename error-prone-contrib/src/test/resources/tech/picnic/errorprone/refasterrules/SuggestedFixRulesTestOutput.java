@@ -7,6 +7,10 @@ import com.sun.source.tree.Tree;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
+  SuggestedFix.Builder testSuggestedFixToBuilder() {
+    return SuggestedFix.emptyFix().toBuilder();
+  }
+
   SuggestedFix testSuggestedFixDelete() {
     return SuggestedFix.delete(null);
   }

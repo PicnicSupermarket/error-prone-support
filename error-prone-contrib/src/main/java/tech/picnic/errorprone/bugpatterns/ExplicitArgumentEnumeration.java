@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -33,6 +34,8 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
+import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +61,9 @@ import tech.picnic.errorprone.utils.SourceCode;
  * href="https://immutables.github.io/immutable.html#copy-methods">Immutables-generated {@code
  * with*}</a> methods to be simplified.
  */
+// XXX: Besides explicitly enumerated iterables, consider also simplifying expressions that contain
+// explicitly enumerated `Stream`s, defined using `Stream.of(...)` or `() -> Stream.of(...)`. This
+// would allow simplifying e.g. invocations of `Flux#fromStream` to `Flux#just`.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Iterable creation can be avoided by using a varargs alternative method",
@@ -87,11 +93,10 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                   .named("copyOf"),
               symbolMatcher(
                   (symbol, state) ->
-                      state
-                          .getSymtab()
-                          .arrayClass
-                          .equals(((MethodSymbol) symbol).params().get(0).type.tsym))),
+                      state.getTypes().isArray(((MethodSymbol) symbol).params().get(0).type))),
           staticMethod().onClass(Arrays.class.getCanonicalName()).named("asList"));
+  private static final Matcher<ExpressionTree> FLUX =
+      staticMethod().onDescendantOf("reactor.core.publisher.Flux");
   private static final Matcher<ExpressionTree> IMMUTABLE_COLLECTION_BUILDER =
       instanceMethod().onDescendantOf(ImmutableCollection.Builder.class.getCanonicalName());
   private static final Matcher<ExpressionTree> OBJECT_ENUMERABLE_ASSERT =
@@ -100,6 +105,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       instanceMethod().onDescendantOf("reactor.test.StepVerifier.Step");
   private static final ImmutableTable<Matcher<ExpressionTree>, String, String> ALTERNATIVE_METHODS =
       ImmutableTable.<Matcher<ExpressionTree>, String, String>builder()
+          .put(FLUX, "fromIterable", "just")
           .put(IMMUTABLE_COLLECTION_BUILDER, "addAll", "add")
           .put(OBJECT_ENUMERABLE_ASSERT, "containsAnyElementsOf", "containsAnyOf")
           .put(OBJECT_ENUMERABLE_ASSERT, "containsAll", "contains")
@@ -178,28 +184,43 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                 state.getTypes())
             .collect(toImmutableList());
 
-    /*
-     * If all overloads have a single parameter, and at least one of them is a varargs method, then
-     * we assume that unwrapping the iterable argument will cause a suitable overload to be invoked.
-     * (Note that there may be multiple varargs overloads, either with different parameter types, or
-     * due to method overriding; this check does not attempt to determine which exact method or
-     * overload will be invoked as a result of the suggested simplification.)
-     *
-     * Note that this is a (highly!) imperfect heuristic, but it is sufficient to prevent e.g.
-     * unwrapping of arguments to `org.jooq.impl.DSL#row`, which can cause the expression's return
-     * type to change from `RowN` to (e.g.) `Row2`.
-     */
-    // XXX: There are certainly cases where it _would_ be nice to unwrap the arguments to
-    // `org.jooq.impl.DSL#row(Collection<?>)`. Look into this.
-    // XXX: Ideally we do check that one of the overloads accepts the unwrapped arguments.
-    // XXX: Ideally we validate that eligible overloads have compatible return types.
-    boolean hasLikelySuitableVarargsOverload =
-        overloads.stream().allMatch(m -> m.params().size() == 1)
-            && overloads.stream().anyMatch(MethodSymbol::isVarArgs);
-
-    return hasLikelySuitableVarargsOverload
+    return hasLikelySuitableVarargsOverload(method, overloads, state)
         ? Optional.of(SourceCode.unwrapMethodInvocation(argument, state))
         : Optional.empty();
+  }
+
+  /**
+   * Tells whether it is likely that, if the argument to the given method is unwrapped, a suitable
+   * varargs overload will be invoked instead.
+   *
+   * <p>If all overloads have a single parameter, and at least one of them is a suitably-typed
+   * varargs method, then we assume that unwrapping the iterable argument will cause a suitable
+   * overload to be invoked. (Note that there may be multiple varargs overloads due to method
+   * overriding; this check does not attempt to determine which exact method or overload will be
+   * invoked as a result of the suggested simplification.)
+   *
+   * <p>Note that this is a (highly!) imperfect heuristic, but it is sufficient to prevent e.g.
+   * unwrapping of arguments to `org.jooq.impl.DSL#row`, which can cause the expression's return
+   * type to change from `RowN` to (e.g.) `Row2`.
+   */
+  // XXX: There are certainly cases where it _would_ be nice to unwrap the arguments to
+  // `org.jooq.impl.DSL#row(Collection<?>)`. Look into this.
+  // XXX: Ideally we validate that eligible overloads have compatible return types.
+  private static boolean hasLikelySuitableVarargsOverload(
+      MethodSymbol method, ImmutableList<MethodSymbol> overloads, VisitorState state) {
+    Types types = state.getTypes();
+    // XXX: This logic is fragile, as it assumes that the method parameter's type is of the form
+    // `X<T>`, where `T` is the type of the explicitly enumerated values passed to the expression to
+    // be unwrapped. This should generally hold, given the types returned by the
+    // `EXPLICIT_ITERABLE_CREATOR` expressions: `Iterable<T>`, `List<T>`, `Set<T>`, etc.
+    Type parameterType =
+        Iterables.getOnlyElement(
+            Iterables.getOnlyElement(method.getParameters()).type.getTypeArguments());
+    return overloads.stream().allMatch(m -> m.params().size() == 1)
+        && overloads.stream()
+            .filter(MethodSymbol::isVarArgs)
+            .map(m -> types.elemtype(Iterables.getOnlyElement(m.getParameters()).type))
+            .anyMatch(varArgsType -> types.containsType(parameterType, varArgsType));
   }
 
   private static Optional<SuggestedFix> trySuggestCallingCustomAlternative(
@@ -219,8 +240,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
             alternatives.get(ASTHelpers.getSymbol(tree).getSimpleName().toString()))
         .map(
             replacement ->
-                SuggestedFix.builder()
-                    .merge(SuggestedFixes.renameMethodInvocation(tree, replacement, state))
+                SuggestedFixes.renameMethodInvocation(tree, replacement, state).toBuilder()
                     .merge(SourceCode.unwrapMethodInvocation(argument, state))
                     .build());
   }

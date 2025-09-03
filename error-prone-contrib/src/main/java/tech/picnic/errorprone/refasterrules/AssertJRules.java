@@ -7,7 +7,6 @@ import com.google.common.collect.Multiset;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
@@ -34,7 +33,6 @@ import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
-import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ expressions and statements. */
 // XXX: Most `AbstractIntegerAssert` rules can also be applied for other primitive types. Generate
@@ -65,8 +63,7 @@ import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 // XXX: `assertThat(optional.map(fun)).hasValue(v)` ->
 // `assertThat(optional).get().extracting(fun).isEqualTo(v)` (if the get fails the map was useless)
 // XXX: `someAssert.extracting(pred).isEqualTo(true)` -> `someAssert.matches(pred)`
-// XXX: `assertThat(someString.contains(s)).isTrue()` -> assertThat(someString).contains(s)` -> Also
-// for collections
+// XXX: `assertThat(someCollection.contains(s)).isTrue()` -> assertThat(someCollection).contains(s)`
 // XXX: `assertThat(someString.matches(s)).isTrue()` -> assertThat(someString).matches(s)`
 // XXX: `assertThat(n > k).isTrue()` -> assertThat(n).isGreaterThan(k)` (etc. Also `==`!)
 // XXX: `assertThat(n > k && n < m).isTrue()` -> assertThat(n).isStrictlyBetween(k, m)` (etc.)
@@ -101,6 +98,10 @@ import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 // XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
 // See how we can combine these things. Do note that (at present) their Refaster rules don't
 // show up as Error Prone checks. So we'd have to build an integration for that.
+// XXX: Cover all cases listed by https://rules.sonarsource.com/java/RSPEC-5838/
+// XXX: For `E extends Comparable<? super E>`, rewrite
+// `assertThat(iterable).isEqualTo(Refaster.<Object>anyOf(ImmutableSortedSet.of(expected),
+// ImmutableSortedMultiset.of(expected)))` to `assertThat(iterable).containsExactly(expected)`.
 @OnlineDocumentation
 final class AssertJRules {
   private AssertJRules() {}
@@ -165,31 +166,6 @@ final class AssertJRules {
   //
   // ObjectEnumerable
   //
-
-  static final class AssertThatObjectEnumerableIsEmpty<E> {
-    @BeforeTemplate
-    @SuppressWarnings("unchecked")
-    void before(
-        ObjectEnumerableAssert<?, E> enumAssert,
-        @Matches(IsEmpty.class) Iterable<? extends E> wellTypedIterable,
-        @Matches(IsEmpty.class) Iterable<?> arbitrarilyTypedIterable) {
-      Refaster.anyOf(
-          enumAssert.containsExactlyElementsOf(wellTypedIterable),
-          enumAssert.containsExactlyInAnyOrderElementsOf(wellTypedIterable),
-          enumAssert.hasSameElementsAs(wellTypedIterable),
-          enumAssert.hasSameSizeAs(arbitrarilyTypedIterable),
-          enumAssert.isSubsetOf(wellTypedIterable),
-          enumAssert.containsExactly(),
-          enumAssert.containsExactlyInAnyOrder(),
-          enumAssert.containsOnly(),
-          enumAssert.isSubsetOf());
-    }
-
-    @AfterTemplate
-    void after(ObjectEnumerableAssert<?, E> enumAssert) {
-      enumAssert.isEmpty();
-    }
-  }
 
   static final class ObjectEnumerableContainsOneElement<S, T extends S> {
     @BeforeTemplate
@@ -311,7 +287,7 @@ final class AssertJRules {
   // `assertThat` overload. Consider defining a `BugChecker` instead.
   static final class AssertThatMapContainsEntry<K, V> {
     @BeforeTemplate
-    ObjectAssert<?> before(Map<K, V> map, K key, V value) {
+    ObjectAssert<V> before(Map<K, V> map, K key, V value) {
       return assertThat(map.get(key)).isEqualTo(value);
     }
 
@@ -954,28 +930,4 @@ final class AssertJRules {
       assertThat(predicate).rejects(object);
     }
   }
-
-  ////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////
-  // Organize the code below.
-
-  // XXX: Do the "single Comparable" match shown below.
-  //    static final class AssertThatOnlyComparableElementIsEqualTo<E extends Comparable<? super E>>
-  // {
-  //        @BeforeTemplate
-  //        AbstractAssert<?, ?> before(Iterable<E> iterable, E expected) {
-  //            return assertThat(iterable)
-  //                    .isEqualTo(
-  //                            Refaster.<Object>anyOf(
-  //                                    ImmutableSortedSet.of(expected),
-  //                                    ImmutableSortedMultiset.of(expected)));
-  //        }
-  //
-  //        @AfterTemplate
-  //        @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-  //        IterableAssert<E> after(Iterable<E> iterable, E expected) {
-  //            return assertThat(iterable).containsExactly(expected);
-  //        }
-  //    }
-  //
 }

@@ -38,6 +38,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
+import java.util.Iterator;
 import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +54,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
@@ -80,10 +82,23 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#empty()} over less clear alternatives. */
+  // XXX: We can additionally introduce a rule that maps `OptionalInt.empty().stream()` to
+  // `Intstream.empty()`, and likewise for `OptionalLong` and `OptionalDouble`, but those
+  // expressions are highly unlikely to be seen in the wild.
   static final class EmptyStream<T> {
     @BeforeTemplate
-    Stream<T> before() {
-      return Stream.of();
+    Stream<T> before(
+        @Matches(IsEmpty.class) Collection<T> collection,
+        @Matches(IsEmpty.class) Iterable<T> iterable,
+        @Matches(IsEmpty.class) Iterator<T> iterator,
+        @Matches(IsEmpty.class) T[] array) {
+      return Refaster.anyOf(
+          Stream.of(),
+          Optional.<T>empty().stream(),
+          collection.stream(),
+          Streams.stream(iterable),
+          Streams.stream(iterator),
+          Arrays.stream(array));
     }
 
     @AfterTemplate

@@ -8,6 +8,10 @@
 
 set -e -u -o pipefail
 
+# Make sure that callers with a customized `MAVEN_ARGS` environment variable do
+# not influence the test result.
+export MAVEN_ARGS=
+
 integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
@@ -63,7 +67,7 @@ shared_build_flags="
   ${additional_build_flags}
   "
 
-format_goal='com.spotify.fmt:fmt-maven-plugin:2.25:format'
+format_goal='com.spotify.fmt:fmt-maven-plugin:2.27:format'
 
 error_prone_patch_flags="${shared_error_prone_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
    find "${error_prone_support_root}" \

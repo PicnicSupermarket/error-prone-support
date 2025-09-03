@@ -1,7 +1,7 @@
 # Updates a pull request based on the corresponding mutation testing analysis
 # performed by the `pitest-analyze-pr.yml` workflow. See
 # https://blog.pitest.org/oss-pitest-pr/ for details.
-name: "Mutation testing: post results"
+name: Mutation testing - post results
 on:
   workflow_run:
     workflows: ["Mutation testing"]
@@ -9,6 +9,8 @@ on:
       - completed
 permissions:
   actions: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   update-pr:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -20,22 +22,23 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
-          disable-sudo: true
+          disable-sudo-and-containers: true
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             api.github.com:443
             github.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          java-version: 17.0.13
+          java-version: 21.0.8
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.11
       - name: Download Pitest analysis artifact
         uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # v3.1.4
         with:

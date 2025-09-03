@@ -5,8 +5,8 @@ set -e -u -o pipefail
 test_name="$(basename "${0}" .sh)"
 project='prometheus-java-client'
 repository='https://github.com/prometheus/client_java.git'
-revision='v1.3.5'
-additional_build_flags='-Djava.version=11 -Dwarnings='
+revision='v1.3.8'
+additional_build_flags='-Djava.version=21 -Dwarnings='
 additional_source_directories=''
 shared_error_prone_flags=''
 patch_error_prone_flags=''

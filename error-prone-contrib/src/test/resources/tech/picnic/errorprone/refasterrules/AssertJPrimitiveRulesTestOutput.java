@@ -7,7 +7,6 @@ import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase {
-  @SuppressWarnings("SimplifyBooleanExpression")
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEqualTo() {
     return ImmutableSet.of(
         assertThat(true).isEqualTo(false),
@@ -28,7 +27,6 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1.0).isEqualTo(2.0));
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(true).isNotEqualTo(false),

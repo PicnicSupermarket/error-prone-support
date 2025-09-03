@@ -28,6 +28,44 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class StringRules {
   private StringRules() {}
 
+  /**
+   * Avoid unnecessary creation of new empty {@link String} objects; use the empty string literal
+   * instead.
+   */
+  static final class EmptyString {
+    @BeforeTemplate
+    @SuppressWarnings("java:S2129" /* This violation will be rewritten. */)
+    String before() {
+      return Refaster.anyOf(
+          new String(),
+          new String(new byte[0], UTF_8),
+          new String(new byte[] {}, UTF_8),
+          new String(new char[0]),
+          new String(new char[] {}));
+    }
+
+    @AfterTemplate
+    String after() {
+      return "";
+    }
+  }
+
+  /** Avoid unnecessary creation of new {@link String} objects. */
+  // XXX: Once `IdentityConversion` supports flagging constructor invocations, use that bug pattern
+  // instead of this Refaster rule.
+  static final class StringIdentity {
+    @BeforeTemplate
+    @SuppressWarnings("java:S2129" /* This violation will be rewritten. */)
+    String before(String str) {
+      return new String(str);
+    }
+
+    @AfterTemplate
+    String after(String str) {
+      return str;
+    }
+  }
+
   /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects
@@ -36,7 +74,11 @@ final class StringRules {
   // rule selection based on some annotation, or a separate Maven module.
   static final class StringIsEmpty {
     @BeforeTemplate
-    @SuppressWarnings("CharSequenceIsEmpty" /* This is a more specific template. */)
+    @SuppressWarnings({
+      "CharSequenceIsEmpty" /* This is a more specific template. */,
+      "java:S7158" /* This violation will be rewritten. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     boolean before(String str) {
       return Refaster.anyOf(str.length() == 0, str.length() <= 0, str.length() < 1);
     }
@@ -94,6 +136,22 @@ final class StringRules {
     @AlsoNegation
     boolean after(String str) {
       return Strings.isNullOrEmpty(str);
+    }
+  }
+
+  /** Prefer {@link String#isBlank()} over less efficient alternatives. */
+  // XXX: Note that this rule changes semantics, as `isBlank()` considers whitespace characters
+  // beyond U+0020, while `trim()` does not.
+  static final class StringIsBlank {
+    @BeforeTemplate
+    boolean before(String str) {
+      return str.trim().isEmpty();
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(String str) {
+      return str.isBlank();
     }
   }
 

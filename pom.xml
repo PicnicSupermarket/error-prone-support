@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.21.1-SNAPSHOT</version>
+    <version>0.24.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -64,13 +64,9 @@
         <url>https://github.com/PicnicSupermarket/error-prone-support/actions</url>
     </ciManagement>
     <distributionManagement>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -146,7 +142,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2025-03-24T10:41:07Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-07-23T22:01:40Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -206,19 +202,17 @@
         <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.37.0</version.error-prone-orig>
-        <version.error-prone-slf4j>0.1.28</version.error-prone-slf4j>
-        <version.guava-beta-checker>1.0</version.guava-beta-checker>
+        <version.error-prone-orig>2.41.0</version.error-prone-orig>
         <version.jdk>17</version.jdk>
         <version.jmh>1.37</version.jmh>
-        <version.maven>3.9.9</version.maven>
+        <version.maven>3.9.11</version.maven>
         <version.mockito>5.17.0</version.mockito>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
         <version.nullaway>0.12.5</version.nullaway>
-        <version.pitest-git>2.2.0</version.pitest-git>
+        <version.pitest-git>2.2.4</version.pitest-git>
         <version.rewrite-templating>1.24.2</version.rewrite-templating>
         <version.surefire>3.2.3</version.surefire>
     </properties>
@@ -273,14 +267,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.18.3</version>
+                <version>2.20.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -306,6 +300,17 @@
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
                 <version>${version.auto-value}</version>
+            </dependency>
+            <!-- XXX: When compiling with JDK 23+, JSR-305 (meta-)annotation
+            usage by dependencies, such as Project Reactor, triggers NullAway
+            to attempt to load said annotations. As such this module requires
+            these annotations to be on the classpath. Periodically review
+            whether we can drop this dependency declaration. See
+            https://github.com/uber/NullAway/issues/1171. -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
@@ -335,17 +340,17 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.26.0</version>
+                <version>1.28.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-beta-checker</artifactId>
-                <version>${version.guava-beta-checker}</version>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.4.0-jre</version>
+                <version>33.4.8-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -367,19 +372,19 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
-                <version>${version.nullaway}</version>
+                <version>0.12.9</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.14.5</version>
+                <version>1.15.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.4</version>
+                <version>2024.0.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -391,12 +396,12 @@
             <dependency>
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>1.6.15</version>
+                <version>1.6.16</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.29</version>
+                <version>2.2.36</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -421,7 +426,7 @@
             <dependency>
                 <groupId>jp.skypencil.errorprone.slf4j</groupId>
                 <artifactId>errorprone-slf4j</artifactId>
-                <version>${version.error-prone-slf4j}</version>
+                <version>0.1.29</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -431,7 +436,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.17.5</version>
+                <version>1.17.7</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -444,19 +449,19 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.23</version>
+                <version>1.9.24</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.27.3</version>
+                <version>3.27.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.49.1</version>
+                <version>3.50.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -466,12 +471,14 @@
             <dependency>
                 <groupId>org.immutables</groupId>
                 <artifactId>value-annotations</artifactId>
-                <version>2.10.1</version>
+                <version>2.11.3</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jooq</artifactId>
-                <version>3.19.18</version>
+                <artifactId>jooq-bom</artifactId>
+                <version>3.20.6</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
@@ -481,21 +488,21 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.12.1</version>
+                <version>5.13.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
-                <version>${version.mockito}</version>
+                <version>5.19.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.4.0</version>
+                <version>5.5.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -517,7 +524,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.5.0</version>
+                <version>3.14.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -531,19 +538,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.2.5</version>
+                <version>6.2.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.4.4</version>
+                <version>3.5.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>6.4.4</version>
+                <version>6.5.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -609,7 +616,7 @@
                 <plugin>
                     <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
-                    <version>2.25</version>
+                    <version>2.27</version>
                     <configuration>
                         <additionalSourceDirectories>
                             <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
@@ -679,7 +686,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>9.0.1</version>
+                    <version>9.0.2</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -919,6 +926,7 @@
                                         <property name="aliasList" value="com.puppycrawl.tools.checkstyle.checks.coding.UnusedLocalVariableCheck=unused" />
                                     </module>
                                     <module name="TrailingComment" />
+                                    <module name="UnnecessaryNullCheckWithInstanceOf" />
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
@@ -942,12 +950,14 @@
                         files are not excluded by the `excludeGeneratedSources`
                         setting. Consider filing an issue for this. -->
                         <resourceExcludes>THIRD-PARTY.txt</resourceExcludes>
+                        <outputFile>${project.build.directory}/checkstyle-result.json</outputFile>
+                        <outputFileFormat>sarif</outputFileFormat>
                     </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>10.22.0</version>
+                            <version>11.0.1</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -967,7 +977,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -975,13 +985,9 @@
                     <version>3.14.0</version>
                     <configuration>
                         <annotationProcessorPaths>
-                            <!-- XXX: Inline and drop the version
-                            declarations once properly supported. See
-                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>com.google.auto.value</groupId>
                                 <artifactId>auto-value</artifactId>
-                                <version>${version.auto-value}</version>
                             </path>
                             <path>
                                 <groupId>com.google.auto.value</groupId>
@@ -991,12 +997,10 @@
                             <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
-                                <version>${version.auto-service}</version>
                             </path>
                             <path>
                                 <groupId>org.openrewrite</groupId>
                                 <artifactId>rewrite-templating</artifactId>
-                                <version>${version.rewrite-templating}</version>
                             </path>
                             <path>
                                 <groupId>org.openjdk.jmh</groupId>
@@ -1091,13 +1095,14 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.1.4</version>
                     <configuration>
+                        <deployAtEnd>true</deployAtEnd>
                         <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
                     </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.1</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -1121,14 +1126,15 @@
                                         </ignoreClasses>
                                     </dependency>
                                     <dependency>
-                                        <groupId>org.springframework</groupId>
-                                        <artifactId>spring-aop</artifactId>
-                                        <!-- Spring AOP redistributes the AOP
-                                        Alliance interfaces of the
-                                        `aopalliance:aopalliance` artifact. See
-                                        https://jira.spring.io/browse/SPR-13984. -->
+                                        <groupId>org.openrewrite</groupId>
+                                        <artifactId>rewrite-java-*</artifactId>
+                                        <!-- Testing generated OpenRewrite
+                                        recipes using the oldest and newest
+                                        supported JDKs requires multiple
+                                        `rewrite-java-*` dependencies on the
+                                        classpath. -->
                                         <ignoreClasses>
-                                            <ignoreClass>org.aopalliance.*</ignoreClass>
+                                            <ignoreClass>org.openrewrite.java.isolated.package-info</ignoreClass>
                                         </ignoreClasses>
                                     </dependency>
                                 </dependencies>
@@ -1142,6 +1148,10 @@
                             </banDynamicVersions>
                             <dependencyConvergence />
                             <enforceBytecodeVersion>
+                                <ignoredScopes>
+                                    <ignoredScope>provided</ignoredScope>
+                                    <ignoredScope>test</ignoredScope>
+                                </ignoredScopes>
                                 <maxJdkVersion>${version.jdk}</maxJdkVersion>
                             </enforceBytecodeVersion>
                             <requireEncoding>
@@ -1150,7 +1160,7 @@
                                 <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
                             </requireEncoding>
                             <requireJavaVersion>
-                                <version>${version.jdk}</version>
+                                <version>21</version>
                             </requireJavaVersion>
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
@@ -1182,13 +1192,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.2.7</version>
+                    <version>3.2.8</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
                             <goals>
                                 <goal>sign</goal>
                             </goals>
+                            <configuration>
+                                <signer>bc</signer>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -1261,7 +1274,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.11.2</version>
+                    <version>3.11.3</version>
                     <configuration>
                         <additionalJOptions>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
@@ -1353,7 +1366,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.5.0</version>
+                    <version>2.6.0</version>
                     <configuration>
                         <includedLicenses>
                             <!-- The SPDX IDs of licenses of third-party
@@ -1503,7 +1516,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1564,7 +1577,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.19.0</version>
+                    <version>1.20.2</version>
                     <configuration>
                         <excludedClasses>
                             <!-- AutoValue generated classes. -->
@@ -1588,12 +1601,12 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.4.0</version>
+                            <version>1.5.3</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>pitest-accelerator-junit5</artifactId>
-                            <version>1.2.0</version>
+                            <version>1.2.2</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
@@ -1603,7 +1616,7 @@
                         <dependency>
                             <groupId>org.pitest</groupId>
                             <artifactId>pitest-junit5-plugin</artifactId>
-                            <version>1.2.2</version>
+                            <version>1.2.3</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1618,7 +1631,13 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.1.0.4751</version>
+                    <version>5.2.0.4988</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.8.0</version>
+                    <extensions>true</extensions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1646,43 +1665,6 @@
             </properties>
         </profile>
         <profile>
-            <!-- Error Prone checks that are not available from Maven Central;
-            these are therefore not enabled by default. -->
-            <id>non-maven-central</id>
-            <properties>
-                <version.reactor-error-prone>0.1.4</version.reactor-error-prone>
-            </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.lhotari</groupId>
-                        <artifactId>reactor-error-prone</artifactId>
-                        <version>${version.reactor-error-prone}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <annotationProcessorPaths combine.children="append">
-                                <!-- XXX: Inline and drop the version
-                                declaration once properly supported. See
-                                https://youtrack.jetbrains.com/issue/IDEA-342187. -->
-                                <path>
-                                    <groupId>com.github.lhotari</groupId>
-                                    <artifactId>reactor-error-prone</artifactId>
-                                    <version>${version.reactor-error-prone}</version>
-                                </path>
-                            </annotationProcessorPaths>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <!-- Applies the Error Prone checks defined by this project to the
             code base itself. Assumes that a prior build has already installed
             the project in the local Maven repository. -->
@@ -1704,28 +1686,21 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
-                                <!-- XXX: Drop the version declarations once
-                                properly supported. See
-                                https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-contrib</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-experimental</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>error-prone-guidelines</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                                 <path>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>refaster-runner</artifactId>
-                                    <version>${project.version}</version>
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
@@ -1889,18 +1864,13 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
                             <annotationProcessorPaths combine.children="append">
-                                <!-- XXX: Inline and drop the version
-                                declarations once properly supported. See
-                                https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                                 <path>
                                     <groupId>com.google.errorprone</groupId>
                                     <artifactId>error_prone_core</artifactId>
-                                    <version>${version.error-prone}</version>
                                 </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava-beta-checker</artifactId>
-                                    <version>${version.guava-beta-checker}</version>
                                 </path>
                                 <path>
                                     <groupId>com.jakewharton.nopen</groupId>
@@ -1910,17 +1880,14 @@
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                    <version>${version.nullaway}</version>
                                 </path>
                                 <path>
                                     <groupId>jp.skypencil.errorprone.slf4j</groupId>
                                     <artifactId>errorprone-slf4j</artifactId>
-                                    <version>${version.error-prone-slf4j}</version>
                                 </path>
                                 <path>
                                     <groupId>org.mockito</groupId>
                                     <artifactId>mockito-errorprone</artifactId>
-                                    <version>${version.mockito}</version>
                                 </path>
                             </annotationProcessorPaths>
                             <compilerArgs combine.children="append">
@@ -1955,8 +1922,6 @@
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
-                                    <!-- We don't target JDK 7. -->
-                                    -Xep:Java7ApiChecker:OFF
                                     <!-- We don't target JDK 8. -->
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- We don't target Android. -->
@@ -1970,6 +1935,7 @@
                                     <!-- XXX: Enable once there are fewer
                                     false-positives.
                                     -XepOpt:CheckReturnValue:CheckAllMethods=true -->
+                                    -XepOpt:ConstantExpressions:ConsiderAllMethodsPure=true
                                     <!-- XXX: Consider renaming flagged types
                                     instead. -->
                                     -XepOpt:IdentifierName:AllowInitialismsInTypeName=true
@@ -1977,12 +1943,16 @@
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
+                                    -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
-                                    -XepOpt:StatementSwitchToExpressionSwitch:EnableDirectConversion=true
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
                                 </arg>
+                                <!-- XXX: Drop this flag once it's enabled by
+                                default on the lowest supported JDK. See
+                                https://github.com/uber/NullAway/wiki/JSpecify-Support. -->
+                                <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
                                 moment it is invoked. Those assumptions require
@@ -2164,7 +2134,7 @@
             </build>
         </profile>
         <profile>
-            <!-- This profile is auto-activated when performing a release. -->
+            <!-- This profile is activated when performing a release. -->
             <id>release</id>
             <build>
                 <plugins>
@@ -2172,22 +2142,57 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                     </plugin>
-                    <!-- Lexicographically this plugin is listed out-of-order
-                    because it must be executed after the
-                    `maven-javadoc-plugin`; otherwise not all artifacts will be
-                    signed. -->
-                    <?SORTPOM IGNORE?>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                    <?SORTPOM RESUME?>
                     <plugin>
                         <groupId>org.kordamp.maven</groupId>
                         <artifactId>pomchecker-maven-plugin</artifactId>
                         <configuration>
                             <release>true</release>
                         </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>custom-test-runtime</id>
+            <activation>
+                <property>
+                    <name>surefire.jdk-toolchain-version</name>
+                </property>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <jdkToolchain>
+                                    <version>${surefire.jdk-toolchain-version}</version>
+                                </jdkToolchain>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+        <profile>
+            <!-- Signs build artifacts if a GPG key is configured. This is
+            required when deploying a release, and optional otherwise. -->
+            <id>sign</id>
+            <activation>
+                <property>
+                    <name>env.MAVEN_GPG_KEY</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>

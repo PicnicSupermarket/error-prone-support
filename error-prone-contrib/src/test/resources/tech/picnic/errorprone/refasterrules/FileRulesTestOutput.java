@@ -1,8 +1,11 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -11,6 +14,11 @@ import java.nio.file.Paths;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class FileRulesTest implements RefasterRuleCollectionTestCase {
+  @Override
+  public ImmutableSet<Object> elidedTypesAndStaticImports() {
+    return ImmutableSet.of(FileInputStream.class, InputStreamReader.class);
+  }
+
   Path testPathOfUri() {
     return Path.of(URI.create("foo"));
   }
@@ -50,5 +58,24 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         new File("foo").mkdirs() || new File("foo").exists(),
         !new File("bar").mkdirs() && !new File("bar").exists());
+  }
+
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderPathOf() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedReader(Path.of("foo")), Files.newBufferedReader(Path.of("bar")));
+  }
+
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderToPath() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedReader(new File("foo").toPath()),
+        Files.newBufferedReader(new File("bar").toPath()));
+  }
+
+  BufferedReader testFilesNewBufferedReaderPathOfWithCharset() throws IOException {
+    return Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8);
+  }
+
+  BufferedReader testFilesNewBufferedReaderToPathWithCharset() throws IOException {
+    return Files.newBufferedReader(new File("foo").toPath(), StandardCharsets.UTF_8);
   }
 }

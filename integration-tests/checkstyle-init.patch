@@ -7,7 +7,7 @@
 +    <dependency>
 +      <groupId>org.assertj</groupId>
 +      <artifactId>assertj-core</artifactId>
-+      <version>3.27.3<!-- Renovate: org.assertj:assertj-bom --></version>
++      <version>3.27.4<!-- Renovate: org.assertj:assertj-bom --></version>
 +      <scope>test</scope>
 +    </dependency>
      <dependency>
@@ -123,6 +123,45 @@
          final String rendered = report
              .replace(VERSION_PLACEHOLDER, String.valueOf(version))
              .replace(RESULTS_PLACEHOLDER, String.join(",\n", results));
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTypeCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTypeCheck.java
+@@ -599,6 +599,10 @@ public final class IllegalTypeCheck extends AbstractCheck {
+      * @param importAst {@link TokenTypes#IMPORT Import}
+      * @return Imported canonical type's name.
+      */
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     private static String getImportedTypeCanonicalName(DetailAST importAst) {
+         final StringBuilder canonicalNameBuilder = new StringBuilder(256);
+         DetailAST toVisit = importAst;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheck.java
+@@ -716,6 +716,10 @@ public class VisibilityModifierCheck
+      * @param type DetailAST {@link TokenTypes#TYPE TYPE} node.
+      * @return canonical type's name
+      */
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     private static String getCanonicalName(DetailAST type) {
+         final StringBuilder canonicalNameBuilder = new StringBuilder(256);
+         DetailAST toVisit = type;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentLevel.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentLevel.java
+@@ -143,6 +143,10 @@ public class IndentLevel {
+     }
+ 
+     @Override
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     public String toString() {
+         final String result;
+         if (levels.cardinality() == 1) {
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 @@ -97,6 +97,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
@@ -176,6 +215,56 @@
  public class TreeWalkerTest extends AbstractModuleTestSupport {
  
      @TempDir
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
+@@ -459,6 +459,10 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
+         }
+     }
+ 
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     private static boolean shouldAppendSpace(StringBuilder text, char firstCharToAppend) {
+         final boolean result;
+ 
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsPagesTest.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsPagesTest.java
+@@ -1496,6 +1496,10 @@ public class XdocsPagesTest {
+         return result;
+     }
+ 
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     private static void validateViolationSection(String fileName, String sectionName,
+                                                  Node subSection,
+                                                  Object instance) throws Exception {
+--- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/utils/CheckUtil.java
++++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/utils/CheckUtil.java
+@@ -289,6 +289,10 @@ public final class CheckUtil {
+         return checkMessage;
+     }
+ 
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     public static String getTokenText(int[] tokens, int... subtractions) {
+         final String tokenText;
+         if (subtractions.length == 0 && Arrays.equals(tokens, TokenUtil.getAllTokenIds())) {
+@@ -341,6 +345,10 @@ public final class CheckUtil {
+         return result;
+     }
+ 
++    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
++    // Java 15 runtime compatibility when suggesting use of
++    // `StringBuilder#isEmpty()`, while this project targets Java 11.
++    @SuppressWarnings("CharSequenceIsEmpty")
+     public static String getJavadocTokenText(int[] tokens, int... subtractions) {
+         final StringBuilder result = new StringBuilder(50);
+         boolean first = true;
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 @@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;

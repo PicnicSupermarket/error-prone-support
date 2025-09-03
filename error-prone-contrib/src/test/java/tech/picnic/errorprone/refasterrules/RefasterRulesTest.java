@@ -13,6 +13,7 @@ final class RefasterRulesTest {
   /** The names of all Refaster rule groups defined in this module. */
   private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
       ImmutableSet.of(
+          AssertJArrayRules.class,
           AssertJBigDecimalRules.class,
           AssertJBigIntegerRules.class,
           AssertJBooleanRules.class,
@@ -20,7 +21,9 @@ final class RefasterRulesTest {
           AssertJCharSequenceRules.class,
           AssertJComparableRules.class,
           AssertJDoubleRules.class,
+          AssertJDurationRules.class,
           AssertJEnumerableRules.class,
+          AssertJInstantRules.class,
           AssertJFloatRules.class,
           AssertJIntegerRules.class,
           AssertJIterableRules.class,
@@ -30,6 +33,7 @@ final class RefasterRulesTest {
           AssertJNumberRules.class,
           AssertJObjectRules.class,
           AssertJOptionalRules.class,
+          AssertJPathRules.class,
           AssertJPrimitiveRules.class,
           AssertJRules.class,
           AssertJShortRules.class,
@@ -58,6 +62,7 @@ final class RefasterRulesTest {
           ImmutableTableRules.class,
           InputStreamRules.class,
           IntStreamRules.class,
+          JacksonRules.class,
           JUnitRules.class,
           JUnitToAssertJRules.class,
           LongStreamRules.class,
@@ -71,6 +76,7 @@ final class RefasterRulesTest {
           PatternRules.class,
           PreconditionsRules.class,
           PrimitiveRules.class,
+          RandomGeneratorRules.class,
           ReactorRules.class,
           RxJava2AdapterRules.class,
           StreamRules.class,

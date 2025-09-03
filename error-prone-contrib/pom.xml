@@ -5,7 +5,7 @@
     <parent>
         <groupId>tech.picnic.error-prone-support</groupId>
         <artifactId>error-prone-support</artifactId>
-        <version>0.21.1-SNAPSHOT</version>
+        <version>0.24.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>error-prone-contrib</artifactId>
@@ -48,6 +48,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <scope>provided</scope>
@@ -60,6 +65,17 @@
         <dependency>
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- XXX: When compiling with JDK 23+, JSR-305 (meta-)annotation usage
+        by dependencies, such as Project Reactor, triggers NullAway to attempt
+        to load said annotations. As such some modules require these
+        annotations to be on the classpath. Periodically review whether we can
+        drop this dependency declaration. See
+        https://github.com/uber/NullAway/issues/1171. -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -221,6 +237,11 @@
         </dependency>
         <dependency>
             <groupId>org.openrewrite</groupId>
+            <artifactId>rewrite-java-21</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openrewrite</groupId>
             <artifactId>rewrite-templating</artifactId>
             <scope>provided</scope>
         </dependency>
@@ -284,23 +305,17 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
                         <annotationProcessorPaths combine.children="append">
-                            <!-- XXX: Drop the version declarations once
-                            properly supported. See
-                            https://youtrack.jetbrains.com/issue/IDEA-342187. -->
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>documentation-support</artifactId>
-                                <version>${project.version}</version>
                             </path>
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-compiler</artifactId>
-                                <version>${project.version}</version>
                             </path>
                             <path>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>refaster-support</artifactId>
-                                <version>${project.version}</version>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs combine.children="append">

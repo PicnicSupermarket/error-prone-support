@@ -1,9 +1,12 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static org.junit.jupiter.api.condition.JRE.JAVA_21;
+
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
 
 final class ExplicitArgumentEnumerationTest {
   @Test
@@ -16,7 +19,8 @@ final class ExplicitArgumentEnumerationTest {
             "import com.google.common.collect.ImmutableList;",
             "import com.google.errorprone.CompilationTestHelper;",
             "import com.google.errorprone.bugpatterns.BugChecker;",
-            "import org.jooq.impl.DSL;",
+            "import io.micrometer.core.instrument.Counter;",
+            "import io.micrometer.core.instrument.Tag;",
             "import reactor.core.publisher.Flux;",
             "import reactor.test.StepVerifier;",
             "",
@@ -30,19 +34,22 @@ final class ExplicitArgumentEnumerationTest {
             "",
             "    ImmutableList.<ImmutableList<String>>builder().add(ImmutableList.of());",
             "",
-            "    DSL.row(ImmutableList.of(1, 2));",
+            "    Counter.builder(\"foo\").tags(ImmutableList.of(Tag.of(\"bar\", \"baz\")));",
             "",
             "    // BUG: Diagnostic contains:",
             "    unaryMethod(ImmutableList.of(1, 2));",
             "    unaryMethodWithLessVisibleOverload(ImmutableList.of(1, 2));",
             "    binaryMethod(ImmutableList.of(1, 2), 3);",
             "",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.fromIterable(ImmutableList.of());",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.fromIterable(ImmutableList.copyOf(new String[0]));",
+            "    Flux.fromIterable(ImmutableList.copyOf(ImmutableList.of()));",
+            "",
             "    ImmutableList.builder()",
             "        // BUG: Diagnostic contains:",
-            "        .addAll(ImmutableList.of())",
-            "        // BUG: Diagnostic contains:",
-            "        .addAll(ImmutableList.copyOf(new String[0]))",
-            "        .addAll(ImmutableList.copyOf(ImmutableList.of()))",
+            "        .addAll(ImmutableList.of(1))",
             "        .build();",
             "",
             "    assertThat(ImmutableList.of(1))",
@@ -86,6 +93,23 @@ final class ExplicitArgumentEnumerationTest {
         .doTest();
   }
 
+  @EnabledForJreRange(min = JAVA_21)
+  @Test
+  void identificationJre21() {
+    CompilationTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import com.google.common.collect.ImmutableList;",
+            "import org.jooq.impl.DSL;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    DSL.row(ImmutableList.of(1, 2));",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
@@ -107,6 +131,8 @@ final class ExplicitArgumentEnumerationTest {
             "",
             "class A {",
             "  void m() {",
+            "    Flux.fromIterable(ImmutableList.of());",
+            "",
             "    ImmutableList.builder().addAll(ImmutableList.of()).build();",
             "",
             "    assertThat(ImmutableList.of()).containsAnyElementsOf(ImmutableMultiset.of());",
@@ -150,6 +176,8 @@ final class ExplicitArgumentEnumerationTest {
             "",
             "class A {",
             "  void m() {",
+            "    Flux.just();",
+            "",
             "    ImmutableList.builder().add().build();",
             "",
             "    assertThat(ImmutableList.of()).containsAnyOf();",

@@ -1,0 +1,77 @@
+name: Run Reviewdog
+on:
+  pull_request:
+permissions:
+  contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
+jobs:
+  analyze:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
+        with:
+          disable-sudo-and-containers: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.adoptium.net:443
+            api.github.com:443
+            github-registry-files.githubusercontent.com:443
+            github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
+            maven.pkg.github.com:443
+            objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        with:
+          java-version: 17.0.16
+          java-distribution: temurin
+          maven-version: 3.9.11
+      - name: Set up Reviewdog
+        uses: reviewdog/action-setup@e04ffabe3898a0af8d0fb1af00c188831c4b5893 # v1.3.2
+        with:
+          # XXX: Configure Renovate to maintain this version.
+          reviewdog_version: v0.20.3
+      - name: Install project to local Maven repository
+        # XXX: Consider configuring Reviewdog such that it reports build
+        # errors during this step. When doing so, make sure that a nonzero
+        # `mvn` exit code does abort this workflow.
+        run: mvn install -DskipTests -Dverification.skip
+      - name: Build project with self-check and report issues
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # XXX: Cover additional output formats, besides Checkstyle and javac.
+        # XXX: Run with `-Dmaven.test.failure.ignore` instead of `-DskipTests`,
+        # and also report Surefire test failures.
+        # XXX: Distribute these commands across three steps?
+        run: |
+          mvn clean verify -Pself-check -DskipTests -Dverification.warn | tee /tmp/build.log
+          # The ANSI escape sequences that color the build output are dropped
+          # before passing the build log to Reviewdog.
+          sed 's/\x1b\[[0-9;]*m//g' < /tmp/build.log \
+            | reviewdog \
+                -name=javac \
+                -efm='[WARNING] %f:[%l,%c] %m' \
+                -filter-mode=file \
+                -reporter=github-pr-review \
+                -tee
+          find -name checkstyle-result.json -exec sh -c '
+            reviewdog -name=Checkstyle -f=sarif -reporter=github-pr-review < "{}"
+          ' \;
+      - name: Apply Error Prone suggestions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./apply-error-prone-suggestions.sh
+      - name: Report suggested changes
+        uses: reviewdog/action-suggester@3d5391db5affb50a46eb4629e908a4e2c5dd20b2 # v1.22.0
+        with:
+          tool_name: Error Prone
+      - name: Remove installed project artifacts
+        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId

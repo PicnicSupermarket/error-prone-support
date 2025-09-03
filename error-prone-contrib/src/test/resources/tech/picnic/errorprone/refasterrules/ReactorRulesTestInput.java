@@ -15,8 +15,10 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +42,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         ArrayList.class,
+        Arrays.class,
         Collection.class,
         HashMap.class,
         List.class,
@@ -68,8 +71,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Mono.justOrEmpty(null), Mono.justOrEmpty(Optional.empty()));
   }
 
-  Mono<Integer> testMonoJust() {
-    return Mono.justOrEmpty(Optional.of(1));
+  ImmutableSet<Mono<Integer>> testMonoJust() {
+    return ImmutableSet.of(Mono.justOrEmpty(Optional.of(1)), Flux.just(2).next());
   }
 
   Mono<Integer> testMonoJustOrEmptyObject() {
@@ -162,6 +165,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<?>> testFluxEmpty() {
     return ImmutableSet.of(
+        Flux.zip(v -> v),
+        Flux.zip(v -> v, 1),
         Flux.concat(),
         Flux.concatDelayError(),
         Flux.firstWithSignal(),
@@ -178,8 +183,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.mergeSequential(),
         Flux.mergeSequential(1),
         Flux.mergeSequentialDelayError(1),
-        Flux.zip(v -> v),
-        Flux.zip(v -> v, 1),
+        Flux.fromArray(new String[0]),
+        Flux.fromArray(new String[] {"foo"}),
+        Flux.fromIterable(ImmutableList.of()),
+        Flux.fromIterable(Iterables.cycle("bar")),
+        Flux.fromStream(() -> Stream.empty()),
+        Flux.fromStream(() -> Stream.generate(() -> "baz")),
         Flux.combineLatest(v -> v),
         Flux.combineLatest(v -> v, 1),
         Flux.mergeComparing(),
@@ -191,9 +200,20 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.range(0, 1),
         Mono.just(2).flux(),
-        Mono.just(3).repeat().take(1),
-        Flux.fromIterable(ImmutableList.of(4)),
-        Flux.fromIterable(ImmutableSet.of(5)));
+        Flux.fromStream(() -> Stream.of(3)),
+        Mono.just(4).repeat().take(1));
+  }
+
+  ImmutableSet<Flux<String>> testFluxJustArray() {
+    return ImmutableSet.of(
+        Flux.fromStream(() -> Stream.of("foo", "bar")),
+        Flux.fromStream(() -> Stream.of("baz", "qux", "quux")));
+  }
+
+  ImmutableSet<Flux<String>> testFluxFromArray() {
+    return ImmutableSet.of(
+        Flux.just(new String[] {"foo"}),
+        Flux.fromStream(() -> Arrays.stream(new String[] {"bar"})));
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
@@ -639,6 +659,48 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(PublisherProbe.empty().wasRequested()).isFalse();
   }
 
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasSubscribed() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasSubscribed();
+    } else {
+      PublisherProbe.of(Mono.just(1)).assertWasNotSubscribed();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotSubscribed();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasSubscribed();
+    }
+  }
+
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasCancelled() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasCancelled();
+    } else {
+      PublisherProbe.of(Mono.just(1)).assertWasNotCancelled();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotCancelled();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasCancelled();
+    }
+  }
+
+  @SuppressWarnings("SimplifyBooleanExpression")
+  void testAssertThatPublisherProbeWasRequested() {
+    if (true) {
+      PublisherProbe.of(Mono.just(1)).assertWasRequested();
+    } else {
+      PublisherProbe.of(Mono.just(1)).assertWasNotRequested();
+    }
+    if (!false) {
+      PublisherProbe.of(Mono.just(2)).assertWasNotRequested();
+    } else {
+      PublisherProbe.of(Mono.just(2)).assertWasRequested();
+    }
+  }
+
   ImmutableSet<StepVerifier.FirstStep<Integer>> testStepVerifierFromMono() {
     return ImmutableSet.of(
         StepVerifier.create(Mono.just(1)), Mono.just(2).flux().as(StepVerifier::create));
@@ -764,5 +826,9 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Flux<Integer> testFluxFromStreamSupplier() {
     return Flux.fromStream(Stream.of(1));
+  }
+
+  Mono<String> testFluxNext() {
+    return Mono.from(Flux.just("foo"));
   }
 }

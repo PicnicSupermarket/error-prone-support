@@ -9,19 +9,19 @@ on:
     - cron: '0 4 * * 1'
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     # Analysis of code in forked repositories is skipped, as such workflow runs
     # do not have access to the requisite secrets.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    permissions:
-      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
-          disable-sudo: true
+          disable-sudo-and-containers: true
           egress-policy: block
           allowed-endpoints: >
             analysis-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
@@ -30,6 +30,7 @@ jobs:
             ea6ne4j2sb.execute-api.eu-central-1.amazonaws.com:443
             github.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             sc-cleancode-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
             *.sonarcloud.io:443
@@ -38,9 +39,9 @@ jobs:
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
           checkout-fetch-depth: 0
-          java-version: 17.0.13
+          java-version: 21.0.8
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.11
       - name: Create missing `test` directory
         # XXX: Drop this step in favour of actually having a test.
         run: mkdir refaster-compiler/src/test
@@ -48,4 +49,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -T1C jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support
+        run: mvn jacoco:prepare-agent verify jacoco:report sonar:sonar -Dverification.skip -Dsonar.projectKey=PicnicSupermarket_error-prone-support

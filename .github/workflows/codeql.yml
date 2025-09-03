@@ -11,6 +11,8 @@ on:
     - cron: '0 4 * * 1'
 permissions:
   contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     strategy:
@@ -22,31 +24,33 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481 # v2.11.0
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # v2.13.0
         with:
-          disable-sudo: true
+          disable-sudo-and-containers: true
           egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             api.github.com:443
             github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             uploads.github.com:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
         with:
-          java-version: 17.0.13
+          java-version: 21.0.8
           java-distribution: temurin
-          maven-version: 3.9.9
+          maven-version: 3.9.11
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@5f8171a638ada777af81d42b55959a643bb29017 # v3.28.12
+        uses: github/codeql-action/init@76621b61decf072c1cee8dd1ce2d2a82d33c17ed # v3.29.8
         with:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
         if: matrix.language == 'java'
-        run: mvn -T1C clean package -DskipTests -Dverification.skip
+        run: mvn clean package -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@5f8171a638ada777af81d42b55959a643bb29017 # v3.28.12
+        uses: github/codeql-action/analyze@76621b61decf072c1cee8dd1ce2d2a82d33c17ed # v3.29.8
         with:
           category: /language:${{ matrix.language }}

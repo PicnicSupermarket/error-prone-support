@@ -12,6 +12,19 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class SuggestedFixRules {
   private SuggestedFixRules() {}
 
+  /** Prefer {@link SuggestedFix#toBuilder()}} over more contrived alternatives. */
+  static final class SuggestedFixToBuilder {
+    @BeforeTemplate
+    SuggestedFix.Builder before(SuggestedFix fix) {
+      return SuggestedFix.builder().merge(fix);
+    }
+
+    @AfterTemplate
+    SuggestedFix.Builder after(SuggestedFix fix) {
+      return fix.toBuilder();
+    }
+  }
+
   /** Prefer {@link SuggestedFix#delete(Tree)} over more contrived alternatives. */
   static final class SuggestedFixDelete {
     @BeforeTemplate

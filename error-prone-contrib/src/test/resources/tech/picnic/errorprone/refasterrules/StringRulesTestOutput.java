@@ -26,6 +26,14 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         Arrays.class, Joiner.class, Objects.class, Stream.class, Streams.class, joining(), UTF_8);
   }
 
+  ImmutableSet<String> testEmptyString() {
+    return ImmutableSet.of("", "", "", "", "");
+  }
+
+  String testStringIdentity() {
+    return "foo";
+  }
+
   ImmutableSet<Boolean> testStringIsEmpty() {
     return ImmutableSet.of(
         "foo".isEmpty(),
@@ -47,6 +55,10 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Boolean> testStringIsNullOrEmpty() {
     return ImmutableSet.of(
         Strings.isNullOrEmpty(getClass().getName()), !Strings.isNullOrEmpty(getClass().getName()));
+  }
+
+  boolean testStringIsBlank() {
+    return "foo".isBlank();
   }
 
   ImmutableSet<Optional<String>> testOptionalNonEmptyString() {

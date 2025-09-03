@@ -42,10 +42,10 @@ import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.predicates.TypePredicates;
 import com.google.errorprone.refaster.ImportPolicy;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ImportTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import com.sun.tools.javac.code.Type;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
@@ -74,6 +74,8 @@ import java.util.stream.Collectors;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
+@SuppressWarnings(
+    "javaarchitecture:S7027" /* `StaticImport` and `NonStaticImport` ensure mutual exclusivity. */)
 public final class StaticImport extends BugChecker implements MemberSelectTreeMatcher {
   private static final long serialVersionUID = 1L;
 
@@ -185,7 +187,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
           .put(Sets.class.getCanonicalName(), "toImmutableEnumSet")
           .put(UUID.class.getCanonicalName(), "randomUUID")
           .put(ZoneOffset.class.getCanonicalName(), "UTC")
-          .put("org.junit.jupiter.params.provider.Arguments", "arguments")
+          .putAll("org.junit.jupiter.params.provider.Arguments", "argumentSet", "arguments")
           .build();
 
   /** Instantiates a new {@link StaticImport} instance. */
@@ -215,7 +217,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
     return parentTree instanceof MethodInvocationTree methodInvocation
         ? methodInvocation.getTypeArguments().isEmpty()
-        : (parentTree.getKind() != Kind.IMPORT && parentTree.getKind() != Kind.MEMBER_SELECT);
+        : !(parentTree instanceof ImportTree || parentTree instanceof MemberSelectTree);
   }
 
   private static boolean isCandidate(MemberSelectTree tree) {

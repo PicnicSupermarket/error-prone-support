@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
@@ -213,13 +214,12 @@ final class ImmutableMapRules {
    */
   abstract static class TransformMapValuesToImmutableMap<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
-    abstract V2 valueTransformation(@MayOptionallyUse V1 value);
+    abstract V2 valueTransformation(@MayOptionallyUse @Nullable V1 value);
 
     // XXX: Instead of `Map.Entry::getKey` we could also match `e -> e.getKey()`. But for some
     // reason Refaster doesn't handle that case. This doesn't matter if we roll out use of
     // `MethodReferenceUsage`. Same observation applies to a lot of other Refaster checks.
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     ImmutableMap<K, V2> before(Map<K, V1> map) {
       return Refaster.anyOf(
           map.entrySet().stream()

@@ -86,7 +86,8 @@ final class OptionalRules {
     @BeforeTemplate
     @SuppressWarnings({
       "java:S3655" /* Matched expressions are in practice embedded in a larger context. */,
-      "NullAway"
+      "NullAway" /* Matched expressions are in practice embedded in a larger context. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     T before(Optional<T> optional) {
       return optional.get();
@@ -190,9 +191,8 @@ final class OptionalRules {
    */
   static final class MapOptionalToBoolean<T> {
     @BeforeTemplate
-    @SuppressWarnings("OptionalOrElseGet" /* Rule is confused by `Refaster#anyOf` usage. */)
     boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
-      return optional.map(predicate).orElse(Refaster.anyOf(false, Boolean.FALSE));
+      return optional.map(predicate).orElse(false);
     }
 
     @AfterTemplate
@@ -229,7 +229,6 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     Optional<S> before(Optional<T> optional) {
       return optional.map(v -> toOptionalFunction(v).orElseThrow());
     }
@@ -242,13 +241,11 @@ final class OptionalRules {
 
   static final class OrOrElseThrow<T> {
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     T before(Optional<T> o1, Optional<T> o2) {
       return o1.orElseGet(() -> o2.orElseThrow());
     }
 
     @AfterTemplate
-    @SuppressWarnings("NullAway")
     T after(Optional<T> o1, Optional<T> o2) {
       return o1.or(() -> o2).orElseThrow();
     }
@@ -313,7 +310,6 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    @SuppressWarnings("NullAway")
     Stream<S> before(Stream<T> stream) {
       return stream.map(e -> toOptionalFunction(e).orElseThrow());
     }
@@ -379,7 +375,7 @@ final class OptionalRules {
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
       "NestedOptionals" /* This violation will be rewritten. */,
       "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
-      "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if

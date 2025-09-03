@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -73,8 +74,18 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").collect(joining(""));
   }
 
-  Stream<String> testEmptyStream() {
-    return Stream.of();
+  ImmutableSet<Stream<?>> testEmptyStream() {
+    return ImmutableSet.of(
+        Stream.of(),
+        Optional.empty().stream(),
+        ImmutableList.of().stream(),
+        ImmutableList.of("foo").reverse().stream(),
+        Streams.stream((Iterable<String>) ImmutableSet.<String>of()),
+        Streams.stream(ImmutableSet.of("bar")::iterator),
+        Streams.stream(ImmutableSet.of().iterator()),
+        Streams.stream(ImmutableSet.of("baz").iterator()),
+        Arrays.stream(new String[0]),
+        Arrays.stream(new String[] {"qux"}));
   }
 
   ImmutableSet<Stream<String>> testStreamOfNullable() {

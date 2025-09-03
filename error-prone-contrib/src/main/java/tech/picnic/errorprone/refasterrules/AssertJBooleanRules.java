@@ -41,11 +41,7 @@ final class AssertJBooleanRules {
   static final class AbstractBooleanAssertIsTrue {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert) {
-      return Refaster.anyOf(
-          boolAssert.isEqualTo(true),
-          boolAssert.isEqualTo(Boolean.TRUE),
-          boolAssert.isNotEqualTo(false),
-          boolAssert.isNotEqualTo(Boolean.FALSE));
+      return Refaster.anyOf(boolAssert.isEqualTo(true), boolAssert.isNotEqualTo(false));
     }
 
     @AfterTemplate
@@ -70,11 +66,7 @@ final class AssertJBooleanRules {
   static final class AbstractBooleanAssertIsFalse {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert) {
-      return Refaster.anyOf(
-          boolAssert.isEqualTo(false),
-          boolAssert.isEqualTo(Boolean.FALSE),
-          boolAssert.isNotEqualTo(true),
-          boolAssert.isNotEqualTo(Boolean.TRUE));
+      return Refaster.anyOf(boolAssert.isEqualTo(false), boolAssert.isNotEqualTo(true));
     }
 
     @AfterTemplate

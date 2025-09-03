@@ -97,6 +97,7 @@ final class RefasterRuleSelector {
   /**
    * Instantiates a new {@link RefasterRuleSelector} backed by the given {@link CodeTransformer}s.
    */
+  @SuppressWarnings("NullAway" /* XXX: Inspect this. */)
   static RefasterRuleSelector create(ImmutableCollection<CodeTransformer> refasterRules) {
     Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> ruleIdentifiersByTransformer =
         indexRuleIdentifiers(refasterRules);

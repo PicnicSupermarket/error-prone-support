@@ -68,7 +68,7 @@ import tech.picnic.errorprone.utils.SourceCode;
 @SuppressWarnings({
   "java:S1192" /* Factoring out repeated method names impacts readability. */,
   "java:S2160" /* Super class equality definition suffices. */,
-  "key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+  "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
 })
 public final class RedundantStringConversion extends BugChecker
     implements BinaryTreeMatcher, CompoundAssignmentTreeMatcher, MethodInvocationTreeMatcher {

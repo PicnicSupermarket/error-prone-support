@@ -14,9 +14,7 @@ import static org.testng.Assert.assertTrue;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import java.util.ArrayList;
-import java.util.Collections;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
@@ -236,44 +234,47 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqualIteratorIterationOrder() {
-    assertEquals(
-        Iterators.unmodifiableIterator(new ArrayList<>().iterator()),
-        Iterators.unmodifiableIterator(new ArrayList<>().iterator()));
+    assertEquals(new ArrayList<Number>().iterator(), new ArrayList<Integer>().iterator());
+    assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator());
   }
 
   void testAssertEqualIteratorIterationOrderWithMessage() {
-    assertEquals(
-        Iterators.unmodifiableIterator(new ArrayList<>().iterator()),
-        Iterators.unmodifiableIterator(new ArrayList<>().iterator()),
-        "foo");
+    assertEquals(new ArrayList<Number>().iterator(), new ArrayList<Integer>().iterator(), "foo");
+    assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator(), "bar");
   }
 
   void testAssertEqualIterableIterationOrder() {
     assertEquals(
-        Iterables.unmodifiableIterable(new ArrayList<>()),
-        Iterables.unmodifiableIterable(new ArrayList<>()));
+        Iterables.unmodifiableIterable(new ArrayList<Number>()),
+        Iterables.unmodifiableIterable(new ArrayList<Integer>()));
     assertEquals(
-        Collections.synchronizedCollection(new ArrayList<>()),
-        Collections.synchronizedCollection(new ArrayList<>()));
+        Iterables.unmodifiableIterable(new ArrayList<Number>()),
+        Iterables.unmodifiableIterable(new ArrayList<String>()));
+    assertEquals(new ArrayList<Number>(), new ArrayList<Integer>());
+    assertEquals(new ArrayList<Number>(), new ArrayList<String>());
   }
 
   void testAssertEqualIterableIterationOrderWithMessage() {
     assertEquals(
-        Iterables.unmodifiableIterable(new ArrayList<>()),
-        Iterables.unmodifiableIterable(new ArrayList<>()),
+        Iterables.unmodifiableIterable(new ArrayList<Number>()),
+        Iterables.unmodifiableIterable(new ArrayList<Integer>()),
         "foo");
     assertEquals(
-        Collections.synchronizedCollection(new ArrayList<>()),
-        Collections.synchronizedCollection(new ArrayList<>()),
+        Iterables.unmodifiableIterable(new ArrayList<Number>()),
+        Iterables.unmodifiableIterable(new ArrayList<String>()),
         "bar");
+    assertEquals(new ArrayList<Number>(), new ArrayList<Integer>(), "baz");
+    assertEquals(new ArrayList<Number>(), new ArrayList<String>(), "qux");
   }
 
   void testAssertEqualSets() {
-    assertEquals(ImmutableSet.of(), ImmutableSet.of());
+    assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<Integer>of());
+    assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of());
   }
 
   void testAssertEqualSetsWithMessage() {
-    assertEquals(ImmutableSet.of(), ImmutableSet.of(), "foo");
+    assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<Integer>of(), "foo");
+    assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of(), "bar");
   }
 
   void testAssertUnequal() {
