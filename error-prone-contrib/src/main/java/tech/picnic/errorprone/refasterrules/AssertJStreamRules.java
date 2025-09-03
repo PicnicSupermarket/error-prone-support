@@ -87,40 +87,4 @@ final class AssertJStreamRules {
       return assertThat(collection);
     }
   }
-
-  static final class AssertThatStreamCountZero {
-    @BeforeTemplate
-    void before(Stream<?> stream) {
-      assertThat(stream.count()).isEqualTo(0);
-    }
-
-    @BeforeTemplate
-    void before2(Stream<?> stream) {
-      assertThat(stream).hasSize(0);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Stream<?> stream) {
-      assertThat(stream).isEmpty();
-    }
-  }
-
-  static final class AssertThatStreamSingleElement {
-    @BeforeTemplate
-    AbstractAssert<?, ?> before(Stream<?> stream) {
-      return assertThat(stream.count()).isEqualTo(1);
-    }
-
-    @BeforeTemplate
-    AbstractAssert<?, ?> before2(Stream<?> stream) {
-      return assertThat(stream).hasSize(1);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(Stream<?> stream) {
-      return assertThat(stream).singleElement();
-    }
-  }
 }
