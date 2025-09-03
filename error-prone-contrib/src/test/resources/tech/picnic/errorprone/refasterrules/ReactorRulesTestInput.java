@@ -237,7 +237,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Flux.just("bar")).single());
   }
 
-  ImmutableSet<Mono<String>> testMonoUsingEager() {
+  ImmutableSet<Mono<String>> testMonoUsingEagerBoolean() {
     return ImmutableSet.of(
         Flux.using(() -> new ByteArrayInputStream(new byte[] {}), s -> Mono.just("foo"), false)
             .single(),
@@ -245,40 +245,40 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
             .single());
   }
 
-  ImmutableSet<Mono<String>> testMonoUsing2() {
+  ImmutableSet<Mono<String>> testMonoUsingResourceCleanup() {
     return ImmutableSet.of(
         Flux.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}).single(),
-        Flux.using(() -> "foo", foo -> Flux.just("bar"), foo -> {}).single());
+        Flux.using(() -> "baz", foo -> Flux.just("qux"), foo -> {}).single());
   }
 
-  ImmutableSet<Mono<String>> testMonoUsing2Eager() {
+  ImmutableSet<Mono<String>> testMonoUsingConsumerEagerBoolean() {
     return ImmutableSet.of(
         Flux.using(() -> "foo", foo -> Mono.just("bar"), foo -> {}, false).single(),
-        Flux.using(() -> "foo", foo -> Flux.just("bar"), foo -> {}, false).single());
+        Flux.using(() -> "baz", foo -> Flux.just("qux"), foo -> {}, false).single());
   }
 
-  ImmutableSet<Mono<String>> testMonoUsingWhen() {
+  ImmutableSet<Mono<String>> testMonoUsingWhenAsyncCleanup() {
     return ImmutableSet.of(
         Flux.usingWhen(Mono.just("foo"), foo -> Mono.just("bar"), foo -> Mono.just("baz")).single(),
-        Flux.usingWhen(Mono.just("foo"), foo -> Flux.just("bar"), foo -> Mono.just("baz"))
+        Flux.usingWhen(Mono.just("qux"), foo -> Flux.just("quux"), foo -> Mono.just("corge"))
             .single());
   }
 
-  ImmutableSet<Mono<String>> testMonoUsingWhen2() {
+  ImmutableSet<Mono<String>> testMonoUsingWhenAsync() {
     return ImmutableSet.of(
         Flux.usingWhen(
                 Mono.just("foo"),
-                foo -> Mono.just("bar"),
-                foo -> Mono.just("baz"),
-                (foo, e) -> Mono.just("qux"),
-                foo -> Mono.just("thud"))
+                __ -> Mono.just("bar"),
+                __ -> Mono.just("baz"),
+                (foo, bar) -> Mono.just("qux"),
+                __ -> Mono.just("quux"))
             .single(),
         Flux.usingWhen(
                 Mono.just("foo"),
-                foo -> Flux.just("bar"),
-                foo -> Mono.just("baz"),
-                (foo, e) -> Mono.just("qux"),
-                foo -> Mono.just("thud"))
+                __ -> Flux.just("bar"),
+                __ -> Mono.just("baz"),
+                (foo, bar) -> Mono.just("qux"),
+                __ -> Mono.just("quux"))
             .single());
   }
 

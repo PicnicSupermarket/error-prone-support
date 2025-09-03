@@ -8,7 +8,6 @@ import com.google.errorprone.suppliers.Suppliers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.tree.Tree.Kind;
 import java.util.function.Function;
 
 /**
@@ -27,11 +26,10 @@ public final class IsFunctionReturningMono implements Matcher<ExpressionTree> {
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
-    if (tree.getKind() != Kind.LAMBDA_EXPRESSION) {
+    if (!(tree instanceof LambdaExpressionTree lambdaExpressionTree)) {
       return false;
     }
 
-    LambdaExpressionTree lambdaExpressionTree = (LambdaExpressionTree) tree;
     return MONO_TYPE.matches(lambdaExpressionTree.getBody(), state)
         && FUNCTION_TYPE.matches(lambdaExpressionTree, state);
   }
