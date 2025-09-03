@@ -5,28 +5,24 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.util.TreeScanner;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugPatternTestCase;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Identification;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Replacement;
 
 /**
  * An {@link Extractor} that describes how to extract data from classes that test a {@code
@@ -37,12 +33,8 @@ import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTe
 // - For replacement tests, indicate which `FixChooser` is used.
 // - ... (We don't use all optional features; TBD what else to support.)
 @AutoService(Extractor.class)
-@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
-public final class BugPatternTestExtractor implements Extractor<BugPatternTestCases> {
-  /** Instantiates a new {@link BugPatternTestExtractor} instance. */
-  public BugPatternTestExtractor() {}
-
+public record BugPatternTestExtractor() implements Extractor<BugPatternTestCases> {
   @Override
   public String identifier() {
     return "bugpattern-test";
@@ -94,10 +86,10 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
             .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
             .namedAnyOf("addOutputLines", "expectUnchanged");
 
-    private final List<BugPatternTestCase> collectedBugPatternTestCases = new ArrayList<>();
+    private final List<BugPatternTestCase> collectedTestCases = new ArrayList<>();
 
     private ImmutableList<BugPatternTestCase> getCollectedTests() {
-      return ImmutableList.copyOf(collectedBugPatternTestCases);
+      return ImmutableList.copyOf(collectedTestCases);
     }
 
     @Override
@@ -115,7 +107,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
                   }
 
                   if (!entries.isEmpty()) {
-                    collectedBugPatternTestCases.add(
+                    collectedTestCases.add(
                         new BugPatternTestCase(
                             classUnderTest, ImmutableList.copyOf(entries).reverse()));
                   }
@@ -146,7 +138,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
         Optional<String> sourceCode =
             getSourceCode(tree).filter(s -> s.contains("// BUG: Diagnostic"));
         if (path != null && sourceCode.isPresent()) {
-          sink.add(new IdentificationTestEntry(path, sourceCode.orElseThrow()));
+          sink.add(new Identification(path, sourceCode.orElseThrow()));
         }
       }
 
@@ -176,8 +168,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
               REPLACEMENT_EXPECT_UNCHANGED.matches(tree, state) ? inputCode : getSourceCode(tree);
 
           if (outputCode.isPresent() && !inputCode.equals(outputCode)) {
-            sink.add(
-                new ReplacementTestEntry(path, inputCode.orElseThrow(), outputCode.orElseThrow()));
+            sink.add(new Replacement(path, inputCode.orElseThrow(), outputCode.orElseThrow()));
           }
         }
       }
@@ -203,45 +194,6 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
       }
 
       return Optional.of(source.toString());
-    }
-  }
-
-  record BugPatternTestCases(
-      URI source, String testClass, ImmutableList<BugPatternTestCase> testCases) {}
-
-  record BugPatternTestCase(String classUnderTest, ImmutableList<TestEntry> entries) {}
-
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  @JsonPropertyOrder("type")
-  @JsonSubTypes({
-    @JsonSubTypes.Type(IdentificationTestEntry.class),
-    @JsonSubTypes.Type(ReplacementTestEntry.class)
-  })
-  @JsonTypeInfo(include = As.EXISTING_PROPERTY, property = "type", use = JsonTypeInfo.Id.DEDUCTION)
-  interface TestEntry {
-    TestType type();
-
-    String path();
-
-    enum TestType {
-      IDENTIFICATION,
-      REPLACEMENT
-    }
-  }
-
-  record IdentificationTestEntry(String path, String code) implements TestEntry {
-    @JsonProperty
-    @Override
-    public TestType type() {
-      return TestType.IDENTIFICATION;
-    }
-  }
-
-  record ReplacementTestEntry(String path, String input, String output) implements TestEntry {
-    @JsonProperty
-    @Override
-    public TestType type() {
-      return TestType.REPLACEMENT;
     }
   }
 }
