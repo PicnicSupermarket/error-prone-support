@@ -9,8 +9,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCase;
-import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
 
 final class RefasterRuleCollectionTestExtractorTest {
   @Test

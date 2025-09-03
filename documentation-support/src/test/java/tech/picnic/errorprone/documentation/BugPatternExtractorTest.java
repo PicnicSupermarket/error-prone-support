@@ -11,7 +11,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternInfo;
 
 final class BugPatternExtractorTest {
   @Test
@@ -43,7 +43,7 @@ final class BugPatternExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "MinimalBugChecker",
-        new BugPatternDocumentation(
+        new BugPatternInfo(
             URI.create("file:///MinimalBugChecker.java"),
             "pkg.MinimalBugChecker",
             "MinimalBugChecker",
@@ -85,7 +85,7 @@ final class BugPatternExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "CompleteBugChecker",
-        new BugPatternDocumentation(
+        new BugPatternInfo(
             URI.create("file:///CompleteBugChecker.java"),
             "pkg.CompleteBugChecker",
             "OtherName",
@@ -119,7 +119,7 @@ final class BugPatternExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "UndocumentedSuppressionBugPattern",
-        new BugPatternDocumentation(
+        new BugPatternInfo(
             URI.create("file:///UndocumentedSuppressionBugPattern.java"),
             "pkg.UndocumentedSuppressionBugPattern",
             "UndocumentedSuppressionBugPattern",
@@ -134,9 +134,9 @@ final class BugPatternExtractorTest {
   }
 
   private static void verifyGeneratedFileContent(
-      Path outputDirectory, String testClass, BugPatternDocumentation expected) {
+      Path outputDirectory, String testClass, BugPatternInfo expected) {
     assertThat(outputDirectory.resolve("bugpattern-%s.json".formatted(testClass)))
         .exists()
-        .returns(expected, path -> Json.read(path, BugPatternDocumentation.class));
+        .returns(expected, path -> Json.read(path, BugPatternInfo.class));
   }
 }

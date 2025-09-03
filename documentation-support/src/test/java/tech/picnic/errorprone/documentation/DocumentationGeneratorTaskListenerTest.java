@@ -3,6 +3,7 @@ package tech.picnic.errorprone.documentation;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.attribute.AclEntryPermission.ADD_SUBDIRECTORY;
+import static java.util.stream.Collectors.joining;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
@@ -12,10 +13,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Immutable;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases;
 
 final class DocumentationGeneratorTaskListenerTest {
   @EnabledOnOs(WINDOWS)
@@ -125,35 +127,33 @@ final class DocumentationGeneratorTaskListenerTest {
         .isEqualToIgnoringWhitespace(
             """
             {
-              "className": "DocumentationGeneratorTaskListenerTestClass",
-              "path": [
-                "CLASS: DocumentationGeneratorTaskListenerTestClass",
-                "COMPILATION_UNIT"
-              ]
+              "source": "class://DocumentationGeneratorTaskListenerTestClass",
+              "testClass": "CLASS: DocumentationGeneratorTaskListenerTestClass, COMPILATION_UNIT",
+              "testCases": []
             }
             """);
   }
 
   @AutoService(Extractor.class)
-  @Immutable
   @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
-  public static final class TestExtractor implements Extractor<ExtractionParameters> {
+  public record TestExtractor() implements Extractor<ProjectInfo> {
     @Override
     public String identifier() {
       return "documentation-generator-task-listener-test";
     }
 
     @Override
-    public Optional<ExtractionParameters> tryExtract(ClassTree tree, VisitorState state) {
+    public Optional<ProjectInfo> tryExtract(ClassTree tree, VisitorState state) {
       return Optional.of(tree.getSimpleName().toString())
           .filter(n -> n.contains(DocumentationGeneratorTaskListenerTest.class.getSimpleName()))
           .map(
               className ->
-                  new ExtractionParameters(
-                      className,
+                  new BugPatternTestCases(
+                      URI.create("class://" + className),
                       Streams.stream(state.getPath())
                           .map(TestExtractor::describeTree)
-                          .collect(toImmutableList())));
+                          .collect(joining(", ")),
+                      ImmutableList.of()));
     }
 
     private static String describeTree(Tree tree) {
@@ -162,6 +162,4 @@ final class DocumentationGeneratorTaskListenerTest {
           : tree.getKind().toString();
     }
   }
-
-  private record ExtractionParameters(String className, ImmutableList<String> path) {}
 }

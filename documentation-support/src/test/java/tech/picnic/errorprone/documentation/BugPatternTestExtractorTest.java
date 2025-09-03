@@ -7,10 +7,10 @@ import java.net.URI;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCase;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCases;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.IdentificationTestEntry;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.ReplacementTestEntry;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugPatternTestCase;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Identification;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Replacement;
 
 final class BugPatternTestExtractorTest {
   @Test
@@ -276,7 +276,7 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "SingleFileCompilationTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        new IdentificationTestEntry(
+                        new Identification(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))))));
   }
 
@@ -309,7 +309,7 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "SingleFileCompilationTestHelperWithSetArgsTest.TestChecker",
                     ImmutableList.of(
-                        new IdentificationTestEntry(
+                        new Identification(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))))));
   }
 
@@ -342,9 +342,8 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "MultiFileCompilationTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        new IdentificationTestEntry(
-                            "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"),
-                        new IdentificationTestEntry(
+                        new Identification("A.java", "// BUG: Diagnostic contains:\nclass A {}\n"),
+                        new Identification(
                             "B.java", "// BUG: Diagnostic contains:\nclass B {}\n"))))));
   }
 
@@ -377,7 +376,7 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "SingleFileBugCheckerRefactoringTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        new ReplacementTestEntry(
+                        new Replacement(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
@@ -416,7 +415,7 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.TestChecker",
                     ImmutableList.of(
-                        new ReplacementTestEntry(
+                        new Replacement(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
@@ -451,9 +450,9 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "MultiFileBugCheckerRefactoringTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        new ReplacementTestEntry(
+                        new Replacement(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"),
-                        new ReplacementTestEntry(
+                        new Replacement(
                             "B.java", "class B {}\n", "class B { /* This is a change. */ }\n"))))));
   }
 
@@ -491,12 +490,12 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
                     ImmutableList.of(
-                        new IdentificationTestEntry(
+                        new Identification(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
                 new BugPatternTestCase(
                     "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
                     ImmutableList.of(
-                        new ReplacementTestEntry(
+                        new Replacement(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
@@ -540,12 +539,12 @@ final class BugPatternTestExtractorTest {
                 new BugPatternTestCase(
                     "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker",
                     ImmutableList.of(
-                        new IdentificationTestEntry(
+                        new Identification(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
                 new BugPatternTestCase(
                     "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker2",
                     ImmutableList.of(
-                        new ReplacementTestEntry(
+                        new Replacement(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 

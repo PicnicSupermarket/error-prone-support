@@ -1,18 +1,16 @@
 package tech.picnic.errorprone.documentation;
 
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Immutable;
 import com.sun.source.tree.ClassTree;
 import java.util.Optional;
 
 /**
- * Interface implemented by classes that define how to extract data of some type {@link T} from a
+ * Interface implemented by classes that define how to extract some type {@link ProjectInfo} from a
  * given {@link ClassTree}.
  *
  * @param <T> The type of data that is extracted.
  */
-@Immutable
-interface Extractor<T> {
+interface Extractor<T extends ProjectInfo> {
   /**
    * Returns the unique identifier of this extractor.
    *

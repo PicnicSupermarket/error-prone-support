@@ -8,16 +8,19 @@ import static com.google.common.collect.ImmutableTable.toImmutableTable;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElseGet;
 import static java.util.stream.Collectors.joining;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -37,32 +40,39 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCase;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.BugPatternTestCases;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.IdentificationTestEntry;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.ReplacementTestEntry;
-import tech.picnic.errorprone.documentation.BugPatternTestExtractor.TestEntry;
-import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCase;
-import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternInfo;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugPatternTestCase;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Identification;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Replacement;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
 
 /**
  * A command line utility that produces configuration files for the Jekyll-based Error Prone Support
  * website.
  */
-// XXX: Expand the class documentation.
-// XXX: Rename this class. Then also update the reference in `website/.gitignore`.
+// XXX: Expand the documentation.
+// XXX: Rename this type. Then also update the reference in `website/.gitignore`.
 // XXX: Now that we have bug checkers in multiple Maven modules, we should
 // likely document the source of each check on the website, perhaps even
 // grouping them by module.
-public final class JekyllCollectionGenerator {
+public record JekyllCollectionGenerator() {
   // XXX: Find a bette name. Also, externalize this.
   private static final PathMatcher PATH_MATCHER =
       FileSystems.getDefault().getPathMatcher("glob:**/target/docs/*.json");
-
-  // XXX: Review class setup.
-  private JekyllCollectionGenerator() {}
+  private static final YAMLMapper YAML_MAPPER =
+      YAMLMapper.builder()
+          .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
+          .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
+          .enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
+          .propertyNamingStrategy(new SnakeCaseStrategy())
+          .visibility(PropertyAccessor.FIELD, Visibility.ANY)
+          .build();
+  @VisibleForTesting static final Path WEBSITE_ROOT = Path.of("website");
+  @VisibleForTesting static final Path BUGPATTERNS_ROOT = WEBSITE_ROOT.resolve("_bugpatterns");
+  @VisibleForTesting static final Path REFASTER_RULES_ROOT = WEBSITE_ROOT.resolve("_refasterrules");
 
   /**
    * Runs the application.
@@ -80,35 +90,31 @@ public final class JekyllCollectionGenerator {
   }
 
   private static void generateIndex(Path projectRoot) throws IOException {
-    try (BufferedWriter writer =
-        Files.newBufferedWriter(projectRoot.resolve("website").resolve("index.md"), UTF_8)) {
-      writer.write("---");
-      writer.newLine();
-      writer.write("layout: default");
-      writer.newLine();
-      writer.write("title: Home");
-      writer.newLine();
-      writer.write("nav_order: 1");
-      writer.newLine();
-      writer.write("---");
-      writer.newLine();
+    Path index = projectRoot.resolve(WEBSITE_ROOT).resolve("index.md");
+    try (BufferedWriter writer = Files.newBufferedWriter(index, UTF_8)) {
+      record IndexFrontMatter(String layout, String title, int navOrder) {}
+      writeFrontMatter(writer, new IndexFrontMatter("default", "Home", 1));
       writer.write(
           Files.readString(projectRoot.resolve("README.md")).replace("=\"website/", "=\""));
     }
   }
 
-  // XXX: Review this class should be split in two: one for bug patterns and one for Refaster rules.
+  private static <T> void writeFrontMatter(BufferedWriter writer, T frontMatter)
+      throws IOException {
+    /* Write the data as a YAML document, including a document start marker (`---`). */
+    YAML_MAPPER.writeValue(writer, frontMatter);
+    /* Close the front matter by emitting another three dashes. */
+    writer.write("---");
+    writer.newLine();
+  }
+
+  // XXX: Review whether this class should be split in two: one for bug patterns and one for
+  // Refaster rules.
+  // XXX: Reorder methods.
   private static final class PageGenerator extends SimpleFileVisitor<Path> {
     private static final Splitter LINE_SPLITTER = Splitter.on(System.lineSeparator());
-    private static final YAMLMapper YAML_MAPPER =
-        YAMLMapper.builder()
-            .visibility(PropertyAccessor.FIELD, Visibility.ANY)
-            .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
-            .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
-            .enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
-            .build();
 
-    private final List<BugPatternDocumentation> bugPatterns = new ArrayList<>();
+    private final List<BugPatternInfo> bugPatterns = new ArrayList<>();
     private final List<BugPatternTestCases> bugPatternTests = new ArrayList<>();
     private final List<RefasterTestCases> refasterRuleCollectionTests = new ArrayList<>();
 
@@ -124,55 +130,44 @@ public final class JekyllCollectionGenerator {
         return FileVisitResult.CONTINUE;
       }
 
-      // XXX: If we use a consistent ID separator, then this can become a switch statement. Now we
-      // depend on evaluation order.
-      // XXX: Alternatively, use polymorphism and let Jackson figure it out.
-      // XXX: If we stick with an ID-based approach, then deduplicate the ID references here and in
-      // the `Extractor` implementations.
-      String fileName = file.getFileName().toString();
-      if (fileName.startsWith("bugpattern-test")) {
-        bugPatternTests.add(Json.read(file, BugPatternTestCases.class));
-      } else if (fileName.startsWith("bugpattern")) {
-        bugPatterns.add(Json.read(file, BugPatternDocumentation.class));
-      } else if (fileName.startsWith("refaster-rule-collection-test")) {
-        refasterRuleCollectionTests.add(Json.read(file, RefasterTestCases.class));
-      } else {
-        // XXX: Handle differently?
-        throw new IllegalStateException("Unexpected file: " + fileName);
+      // XXX: Replace with type switch once we target JDK 21+.
+      ProjectInfo entry = Json.read(file, ProjectInfo.class);
+      if (entry instanceof BugPatternInfo data) {
+        bugPatterns.add(data);
+      } else if (entry instanceof BugPatternTestCases data) {
+        bugPatternTests.add(data);
+      } else if (entry instanceof RefasterTestCases data) {
+        refasterRuleCollectionTests.add(data);
       }
 
       return FileVisitResult.CONTINUE;
     }
 
     private void writePages(Path projectRoot) throws IOException {
-      Path website = projectRoot.resolve("website");
       writePages(
-          website.resolve("_bugpatterns"),
-          getJekyllBugPatternDescriptions(projectRoot),
-          JekyllBugPatternDescription::name);
+          projectRoot.resolve(BUGPATTERNS_ROOT),
+          createBugPatternDescriptions(projectRoot),
+          BugPatternDescription::name);
       writePages(
-          website.resolve("_refasterrules"),
-          getJekyllRefasterRuleCollectionDescription(),
-          JekyllRefasterRuleCollectionDescription::name);
+          projectRoot.resolve(REFASTER_RULES_ROOT),
+          createRefasterRuleCollection(),
+          RefasterRuleCollectionDescription::name);
     }
 
     private static <T> void writePages(
         Path directory, ImmutableList<T> documents, Function<T, String> nameExtractor)
         throws IOException {
+      Files.createDirectories(directory);
       for (T document : documents) {
-        Files.createDirectories(directory);
         try (BufferedWriter writer =
             Files.newBufferedWriter(
                 directory.resolve(nameExtractor.apply(document) + ".md"), UTF_8)) {
-          YAML_MAPPER.writeValue(writer, document);
-          writer.write("---");
-          writer.newLine();
+          writeFrontMatter(writer, document);
         }
       }
     }
 
-    private ImmutableList<JekyllBugPatternDescription> getJekyllBugPatternDescriptions(
-        Path projectRoot) {
+    private ImmutableList<BugPatternDescription> createBugPatternDescriptions(Path projectRoot) {
       ImmutableListMultimap<String, TestEntry> bugPatternTestCases =
           bugPatternTests.stream()
               .flatMap(testCases -> testCases.testCases().stream())
@@ -182,29 +177,43 @@ public final class JekyllCollectionGenerator {
 
       return bugPatterns.stream()
           .map(
-              b ->
-                  new JekyllBugPatternDescription(
-                      b.name(),
-                      b.name(),
-                      b.summary(),
-                      b.severityLevel(),
-                      b.tags(),
-                      // XXX: Derive `Path` from filesytem.
-                      projectRoot.relativize(Path.of(b.source())).toString(),
-                      bugPatternTestCases.get(b.fullyQualifiedName()).stream()
-                          .filter(t -> t.type() == TestEntry.TestType.IDENTIFICATION)
-                          .map(t -> ((IdentificationTestEntry) t).code())
-                          .collect(toImmutableList()),
-                      bugPatternTestCases.get(b.fullyQualifiedName()).stream()
-                          .filter(t -> t.type() == TestEntry.TestType.REPLACEMENT)
-                          .map(t -> generateDiff((ReplacementTestEntry) t))
-                          .collect(toImmutableList())))
+              bugPattern ->
+                  getBugPatternDescription(
+                      projectRoot,
+                      bugPattern,
+                      bugPatternTestCases.get(bugPattern.fullyQualifiedName())))
           .collect(toImmutableList());
     }
 
-    private ImmutableList<JekyllRefasterRuleCollectionDescription>
-        getJekyllRefasterRuleCollectionDescription() {
-      ImmutableTable<String, Boolean, List<RefasterTestCase>> refasterTests =
+    private static BugPatternDescription getBugPatternDescription(
+        Path projectRoot, BugPatternInfo bugPattern, ImmutableList<TestEntry> testEntries) {
+      ImmutableList.Builder<String> identification = ImmutableList.builder();
+      ImmutableList.Builder<String> replacement = ImmutableList.builder();
+
+      // XXX: Replace with type switch once we target JDK 21+.
+      for (TestEntry testEntry : testEntries) {
+        if (testEntry instanceof Identification entry) {
+          identification.add(entry.code());
+        } else if (testEntry instanceof Replacement entry) {
+          replacement.add(generateDiff(entry));
+        }
+      }
+
+      return new BugPatternDescription(
+          bugPattern.name(),
+          bugPattern.name(),
+          bugPattern.summary(),
+          bugPattern.severityLevel(),
+          bugPattern.tags(),
+          // XXX: Or use (absolute) string paths and derive `Path` from
+          // `projectRoot.getFileSystem()`.
+          projectRoot.relativize(Path.of(bugPattern.source())).toString(),
+          identification.build(),
+          replacement.build());
+    }
+
+    private ImmutableList<RefasterRuleCollectionDescription> createRefasterRuleCollection() {
+      ImmutableTable<String, Boolean, ImmutableList<RefasterTestCase>> refasterTests =
           refasterRuleCollectionTests.stream()
               .collect(
                   toImmutableTable(
@@ -214,31 +223,42 @@ public final class JekyllCollectionGenerator {
 
       return refasterTests.rowMap().entrySet().stream()
           .map(
-              c ->
-                  new JekyllRefasterRuleCollectionDescription(
-                      c.getKey(),
-                      c.getKey(),
-                      // XXX: Derive severity from input.
-                      SUGGESTION,
-                      // XXX: Derive tags from input (or drop this feature).
-                      ImmutableList.of("Simplification"),
-                      // XXX: Derive source location from input.
-                      String.format(
-                          "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java",
-                          c.getKey()),
-                      getRules(c.getValue().get(true), c.getValue().get(false))))
+              e ->
+                  createRefasterRuleCollection(
+                      e.getKey(),
+                      requireNonNullElseGet(e.getValue().get(true), ImmutableList::of),
+                      requireNonNullElseGet(e.getValue().get(false), ImmutableList::of)))
           .collect(toImmutableList());
     }
 
-    private static ImmutableList<JekyllRefasterRuleCollectionDescription.Rule> getRules(
-        @Nullable List<RefasterTestCase> inputTests, @Nullable List<RefasterTestCase> outputTests) {
-      ImmutableMap<String, String> inputs = indexRefasterTestData(inputTests);
-      ImmutableMap<String, String> outputs = indexRefasterTestData(outputTests);
+    private static RefasterRuleCollectionDescription createRefasterRuleCollection(
+        String name,
+        ImmutableList<RefasterTestCase> inputTests,
+        ImmutableList<RefasterTestCase> outputTests) {
+      return new RefasterRuleCollectionDescription(
+          name,
+          name,
+          // XXX: Derive severity from input.
+          SUGGESTION,
+          // XXX: Derive tags from input (or drop this feature).
+          ImmutableList.of("Simplification"),
+          // XXX: Derive source location from input.
+          String.format(
+              "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java",
+              name),
+          createRefasterRule(inputTests, outputTests));
+    }
 
+    private static ImmutableList<RefasterRuleCollectionDescription.Rule> createRefasterRule(
+        ImmutableList<RefasterTestCase> inputTests, ImmutableList<RefasterTestCase> outputTests) {
+      ImmutableMap<String, String> inputs = indexRefasterTestCases(inputTests);
+      ImmutableMap<String, String> outputs = indexRefasterTestCases(outputTests);
+
+      // XXX: Consider simply requiring that input and output test cases have the same names.
       return Sets.intersection(inputs.keySet(), outputs.keySet()).stream()
           .map(
               name ->
-                  new JekyllRefasterRuleCollectionDescription.Rule(
+                  new RefasterRuleCollectionDescription.Rule(
                       name,
                       // XXX: Derive severity from input.
                       SUGGESTION,
@@ -250,20 +270,17 @@ public final class JekyllCollectionGenerator {
           .collect(toImmutableList());
     }
 
-    private static ImmutableMap<String, String> indexRefasterTestData(
-        @Nullable List<RefasterTestCase> data) {
-      return data == null
-          ? ImmutableMap.of()
-          : data.stream()
-              .collect(toImmutableMap(RefasterTestCase::name, RefasterTestCase::content));
+    private static ImmutableMap<String, String> indexRefasterTestCases(
+        ImmutableList<RefasterTestCase> testCases) {
+      return testCases.stream()
+          .collect(toImmutableMap(RefasterTestCase::name, RefasterTestCase::content));
     }
 
-    private static String generateDiff(ReplacementTestEntry testEntry) {
+    private static String generateDiff(Replacement testEntry) {
       return generateDiff(testEntry.input(), testEntry.output());
     }
 
     private static String generateDiff(String before, String after) {
-      // XXX: Extract splitter.
       List<String> originalLines = LINE_SPLITTER.splitToList(before);
       List<String> replacementLines = LINE_SPLITTER.splitToList(after);
 
@@ -277,8 +294,7 @@ public final class JekyllCollectionGenerator {
     }
   }
 
-  record JekyllBugPatternDescription(
-      // XXX: Make this a derived property?
+  private record BugPatternDescription(
       String title,
       String name,
       String summary,
@@ -290,8 +306,7 @@ public final class JekyllCollectionGenerator {
       ImmutableList<String> identification,
       ImmutableList<String> replacement) {}
 
-  record JekyllRefasterRuleCollectionDescription(
-      // XXX: Make this a derived property?
+  private record RefasterRuleCollectionDescription(
       String title,
       String name,
       SeverityLevel severity,
@@ -300,6 +315,7 @@ public final class JekyllCollectionGenerator {
       // line numbers. If we do this, we should do the same for individual rules.
       String source,
       ImmutableList<Rule> rules) {
-    record Rule(String name, SeverityLevel severity, ImmutableList<String> tags, String diff) {}
+    private record Rule(
+        String name, SeverityLevel severity, ImmutableList<String> tags, String diff) {}
   }
 }

@@ -440,6 +440,11 @@
                 <version>2.12.1</version>
             </dependency>
             <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>24.0.0</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
                 <version>3.20.10</version>
@@ -1682,32 +1687,34 @@
                 <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
             </properties>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <annotationProcessorPaths combine.children="append">
-                                <path>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>error-prone-contrib</artifactId>
-                                </path>
-                                <path>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>error-prone-experimental</artifactId>
-                                </path>
-                                <path>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>error-prone-guidelines</artifactId>
-                                </path>
-                                <path>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>refaster-runner</artifactId>
-                                </path>
-                            </annotationProcessorPaths>
-                        </configuration>
-                    </plugin>
-                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <annotationProcessorPaths combine.children="append">
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>error-prone-contrib</artifactId>
+                                    </path>
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>error-prone-experimental</artifactId>
+                                    </path>
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>error-prone-guidelines</artifactId>
+                                    </path>
+                                    <path>
+                                        <groupId>${project.groupId}</groupId>
+                                        <artifactId>refaster-runner</artifactId>
+                                    </path>
+                                </annotationProcessorPaths>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
             </build>
         </profile>
         <profile>

@@ -11,14 +11,14 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.FormatMethod;
-import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import java.net.URI;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import tech.picnic.errorprone.documentation.RefasterRuleCollectionTestExtractor.RefasterTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -29,9 +29,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // be located alongside rules, rather than in two additional resource files as currently required by
 // `RefasterRuleCollection`.
 @AutoService(Extractor.class)
-@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
-public final class RefasterRuleCollectionTestExtractor implements Extractor<RefasterTestCases> {
+public record RefasterRuleCollectionTestExtractor() implements Extractor<RefasterTestCases> {
   private static final Matcher<ClassTree> IS_REFASTER_RULE_COLLECTION_TEST_CASE =
       isSubtypeOf("tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase");
   private static final Pattern TEST_CLASS_NAME_PATTERN = Pattern.compile("(.*)Test");
@@ -40,9 +39,6 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
   private static final Pattern TEST_METHOD_NAME_PATTERN = Pattern.compile("test(.*)");
   private static final String LINE_SEPARATOR = "\n";
   private static final Splitter LINE_SPLITTER = Splitter.on(LINE_SEPARATOR);
-
-  /** Instantiates a new {@link RefasterRuleCollectionTestExtractor} instance. */
-  public RefasterRuleCollectionTestExtractor() {}
 
   @Override
   public String identifier() {
@@ -138,12 +134,4 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
   private static Supplier<VerifyException> violation(String format, Object... args) {
     return () -> new VerifyException(format.formatted(args));
   }
-
-  record RefasterTestCases(
-      URI source,
-      String ruleCollection,
-      boolean isInput,
-      ImmutableList<RefasterTestCase> testCases) {}
-
-  record RefasterTestCase(String name, String content) {}
 }
