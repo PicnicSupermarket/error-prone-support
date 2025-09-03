@@ -1534,8 +1534,6 @@
                     <version>1.20.2</version>
                     <configuration>
                         <excludedClasses>
-                            <!-- AutoValue generated classes. -->
-                            <excludedClass>*.AutoValue_*</excludedClass>
                             <!-- Refaster rule collections. -->
                             <excludedClass>*.refaster*.*Rules*</excludedClass>
                         </excludedClasses>
