@@ -15,6 +15,7 @@ final class IsFunctionReturningMonoTest {
             "A.java",
             "import java.util.function.Function;",
             "import java.util.function.Supplier;",
+            "import org.reactivestreams.Publisher;",
             "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
             "",
@@ -24,7 +25,9 @@ final class IsFunctionReturningMonoTest {
             "",
             "  Function<String, Flux<String>> negative = s -> Flux.just(s);",
             "",
-            "  Supplier<Mono<String>> negative2 = () -> Mono.just(\"s\");",
+            "  Function<String, Publisher<String>> negative2 = s -> Flux.just(s);",
+            "",
+            "  Supplier<Mono<String>> negative3 = () -> Mono.just(\"s\");",
             "}")
         .doTest();
   }

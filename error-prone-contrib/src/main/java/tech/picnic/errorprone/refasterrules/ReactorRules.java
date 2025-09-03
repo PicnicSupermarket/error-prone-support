@@ -607,10 +607,10 @@ final class ReactorRules {
   }
 
   /**
-   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, boolean)} to a mono,
-   * instead use the equivalent API provided by {@link Mono}.
+   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, boolean)} to a {@link
+   * Mono}, instead use the equivalent API provided by {@link Mono}.
    */
-  static final class MonoUsingEager<
+  static final class MonoUsingEagerBoolean<
       D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
     @BeforeTemplate
     Mono<T> before(
@@ -627,10 +627,10 @@ final class ReactorRules {
   }
 
   /**
-   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer)} to a mono,
-   * instead use the equivalent API provided by {@link Mono}.
+   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer)} to a {@link
+   * Mono}, instead use the equivalent API provided by {@link Mono}.
    */
-  static final class MonoUsing2<
+  static final class MonoUsingResourceCleanup<
       D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
     @BeforeTemplate
     Mono<T> before(
@@ -651,7 +651,7 @@ final class ReactorRules {
    * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer, boolean)} to a
    * mono, instead use the equivalent API provided by {@link Mono}.
    */
-  static final class MonoUsing2Eager<
+  static final class MonoUsingConsumerEagerBoolean<
       D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
     @BeforeTemplate
     Mono<T> before(
@@ -674,9 +674,9 @@ final class ReactorRules {
 
   /**
    * Don't unnecessarily transform a {@link Flux#usingWhen(Publisher, Function, Function)} to a
-   * mono, instead use the equivalent API provided by {@link Mono}.
+   * {@link Mono}, instead use the equivalent API provided by {@link Mono}.
    */
-  static final class MonoUsingWhen<
+  static final class MonoUsingWhenAsyncCleanup<
       D,
       T,
       P extends Publisher<? extends T>,
@@ -701,9 +701,10 @@ final class ReactorRules {
 
   /**
    * Don't unnecessarily transform a {@link Flux#usingWhen(Publisher, Function, Function,
-   * BiFunction, Function)} to a mono, instead use the equivalent API provided by {@link Mono}.
+   * BiFunction, Function)} to a {@link Mono}, instead use the equivalent API provided by {@link
+   * Mono}.
    */
-  static final class MonoUsingWhen2<
+  static final class MonoUsingWhenAsync<
       D,
       T,
       P extends Publisher<? extends T>,
