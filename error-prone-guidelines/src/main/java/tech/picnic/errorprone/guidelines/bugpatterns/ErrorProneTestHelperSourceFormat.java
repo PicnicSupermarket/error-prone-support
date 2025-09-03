@@ -51,6 +51,8 @@ import java.util.Optional;
 // Windows; TBD.
 // XXX: Once we support text blocks, also format arguments to
 // `org.openrewrite.test.RewriteTest#rewriteRun`.
+// XXX: Once we support text blocks, also format arguments to `@Language("java")` parameters. (And
+// validate that this works for `record` parameters.)
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Test code should follow the Google Java style",

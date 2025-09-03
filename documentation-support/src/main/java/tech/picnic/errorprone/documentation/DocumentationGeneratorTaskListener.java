@@ -25,21 +25,13 @@ import javax.tools.JavaFileObject;
  * and writes it to disk.
  */
 // XXX: Find a better name for this class; it doesn't generate documentation per se.
-final class DocumentationGeneratorTaskListener implements TaskListener {
+record DocumentationGeneratorTaskListener(Context context, Path docsPath) implements TaskListener {
   @SuppressWarnings({"rawtypes", "unchecked"} /* Unbounded wildcard type introduction is safe. */)
   private static final ImmutableList<Extractor<?>> EXTRACTORS =
       (ImmutableList)
           ImmutableList.copyOf(
               ServiceLoader.load(
                   Extractor.class, DocumentationGeneratorTaskListener.class.getClassLoader()));
-
-  private final Context context;
-  private final Path docsPath;
-
-  DocumentationGeneratorTaskListener(Context context, Path path) {
-    this.context = context;
-    this.docsPath = path;
-  }
 
   @Override
   public void started(TaskEvent taskEvent) {
@@ -50,11 +42,11 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
 
   @Override
   public void finished(TaskEvent taskEvent) {
-    if (taskEvent.getKind() != Kind.ANALYZE || JavaCompiler.instance(context).errorCount() > 0) {
+    if (taskEvent.getKind() != Kind.ANALYZE || JavaCompiler.instance(context()).errorCount() > 0) {
       return;
     }
 
-    ClassTree classTree = JavacTrees.instance(context).getTree(taskEvent.getTypeElement());
+    ClassTree classTree = JavacTrees.instance(context()).getTree(taskEvent.getTypeElement());
     if (classTree == null) {
       return;
     }
@@ -62,7 +54,7 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
     CompilationUnitTree compilationUnit =
         requireNonNull(taskEvent.getCompilationUnit(), "No compilation unit");
     VisitorState state =
-        VisitorState.createForUtilityPurposes(context)
+        VisitorState.createForUtilityPurposes(context())
             .withPath(new TreePath(new TreePath(compilationUnit), classTree));
 
     JavaFileObject sourceFile = requireNonNull(taskEvent.getSourceFile(), "No source file");
@@ -78,15 +70,15 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
 
   private void createDocsDirectory() {
     try {
-      Files.createDirectories(docsPath);
+      Files.createDirectories(docsPath());
     } catch (IOException e) {
       throw new IllegalStateException(
-          "Error while creating directory with path '%s'".formatted(docsPath), e);
+          "Error while creating directory with path '%s'".formatted(docsPath()), e);
     }
   }
 
   private <T> void writeToFile(String identifier, String className, T data) {
-    Json.write(docsPath.resolve("%s-%s.json".formatted(identifier, className)), data);
+    Json.write(docsPath().resolve("%s-%s.json".formatted(identifier, className)), data);
   }
 
   private static String getSimpleClassName(URI path) {
