@@ -8,36 +8,29 @@ import com.google.auto.common.AnnotationMirrors;
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
-import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.tools.javac.code.Attribute;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import java.net.URI;
 import java.util.Optional;
 import javax.lang.model.element.AnnotationValue;
-import tech.picnic.errorprone.documentation.BugPatternExtractor.BugPatternDocumentation;
+import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternInfo;
 
 /**
  * An {@link Extractor} that describes how to extract data from a {@code @BugPattern} annotation.
  */
 @AutoService(Extractor.class)
-@Immutable
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
-public final class BugPatternExtractor implements Extractor<BugPatternDocumentation> {
-  /** Instantiates a new {@link BugPatternExtractor} instance. */
-  public BugPatternExtractor() {}
-
+public record BugPatternExtractor() implements Extractor<BugPatternInfo> {
   @Override
   public String identifier() {
     return "bugpattern";
   }
 
   @Override
-  public Optional<BugPatternDocumentation> tryExtract(ClassTree tree, VisitorState state) {
+  public Optional<BugPatternInfo> tryExtract(ClassTree tree, VisitorState state) {
     ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     BugPattern annotation = symbol.getAnnotation(BugPattern.class);
     if (annotation == null) {
@@ -45,7 +38,7 @@ public final class BugPatternExtractor implements Extractor<BugPatternDocumentat
     }
 
     return Optional.of(
-        new BugPatternDocumentation(
+        new BugPatternInfo(
             state.getPath().getCompilationUnit().getSourceFile().toUri(),
             symbol.getQualifiedName().toString(),
             annotation.name().isEmpty() ? tree.getSimpleName().toString() : annotation.name(),
@@ -90,17 +83,4 @@ public final class BugPatternExtractor implements Extractor<BugPatternDocumentat
     verify(target.isInstance(value), "Value '%s' is not of type '%s'", value, target);
     return (T) value;
   }
-
-  record BugPatternDocumentation(
-      URI source,
-      String fullyQualifiedName,
-      String name,
-      ImmutableList<String> altNames,
-      String link,
-      ImmutableList<String> tags,
-      String summary,
-      String explanation,
-      SeverityLevel severityLevel,
-      boolean canDisable,
-      ImmutableList<String> suppressionAnnotations) {}
 }
