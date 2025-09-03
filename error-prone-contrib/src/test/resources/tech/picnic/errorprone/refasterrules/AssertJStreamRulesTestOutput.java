@@ -35,14 +35,4 @@ final class AssertJStreamRulesTest implements RefasterRuleCollectionTestCase {
   AbstractAssert<?, ?> testAssertThatCollectionStream() {
     return assertThat(ImmutableSet.of("a", "b"));
   }
-
-  void testAssertThatStreamCountZero() {
-    assertThat(Stream.of()).isEmpty();
-    assertThat(Stream.of()).isEmpty();
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamSingleElement() {
-    return ImmutableSet.of(
-        assertThat(Stream.of(42)).singleElement(), assertThat(Stream.of(43)).singleElement());
-  }
 }
