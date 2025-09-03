@@ -27,13 +27,13 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import tech.picnic.errorprone.refaster.runner.NodeTestCase.NodeTestCaseEntry;
 
-@Open
-@State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Fork(jvmArgs = {"-Xms1G", "-Xmx1G"})
-@Warmup(iterations = 5)
 @Measurement(iterations = 10)
+@Open
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@State(Scope.Benchmark)
+@Warmup(iterations = 5)
 public class NodeBenchmark {
   @SuppressWarnings("NullAway" /* Initialized by `@Setup` method. */)
   private ImmutableListMultimap<NodeTestCase<Integer>, NodeTestCaseEntry<Integer>> testCases;
