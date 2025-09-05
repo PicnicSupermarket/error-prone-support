@@ -43,7 +43,7 @@ final class BugPatternExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "MinimalBugChecker",
-        BugPatternDocumentation.create(
+        new BugPatternDocumentation(
             URI.create("file:///MinimalBugChecker.java"),
             "pkg.MinimalBugChecker",
             "MinimalBugChecker",
@@ -85,7 +85,7 @@ final class BugPatternExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "CompleteBugChecker",
-        BugPatternDocumentation.create(
+        new BugPatternDocumentation(
             URI.create("file:///CompleteBugChecker.java"),
             "pkg.CompleteBugChecker",
             "OtherName",
@@ -119,7 +119,7 @@ final class BugPatternExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "UndocumentedSuppressionBugPattern",
-        BugPatternDocumentation.create(
+        new BugPatternDocumentation(
             URI.create("file:///UndocumentedSuppressionBugPattern.java"),
             "pkg.UndocumentedSuppressionBugPattern",
             "UndocumentedSuppressionBugPattern",

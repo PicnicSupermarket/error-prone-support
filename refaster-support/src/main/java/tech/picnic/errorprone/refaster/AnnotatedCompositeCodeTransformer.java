@@ -7,7 +7,6 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static tech.picnic.errorprone.refaster.annotation.OnlineDocumentation.NESTED_CLASS_URL_PLACEHOLDER;
 import static tech.picnic.errorprone.refaster.annotation.OnlineDocumentation.TOP_LEVEL_CLASS_URL_PLACEHOLDER;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableClassToInstanceMap;
@@ -36,39 +35,21 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
  * <p>The content is augmented based on custom {@link tech.picnic.errorprone.refaster.annotation
  * annotations} available on the matching {@link CodeTransformer} or on this {@link
  * CompositeCodeTransformer} as a fallback, if any.
+ *
+ * @param packageName The package in which the wrapped {@link CodeTransformer}s reside.
+ * @param transformers The {@link CodeTransformer}s to which to delegate.
+ * @param annotations The annotations that are applicable to this {@link CodeTransformer}.
  */
-@AutoValue
-public abstract class AnnotatedCompositeCodeTransformer implements CodeTransformer, Serializable {
+public record AnnotatedCompositeCodeTransformer(
+    String packageName,
+    ImmutableList<CodeTransformer> transformers,
+    ImmutableClassToInstanceMap<Annotation> annotations)
+    implements CodeTransformer, Serializable {
   private static final long serialVersionUID = 1L;
   private static final Splitter CLASS_NAME_SPLITTER = Splitter.on('.').limit(2);
 
-  AnnotatedCompositeCodeTransformer() {}
-
-  abstract String packageName();
-
-  abstract ImmutableList<CodeTransformer> transformers();
-
   @Override
-  @SuppressWarnings("java:S3038" /* All AutoValue properties must be specified explicitly. */)
-  public abstract ImmutableClassToInstanceMap<Annotation> annotations();
-
-  /**
-   * Creates an instance of an {@link AnnotatedCompositeCodeTransformer}.
-   *
-   * @param packageName The package in which the wrapped {@link CodeTransformer}s reside.
-   * @param transformers The {@link CodeTransformer}s to which to delegate.
-   * @param annotations The annotations that are applicable to this {@link CodeTransformer}.
-   * @return A non-{@code null} {@link AnnotatedCompositeCodeTransformer}.
-   */
-  public static AnnotatedCompositeCodeTransformer create(
-      String packageName,
-      ImmutableList<CodeTransformer> transformers,
-      ImmutableClassToInstanceMap<Annotation> annotations) {
-    return new AutoValue_AnnotatedCompositeCodeTransformer(packageName, transformers, annotations);
-  }
-
-  @Override
-  public final void apply(TreePath path, Context context, DescriptionListener listener) {
+  public void apply(TreePath path, Context context, DescriptionListener listener) {
     for (CodeTransformer transformer : transformers()) {
       transformer.apply(
           path,
@@ -93,17 +74,16 @@ public abstract class AnnotatedCompositeCodeTransformer implements CodeTransform
   }
 
   private String getShortCheckName(String fullCheckName) {
-    String packageName = packageName();
-    if (packageName.isEmpty()) {
+    if (packageName().isEmpty()) {
       return fullCheckName;
     }
 
-    String prefix = packageName + '.';
+    String prefix = packageName() + '.';
     checkState(
         fullCheckName.startsWith(prefix),
         "Refaster rule class '%s' is not located in package '%s'",
         fullCheckName,
-        packageName);
+        packageName());
 
     return fullCheckName.substring(prefix.length());
   }

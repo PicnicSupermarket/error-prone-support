@@ -13,7 +13,6 @@ import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 import com.google.common.base.VerifyException;
@@ -215,23 +214,11 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
   }
 
   /** Description of a string format expression. */
-  @AutoValue
-  abstract static class StringFormatExpression {
-    /** The full string format expression. */
-    abstract MethodInvocationTree expression();
-
-    /** The format string expression. */
-    abstract Tree formatString();
-
-    /** The string format arguments to be plugged into its format string. */
-    abstract ImmutableList<ExpressionTree> arguments();
-
-    /**
-     * The constant format string, if it contains only {@code %s} placeholders, and the number of
-     * said placeholders matches the number of format arguments.
-     */
-    abstract Optional<String> simplifiableFormatString();
-
+  private record StringFormatExpression(
+      MethodInvocationTree expression,
+      Tree formatString,
+      ImmutableList<ExpressionTree> arguments,
+      Optional<String> simplifiableFormatString) {
     private SuggestedFix suggestFlattening(String newPlaceholder, VisitorState state) {
       return SuggestedFix.replace(
           expression(),
@@ -242,7 +229,7 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
     }
 
     private String deriveFormatStringExpression(String newPlaceholder, VisitorState state) {
-      String formatString =
+      String derivative =
           String.format(
               simplifiableFormatString()
                   .orElseThrow(() -> new VerifyException("Format string cannot be simplified")),
@@ -253,9 +240,9 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
        * expression's existing source code representation. This way string constant references are
        * not unnecessarily replaced.
        */
-      return formatString.equals(ASTHelpers.constValue(formatString(), String.class))
+      return derivative.equals(ASTHelpers.constValue(formatString(), String.class))
           ? SourceCode.treeToString(formatString(), state)
-          : SourceCode.toStringConstantExpression(formatString, state);
+          : SourceCode.toStringConstantExpression(derivative, state);
     }
 
     private static Optional<StringFormatExpression> tryCreate(
@@ -288,7 +275,7 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
         Tree formatString,
         ImmutableList<ExpressionTree> arguments,
         VisitorState state) {
-      return new AutoValue_EagerStringFormatting_StringFormatExpression(
+      return new StringFormatExpression(
           expression,
           formatString,
           arguments,
