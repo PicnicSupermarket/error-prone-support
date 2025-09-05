@@ -3,36 +3,28 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJStreamRulesTest implements RefasterRuleCollectionTestCase {
-  public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of();
-  }
-
   AbstractAssert<?, ?> testAssertThatFilteredOn() {
-    Predicate<Integer> pred = i -> i > 0;
-    return assertThat(Stream.of(1, 2, 3).filter(pred));
+    return assertThat(Stream.of(1).filter(i -> i > 0));
   }
 
   void testAssertThatNoneMatch() {
-    Predicate<Integer> pred = i -> i > 0;
-    assertThat(Stream.of(1, 2, 3)).filteredOn(pred).isEmpty();
-    assertThat(Stream.of(1, 2, 3).anyMatch(pred)).isFalse();
-    assertThat(Stream.of(1, 2, 3).noneMatch(pred)).isTrue();
+    assertThat(Stream.of(1)).filteredOn(i -> i > 0).isEmpty();
+    assertThat(Stream.of(2).anyMatch(i -> i > 0)).isFalse();
+    assertThat(Stream.of(3).noneMatch(i -> i > 0)).isTrue();
   }
 
   void testAssertThatAnyMatch() {
-    Predicate<Integer> pred = i -> i > 0;
-    assertThat(Stream.of(1, 2, 3)).filteredOn(pred).isNotEmpty();
-    assertThat(Stream.of(1, 2, 3).anyMatch(pred)).isTrue();
-    assertThat(Stream.of(1, 2, 3).noneMatch(pred)).isFalse();
+    assertThat(Stream.of(1)).filteredOn(i -> i > 0).isNotEmpty();
+    assertThat(Stream.of(2).anyMatch(i -> i > 0)).isTrue();
+    assertThat(Stream.of(3).noneMatch(i -> i > 0)).isFalse();
   }
 
-  AbstractAssert<?, ?> testAssertThatCollectionStream() {
-    return assertThat(ImmutableSet.of("a", "b").stream());
+  AbstractAssert<?, ?> testAssertThatCollection() {
+    return assertThat(ImmutableSet.of("a").stream());
   }
 }

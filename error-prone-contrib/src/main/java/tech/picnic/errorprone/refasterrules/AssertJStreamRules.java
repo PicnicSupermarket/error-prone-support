@@ -66,7 +66,7 @@ final class AssertJStreamRules {
     }
   }
 
-  static final class AssertThatCollectionStream<E> {
+  static final class AssertThatCollection<E> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Collection<E> collection) {
       return assertThat(collection.stream());
