@@ -52,8 +52,8 @@ final class AssertJStreamRules {
 
   static final class AssertThatAnyMatch<T> {
     @BeforeTemplate
-    void before(Stream<T> stream, Predicate<? super T> predicate) {
-      Refaster.anyOf(
+    AbstractAssert<?, ?> before(Stream<T> stream, Predicate<? super T> predicate) {
+      return Refaster.anyOf(
           assertThat(stream).filteredOn(predicate).isNotEmpty(),
           assertThat(stream.anyMatch(predicate)).isTrue(),
           assertThat(stream.noneMatch(predicate)).isFalse());
@@ -61,8 +61,8 @@ final class AssertJStreamRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Stream<T> stream, Predicate<? super T> predicate) {
-      assertThat(stream).anyMatch(predicate);
+    AbstractAssert<?, ?> after(Stream<T> stream, Predicate<? super T> predicate) {
+      return assertThat(stream).anyMatch(predicate);
     }
   }
 
