@@ -13,19 +13,19 @@ final class AssertJStreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of();
   }
 
-  AbstractAssert<?, ?> testAssertThatStreamFilteredOn() {
+  AbstractAssert<?, ?> testAssertThatFilteredOn() {
     Predicate<Integer> pred = i -> i > 0;
     return assertThat(Stream.of(1, 2, 3).filter(pred));
   }
 
-  void testAssertThatStreamNoneMatch() {
+  void testAssertThatNoneMatch() {
     Predicate<Integer> pred = i -> i > 0;
     assertThat(Stream.of(1, 2, 3)).filteredOn(pred).isEmpty();
     assertThat(Stream.of(1, 2, 3).anyMatch(pred)).isFalse();
     assertThat(Stream.of(1, 2, 3).noneMatch(pred)).isTrue();
   }
 
-  void testAssertThatStreamAnyMatch() {
+  void testAssertThatAnyMatch() {
     Predicate<Integer> pred = i -> i > 0;
     assertThat(Stream.of(1, 2, 3)).filteredOn(pred).isNotEmpty();
     assertThat(Stream.of(1, 2, 3).anyMatch(pred)).isTrue();
