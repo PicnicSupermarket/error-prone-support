@@ -70,7 +70,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./apply-error-prone-suggestions.sh
       - name: Report suggested changes
-        uses: reviewdog/action-suggester@3d5391db5affb50a46eb4629e908a4e2c5dd20b2 # v1.22.0
+        uses: reviewdog/action-suggester@130e59f2fa3ec43a448d2c3d3a6fdc66883c6ebc # v1.23.1
         with:
           tool_name: Error Prone
       - name: Remove installed project artifacts
