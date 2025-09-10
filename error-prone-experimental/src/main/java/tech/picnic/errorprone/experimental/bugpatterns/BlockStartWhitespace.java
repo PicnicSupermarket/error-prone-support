@@ -17,7 +17,6 @@ import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
-import com.google.errorprone.util.Commented;
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
@@ -60,7 +59,7 @@ public final class BlockStartWhitespace extends BugChecker
     @Var int newLineCount = 0;
     @Var int lastNewLinePos = -1;
     // Given a `BlockTree` or a `ClassTree`, find the first `{` marking the start of their body.
-    // Comments containing `{` may break this, consider using EP Tokens instead.
+    // TODO Comments containing `{` should break this, consider using EP Tokens instead.
     for (int pos = 0; pos < source.length(); pos++) {
       // Ignore everything until an opening brace.
       if (!isInBlock) {
@@ -69,7 +68,8 @@ public final class BlockStartWhitespace extends BugChecker
         }
         continue;
       }
-      // Count new lines. With `String#startWith` we can avoid constructing a new string for each character in the string.
+      // Count new lines. With `String#startWith` we avoid constructing a new string for each
+      // character in the string.
       if (source.startsWith(System.lineSeparator(), pos)) {
         newLineCount++;
         lastNewLinePos = pos;
@@ -88,7 +88,8 @@ public final class BlockStartWhitespace extends BugChecker
 
     int offset = ASTHelpers.getStartPosition(tree);
     checkState(offset != Position.NOPOS, "tree start position");
-    SuggestedFix suggestedFix = SuggestedFix.replace(source.indexOf('{') + 1 + offset, lastNewLinePos + offset,"");
+    SuggestedFix suggestedFix =
+        SuggestedFix.replace(source.indexOf('{') + 1 + offset, lastNewLinePos + offset, "");
     return describeMatch(tree, suggestedFix);
   }
 }

@@ -34,8 +34,9 @@ final class BlockStartWhitespaceTest {
         .doTest();
   }
 
-  @Test
+  // This test intentionally uses tabs for indentation, and so disables the format checker.
   @SuppressWarnings("ErrorProneTestHelperSourceFormat")
+  @Test
   void replacementClassBodyBlock() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
         .addInputLines(
@@ -47,16 +48,22 @@ final class BlockStartWhitespaceTest {
             "  }",
             "",
             "  static final class B {",
-            "",
+            "    ",
             "    private static final int foo = 1;",
             "  }",
             "",
             "  static final class C {",
             "",
+            "",
             "    private static final int foo = 1;",
             "  }",
             "",
             "  static final class D {",
+            "\t\t",
+            "\t\tprivate static final int foo = 1;",
+            "  }",
+            "",
+            "  static final class E {",
             "",
             "    // comment",
             "",
@@ -79,6 +86,10 @@ final class BlockStartWhitespaceTest {
             "  }",
             "",
             "  static final class D {",
+            "    private static final int foo = 1;",
+            "  }",
+            "",
+            "  static final class E {",
             "    // comment",
             "",
             "    private static final int foo = 1;",
@@ -87,6 +98,8 @@ final class BlockStartWhitespaceTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  // This test intentionally uses tabs for indentation, and so disables the format checker.
+  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void methodBodyBlock() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
@@ -99,16 +112,22 @@ final class BlockStartWhitespaceTest {
             "  }",
             "",
             "  static int methodB() {",
-            "",
+            "    ",
             "    return 1;",
             "  }",
             "",
             "  static int methodC() {",
             "",
+            "",
             "    return 1;",
             "  }",
             "",
             "  static int methodD() {",
+            "\t\t",
+            "\t\treturn 1;",
+            "  }",
+            "",
+            "  static int methodE() {",
             "",
             "    // comment",
             "",
@@ -131,6 +150,10 @@ final class BlockStartWhitespaceTest {
             "  }",
             "",
             "  static int methodD() {",
+            "    return 1;",
+            "  }",
+            "",
+            "  static int methodE() {",
             "    // comment",
             "",
             "    return 1;",
@@ -139,9 +162,8 @@ final class BlockStartWhitespaceTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-
   @Test
-  void rename_me_overlapping_fixes() {
+  void fixesNestedTypes() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
         .addInputLines(
             "Nested.java",
