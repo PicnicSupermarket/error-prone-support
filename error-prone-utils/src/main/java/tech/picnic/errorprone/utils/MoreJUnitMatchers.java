@@ -111,11 +111,13 @@ public final class MoreJUnitMatchers {
   }
 
   /**
-   * Finds the {@code @MethodSource} annotation on the given method, if any.
+   * Finds the {@link org.junit.jupiter.params.provider.MethodSource} annotation on the given
+   * method, if any.
    *
    * @param methodTree The method tree on which to find the annotation from.
    * @param state The {@link VisitorState} from which to derive the AST location of interest.
-   * @return Returns the {@code @MethodSource} annotation on the given method, if any.
+   * @return The {@link org.junit.jupiter.params.provider.MethodSource} annotation on the given
+   *     method, if any.
    */
   public static Optional<AnnotationTree> findMethodSourceAnnotation(
       MethodTree methodTree, VisitorState state) {

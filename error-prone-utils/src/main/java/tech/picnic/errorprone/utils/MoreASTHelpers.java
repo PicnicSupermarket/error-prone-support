@@ -11,7 +11,6 @@ import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.code.Types;
 import java.util.Optional;
@@ -109,7 +108,8 @@ public final class MoreASTHelpers {
       return types.wildLowerBound(type);
     }
 
-    if (type.hasTag(TypeTag.TYPEVAR) && ((TypeVar) type).isCaptured()) {
+    // XXX: Look into these both:
+    if (type.hasTag(TypeTag.TYPEVAR) && ((Type.TypeVar) type).isCaptured()) {
       return types.cvarLowerBound(type);
     }
 
@@ -117,7 +117,7 @@ public final class MoreASTHelpers {
       return type.getLowerBound();
     }
 
-    // concrete type, e.g. java.lang.String, or a case we haven't considered
+    // Concrete type, e.g. java.lang.String, or a case we haven't considered.
     return type;
   }
 }
