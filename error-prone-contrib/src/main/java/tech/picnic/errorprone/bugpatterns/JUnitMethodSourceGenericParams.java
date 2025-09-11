@@ -105,7 +105,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
       return Description.NO_MATCH;
     }
 
-    // In practice, the method source annotation is always found because of the earlier matcher.
+    /* The method source annotation is always found because of the earlier matcher. */
     AnnotationTree methodSourceAnnotation = findMethodSourceAnnotation(tree, state).orElseThrow();
     ImmutableList<Optional<MethodTree>> offendingMethodSourceProviders =
         getOffendingMethodSourceProviders(methodSourceAnnotation, tree, state);
@@ -133,8 +133,8 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
   }
 
   /**
-   * Returns an optional of the methodSourceMethodTree if it has incompatible generic parameters, if
-   * any.
+   * Returns an optional of the `methodSourceMethodTree` if it has incompatible generic parameters,
+   * if any.
    */
   private static Optional<MethodTree> findOffendingMethodSourceProvider(
       MethodTree methodSourceMethodTree, MethodTree testMethodTree, VisitorState state) {
@@ -202,8 +202,8 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
           getPotentialOffendingProvider(
               potentialOffendingProviders, methodInvocationTree.getArguments(), state);
         }
-        // Else, the method source provider is not supported. Ignore it as JUnit this will be
-        // compile-time checked from MethodArgumentsProvider#isFactoryMethod.
+        // Otherwise, the method source provider is not supported. Ignore it as in JUnit this will
+        // be checked compile-time from `MethodArgumentsProvider#isFactoryMethod`.
       }
     } else if (tree instanceof NewArrayTree newArrayTree) {
       List<? extends ExpressionTree> arrayInitializers = newArrayTree.getInitializers();
@@ -272,9 +272,9 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
       if (testMethodArgumentTypeArgument.isExtendsBound()) {
         Type upperBoundType = ASTHelpers.getUpperBound(testMethodArgumentTypeArgument, types);
 
-        //  Here, we assume the user has ensured type compatibility for casting a subtype to the
-        // super type. This ensures we can pass an empty ImmutableCollection.of() (effectively a
-        // ImmutableCollection<Object>) to a ImmutableCollection<Integer> parameter.
+        // We assume the user has ensured type compatibility for casting a subtype to the
+        // super type. This ensures we can pass an empty `ImmutableCollection.of()` (effectively a
+        // `ImmutableCollection<Object>`) to a `ImmutableCollection<Integer>`parameter.
         if (isSuperTypeOrSubtype(
             methodSourceProviderArgumentTypesArgument, upperBoundType, types)) {
           return true;
@@ -352,7 +352,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     return parameters.stream().map(ASTHelpers::getType).collect(toImmutableList());
   }
 
-  /** A presentation of a potential offending {@link Arguments} object. */
+  /** A representation of a potential offending {@link Arguments} object. */
   private record PotentialOffendingArgumentsProvider(
       ImmutableList<? extends ExpressionTree> arguments) {}
 }
