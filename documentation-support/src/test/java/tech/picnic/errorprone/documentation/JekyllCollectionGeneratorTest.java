@@ -40,7 +40,7 @@ final class JekyllCollectionGeneratorTest {
   void main(Function<Path, TestData> dataset, @TempDir Path projectRoot) throws IOException {
     TestData data = dataset.apply(projectRoot);
 
-    for (Input input : data.inputs()) {
+    for (TestInput input : data.inputs()) {
       input.writeFile();
     }
 
@@ -59,7 +59,7 @@ final class JekyllCollectionGeneratorTest {
 
     JekyllCollectionGenerator.main(new String[] {projectRoot.toString()});
 
-    assertThat(data.outputs()).allSatisfy(Output::verify);
+    assertThat(data.outputs()).allSatisfy(TestOutput::verify);
 
     // XXX: Validate `website/index.md` contents!
   }
@@ -74,15 +74,15 @@ final class JekyllCollectionGeneratorTest {
         "bugpattern-and-refaster",
         (Function<Path, TestData>)
             root -> {
-              ImmutableList<Input> inputs =
+              ImmutableList<TestInput> inputs =
                   ImmutableList.of(
-                      Input.create(
+                      TestInput.create(
                           root, "module-a", JekyllCollectionGeneratorTest::bugPatternAlpha),
-                      Input.create(
+                      TestInput.create(
                           root,
                           "module-a",
                           JekyllCollectionGeneratorTest::bugPatternTestCasesAlpha),
-                      new Input(
+                      new TestInput(
                           resolvePath(
                               root, "module-b", "target", "docs", "refaster-input-Beta.json"),
                           new RefasterTestCases(
@@ -91,7 +91,7 @@ final class JekyllCollectionGeneratorTest {
                               /* isInput= */ true,
                               ImmutableList.of(
                                   refasterTestCaseInputRule1(), refasterTestCaseInputRule2()))),
-                      new Input(
+                      new TestInput(
                           resolvePath(
                               root, "module-b", "target", "docs", "refaster-output-Beta.json"),
                           new RefasterTestCases(
@@ -101,9 +101,9 @@ final class JekyllCollectionGeneratorTest {
                               ImmutableList.of(
                                   refasterTestCaseOutputRule1(), refasterTestCaseOutputRule2()))));
 
-              ImmutableList<Output> outputs =
+              ImmutableList<TestOutput> outputs =
                   ImmutableList.of(
-                      Output.bugpattern(
+                      TestOutput.bugpattern(
                           root,
                           "Alpha",
                           """
@@ -123,7 +123,7 @@ final class JekyllCollectionGeneratorTest {
                           - "-class B {}\\n+class B { /* changed */ }\\n "
                           ---
                           """),
-                      Output.refaster(
+                      TestOutput.refaster(
                           root,
                           "Beta",
                           """
@@ -157,9 +157,9 @@ final class JekyllCollectionGeneratorTest {
         "only-bugpattern",
         (Function<Path, TestData>)
             root -> {
-              ImmutableList<Input> inputs =
+              ImmutableList<TestInput> inputs =
                   ImmutableList.of(
-                      new Input(
+                      new TestInput(
                           resolvePath(root, "module-d", "target", "docs", "bugpattern-Gamma.json"),
                           new BugPatternInfo(
                               root.resolve("module-d/src/main/java/pkg/Gamma.java").toUri(),
@@ -173,7 +173,7 @@ final class JekyllCollectionGeneratorTest {
                               SUGGESTION,
                               /* canDisable= */ true,
                               ImmutableList.of())),
-                      new Input(
+                      new TestInput(
                           resolvePath(root, "module-d", "target", "docs", "tests-Gamma.json"),
                           new BugPatternTestCases(
                               root.resolve("module-d/src/test/java/pkg/GammaTest.java").toUri(),
@@ -186,9 +186,9 @@ final class JekyllCollectionGeneratorTest {
                                               "G.java",
                                               "// BUG: Diagnostic contains:\nclass G {}\n")))))));
 
-              ImmutableList<Output> outputs =
+              ImmutableList<TestOutput> outputs =
                   ImmutableList.of(
-                      Output.bugpattern(
+                      TestOutput.bugpattern(
                           root,
                           "Gamma",
                           """
@@ -299,15 +299,16 @@ final class JekyllCollectionGeneratorTest {
     return result;
   }
 
-  private record TestData(ImmutableList<Input> inputs, ImmutableList<Output> outputs) {}
+  private record TestData(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {}
 
-  // XXX: Replace remaining `new Input` calls.
-  private record Input(Path path, ProjectInfo info) {
-    static Input create(
+  // XXX: Replace remaining `new TestInput` calls.
+  private record TestInput(Path path, ProjectInfo info) {
+    static TestInput create(
         Path projectRoot, String module, BiFunction<Path, String, ProjectInfo> projectInfoFactory) {
       ProjectInfo projectInfo = projectInfoFactory.apply(projectRoot, module);
       String fileName = String.format("input-%s.json", Path.of(projectInfo.source()).getFileName());
-      return new Input(resolvePath(projectRoot, module, "target", "docs", fileName), projectInfo);
+      return new TestInput(
+          resolvePath(projectRoot, module, "target", "docs", fileName), projectInfo);
     }
 
     void writeFile() throws IOException {
@@ -316,17 +317,18 @@ final class JekyllCollectionGeneratorTest {
     }
   }
 
-  private record Output(Path path, @Language("yaml") String content) {
-    static Output bugpattern(Path projectRoot, String name, @Language("yaml") String content) {
+  private record TestOutput(Path path, @Language("yaml") String content) {
+    static TestOutput bugpattern(Path projectRoot, String name, @Language("yaml") String content) {
       return create(projectRoot.resolve(BUGPATTERNS_ROOT), name, content);
     }
 
-    static Output refaster(Path projectRoot, String name, @Language("yaml") String content) {
+    static TestOutput refaster(Path projectRoot, String name, @Language("yaml") String content) {
       return create(projectRoot.resolve(REFASTER_RULES_ROOT), name, content);
     }
 
-    private static Output create(Path directory, String name, @Language("yaml") String content) {
-      return new Output(
+    private static TestOutput create(
+        Path directory, String name, @Language("yaml") String content) {
+      return new TestOutput(
           directory.resolve(name + ".md"), content.replace("\n", System.lineSeparator()));
     }
 
