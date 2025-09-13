@@ -59,9 +59,9 @@ import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
-import tech.picnic.errorprone.refaster.matchers.IsFunctionReturningMono;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
+import tech.picnic.errorprone.refaster.matchers.ReturnsMono;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to Reactor expressions and statements. */
@@ -587,148 +587,160 @@ final class ReactorRules {
     }
   }
 
-  /**
-   * Don't unnecessarily transform a {@link Flux#using(Callable, Function)} to a mono, instead use
-   * the equivalent API provided by {@link Mono}.
-   */
-  static final class MonoUsing<
-      D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
+  /** Prefer {@link Mono#using(Callable, Function)} over more contrived alternatives. */
+  // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
+  // replacement does not.
+  static final class MonoUsing<D extends AutoCloseable, T> {
     @BeforeTemplate
     Mono<T> before(
-        Callable<D> resourceSupplier,
-        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier) {
-      return Flux.using(resourceSupplier, sourceSupplier).single();
-    }
-
-    @AfterTemplate
-    Mono<T> after(Callable<D> resourceSupplier, Function<D, M> sourceSupplier) {
-      return Mono.using(resourceSupplier, sourceSupplier);
-    }
-  }
-
-  /**
-   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, boolean)} to a {@link
-   * Mono}, instead use the equivalent API provided by {@link Mono}.
-   */
-  static final class MonoUsingEagerBoolean<
-      D extends AutoCloseable, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
-    @BeforeTemplate
-    Mono<T> before(
-        Callable<D> resourceSupplier,
-        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier,
-        boolean eager) {
-      return Flux.using(resourceSupplier, sourceSupplier, eager).single();
-    }
-
-    @AfterTemplate
-    Mono<T> after(Callable<D> resourceSupplier, Function<D, M> sourceSupplier, boolean eager) {
-      return Mono.using(resourceSupplier, sourceSupplier, eager);
-    }
-  }
-
-  /**
-   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer)} to a {@link
-   * Mono}, instead use the equivalent API provided by {@link Mono}.
-   */
-  static final class MonoUsingResourceCleanup<
-      D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
-    @BeforeTemplate
-    Mono<T> before(
-        Callable<D> resourceSupplier,
-        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier,
-        Consumer<D> resourceCleanup) {
-      return Flux.using(resourceSupplier, sourceSupplier, resourceCleanup).single();
+        Callable<? extends D> resourceSupplier,
+        @Matches(ReturnsMono.class)
+            Function<? super D, ? extends Publisher<? extends T>> sourceSupplier) {
+      return Refaster.anyOf(
+          Flux.using(resourceSupplier, sourceSupplier).next(),
+          Flux.using(resourceSupplier, sourceSupplier).single());
     }
 
     @AfterTemplate
     Mono<T> after(
-        Callable<D> resourceSupplier, Function<D, M> sourceSupplier, Consumer<D> resourceCleanup) {
+        Callable<? extends D> resourceSupplier,
+        Function<? super D, ? extends Mono<? extends T>> sourceSupplier) {
+      return Mono.using(resourceSupplier, sourceSupplier);
+    }
+  }
+
+  /** Prefer {@link Mono#using(Callable, Function, boolean)} over more contrived alternatives. */
+  // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
+  // replacement does not.
+  static final class MonoUsingEagerBoolean<D extends AutoCloseable, T> {
+    @BeforeTemplate
+    Mono<T> before(
+        Callable<? extends D> resourceSupplier,
+        @Matches(ReturnsMono.class)
+            Function<? super D, ? extends Publisher<? extends T>> sourceSupplier,
+        boolean eager) {
+      return Refaster.anyOf(
+          Flux.using(resourceSupplier, sourceSupplier, eager).next(),
+          Flux.using(resourceSupplier, sourceSupplier, eager).single());
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Callable<? extends D> resourceSupplier,
+        Function<? super D, ? extends Mono<? extends T>> sourceSupplier,
+        boolean eager) {
+      return Mono.using(resourceSupplier, sourceSupplier, eager);
+    }
+  }
+
+  /** Prefer {@link Mono#using(Callable, Function, Consumer)} over more contrived alternatives. */
+  // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
+  // replacement does not.
+  static final class MonoUsingResourceCleanup<D, T> {
+    @BeforeTemplate
+    Mono<T> before(
+        Callable<? extends D> resourceSupplier,
+        @Matches(ReturnsMono.class)
+            Function<? super D, ? extends Publisher<? extends T>> sourceSupplier,
+        Consumer<? super D> resourceCleanup) {
+      return Refaster.anyOf(
+          Flux.using(resourceSupplier, sourceSupplier, resourceCleanup).next(),
+          Flux.using(resourceSupplier, sourceSupplier, resourceCleanup).single());
+    }
+
+    @AfterTemplate
+    Mono<T> after(
+        Callable<? extends D> resourceSupplier,
+        Function<? super D, ? extends Mono<? extends T>> sourceSupplier,
+        Consumer<? super D> resourceCleanup) {
       return Mono.using(resourceSupplier, sourceSupplier, resourceCleanup);
     }
   }
 
   /**
-   * Don't unnecessarily transform a {@link Flux#using(Callable, Function, Consumer, boolean)} to a
-   * mono, instead use the equivalent API provided by {@link Mono}.
+   * Prefer {@link Mono#using(Callable, Function, Consumer, boolean)} over more contrived
+   * alternatives.
    */
-  static final class MonoUsingConsumerEagerBoolean<
-      D, T, P extends Publisher<? extends T>, M extends Mono<? extends T>> {
+  // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
+  // replacement does not.
+  static final class MonoUsingConsumerEagerBoolean<D, T> {
     @BeforeTemplate
     Mono<T> before(
-        Callable<D> resourceSupplier,
-        @Matches(IsFunctionReturningMono.class) Function<D, P> sourceSupplier,
-        Consumer<D> resourceCleanup,
+        Callable<? extends D> resourceSupplier,
+        @Matches(ReturnsMono.class)
+            Function<? super D, ? extends Publisher<? extends T>> sourceSupplier,
+        Consumer<? super D> resourceCleanup,
         boolean eager) {
-      return Flux.using(resourceSupplier, sourceSupplier, resourceCleanup, eager).single();
+      return Refaster.anyOf(
+          Flux.using(resourceSupplier, sourceSupplier, resourceCleanup, eager).next(),
+          Flux.using(resourceSupplier, sourceSupplier, resourceCleanup, eager).single());
     }
 
     @AfterTemplate
     Mono<T> after(
-        Callable<D> resourceSupplier,
-        Function<D, M> sourceSupplier,
-        Consumer<D> resourceCleanup,
+        Callable<? extends D> resourceSupplier,
+        Function<? super D, ? extends Mono<? extends T>> sourceSupplier,
+        Consumer<? super D> resourceCleanup,
         boolean eager) {
       return Mono.using(resourceSupplier, sourceSupplier, resourceCleanup, eager);
     }
   }
 
   /**
-   * Don't unnecessarily transform a {@link Flux#usingWhen(Publisher, Function, Function)} to a
-   * {@link Mono}, instead use the equivalent API provided by {@link Mono}.
+   * Prefer {@link Mono#usingWhen(Publisher, Function, Function)} over more contrived alternatives.
    */
-  static final class MonoUsingWhenAsyncCleanup<
-      D,
-      T,
-      P extends Publisher<? extends T>,
-      P2 extends Publisher<?>,
-      M extends Mono<? extends T>> {
+  // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
+  // replacement does not.
+  static final class MonoUsingWhenAsyncCleanup<D, T> {
     @BeforeTemplate
     Mono<T> before(
-        Publisher<D> resourceSupplier,
-        @Matches(IsFunctionReturningMono.class) Function<D, P> resourceClosure,
-        Function<D, P2> asyncCleanup) {
-      return Flux.usingWhen(resourceSupplier, resourceClosure, asyncCleanup).single();
+        Publisher<? extends D> resourceSupplier,
+        @Matches(ReturnsMono.class)
+            Function<? super D, ? extends Publisher<? extends T>> resourceClosure,
+        Function<? super D, ? extends Publisher<?>> asyncCleanup) {
+      return Refaster.anyOf(
+          Flux.usingWhen(resourceSupplier, resourceClosure, asyncCleanup).next(),
+          Flux.usingWhen(resourceSupplier, resourceClosure, asyncCleanup).single());
     }
 
     @AfterTemplate
     Mono<T> after(
-        Publisher<D> resourceSupplier,
-        Function<D, M> resourceClosure,
-        Function<D, P2> asyncCleanup) {
+        Publisher<? extends D> resourceSupplier,
+        Function<? super D, ? extends Mono<? extends T>> resourceClosure,
+        Function<? super D, ? extends Publisher<?>> asyncCleanup) {
       return Mono.usingWhen(resourceSupplier, resourceClosure, asyncCleanup);
     }
   }
 
   /**
-   * Don't unnecessarily transform a {@link Flux#usingWhen(Publisher, Function, Function,
-   * BiFunction, Function)} to a {@link Mono}, instead use the equivalent API provided by {@link
-   * Mono}.
+   * Prefer {@link Mono#usingWhen(Publisher, Function, Function, BiFunction, Function)} over more
+   * contrived alternatives.
    */
-  static final class MonoUsingWhenAsync<
-      D,
-      T,
-      P extends Publisher<? extends T>,
-      P2 extends Publisher<?>,
-      M extends Mono<? extends T>> {
+  // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
+  // replacement does not.
+  static final class MonoUsingWhenAsync<D, T> {
     @BeforeTemplate
     Mono<T> before(
-        Publisher<D> resourceSupplier,
-        @Matches(IsFunctionReturningMono.class) Function<D, P> resourceClosure,
-        Function<D, P2> asyncComplete,
-        BiFunction<D, ? super Throwable, P2> asyncError,
-        Function<D, P2> asyncCancel) {
-      return Flux.usingWhen(
-              resourceSupplier, resourceClosure, asyncComplete, asyncError, asyncCancel)
-          .single();
+        Publisher<? extends D> resourceSupplier,
+        @Matches(ReturnsMono.class)
+            Function<? super D, ? extends Publisher<? extends T>> resourceClosure,
+        Function<? super D, ? extends Publisher<?>> asyncComplete,
+        BiFunction<? super D, ? super Throwable, ? extends Publisher<?>> asyncError,
+        Function<? super D, ? extends Publisher<?>> asyncCancel) {
+      return Refaster.anyOf(
+          Flux.usingWhen(resourceSupplier, resourceClosure, asyncComplete, asyncError, asyncCancel)
+              .next(),
+          Flux.usingWhen(resourceSupplier, resourceClosure, asyncComplete, asyncError, asyncCancel)
+              .single());
     }
 
     @AfterTemplate
     Mono<T> after(
-        Publisher<D> resourceSupplier,
-        Function<D, M> resourceClosure,
-        Function<D, P2> asyncComplete,
-        BiFunction<D, ? super Throwable, ? extends Publisher<?>> asyncError,
-        Function<D, P2> asyncCancel) {
+        Publisher<? extends D> resourceSupplier,
+        Function<? super D, ? extends Mono<? extends T>> resourceClosure,
+        Function<? super D, ? extends Publisher<?>> asyncComplete,
+        BiFunction<? super D, ? super Throwable, ? extends Publisher<?>> asyncError,
+        Function<? super D, ? extends Publisher<?>> asyncCancel) {
       return Mono.usingWhen(
           resourceSupplier, resourceClosure, asyncComplete, asyncError, asyncCancel);
     }
