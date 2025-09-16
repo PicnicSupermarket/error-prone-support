@@ -213,9 +213,13 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     // `X<T>`, where `T` is the type of the explicitly enumerated values passed to the expression to
     // be unwrapped. This should generally hold, given the types returned by the
     // `EXPLICIT_ITERABLE_CREATOR` expressions: `Iterable<T>`, `List<T>`, `Set<T>`, etc.
-    Type parameterType =
-        Iterables.getOnlyElement(
-            Iterables.getOnlyElement(method.getParameters()).type.getTypeArguments());
+    List<Type> typeArguments =
+        Iterables.getOnlyElement(method.getParameters()).type.getTypeArguments();
+    if (typeArguments.isEmpty()) {
+      // Can't determine the element type, so we can't suggest a fix.
+      return false;
+    }
+    Type parameterType = Iterables.getOnlyElement(typeArguments);
     return overloads.stream().allMatch(m -> m.params().size() == 1)
         && overloads.stream()
             .filter(MethodSymbol::isVarArgs)
