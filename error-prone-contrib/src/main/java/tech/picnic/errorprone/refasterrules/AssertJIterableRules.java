@@ -9,7 +9,11 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 
-import org.assertj.core.api.*;
+import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.AbstractIterableAssert;
+import org.assertj.core.api.IterableAssert;
+import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 @OnlineDocumentation
