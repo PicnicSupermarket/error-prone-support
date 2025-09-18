@@ -26,7 +26,7 @@ final class AssertJIterableRules {
 
     @BeforeTemplate
     void before2(Iterable<E> iterable) {
-        assertThat(iterable).hasSize(0);
+      assertThat(iterable).hasSize(0);
     }
 
     @BeforeTemplate
