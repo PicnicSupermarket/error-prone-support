@@ -110,6 +110,30 @@ final class ExplicitArgumentEnumerationTest {
         .doTest();
   }
 
+  /**
+   * Verifies that the checker does not crash when encountering a method with a raw {@link
+   * java.util.Collection} parameter.
+   */
+  @Test
+  void identificationRawListNoCrash() {
+    CompilationTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
+        .addSourceLines(
+            "RawListProcessor.java",
+            "import java.util.List;",
+            "",
+            "public class RawListProcessor {",
+            "  public void processRawList(List items) {}",
+            "}",
+            "",
+            "class BugTrigger {",
+            "  void methodThatTriggersTheBug() {",
+            "    RawListProcessor processor = new RawListProcessor();",
+            "    processor.processRawList(List.of(\"a\", \"b\"));",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
