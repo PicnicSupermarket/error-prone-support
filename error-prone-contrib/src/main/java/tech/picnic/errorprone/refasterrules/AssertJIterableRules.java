@@ -30,7 +30,7 @@ final class AssertJIterableRules {
     }
 
     @BeforeTemplate
-    void before(Collection<E> iterable) {
+    void before3(Collection<E> iterable) {
       assertThat(iterable.isEmpty()).isTrue();
     }
 
