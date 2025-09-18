@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.AbstractIterableAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJIterableRulesTest implements RefasterRuleCollectionTestCase {
@@ -30,5 +31,9 @@ final class AssertJIterableRulesTest implements RefasterRuleCollectionTestCase {
 
   AbstractAssert<?, ?> testAssertThatIterableHasOneElementEqualTo() {
     return assertThat(ImmutableSet.of(new Object())).containsExactly("foo");
+  }
+
+  AbstractIterableAssert<?, ?, ?, ?> testAssertThatCollectionHasSize() {
+    return assertThat(ImmutableSet.of(1, 2, 3)).hasSize(3);
   }
 }

@@ -8,10 +8,8 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
-import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.api.AbstractIntegerAssert;
-import org.assertj.core.api.IterableAssert;
-import org.assertj.core.api.ObjectAssert;
+
+import org.assertj.core.api.*;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 @OnlineDocumentation
@@ -85,6 +83,20 @@ final class AssertJIterableRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     IterableAssert<S> after(Iterable<S> iterable, E element) {
       return assertThat(iterable).containsExactly(element);
+    }
+  }
+
+  /** Prefer {@link AbstractIterableAssert#hasSize(int)} over more verbose alternatives. */
+  static final class AssertThatCollectionHasSize<E> {
+    @BeforeTemplate
+    AbstractIntegerAssert<?> before(Collection<E> collection, int size) {
+        return assertThat(collection.size()).isEqualTo(size);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractIterableAssert<?, ?, ?, ?> after(Collection<E> collection, int size) {
+        return assertThat(collection).hasSize(size);
     }
   }
 }
