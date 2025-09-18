@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /** Refaster rules related to AssertJ assertions over {@link Collection}s. */
 @OnlineDocumentation
-public class AssertJCollectionRules {
+final class AssertJCollectionRules {
   private AssertJCollectionRules() {}
 
   /** Prefer {@link AbstractCollectionAssert#hasSize(int)} over more verbose alternatives. */
