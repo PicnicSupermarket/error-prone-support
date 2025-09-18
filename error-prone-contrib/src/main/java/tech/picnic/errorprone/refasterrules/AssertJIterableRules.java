@@ -25,7 +25,12 @@ final class AssertJIterableRules {
     }
 
     @BeforeTemplate
-    void before(Collection<E> iterable) {
+    void before2(Iterable<E> iterable) {
+      assertThat(iterable).hasSize(0);
+    }
+
+    @BeforeTemplate
+    void before3(Collection<E> iterable) {
       assertThat(iterable.isEmpty()).isTrue();
     }
 
