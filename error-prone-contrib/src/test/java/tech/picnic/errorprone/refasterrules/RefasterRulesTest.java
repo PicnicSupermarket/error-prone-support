@@ -19,6 +19,7 @@ final class RefasterRulesTest {
           AssertJBooleanRules.class,
           AssertJByteRules.class,
           AssertJCharSequenceRules.class,
+          AssertJCollectionRules.class,
           AssertJComparableRules.class,
           AssertJDoubleRules.class,
           AssertJDurationRules.class,
