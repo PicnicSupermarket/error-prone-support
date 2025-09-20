@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -225,6 +226,78 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<Integer> testMonoSingle() {
     return Mono.just(1).single();
+  }
+
+  ImmutableSet<Mono<String>> testMonoUsing() {
+    return ImmutableSet.of(
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("foo")),
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("bar")).next(),
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("baz")),
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("qux")).single());
+  }
+
+  ImmutableSet<Mono<String>> testMonoUsingEagerBoolean() {
+    return ImmutableSet.of(
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("foo"), false),
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("bar"), false)
+            .next(),
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("baz"), true),
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("qux"), true)
+            .single());
+  }
+
+  ImmutableSet<Mono<String>> testMonoUsingResourceCleanup() {
+    return ImmutableSet.of(
+        Mono.using(() -> 1, v -> Mono.just("foo"), v -> {}),
+        Flux.using(() -> 2, v -> Flux.just("bar"), v -> {}).next(),
+        Mono.using(() -> 3, v -> Mono.just("baz"), v -> {}),
+        Flux.using(() -> 4, v -> Flux.just("qux"), v -> {}).single());
+  }
+
+  ImmutableSet<Mono<String>> testMonoUsingConsumerEagerBoolean() {
+    return ImmutableSet.of(
+        Mono.using(() -> 1, v -> Mono.just("foo"), v -> {}, false),
+        Flux.using(() -> 2, v -> Flux.just("bar"), v -> {}, false).next(),
+        Mono.using(() -> 3, v -> Mono.just("baz"), v -> {}, true),
+        Flux.using(() -> 4, v -> Flux.just("qux"), v -> {}, true).single());
+  }
+
+  ImmutableSet<Mono<String>> testMonoUsingWhenAsyncCleanup() {
+    return ImmutableSet.of(
+        Mono.usingWhen(Mono.just(1), v -> Mono.just("foo"), v -> Mono.just(2)),
+        Flux.usingWhen(Mono.just(3), v -> Flux.just("bar"), v -> Mono.just(4)).next(),
+        Mono.usingWhen(Mono.just(5), v -> Mono.just("baz"), v -> Mono.just(6)),
+        Flux.usingWhen(Mono.just(7), v -> Flux.just("qux"), v -> Mono.just(8)).single());
+  }
+
+  ImmutableSet<Mono<String>> testMonoUsingWhenAsync() {
+    return ImmutableSet.of(
+        Mono.usingWhen(
+            Mono.just(1),
+            v -> Mono.just("foo"),
+            v -> Mono.just(2),
+            (v, t) -> Mono.just(3),
+            v -> Mono.just(4)),
+        Flux.usingWhen(
+                Mono.just(5),
+                v -> Flux.just("bar"),
+                v -> Mono.just(6),
+                (v, t) -> Mono.just(7),
+                v -> Mono.just(8))
+            .next(),
+        Mono.usingWhen(
+            Mono.just(9),
+            v -> Mono.just("baz"),
+            v -> Mono.just(10),
+            (v, t) -> Mono.just(11),
+            v -> Mono.just(12)),
+        Flux.usingWhen(
+                Mono.just(13),
+                v -> Flux.just("qux"),
+                v -> Mono.just(14),
+                (v, t) -> Mono.just(15),
+                v -> Mono.just(16))
+            .single());
   }
 
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {

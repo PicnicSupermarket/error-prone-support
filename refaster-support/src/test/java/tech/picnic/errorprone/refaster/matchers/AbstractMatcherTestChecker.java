@@ -12,6 +12,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TypeCastTree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 import org.jspecify.annotations.Nullable;
@@ -74,6 +75,18 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
          * Refaster.
          */
         return scan(tree.getExpression(), null);
+      }
+
+      @Override
+      public @Nullable Void visitVariable(VariableTree tree, @Nullable Void unused) {
+        /*
+         * We're not interested in matching the modifiers and type subtrees that are part of a
+         * variable declaration. While the latter can be `ExpressionTree`s, they will never be
+         * matched by Refaster.
+         */
+        scan(tree.getNameExpression(), null);
+        scan(tree.getInitializer(), null);
+        return null;
       }
     }.scan(compilationUnit, null);
 
