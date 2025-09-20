@@ -81,38 +81,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Math.toIntExact(Long.MAX_VALUE);
   }
 
-  int testBooleanHashCode() {
-    return Boolean.hashCode(true);
-  }
-
-  int testByteHashCode() {
-    return Byte.hashCode((byte) 1);
-  }
-
-  int testCharacterHashCode() {
-    return Character.hashCode('a');
-  }
-
-  int testShortHashCode() {
-    return Short.hashCode((short) 1);
-  }
-
-  int testIntegerHashCode() {
-    return Integer.hashCode(1);
-  }
-
-  int testLongHashCode() {
-    return Long.hashCode(1);
-  }
-
-  int testFloatHashCode() {
-    return Float.hashCode(1);
-  }
-
-  int testDoubleHashCode() {
-    return Double.hashCode(1);
-  }
-
   int testCharacterBytes() {
     return Character.BYTES;
   }
@@ -135,14 +103,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
 
   int testDoubleBytes() {
     return Double.BYTES;
-  }
-
-  boolean testFloatIsFinite() {
-    return Float.isFinite(1);
-  }
-
-  boolean testDoubleIsFinite() {
-    return Double.isFinite(1);
   }
 
   ImmutableSet<Boolean> testIntegerSignumIsPositive() {
