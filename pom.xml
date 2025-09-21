@@ -48,6 +48,7 @@
         <module>refaster-runner</module>
         <module>refaster-support</module>
         <module>refaster-test-support</module>
+        <module>testng-junit-migrator</module>
     </modules>
 
     <scm child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
