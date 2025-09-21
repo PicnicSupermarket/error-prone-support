@@ -155,6 +155,7 @@ final class AssertJPathRules {
     }
   }
 
+  // XXX: This rule changes the `Path` against which subsequent assertions are made.
   static final class AssertThatHasParentRaw {
     @BeforeTemplate
     AbstractPathAssert<?> before(Path actual, Path expected) {

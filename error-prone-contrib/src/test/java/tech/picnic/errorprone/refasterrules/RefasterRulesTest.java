@@ -24,6 +24,7 @@ final class RefasterRulesTest {
           AssertJDurationRules.class,
           AssertJEnumerableRules.class,
           AssertJInstantRules.class,
+          AssertJFileRules.class,
           AssertJFloatRules.class,
           AssertJIntegerRules.class,
           AssertJIterableRules.class,
