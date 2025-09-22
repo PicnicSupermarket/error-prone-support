@@ -40,6 +40,9 @@ final class ExplicitArgumentEnumerationTest {
             "    unaryMethod(ImmutableList.of(1, 2));",
             "    unaryMethodWithLessVisibleOverload(ImmutableList.of(1, 2));",
             "    binaryMethod(ImmutableList.of(1, 2), 3);",
+            "    // BUG: Diagnostic contains:",
+            "    rawListMethod(ImmutableList.of(1, 2));",
+            "    rawListMethodWithTypeRestrictedOverload(ImmutableList.of(1, 2));",
             "",
             "    // BUG: Diagnostic contains:",
             "    Flux.fromIterable(ImmutableList.of());",
@@ -89,6 +92,18 @@ final class ExplicitArgumentEnumerationTest {
             "  private void binaryMethod(Integer... args) {",
             "    binaryMethod(ImmutableList.copyOf(args), 0);",
             "  }",
+            "",
+            "  private void rawListMethod(ImmutableList args) {}",
+            "",
+            "  private void rawListMethod(Object... args) {",
+            "    rawListMethod(ImmutableList.copyOf(args));",
+            "  }",
+            "",
+            "  private void rawListMethodWithTypeRestrictedOverload(ImmutableList args) {}",
+            "",
+            "  private void rawListMethodWithTypeRestrictedOverload(String... args) {",
+            "    rawListMethodWithTypeRestrictedOverload(ImmutableList.copyOf(args));",
+            "  }",
             "}")
         .doTest();
   }
@@ -105,30 +120,6 @@ final class ExplicitArgumentEnumerationTest {
             "class A {",
             "  void m() {",
             "    DSL.row(ImmutableList.of(1, 2));",
-            "  }",
-            "}")
-        .doTest();
-  }
-
-  /**
-   * Verifies that the checker does not crash when encountering a method with a raw {@link
-   * java.util.Collection} parameter.
-   */
-  @Test
-  void identificationRawListNoCrash() {
-    CompilationTestHelper.newInstance(ExplicitArgumentEnumeration.class, getClass())
-        .addSourceLines(
-            "RawListProcessor.java",
-            "import java.util.List;",
-            "",
-            "public class RawListProcessor {",
-            "  public void processRawList(List items) {}",
-            "}",
-            "",
-            "class BugTrigger {",
-            "  void methodThatTriggersTheBug() {",
-            "    RawListProcessor processor = new RawListProcessor();",
-            "    processor.processRawList(List.of(\"a\", \"b\"));",
             "  }",
             "}")
         .doTest();
