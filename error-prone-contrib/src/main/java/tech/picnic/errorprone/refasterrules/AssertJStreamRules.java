@@ -10,7 +10,9 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractCollectionAssert;
+import org.assertj.core.api.ListAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 @OnlineDocumentation
@@ -19,13 +21,13 @@ final class AssertJStreamRules {
 
   static final class AssertThatFilteredOn<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Stream<T> stream, Predicate<? super T> predicate) {
+    ListAssert<T> before(Stream<T> stream, Predicate<? super T> predicate) {
       return assertThat(stream.filter(predicate));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(Stream<T> stream, Predicate<? super T> predicate) {
+    ListAssert<T> after(Stream<T> stream, Predicate<? super T> predicate) {
       return assertThat(stream).filteredOn(predicate);
     }
   }
@@ -52,29 +54,34 @@ final class AssertJStreamRules {
 
   static final class AssertThatAnyMatch<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Stream<T> stream, Predicate<? super T> predicate) {
+    ListAssert<T> before(Stream<T> stream, Predicate<? super T> predicate) {
+      return assertThat(stream).filteredOn(predicate).isNotEmpty();
+    }
+
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before2(Stream<T> stream, Predicate<? super T> predicate) {
       return Refaster.anyOf(
-          assertThat(stream).filteredOn(predicate).isNotEmpty(),
           assertThat(stream.anyMatch(predicate)).isTrue(),
           assertThat(stream.noneMatch(predicate)).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(Stream<T> stream, Predicate<? super T> predicate) {
+    ListAssert<T> after(Stream<T> stream, Predicate<? super T> predicate) {
       return assertThat(stream).anyMatch(predicate);
     }
   }
 
-  static final class AssertThatCollection<E> {
+  // XXX: Consider moving this rule to a new `AssertJCollectionRules` class.
+  static final class AssertThatCollection<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Collection<E> collection) {
+    ListAssert<T> before(Collection<T> collection) {
       return assertThat(collection.stream());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(Collection<E> collection) {
+    AbstractCollectionAssert<?, ?, T, ?> after(Collection<T> collection) {
       return assertThat(collection);
     }
   }
