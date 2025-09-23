@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractPathAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJPathRulesTest implements RefasterRuleCollectionTestCase {
@@ -54,11 +55,11 @@ final class AssertJPathRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(Files.isExecutable(Path.of("foo"))).isTrue();
   }
 
-  AbstractAssert<?, ?> testAssertThatHasFileName() {
+  AbstractPathAssert<?> testAssertThatHasFileName() {
     return assertThat(Path.of("foo").getFileName()).hasToString("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatHasParentRaw() {
+  AbstractPathAssert<?> testAssertThatHasParentRaw() {
     return assertThat(Path.of("foo").getParent()).isEqualTo(Path.of("bar"));
   }
 
@@ -76,10 +77,9 @@ final class AssertJPathRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatHasExtension() {
     return ImmutableSet.of(
-        assertThat(Path.of("foo").toString()).endsWith('.' + "bar"),
-        assertThat(Path.of("baz").getFileName().toString()).endsWith('.' + "qux"),
-        assertThat(Path.of("quux").toString()).endsWith("." + toString()),
-        assertThat(Path.of("corge").getFileName().toString())
-            .endsWith("." + getClass().toString()));
+        assertThat(Path.of("foo").getFileName().toString()).endsWith('.' + "bar"),
+        assertThat(Path.of("baz").toString()).endsWith('.' + "qux"),
+        assertThat(Path.of("quux").getFileName().toString()).endsWith("." + toString()),
+        assertThat(Path.of("corge").toString()).endsWith("." + getClass().toString()));
   }
 }

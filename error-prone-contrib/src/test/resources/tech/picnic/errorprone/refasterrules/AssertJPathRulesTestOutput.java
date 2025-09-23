@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractPathAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJPathRulesTest implements RefasterRuleCollectionTestCase {
@@ -54,11 +55,11 @@ final class AssertJPathRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(Path.of("foo")).isExecutable();
   }
 
-  AbstractAssert<?, ?> testAssertThatHasFileName() {
+  AbstractPathAssert<?> testAssertThatHasFileName() {
     return assertThat(Path.of("foo")).hasFileName("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatHasParentRaw() {
+  AbstractPathAssert<?> testAssertThatHasParentRaw() {
     return assertThat(Path.of("foo")).hasParentRaw(Path.of("bar"));
   }
 
