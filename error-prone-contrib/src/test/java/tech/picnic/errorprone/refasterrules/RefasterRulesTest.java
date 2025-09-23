@@ -37,6 +37,7 @@ final class RefasterRulesTest {
           AssertJPrimitiveRules.class,
           AssertJRules.class,
           AssertJShortRules.class,
+          AssertJStreamRules.class,
           AssertJStringRules.class,
           AssertJThrowingCallableRules.class,
           AssortedRules.class,

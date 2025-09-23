@@ -31,7 +31,7 @@ final class AssertJIterableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Collection<E> iterable) {
+    void after(Iterable<E> iterable) {
       assertThat(iterable).isEmpty();
     }
   }
