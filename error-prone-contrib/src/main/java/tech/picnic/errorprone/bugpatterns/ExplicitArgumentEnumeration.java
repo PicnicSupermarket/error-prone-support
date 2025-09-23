@@ -212,10 +212,15 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     // XXX: This logic is fragile, as it assumes that the method parameter's type is of the form
     // `X<T>`, where `T` is the type of the explicitly enumerated values passed to the expression to
     // be unwrapped. This should generally hold, given the types returned by the
-    // `EXPLICIT_ITERABLE_CREATOR` expressions: `Iterable<T>`, `List<T>`, `Set<T>`, etc.
+    // `EXPLICIT_ITERABLE_CREATOR` expressions: `Iterable<T>`, `List<T>`, `Set<T>`, etc. For
+    // example, we don't need to consider a `StringList` defined as `class StringList extends
+    // ArrayList<String>` or a `ListMap<K, V>` defined as `abstract ListMap<K, V> extends
+    // AbstractMap<K, V> implements List<V>`. Raw types are handled by assuming `Object` as the
+    // parameter type.
     Type parameterType =
         Iterables.getOnlyElement(
-            Iterables.getOnlyElement(method.getParameters()).type.getTypeArguments());
+            Iterables.getOnlyElement(method.getParameters()).type.getTypeArguments(),
+            state.getSymtab().objectType);
     return overloads.stream().allMatch(m -> m.params().size() == 1)
         && overloads.stream()
             .filter(MethodSymbol::isVarArgs)
