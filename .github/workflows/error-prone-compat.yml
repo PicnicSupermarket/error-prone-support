@@ -13,7 +13,7 @@
 name: Error Prone compatibility check
 on:
   push:
-    branches: [ master ]
+    branches: [ master, sschroevers/fix-error-prone-compat ]
   schedule:
     - cron: '0 4 * * *'
 permissions:
