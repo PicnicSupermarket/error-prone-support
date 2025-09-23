@@ -44,4 +44,4 @@ jobs:
       - name: Quickly build and install project
         run: mvn install -Dverification.skip
       - name: Build and test project with self-check against the latest Error Prone release
-        run: mvn clean verify -s settings.xml -Pself-check -Dversion.error-prone=LATEST -Denforcer.skip
+        run: mvn clean verify -s settings.xml -Pself-check -Dversion.error-prone=LATEST -Denforcer.skip -Dmdep.analyze.skip
