@@ -4,6 +4,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -14,12 +15,15 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractFileAssert;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -412,17 +416,18 @@ final class StringRules {
   // String.copyValueOf(new char[]);
   // -->
   // new String(new char[]);
-
-  static final class StringEqualsToIsEmpty {
-    @BeforeTemplate
-    boolean before(String str) {
-      return Refaster.anyOf(str.equals(""));
-    }
-
-    @AfterTemplate
-    @AlsoNegation
-    boolean after(String str) {
-      return str.isEmpty();
-    }
+  static final class NewStringChar {
+    // XXX: Implement.
   }
+
+  // Rewrite `str.equals("")` to `str.isEmpty()`.
+  static final class StringEqualsToIsEmpty {
+    // XXX: Implement.
+  }
+
+  // Rewrite `assertThat(file.exists()).isTrue()` to `assertThat(file).exists()`.
+  static final class AssertThatExists {
+    // XXX: Implement.
+  }
+
 }

@@ -21,18 +21,6 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJFileRules {
   private AssertJFileRules() {}
 
-  static final class AssertThatExists {
-    @BeforeTemplate
-    AbstractBooleanAssert<?> before(File actual) {
-      return assertThat(actual.exists()).isTrue();
-    }
-
-    @AfterTemplate
-    AbstractFileAssert<?> after(File actual) {
-      return assertThat(actual).exists();
-    }
-  }
-
   static final class AssertThatDoesNotExist {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {

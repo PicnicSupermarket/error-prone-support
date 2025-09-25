@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -11,12 +12,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
+import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class StringRulesTest implements RefasterRuleCollectionTestCase {
@@ -138,10 +141,14 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   boolean testStringEqualsToIsEmpty() {
-    return "foo".isEmpty();
+    return "simple-example".isEmpty();
   }
 
   String testNewStringChar() {
     return new String(new char[] {'f', 'o', 'o'});
+  }
+
+  AbstractAssert<?, ?> testAssertThatExists() {
+    return assertThat(new File("foo")).exists();
   }
 }

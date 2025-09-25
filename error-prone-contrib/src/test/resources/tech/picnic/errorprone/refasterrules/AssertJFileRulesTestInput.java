@@ -9,10 +9,6 @@ import org.assertj.core.api.AbstractFileAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJFileRulesTest implements RefasterRuleCollectionTestCase {
-  AbstractAssert<?, ?> testAssertThatExists() {
-    return assertThat(new File("foo").exists()).isTrue();
-  }
-
   AbstractAssert<?, ?> testAssertThatDoesNotExist() {
     return assertThat(new File("foo").exists()).isFalse();
   }
