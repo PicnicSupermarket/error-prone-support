@@ -412,4 +412,17 @@ final class StringRules {
   // String.copyValueOf(new char[]);
   // -->
   // new String(new char[]);
+
+  static final class StringEqualsToIsEmpty {
+    @BeforeTemplate
+    boolean before(String str) {
+      return Refaster.anyOf(str.equals(""));
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(String str) {
+      return str.isEmpty();
+    }
+  }
 }

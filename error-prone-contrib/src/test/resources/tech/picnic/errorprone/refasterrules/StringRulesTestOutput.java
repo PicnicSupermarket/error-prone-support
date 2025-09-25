@@ -137,6 +137,10 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return "foo".startsWith("bar", 1);
   }
 
+  boolean testStringEqualsToIsEmpty() {
+    return "foo".isEmpty();
+  }
+
   String testNewStringChar() {
     return new String(new char[] {'f', 'o', 'o'});
   }
