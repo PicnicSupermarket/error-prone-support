@@ -4,7 +4,9 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static tech.picnic.errorprone.documentation.JekyllCollectionGenerator.BUGPATTERNS_ROOT;
 import static tech.picnic.errorprone.documentation.JekyllCollectionGenerator.REFASTER_RULES_ROOT;
 import static tech.picnic.errorprone.documentation.JekyllCollectionGenerator.WEBSITE_ROOT;
@@ -34,15 +36,26 @@ import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.Test
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
 
+// XXX: `Beta` -> `BetaRules`. And likewise `Alpha` -> `AlphaCheck` or something.
 final class JekyllCollectionGeneratorTest {
+  private static Stream<Arguments> mainWithInvalidArgsTestCases() {
+    return Stream.of(arguments(ImmutableList.of()), arguments(ImmutableList.of("foo", "bar")));
+  }
+
+  @MethodSource("mainWithInvalidArgsTestCases")
+  @ParameterizedTest
+  void mainWithInvalidArgs(ImmutableList<String> args) {
+    assertThatThrownBy(() -> JekyllCollectionGenerator.main(args.toArray(String[]::new)))
+        .isInstanceOf(IllegalArgumentException.class);
+  }
+
   @MethodSource("mainTestCases")
   @ParameterizedTest
-  void main(Function<Path, TestData> dataset, @TempDir Path projectRoot) throws IOException {
-    TestData data = dataset.apply(projectRoot);
+  void main(Function<Path, TestCase> testCaseGenerator, @TempDir Path projectRoot)
+      throws IOException {
+    TestCase testCase = testCaseGenerator.apply(projectRoot);
 
-    for (TestInput input : data.inputs()) {
-      input.writeFile();
-    }
+    testCase.setUp();
 
     /*
      * In practise the `website` directory will already be present (containing e.g.
@@ -59,11 +72,12 @@ final class JekyllCollectionGeneratorTest {
 
     JekyllCollectionGenerator.main(new String[] {projectRoot.toString()});
 
-    assertThat(data.outputs()).allSatisfy(TestOutput::verify);
+    testCase.verify();
 
     // XXX: Validate `website/index.md` contents!
   }
 
+  // XXX: Move up!
   private static Stream<Arguments> mainTestCases() {
     return Stream.of(bugpatternAndRefaster(), onlyBugpattern());
   }
@@ -72,7 +86,7 @@ final class JekyllCollectionGeneratorTest {
   private static Arguments bugpatternAndRefaster() {
     return argumentSet(
         "bugpattern-and-refaster",
-        (Function<Path, TestData>)
+        (Function<Path, TestCase>)
             root -> {
               ImmutableList<TestInput> inputs =
                   ImmutableList.of(
@@ -82,24 +96,14 @@ final class JekyllCollectionGeneratorTest {
                           root,
                           "module-a",
                           JekyllCollectionGeneratorTest::bugPatternTestCasesAlpha),
-                      new TestInput(
-                          resolvePath(
-                              root, "module-b", "target", "docs", "refaster-input-Beta.json"),
-                          new RefasterTestCases(
-                              root.resolve("module-b/src/test/java/pkg/BetaTest.java").toUri(),
-                              "Beta",
-                              /* isInput= */ true,
-                              ImmutableList.of(
-                                  refasterTestCaseInputRule1(), refasterTestCaseInputRule2()))),
-                      new TestInput(
-                          resolvePath(
-                              root, "module-b", "target", "docs", "refaster-output-Beta.json"),
-                          new RefasterTestCases(
-                              root.resolve("module-b/src/test/java/pkg/BetaTest.java").toUri(),
-                              "Beta",
-                              /* isInput= */ false,
-                              ImmutableList.of(
-                                  refasterTestCaseOutputRule1(), refasterTestCaseOutputRule2()))));
+                      TestInput.create(
+                          root,
+                          "module-b",
+                          JekyllCollectionGeneratorTest::refasterTestCasesBetaInput),
+                      TestInput.create(
+                          root,
+                          "module-b",
+                          JekyllCollectionGeneratorTest::refasterTestCasesBetaOutput));
 
               ImmutableList<TestOutput> outputs =
                   ImmutableList.of(
@@ -148,14 +152,14 @@ final class JekyllCollectionGeneratorTest {
                           ---
                           """));
 
-              return new TestData(inputs, outputs);
+              return new TestCase(inputs, outputs);
             });
   }
 
   private static Arguments onlyBugpattern() {
     return argumentSet(
         "only-bugpattern",
-        (Function<Path, TestData>)
+        (Function<Path, TestCase>)
             root -> {
               ImmutableList<TestInput> inputs =
                   ImmutableList.of(
@@ -207,7 +211,7 @@ final class JekyllCollectionGeneratorTest {
                           ---
                           """));
 
-              return new TestData(inputs, outputs);
+              return new TestCase(inputs, outputs);
             });
   }
 
@@ -275,6 +279,42 @@ final class JekyllCollectionGeneratorTest {
 		""");
   }
 
+  private static RefasterTestCases refasterTestCasesBetaInput(Path projectRoot, String module) {
+    return refasterTestCasesInput(
+        projectRoot,
+        module,
+        "Beta",
+        /* isInput= */ true,
+        refasterTestCaseInputRule1(),
+        refasterTestCaseInputRule2());
+  }
+
+  private static RefasterTestCases refasterTestCasesBetaOutput(Path projectRoot, String module) {
+    return refasterTestCasesInput(
+        projectRoot,
+        module,
+        "Beta",
+        /* isInput= */ false,
+        refasterTestCaseOutputRule1(),
+        refasterTestCaseOutputRule2());
+  }
+
+  private static RefasterTestCases refasterTestCasesInput(
+      Path projectRoot,
+      String module,
+      String name,
+      boolean isInput,
+      RefasterTestCase... testCases) {
+    String pkg = name.toLowerCase(Locale.ROOT);
+    String typeName = name + "Test" + (isInput ? "Input" : "Output");
+    return new RefasterTestCases(
+        resolvePath(projectRoot, module, "src", "test", "resources", pkg, typeName + ".java")
+            .toUri(),
+        name,
+        isInput,
+        ImmutableList.copyOf(testCases));
+  }
+
   private static RefasterTestCase refasterTestCaseInputRule1() {
     return new RefasterTestCase("Rule1", "void testRule1() {}\n");
   }
@@ -299,7 +339,17 @@ final class JekyllCollectionGeneratorTest {
     return result;
   }
 
-  private record TestData(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {}
+  private record TestCase(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {
+    void setUp() throws IOException {
+      for (TestInput input : inputs()) {
+        input.writeFile();
+      }
+    }
+
+    void verify() {
+      assertThat(outputs()).allSatisfy(TestOutput::verify);
+    }
+  }
 
   // XXX: Replace remaining `new TestInput` calls.
   private record TestInput(Path path, ProjectInfo info) {
