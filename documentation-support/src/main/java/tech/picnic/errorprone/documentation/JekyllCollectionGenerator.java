@@ -83,7 +83,7 @@ public record JekyllCollectionGenerator() {
    */
   public static void main(String[] args) throws IOException {
     checkArgument(args.length == 1, "Precisely one project root path must be provided");
-    Path projectRoot = Path.of(args[0]).toAbsolutePath();
+    Path projectRoot = Path.of(args[0]);
 
     generateIndex(projectRoot);
     PageGenerator.apply(projectRoot);
