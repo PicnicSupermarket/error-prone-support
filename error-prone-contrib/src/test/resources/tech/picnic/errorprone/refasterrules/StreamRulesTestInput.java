@@ -36,6 +36,7 @@ import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -332,5 +333,11 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<String> testCollectionParallelStream() {
     return StreamSupport.stream(ImmutableList.of("foo").spliterator(), true);
+  }
+
+  ImmutableSet<Stream<String>> testCollectionsNCopiesStream() {
+    return ImmutableSet.of(
+        Stream.generate(() -> "foo").limit(1),
+        Stream.generate(() -> UUID.randomUUID().toString()).limit(2));
   }
 }

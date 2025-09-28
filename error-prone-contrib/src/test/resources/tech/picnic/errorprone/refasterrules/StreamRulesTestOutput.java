@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -329,5 +331,11 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<String> testCollectionParallelStream() {
     return ImmutableList.of("foo").parallelStream();
+  }
+
+  ImmutableSet<Stream<String>> testCollectionsNCopiesStream() {
+    return ImmutableSet.of(
+        Collections.nCopies(1, "foo").stream(),
+        Stream.generate(() -> UUID.randomUUID().toString()).limit(2));
   }
 }
