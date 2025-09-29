@@ -4,10 +4,8 @@ import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.common.AnnotationMirrors;
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.SeverityLevel;
@@ -47,7 +45,7 @@ public final class BugPatternExtractor implements Extractor<BugPatternDocumentat
     }
 
     return Optional.of(
-        BugPatternDocumentation.create(
+        new BugPatternDocumentation(
             state.getPath().getCompilationUnit().getSourceFile().toUri(),
             symbol.getQualifiedName().toString(),
             annotation.name().isEmpty() ? tree.getSimpleName().toString() : annotation.name(),
@@ -93,55 +91,16 @@ public final class BugPatternExtractor implements Extractor<BugPatternDocumentat
     return (T) value;
   }
 
-  @AutoValue
-  @JsonDeserialize(as = AutoValue_BugPatternExtractor_BugPatternDocumentation.class)
-  abstract static class BugPatternDocumentation {
-    static BugPatternDocumentation create(
-        URI source,
-        String fullyQualifiedName,
-        String name,
-        ImmutableList<String> altNames,
-        String link,
-        ImmutableList<String> tags,
-        String summary,
-        String explanation,
-        SeverityLevel severityLevel,
-        boolean canDisable,
-        ImmutableList<String> suppressionAnnotations) {
-      return new AutoValue_BugPatternExtractor_BugPatternDocumentation(
-          source,
-          fullyQualifiedName,
-          name,
-          altNames,
-          link,
-          tags,
-          summary,
-          explanation,
-          severityLevel,
-          canDisable,
-          suppressionAnnotations);
-    }
-
-    abstract URI source();
-
-    abstract String fullyQualifiedName();
-
-    abstract String name();
-
-    abstract ImmutableList<String> altNames();
-
-    abstract String link();
-
-    abstract ImmutableList<String> tags();
-
-    abstract String summary();
-
-    abstract String explanation();
-
-    abstract SeverityLevel severityLevel();
-
-    abstract boolean canDisable();
-
-    abstract ImmutableList<String> suppressionAnnotations();
-  }
+  record BugPatternDocumentation(
+      URI source,
+      String fullyQualifiedName,
+      String name,
+      ImmutableList<String> altNames,
+      String link,
+      ImmutableList<String> tags,
+      String summary,
+      String explanation,
+      SeverityLevel severityLevel,
+      boolean canDisable,
+      ImmutableList<String> suppressionAnnotations) {}
 }

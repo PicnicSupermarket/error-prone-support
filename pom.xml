@@ -291,6 +291,11 @@
                 <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
+            <!-- XXX: This dependency's version is managed because version 1.10
+            contains annotations that are also packaged with
+            `org.jetbrains:annotations`, causing classpath duplication. Try to
+            drop this once https://github.com/google/compile-testing/pull/499
+            is released. (And/or convince OpenRewrite to migrate to JSpecify.) -->
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value</artifactId>
@@ -357,7 +362,7 @@
             <dependency>
                 <groupId>com.google.truth</groupId>
                 <artifactId>truth</artifactId>
-                <version>1.4.4</version>
+                <version>1.4.5</version>
             </dependency>
             <dependency>
                 <groupId>com.jakewharton.nopen</groupId>
@@ -377,14 +382,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.15.3</version>
+                <version>1.15.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.9</version>
+                <version>2024.0.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -461,7 +466,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.50.0</version>
+                <version>3.51.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -476,7 +481,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.6</version>
+                <version>3.20.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -502,7 +507,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.5.1</version>
+                <version>5.6.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -538,7 +543,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.2.10</version>
+                <version>6.2.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -616,7 +621,7 @@
                 <plugin>
                     <groupId>com.spotify.fmt</groupId>
                     <artifactId>fmt-maven-plugin</artifactId>
-                    <version>2.27</version>
+                    <version>2.28</version>
                     <configuration>
                         <additionalSourceDirectories>
                             <additionalSourceDirectory>${basedir}/src/test/resources</additionalSourceDirectory>
@@ -986,15 +991,6 @@
                     <configuration>
                         <annotationProcessorPaths>
                             <path>
-                                <groupId>com.google.auto.value</groupId>
-                                <artifactId>auto-value</artifactId>
-                            </path>
-                            <path>
-                                <groupId>com.google.auto.value</groupId>
-                                <artifactId>auto-value</artifactId>
-                                <version>${version.auto-value}</version>
-                            </path>
-                            <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
                             </path>
@@ -1344,7 +1340,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.3</version>
+                    <version>3.5.4</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1508,7 +1504,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.18.0</version>
+                    <version>2.19.0</version>
                     <configuration>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
@@ -1580,8 +1576,6 @@
                     <version>1.20.2</version>
                     <configuration>
                         <excludedClasses>
-                            <!-- AutoValue generated classes. -->
-                            <excludedClass>*.AutoValue_*</excludedClass>
                             <!-- Refaster rule collections. -->
                             <excludedClass>*.refaster*.*Rules*</excludedClass>
                         </excludedClasses>

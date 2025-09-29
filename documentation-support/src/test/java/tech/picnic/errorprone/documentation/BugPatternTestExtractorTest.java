@@ -269,14 +269,14 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileCompilationTestHelperTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create("file:///SingleFileCompilationTestHelperTest.java"),
             "SingleFileCompilationTestHelperTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "SingleFileCompilationTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        IdentificationTestEntry.create(
+                        new IdentificationTestEntry(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))))));
   }
 
@@ -302,14 +302,14 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileCompilationTestHelperWithSetArgsTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create("file:///SingleFileCompilationTestHelperWithSetArgsTest.java"),
             "SingleFileCompilationTestHelperWithSetArgsTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "SingleFileCompilationTestHelperWithSetArgsTest.TestChecker",
                     ImmutableList.of(
-                        IdentificationTestEntry.create(
+                        new IdentificationTestEntry(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))))));
   }
 
@@ -335,16 +335,16 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "MultiFileCompilationTestHelperTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create("file:///MultiFileCompilationTestHelperTest.java"),
             "MultiFileCompilationTestHelperTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "MultiFileCompilationTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        IdentificationTestEntry.create(
+                        new IdentificationTestEntry(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"),
-                        IdentificationTestEntry.create(
+                        new IdentificationTestEntry(
                             "B.java", "// BUG: Diagnostic contains:\nclass B {}\n"))))));
   }
 
@@ -370,14 +370,14 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileBugCheckerRefactoringTestHelperTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create("file:///SingleFileBugCheckerRefactoringTestHelperTest.java"),
             "SingleFileBugCheckerRefactoringTestHelperTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "SingleFileBugCheckerRefactoringTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        ReplacementTestEntry.create(
+                        new ReplacementTestEntry(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
@@ -408,15 +408,15 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create(
                 "file:///SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java"),
             "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.TestChecker",
                     ImmutableList.of(
-                        ReplacementTestEntry.create(
+                        new ReplacementTestEntry(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
@@ -444,16 +444,16 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "MultiFileBugCheckerRefactoringTestHelperTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create("file:///MultiFileBugCheckerRefactoringTestHelperTest.java"),
             "MultiFileBugCheckerRefactoringTestHelperTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "MultiFileBugCheckerRefactoringTestHelperTest.TestChecker",
                     ImmutableList.of(
-                        ReplacementTestEntry.create(
+                        new ReplacementTestEntry(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"),
-                        ReplacementTestEntry.create(
+                        new ReplacementTestEntry(
                             "B.java", "class B {}\n", "class B { /* This is a change. */ }\n"))))));
   }
 
@@ -484,19 +484,19 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "CompilationAndBugCheckerRefactoringTestHelpersTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create("file:///CompilationAndBugCheckerRefactoringTestHelpersTest.java"),
             "CompilationAndBugCheckerRefactoringTestHelpersTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
                     ImmutableList.of(
-                        IdentificationTestEntry.create(
+                        new IdentificationTestEntry(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "CompilationAndBugCheckerRefactoringTestHelpersTest.TestChecker",
                     ImmutableList.of(
-                        ReplacementTestEntry.create(
+                        new ReplacementTestEntry(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 
@@ -532,20 +532,20 @@ final class BugPatternTestExtractorTest {
     verifyGeneratedFileContent(
         outputDirectory,
         "CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest",
-        BugPatternTestCases.create(
+        new BugPatternTestCases(
             URI.create(
                 "file:///CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.java"),
             "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest",
             ImmutableList.of(
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker",
                     ImmutableList.of(
-                        IdentificationTestEntry.create(
+                        new IdentificationTestEntry(
                             "A.java", "// BUG: Diagnostic contains:\nclass A {}\n"))),
-                BugPatternTestCase.create(
+                new BugPatternTestCase(
                     "pkg.CompilationAndBugCheckerRefactoringTestHelpersWithCustomCheckerPackageAndNamesTest.CustomTestChecker2",
                     ImmutableList.of(
-                        ReplacementTestEntry.create(
+                        new ReplacementTestEntry(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
   }
 

@@ -140,7 +140,12 @@ final class RefasterRuleSelector {
     } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer annotatedTransformer) {
       for (Map.Entry<CodeTransformer, ImmutableSet<ImmutableSet<String>>> e :
           indexRuleIdentifiers(annotatedTransformer.transformers()).entrySet()) {
-        identifiers.put(annotatedTransformer.withTransformers(e.getKey()), e.getValue());
+        identifiers.put(
+            new AnnotatedCompositeCodeTransformer(
+                annotatedTransformer.packageName(),
+                ImmutableList.of(e.getKey()),
+                annotatedTransformer.annotations()),
+            e.getValue());
       }
     } else if (codeTransformer instanceof RefasterRule) {
       identifiers.put(

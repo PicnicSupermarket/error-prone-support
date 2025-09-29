@@ -67,7 +67,7 @@ shared_build_flags="
   ${additional_build_flags}
   "
 
-format_goal='com.spotify.fmt:fmt-maven-plugin:2.27:format'
+format_goal='com.spotify.fmt:fmt-maven-plugin:2.28:format'
 
 error_prone_patch_flags="${shared_error_prone_flags} -XepPatchLocation:IN_PLACE -XepPatchChecks:$(
    find "${error_prone_support_root}" \

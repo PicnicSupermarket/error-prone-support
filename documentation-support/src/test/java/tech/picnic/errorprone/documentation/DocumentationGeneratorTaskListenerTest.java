@@ -8,7 +8,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 import com.google.auto.service.AutoService;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
@@ -150,7 +149,7 @@ final class DocumentationGeneratorTaskListenerTest {
           .filter(n -> n.contains(DocumentationGeneratorTaskListenerTest.class.getSimpleName()))
           .map(
               className ->
-                  new AutoValue_DocumentationGeneratorTaskListenerTest_ExtractionParameters(
+                  new ExtractionParameters(
                       className,
                       Streams.stream(state.getPath())
                           .map(TestExtractor::describeTree)
@@ -164,10 +163,5 @@ final class DocumentationGeneratorTaskListenerTest {
     }
   }
 
-  @AutoValue
-  abstract static class ExtractionParameters {
-    abstract String className();
-
-    abstract ImmutableList<String> path();
-  }
+  private record ExtractionParameters(String className, ImmutableList<String> path) {}
 }

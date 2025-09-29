@@ -2,7 +2,6 @@ package tech.picnic.errorprone.refaster.runner;
 
 import static java.util.Comparator.comparingInt;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -20,8 +19,7 @@ import java.util.function.Function;
  *
  * <p>The tree's edges are string-labeled, while its leaves store values of type {@code T}.
  */
-@AutoValue
-abstract class Node<T> {
+record Node<T>(ImmutableMap<String, Node<T>> children, ImmutableList<T> values) {
   // XXX: Review: should this method accept a `SetMultimap<V, ? extends Set<String>>`, or should
   // there be such an overload?
   static <T> Node<T> create(
@@ -30,10 +28,6 @@ abstract class Node<T> {
     tree.register(values, pathExtractor);
     return tree.build();
   }
-
-  abstract ImmutableMap<String, Node<T>> children();
-
-  abstract ImmutableList<T> values();
 
   // XXX: Consider having `RefasterRuleSelector` already collect the candidate edges into a
   // `SortedSet`, as that would likely speed up `ImmutableSortedSet#copyOf`.
@@ -72,16 +66,26 @@ abstract class Node<T> {
     }
   }
 
-  @AutoValue
-  @SuppressWarnings("AutoValueImmutableFields" /* Type is used only during `Node` construction. */)
-  abstract static class Builder<T> {
-    private static <T> Builder<T> create() {
-      return new AutoValue_Node_Builder<>(new HashMap<>(), new ArrayList<>());
+  static final class Builder<T> {
+    private final Map<String, Builder<T>> children;
+    private final List<T> values;
+
+    private Builder(Map<String, Builder<T>> children, List<T> values) {
+      this.children = children;
+      this.values = values;
     }
 
-    abstract Map<String, Builder<T>> children();
+    private static <T> Builder<T> create() {
+      return new Builder<>(new HashMap<>(), new ArrayList<>());
+    }
 
-    abstract List<T> values();
+    Map<String, Builder<T>> children() {
+      return children;
+    }
+
+    List<T> values() {
+      return values;
+    }
 
     /**
      * Registers all paths to each of the given values.
@@ -90,8 +94,9 @@ abstract class Node<T> {
      * leads to the same value.
      */
     private void register(
-        Set<T> values, Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
-      for (T value : values) {
+        Set<T> valuesToRegister,
+        Function<? super T, ? extends Set<? extends Set<String>>> pathsExtractor) {
+      for (T value : valuesToRegister) {
         List<? extends Set<String>> paths = new ArrayList<>(pathsExtractor.apply(value));
         /*
          * We sort paths by length ascending, so that in case of two paths where one is an initial
@@ -118,7 +123,7 @@ abstract class Node<T> {
     }
 
     private Node<T> build() {
-      return new AutoValue_Node<>(
+      return new Node<>(
           ImmutableMap.copyOf(Maps.transformValues(children(), Builder::build)),
           ImmutableList.copyOf(values()));
     }

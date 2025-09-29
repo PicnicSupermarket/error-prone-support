@@ -7,7 +7,6 @@ import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutab
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -21,8 +20,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Stream;
 
-@AutoValue
-abstract class NodeTestCase<V> {
+record NodeTestCase<V>(ImmutableSetMultimap<V, ImmutableSet<String>> input) {
   static NodeTestCase<Integer> generate(
       int entryCount, int maxPathCount, int maxPathLength, int pathValueDomainSize, Random random) {
     return random
@@ -44,16 +42,14 @@ abstract class NodeTestCase<V> {
                                             pathValueDomainSize)
                                         .mapToObj(String::valueOf)
                                         .collect(toImmutableSet()))),
-                AutoValue_NodeTestCase::new));
+                NodeTestCase::new));
   }
 
-  abstract ImmutableSetMultimap<V, ImmutableSet<String>> input();
-
-  final Node<V> buildTree() {
+  Node<V> buildTree() {
     return Node.create(input().keySet(), input()::get);
   }
 
-  final Stream<NodeTestCaseEntry<V>> generateTestCaseEntries(Random random) {
+  Stream<NodeTestCaseEntry<V>> generateTestCaseEntries(Random random) {
     return generatePathTestCases(input(), random);
   }
 
@@ -123,7 +119,7 @@ abstract class NodeTestCase<V> {
 
   private static <V> NodeTestCaseEntry<V> createTestCaseEntry(
       ImmutableSetMultimap<V, ImmutableSet<String>> treeInput, ImmutableSet<String> edges) {
-    return new AutoValue_NodeTestCase_NodeTestCaseEntry<>(
+    return new NodeTestCaseEntry<>(
         edges,
         treeInput.asMap().entrySet().stream()
             .filter(e -> e.getValue().stream().anyMatch(edges::containsAll))
@@ -131,10 +127,6 @@ abstract class NodeTestCase<V> {
             .collect(toImmutableList()));
   }
 
-  @AutoValue
-  abstract static class NodeTestCaseEntry<V> {
-    abstract ImmutableSet<String> candidateEdges();
-
-    abstract ImmutableList<V> reachableValues();
-  }
+  record NodeTestCaseEntry<V>(
+      ImmutableSet<String> candidateEdges, ImmutableList<V> reachableValues) {}
 }
