@@ -1956,7 +1956,7 @@
    @TempDir public File folder;
  
    private File dataDirectory;
-@@ -19,7 +19,7 @@ public class FixedNameCsvFileProviderTest {
+@@ -19,19 +19,19 @@ public class FixedNameCsvFileProviderTest {
    }
  
    @Test
@@ -1964,8 +1964,10 @@
 +  void getFile() {
      FixedNameCsvFileProvider provider = new FixedNameCsvFileProvider();
      File file = provider.getFile(dataDirectory, "test");
-     assertThat(file.getParentFile()).isEqualTo(dataDirectory);
-@@ -27,7 +27,7 @@ public class FixedNameCsvFileProviderTest {
+-    assertThat(file.getParentFile()).isEqualTo(dataDirectory);
+-    assertThat(file.getName()).isEqualTo("test.csv");
++    assertThat(file).hasParent(dataDirectory);
++    assertThat(file).hasFileName("test.csv");
    }
  
    @Test
@@ -1973,7 +1975,13 @@
 +  void getFileSanitize() {
      FixedNameCsvFileProvider provider = new FixedNameCsvFileProvider();
      File file = provider.getFile(dataDirectory, "/myfake/uri");
-     assertThat(file.getParentFile()).isEqualTo(dataDirectory);
+-    assertThat(file.getParentFile()).isEqualTo(dataDirectory);
+-    assertThat(file.getName()).isEqualTo("myfake.uri.csv");
++    assertThat(file).hasParent(dataDirectory);
++    assertThat(file).hasFileName("myfake.uri.csv");
+   }
+ 
+   private static File newFolder(File root, String... subDirs) throws IOException {
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/HistogramTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/HistogramTest.java
 @@ -7,14 +7,14 @@ import static org.mockito.Mockito.when;

@@ -1,7 +1,5 @@
 package tech.picnic.errorprone.refasterrules;
 
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -95,110 +93,6 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Boolean#hashCode(boolean)} over the Guava alternative. */
-  static final class BooleanHashCode {
-    @BeforeTemplate
-    int before(boolean b) {
-      return Booleans.hashCode(b);
-    }
-
-    @AfterTemplate
-    int after(boolean b) {
-      return Boolean.hashCode(b);
-    }
-  }
-
-  /** Prefer {@link Byte#hashCode(byte)} over the Guava alternative. */
-  static final class ByteHashCode {
-    @BeforeTemplate
-    int before(byte b) {
-      return Bytes.hashCode(b);
-    }
-
-    @AfterTemplate
-    int after(byte b) {
-      return Byte.hashCode(b);
-    }
-  }
-
-  /** Prefer {@link Character#hashCode(char)} over the Guava alternative. */
-  static final class CharacterHashCode {
-    @BeforeTemplate
-    int before(char c) {
-      return Chars.hashCode(c);
-    }
-
-    @AfterTemplate
-    int after(char c) {
-      return Character.hashCode(c);
-    }
-  }
-
-  /** Prefer {@link Short#hashCode(short)} over the Guava alternative. */
-  static final class ShortHashCode {
-    @BeforeTemplate
-    int before(short s) {
-      return Shorts.hashCode(s);
-    }
-
-    @AfterTemplate
-    int after(short s) {
-      return Short.hashCode(s);
-    }
-  }
-
-  /** Prefer {@link Integer#hashCode(int)} over the Guava alternative. */
-  static final class IntegerHashCode {
-    @BeforeTemplate
-    int before(int i) {
-      return Ints.hashCode(i);
-    }
-
-    @AfterTemplate
-    int after(int i) {
-      return Integer.hashCode(i);
-    }
-  }
-
-  /** Prefer {@link Long#hashCode(long)} over the Guava alternative. */
-  static final class LongHashCode {
-    @BeforeTemplate
-    int before(long l) {
-      return Longs.hashCode(l);
-    }
-
-    @AfterTemplate
-    int after(long l) {
-      return Long.hashCode(l);
-    }
-  }
-
-  /** Prefer {@link Float#hashCode(float)} over the Guava alternative. */
-  static final class FloatHashCode {
-    @BeforeTemplate
-    int before(float f) {
-      return Floats.hashCode(f);
-    }
-
-    @AfterTemplate
-    int after(float f) {
-      return Float.hashCode(f);
-    }
-  }
-
-  /** Prefer {@link Double#hashCode(double)} over the Guava alternative. */
-  static final class DoubleHashCode {
-    @BeforeTemplate
-    int before(double d) {
-      return Doubles.hashCode(d);
-    }
-
-    @AfterTemplate
-    int after(double d) {
-      return Double.hashCode(d);
-    }
-  }
-
   /** Prefer {@link Character#BYTES} over the Guava alternative. */
   static final class CharacterBytes {
     @BeforeTemplate
@@ -274,32 +168,6 @@ final class PrimitiveRules {
     @AfterTemplate
     int after() {
       return Double.BYTES;
-    }
-  }
-
-  /** Prefer {@link Float#isFinite(float)} over the Guava alternative. */
-  static final class FloatIsFinite {
-    @BeforeTemplate
-    boolean before(float f) {
-      return Floats.isFinite(f);
-    }
-
-    @AfterTemplate
-    boolean after(float f) {
-      return Float.isFinite(f);
-    }
-  }
-
-  /** Prefer {@link Double#isFinite(double)} over the Guava alternative. */
-  static final class DoubleIsFinite {
-    @BeforeTemplate
-    boolean before(double d) {
-      return Doubles.isFinite(d);
-    }
-
-    @AfterTemplate
-    boolean after(double d) {
-      return Double.isFinite(d);
     }
   }
 

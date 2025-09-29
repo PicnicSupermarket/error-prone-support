@@ -4172,16 +4172,17 @@
    @Override
 --- a/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusData.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusData.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,9 @@
  package io.prometheus.metrics.exporter.opentelemetry.otelmodel;
  
 +import static com.google.common.collect.ImmutableList.toImmutableList;
 +
 +import com.google.common.collect.ImmutableList;
++import com.google.common.collect.Streams;
  import io.opentelemetry.api.common.Attributes;
  import io.opentelemetry.api.common.AttributesBuilder;
  import io.opentelemetry.api.trace.SpanContext;
-@@ -15,10 +18,8 @@ import io.prometheus.metrics.model.snapshots.Exemplar;
+@@ -15,11 +19,8 @@ import io.prometheus.metrics.model.snapshots.Exemplar;
  import io.prometheus.metrics.model.snapshots.Exemplars;
  import io.prometheus.metrics.model.snapshots.Label;
  import io.prometheus.metrics.model.snapshots.Labels;
@@ -4189,10 +4190,11 @@
  import java.util.List;
  import java.util.concurrent.TimeUnit;
 -import java.util.stream.Collectors;
- import java.util.stream.StreamSupport;
+-import java.util.stream.StreamSupport;
  
  abstract class PrometheusData<T extends PointData> implements Data<T> {
-@@ -47,7 +48,7 @@ abstract class PrometheusData<T extends PointData> implements Data<T> {
+ 
+@@ -47,15 +48,13 @@ abstract class PrometheusData<T extends PointData> implements Data<T> {
  
    protected List<DoubleExemplarData> convertExemplar(Exemplar exemplar) {
      if (exemplar == null) {
@@ -4201,12 +4203,12 @@
      }
      return convertExemplars(Exemplars.of(exemplar));
    }
-@@ -55,7 +56,7 @@ abstract class PrometheusData<T extends PointData> implements Data<T> {
+ 
    protected List<DoubleExemplarData> convertExemplars(Exemplars exemplars) {
-     return StreamSupport.stream(exemplars.spliterator(), false)
-         .map(this::toDoubleExemplarData)
+-    return StreamSupport.stream(exemplars.spliterator(), false)
+-        .map(this::toDoubleExemplarData)
 -        .collect(Collectors.toList());
-+        .collect(toImmutableList());
++    return Streams.stream(exemplars).map(this::toDoubleExemplarData).collect(toImmutableList());
    }
  
    protected DoubleExemplarData toDoubleExemplarData(Exemplar exemplar) {

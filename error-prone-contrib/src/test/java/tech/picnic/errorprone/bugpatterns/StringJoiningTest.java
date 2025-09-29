@@ -5,10 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class StringJoinTest {
+final class StringJoiningTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(StringJoin.class, getClass())
+    CompilationTestHelper.newInstance(StringJoining.class, getClass())
         .expectErrorMessage(
             "valueOf", m -> m.contains("Prefer `String#valueOf` over `String#format`"))
         .expectErrorMessage("join", m -> m.contains("Prefer `String#join` over `String#format`"))
@@ -56,7 +56,7 @@ final class StringJoinTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(StringJoin.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(StringJoining.class, getClass())
         .addInputLines(
             "A.java",
             "class A {",

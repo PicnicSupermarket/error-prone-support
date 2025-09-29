@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags {@link String#format(String, Object...)} invocations which can be
+ * A {@link BugChecker} that flags {@link String#format(String, Object...)} invocations that can be
  * replaced with a {@link String#join(CharSequence, CharSequence...)} or even a {@link
  * String#valueOf} invocation.
  */
@@ -42,11 +42,11 @@ import tech.picnic.errorprone.utils.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `String#join` over `String#format`",
-    link = BUG_PATTERNS_BASE_URL + "StringJoin",
+    link = BUG_PATTERNS_BASE_URL + "StringJoining",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class StringJoin extends BugChecker implements MethodInvocationTreeMatcher {
+public final class StringJoining extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Splitter FORMAT_SPECIFIER_SPLITTER = Splitter.on("%s");
   private static final Matcher<ExpressionTree> STRING_FORMAT_INVOCATION =
@@ -55,8 +55,8 @@ public final class StringJoin extends BugChecker implements MethodInvocationTree
       Suppliers.typeFromClass(CharSequence.class);
   private static final Supplier<Type> FORMATTABLE_TYPE = Suppliers.typeFromClass(Formattable.class);
 
-  /** Instantiates a new {@link StringJoin} instance. */
-  public StringJoin() {}
+  /** Instantiates a new {@link StringJoining} instance. */
+  public StringJoining() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {

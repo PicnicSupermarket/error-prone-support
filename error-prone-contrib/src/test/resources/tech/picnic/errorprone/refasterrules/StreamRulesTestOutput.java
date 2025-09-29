@@ -27,6 +27,7 @@ import static java.util.stream.Collectors.summingLong;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class StreamRulesTest implements RefasterRuleCollectionTestCase {
@@ -50,6 +52,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         List.class,
         Map.class,
         Objects.class,
+        StreamSupport.class,
         Streams.class,
         collectingAndThen(null, null),
         counting(),
@@ -318,5 +321,13 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamOf5() {
     return Stream.of(1, 2, 3, 4, 5);
+  }
+
+  Stream<String> testStreamsStream() {
+    return Streams.stream(Iterables.cycle("foo"));
+  }
+
+  Stream<String> testCollectionParallelStream() {
+    return ImmutableList.of("foo").parallelStream();
   }
 }
