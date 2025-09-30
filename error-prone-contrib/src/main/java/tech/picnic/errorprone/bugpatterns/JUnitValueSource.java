@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.utils.MoreJUnitMatchers.HAS_METHOD_SOURCE;
+import static tech.picnic.errorprone.utils.MoreJUnitMatchers.findMethodSourceAnnotation;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.getMethodSourceFactoryNames;
 
 import com.google.auto.service.AutoService;
@@ -195,11 +195,6 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
         .anyMatch(
             annotation ->
                 getMethodSourceFactoryNames(annotation, tree).contains(valueFactoryMethodName));
-  }
-
-  private static Optional<AnnotationTree> findMethodSourceAnnotation(
-      MethodTree tree, VisitorState state) {
-    return HAS_METHOD_SOURCE.multiMatchResult(tree, state).matchingNodes().stream().findFirst();
   }
 
   private static Optional<SuggestedFix> tryConstructValueSourceFix(
