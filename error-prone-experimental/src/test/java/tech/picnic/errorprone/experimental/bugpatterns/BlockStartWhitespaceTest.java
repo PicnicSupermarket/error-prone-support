@@ -183,4 +183,25 @@ final class BlockStartWhitespaceTest {
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
+
+  // TODO: this.
+  @Test
+  void weirdo() {
+    BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
+        .addInputLines(
+            "A.java",
+            "class A /* { */",
+            "",
+            "{",
+            "",
+            "  private static final int foo = 1;",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A /* { */ {",
+            "",
+            "  private static final int foo = 1;",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
 }
