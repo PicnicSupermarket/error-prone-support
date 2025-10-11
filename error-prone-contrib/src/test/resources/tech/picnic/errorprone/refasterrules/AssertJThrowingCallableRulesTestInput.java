@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.refasterrules;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIOException;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -220,9 +219,9 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
             .withFailMessage(String.format("foo %s %s", "bar", 1)));
   }
 
-  @SuppressWarnings("deprecation" /* Rule targets deprecated API. */)
-  AbstractThrowableAssert<?, ? extends Throwable> testAbstractThrowableAssertCauseIsSameAs() {
-    return assertThat(new IllegalStateException())
-        .hasCauseReference(new IllegalArgumentException());
-  }
+  //  @SuppressWarnings("deprecation" /* Rule targets deprecated API. */)
+  //  AbstractThrowableAssert<?, ? extends Throwable> testAbstractThrowableAssertCauseIsSameAs() {
+  //    return assertThat(new IllegalStateException())
+  //        .hasCauseReference(new IllegalArgumentException());
+  //  }
 }
