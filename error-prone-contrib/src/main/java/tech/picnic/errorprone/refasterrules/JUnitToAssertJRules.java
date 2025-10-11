@@ -264,7 +264,6 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
       "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>)",
       "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>, String)",
       "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>, Supplier<String>)",
-      "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>, Supplier<String>, TimeoutFailureFactory<E>)",
       "assertTrue(BooleanSupplier)",
       "assertTrue(BooleanSupplier, String)",
       "assertTrue(BooleanSupplier, Supplier<String>)",
