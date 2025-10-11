@@ -24,6 +24,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.function.Supplier;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.function.ThrowingSupplier;
@@ -263,7 +264,6 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
       "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>)",
       "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>, String)",
       "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>, Supplier<String>)",
-      "assertTimeoutPreemptively(Duration, ThrowingSupplier<T>, Supplier<String>, TimeoutFailureFactory<E>)",
       "assertTrue(BooleanSupplier)",
       "assertTrue(BooleanSupplier, String)",
       "assertTrue(BooleanSupplier, Supplier<String>)",
@@ -300,13 +300,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatBooleanArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(boolean[] actual, Supplier<String> message, boolean[] expected) {
+    void before(boolean[] actual, Supplier<@Nullable String> message, boolean[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean[] actual, Supplier<String> message, boolean[] expected) {
+    void after(boolean[] actual, Supplier<@Nullable String> message, boolean[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -339,13 +339,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatByteArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(byte[] actual, Supplier<String> message, byte[] expected) {
+    void before(byte[] actual, Supplier<@Nullable String> message, byte[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(byte[] actual, Supplier<String> message, byte[] expected) {
+    void after(byte[] actual, Supplier<@Nullable String> message, byte[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -378,13 +378,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatCharArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(char[] actual, Supplier<String> message, char[] expected) {
+    void before(char[] actual, Supplier<@Nullable String> message, char[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(char[] actual, Supplier<String> message, char[] expected) {
+    void after(char[] actual, Supplier<@Nullable String> message, char[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -417,13 +417,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatShortArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(short[] actual, Supplier<String> message, short[] expected) {
+    void before(short[] actual, Supplier<@Nullable String> message, short[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(short[] actual, Supplier<String> message, short[] expected) {
+    void after(short[] actual, Supplier<@Nullable String> message, short[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -456,13 +456,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatIntArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(int[] actual, Supplier<String> message, int[] expected) {
+    void before(int[] actual, Supplier<@Nullable String> message, int[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(int[] actual, Supplier<String> message, int[] expected) {
+    void after(int[] actual, Supplier<@Nullable String> message, int[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -495,13 +495,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatLongArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(long[] actual, Supplier<String> message, long[] expected) {
+    void before(long[] actual, Supplier<@Nullable String> message, long[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(long[] actual, Supplier<String> message, long[] expected) {
+    void after(long[] actual, Supplier<@Nullable String> message, long[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -534,13 +534,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatFloatArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(float[] actual, Supplier<String> message, float[] expected) {
+    void before(float[] actual, Supplier<@Nullable String> message, float[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(float[] actual, Supplier<String> message, float[] expected) {
+    void after(float[] actual, Supplier<@Nullable String> message, float[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -573,13 +573,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset {
     @BeforeTemplate
-    void before(float[] actual, Supplier<String> message, float[] expected, float delta) {
+    void before(float[] actual, Supplier<@Nullable String> message, float[] expected, float delta) {
       assertArrayEquals(expected, actual, delta, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(float[] actual, Supplier<String> message, float[] expected, float delta) {
+    void after(float[] actual, Supplier<@Nullable String> message, float[] expected, float delta) {
       assertThat(actual).withFailMessage(message).containsExactly(expected, offset(delta));
     }
   }
@@ -612,13 +612,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatDoubleArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(double[] actual, Supplier<String> message, double[] expected) {
+    void before(double[] actual, Supplier<@Nullable String> message, double[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(double[] actual, Supplier<String> message, double[] expected) {
+    void after(double[] actual, Supplier<@Nullable String> message, double[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -652,13 +652,20 @@ final class JUnitToAssertJRules {
   static final class AssertThatDoubleArrayWithFailMessageSupplierContainsExactlyWithOffset {
     @BeforeTemplate
     void before(
-        double[] actual, Supplier<String> messageSupplier, double[] expected, double delta) {
+        double[] actual,
+        Supplier<@Nullable String> messageSupplier,
+        double[] expected,
+        double delta) {
       assertArrayEquals(expected, actual, delta, messageSupplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(double[] actual, Supplier<String> messageSupplier, double[] expected, double delta) {
+    void after(
+        double[] actual,
+        Supplier<@Nullable String> messageSupplier,
+        double[] expected,
+        double delta) {
       assertThat(actual).withFailMessage(messageSupplier).containsExactly(expected, offset(delta));
     }
   }
@@ -691,13 +698,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatObjectArrayWithFailMessageSupplierContainsExactly {
     @BeforeTemplate
-    void before(Object[] actual, Supplier<String> message, Object[] expected) {
+    void before(Object[] actual, Supplier<@Nullable String> message, Object[] expected) {
       assertArrayEquals(expected, actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object[] actual, Supplier<String> message, Object[] expected) {
+    void after(Object[] actual, Supplier<@Nullable String> message, Object[] expected) {
       assertThat(actual).withFailMessage(message).containsExactly(expected);
     }
   }
@@ -789,13 +796,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsTrue {
     @BeforeTemplate
-    void before(boolean actual, Supplier<String> supplier) {
+    void before(boolean actual, Supplier<@Nullable String> supplier) {
       assertTrue(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean actual, Supplier<String> supplier) {
+    void after(boolean actual, Supplier<@Nullable String> supplier) {
       assertThat(actual).withFailMessage(supplier).isTrue();
     }
   }
@@ -828,13 +835,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsFalse {
     @BeforeTemplate
-    void before(boolean actual, Supplier<String> supplier) {
+    void before(boolean actual, Supplier<@Nullable String> supplier) {
       assertFalse(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean actual, Supplier<String> supplier) {
+    void after(boolean actual, Supplier<@Nullable String> supplier) {
       assertThat(actual).withFailMessage(supplier).isFalse();
     }
   }
@@ -867,13 +874,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsNull {
     @BeforeTemplate
-    void before(Object actual, Supplier<String> supplier) {
+    void before(Object actual, Supplier<@Nullable String> supplier) {
       assertNull(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Supplier<String> supplier) {
+    void after(Object actual, Supplier<@Nullable String> supplier) {
       assertThat(actual).withFailMessage(supplier).isNull();
     }
   }
@@ -906,13 +913,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsNotNull {
     @BeforeTemplate
-    void before(Object actual, Supplier<String> supplier) {
+    void before(Object actual, Supplier<@Nullable String> supplier) {
       assertNotNull(actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Supplier<String> supplier) {
+    void after(Object actual, Supplier<@Nullable String> supplier) {
       assertThat(actual).withFailMessage(supplier).isNotNull();
     }
   }
@@ -945,13 +952,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsSameAs {
     @BeforeTemplate
-    void before(Object actual, Supplier<String> supplier, Object expected) {
+    void before(Object actual, Supplier<@Nullable String> supplier, Object expected) {
       assertSame(expected, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Supplier<String> supplier, Object expected) {
+    void after(Object actual, Supplier<@Nullable String> supplier, Object expected) {
       assertThat(actual).withFailMessage(supplier).isSameAs(expected);
     }
   }
@@ -984,13 +991,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsNotSameAs {
     @BeforeTemplate
-    void before(Object actual, Supplier<String> supplier, Object expected) {
+    void before(Object actual, Supplier<@Nullable String> supplier, Object expected) {
       assertNotSame(expected, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Supplier<String> supplier, Object expected) {
+    void after(Object actual, Supplier<@Nullable String> supplier, Object expected) {
       assertThat(actual).withFailMessage(supplier).isNotSameAs(expected);
     }
   }
@@ -1025,13 +1032,14 @@ final class JUnitToAssertJRules {
   static final class AssertThatThrownByWithFailMessageSupplierIsExactlyInstanceOf<
       T extends Throwable> {
     @BeforeTemplate
-    void before(Executable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
+    void before(Executable throwingCallable, Supplier<@Nullable String> supplier, Class<T> clazz) {
       assertThrowsExactly(clazz, throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
+    void after(
+        ThrowingCallable throwingCallable, Supplier<@Nullable String> supplier, Class<T> clazz) {
       assertThatThrownBy(throwingCallable).withFailMessage(supplier).isExactlyInstanceOf(clazz);
     }
   }
@@ -1064,13 +1072,14 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatThrownByWithFailMessageSupplierIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
+    void before(Executable throwingCallable, Supplier<@Nullable String> supplier, Class<T> clazz) {
       assertThrows(clazz, throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Supplier<String> supplier, Class<T> clazz) {
+    void after(
+        ThrowingCallable throwingCallable, Supplier<@Nullable String> supplier, Class<T> clazz) {
       assertThatThrownBy(throwingCallable).withFailMessage(supplier).isInstanceOf(clazz);
     }
   }
@@ -1113,18 +1122,18 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException {
     @BeforeTemplate
-    void before(Executable throwingCallable, Supplier<String> supplier) {
+    void before(Executable throwingCallable, Supplier<@Nullable String> supplier) {
       assertDoesNotThrow(throwingCallable, supplier);
     }
 
     @BeforeTemplate
-    void before(ThrowingSupplier<?> throwingCallable, Supplier<String> supplier) {
+    void before(ThrowingSupplier<?> throwingCallable, Supplier<@Nullable String> supplier) {
       assertDoesNotThrow(throwingCallable, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Supplier<String> supplier) {
+    void after(ThrowingCallable throwingCallable, Supplier<@Nullable String> supplier) {
       assertThatCode(throwingCallable).withFailMessage(supplier).doesNotThrowAnyException();
     }
   }
@@ -1157,13 +1166,13 @@ final class JUnitToAssertJRules {
 
   static final class AssertThatWithFailMessageSupplierIsInstanceOf<T> {
     @BeforeTemplate
-    void before(Object actual, Supplier<String> supplier, Class<T> clazz) {
+    void before(Object actual, Supplier<@Nullable String> supplier, Class<T> clazz) {
       assertInstanceOf(clazz, actual, supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object actual, Supplier<String> supplier, Class<T> clazz) {
+    void after(Object actual, Supplier<@Nullable String> supplier, Class<T> clazz) {
       assertThat(actual).withFailMessage(supplier).isInstanceOf(clazz);
     }
   }
