@@ -130,7 +130,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
       if (TEST_HELPER_NEW_INSTANCE.matches(tree, state)) {
         return Optional.ofNullable(ASTHelpers.getSymbol(tree.getArguments().get(0)))
             .filter(s -> !s.type.allparams().isEmpty())
-            .map(s -> s.type.allparams().get(0).tsym.getQualifiedName().toString());
+            .map(s -> s.type.allparams().getFirst().tsym.getQualifiedName().toString());
       }
 
       ExpressionTree receiver = ASTHelpers.getReceiver(tree);

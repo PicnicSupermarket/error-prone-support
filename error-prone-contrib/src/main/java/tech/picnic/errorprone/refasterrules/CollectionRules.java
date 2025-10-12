@@ -399,7 +399,7 @@ final class CollectionRules {
 
     @BeforeTemplate
     Optional<T> before(List<T> collection) {
-      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.get(0));
+      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.getFirst());
     }
 
     @BeforeTemplate
@@ -481,6 +481,32 @@ final class CollectionRules {
     @AfterTemplate
     void after(Collection<T> collection, Consumer<? super T> consumer) {
       collection.forEach(consumer);
+    }
+  }
+
+  /** Prefer {@link List#getFirst()} over less idiomatic alternatives. */
+  static final class ListGetFirst<T> {
+    @BeforeTemplate
+    T before(List<T> list) {
+      return list.get(0);
+    }
+
+    @AfterTemplate
+    T after(List<T> list) {
+      return list.getFirst();
+    }
+  }
+
+  /** Prefer {@link List#getLast()} over less idiomatic alternatives. */
+  static final class ListGetLast<T> {
+    @BeforeTemplate
+    T before(List<T> list) {
+      return list.get(list.size() - 1);
+    }
+
+    @AfterTemplate
+    T after(List<T> list) {
+      return list.getLast();
     }
   }
 

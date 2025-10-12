@@ -12,7 +12,6 @@ import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.receiverOfInvocation;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.symbolMatcher;
-import static com.google.errorprone.matchers.Matchers.toType;
 import static com.google.errorprone.predicates.TypePredicates.anyOf;
 import static com.google.errorprone.predicates.TypePredicates.isArray;
 import static com.google.errorprone.predicates.TypePredicates.isDescendantOfAny;
@@ -129,24 +128,21 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
    *     compact means of recognizing a wide range of methods that are exceedingly likely to produce
    *     empty instances.
    */
-  private static final Matcher<ExpressionTree> EMPTY_INSTANCE_FACTORY =
+  private static final Matcher<MethodInvocationTree> EMPTY_INSTANCE_FACTORY =
+      allOf(
+          argumentCount(0),
+          anyOf(
+              staticMethod().onClass(CONTAINER_TYPE).namedAnyOf("empty", "just", "of", "ofEntries"),
+              staticMethod()
+                  .onClassAny(
+                      Collections.class.getCanonicalName(), Spliterators.class.getCanonicalName())
+                  .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN)));
+
+  private static final Matcher<ExpressionTree> EMPTY_INSTANCE_CONSTANT =
       anyOf(
           staticField(Collections.class.getCanonicalName(), "EMPTY_LIST"),
           staticField(Collections.class.getCanonicalName(), "EMPTY_MAP"),
-          staticField(Collections.class.getCanonicalName(), "EMPTY_SET"),
-          toType(
-              MethodInvocationTree.class,
-              allOf(
-                  argumentCount(0),
-                  anyOf(
-                      staticMethod()
-                          .onClass(CONTAINER_TYPE)
-                          .namedAnyOf("empty", "just", "of", "ofEntries"),
-                      staticMethod()
-                          .onClassAny(
-                              Collections.class.getCanonicalName(),
-                              Spliterators.class.getCanonicalName())
-                          .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN)))));
+          staticField(Collections.class.getCanonicalName(), "EMPTY_SET"));
 
   /**
    * A matcher of operations on empty container expressions that yield (another) empty instance.
@@ -180,39 +176,38 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   // matcher does not exclude Guava's `SetView#copyInto` method, because in practice `SetView`s are
   // returned only by methods in the `Sets` utility class, none of which are currently recognized by
   // this matcher.
-  private static final Matcher<ExpressionTree> EMPTY_DERIVATIVE =
-      toType(
-          MethodInvocationTree.class,
-          allOf(
-              anyOf(
-                  symbolReturns(REGULAR_CONTAINER_TYPE),
-                  allOf(
-                      symbolReturns(REACTOR_CONTAINER_TYPE),
-                      instanceMethod().anyClass().namedAnyOf("readOnly", "delete"))),
-              receiverOfInvocation(new IsEmpty())));
+  private static final Matcher<MethodInvocationTree> EMPTY_DERIVATIVE =
+      allOf(
+          anyOf(
+              symbolReturns(REGULAR_CONTAINER_TYPE),
+              allOf(
+                  symbolReturns(REACTOR_CONTAINER_TYPE),
+                  instanceMethod().anyClass().namedAnyOf("readOnly", "delete"))),
+          receiverOfInvocation(new IsEmpty()));
 
   /** Instantiates a new {@link IsEmpty} instance. */
   public IsEmpty() {}
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
-    // XXX: Once we target JDK 21+, use a type switch here.
-    return isEmptyArrayCreation(tree)
-        || isEmptyCollectionConstructor(tree, state)
-        || EMPTY_INSTANCE_FACTORY.matches(tree, state)
-        || (tree instanceof TypeCastTree typeCast && matches(typeCast.getExpression(), state))
-        || (tree instanceof ParenthesizedTree parenthesized
-            && matches(parenthesized.getExpression(), state))
-        || EMPTY_DERIVATIVE.matches(tree, state);
+    return switch (tree) {
+      case MethodInvocationTree methodInvocation ->
+          EMPTY_INSTANCE_FACTORY.matches(methodInvocation, state)
+              || EMPTY_DERIVATIVE.matches(methodInvocation, state);
+      case NewArrayTree newArray -> isEmptyArrayCreation(newArray);
+      case NewClassTree newClass -> isEmptyCollectionConstructor(newClass, state);
+      case ParenthesizedTree parenthesized -> matches(parenthesized.getExpression(), state);
+      case TypeCastTree typeCast -> matches(typeCast.getExpression(), state);
+      default -> EMPTY_INSTANCE_CONSTANT.matches(tree, state);
+    };
   }
 
-  private boolean isEmptyCollectionConstructor(ExpressionTree tree, VisitorState state) {
-    if (!(tree instanceof NewClassTree newClassTree)
-        || !MUTABLE_COLLECTION_TYPE.matches(tree, state)) {
+  private boolean isEmptyCollectionConstructor(NewClassTree newClass, VisitorState state) {
+    if (!MUTABLE_COLLECTION_TYPE.matches(newClass, state)) {
       return false;
     }
 
-    List<? extends ExpressionTree> arguments = newClassTree.getArguments();
+    List<? extends ExpressionTree> arguments = newClass.getArguments();
     if (arguments.stream().allMatch(a -> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT.matches(a, state))) {
       /*
        * This is a default constructor, or a constructor that creates an empty collection using
@@ -229,11 +224,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
     return matches(arguments.get(0), state);
   }
 
-  private static boolean isEmptyArrayCreation(ExpressionTree tree) {
-    if (!(tree instanceof NewArrayTree newArray)) {
-      return false;
-    }
-
+  private static boolean isEmptyArrayCreation(NewArrayTree newArray) {
     return (!newArray.getDimensions().isEmpty()
             && ZERO.equals(ASTHelpers.constValue(newArray.getDimensions().get(0), Integer.class)))
         || (newArray.getInitializers() != null && newArray.getInitializers().isEmpty());

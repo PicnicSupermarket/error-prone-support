@@ -130,14 +130,18 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(1).isEmpty()
             ? Optional.empty()
             : Optional.of(ImmutableSet.of(1).iterator().next()),
-        ImmutableList.of(2).isEmpty() ? Optional.empty() : Optional.of(ImmutableList.of(2).get(0)),
+        ImmutableList.of(2).isEmpty()
+            ? Optional.empty()
+            : Optional.of(ImmutableList.of(2).getFirst()),
         ImmutableSortedSet.of(3).isEmpty()
             ? Optional.empty()
             : Optional.of(ImmutableSortedSet.of(3).first()),
         !ImmutableSet.of(1).isEmpty()
             ? Optional.of(ImmutableSet.of(1).iterator().next())
             : Optional.empty(),
-        !ImmutableList.of(2).isEmpty() ? Optional.of(ImmutableList.of(2).get(0)) : Optional.empty(),
+        !ImmutableList.of(2).isEmpty()
+            ? Optional.of(ImmutableList.of(2).getFirst())
+            : Optional.empty(),
         !ImmutableSortedSet.of(3).isEmpty()
             ? Optional.of(ImmutableSortedSet.of(3).first())
             : Optional.empty());
@@ -206,5 +210,13 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   void testCollectionForEach() {
     ImmutableSet.of(1).stream().forEach(String::valueOf);
+  }
+
+  String testListGetFirst() {
+    return ImmutableList.of("foo").get(0);
+  }
+
+  String testListGetLast() {
+    return ImmutableList.of("foo").get(ImmutableList.of("foo").size() - 1);
   }
 }
