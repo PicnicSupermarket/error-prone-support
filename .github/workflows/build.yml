@@ -23,7 +23,7 @@ jobs:
         target-jdk: [ 17.0.16 ]
         include:
           - os: ubuntu-24.04
-            build-jdk: 24.0.2
+            build-jdk: 25
             target-jdk: 17.0.16
     runs-on: ${{ matrix.os }}
     steps:
