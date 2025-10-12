@@ -156,4 +156,12 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   void testCollectionForEach() {
     ImmutableSet.of(1).forEach(String::valueOf);
   }
+
+  String testListGetFirst() {
+    return ImmutableList.of("foo").getFirst();
+  }
+
+  String testListGetLast() {
+    return ImmutableList.of("foo").getLast();
+  }
 }

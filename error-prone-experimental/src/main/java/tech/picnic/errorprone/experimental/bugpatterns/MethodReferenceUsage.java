@@ -187,7 +187,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       }
     }
 
-    return Optional.of(diff == 0 ? Optional.empty() : Optional.of(expectedArguments.get(0)));
+    return Optional.of(diff == 0 ? Optional.empty() : Optional.of(expectedArguments.getFirst()));
   }
 
   private static ImmutableList<Name> getVariables(LambdaExpressionTree tree) {

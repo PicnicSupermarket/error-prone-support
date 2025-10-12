@@ -13,8 +13,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 /**
  * Refaster rules related to AssertJ assertions over {@link Duration}s.
  *
- * <p>These rules simplify and improve the readability of tests by using {@link Duration}-specific
- * AssertJ assertion methods instead of generic assertions.
+ * <p>These rules simplify and improve the rAssertJDurationRuleseadability of tests by using {@link
+ * Duration}-specific AssertJ assertion methods instead of generic assertions.
  */
 @OnlineDocumentation
 final class AssertJDurationRules {
@@ -112,11 +112,14 @@ final class AssertJDurationRules {
     }
   }
 
-  // XXX: Once we build against JDK 18+, update this rule to also rewrite
-  // `assertThat(duration.isPositive()).isTrue()`
   static final class AssertThatIsPositive {
     @BeforeTemplate
-    AbstractDurationAssert<?> before(Duration duration) {
+    AbstractBooleanAssert<?> before(Duration duration) {
+      return assertThat(duration.isPositive()).isTrue();
+    }
+
+    @BeforeTemplate
+    AbstractDurationAssert<?> before2(Duration duration) {
       return assertThat(duration).isGreaterThan(Duration.ZERO);
     }
 

@@ -93,7 +93,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                   .named("copyOf"),
               symbolMatcher(
                   (symbol, state) ->
-                      state.getTypes().isArray(((MethodSymbol) symbol).params().get(0).type))),
+                      state.getTypes().isArray(((MethodSymbol) symbol).params().getFirst().type))),
           staticMethod().onClass(Arrays.class.getCanonicalName()).named("asList"));
   private static final Matcher<ExpressionTree> FLUX =
       staticMethod().onDescendantOf("reactor.core.publisher.Flux");
@@ -156,7 +156,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     List<VarSymbol> params = method.params();
     return !method.isVarArgs()
         && params.size() == 1
-        && ASTHelpers.isSubtype(params.get(0).type, state.getSymtab().iterableType, state);
+        && ASTHelpers.isSubtype(params.getFirst().type, state.getSymtab().iterableType, state);
   }
 
   private static boolean isLocalOverload(MethodSymbol calledMethod, VisitorState state) {

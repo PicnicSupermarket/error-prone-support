@@ -29,7 +29,7 @@ jobs:
         uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
           checkout-fetch-depth: 2
-          java-version: 21.0.8
+          java-version: 25
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Run Pitest

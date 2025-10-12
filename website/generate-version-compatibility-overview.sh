@@ -12,6 +12,8 @@ set -e -u -o pipefail
 
 # Currently all released Error Prone Support versions are compatible with Java
 # 17.
+# XXX: This is no longer true. Do something smarter (maybe look at
+# `.sdkmanrc`)?
 java_version=17.0.16-tem
 (set +u && echo n | sdk install java "${java_version}")
 sdk use java "${java_version}"

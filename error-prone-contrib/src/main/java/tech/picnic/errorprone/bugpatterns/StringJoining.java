@@ -85,7 +85,7 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
     }
 
     int lastIndex = separators.size() - 1;
-    if (!separators.get(0).isEmpty() || !separators.get(lastIndex).isEmpty()) {
+    if (!separators.getFirst().isEmpty() || !separators.get(lastIndex).isEmpty()) {
       /* The format string contains leading or trailing characters. */
       return Description.NO_MATCH;
     }
