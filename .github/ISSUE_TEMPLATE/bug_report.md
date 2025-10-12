@@ -41,10 +41,10 @@ Please replace this sentence with log output, if applicable.
 
 <!-- Please complete the following information: -->
 
-- Operating system (e.g. MacOS Monterey).
-- Java version (i.e. `java --version`, e.g. `17.0.16`).
-- Error Prone version (e.g. `2.41.0`).
-- Error Prone Support version (e.g. `0.24.0`).
+- Operating system (e.g. MacOS Tahoe).
+- Java version (i.e. `java --version`, e.g. `21.0.8`).
+- Error Prone version (e.g. `2.42.0`).
+- Error Prone Support version (e.g. `0.25.0`).
 
 ### Additional context
 
