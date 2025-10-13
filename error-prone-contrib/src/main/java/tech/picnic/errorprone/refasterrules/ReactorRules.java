@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -95,6 +96,32 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after() {
       return Mono.empty();
+    }
+  }
+
+  /** Prefer {@link Mono#timeout(Duration, Mono)} over more contrived alternatives. */
+  static final class MonoTimeoutEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Duration duration) {
+      return mono.timeout(duration).onErrorComplete(TimeoutException.class);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Duration duration) {
+      return mono.timeout(duration, Mono.empty());
+    }
+  }
+
+  /** Prefer {@link Mono#timeout(Duration, Mono)} over more contrived alternatives. */
+  static final class MonoTimeoutFallback<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Duration duration, T t) {
+      return mono.timeout(duration).onErrorReturn(TimeoutException.class, t);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Duration duration, T t) {
+      return mono.timeout(duration, Mono.fromSupplier(() -> t));
     }
   }
 
