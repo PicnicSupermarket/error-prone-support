@@ -74,12 +74,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Mono.justOrEmpty(null), Mono.justOrEmpty(Optional.empty()));
   }
 
-  Mono<Integer> testMonoTimeoutEmpty() {
-    return Mono.just(1).timeout(Duration.ofSeconds(1)).onErrorComplete(TimeoutException.class);
+  Mono<Integer> testMonoTimeoutMonoEmpty() {
+    return Mono.just(1).timeout(Duration.ofSeconds(2)).onErrorComplete(TimeoutException.class);
   }
 
-  Mono<Integer> testMonoTimeoutFallback() {
-    return Mono.just(1).timeout(Duration.ofSeconds(1)).onErrorReturn(TimeoutException.class, 2);
+  Mono<Integer> testMonoTimeoutMonoJust() {
+    return Mono.just(1).timeout(Duration.ofSeconds(2)).onErrorReturn(TimeoutException.class, 3);
   }
 
   ImmutableSet<Mono<Integer>> testMonoJust() {

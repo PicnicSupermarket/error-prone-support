@@ -99,8 +99,11 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#timeout(Duration, Mono)} over more contrived alternatives. */
-  static final class MonoTimeoutEmpty<T> {
+  /**
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutMonoEmpty<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, Duration duration) {
       return mono.timeout(duration).onErrorComplete(TimeoutException.class);
@@ -112,16 +115,19 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#timeout(Duration, Mono)} over more contrived alternatives. */
-  static final class MonoTimeoutFallback<T> {
+  /**
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutMonoJust<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Duration duration, T t) {
-      return mono.timeout(duration).onErrorReturn(TimeoutException.class, t);
+    Mono<T> before(Mono<T> mono, Duration duration, T fallbackValue) {
+      return mono.timeout(duration).onErrorReturn(TimeoutException.class, fallbackValue);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Duration duration, T t) {
-      return mono.timeout(duration, Mono.fromSupplier(() -> t));
+    Mono<T> after(Mono<T> mono, Duration duration, T fallbackValue) {
+      return mono.timeout(duration, Mono.just(fallbackValue));
     }
   }
 
