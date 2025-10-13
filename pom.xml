@@ -1053,8 +1053,6 @@
                                     those strictly required, and disable all
                                     linting. -->
                                     <arg>-Xlint:none</arg>
-                                    <!-- Use `classpathFromResources` -->
-                                    <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
                                 </compilerArgs>
                                 <source>8</source>
                                 <target>8</target>
