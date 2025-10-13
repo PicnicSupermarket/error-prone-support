@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import reactor.core.publisher.Flux;
@@ -52,6 +53,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         List.class,
         ImmutableCollection.class,
         ImmutableMap.class,
+        TimeoutException.class,
         assertThat(false),
         assertThat(0),
         maxBy(null),
@@ -73,6 +75,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Mono<String>> testMonoEmpty() {
     return ImmutableSet.of(Mono.empty(), Mono.empty());
+  }
+
+  Mono<Integer> testMonoTimeoutEmpty() {
+    return Mono.just(1).timeout(Duration.ofSeconds(1), Mono.empty());
+  }
+
+  Mono<Integer> testMonoTimeoutFallback() {
+    return Mono.just(1).timeout(Duration.ofSeconds(1), Mono.fromSupplier(() -> 2));
   }
 
   ImmutableSet<Mono<Integer>> testMonoJust() {
