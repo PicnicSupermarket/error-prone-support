@@ -505,6 +505,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-templating</artifactId>
+                <version>1.36.3</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-bom</artifactId>
                 <version>2.0.17</version>
@@ -1016,9 +1021,9 @@
                                     those strictly required, and disable all
                                     linting. -->
                                     <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                    <arg>-Xlint:none</arg>
                                     <!-- Use `classpathFromResources` -->
                                     <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
-                                    <arg>-Xlint:none</arg>
                                 </compilerArgs>
                                 <includes>
                                     <include>**/*Rules.java</include>
@@ -1048,6 +1053,8 @@
                                     those strictly required, and disable all
                                     linting. -->
                                     <arg>-Xlint:none</arg>
+                                    <!-- Use `classpathFromResources` -->
+                                    <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
                                 </compilerArgs>
                                 <source>8</source>
                                 <target>8</target>
