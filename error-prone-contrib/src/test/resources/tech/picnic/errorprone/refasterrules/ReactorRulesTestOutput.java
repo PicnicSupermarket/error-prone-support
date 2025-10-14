@@ -81,8 +81,28 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just(1).timeout(Duration.ofSeconds(2), Mono.empty());
   }
 
+  Mono<Integer> testMonoTimeoutPublisherMonoEmpty() {
+    return Mono.just(1).timeout(Mono.just(2), Mono.empty());
+  }
+
   Mono<Integer> testMonoTimeoutMonoJust() {
     return Mono.just(1).timeout(Duration.ofSeconds(2), Mono.just(3));
+  }
+
+  ImmutableSet<Mono<Integer>> testMonoTimeoutMonoFallback() {
+    return ImmutableSet.of(
+        Mono.just(1).timeout(Duration.ofSeconds(2), Mono.empty()),
+        Mono.just(3).timeout(Duration.ofSeconds(4), Mono.just(5)));
+  }
+
+  Mono<Integer> testMonoTimeoutPublisherMonoJust() {
+    return Mono.just(1).timeout(Mono.just(2), Mono.just(3));
+  }
+
+  ImmutableSet<Mono<Integer>> testMonoTimeoutPublisherMonoFallback() {
+    return ImmutableSet.of(
+        Mono.just(1).timeout(Mono.just(2), Mono.empty()),
+        Mono.just(3).timeout(Mono.just(4), Mono.just(5)));
   }
 
   ImmutableSet<Mono<Integer>> testMonoJust() {
@@ -209,6 +229,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.empty(),
         Flux.empty(),
         Flux.empty());
+  }
+
+  ImmutableSet<Flux<Integer>> testFluxTimeoutFluxEmpty() {
+    return ImmutableSet.of(
+        Flux.just(1).timeout(Duration.ofSeconds(2), Flux.empty()),
+        Flux.just(3).timeout(Duration.ofSeconds(4), Flux.empty()));
   }
 
   ImmutableSet<Flux<Integer>> testFluxJust() {

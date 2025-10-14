@@ -78,8 +78,34 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just(1).timeout(Duration.ofSeconds(2)).onErrorComplete(TimeoutException.class);
   }
 
+  Mono<Integer> testMonoTimeoutPublisherMonoEmpty() {
+    return Mono.just(1).timeout(Mono.just(2)).onErrorComplete(TimeoutException.class);
+  }
+
   Mono<Integer> testMonoTimeoutMonoJust() {
     return Mono.just(1).timeout(Duration.ofSeconds(2)).onErrorReturn(TimeoutException.class, 3);
+  }
+
+  ImmutableSet<Mono<Integer>> testMonoTimeoutMonoFallback() {
+    return ImmutableSet.of(
+        Mono.just(1)
+            .timeout(Duration.ofSeconds(2))
+            .onErrorResume(TimeoutException.class, e -> Mono.empty()),
+        Mono.just(3)
+            .timeout(Duration.ofSeconds(4))
+            .onErrorResume(TimeoutException.class, e -> Mono.just(5)));
+  }
+
+  Mono<Integer> testMonoTimeoutPublisherMonoJust() {
+    return Mono.just(1).timeout(Mono.just(2)).onErrorReturn(TimeoutException.class, 3);
+  }
+
+  ImmutableSet<Mono<Integer>> testMonoTimeoutPublisherMonoFallback() {
+    return ImmutableSet.of(
+        Mono.just(1).timeout(Mono.just(2)).onErrorResume(TimeoutException.class, e -> Mono.empty()),
+        Mono.just(3)
+            .timeout(Mono.just(4))
+            .onErrorResume(TimeoutException.class, e -> Mono.just(5)));
   }
 
   ImmutableSet<Mono<Integer>> testMonoJust() {
@@ -205,6 +231,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.mergeComparing(),
         Flux.mergePriority(),
         Flux.range(0, 0));
+  }
+
+  ImmutableSet<Flux<Integer>> testFluxTimeoutFluxEmpty() {
+    return ImmutableSet.of(
+        Flux.just(1).timeout(Duration.ofSeconds(2)).onErrorComplete(TimeoutException.class),
+        Flux.just(3)
+            .timeout(Duration.ofSeconds(4))
+            .onErrorResume(TimeoutException.class, e -> Flux.empty()));
   }
 
   ImmutableSet<Flux<Integer>> testFluxJust() {
