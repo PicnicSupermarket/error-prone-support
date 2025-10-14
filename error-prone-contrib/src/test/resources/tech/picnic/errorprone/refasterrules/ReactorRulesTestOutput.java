@@ -231,10 +231,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.empty());
   }
 
-  ImmutableSet<Flux<Integer>> testFluxTimeoutFluxEmpty() {
-    return ImmutableSet.of(
-        Flux.just(1).timeout(Duration.ofSeconds(2), Flux.empty()),
-        Flux.just(3).timeout(Duration.ofSeconds(4), Flux.empty()));
+  Flux<Integer> testFluxTimeoutFluxEmpty() {
+    return Flux.just(1).timeout(Duration.ofSeconds(2), Flux.empty());
   }
 
   ImmutableSet<Flux<Integer>> testFluxJust() {

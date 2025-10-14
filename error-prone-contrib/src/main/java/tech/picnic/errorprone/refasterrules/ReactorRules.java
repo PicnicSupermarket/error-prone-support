@@ -597,9 +597,7 @@ final class ReactorRules {
   static final class FluxTimeoutFluxEmpty<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Duration duration) {
-      return Refaster.anyOf(
-          flux.timeout(duration).onErrorComplete(TimeoutException.class),
-          flux.timeout(duration).onErrorResume(TimeoutException.class, e -> Flux.empty()));
+      return flux.timeout(duration).onErrorComplete(TimeoutException.class);
     }
 
     @AfterTemplate
