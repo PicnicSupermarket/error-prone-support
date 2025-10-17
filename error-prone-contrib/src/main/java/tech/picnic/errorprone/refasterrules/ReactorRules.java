@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -95,6 +96,102 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after() {
       return Mono.empty();
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutDurationMonoEmpty<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Duration duration) {
+      return mono.timeout(duration).onErrorComplete(TimeoutException.class);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Duration duration) {
+      return mono.timeout(duration, Mono.empty());
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutDurationMonoJust<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Duration duration, T fallbackValue) {
+      return mono.timeout(duration).onErrorReturn(TimeoutException.class, fallbackValue);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Duration duration, T fallbackValue) {
+      return mono.timeout(duration, Mono.just(fallbackValue));
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutDuration<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Duration duration, Mono<T> fallback) {
+      return mono.timeout(duration).onErrorResume(TimeoutException.class, e -> fallback);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Duration duration, Mono<T> fallback) {
+      return mono.timeout(duration, fallback);
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutPublisherMonoEmpty<T, S> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Publisher<S> other) {
+      return mono.timeout(other).onErrorComplete(TimeoutException.class);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Publisher<S> other) {
+      return mono.timeout(other, Mono.empty());
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutPublisherMonoJust<T, S> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Publisher<S> other, T fallbackValue) {
+      return mono.timeout(other).onErrorReturn(TimeoutException.class, fallbackValue);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Publisher<S> other, T fallbackValue) {
+      return mono.timeout(other, Mono.just(fallbackValue));
+    }
+  }
+
+  /**
+   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class MonoTimeoutPublisher<T, S> {
+    @BeforeTemplate
+    Mono<T> before(Mono<T> mono, Publisher<S> other, Mono<T> fallback) {
+      return mono.timeout(other).onErrorResume(TimeoutException.class, e -> fallback);
+    }
+
+    @AfterTemplate
+    Mono<T> after(Mono<T> mono, Publisher<S> other, Mono<T> fallback) {
+      return mono.timeout(other, fallback);
     }
   }
 
@@ -490,6 +587,22 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after() {
       return Flux.empty();
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#timeout(Duration, Publisher)} over more contrived or less performant
+   * alternatives.
+   */
+  static final class FluxTimeoutFluxEmpty<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Duration duration) {
+      return flux.timeout(duration).onErrorComplete(TimeoutException.class);
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Duration duration) {
+      return flux.timeout(duration, Flux.empty());
     }
   }
 
