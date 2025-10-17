@@ -2624,4 +2624,18 @@ final class ReactorRules {
       return flux.next();
     }
   }
+
+  /** Prefer {@link Flux#fromArray(Object[])} over {@link Flux#just(Object...)}. */
+  static final class FluxJustFromArray<T> {
+    @BeforeTemplate
+    Flux<T> before(@Repeated T elements) {
+      return Flux.just(Refaster.asVarargs(elements));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked")
+    Flux<T> after(@Repeated T elements) {
+      return Flux.fromArray(Refaster.asVarargs(elements));
+    }
+  }
 }
