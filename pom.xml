@@ -497,6 +497,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- XXX: Drop once we depend on `rewrite-recipe-bom` 3.17.0+. -->
+            <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-templating</artifactId>
+                <version>1.36.3</version>
+            </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
@@ -1017,6 +1023,10 @@
                                     linting. -->
                                     <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                                     <arg>-Xlint:none</arg>
+                                    <!-- Generate recipe definitions that use
+                                    `JavaParser.Builder#classpathFromResources`
+                                    rather than `JavaParser.Builder#classpath`. -->
+                                    <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
                                 </compilerArgs>
                                 <includes>
                                     <include>**/*Rules.java</include>
