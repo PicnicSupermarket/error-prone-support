@@ -24,9 +24,9 @@
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 --- a/pom.xml
 +++ b/pom.xml
-@@ -136,6 +136,27 @@
-         </repository>
-     </distributionManagement>
+@@ -123,6 +123,27 @@
+         <url>https://github.com/dropwizard/metrics/issues/</url>
+     </issueManagement>
  
 +    <dependencyManagement>
 +        <dependencies>
@@ -51,19 +51,17 @@
 +
      <profiles>
          <profile>
-             <id>jdk8</id>
-@@ -218,7 +239,9 @@
-                             <compilerArgs>
+             <id>jdk17</id>
+@@ -145,7 +166,7 @@
                                  <arg>-Xlint:all</arg>
                                  <arg>-XDcompilePolicy=simple</arg>
+                                 <arg>--should-stop=ifError=FLOW</arg>
 -                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
-+                                <!-- XXX: Drop this flag once the project uses Error Prone 2.36.0+ by default. -->
-+                                <arg>--should-stop=ifError=FLOW</arg>
-+                                <arg>-Xplugin:ErrorProne ${error-prone.configuration-args}</arg>
++                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.* ${error-prone.configuration-args}</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-@@ -229,12 +252,24 @@
+@@ -156,12 +177,24 @@
                                  <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                                  <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                                  <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
@@ -89,12 +87,3 @@
                                  </path>
                              </annotationProcessorPaths>
                          </configuration>
-@@ -364,7 +399,7 @@
-                 <groupId>org.apache.maven.plugins</groupId>
-                 <artifactId>maven-compiler-plugin</artifactId>
-                 <configuration>
--                    <release>8</release>
-+                    <release>11</release>
-                     <fork>true</fork>
-                     <parameters>true</parameters>
-                     <showWarnings>true</showWarnings>

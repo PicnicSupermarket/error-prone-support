@@ -11,18 +11,13 @@
              .withLogConsumer(LogConsumer.withPrefix(sampleApp))
 --- a/pom.xml
 +++ b/pom.xml
-@@ -99,7 +99,6 @@
-       <groupId>com.google.guava</groupId>
-       <artifactId>guava</artifactId>
-       <version>${guava.version}</version>
--      <scope>test</scope>
-     </dependency>
-     <dependency>
-       <groupId>org.slf4j</groupId>
-@@ -312,13 +311,24 @@
+@@ -267,21 +267,32 @@
+               -Xep:MissingSummary:OFF
                -Xep:LongDoubleConversion:OFF
                -Xep:StringSplitter:OFF
-               -XepExcludedPaths:.*/generated/.*
+-              -XepExcludedPaths:(.*/generated/.*|.*/src/test/java/.*|.*/examples/.*|.*/integration-tests/.*)
++              -XepExcludedPaths:.*/generated/.*
+               -XepOpt:NullAway:AnnotatedPackages=io.prometheus.metrics
 +              ${error-prone.configuration-args}
              </arg>
            </compilerArgs>
@@ -30,9 +25,14 @@
              <path>
                <groupId>com.google.errorprone</groupId>
                <artifactId>error_prone_core</artifactId>
--              <version>2.38.0</version>
+-              <version>2.41.0</version>
 +              <version>${error-prone.version}</version>
-+            </path>
+             </path>
+             <path>
+               <groupId>com.uber.nullaway</groupId>
+               <artifactId>nullaway</artifactId>
+               <version>0.12.8</version>
+             </path>
 +            <path>
 +              <groupId>tech.picnic.error-prone-support</groupId>
 +              <artifactId>error-prone-contrib</artifactId>
@@ -42,14 +42,23 @@
 +              <groupId>tech.picnic.error-prone-support</groupId>
 +              <artifactId>refaster-runner</artifactId>
 +              <version>${error-prone-support.version}</version>
-             </path>
++            </path>
              <!-- Other annotation processors go here.
  
+             If 'annotationProcessorPaths' is set, processors will no longer be
+@@ -394,7 +405,6 @@
+           <groupId>com.google.guava</groupId>
+           <artifactId>guava</artifactId>
+           <version>${guava.version}</version>
+-          <scope>test</scope>
+         </dependency>
+         <dependency>
+           <groupId>org.slf4j</groupId>
 --- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
 +++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
-@@ -27,6 +27,8 @@ import java.io.ByteArrayOutputStream;
- import java.io.IOException;
- import org.junit.jupiter.api.Test;
+@@ -32,6 +32,8 @@ import org.junit.jupiter.api.Test;
+ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.CsvSource;
  
 +// This class is extended by another test class.
 +@SuppressWarnings("JUnitClassModifiers")
