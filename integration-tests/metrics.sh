@@ -5,10 +5,10 @@ set -e -u -o pipefail
 test_name="$(basename "${0}" .sh)"
 project='metrics'
 repository='https://github.com/dropwizard/metrics.git'
-revision='v5.0.0-rc22'
+revision='v5.0.5'
 additional_build_flags=''
 additional_source_directories=''
-shared_error_prone_flags='-XepExcludedPaths:.*/target/generated-sources/.* -XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=LOGGER'
+shared_error_prone_flags='-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=LOGGER'
 patch_error_prone_flags=''
 validation_error_prone_flags=''
 # Validation skips two instances of the

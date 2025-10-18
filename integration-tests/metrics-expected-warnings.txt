@@ -10,9 +10,13 @@ metrics-core/src/main/java/io/dropwizard/metrics5/CsvReporter.java:[390,35] [For
 metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.java:[244,25] [try] auto-closeable resource durationContext is never referenced in body of corresponding try statement
 metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.java:[266,25] [try] auto-closeable resource context is never referenced in body of corresponding try statement
 metrics-core/src/main/java/io/dropwizard/metrics5/MetricRegistry.java:[56,27] [this-escape] possible 'this' escape before subclass is fully initialized
+metrics-core/src/main/java/io/dropwizard/metrics5/ScheduledReporter.java:[40,12] [removal] SecurityManager in java.lang has been deprecated and marked for removal
+metrics-core/src/main/java/io/dropwizard/metrics5/ScheduledReporter.java:[40,38] [removal] getSecurityManager() in System has been deprecated and marked for removal
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[431,17] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[436,19] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[449,20] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
+metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java:[270,32] [removal] getSecurityManager() in System has been deprecated and marked for removal
+metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java:[270,6] [removal] SecurityManager in java.lang has been deprecated and marked for removal
 metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest.java:[189,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
 metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest.java:[203,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
 metrics-httpasyncclient/src/main/java/io/dropwizard/metrics5/httpasyncclient/InstrumentedNClientConnManager.java:[40,8] [this-escape] possible 'this' escape before subclass is fully initialized
@@ -33,6 +37,8 @@ metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[287,19] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/CpuProfileServlet.java:[23,21] [serial] non-transient instance field of a serializable class declared with a non-serializable type
 metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/HealthCheckServletTest.java:[31,67] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
+metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/InstrumentedTimingCollector.java:[20,52] [removal] TimingCollector in org.jdbi.v3.core.statement has been deprecated and marked for removal
+metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/InstrumentedTimingCollector.java:[36,14] [removal] collect(long,StatementContext) in TimingCollector has been deprecated and marked for removal
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[18,10] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
 metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[24,20] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
 metrics-jetty10/src/main/java/io/dropwizard/metrics5/jetty10/InstrumentedConnectionFactory.java:[26,11] [this-escape] possible 'this' escape before subclass is fully initialized
