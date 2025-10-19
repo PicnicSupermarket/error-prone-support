@@ -11,10 +11,7 @@ additional_source_directories=''
 shared_error_prone_flags=''
 patch_error_prone_flags=''
 validation_error_prone_flags=''
-# Validation skips some tests:
-# - Starting from a clean repository, the `PushGatewayIT` tests reference a JAR
-#   file that is created only after test completion, causing the tests to fail.
-validation_build_flags='-Dtest=!PushGatewayIT -Dsurefire.failIfNoSpecifiedTests=false'
+validation_build_flags=''
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
   >&2 echo "Usage: ${0} [--sync] [<report_directory>]"
