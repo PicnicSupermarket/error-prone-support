@@ -149,44 +149,40 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
     return isStatic ? "comparing" : "thenComparing";
   }
 
-  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static Optional<Type> getPotentiallyBoxedReturnType(ExpressionTree tree) {
-    if (tree instanceof LambdaExpressionTree lambdaExpression) {
-      /* Return the lambda expression's actual return type. */
-      return Optional.ofNullable(ASTHelpers.getType(lambdaExpression.getBody()));
-    }
-
-    // XXX: The match against a concrete type and reference to one of its fields is fragile. Do
-    // better.
-    if (tree instanceof JCMemberReference memberReference) {
-      /* Return the method's declared return type. */
-      Type subType = memberReference.referentType;
-      return Optional.of(subType.getReturnType());
-    }
-
-    /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
-    return Optional.empty();
+    return switch (tree) {
+      case LambdaExpressionTree lambdaExpression ->
+          /* Return the lambda expression's actual return type. */
+          Optional.ofNullable(ASTHelpers.getType(lambdaExpression.getBody()));
+      case JCMemberReference memberReference ->
+          // XXX: The match against a concrete type and reference to one of its fields is fragile.
+          // Do better.
+          /* Return the method's declared return type. */
+          Optional.of(memberReference.referentType.getReturnType());
+      default ->
+          /* This appears to be a genuine `{,ToInt,ToLong,ToDouble}Function`. */
+          Optional.empty();
+    };
   }
 
-  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static Fix suggestFix(
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
-
-    if (expr instanceof IdentifierTree) {
-      SuggestedFix.Builder fix = SuggestedFix.builder();
-      String replacement =
-          SuggestedFixes.qualifyStaticImport(
-              Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
-      return fix.replace(expr, replacement).build();
-    }
-
-    if (expr instanceof MemberSelectTree memberSelect) {
-      return SuggestedFix.replace(
-          memberSelect,
-          SourceCode.treeToString(memberSelect.getExpression(), state) + '.' + preferredMethodName);
-    }
-
-    throw new VerifyException("Unexpected type of expression: " + expr.getKind());
+    return switch (expr) {
+      case IdentifierTree identifierTree -> {
+        SuggestedFix.Builder fix = SuggestedFix.builder();
+        String replacement =
+            SuggestedFixes.qualifyStaticImport(
+                Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
+        yield fix.replace(expr, replacement).build();
+      }
+      case MemberSelectTree memberSelect ->
+          SuggestedFix.replace(
+              memberSelect,
+              SourceCode.treeToString(memberSelect.getExpression(), state)
+                  + '.'
+                  + preferredMethodName);
+      default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
+    };
   }
 }
