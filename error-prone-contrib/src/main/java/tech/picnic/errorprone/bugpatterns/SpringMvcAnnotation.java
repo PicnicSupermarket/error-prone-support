@@ -22,6 +22,7 @@ import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
@@ -90,11 +91,10 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
         : Optional.of(extractMethod(expr, state));
   }
 
-  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static String extractMethod(ExpressionTree expr, VisitorState state) {
-    return switch (expr.getKind()) {
-      case IDENTIFIER -> SourceCode.treeToString(expr, state);
-      case MEMBER_SELECT -> ((MemberSelectTree) expr).getIdentifier().toString();
+    return switch (expr) {
+      case IdentifierTree identifier -> SourceCode.treeToString(identifier, state);
+      case MemberSelectTree memberSelect -> memberSelect.getIdentifier().toString();
       default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     };
   }

@@ -84,17 +84,17 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .orElse(Description.NO_MATCH);
   }
 
-  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr, Tree subTree) {
-    return switch (subTree.getKind()) {
-      case BLOCK -> constructMethodRef(lambdaExpr, (BlockTree) subTree);
-      case EXPRESSION_STATEMENT ->
-          constructMethodRef(lambdaExpr, ((ExpressionStatementTree) subTree).getExpression());
-      case METHOD_INVOCATION -> constructMethodRef(lambdaExpr, (MethodInvocationTree) subTree);
-      case PARENTHESIZED ->
-          constructMethodRef(lambdaExpr, ((ParenthesizedTree) subTree).getExpression());
-      case RETURN -> constructMethodRef(lambdaExpr, ((ReturnTree) subTree).getExpression());
+    return switch (subTree) {
+      case BlockTree block -> constructMethodRef(lambdaExpr, block);
+      case ExpressionStatementTree expressionStatement ->
+          constructMethodRef(lambdaExpr, expressionStatement.getExpression());
+      case MethodInvocationTree methodInvocation ->
+          constructMethodRef(lambdaExpr, methodInvocation);
+      case ParenthesizedTree parenthesized ->
+          constructMethodRef(lambdaExpr, parenthesized.getExpression());
+      case ReturnTree returnTree -> constructMethodRef(lambdaExpr, returnTree.getExpression());
       default -> Optional.empty();
     };
   }
@@ -114,30 +114,28 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
         .flatMap(expectedInstance -> constructMethodRef(lambdaExpr, subTree, expectedInstance));
   }
 
-  // XXX: Review whether to use switch pattern matching once the targeted JDK supports this.
   private static Optional<SuggestedFix.Builder> constructMethodRef(
       LambdaExpressionTree lambdaExpr,
       MethodInvocationTree subTree,
       Optional<Name> expectedInstance) {
     ExpressionTree methodSelect = subTree.getMethodSelect();
+    return switch (methodSelect) {
+      case IdentifierTree identifier -> {
+        if (expectedInstance.isPresent()) {
+          /* Direct method call; there is no matching "implicit parameter". */
+          yield Optional.empty();
+        }
 
-    if (methodSelect instanceof IdentifierTree) {
-      if (expectedInstance.isPresent()) {
-        /* Direct method call; there is no matching "implicit parameter". */
-        return Optional.empty();
+        Symbol sym = ASTHelpers.getSymbol(subTree);
+        yield ASTHelpers.isStatic(sym)
+            ? constructFix(lambdaExpr, sym.owner, methodSelect)
+            : constructFix(lambdaExpr, "this", methodSelect);
       }
-
-      Symbol sym = ASTHelpers.getSymbol(subTree);
-      return ASTHelpers.isStatic(sym)
-          ? constructFix(lambdaExpr, sym.owner, methodSelect)
-          : constructFix(lambdaExpr, "this", methodSelect);
-    }
-
-    if (methodSelect instanceof MemberSelectTree memberSelect) {
-      return constructMethodRef(lambdaExpr, memberSelect, expectedInstance);
-    }
-
-    throw new VerifyException("Unexpected type of expression: " + methodSelect.getKind());
+      case MemberSelectTree memberSelect ->
+          constructMethodRef(lambdaExpr, memberSelect, expectedInstance);
+      default ->
+          throw new VerifyException("Unexpected type of expression: " + methodSelect.getKind());
+    };
   }
 
   private static Optional<SuggestedFix.Builder> constructMethodRef(
