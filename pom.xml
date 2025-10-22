@@ -498,10 +498,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrewrite</groupId>
-                <artifactId>rewrite-templating</artifactId>
-            </dependency>
-            <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
                 <version>3.17.0</version>
