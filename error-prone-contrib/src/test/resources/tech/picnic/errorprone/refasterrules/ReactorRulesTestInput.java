@@ -213,7 +213,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<String>> testFluxFromArray() {
     return ImmutableSet.of(
-        Flux.just(new String[] {"foo"}),
+        Flux.just(new String[] {"foo", "bar"}),
         Flux.fromStream(() -> Arrays.stream(new String[] {"bar"})));
   }
 
@@ -907,9 +907,5 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<String> testFluxNext() {
     return Mono.from(Flux.just("foo"));
-  }
-
-  Flux<String> testFluxJustFromArray() {
-    return Flux.just("foo", "bar");
   }
 }
