@@ -643,13 +643,13 @@ final class ReactorRules {
   /** Prefer {@link Flux#fromArray(Object[])}} over more ambiguous or contrived alternatives. */
   static final class FluxFromArray<T> {
     @BeforeTemplate
-    Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
-      return Flux.fromStream(() -> Arrays.stream(array));
+    Flux<T> before(T[] array) {
+      return Flux.just(array);
     }
 
     @BeforeTemplate
-    Flux<T> before2(T[] array) {
-      return Flux.just(array);
+    Flux<T> before2(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
+      return Flux.fromStream(() -> Arrays.stream(array));
     }
 
     @AfterTemplate

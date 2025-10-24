@@ -255,7 +255,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<String>> testFluxFromArray() {
     return ImmutableSet.of(
-        Flux.just(new String[] {"foo", "bar"}),
+        Flux.just(new String[] {"foo"}),
         Flux.fromStream(() -> Arrays.stream(new String[] {"bar"})));
   }
 
