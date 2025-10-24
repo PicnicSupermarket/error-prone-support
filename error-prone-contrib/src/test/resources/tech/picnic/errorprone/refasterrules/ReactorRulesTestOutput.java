@@ -249,7 +249,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<String>> testFluxFromArray() {
     return ImmutableSet.of(
-        Flux.fromArray(new String[] {"foo"}), Flux.fromArray(new String[] {"bar"}));
+        Flux.fromArray(new String[] {"foo", "bar"}), Flux.fromArray(new String[] {"bar"}));
   }
 
   ImmutableSet<Mono<?>> testMonoIdentity() {
@@ -884,9 +884,5 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   Mono<String> testFluxNext() {
     return Flux.just("foo").next();
-  }
-
-  Flux<String> testFluxJustFromArray() {
-    return Flux.fromArray(new String[] {"foo", "bar"});
   }
 }

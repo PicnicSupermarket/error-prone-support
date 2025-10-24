@@ -644,7 +644,12 @@ final class ReactorRules {
   static final class FluxFromArray<T> {
     @BeforeTemplate
     Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
-      return Refaster.anyOf(Flux.just(array), Flux.fromStream(() -> Arrays.stream(array)));
+      return Flux.fromStream(() -> Arrays.stream(array));
+    }
+
+    @BeforeTemplate
+    Flux<T> before2(T[] array) {
+      return Flux.just(array);
     }
 
     @AfterTemplate
@@ -2622,20 +2627,6 @@ final class ReactorRules {
     @AfterTemplate
     Mono<T> after(Flux<T> flux) {
       return flux.next();
-    }
-  }
-
-  /** Prefer {@link Flux#fromArray(Object[])} over {@link Flux#just(Object...)}. */
-  static final class FluxJustFromArray<T> {
-    @BeforeTemplate
-    Flux<T> before(@Repeated T elements) {
-      return Flux.just(Refaster.asVarargs(elements));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked")
-    Flux<T> after(@Repeated T elements) {
-      return Flux.fromArray(Refaster.asVarargs(elements));
     }
   }
 }
