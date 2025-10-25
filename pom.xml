@@ -282,16 +282,6 @@
                 <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
-            <!-- XXX: This dependency's version is managed because version 1.10
-            contains annotations that are also packaged with
-            `org.jetbrains:annotations`, causing classpath duplication. Try to
-            drop this once https://github.com/google/compile-testing/pull/499
-            is released. (And/or convince OpenRewrite to migrate to JSpecify.) -->
-            <dependency>
-                <groupId>com.google.auto.value</groupId>
-                <artifactId>auto-value</artifactId>
-                <version>${version.auto-value}</version>
-            </dependency>
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
@@ -1908,8 +1898,6 @@
                                     always contains forward-slash path
                                     separators. -->
                                     -XepExcludedPaths:(?!.*/src/[^/]+/java/.*).*
-                                    <!-- We don't target Android. -->
-                                    -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
@@ -1936,6 +1924,7 @@
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
+                                    -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
