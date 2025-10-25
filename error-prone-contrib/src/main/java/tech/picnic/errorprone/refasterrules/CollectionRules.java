@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Consumer;
@@ -484,29 +486,140 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link List#getFirst()} over less idiomatic alternatives. */
-  static final class ListGetFirst<T> {
+  /** Prefer {@code collection.iterator().next()} over more contrived alternatives. */
+  static final class CollectionIteratorNext<T> {
     @BeforeTemplate
-    T before(List<T> list) {
-      return list.get(0);
+    T before(Collection<T> collection) {
+      return collection.stream().findFirst().orElseThrow();
     }
 
     @AfterTemplate
-    T after(List<T> list) {
-      return list.getFirst();
+    T after(Collection<T> collection) {
+      return collection.iterator().next();
     }
   }
 
-  /** Prefer {@link List#getLast()} over less idiomatic alternatives. */
-  static final class ListGetLast<T> {
+  /** Prefer {@link SequencedCollection#getFirst()} over less idiomatic alternatives. */
+  static final class SequencedCollectionGetFirst<T> {
+    @BeforeTemplate
+    T before(SequencedCollection<T> collection) {
+      return collection.iterator().next();
+    }
+
+    @BeforeTemplate
+    T before(List<T> collection) {
+      return collection.get(0);
+    }
+
+    @AfterTemplate
+    T after(SequencedCollection<T> collection) {
+      return collection.getFirst();
+    }
+  }
+
+  /** Prefer {@link SequencedCollection#getLast()} over less idiomatic alternatives. */
+  static final class SequencedCollectionGetLast<T> {
+    @BeforeTemplate
+    T before(SequencedCollection<T> collection) {
+      return Refaster.anyOf(
+          collection.reversed().getFirst(), Streams.findLast(collection.stream()).orElseThrow());
+    }
+
+    @BeforeTemplate
+    T before(List<T> collection) {
+      return collection.get(collection.size() - 1);
+    }
+
+    @AfterTemplate
+    T after(SequencedCollection<T> collection) {
+      return collection.getLast();
+    }
+  }
+
+  /** Prefer {@link List#addFirst(Object)} over less idiomatic alternatives. */
+  static final class ListAddFirst<S, T extends S> {
+    @BeforeTemplate
+    void before(List<S> list, T element) {
+      list.add(0, element);
+    }
+
+    @AfterTemplate
+    void after(List<S> list, T element) {
+      list.addFirst(element);
+    }
+  }
+
+  /** Prefer {@link List#add(Object)} over less idiomatic alternatives. */
+  static final class ListAdd<S, T extends S> {
+    @BeforeTemplate
+    void before(List<S> list, T element) {
+      list.addLast(element);
+    }
+
+    @BeforeTemplate
+    void before2(List<S> list, T element) {
+      list.add(list.size(), element);
+    }
+
+    @AfterTemplate
+    void after(List<S> list, T element) {
+      list.add(element);
+    }
+  }
+
+  /** Prefer {@link List#removeFirst()}} over less idiomatic alternatives. */
+  // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
+  // `NoSuchElementException`.
+  static final class ListRemoveFirst<T> {
     @BeforeTemplate
     T before(List<T> list) {
-      return list.get(list.size() - 1);
+      return list.remove(0);
     }
 
     @AfterTemplate
     T after(List<T> list) {
-      return list.getLast();
+      return list.removeFirst();
+    }
+  }
+
+  /** Prefer {@link List#removeLast()}} over less idiomatic alternatives. */
+  // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
+  // `NoSuchElementException`.
+  static final class ListRemoveLast<T> {
+    @BeforeTemplate
+    T before(List<T> list) {
+      return list.remove(list.size() - 1);
+    }
+
+    @AfterTemplate
+    T after(List<T> list) {
+      return list.removeLast();
+    }
+  }
+
+  /** Prefer {@link SortedSet#first()} over more verbose alternatives. */
+  static final class SortedSetFirst<T> {
+    @BeforeTemplate
+    T before(SortedSet<T> set) {
+      return set.getFirst();
+    }
+
+    @AfterTemplate
+    T after(SortedSet<T> set) {
+      return set.first();
+    }
+  }
+
+  /** Prefer {@link SortedSet#last()} over more verbose alternatives. */
+  static final class SortedSetLast<T> {
+    @BeforeTemplate
+    T before(SortedSet<T> set) {
+      return set.getLast();
+    }
+
+    @AfterTemplate
+    T after(SortedSet<T> set) {
+      return set.last();
     }
   }
 

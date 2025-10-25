@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Iterables.class, Lists.class);
+    return ImmutableSet.of(Iterables.class, Lists.class, Streams.class);
   }
 
   ImmutableSet<Boolean> testCollectionIsEmpty() {
@@ -212,11 +213,44 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     ImmutableSet.of(1).stream().forEach(String::valueOf);
   }
 
-  String testListGetFirst() {
-    return ImmutableList.of("foo").get(0);
+  String testCollectionIteratorNext() {
+    return ImmutableSet.of("foo").stream().findFirst().orElseThrow();
   }
 
-  String testListGetLast() {
-    return ImmutableList.of("foo").get(ImmutableList.of("foo").size() - 1);
+  ImmutableSet<String> testSequencedCollectionGetFirst() {
+    return ImmutableSet.of(
+        ImmutableList.of("foo").iterator().next(), ImmutableList.of("bar").get(0));
+  }
+
+  ImmutableSet<String> testSequencedCollectionGetLast() {
+    return ImmutableSet.of(
+        ImmutableList.of("foo").reversed().getFirst(),
+        Streams.findLast(ImmutableList.of("bar").stream()).orElseThrow(),
+        ImmutableList.of("baz").get(ImmutableList.of("baz").size() - 1));
+  }
+
+  void testListAddFirst() {
+    new ArrayList<String>().add(0, "foo");
+  }
+
+  void testListAdd() {
+    new ArrayList<String>(0).addLast("bar");
+    new ArrayList<String>(1).add(new ArrayList<String>(1).size(), "qux");
+  }
+
+  String testListRemoveFirst() {
+    return new ArrayList<String>().remove(0);
+  }
+
+  String testListRemoveLast() {
+    return new ArrayList<String>().remove(new ArrayList<String>().size() - 1);
+  }
+
+  String testSortedSetFirst() {
+    return ImmutableSortedSet.of("foo").getFirst();
+  }
+
+  String testSortedSetLast() {
+    return ImmutableSortedSet.of("foo").getLast();
   }
 }
