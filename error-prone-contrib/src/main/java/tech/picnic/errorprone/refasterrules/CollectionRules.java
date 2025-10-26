@@ -487,51 +487,51 @@ final class CollectionRules {
   }
 
   /** Prefer {@code collection.iterator().next()} over more contrived alternatives. */
-  static final class CollectionIteratorNext<T> {
+  static final class CollectionIteratorNext<S, T extends S> {
     @BeforeTemplate
-    T before(Collection<T> collection) {
+    S before(Collection<T> collection) {
       return collection.stream().findFirst().orElseThrow();
     }
 
     @AfterTemplate
-    T after(Collection<T> collection) {
+    S after(Collection<T> collection) {
       return collection.iterator().next();
     }
   }
 
   /** Prefer {@link SequencedCollection#getFirst()} over less idiomatic alternatives. */
-  static final class SequencedCollectionGetFirst<T> {
+  static final class SequencedCollectionGetFirst<S, T extends S> {
     @BeforeTemplate
-    T before(SequencedCollection<T> collection) {
+    S before(SequencedCollection<T> collection) {
       return collection.iterator().next();
     }
 
     @BeforeTemplate
-    T before(List<T> collection) {
+    S before(List<T> collection) {
       return collection.get(0);
     }
 
     @AfterTemplate
-    T after(SequencedCollection<T> collection) {
+    S after(SequencedCollection<T> collection) {
       return collection.getFirst();
     }
   }
 
   /** Prefer {@link SequencedCollection#getLast()} over less idiomatic alternatives. */
-  static final class SequencedCollectionGetLast<T> {
+  static final class SequencedCollectionGetLast<S, T extends S> {
     @BeforeTemplate
-    T before(SequencedCollection<T> collection) {
+    S before(SequencedCollection<T> collection) {
       return Refaster.anyOf(
           collection.reversed().getFirst(), Streams.findLast(collection.stream()).orElseThrow());
     }
 
     @BeforeTemplate
-    T before(List<T> collection) {
+    S before(List<T> collection) {
       return collection.get(collection.size() - 1);
     }
 
     @AfterTemplate
-    T after(SequencedCollection<T> collection) {
+    S after(SequencedCollection<T> collection) {
       return collection.getLast();
     }
   }
@@ -570,14 +570,14 @@ final class CollectionRules {
   /** Prefer {@link List#removeFirst()}} over less idiomatic alternatives. */
   // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
   // `NoSuchElementException`.
-  static final class ListRemoveFirst<T> {
+  static final class ListRemoveFirst<S, T extends S> {
     @BeforeTemplate
-    T before(List<T> list) {
+    S before(List<T> list) {
       return list.remove(0);
     }
 
     @AfterTemplate
-    T after(List<T> list) {
+    S after(List<T> list) {
       return list.removeFirst();
     }
   }
@@ -585,40 +585,40 @@ final class CollectionRules {
   /** Prefer {@link List#removeLast()}} over less idiomatic alternatives. */
   // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
   // `NoSuchElementException`.
-  static final class ListRemoveLast<T> {
+  static final class ListRemoveLast<S, T extends S> {
     @BeforeTemplate
-    T before(List<T> list) {
+    S before(List<T> list) {
       return list.remove(list.size() - 1);
     }
 
     @AfterTemplate
-    T after(List<T> list) {
+    S after(List<T> list) {
       return list.removeLast();
     }
   }
 
   /** Prefer {@link SortedSet#first()} over more verbose alternatives. */
-  static final class SortedSetFirst<T> {
+  static final class SortedSetFirst<S, T extends S> {
     @BeforeTemplate
-    T before(SortedSet<T> set) {
+    S before(SortedSet<T> set) {
       return set.getFirst();
     }
 
     @AfterTemplate
-    T after(SortedSet<T> set) {
+    S after(SortedSet<T> set) {
       return set.first();
     }
   }
 
   /** Prefer {@link SortedSet#last()} over more verbose alternatives. */
-  static final class SortedSetLast<T> {
+  static final class SortedSetLast<S, T extends S> {
     @BeforeTemplate
-    T before(SortedSet<T> set) {
+    S before(SortedSet<T> set) {
       return set.getLast();
     }
 
     @AfterTemplate
-    T after(SortedSet<T> set) {
+    S after(SortedSet<T> set) {
       return set.last();
     }
   }

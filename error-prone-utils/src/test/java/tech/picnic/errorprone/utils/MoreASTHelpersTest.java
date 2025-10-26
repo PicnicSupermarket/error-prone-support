@@ -241,7 +241,7 @@ final class MoreASTHelpersTest {
       List<? extends VariableTree> parameters = tree.getParameters();
       return parameters.stream()
               .skip(1)
-              .allMatch(p -> MoreASTHelpers.areSameType(p, parameters.get(0), state))
+              .allMatch(p -> MoreASTHelpers.areSameType(p, parameters.getFirst(), state))
           ? describeMatch(tree)
           : Description.NO_MATCH;
     }

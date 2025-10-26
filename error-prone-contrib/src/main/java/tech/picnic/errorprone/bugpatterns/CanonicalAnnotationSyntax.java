@@ -87,7 +87,7 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
       return Optional.empty();
     }
 
-    ExpressionTree arg = args.get(0);
+    ExpressionTree arg = args.getFirst();
     if (state.getSourceForNode(arg) == null) {
       /*
        * The annotation argument doesn't have a source representation, e.g. because `value` isn't
@@ -139,7 +139,7 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
   private static Optional<String> simplifySingletonArray(NewArrayTree array, VisitorState state) {
     return Optional.of(array.getInitializers())
         .filter(initializers -> initializers.size() == 1)
-        .map(initializers -> SourceCode.treeToString(initializers.get(0), state));
+        .map(initializers -> SourceCode.treeToString(initializers.getFirst(), state));
   }
 
   private static Optional<String> dropTrailingComma(NewArrayTree array, VisitorState state) {

@@ -75,7 +75,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
       return Description.NO_MATCH;
     }
 
-    StatementTree finalStatement = statements.get(statements.size() - 1);
+    StatementTree finalStatement = statements.getLast();
     if (!VARIABLE_RETURN.matches(finalStatement, state)) {
       return Description.NO_MATCH;
     }

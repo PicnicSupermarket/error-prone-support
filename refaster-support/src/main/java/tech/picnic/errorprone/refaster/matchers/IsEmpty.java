@@ -221,12 +221,13 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
      * argument is.
      */
     verify(arguments.size() == 1, "Unexpected %s-ary constructor", arguments.size());
-    return matches(arguments.get(0), state);
+    return matches(arguments.getFirst(), state);
   }
 
   private static boolean isEmptyArrayCreation(NewArrayTree newArray) {
     return (!newArray.getDimensions().isEmpty()
-            && ZERO.equals(ASTHelpers.constValue(newArray.getDimensions().get(0), Integer.class)))
+            && ZERO.equals(
+                ASTHelpers.constValue(newArray.getDimensions().getFirst(), Integer.class)))
         || (newArray.getInitializers() != null && newArray.getInitializers().isEmpty());
   }
 

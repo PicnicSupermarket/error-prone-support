@@ -284,7 +284,7 @@ public final class RedundantStringConversion extends BugChecker
     // XXX: Not so nice: we effectively try to simplify the final argument twice.
     boolean omitLast =
         !arguments.isEmpty()
-            && trySimplify(arguments.get(arguments.size() - 1), state)
+            && trySimplify(arguments.getLast(), state)
                 .filter(replacement -> THROWABLE.matches(replacement, state))
                 .isPresent();
     return tryFixFormatterArguments(
@@ -301,7 +301,7 @@ public final class RedundantStringConversion extends BugChecker
       return Optional.empty();
     }
 
-    int patternIndex = firstArgFilter.matches(arguments.get(0), state) ? 1 : 0;
+    int patternIndex = firstArgFilter.matches(arguments.getFirst(), state) ? 1 : 0;
     if (arguments.size() <= patternIndex) {
       /* This format method accepts only an ignored parameter. Some odd overload? */
       return Optional.empty();

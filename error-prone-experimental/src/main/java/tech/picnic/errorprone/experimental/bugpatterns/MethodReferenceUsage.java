@@ -103,7 +103,7 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
       LambdaExpressionTree lambdaExpr, BlockTree subTree) {
     return Optional.of(subTree.getStatements())
         .filter(statements -> statements.size() == 1)
-        .flatMap(statements -> constructMethodRef(lambdaExpr, statements.get(0)));
+        .flatMap(statements -> constructMethodRef(lambdaExpr, statements.getFirst()));
   }
 
   // XXX: Replace nested `Optional` usage.
