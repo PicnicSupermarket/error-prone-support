@@ -169,20 +169,26 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
       MethodInvocationTree tree, String preferredMethodName, VisitorState state) {
     ExpressionTree expr = tree.getMethodSelect();
     return switch (expr) {
-      case IdentifierTree identifierTree -> {
-        SuggestedFix.Builder fix = SuggestedFix.builder();
-        String replacement =
-            SuggestedFixes.qualifyStaticImport(
-                Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
-        yield fix.replace(expr, replacement).build();
-      }
+      case IdentifierTree identifier -> replaceIdentifier(preferredMethodName, state, expr);
       case MemberSelectTree memberSelect ->
-          SuggestedFix.replace(
-              memberSelect,
-              SourceCode.treeToString(memberSelect.getExpression(), state)
-                  + '.'
-                  + preferredMethodName);
+          replaceMemberSelect(preferredMethodName, state, memberSelect);
       default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     };
+  }
+
+  private static SuggestedFix replaceMemberSelect(
+      String preferredMethodName, VisitorState state, MemberSelectTree memberSelect) {
+    return SuggestedFix.replace(
+        memberSelect,
+        SourceCode.treeToString(memberSelect.getExpression(), state) + '.' + preferredMethodName);
+  }
+
+  private static SuggestedFix replaceIdentifier(
+      String preferredMethodName, VisitorState state, ExpressionTree expr) {
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String replacement =
+        SuggestedFixes.qualifyStaticImport(
+            Comparator.class.getCanonicalName() + '.' + preferredMethodName, fix, state);
+    return fix.replace(expr, replacement).build();
   }
 }
