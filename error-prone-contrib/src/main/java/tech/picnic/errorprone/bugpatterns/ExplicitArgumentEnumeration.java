@@ -141,7 +141,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       return Description.NO_MATCH;
     }
 
-    ExpressionTree argument = tree.getArguments().get(0);
+    ExpressionTree argument = tree.getArguments().getFirst();
     if (!EXPLICIT_ITERABLE_CREATOR.matches(argument, state)) {
       return Description.NO_MATCH;
     }

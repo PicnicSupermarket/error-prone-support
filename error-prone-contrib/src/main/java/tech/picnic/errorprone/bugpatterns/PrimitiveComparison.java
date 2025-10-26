@@ -84,7 +84,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
       return Description.NO_MATCH;
     }
 
-    return getPotentiallyBoxedReturnType(tree.getArguments().get(0))
+    return getPotentiallyBoxedReturnType(tree.getArguments().getFirst())
         .flatMap(cmpType -> attemptMethodInvocationReplacement(tree, cmpType, isStatic, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
@@ -122,7 +122,7 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
 
     String typeArguments =
         Stream.concat(
-                Stream.of(SourceCode.treeToString(tree.getTypeArguments().get(0), state)),
+                Stream.of(SourceCode.treeToString(tree.getTypeArguments().getFirst(), state)),
                 Stream.of(cmpType.tsym.getSimpleName())
                     .filter(u -> "comparing".equals(preferredMethodName)))
             .collect(joining(", ", "<", ">"));

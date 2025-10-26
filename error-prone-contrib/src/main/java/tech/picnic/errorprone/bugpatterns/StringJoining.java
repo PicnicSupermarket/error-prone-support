@@ -68,7 +68,7 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
     // this argument is not vacuous, and that as a result the expression cannot be simplified using
     // `#valueOf` or `#join`. Implement a separate check that identifies and drops redundant
     // `Locale` arguments. See also a related comment in `FormatStringConcatenation`.
-    String formatString = ASTHelpers.constValue(tree.getArguments().get(0), String.class);
+    String formatString = ASTHelpers.constValue(tree.getArguments().getFirst(), String.class);
     if (formatString == null) {
       return Description.NO_MATCH;
     }

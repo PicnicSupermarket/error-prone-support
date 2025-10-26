@@ -66,7 +66,8 @@ public final class MockitoMockClassReference extends BugChecker
     }
 
     List<? extends ExpressionTree> arguments = tree.getArguments();
-    return describeMatch(tree, SuggestedFixes.removeElement(arguments.get(0), arguments, state));
+    return describeMatch(
+        tree, SuggestedFixes.removeElement(arguments.getFirst(), arguments, state));
   }
 
   private static boolean isTypeDerivableFromContext(MethodInvocationTree tree, VisitorState state) {

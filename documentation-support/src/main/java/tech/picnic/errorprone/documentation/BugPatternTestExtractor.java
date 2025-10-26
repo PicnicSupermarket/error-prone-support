@@ -128,7 +128,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
     private static Optional<String> getClassUnderTest(
         MethodInvocationTree tree, VisitorState state) {
       if (TEST_HELPER_NEW_INSTANCE.matches(tree, state)) {
-        return Optional.ofNullable(ASTHelpers.getSymbol(tree.getArguments().get(0)))
+        return Optional.ofNullable(ASTHelpers.getSymbol(tree.getArguments().getFirst()))
             .filter(s -> !s.type.allparams().isEmpty())
             .map(s -> s.type.allparams().getFirst().tsym.getQualifiedName().toString());
       }
@@ -142,7 +142,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
     private static void extractIdentificationBugPatternTestCases(
         MethodInvocationTree tree, List<TestEntry> sink, VisitorState state) {
       if (IDENTIFICATION_SOURCE_LINES.matches(tree, state)) {
-        String path = ASTHelpers.constValue(tree.getArguments().get(0), String.class);
+        String path = ASTHelpers.constValue(tree.getArguments().getFirst(), String.class);
         Optional<String> sourceCode =
             getSourceCode(tree).filter(s -> s.contains("// BUG: Diagnostic"));
         if (path != null && sourceCode.isPresent()) {
@@ -169,7 +169,7 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
                 requireNonNull(
                     ASTHelpers.getReceiver(tree), "Instance method invocation must have receiver");
 
-        String path = ASTHelpers.constValue(inputTree.getArguments().get(0), String.class);
+        String path = ASTHelpers.constValue(inputTree.getArguments().getFirst(), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);
         if (path != null && inputCode.isPresent()) {
           Optional<String> outputCode =

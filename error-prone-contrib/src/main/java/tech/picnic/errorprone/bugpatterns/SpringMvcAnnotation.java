@@ -87,7 +87,7 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
     return expr instanceof NewArrayTree newArray
         ? Optional.of(newArray.getInitializers())
             .filter(args -> args.size() == 1)
-            .map(args -> extractMethod(args.get(0), state))
+            .map(args -> extractMethod(args.getFirst(), state))
         : Optional.of(extractMethod(expr, state));
   }
 
