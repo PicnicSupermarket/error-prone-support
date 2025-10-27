@@ -708,48 +708,54 @@
  
 --- a/metrics-core/src/main/java/io/dropwizard/metrics5/MetricName.java
 +++ b/metrics-core/src/main/java/io/dropwizard/metrics5/MetricName.java
-@@ -1,13 +1,19 @@
+@@ -1,12 +1,18 @@
  package io.dropwizard.metrics5;
  
 -import java.util.Collections;
--import java.util.Comparator;
 +import static com.google.common.base.Preconditions.checkArgument;
-+import static java.util.Collections.unmodifiableMap;
-+import static java.util.Map.Entry.comparingByKey;
++import static java.util.Collections.emptySortedMap;
++import static java.util.Collections.unmodifiableSortedMap;
 +import static java.util.Objects.requireNonNull;
 +import static java.util.stream.Collectors.joining;
 +
 +import com.google.common.base.Strings;
-+import com.google.common.collect.ImmutableMap;
 +import java.util.Arrays;
- import java.util.HashMap;
  import java.util.Iterator;
- import java.util.LinkedHashMap;
  import java.util.Map;
  import java.util.Objects;
+ import java.util.SortedMap;
+ import java.util.TreeMap;
 -import java.util.stream.Collectors;
  import java.util.stream.Stream;
  
  /**
-@@ -17,7 +23,7 @@ import java.util.stream.Stream;
+@@ -16,7 +22,7 @@ import java.util.stream.Stream;
  public class MetricName implements Comparable<MetricName> {
  
    private static final String SEPARATOR = ".";
--  private static final Map<String, String> EMPTY_TAGS = Collections.emptyMap();
-+  private static final Map<String, String> EMPTY_TAGS = ImmutableMap.of();
+-  private static final SortedMap<String, String> EMPTY_TAGS = Collections.emptySortedMap();
++  private static final SortedMap<String, String> EMPTY_TAGS = emptySortedMap();
    static final MetricName EMPTY = new MetricName("", EMPTY_TAGS);
  
    /**
-@@ -33,7 +39,7 @@ public class MetricName implements Comparable<MetricName> {
-   private final Map<String, String> tags;
+@@ -32,13 +38,13 @@ public class MetricName implements Comparable<MetricName> {
+   private final SortedMap<String, String> tags;
  
    public MetricName(String key, Map<String, String> tags) {
--    this.key = Objects.requireNonNull(key);
-+    this.key = requireNonNull(key);
-     this.tags = tags.isEmpty() ? EMPTY_TAGS : unmodifiableSortedCopy(tags);
+-    this.key = Objects.requireNonNull(key, "Metric key must not be null");
++    this.key = requireNonNull(key, "Metric key must not be null");
+     if (tags == null || tags.isEmpty()) {
+       this.tags = EMPTY_TAGS;
+     } else if (tags instanceof SortedMap) {
+-      this.tags = Collections.unmodifiableSortedMap((SortedMap<String, String>) tags);
++      this.tags = unmodifiableSortedMap((SortedMap<String, String>) tags);
+     } else {
+-      this.tags = Collections.unmodifiableSortedMap(new TreeMap<>(tags));
++      this.tags = unmodifiableSortedMap(new TreeMap<>(tags));
+     }
    }
  
-@@ -63,9 +69,9 @@ public class MetricName implements Comparable<MetricName> {
+@@ -68,9 +74,9 @@ public class MetricName implements Comparable<MetricName> {
      }
  
      String newKey =
@@ -762,7 +768,7 @@
      return new MetricName(newKey, tags);
    }
  
-@@ -94,9 +100,7 @@ public class MetricName implements Comparable<MetricName> {
+@@ -101,9 +107,7 @@ public class MetricName implements Comparable<MetricName> {
        return this;
      }
  
@@ -771,19 +777,100 @@
 -    }
 +    checkArgument(pairs.length % 2 == 0, "Argument count must be even");
  
-     final Map<String, String> add = new HashMap<>();
+     final SortedMap<String, String> newTags = new TreeMap<>(tags);
      for (int i = 0; i < pairs.length; i += 2) {
-@@ -201,8 +205,8 @@ public class MetricName implements Comparable<MetricName> {
-   private static <K extends Comparable<K>, V> Map<K, V> unmodifiableSortedCopy(Map<K, V> map) {
-     LinkedHashMap<K, V> sorted = new LinkedHashMap<>();
-     map.entrySet().stream()
--        .sorted(Comparator.comparing(Map.Entry::getKey))
-+        .sorted(comparingByKey())
-         .forEach(e -> sorted.put(e.getKey(), e.getValue()));
--    return Collections.unmodifiableMap(sorted);
-+    return unmodifiableMap(sorted);
+@@ -171,7 +175,7 @@ public class MetricName implements Comparable<MetricName> {
+    * @throws IllegalArgumentException if the string cannot be parsed
+    */
+   public static MetricName parse(String metricNameString) {
+-    if (metricNameString == null || metricNameString.isEmpty()) {
++    if (Strings.isNullOrEmpty(metricNameString)) {
+       return EMPTY;
+     }
+ 
+@@ -219,14 +223,10 @@ public class MetricName implements Comparable<MetricName> {
+     }
+ 
+     // Check for trailing comma
+-    if (tagsPart.endsWith(",")) {
+-      throw new IllegalArgumentException("Trailing comma in tags");
+-    }
++    checkArgument(!tagsPart.endsWith(","), "Trailing comma in tags");
+ 
+     // Check for consecutive commas
+-    if (tagsPart.contains(",,")) {
+-      throw new IllegalArgumentException("Consecutive commas in tags");
+-    }
++    checkArgument(!tagsPart.contains(",,"), "Consecutive commas in tags");
+ 
+     int start = 0;
+     while (start < tagsPart.length()) {
+@@ -252,25 +252,17 @@ public class MetricName implements Comparable<MetricName> {
    }
- }
+ 
+   private static void parseTagPair(String tagPair, Map<String, String> tags) {
+-    if (tagPair.trim().isEmpty()) {
+-      throw new IllegalArgumentException("Empty tag pair");
+-    }
++    checkArgument(!tagPair.isBlank(), "Empty tag pair");
+ 
+     int equalIndex = findFirstUnescapedEquals(tagPair);
+-    if (equalIndex == -1) {
+-      throw new IllegalArgumentException("Invalid tag format: " + tagPair);
+-    }
++    checkArgument(equalIndex != -1, "Invalid tag format: %s", tagPair);
+ 
+-    if (equalIndex == 0) {
+-      throw new IllegalArgumentException("Empty tag key in: " + tagPair);
+-    }
++    checkArgument(equalIndex != 0, "Empty tag key in: %s", tagPair);
+ 
+     String key = unescapeTag(tagPair.substring(0, equalIndex));
+     String value = unescapeTag(tagPair.substring(equalIndex + 1));
+ 
+-    if (key.isEmpty()) {
+-      throw new IllegalArgumentException("Empty tag key after unescaping in: " + tagPair);
+-    }
++    checkArgument(!key.isEmpty(), "Empty tag key after unescaping in: %s", tagPair);
+ 
+     tags.put(key, value);
+   }
+@@ -285,7 +277,7 @@ public class MetricName implements Comparable<MetricName> {
+   }
+ 
+   private static String escapeKey(String key) {
+-    if (key == null || key.isEmpty()) {
++    if (Strings.isNullOrEmpty(key)) {
+       return key;
+     }
+     StringBuilder escaped = new StringBuilder(key.length());
+@@ -326,7 +318,7 @@ public class MetricName implements Comparable<MetricName> {
+   }
+ 
+   private static String escapeTag(String tag) {
+-    if (tag == null || tag.isEmpty()) {
++    if (Strings.isNullOrEmpty(tag)) {
+       return tag;
+     }
+     StringBuilder escaped = new StringBuilder(tag.length());
+@@ -367,7 +359,7 @@ public class MetricName implements Comparable<MetricName> {
+   }
+ 
+   private static String unescapeKey(String escapedKey) {
+-    if (escapedKey == null || escapedKey.trim().isEmpty()) {
++    if (escapedKey == null || escapedKey.isBlank()) {
+       return escapedKey;
+     }
+     StringBuilder unescaped = new StringBuilder(escapedKey.length());
+@@ -433,7 +425,7 @@ public class MetricName implements Comparable<MetricName> {
+   }
+ 
+   private static String unescapeTag(String escapedTag) {
+-    if (escapedTag == null || escapedTag.trim().isEmpty()) {
++    if (escapedTag == null || escapedTag.isBlank()) {
+       return escapedTag;
+     }
+     StringBuilder unescaped = new StringBuilder(escapedTag.length());
 --- a/metrics-core/src/main/java/io/dropwizard/metrics5/MetricRegistry.java
 +++ b/metrics-core/src/main/java/io/dropwizard/metrics5/MetricRegistry.java
 @@ -1,6 +1,10 @@
@@ -1238,18 +1325,6 @@
      appendDoubleIfEnabled(b, MEAN, snapshot::getMean);
      appendDoubleIfEnabled(b, STDDEV, snapshot::getStdDev);
      appendDoubleIfEnabled(b, P50, snapshot::getMedian);
---- a/metrics-core/src/main/java/io/dropwizard/metrics5/SlidingTimeWindowMovingAverages.java
-+++ b/metrics-core/src/main/java/io/dropwizard/metrics5/SlidingTimeWindowMovingAverages.java
-@@ -186,8 +186,7 @@ public class SlidingTimeWindowMovingAverages implements MovingAverages {
-       buckets.stream().limit(toIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
-       buckets.stream().skip(fromIndex).mapToLong(LongAdder::longValue).forEach(adder::add);
-     }
--    long retval = adder.longValue();
--    return retval;
-+    return adder.longValue();
-   }
- 
-   @Override
 --- a/metrics-core/src/main/java/io/dropwizard/metrics5/UniformSnapshot.java
 +++ b/metrics-core/src/main/java/io/dropwizard/metrics5/UniformSnapshot.java
 @@ -1,5 +1,6 @@
@@ -2554,16 +2629,24 @@
      assertThat(MetricFilter.ALL.matches(MetricName.build(""), mock(Metric.class))).isTrue();
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/MetricNameTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/MetricNameTest.java
-@@ -1,105 +1,106 @@
+@@ -1,10 +1,12 @@
  package io.dropwizard.metrics5;
  
++import static java.util.Collections.synchronizedList;
  import static org.assertj.core.api.Assertions.assertThat;
 -import static org.junit.jupiter.api.Assertions.assertThrows;
 +import static org.assertj.core.api.Assertions.assertThatThrownBy;
++import static org.junit.jupiter.params.provider.Arguments.arguments;
  
++import com.google.common.collect.ImmutableMap;
+ import java.util.ArrayList;
+-import java.util.Collections;
  import java.util.HashMap;
+ import java.util.List;
  import java.util.Map;
- import org.junit.jupiter.api.Test;
+@@ -16,9 +18,9 @@ import org.junit.jupiter.params.ParameterizedTest;
+ import org.junit.jupiter.params.provider.Arguments;
+ import org.junit.jupiter.params.provider.MethodSource;
  
 -class MetricNameTest {
 +final class MetricNameTest {
@@ -2571,11 +2654,9 @@
 -  void testEmpty() {
 +  void empty() {
      assertThat(MetricName.EMPTY.getTags()).isEmpty();
--    assertThat(MetricName.EMPTY.getKey()).isEqualTo("");
-+    assertThat(MetricName.EMPTY.getKey()).isEmpty();
+     assertThat(MetricName.EMPTY.getKey()).isEmpty();
  
-     assertThat(MetricName.build()).isEqualTo(MetricName.EMPTY);
-     assertThat(MetricName.EMPTY.resolve((String) null)).isEqualTo(MetricName.EMPTY);
+@@ -27,107 +29,105 @@ class MetricNameTest {
    }
  
    @Test
@@ -2608,9 +2689,9 @@
  
    @Test
 -  void testAddTagsVarious() {
+-    final Map<String, String> refTags = Map.of("foo", "bar");
 +  void addTagsVarious() {
-     final Map<String, String> refTags = new HashMap<String, String>();
-     refTags.put("foo", "bar");
++    final Map<String, String> refTags = ImmutableMap.of("foo", "bar");
      final MetricName test = MetricName.EMPTY.tagged("foo", "bar");
      final MetricName test2 = MetricName.EMPTY.tagged(refTags);
  
@@ -2625,42 +2706,31 @@
  
    @Test
 -  void testTaggedMoreArguments() {
-+  void taggedMoreArguments() {
-     final Map<String, String> refTags = new HashMap<String, String>();
-     refTags.put("foo", "bar");
-     refTags.put("baz", "biz");
+-    final Map<String, String> refTags =
+-        Map.of(
+-            "foo", "bar",
+-            "baz", "biz");
 -    assertThat(MetricName.EMPTY.tagged("foo", "bar", "baz", "biz").getTags()).isEqualTo(refTags);
++  void taggedMoreArguments() {
++    final Map<String, String> refTags = ImmutableMap.of("foo", "bar", "baz", "biz");
 +    assertThat(MetricName.EMPTY.tagged("foo", "bar", "baz", "biz").getTags())
 +        .containsExactlyInAnyOrderEntriesOf(refTags);
    }
  
    @Test
 -  void testTaggedNotPairs() {
--    assertThrows(
--        IllegalArgumentException.class,
--        () -> {
--          MetricName.EMPTY.tagged("foo");
--        });
+-    assertThrows(IllegalArgumentException.class, () -> MetricName.EMPTY.tagged("foo"));
 +  void taggedNotPairs() {
-+    assertThatThrownBy(
-+            () -> {
-+              MetricName.EMPTY.tagged("foo");
-+            })
++    assertThatThrownBy(() -> MetricName.EMPTY.tagged("foo"))
 +        .isInstanceOf(IllegalArgumentException.class);
    }
  
    @Test
 -  void testTaggedNotPairs2() {
 -    assertThrows(
--        IllegalArgumentException.class,
--        () -> {
--          MetricName.EMPTY.tagged("foo", "bar", "baz");
--        });
+-        IllegalArgumentException.class, () -> MetricName.EMPTY.tagged("foo", "bar", "baz"));
 +  void taggedNotPairs2() {
-+    assertThatThrownBy(
-+            () -> {
-+              MetricName.EMPTY.tagged("foo", "bar", "baz");
-+            })
++    assertThatThrownBy(() -> MetricName.EMPTY.tagged("foo", "bar", "baz"))
 +        .isInstanceOf(IllegalArgumentException.class);
    }
  
@@ -2695,7 +2765,686 @@
 +    assertThat(a).isLessThan(b);
 +    assertThat(b).isGreaterThan(a);
    }
- }
+ 
+   @Test
+-  void testToStringWithSpecialCharacters() {
++  void toStringWithSpecialCharacters() {
+     // Test metric name with special characters that need escaping
+     final MetricName specialKey = MetricName.build("metric,with=special chars");
+-    assertThat(specialKey.toString()).isEqualTo("metric\\,with\\=special\\ chars");
++    assertThat(specialKey).hasToString("metric\\,with\\=special\\ chars");
+ 
+     // Test tags with special characters
+     final MetricName specialTags =
+         MetricName.build("metric")
+             .tagged("key,with=comma", "value with spaces")
+             .tagged("equals=key", "comma,value");
+-    assertThat(specialTags.toString())
+-        .isEqualTo("metric,equals\\=key=comma\\,value,key\\,with\\=comma=value\\ with\\ spaces");
++    assertThat(specialTags)
++        .hasToString("metric,equals\\=key=comma\\,value,key\\,with\\=comma=value\\ with\\ spaces");
+ 
+     // Test backslashes
+     final MetricName backslashes =
+         MetricName.build("path\\to\\metric").tagged("path", "C:\\Windows\\System32");
+-    assertThat(backslashes.toString())
+-        .isEqualTo("path\\\\to\\\\metric,path=C:\\\\Windows\\\\System32");
++    assertThat(backslashes).hasToString("path\\\\to\\\\metric,path=C:\\\\Windows\\\\System32");
+   }
+ 
+   @Test
+-  void testParseWithSpecialCharacters() {
++  void parseWithSpecialCharacters() {
+     // Test escaped special characters in key
+     MetricName parsed = MetricName.parse("metric\\,with\\=special\\ chars");
+     assertThat(parsed.getKey()).isEqualTo("metric,with=special chars");
+@@ -150,7 +150,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testParseEmptyAndNull() {
++  void parseEmptyAndNull() {
+     // Test null input
+     MetricName parsed = MetricName.parse(null);
+     assertThat(parsed).isEqualTo(MetricName.EMPTY);
+@@ -161,16 +161,18 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testParseInvalidFormat() {
++  void parseInvalidFormat() {
+     // Test invalid tag format (no equals sign)
+-    assertThrows(IllegalArgumentException.class, () -> MetricName.parse("metric,invalidtag"));
++    assertThatThrownBy(() -> MetricName.parse("metric,invalidtag"))
++        .isInstanceOf(IllegalArgumentException.class);
+ 
+     // Test invalid tag format (empty tag key)
+-    assertThrows(IllegalArgumentException.class, () -> MetricName.parse("metric,=value"));
++    assertThatThrownBy(() -> MetricName.parse("metric,=value"))
++        .isInstanceOf(IllegalArgumentException.class);
+   }
+ 
+   @Test
+-  void testMultipleRoundTrips() {
++  void multipleRoundTrips() {
+     // Test multiple round-trips to ensure stability
+     MetricName original =
+         MetricName.build("complex.metric")
+@@ -189,10 +191,10 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testUnicodeCharactersInKeysAndValues() {
++  void unicodeCharactersInKeysAndValues() {
+     // Test Unicode characters in metric key
+     MetricName unicodeKey = MetricName.build("métriques_データ_метрики");
+-    assertThat(unicodeKey.toString()).isEqualTo("métriques_データ_метрики");
++    assertThat(unicodeKey).hasToString("métriques_データ_метрики");
+ 
+     // Test Unicode characters in tag keys and values
+     MetricName unicodeTags =
+@@ -202,7 +204,7 @@ class MetricNameTest {
+             .tagged("статус", "работает");
+ 
+     String expected = "metrics,régión=amérique,статус=работает,環境=プロダクション";
+-    assertThat(unicodeTags.toString()).isEqualTo(expected);
++    assertThat(unicodeTags).hasToString(expected);
+ 
+     // Round-trip test for Unicode
+     MetricName parsed = MetricName.parse(unicodeTags.toString());
+@@ -213,10 +215,10 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testEmojiCharactersInKeysAndValues() {
++  void emojiCharactersInKeysAndValues() {
+     // Test emoji characters in metric key
+     MetricName emojiKey = MetricName.build("metrics🚀performance📊");
+-    assertThat(emojiKey.toString()).isEqualTo("metrics🚀performance📊");
++    assertThat(emojiKey).hasToString("metrics🚀performance📊");
+ 
+     // Test emoji characters in tag keys and values
+     MetricName emojiTags =
+@@ -226,7 +228,7 @@ class MetricNameTest {
+             .tagged("env🌍", "production🏭");
+ 
+     String expected = "status,alert🚨=critical⚠️,env🌍=production🏭,mood😊=happy😄";
+-    assertThat(emojiTags.toString()).isEqualTo(expected);
++    assertThat(emojiTags).hasToString(expected);
+ 
+     // Round-trip test for emojis
+     MetricName parsed = MetricName.parse(emojiTags.toString());
+@@ -237,7 +239,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testEqualsAndCommasInTagKeysAndValues() {
++  void equalsAndCommasInTagKeysAndValues() {
+     // Test metric with equals and commas in tag keys
+     MetricName specialTagKeys =
+         MetricName.build("metrics")
+@@ -280,7 +282,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testComplexSpecialCharacterCombinations() {
++  void complexSpecialCharacterCombinations() {
+     // Test complex combinations of special characters, Unicode, and emojis
+     MetricName complex =
+         MetricName.build("complex🔥metric,with=special")
+@@ -305,88 +307,87 @@ class MetricNameTest {
+   // Parameterized test data providers
+   private static Stream<Arguments> nonPrintableCharacterData() {
+     return Stream.of(
+-        Arguments.of('\n', "\\n", "newlines"),
+-        Arguments.of('\t', "\\t", "tabs"),
+-        Arguments.of('\r', "\\r", "carriagereturns"));
++        arguments('\n', "\\n", "newlines"),
++        arguments('\t', "\\t", "tabs"),
++        arguments('\r', "\\r", "carriagereturns"));
+   }
+ 
+   private static Stream<Arguments> parseErrorData() {
+     return Stream.of(
+-        Arguments.of("metric\\", "incomplete escape sequence at end"),
+-        Arguments.of("metric,key=value\\", "incomplete escape sequence in tag value"),
+-        Arguments.of("metric\\uZZZZ", "invalid unicode escape sequence"),
+-        Arguments.of("metric\\u123", "incomplete unicode escape sequence"),
+-        Arguments.of("metric,=value", "empty tag key"),
+-        Arguments.of("metric,,key=value", "consecutive commas"),
+-        Arguments.of("metric,key=value,", "trailing comma"));
++        arguments("metric\\", "incomplete escape sequence at end"),
++        arguments("metric,key=value\\", "incomplete escape sequence in tag value"),
++        arguments("metric\\uZZZZ", "invalid unicode escape sequence"),
++        arguments("metric\\u123", "incomplete unicode escape sequence"),
++        arguments("metric,=value", "empty tag key"),
++        arguments("metric,,key=value", "consecutive commas"),
++        arguments("metric,key=value,", "trailing comma"));
+   }
+ 
+   private static Stream<Arguments> roundTripTestData() {
+     return Stream.of(
+-        Arguments.of(MetricName.build("http.requests"), "simple metric name"),
+-        Arguments.of(MetricName.build("http.requests").tagged("method", "GET"), "single tag"),
+-        Arguments.of(
++        arguments(MetricName.build("http.requests"), "simple metric name"),
++        arguments(MetricName.build("http.requests").tagged("method", "GET"), "single tag"),
++        arguments(
+             MetricName.build("database.queries")
+                 .tagged("database", "users")
+                 .tagged("action", "select")
+                 .tagged("environment", "production"),
+             "multiple tags"),
+-        Arguments.of(
++        arguments(
+             MetricName.EMPTY.tagged("env", "production").tagged("region", "eu-west"),
+             "empty key with tags"),
+-        Arguments.of(
++        arguments(
+             MetricName.build("path\\to,metric=test")
+                 .tagged("key,with=special", "value with spaces")
+                 .tagged("backslash\\key", "backslash\\value"),
+             "special characters"),
+-        Arguments.of(MetricName.EMPTY, "empty metric name"));
++        arguments(MetricName.EMPTY, "empty metric name"));
+   }
+ 
+   private static Stream<Arguments> constructorTestData() {
+     return Stream.of(
+-        Arguments.of("", Collections.emptyMap(), "empty key, empty tags"),
+-        Arguments.of("metric", Collections.emptyMap(), "simple key, empty tags"),
+-        Arguments.of("metric", null, "simple key, null tags"),
+-        Arguments.of(
++        arguments("", ImmutableMap.of(), "empty key, empty tags"),
++        arguments("metric", ImmutableMap.of(), "simple key, empty tags"),
++        arguments("metric", null, "simple key, null tags"),
++        arguments(
+             "complex.metric.name",
+-            Map.of("env", "prod", "region", "us"),
++            ImmutableMap.of("env", "prod", "region", "us"),
+             "complex key, multiple tags"));
+   }
+ 
+   private static Stream<Arguments> multipleRoundTripData() {
+     return Stream.of(
+-        Arguments.of(MetricName.build("test").tagged("key", "value"), 5),
+-        Arguments.of(
++        arguments(MetricName.build("test").tagged("key", "value"), 5),
++        arguments(
+             MetricName.build("complex🔥metric,with=special")
+                 .tagged("user🧑‍💻", "admin=true,role=super"),
+             3),
+-        Arguments.of(MetricName.build("metric\n\t\rwith\nnon\tprintable\rchars"), 10));
++        arguments(MetricName.build("metric\n\t\rwith\nnon\tprintable\rchars"), 10));
+   }
+ 
+-  @ParameterizedTest(name = "Non-printable character {2} in metric keys")
+   @MethodSource("nonPrintableCharacterData")
+-  void testNonPrintableCharactersInKeys(char character, String escaped, String description) {
++  @ParameterizedTest(name = "Non-printable character {2} in metric keys")
++  void nonPrintableCharactersInKeys(char character, String escaped, String description) {
+     // Test character in metric key
+     MetricName metricWithChar =
+         MetricName.build("metric" + character + "with" + character + description);
+     String stringRep = metricWithChar.toString();
+-    assertThat(stringRep).isEqualTo("metric" + escaped + "with" + escaped + description);
++    assertThat(stringRep).isEqualTo("metric%swith%s%s", escaped, escaped, description);
+ 
+     MetricName parsed = MetricName.parse(stringRep);
+     assertThat(parsed).isEqualTo(metricWithChar);
+-    assertThat(parsed.getKey()).isEqualTo("metric" + character + "with" + character + description);
++    assertThat(parsed.getKey()).isEqualTo("metric%swith%s%s", character, character, description);
+   }
+ 
+-  @ParameterizedTest(name = "Non-printable character {2} in tag keys")
+   @MethodSource("nonPrintableCharacterData")
+-  void testNonPrintableCharactersInTagKeys(char character, String escaped, String description) {
++  @ParameterizedTest(name = "Non-printable character {2} in tag keys")
++  void nonPrintableCharactersInTagKeys(char character, String escaped, String description) {
+     // Test character in tag key
+     MetricName metricWithTagKey =
+         MetricName.build("metric")
+             .tagged("key" + character + "with" + character + description, "value");
+     String stringRep = metricWithTagKey.toString();
+-    assertThat(stringRep)
+-        .isEqualTo("metric,key" + escaped + "with" + escaped + description + "=value");
++    assertThat(stringRep).isEqualTo("metric,key%swith%s%s=value", escaped, escaped, description);
+ 
+     MetricName parsed = MetricName.parse(stringRep);
+     assertThat(parsed).isEqualTo(metricWithTagKey);
+@@ -394,51 +395,51 @@ class MetricNameTest {
+         .isEqualTo("value");
+   }
+ 
+-  @ParameterizedTest(name = "Non-printable character {2} in tag values")
+   @MethodSource("nonPrintableCharacterData")
+-  void testNonPrintableCharactersInTagValues(char character, String escaped, String description) {
++  @ParameterizedTest(name = "Non-printable character {2} in tag values")
++  void nonPrintableCharactersInTagValues(char character, String escaped, String description) {
+     // Test character in tag value
+     MetricName metricWithTagValue =
+         MetricName.build("metric")
+             .tagged("key", "value" + character + "with" + character + description);
+     String stringRep = metricWithTagValue.toString();
+-    assertThat(stringRep).isEqualTo("metric,key=value" + escaped + "with" + escaped + description);
++    assertThat(stringRep).isEqualTo("metric,key=value%swith%s%s", escaped, escaped, description);
+ 
+     MetricName parsed = MetricName.parse(stringRep);
+     assertThat(parsed).isEqualTo(metricWithTagValue);
+     assertThat(parsed.getTags().get("key"))
+-        .isEqualTo("value" + character + "with" + character + description);
++        .isEqualTo("value%swith%s%s", character, character, description);
+   }
+ 
+-  @ParameterizedTest(name = "Parse error: {1}")
+   @MethodSource("parseErrorData")
+-  void testParseErrors(String input, String description) {
+-    assertThrows(IllegalArgumentException.class, () -> MetricName.parse(input));
++  @ParameterizedTest(name = "Parse error: {1}")
++  void parseErrors(String input, String description) {
++    assertThatThrownBy(() -> MetricName.parse(input)).isInstanceOf(IllegalArgumentException.class);
+   }
+ 
+-  @ParameterizedTest(name = "Round-trip test: {1}")
+   @MethodSource("roundTripTestData")
+-  void testRoundTripConversion(MetricName original, String description) {
++  @ParameterizedTest(name = "Round-trip test: {1}")
++  void roundTripConversion(MetricName original, String description) {
+     String stringRepresentation = original.toString();
+     MetricName parsed = MetricName.parse(stringRepresentation);
+     assertThat(parsed).isEqualTo(original);
+   }
+ 
+-  @ParameterizedTest(name = "Constructor test: {2}")
+   @MethodSource("constructorTestData")
+-  void testConstructorVariations(String key, Map<String, String> tags, String description) {
++  @ParameterizedTest(name = "Constructor test: {2}")
++  void constructorVariations(String key, Map<String, String> tags, String description) {
+     MetricName metricName = new MetricName(key, tags);
+     assertThat(metricName.getKey()).isEqualTo(key);
+     if (tags == null) {
+       assertThat(metricName.getTags()).isEmpty();
+     } else {
+-      assertThat(metricName.getTags()).isEqualTo(tags);
++      assertThat(metricName.getTags()).containsExactlyInAnyOrderEntriesOf(tags);
+     }
+   }
+ 
+-  @ParameterizedTest(name = "Multiple round-trips with {1} iterations")
+   @MethodSource("multipleRoundTripData")
+-  void testMultipleRoundTrips(MetricName original, int iterations) {
++  @ParameterizedTest(name = "Multiple round-trips with {1} iterations")
++  void multipleRoundTrips(MetricName original, int iterations) {
+     MetricName current = original;
+     for (int i = 0; i < iterations; i++) {
+       String stringRep = current.toString();
+@@ -448,7 +449,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testEdgeCasesWithSpecialCharacters() {
++  void edgeCasesWithSpecialCharacters() {
+     // Test edge case: tag key that is just special characters
+     MetricName edgeCase1 = MetricName.build("metric").tagged("=,=", "value");
+     String stringRep = edgeCase1.toString();
+@@ -479,7 +480,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testNonPrintableCharactersCombinedWithSpecialCharacters() {
++  void nonPrintableCharactersCombinedWithSpecialCharacters() {
+     // Test combination of non-printable and special characters in metric key
+     MetricName complexKey = MetricName.build("metric\n,with=special\t characters\r");
+     String stringRep = complexKey.toString();
+@@ -508,7 +509,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testNonPrintableCharactersRoundTrip() {
++  void nonPrintableCharactersRoundTrip() {
+     // Test extensive round-trip with various non-printable characters
+     MetricName complex =
+         MetricName.build("metric\n\t\rwith\nnon\tprintable\rchars")
+@@ -534,7 +535,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testNonPrintableCharactersEdgeCases() {
++  void nonPrintableCharactersEdgeCases() {
+     // Test edge case: only non-printable characters in key
+     MetricName onlyNonPrintable = MetricName.build("\n\t\r");
+     String stringRep = onlyNonPrintable.toString();
+@@ -567,7 +568,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testNonPrintableCharactersWithUnicodeAndEmojis() {
++  void nonPrintableCharactersWithUnicodeAndEmojis() {
+     // Test combination of non-printable characters with Unicode and emojis
+     MetricName unicodeWithNonPrintable =
+         MetricName.build("métriques\nデータ\t🚀")
+@@ -589,28 +590,29 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testConstructorNullKey() {
+-    assertThrows(NullPointerException.class, () -> new MetricName(null, Map.of()));
++  void constructorNullKey() {
++    assertThatThrownBy(() -> new MetricName(null, ImmutableMap.of()))
++        .isInstanceOf(NullPointerException.class);
+   }
+ 
+   @Test
+-  void testConstructorEmptyKey() {
++  void constructorEmptyKey() {
+     // Empty key is allowed by the constructor
+-    MetricName metricName = new MetricName("", Map.of());
++    MetricName metricName = new MetricName("", ImmutableMap.of());
+     assertThat(metricName.getKey()).isEmpty();
+     assertThat(metricName.getTags()).isEmpty();
+   }
+ 
+   @Test
+-  void testConstructorBlankKey() {
++  void constructorBlankKey() {
+     // Blank key is allowed by the constructor
+-    MetricName metricName = new MetricName("   ", Map.of());
++    MetricName metricName = new MetricName("   ", ImmutableMap.of());
+     assertThat(metricName.getKey()).isEqualTo("   ");
+     assertThat(metricName.getTags()).isEmpty();
+   }
+ 
+   @Test
+-  void testConstructorNullTags() {
++  void constructorNullTags() {
+     // Null tags are allowed by the constructor (converted to EMPTY_TAGS)
+     MetricName metricName = new MetricName("key", null);
+     assertThat(metricName.getKey()).isEqualTo("key");
+@@ -618,7 +620,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testControlCharactersEscaping() {
++  void controlCharactersEscaping() {
+     // Test ASCII control characters (0-31 and 127)
+     MetricName controlChars = MetricName.build("metric\u0001\u0002\u007F");
+     String stringRep = controlChars.toString();
+@@ -631,7 +633,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testControlCharactersInTags() {
++  void controlCharactersInTags() {
+     MetricName controlTags =
+         MetricName.build("metric").tagged("key\u0000", "value\u001F").tagged("del\u007F", "test");
+ 
+@@ -641,7 +643,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testLargeNumberOfTags() {
++  void largeNumberOfTags() {
+     Map<String, String> largeTags = new HashMap<>();
+     for (int i = 0; i < 1000; i++) {
+       largeTags.put("key" + i, "value" + i);
+@@ -654,7 +656,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testVeryLongKeysAndValues() {
++  void veryLongKeysAndValues() {
+     String longKey = "a".repeat(10000);
+     String longValue = "b".repeat(10000);
+ 
+@@ -664,19 +666,19 @@ class MetricNameTest {
+     assertThat(parsed).isEqualTo(longName);
+   }
+ 
+-  @Test
+   @SuppressWarnings("SelfAssertion")
+-  void testEqualsAndHashCode() {
++  @Test
++  void equalsAndHashCode() {
+     MetricName name1 = MetricName.build("test").tagged("env", "prod");
+     MetricName name2 = MetricName.build("test").tagged("env", "prod");
+     MetricName name3 = MetricName.build("test").tagged("env", "dev");
+ 
+     assertThat(name1).isEqualTo(name2);
+     assertThat(name1).isNotEqualTo(name3);
+-    assertThat(name1.hashCode()).isEqualTo(name2.hashCode());
++    assertThat(name1).hasSameHashCodeAs(name2);
+ 
+     // Test equals with null and different types
+-    assertThat(name1).isNotEqualTo(null);
++    assertThat(name1).isNotNull();
+     assertThat(name1).isNotEqualTo("string");
+ 
+     // Test self-equality
+@@ -684,16 +686,16 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testEqualsWithDifferentTagOrder() {
++  void equalsWithDifferentTagOrder() {
+     MetricName name1 = MetricName.build("test").tagged("a", "1").tagged("b", "2");
+     MetricName name2 = MetricName.build("test").tagged("b", "2").tagged("a", "1");
+ 
+     assertThat(name1).isEqualTo(name2);
+-    assertThat(name1.hashCode()).isEqualTo(name2.hashCode());
++    assertThat(name1).hasSameHashCodeAs(name2);
+   }
+ 
+   @Test
+-  void testTagsImmutability() {
++  void tagsImmutability() {
+     Map<String, String> originalTags = new HashMap<>();
+     originalTags.put("env", "prod");
+ 
+@@ -708,11 +710,12 @@ class MetricNameTest {
+     assertThat(name.getTags()).doesNotContainKey("new");
+ 
+     // Returned map should be immutable
+-    assertThrows(UnsupportedOperationException.class, () -> name.getTags().put("another", "tag"));
++    assertThatThrownBy(() -> name.getTags().put("another", "tag"))
++        .isInstanceOf(UnsupportedOperationException.class);
+   }
+ 
+   @Test
+-  void testAppendMethod() {
++  void appendMethod() {
+     MetricName base = MetricName.build("base").tagged("env", "prod");
+     MetricName append = MetricName.build("suffix").tagged("version", "1.0");
+ 
+@@ -725,7 +728,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testAppendWithConflictingTags() {
++  void appendWithConflictingTags() {
+     MetricName base = MetricName.build("base").tagged("env", "prod");
+     MetricName append = MetricName.build("suffix").tagged("env", "dev");
+ 
+@@ -736,7 +739,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testResolveWithMultipleParts() {
++  void resolveWithMultipleParts() {
+     MetricName base = MetricName.build("base");
+     MetricName result = base.resolve("part1", "part2", "part3");
+ 
+@@ -744,7 +747,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testResolveWithNullAndEmptyParts() {
++  void resolveWithNullAndEmptyParts() {
+     MetricName base = MetricName.build("base");
+     MetricName result = base.resolve(null, "", "valid", null, "");
+ 
+@@ -752,7 +755,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testMaxIntegerTagValues() {
++  void maxIntegerTagValues() {
+     MetricName name =
+         MetricName.build("metric")
+             .tagged("max", String.valueOf(Integer.MAX_VALUE))
+@@ -765,7 +768,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testEmptyStringTagValues() {
++  void emptyStringTagValues() {
+     MetricName name =
+         MetricName.build("metric").tagged("empty", "").tagged("space", " ").tagged("tab", "\t");
+ 
+@@ -778,7 +781,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testTaggedWithNullArguments() {
++  void taggedWithNullArguments() {
+     MetricName nameWithNullArray = MetricName.build("test").tagged((String[]) null);
+     assertThat(nameWithNullArray.getTags()).isEmpty();
+ 
+@@ -787,55 +790,55 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testTaggedWithEmptyMap() {
++  void taggedWithEmptyMap() {
+     MetricName original = MetricName.build("test").tagged("env", "prod");
+-    MetricName result = original.tagged(Map.of());
++    MetricName result = original.tagged(ImmutableMap.of());
+ 
+     assertThat(result).isEqualTo(original);
+   }
+ 
+   @Test
+-  void testBuildWithNullParts() {
++  void buildWithNullParts() {
+     MetricName result = MetricName.build((String[]) null);
+     assertThat(result).isEqualTo(MetricName.EMPTY);
+   }
+ 
+   @Test
+-  void testBuildWithEmptyArray() {
++  void buildWithEmptyArray() {
+     MetricName result = MetricName.build(new String[0]);
+     assertThat(result).isEqualTo(MetricName.EMPTY);
+   }
+ 
+   @Test
+-  void testComparabilityConsistency() {
++  void comparabilityConsistency() {
+     MetricName a = MetricName.build("a").tagged("x", "1");
+     MetricName b = MetricName.build("b").tagged("x", "1");
+     MetricName c = MetricName.build("c").tagged("x", "1");
+ 
+     // Test transitivity: if a < b and b < c, then a < c
+-    assertThat(a.compareTo(b)).isLessThan(0);
+-    assertThat(b.compareTo(c)).isLessThan(0);
+-    assertThat(a.compareTo(c)).isLessThan(0);
++    assertThat(a).isLessThan(b);
++    assertThat(b).isLessThan(c);
++    assertThat(a).isLessThan(c);
+ 
+     // Test consistency with equals
+     MetricName a2 = MetricName.build("a").tagged("x", "1");
+-    assertThat(a.compareTo(a2)).isEqualTo(0);
++    assertThat(a).isEqualByComparingTo(a2);
+     assertThat(a).isEqualTo(a2);
+   }
+ 
+   @Test
+-  void testCompareToWithDifferentNumberOfTags() {
++  void compareToWithDifferentNumberOfTags() {
+     MetricName noTags = MetricName.build("metric");
+     MetricName oneTags = MetricName.build("metric").tagged("a", "1");
+     MetricName twoTags = MetricName.build("metric").tagged("a", "1").tagged("b", "2");
+ 
+-    assertThat(noTags.compareTo(oneTags)).isLessThan(0);
+-    assertThat(oneTags.compareTo(twoTags)).isLessThan(0);
+-    assertThat(noTags.compareTo(twoTags)).isLessThan(0);
++    assertThat(noTags).isLessThan(oneTags);
++    assertThat(oneTags).isLessThan(twoTags);
++    assertThat(noTags).isLessThan(twoTags);
+   }
+ 
+   @Test
+-  void testPerformanceWithLargeTags() {
++  void performanceWithLargeTags() {
+     // Test performance doesn't degrade significantly with many tags
+     Map<String, String> manyTags = new HashMap<>();
+     for (int i = 0; i < 100; i++) {
+@@ -854,13 +857,13 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testThreadSafety() throws InterruptedException {
++  void threadSafety() throws InterruptedException {
+     MetricName name = MetricName.build("test").tagged("env", "prod");
+ 
+     int threadCount = 10;
+     int operationsPerThread = 100;
+     CountDownLatch latch = new CountDownLatch(threadCount);
+-    List<Exception> exceptions = Collections.synchronizedList(new ArrayList<>());
++    List<Exception> exceptions = synchronizedList(new ArrayList<>());
+ 
+     for (int i = 0; i < threadCount; i++) {
+       new Thread(
+@@ -898,7 +901,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testComplexEscapeSequences() {
++  void complexEscapeSequences() {
+     // Test multiple consecutive backslashes
+     MetricName multiBackslash = MetricName.build("metric\\\\\\\\test");
+     String stringRep = multiBackslash.toString();
+@@ -910,7 +913,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testEscapeSequenceEdgeCases() {
++  void escapeSequenceEdgeCases() {
+     // Test backslash at end of string
+     MetricName endBackslash = MetricName.build("test\\");
+     String stringRep = endBackslash.toString();
+@@ -925,7 +928,7 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testMemoryUsageWithDeepNesting() {
++  void memoryUsageWithDeepNesting() {
+     // Test that deeply nested resolve operations don't cause memory issues
+     MetricName name = MetricName.build("root");
+ 
+@@ -944,19 +947,15 @@ class MetricNameTest {
+   }
+ 
+   @Test
+-  void testTagOrderingConsistency() {
++  void tagOrderingConsistency() {
+     // Test that tag ordering is consistent across different creation methods
+-    Map<String, String> tags =
+-        Map.of(
+-            "zebra", "z",
+-            "alpha", "a",
+-            "beta", "b");
++    Map<String, String> tags = ImmutableMap.of("zebra", "z", "alpha", "a", "beta", "b");
+ 
+     MetricName fromMap = new MetricName("test", tags);
+     MetricName fromChaining =
+         MetricName.build("test").tagged("zebra", "z").tagged("alpha", "a").tagged("beta", "b");
+ 
+-    assertThat(fromMap.toString()).isEqualTo(fromChaining.toString());
++    assertThat(fromMap).hasToString(fromChaining.toString());
+     assertThat(fromMap).isEqualTo(fromChaining);
+ 
+     // Verify alphabetical ordering in string representation
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/MetricRegistryListenerTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/MetricRegistryListenerTest.java
 @@ -5,13 +5,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
@@ -2892,7 +3641,7 @@
  import static org.mockito.Mockito.mock;
  import static org.mockito.Mockito.never;
  import static org.mockito.Mockito.verify;
-@@ -12,16 +12,16 @@ import java.util.Set;
+@@ -13,16 +13,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;
  
@@ -2915,7 +3664,7 @@
  
    @BeforeEach
    void setUp() {
-@@ -220,8 +220,8 @@ class NoopMetricRegistryTest {
+@@ -221,8 +221,8 @@ class NoopMetricRegistryTest {
      verify(listener, never()).onGaugeAdded(METRIC_THING, gauge1);
    }
  
@@ -2925,7 +3674,7 @@
    void accessingACustomGaugeRegistersAndReusesIt() {
      final MetricRegistry.MetricSupplier<Gauge<String>> supplier = () -> gauge;
      final Gauge gauge1 = registry.gauge(METRIC_THING, supplier);
-@@ -242,7 +242,7 @@ class NoopMetricRegistryTest {
+@@ -243,7 +243,7 @@ class NoopMetricRegistryTest {
      registry.register(MetricName.build("meter"), meter);
      registry.register(MetricName.build("timer"), timer);
  
@@ -2934,7 +3683,7 @@
      registry.addListener(other);
  
      verify(other, never()).onGaugeAdded(MetricName.build("gauge"), gauge);
-@@ -491,8 +491,8 @@ class NoopMetricRegistryTest {
+@@ -492,9 +492,9 @@ class NoopMetricRegistryTest {
    @Test
    void registerNullMetric() {
      MetricRegistry registry = new NoopMetricRegistry();
@@ -2945,7 +3694,8 @@
 +        .isInstanceOf(NullPointerException.class)
 +        .hasMessage("metric == null");
    }
- }
+ 
+   @Test
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/RatioGaugeTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/RatioGaugeTest.java
 @@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
@@ -8542,6 +9292,151 @@
    }
  
 @@ -250,7 +250,7 @@ public class InstrumentedEE10HandlerTest {
+                             @Override
+                             public void onWritePossible() throws IOException {
+                               servletOutputStream.write(
+-                                  "some content from the async\n".getBytes(StandardCharsets.UTF_8));
++                                  "some content from the async\n".getBytes(UTF_8));
+                               context.complete();
+                               servletContextRequest.getServletChannel().handle();
+                             }
+--- a/metrics-jetty12-ee11/src/test/java/io/dropwizard/metrics/jetty12/ee11/InstrumentedEE11HandlerTest.java
++++ b/metrics-jetty12-ee11/src/test/java/io/dropwizard/metrics/jetty12/ee11/InstrumentedEE11HandlerTest.java
+@@ -3,6 +3,7 @@ package io.dropwizard.metrics.jetty12.ee11;
+ import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+ import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.COARSE;
+ import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.DETAILED;
++import static java.nio.charset.StandardCharsets.UTF_8;
+ import static org.assertj.core.api.Assertions.assertThat;
+ import static org.assertj.core.api.Assertions.assertThatCode;
+ 
+@@ -14,7 +15,6 @@ import jakarta.servlet.WriteListener;
+ import jakarta.servlet.http.HttpServletRequest;
+ import jakarta.servlet.http.HttpServletResponse;
+ import java.io.IOException;
+-import java.nio.charset.StandardCharsets;
+ import java.util.concurrent.TimeUnit;
+ import org.eclipse.jetty.client.ContentResponse;
+ import org.eclipse.jetty.client.HttpClient;
+@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Disabled;
+ import org.junit.jupiter.api.Test;
+ 
+-public class InstrumentedEE11HandlerTest {
++final class InstrumentedEE11HandlerTest {
+   private final HttpClient client = new HttpClient();
+   private final MetricRegistry registry = new MetricRegistry();
+   private final Server server = new Server();
+@@ -40,7 +40,7 @@ public class InstrumentedEE11HandlerTest {
+   private final InstrumentedEE11Handler handler = new InstrumentedEE11Handler(registry, null, ALL);
+ 
+   @BeforeEach
+-  public void setUp() throws Exception {
++  void setUp() throws Exception {
+     handler.setName("handler");
+ 
+     TestHandler testHandler = new TestHandler();
+@@ -62,18 +62,18 @@ public class InstrumentedEE11HandlerTest {
+   }
+ 
+   @AfterEach
+-  public void tearDown() throws Exception {
++  void tearDown() throws Exception {
+     server.stop();
+     client.stop();
+   }
+ 
+   @Test
+-  public void hasAName() throws Exception {
++  void hasAName() throws Exception {
+     assertThat(handler.getName()).isEqualTo("handler");
+   }
+ 
+   @Test
+-  public void createsAndRemovesMetricsForTheHandler() throws Exception {
++  void createsAndRemovesMetricsForTheHandler() throws Exception {
+     final ContentResponse response = client.GET(uri("/hello"));
+ 
+     assertThat(response.getStatus()).isEqualTo(404);
+@@ -115,9 +115,9 @@ public class InstrumentedEE11HandlerTest {
+     assertThat(registry.getNames()).isEmpty();
+   }
+ 
+-  @Test
+   @Disabled("flaky on virtual machines")
+-  public void responseTimesAreRecordedForBlockingResponses() throws Exception {
++  @Test
++  void responseTimesAreRecordedForBlockingResponses() throws Exception {
+ 
+     final ContentResponse response = client.GET(uri("/blocking"));
+ 
+@@ -127,7 +127,7 @@ public class InstrumentedEE11HandlerTest {
+   }
+ 
+   @Test
+-  public void doStopDoesNotThrowNPE() throws Exception {
++  void doStopDoesNotThrowNPE() throws Exception {
+     InstrumentedEE11Handler handler = new InstrumentedEE11Handler(registry, null, ALL);
+     handler.setHandler(new TestHandler());
+ 
+@@ -135,7 +135,7 @@ public class InstrumentedEE11HandlerTest {
+   }
+ 
+   @Test
+-  public void gaugesAreRegisteredWithResponseMeteredLevelCoarse() throws Exception {
++  void gaugesAreRegisteredWithResponseMeteredLevelCoarse() throws Exception {
+     InstrumentedEE11Handler handler = new InstrumentedEE11Handler(registry, "coarse", COARSE);
+     handler.setHandler(new TestHandler());
+     handler.setName("handler");
+@@ -145,7 +145,7 @@ public class InstrumentedEE11HandlerTest {
+   }
+ 
+   @Test
+-  public void gaugesAreNotRegisteredWithResponseMeteredLevelDetailed() throws Exception {
++  void gaugesAreNotRegisteredWithResponseMeteredLevelDetailed() throws Exception {
+     InstrumentedEE11Handler handler = new InstrumentedEE11Handler(registry, "detailed", DETAILED);
+     handler.setHandler(new TestHandler());
+     handler.setName("handler");
+@@ -154,9 +154,9 @@ public class InstrumentedEE11HandlerTest {
+         .doesNotContainKey(MetricName.build("detailed", "handler", "percent-4xx-1m"));
+   }
+ 
+-  @Test
+   @Disabled("flaky on virtual machines")
+-  public void responseTimesAreRecordedForAsyncResponses() throws Exception {
++  @Test
++  void responseTimesAreRecordedForAsyncResponses() throws Exception {
+ 
+     final ContentResponse response = client.GET(uri("/async"));
+ 
+@@ -167,9 +167,9 @@ public class InstrumentedEE11HandlerTest {
+ 
+   private void assertResponseTimesValid() {
+     assertThat(registry.getMeters().get(metricName().resolve("2xx-responses")).getCount())
+-        .isGreaterThan(0L);
++        .isPositive();
+     assertThat(registry.getMeters().get(metricName().resolve(".200-responses")).getCount())
+-        .isGreaterThan(0L);
++        .isPositive();
+ 
+     assertThat(
+             registry
+@@ -177,12 +177,12 @@ public class InstrumentedEE11HandlerTest {
+                 .get(metricName().resolve(".get-requests"))
+                 .getSnapshot()
+                 .getMedian())
+-        .isGreaterThan(0.0)
++        .isPositive()
+         .isLessThan(TimeUnit.SECONDS.toNanos(1));
+ 
+     assertThat(
+             registry.getTimers().get(metricName().resolve(".requests")).getSnapshot().getMedian())
+-        .isGreaterThan(0.0)
++        .isPositive()
+         .isLessThan(TimeUnit.SECONDS.toNanos(1));
+   }
+ 
+@@ -250,7 +250,7 @@ public class InstrumentedEE11HandlerTest {
                              @Override
                              public void onWritePossible() throws IOException {
                                servletOutputStream.write(
