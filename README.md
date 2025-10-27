@@ -272,6 +272,12 @@ guidelines][contributing].
 If you want to report a security vulnerability, please do so through a private
 channel; please see our [security policy][security] for details.
 
+## Acknowledgements
+
+This project's pull requests are analyzed using [Pitest][pitest], thanks to an
+OSS license generously provided by [Arcmutate][arcmutate]. Check them out!
+
+[arcmutate]: https://www.arcmutate.com
 [baeldung-java-source-target-options]: https://www.baeldung.com/java-source-target-options
 [bug-checks]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/
 [bug-checks-identity-conversion]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/main/java/tech/picnic/errorprone/bugpatterns/IdentityConversion.java
