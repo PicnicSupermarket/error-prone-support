@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.25.1-SNAPSHOT</version>
+    <version>0.26.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -142,7 +142,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2025-09-26T16:58:34Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-10-27T15:28:40Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -206,15 +206,13 @@
         <version.jdk>17</version.jdk>
         <version.jmh>1.37</version.jmh>
         <version.maven>3.9.11</version.maven>
-        <version.mockito>5.17.0</version.mockito>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
         <version.nullaway>0.12.5</version.nullaway>
-        <version.pitest-git>2.2.4</version.pitest-git>
+        <version.pitest-git>2.2.5</version.pitest-git>
         <version.rewrite-templating>1.24.2</version.rewrite-templating>
-        <version.surefire>3.2.3</version.surefire>
     </properties>
 
     <dependencyManagement>
@@ -382,14 +380,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.15.4</version>
+                <version>1.15.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.10</version>
+                <version>2024.0.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -406,7 +404,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.37</version>
+                <version>2.2.39</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -441,7 +439,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.17.7</version>
+                <version>1.17.8</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -466,7 +464,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.51.0</version>
+                <version>3.51.1</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -476,12 +474,12 @@
             <dependency>
                 <groupId>org.immutables</groupId>
                 <artifactId>value-annotations</artifactId>
-                <version>2.11.3</version>
+                <version>2.11.6</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.7</version>
+                <version>3.20.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -493,7 +491,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>5.13.4</version>
+                <version>6.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -507,7 +505,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.6.0</version>
+                <version>5.6.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -529,7 +527,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.14.0</version>
+                <version>3.17.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -543,19 +541,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.2.11</version>
+                <version>6.2.12</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.5.6</version>
+                <version>3.5.7</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>6.5.5</version>
+                <version>6.5.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -644,7 +642,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.9</version>
+                    <version>3.10</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -965,7 +963,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>11.0.1</version>
+                            <version>12.1.1</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1028,27 +1026,68 @@
                         <useIncrementalCompilation>false</useIncrementalCompilation>
                     </configuration>
                     <executions>
-                        <!-- OpenRewrite recipe sources, generated by the
-                        `rewrite-templating` annotation processor and
-                        identified as classes whose name ends in `Recipes`, are
-                        compiled to target Java 8 for compatibility with the
-                        wider OpenRewrite ecosystem. The `maven-jar-plugin` is
-                        configured to package these files into a separate JAR. -->
                         <execution>
+                            <!-- Generates OpenRewrite recipe sources. -->
+                            <!-- XXX: This step recompiles Refaster rule files
+                            (identified as classes whose name ends in `Rules`)
+                            without linting, as a workaround for a JDK 25
+                            issue that causes `@SuppressWarnings` annotations
+                            to be ineffectual. Merge this step back into the
+                            default compilation step once the bug is resolved
+                            or building with JDK 25 is no longer supported. See
+                            https://github.com/openrewrite/rewrite-templating/issues/165. -->
+                            <id>generate-recipes</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <annotationProcessorPaths combine.self="override">
+                                    <path>
+                                        <groupId>org.openrewrite</groupId>
+                                        <artifactId>rewrite-templating</artifactId>
+                                    </path>
+                                </annotationProcessorPaths>
+                                <compilerArgs combine.self="override">
+                                    <!-- This step only recompiles code, so
+                                    static analysis is irrelevant. As such we
+                                    clear all compiler arguments, specify only
+                                    those strictly required, and disable all
+                                    linting. -->
+                                    <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                    <arg>-Xlint:none</arg>
+                                    <!-- Generate recipe definitions that use
+                                    `JavaParser.Builder#classpathFromResources`
+                                    rather than `JavaParser.Builder#classpath`. -->
+                                    <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
+                                </compilerArgs>
+                                <includes>
+                                    <include>**/*Rules.java</include>
+                                </includes>
+                                <!-- Force recompilation by relying on the
+                                MCOMPILER-209 bug mentioned above. -->
+                                <useIncrementalCompilation>true</useIncrementalCompilation>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <!-- OpenRewrite recipe sources, generated by the
+                            `rewrite-templating` annotation processor and
+                            identified as classes whose name ends in `Recipes`,
+                            are compiled to target Java 8 for compatibility
+                            with the wider OpenRewrite ecosystem. The
+                            `maven-jar-plugin` is configured to package these
+                            files into a separate JAR. -->
                             <id>compile-recipes</id>
                             <goals>
                                 <goal>compile</goal>
                             </goals>
                             <configuration>
                                 <compilerArgs combine.self="override">
-                                    <!-- When Java 8 is targeted we can't use
-                                    the `add-exports` flag. And since this goal
-                                    only recompiles already-compiled code,
+                                    <!-- This step only recompiles code, so
                                     static analysis is irrelevant. As such we
-                                    clear all compiler arguments, and only
-                                    suppress source/target/bootstrap classpath
-                                    warnings. -->
-                                    <arg>-Xlint:-options</arg>
+                                    clear all compiler arguments, specify only
+                                    those strictly required, and disable all
+                                    linting. -->
+                                    <arg>-Xlint:none</arg>
                                 </compilerArgs>
                                 <source>8</source>
                                 <target>8</target>
@@ -1063,7 +1102,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.9.0</version>
                     <configuration>
                         <!-- XXX: Drop `ignoreAllNonTestScoped` once
                         https://issues.apache.org/jira/browse/MNG-6058 is
@@ -1101,7 +1140,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -1176,7 +1215,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.10.0</version>
+                            <version>1.11.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1546,7 +1585,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.13</version>
+                    <version>0.8.14</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
@@ -1576,7 +1615,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.20.3</version>
+                    <version>1.21.0</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->
@@ -1598,7 +1637,7 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.5.3</version>
+                            <version>1.6.0</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
@@ -1633,7 +1672,7 @@
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.8.0</version>
+                    <version>0.9.0</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>

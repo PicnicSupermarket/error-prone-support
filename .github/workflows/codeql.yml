@@ -38,19 +38,19 @@ jobs:
             repo.maven.apache.org:443
             uploads.github.com:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
           java-version: 21.0.8
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@f1f6e5f6af878fb37288ce1c627459e94dbf7d01 # v3.30.1
+        uses: github/codeql-action/init@755f44910c12a3d7ca0d8c6e42c048b3362f7cec # v3.30.8
         with:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
         if: matrix.language == 'java'
         run: mvn package -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@f1f6e5f6af878fb37288ce1c627459e94dbf7d01 # v3.30.1
+        uses: github/codeql-action/analyze@755f44910c12a3d7ca0d8c6e42c048b3362f7cec # v3.30.8
         with:
           category: /language:${{ matrix.language }}

@@ -35,6 +35,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
@@ -59,6 +60,7 @@ import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
+import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 
 /** Refaster rules related to expressions dealing with {@link Stream}s. */
 @OnlineDocumentation
@@ -813,6 +815,22 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(Collection<T> collection) {
       return collection.parallelStream();
+    }
+  }
+
+  /**
+   * Prefer streaming the result of {@link Collections#nCopies(int, Object)} if a stream of
+   * identical elements is required.
+   */
+  static final class CollectionsNCopiesStream<T> {
+    @BeforeTemplate
+    Stream<T> before(int n, @NotMatches(RequiresComputation.class) T element) {
+      return Stream.generate(() -> element).limit(n);
+    }
+
+    @AfterTemplate
+    Stream<T> after(int n, T element) {
+      return Collections.nCopies(n, element).stream();
     }
   }
 }

@@ -23,7 +23,7 @@ jobs:
         target-jdk: [ 17.0.16 ]
         include:
           - os: ubuntu-24.04
-            build-jdk: 24.0.2
+            build-jdk: 25
             target-jdk: 17.0.16
     runs-on: ${{ matrix.os }}
     steps:
@@ -47,7 +47,7 @@ jobs:
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
           java-version: |
             ${{ matrix.target-jdk }}
@@ -82,7 +82,7 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4f7fb9d9675e899ca81c6161dadbba0189a4ebb1 # v1.18.0
+        uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
           java-version: 21.0.8
           java-distribution: temurin
