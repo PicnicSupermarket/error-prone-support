@@ -48,7 +48,10 @@ final class JacksonRules {
     }
   }
 
-  /** Prefer {@link ObjectMapper#valueToTree(Object)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ObjectMapper#valueToTree(Object)} over more contrived and less efficient
+   * alternatives.
+   */
   static final class ObjectMapperValueToTree {
     @BeforeTemplate
     JsonNode before(ObjectMapper objectMapper, Object object) throws JsonProcessingException {
