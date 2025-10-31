@@ -339,4 +339,3 @@ OSS license generously provided by [Arcmutate][arcmutate]. Check them out!
 [sonarcloud-security-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=security_rating
 [sonarcloud-technical-debt-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=sqale_index
 [sonarcloud-technical-debt-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=sqale_index
-
