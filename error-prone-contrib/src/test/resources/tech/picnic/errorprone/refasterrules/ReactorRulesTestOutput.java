@@ -595,8 +595,24 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just(1).doOnError(IllegalArgumentException.class, e -> {});
   }
 
+  Mono<Integer> testMonoDoOnErrorOnErrorComplete() {
+    return Mono.just(1).doOnError(e -> {}).onErrorComplete();
+  }
+
+  Mono<Integer> testMonoDoOnErrorClassOnErrorComplete() {
+    return Mono.just(1).doOnError(IllegalArgumentException.class, e -> {}).onErrorComplete();
+  }
+
   Flux<Integer> testFluxDoOnError() {
     return Flux.just(1).doOnError(IllegalArgumentException.class, e -> {});
+  }
+
+  Flux<Integer> testFluxDoOnErrorOnErrorComplete() {
+    return Flux.just(1).doOnError(e -> {}).onErrorComplete();
+  }
+
+  Flux<Integer> testFluxDoOnErrorClassOnErrorComplete() {
+    return Flux.just(1).doOnError(IllegalArgumentException.class, e -> {}).onErrorComplete();
   }
 
   Mono<Integer> testMonoOnErrorComplete() {
