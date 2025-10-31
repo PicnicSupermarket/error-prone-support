@@ -616,34 +616,25 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just(1).doOnError(IllegalArgumentException.class::isInstance, e -> {});
   }
 
-  Mono<Integer> testMonoDoOnErrorOnErrorComplete() {
-    return Mono.just(1).onErrorComplete().doOnError(e -> {});
-  }
-
-  Mono<Integer> testMonoDoOnErrorClassOnErrorComplete() {
-    return Mono.just(1).onErrorComplete().doOnError(IllegalArgumentException.class, e -> {});
-  }
-
   Flux<Integer> testFluxDoOnError() {
     return Flux.just(1).doOnError(IllegalArgumentException.class::isInstance, e -> {});
   }
 
-  Flux<Integer> testFluxDoOnErrorOnErrorComplete() {
-    return Flux.just(1).onErrorComplete().doOnError(e -> {});
-  }
-
-  Flux<Integer> testFluxDoOnErrorClassOnErrorComplete() {
-    return Flux.just(1).onErrorComplete().doOnError(IllegalArgumentException.class, e -> {});
-  }
-
-  Mono<Integer> testMonoOnErrorComplete() {
-    return Mono.just(1).onErrorResume(e -> Mono.empty());
+  ImmutableSet<Mono<Integer>> testMonoOnErrorComplete() {
+    return ImmutableSet.of(
+        Mono.just(1).onErrorResume(e -> Mono.empty()),
+        Mono.just(2).onErrorComplete().doOnError(e -> {}),
+        Mono.just(3).onErrorComplete().doOnError(IllegalArgumentException.class, e -> {}),
+        Mono.just(4).onErrorComplete().doOnError(e -> true, e -> {}));
   }
 
   ImmutableSet<Flux<Integer>> testFluxOnErrorComplete() {
     return ImmutableSet.of(
         Flux.just(1).onErrorResume(e -> Mono.empty()),
-        Flux.just(2).onErrorResume(e -> Flux.empty()));
+        Flux.just(2).onErrorResume(e -> Flux.empty()),
+        Flux.just(3).onErrorComplete().doOnError(e -> {}),
+        Flux.just(4).onErrorComplete().doOnError(IllegalArgumentException.class, e -> {}),
+        Flux.just(5).onErrorComplete().doOnError(e -> true, e -> {}));
   }
 
   ImmutableSet<Mono<Integer>> testMonoOnErrorCompleteClass() {

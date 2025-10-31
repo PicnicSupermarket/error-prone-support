@@ -1640,37 +1640,6 @@ final class ReactorRules {
     }
   }
 
-  /** Calling {@link Mono#doOnError(Consumer)} after {@link Mono#onErrorComplete()} is redundant. */
-  static final class MonoDoOnErrorOnErrorComplete<T> {
-    @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Consumer<? super Throwable> onError) {
-      return mono.onErrorComplete().doOnError(onError);
-    }
-
-    @AfterTemplate
-    Mono<T> after(Mono<T> mono, Consumer<? super Throwable> onError) {
-      return mono.doOnError(onError).onErrorComplete();
-    }
-  }
-
-  /**
-   * Calling {@link Mono#doOnError(Class, Consumer)} after {@link Mono#onErrorComplete()} is
-   * redundant.
-   */
-  static final class MonoDoOnErrorClassOnErrorComplete<T> {
-    @BeforeTemplate
-    Mono<T> before(
-        Mono<T> mono, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return mono.onErrorComplete().doOnError(clazz, onError);
-    }
-
-    @AfterTemplate
-    Mono<T> after(
-        Mono<T> mono, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return mono.doOnError(clazz, onError).onErrorComplete();
-    }
-  }
-
   /**
    * Prefer {@link Flux#doOnError(Class, Consumer)} over {@link Flux#doOnError(Predicate, Consumer)}
    * where possible.
@@ -1689,42 +1658,23 @@ final class ReactorRules {
     }
   }
 
-  /** Calling {@link Flux#doOnError(Consumer)} after {@link Flux#onErrorComplete()} is redundant. */
-  static final class FluxDoOnErrorOnErrorComplete<T> {
-    @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Consumer<? super Throwable> onError) {
-      return flux.onErrorComplete().doOnError(onError);
-    }
-
-    @AfterTemplate
-    Flux<T> after(Flux<T> flux, Consumer<? super Throwable> onError) {
-      return flux.doOnError(onError).onErrorComplete();
-    }
-  }
-
   /**
-   * Calling {@link Flux#doOnError(Class, Consumer)} after {@link Flux#onErrorComplete()} is
-   * redundant.
+   * Prefer {@link Mono#onErrorComplete()} over more contrived alternatives, and don't chain it with
+   * redundant calls to {@link Mono#doOnError}.
    */
-  static final class FluxDoOnErrorOnClassErrorComplete<T> {
+  static final class MonoOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
-    Flux<T> before(
-        Flux<T> flux, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return flux.onErrorComplete().doOnError(clazz, onError);
-    }
-
-    @AfterTemplate
-    Flux<T> after(
-        Flux<T> flux, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return flux.doOnError(clazz, onError).onErrorComplete();
-    }
-  }
-
-  /** Prefer {@link Mono#onErrorComplete()} over more contrived alternatives. */
-  static final class MonoOnErrorComplete<T> {
-    @BeforeTemplate
-    Mono<T> before(Mono<T> mono) {
-      return mono.onErrorResume(e -> Mono.empty());
+    Mono<T> before(
+        Mono<T> mono,
+        Consumer<? super Throwable> onThrowable,
+        Class<E> clazz,
+        Consumer<? super E> onError,
+        Predicate<? super Throwable> predicate) {
+      return Refaster.anyOf(
+          mono.onErrorResume(e -> Mono.empty()),
+          mono.onErrorComplete().doOnError(onThrowable),
+          mono.onErrorComplete().doOnError(clazz, onError),
+          mono.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
     @AfterTemplate
@@ -1733,11 +1683,23 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete()} over more contrived alternatives. */
-  static final class FluxOnErrorComplete<T> {
+  /**
+   * Prefer {@link Flux#onErrorComplete()} over more contrived alternatives, and don't chain it with
+   * redundant calls to {@link Flux#doOnError}.
+   */
+  static final class FluxOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux) {
-      return flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty()));
+    Flux<T> before(
+        Flux<T> flux,
+        Consumer<? super Throwable> onThrowable,
+        Class<E> clazz,
+        Consumer<? super E> onError,
+        Predicate<? super Throwable> predicate) {
+      return Refaster.anyOf(
+          flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty())),
+          flux.onErrorComplete().doOnError(onThrowable),
+          flux.onErrorComplete().doOnError(clazz, onError),
+          flux.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
     @AfterTemplate
