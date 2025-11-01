@@ -63,15 +63,13 @@ public final class ReturnsMono implements Matcher<ExpressionTree> {
       return false;
     }
 
-    if (tree instanceof LambdaExpressionTree lambdaExpression) {
-      return IS_MONO_TREE.matches(lambdaExpression.getBody(), state);
-    }
-
-    if (tree instanceof MemberReferenceTree memberReference) {
-      return IS_MONO_TYPE.apply(
-          ASTHelpers.getSymbol(memberReference).type.asMethodType().getReturnType(), state);
-    }
-
-    return IS_FUNCTION_RETURNING_MONO_TREE.matches(tree, state);
+    return switch (tree) {
+      case LambdaExpressionTree lambdaExpression ->
+          IS_MONO_TREE.matches(lambdaExpression.getBody(), state);
+      case MemberReferenceTree memberReference ->
+          IS_MONO_TYPE.apply(
+              ASTHelpers.getSymbol(memberReference).type.asMethodType().getReturnType(), state);
+      default -> IS_FUNCTION_RETURNING_MONO_TREE.matches(tree, state);
+    };
   }
 }

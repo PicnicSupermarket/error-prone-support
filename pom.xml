@@ -203,7 +203,7 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.42.0</version.error-prone-orig>
-        <version.jdk>17</version.jdk>
+        <version.jdk>21</version.jdk>
         <version.maven>3.9.11</version.maven>
         <version.pitest-git>2.2.5</version.pitest-git>
     </properties>
@@ -1160,7 +1160,7 @@
                                 <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
                             </requireEncoding>
                             <requireJavaVersion>
-                                <version>21</version>
+                                <version>25</version>
                             </requireJavaVersion>
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
@@ -1236,7 +1236,7 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
-                                <!-- These Java 17 bytecode classes are omitted
+                                <!-- These Java 21 bytecode classes are omitted
                                 from the default JAR, as instead we produce a
                                 separate artifact with Java 8 bytecode variants. -->
                                 <excludes>

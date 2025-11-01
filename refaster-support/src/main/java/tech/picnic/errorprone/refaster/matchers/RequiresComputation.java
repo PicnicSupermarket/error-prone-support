@@ -29,51 +29,30 @@ public final class RequiresComputation implements Matcher<ExpressionTree> {
   // XXX: Some `BinaryTree`s may represent what could be considered "trivial computations".
   // Depending on feedback such trees may be matched in the future.
   private static boolean matches(ExpressionTree expressionTree) {
-    if (expressionTree instanceof ArrayAccessTree arrayAccess) {
-      return matches(arrayAccess.getExpression()) || matches(arrayAccess.getIndex());
-    }
-
-    if (expressionTree instanceof LiteralTree) {
-      return false;
-    }
-
-    if (expressionTree instanceof LambdaExpressionTree) {
-      /*
-       * Lambda expressions encapsulate computations, but their definition does not involve
-       * significant computation.
-       */
-      return false;
-    }
-
-    if (expressionTree instanceof IdentifierTree) {
-      // XXX: Generally identifiers don't by themselves represent a computation, though they may be
-      // a stand-in for one if they are a Refaster template method argument. Can we identify such
-      // cases, also when the `Matcher` is invoked by Refaster?
-      return false;
-    }
-
-    if (expressionTree instanceof MemberReferenceTree memberReference) {
-      return matches(memberReference.getQualifierExpression());
-    }
-
-    if (expressionTree instanceof MemberSelectTree memberSelect) {
-      return matches(memberSelect.getExpression());
-    }
-
-    if (expressionTree instanceof ParenthesizedTree parenthesized) {
-      return matches(parenthesized.getExpression());
-    }
-
-    if (expressionTree instanceof TypeCastTree typeCast) {
-      return matches(typeCast.getExpression());
-    }
-
-    if (expressionTree instanceof UnaryTree unary) {
-      // XXX: Arguably side-effectful options such as pre- and post-increment and -decrement
-      // represent non-trivial computations.
-      return matches(unary.getExpression());
-    }
-
-    return ASTHelpers.constValue(expressionTree) == null;
+    return switch (expressionTree) {
+      case ArrayAccessTree arrayAccess ->
+          matches(arrayAccess.getExpression()) || matches(arrayAccess.getIndex());
+      case LiteralTree literal -> false;
+      case LambdaExpressionTree lambdaExpression ->
+          /*
+           * Lambda expressions encapsulate computations, but their definition does not involve
+           * significant computation.
+           */
+          false;
+      case IdentifierTree identifier ->
+          // XXX: Generally identifiers don't by themselves represent a computation, though they may
+          // be a stand-in for one if they are a Refaster template method argument. Can we identify
+          // such cases, also when the `Matcher` is invoked by Refaster?
+          false;
+      case MemberReferenceTree memberReference -> matches(memberReference.getQualifierExpression());
+      case MemberSelectTree memberSelect -> matches(memberSelect.getExpression());
+      case ParenthesizedTree parenthesized -> matches(parenthesized.getExpression());
+      case TypeCastTree typeCast -> matches(typeCast.getExpression());
+      case UnaryTree unary ->
+          // XXX: Arguably side-effectful options such as pre- and post-increment and -decrement
+          // represent non-trivial computations.
+          matches(unary.getExpression());
+      default -> ASTHelpers.constValue(expressionTree) == null;
+    };
   }
 }

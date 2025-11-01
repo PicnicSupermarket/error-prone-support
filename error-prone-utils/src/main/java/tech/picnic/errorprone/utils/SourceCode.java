@@ -34,7 +34,7 @@ public final class SourceCode {
    *
    * @param str The string of interest.
    * @return {@code true} if the given string is a valid identifier in the Java language.
-   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.8">JDK 17 JLS
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.8">JDK 21 JLS
    *     section 3.8: Identifiers</a>
    */
   public static boolean isValidIdentifier(String str) {

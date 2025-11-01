@@ -20,8 +20,10 @@ import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import java.util.List;
@@ -64,18 +66,18 @@ public final class MockitoMockClassReference extends BugChecker
     }
 
     List<? extends ExpressionTree> arguments = tree.getArguments();
-    return describeMatch(tree, SuggestedFixes.removeElement(arguments.get(0), arguments, state));
+    return describeMatch(
+        tree, SuggestedFixes.removeElement(arguments.getFirst(), arguments, state));
   }
 
-  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static boolean isTypeDerivableFromContext(MethodInvocationTree tree, VisitorState state) {
     Tree parent = state.getPath().getParentPath().getLeaf();
-    return switch (parent.getKind()) {
-      case VARIABLE ->
-          !ASTHelpers.hasImplicitType((VariableTree) parent, state)
-              && MoreASTHelpers.areSameType(tree, parent, state);
-      case ASSIGNMENT -> MoreASTHelpers.areSameType(tree, parent, state);
-      case RETURN ->
+    return switch (parent) {
+      case VariableTree variable ->
+          !ASTHelpers.hasImplicitType(variable, state)
+              && MoreASTHelpers.areSameType(tree, variable, state);
+      case AssignmentTree assignment -> MoreASTHelpers.areSameType(tree, assignment, state);
+      case ReturnTree returnTree ->
           MoreASTHelpers.findMethodExitedOnReturn(state)
               .filter(m -> MoreASTHelpers.areSameType(tree, m.getReturnType(), state))
               .isPresent();

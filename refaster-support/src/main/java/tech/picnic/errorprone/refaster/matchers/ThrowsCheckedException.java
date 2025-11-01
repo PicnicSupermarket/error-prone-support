@@ -23,16 +23,14 @@ public final class ThrowsCheckedException implements Matcher<ExpressionTree> {
 
   @Override
   public boolean matches(ExpressionTree tree, VisitorState state) {
-    if (tree instanceof LambdaExpressionTree lambdaExpression) {
-      return throwsCheckedException(lambdaExpression, state);
-    }
-
-    if (tree instanceof MemberReferenceTree memberReference) {
-      return throwsCheckedException(memberReference, state);
-    }
-
-    Type type = ASTHelpers.getType(tree);
-    return type != null && throwsCheckedException(type, state);
+    return switch (tree) {
+      case LambdaExpressionTree lambdaExpression -> throwsCheckedException(lambdaExpression, state);
+      case MemberReferenceTree memberReference -> throwsCheckedException(memberReference, state);
+      default -> {
+        Type type = ASTHelpers.getType(tree);
+        yield type != null && throwsCheckedException(type, state);
+      }
+    };
   }
 
   private static boolean throwsCheckedException(LambdaExpressionTree tree, VisitorState state) {

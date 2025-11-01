@@ -105,7 +105,7 @@ public final class IdentityConversion extends BugChecker implements MethodInvoca
       return Description.NO_MATCH;
     }
 
-    ExpressionTree sourceTree = arguments.get(0);
+    ExpressionTree sourceTree = arguments.getFirst();
     Type sourceType = ASTHelpers.getType(sourceTree);
     Type resultType = ASTHelpers.getType(tree);
     TargetType targetType = TargetType.targetType(state);
