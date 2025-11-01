@@ -44,4 +44,9 @@ jobs:
       - name: Quickly build and install project
         run: mvn install -Dverification.skip
       - name: Build and test project with self-check against the latest Error Prone release
-        run: mvn clean verify -s settings.xml -Pself-check -Dversion.error-prone=LATEST -Denforcer.skip -Dmdep.analyze.skip
+        # Note that it is okay for the build to reference checks that have been
+        # deleted in the latest release, or to trigger new warnings; those
+        # don't indicate that Error Prone Support is incompatible with the
+        # latest Error Prone release as far as downstream users are concerned.
+        # XXX: This use of `error-prone.patch-args` is a bit dodgy...
+        run: mvn clean verify -s settings.xml -Pself-check -Dversion.error-prone=LATEST -Derror-prone.patch-args=-XepIgnoreUnknownCheckNames -Dverification.warn
