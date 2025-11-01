@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.common.collect.ImmutableSet;
 import java.time.Duration;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractDurationAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJDurationRulesTest implements RefasterRuleCollectionTestCase {
@@ -37,10 +38,8 @@ final class AssertJDurationRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Duration.ofMillis(0)).isZero(), assertThat(Duration.ofMillis(1)).isZero());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsPositive() {
-    return ImmutableSet.of(
-        assertThat(Duration.ofMillis(0)).isPositive(),
-        assertThat(Duration.ofMillis(1)).isPositive());
+  AbstractDurationAssert<?> testAssertThatIsPositive() {
+    return assertThat(Duration.ofMillis(0)).isPositive();
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNegative() {

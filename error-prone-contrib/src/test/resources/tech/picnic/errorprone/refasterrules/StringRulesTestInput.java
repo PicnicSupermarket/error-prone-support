@@ -114,20 +114,12 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return "foo".getBytes(UTF_8).length;
   }
 
-  int testStringIndexOfCharFromIndex() {
+  int testStringIndexOfChar() {
     return "foo".substring(1).indexOf('a');
   }
 
-  int testStringIndexOfCharBetweenIndices() {
-    return "foo".substring(1, 2).indexOf('a');
-  }
-
-  int testStringIndexOfStringFromIndex() {
+  int testStringIndexOfString() {
     return "foo".substring(1).indexOf("bar");
-  }
-
-  int testStringIndexOfStringBetweenIndices() {
-    return "foo".substring(1, 2).indexOf("bar");
   }
 
   int testStringLastIndexOfChar() {
