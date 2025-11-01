@@ -12,8 +12,6 @@
 # incompatibilities.
 name: Error Prone compatibility check
 on:
-  # XXX: Drop
-  pull_request:
   push:
     branches: [ master ]
   schedule:
@@ -51,4 +49,4 @@ jobs:
         # don't indicate that Error Prone Support is incompatible with the
         # latest Error Prone release as far as downstream users are concerned.
         # XXX: This use of `error-prone.patch-args` is a bit dodgy...
-        run: mvn clean verify -s settings.xml -Pself-check -Dversion.error-prone=LATEST -Denforcer.skip -Dmdep.analyze.skip
+        run: mvn clean verify -s settings.xml -Pself-check -Dversion.error-prone=LATEST -Derror-prone.patch-args=-XepIgnoreUnknownCheckNames -Dverification.warn
