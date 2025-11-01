@@ -48,7 +48,6 @@ final class RefasterRulesTest {
           ClassRules.class,
           CollectionRules.class,
           ComparatorRules.class,
-          DequeRules.class,
           DoubleStreamRules.class,
           EqualityRules.class,
           FileRules.class,

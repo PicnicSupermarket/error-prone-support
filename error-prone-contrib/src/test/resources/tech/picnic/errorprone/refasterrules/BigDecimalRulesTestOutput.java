@@ -13,10 +13,6 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
   }
 
-  ImmutableSet<BigDecimal> testBigDecimalTwo() {
-    return ImmutableSet.of(BigDecimal.TWO, BigDecimal.TWO, BigDecimal.TWO);
-  }
-
   ImmutableSet<BigDecimal> testBigDecimalTen() {
     return ImmutableSet.of(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN);
   }

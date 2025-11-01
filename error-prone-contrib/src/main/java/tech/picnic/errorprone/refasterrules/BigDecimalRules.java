@@ -38,19 +38,6 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#TWO} when possible. */
-  static final class BigDecimalTwo {
-    @BeforeTemplate
-    BigDecimal before() {
-      return Refaster.anyOf(BigDecimal.valueOf(2), new BigDecimal("2"));
-    }
-
-    @AfterTemplate
-    BigDecimal after() {
-      return BigDecimal.TWO;
-    }
-  }
-
   /** Prefer using the constant {@link BigDecimal#TEN} when possible. */
   static final class BigDecimalTen {
     @BeforeTemplate

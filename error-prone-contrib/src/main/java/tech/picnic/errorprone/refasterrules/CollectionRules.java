@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.Queue;
-import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Consumer;
@@ -401,7 +399,7 @@ final class CollectionRules {
 
     @BeforeTemplate
     Optional<T> before(List<T> collection) {
-      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.getFirst());
+      return collection.isEmpty() ? Optional.empty() : Optional.of(collection.get(0));
     }
 
     @BeforeTemplate
@@ -483,143 +481,6 @@ final class CollectionRules {
     @AfterTemplate
     void after(Collection<T> collection, Consumer<? super T> consumer) {
       collection.forEach(consumer);
-    }
-  }
-
-  /** Prefer {@code collection.iterator().next()} over more contrived alternatives. */
-  static final class CollectionIteratorNext<S, T extends S> {
-    @BeforeTemplate
-    S before(Collection<T> collection) {
-      return collection.stream().findFirst().orElseThrow();
-    }
-
-    @AfterTemplate
-    S after(Collection<T> collection) {
-      return collection.iterator().next();
-    }
-  }
-
-  /** Prefer {@link SequencedCollection#getFirst()} over less idiomatic alternatives. */
-  static final class SequencedCollectionGetFirst<S, T extends S> {
-    @BeforeTemplate
-    S before(SequencedCollection<T> collection) {
-      return collection.iterator().next();
-    }
-
-    @BeforeTemplate
-    S before(List<T> collection) {
-      return collection.get(0);
-    }
-
-    @AfterTemplate
-    S after(SequencedCollection<T> collection) {
-      return collection.getFirst();
-    }
-  }
-
-  /** Prefer {@link SequencedCollection#getLast()} over less idiomatic alternatives. */
-  static final class SequencedCollectionGetLast<S, T extends S> {
-    @BeforeTemplate
-    S before(SequencedCollection<T> collection) {
-      return Refaster.anyOf(
-          collection.reversed().getFirst(), Streams.findLast(collection.stream()).orElseThrow());
-    }
-
-    @BeforeTemplate
-    S before(List<T> collection) {
-      return collection.get(collection.size() - 1);
-    }
-
-    @AfterTemplate
-    S after(SequencedCollection<T> collection) {
-      return collection.getLast();
-    }
-  }
-
-  /** Prefer {@link List#addFirst(Object)} over less idiomatic alternatives. */
-  static final class ListAddFirst<S, T extends S> {
-    @BeforeTemplate
-    void before(List<S> list, T element) {
-      list.add(0, element);
-    }
-
-    @AfterTemplate
-    void after(List<S> list, T element) {
-      list.addFirst(element);
-    }
-  }
-
-  /** Prefer {@link List#add(Object)} over less idiomatic alternatives. */
-  static final class ListAdd<S, T extends S> {
-    @BeforeTemplate
-    void before(List<S> list, T element) {
-      list.addLast(element);
-    }
-
-    @BeforeTemplate
-    void before2(List<S> list, T element) {
-      list.add(list.size(), element);
-    }
-
-    @AfterTemplate
-    void after(List<S> list, T element) {
-      list.add(element);
-    }
-  }
-
-  /** Prefer {@link List#removeFirst()}} over less idiomatic alternatives. */
-  // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
-  // `NoSuchElementException`.
-  static final class ListRemoveFirst<S, T extends S> {
-    @BeforeTemplate
-    S before(List<T> list) {
-      return list.remove(0);
-    }
-
-    @AfterTemplate
-    S after(List<T> list) {
-      return list.removeFirst();
-    }
-  }
-
-  /** Prefer {@link List#removeLast()}} over less idiomatic alternatives. */
-  // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
-  // `NoSuchElementException`.
-  static final class ListRemoveLast<S, T extends S> {
-    @BeforeTemplate
-    S before(List<T> list) {
-      return list.remove(list.size() - 1);
-    }
-
-    @AfterTemplate
-    S after(List<T> list) {
-      return list.removeLast();
-    }
-  }
-
-  /** Prefer {@link SortedSet#first()} over more verbose alternatives. */
-  static final class SortedSetFirst<S, T extends S> {
-    @BeforeTemplate
-    S before(SortedSet<T> set) {
-      return set.getFirst();
-    }
-
-    @AfterTemplate
-    S after(SortedSet<T> set) {
-      return set.first();
-    }
-  }
-
-  /** Prefer {@link SortedSet#last()} over more verbose alternatives. */
-  static final class SortedSetLast<S, T extends S> {
-    @BeforeTemplate
-    S before(SortedSet<T> set) {
-      return set.getLast();
-    }
-
-    @AfterTemplate
-    S after(SortedSet<T> set) {
-      return set.last();
     }
   }
 
