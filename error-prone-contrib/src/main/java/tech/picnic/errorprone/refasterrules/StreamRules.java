@@ -251,6 +251,38 @@ final class StreamRules {
   }
 
   /**
+   * Apply {@link Stream#distinct()} before {@link Stream#sorted()} to reduce the number of elements
+   * to sort.
+   */
+  static final class StreamDistinctSorted<T> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream) {
+      return stream.sorted().distinct();
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream) {
+      return stream.distinct().sorted();
+    }
+  }
+
+  /**
+   * Apply {@link Stream#distinct()} before {@link Stream#sorted(Comparator)} to reduce the number
+   * of elements to sort.
+   */
+  static final class StreamDistinctSortedWithComparator<T> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, Comparator<? super T> comparator) {
+      return stream.sorted(comparator).distinct();
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream, Comparator<? super T> comparator) {
+      return stream.distinct().sorted(comparator);
+    }
+  }
+
+  /**
    * Where possible, clarify that a mapping operation will be applied only to a single stream
    * element.
    */
