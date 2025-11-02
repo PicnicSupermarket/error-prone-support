@@ -1940,10 +1940,6 @@
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
                                 </arg>
-                                <!-- XXX: Drop this flag once it's enabled by
-                                default on the lowest supported JDK. See
-                                https://github.com/uber/NullAway/wiki/JSpecify-Support. -->
-                                <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
                                 moment it is invoked. Those assumptions require
