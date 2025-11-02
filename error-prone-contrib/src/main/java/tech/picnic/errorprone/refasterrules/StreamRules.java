@@ -270,14 +270,14 @@ final class StreamRules {
    * Apply {@link Stream#distinct()} before {@link Stream#sorted(Comparator)} to reduce the number
    * of elements to sort.
    */
-  static final class StreamDistinctSortedWithComparator<T> {
+  static final class StreamDistinctSortedWithComparator<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, Comparator<? super T> comparator) {
+    Stream<T> before(Stream<T> stream, Comparator<S> comparator) {
       return stream.sorted(comparator).distinct();
     }
 
     @AfterTemplate
-    Stream<T> after(Stream<T> stream, Comparator<? super T> comparator) {
+    Stream<T> after(Stream<T> stream, Comparator<S> comparator) {
       return stream.distinct().sorted(comparator);
     }
   }
