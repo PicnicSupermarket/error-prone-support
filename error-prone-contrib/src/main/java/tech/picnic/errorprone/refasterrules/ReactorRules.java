@@ -1955,14 +1955,14 @@ final class ReactorRules {
    * Apply {@link Flux#distinct()} before {@link Flux#sort(Comparator)} to reduce the number of
    * elements to sort.
    */
-  static final class FluxDistinctSortWithComparator<T> {
+  static final class FluxDistinctSortWithComparator<S, T extends S> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Comparator<? super T> comparator) {
+    Flux<T> before(Flux<T> flux, Comparator<S> comparator) {
       return flux.sort(comparator).distinct();
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Comparator<? super T> comparator) {
+    Flux<T> after(Flux<T> flux, Comparator<S> comparator) {
       return flux.distinct().sort(comparator);
     }
   }

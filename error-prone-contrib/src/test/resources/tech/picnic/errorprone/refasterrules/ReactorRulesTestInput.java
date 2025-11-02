@@ -688,19 +688,19 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<Integer> testFluxFilterSort() {
-    return Flux.just(1, 4, 3, 2).sort().filter(i -> i % 2 == 0);
+    return Flux.just(1).sort().filter(i -> i % 2 == 0);
   }
 
   Flux<Integer> testFluxFilterSortWithComparator() {
-    return Flux.just(1, 4, 3, 2).sort(reverseOrder()).filter(i -> i % 2 == 0);
+    return Flux.just(1).sort(reverseOrder()).filter(i -> i % 2 == 0);
   }
 
   Flux<Integer> testFluxDistinctSort() {
-    return Flux.just(1, 4, 3, 2, 4, 1).sort().distinct();
+    return Flux.just(1).sort().distinct();
   }
 
   Flux<Integer> testFluxDistinctSortWithComparator() {
-    return Flux.just(1, 4, 3, 2, 4, 1).sort(reverseOrder()).distinct();
+    return Flux.just(1).sort(reverseOrder()).distinct();
   }
 
   Flux<Integer> testFluxTakeWhile() {
