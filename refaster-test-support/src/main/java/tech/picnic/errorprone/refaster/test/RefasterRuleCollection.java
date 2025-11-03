@@ -134,6 +134,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, clazz)
         .setArgs(
+            "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
             "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
             "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className)
         .addInputLines(inputResource, loadResource(clazz, inputResource))

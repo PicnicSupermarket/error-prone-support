@@ -7,8 +7,11 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.Constants;
 import com.sun.tools.javac.util.Convert;
+import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import javax.lang.model.element.Name;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -95,6 +98,20 @@ final class BugCheckerRules {
     @AfterTemplate
     boolean after(Name name, CharSequence string) {
       return name.contentEquals(string);
+    }
+  }
+
+  /** Prefer {@link ASTHelpers#getStartPosition(Tree)} over alternatives that require casting. */
+  static final class ASTHelpersGetStartPosition<T extends DiagnosticPosition> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked" /* We also want to replace unchecked casts. */)
+    int before(Tree tree) {
+      return ((T) tree).getStartPosition();
+    }
+
+    @AfterTemplate
+    int after(Tree tree) {
+      return ASTHelpers.getStartPosition(tree);
     }
   }
 }
