@@ -760,19 +760,21 @@ final class AssertJThrowingCallableRules {
     }
   }
 
+  // XXX: Temporarily disabled because of `hasCauseReference(java.lang.Throwable) in
+  // org.assertj.core.api.AbstractThrowableAssert has been deprecated`.
   // XXX: This rule changes the `Throwable` against which subsequent assertions are made.
-  static final class AbstractThrowableAssertCauseIsSameAs {
-    @BeforeTemplate
-    @SuppressWarnings("deprecation" /* This deprecated API will be rewritten. */)
-    AbstractThrowableAssert<?, ? extends Throwable> before(
-        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
-      return throwableAssert.hasCauseReference(expected);
-    }
-
-    @AfterTemplate
-    AbstractThrowableAssert<?, ? extends Throwable> after(
-        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
-      return throwableAssert.cause().isSameAs(expected);
-    }
-  }
+  //  static final class AbstractThrowableAssertCauseIsSameAs {
+  //    @BeforeTemplate
+  //    @SuppressWarnings("deprecation" /* This deprecated API will be rewritten. */)
+  //    AbstractThrowableAssert<?, ? extends Throwable> before(
+  //        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
+  //      return throwableAssert.hasCauseReference(expected);
+  //    }
+  //
+  //    @AfterTemplate
+  //    AbstractThrowableAssert<?, ? extends Throwable> after(
+  //        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
+  //      return throwableAssert.cause().isSameAs(expected);
+  //    }
+  //  }
 }
