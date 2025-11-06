@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TARGET_JDK=17
+TARGET_JDK=21
 
 # Builds the project twice: once against the original Error Prone release,
 # using only Error Prone checks available on Maven Central, and once against

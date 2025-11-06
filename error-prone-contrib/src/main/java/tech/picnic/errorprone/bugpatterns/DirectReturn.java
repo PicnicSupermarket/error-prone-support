@@ -75,7 +75,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
       return Description.NO_MATCH;
     }
 
-    StatementTree finalStatement = statements.get(statements.size() - 1);
+    StatementTree finalStatement = statements.getLast();
     if (!VARIABLE_RETURN.matches(finalStatement, state)) {
       return Description.NO_MATCH;
     }
@@ -105,24 +105,20 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
   }
 
   private static Optional<ExpressionTree> tryMatchAssignment(Symbol targetSymbol, Tree tree) {
-    if (tree instanceof ExpressionStatementTree expressionStatement) {
-      return tryMatchAssignment(targetSymbol, expressionStatement.getExpression());
-    }
-
-    if (tree instanceof AssignmentTree assignment) {
-      return targetSymbol.equals(ASTHelpers.getSymbol(assignment.getVariable()))
-          ? Optional.of(assignment.getExpression())
-          : Optional.empty();
-    }
-
-    if (tree instanceof VariableTree declaration) {
-      return declaration.getModifiers().getAnnotations().isEmpty()
-              && targetSymbol.equals(ASTHelpers.getSymbol(declaration))
-          ? Optional.ofNullable(declaration.getInitializer())
-          : Optional.empty();
-    }
-
-    return Optional.empty();
+    return switch (tree) {
+      case ExpressionStatementTree expressionStatement ->
+          tryMatchAssignment(targetSymbol, expressionStatement.getExpression());
+      case AssignmentTree assignment ->
+          targetSymbol.equals(ASTHelpers.getSymbol(assignment.getVariable()))
+              ? Optional.of(assignment.getExpression())
+              : Optional.empty();
+      case VariableTree declaration ->
+          declaration.getModifiers().getAnnotations().isEmpty()
+                  && targetSymbol.equals(ASTHelpers.getSymbol(declaration))
+              ? Optional.ofNullable(declaration.getInitializer())
+              : Optional.empty();
+      default -> Optional.empty();
+    };
   }
 
   /**

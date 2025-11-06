@@ -48,7 +48,7 @@ public final class IsIdentityOperation implements Matcher<ExpressionTree> {
         (tree, state) ->
             tree.getBodyKind() == BodyKind.EXPRESSION
                 && tree.getParameters().size() == 1
-                && ASTHelpers.getSymbol(tree.getParameters().get(0))
+                && ASTHelpers.getSymbol(tree.getParameters().getFirst())
                     .equals(ASTHelpers.getSymbol(tree.getBody())));
   }
 }

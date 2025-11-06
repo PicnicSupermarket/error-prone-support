@@ -50,7 +50,7 @@ high-quality and consistent Java code_][picnic-blog-ep-post].
 
 This library is built on top of [Error Prone][error-prone-orig-repo]. To use
 it, read the installation guide for Maven or Gradle below. The library requires
-that your build is executed using JDK 17 or above, but supports builds that
+that your build is executed using JDK 21 or above, but supports builds that
 [target][baeldung-java-source-target-options] older versions of Java.
 
 #### Maven
@@ -188,7 +188,8 @@ rules][refaster-rules].
 
 This is a [Maven][maven] project, so running `mvn clean install` performs a
 full clean build and installs the library to your local Maven repository. While
-the project targets JDK 17, building it requires JDK 21.
+the project targets JDK 21, building it requires JDK 25. If you use
+[SDKMAN!][sdmkan], simply run `sdk env` to configure the current shell.
 
 Once you've made changes, the build may fail due to a warning or error emitted
 by static code analysis. The flags and commands listed below allow you to
@@ -322,6 +323,7 @@ OSS license generously provided by [Arcmutate][arcmutate]. Check them out!
 [script-run-branch-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [script-run-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
 [script-run-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-mutation-tests.sh
+[sdkman]: https://sdkman.io
 [security]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/SECURITY.md
 [sonarcloud-coverage-badge]: https://sonarcloud.io/api/project_badges/measure?project=PicnicSupermarket_error-prone-support&metric=coverage
 [sonarcloud-coverage-master]: https://sonarcloud.io/component_measures?id=PicnicSupermarket_error-prone-support&metric=coverage

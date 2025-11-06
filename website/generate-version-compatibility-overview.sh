@@ -10,12 +10,6 @@ source "${HOME}/.sdkman/bin/sdkman-init.sh"
 
 set -e -u -o pipefail
 
-# Currently all released Error Prone Support versions are compatible with Java
-# 17.
-java_version=17.0.16-tem
-(set +u && echo n | sdk install java "${java_version}")
-sdk use java "${java_version}"
-
 output_file="$(dirname "${0}")/_data/compatibility.yml"
 
 ep_versions="$(
@@ -33,17 +27,12 @@ build_log="${work_dir}/build.log"
 git clone -q git@github.com:PicnicSupermarket/error-prone-support.git "${work_dir}"
 pushd "${work_dir}" > /dev/null
 
-eps_versions="$(git tag --list --sort='-v:refname' 'v*.*.*')"
+eps_versions="$(git tag --list --sort='-v:refname' | grep -P '^v\d+\.\d+\.\d+$')"
 
 # Check out the source of each Error Prone Support release, and try to build
 # and test it against each Error Prone release.
 for eps_version in ${eps_versions}; do
   git checkout --force "${eps_version}" --
-
-  # Make sure to build with a compatible version of Maven.
-  mvn_version="$(grep -oP '(?<=<version.maven>)[^>]+(?=</version.maven>)' pom.xml)"
-  (set +u && echo n | sdk install maven "${mvn_version}")
-  sdk use maven "${mvn_version}"
 
   # As of version 2.36.0, Error Prone requires that the
   # `--should-stop=ifError=FLOW` flag is provided. Make sure that this flag is
@@ -79,6 +68,24 @@ for eps_version in ${eps_versions}; do
   # with Error Prone APIs, while also assessing whether the Refaster rules are
   # deserialization-compatible.
   for ep_version in ${ep_versions}; do
+    # Make sure to build with a compatible JDK and Maven version.
+    set +u # Some SDKMAN! commands reference unbound variables.
+    if [ -f .sdkmanrc ]; then
+      sdk env install
+    else
+      # Before the introduction of an `.sdkmanrc` file, all released Error Prone
+      # Support versions were compatible with Java 17. Error Prone 2.43.0 raised
+      # the baseline from Java 17 to Java 21.
+      default_java_version="$(echo -e "2.43.0\n${ep_version}" | sort -CV && echo 25-tem || echo 17.0.16-tem)"
+      echo n | sdk install java "${default_java_version}"
+      sdk use java "${default_java_version}"
+
+      mvn_version="$(grep -oP '(?<=<version.maven>)[^>]+(?=</version.maven>)' pom.xml)"
+      echo n | sdk install maven "${mvn_version}"
+      sdk use maven "${mvn_version}"
+    fi
+    set -u
+
     echo "Testing Error Prone Support ${eps_version} with Error Prone ${ep_version}..."
     mvn clean test \
         -Perror-prone \

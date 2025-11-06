@@ -90,7 +90,7 @@ public final class LexicographicalAnnotationListing extends BugChecker
     }
 
     return describeMatch(
-        originalOrdering.get(0), fixOrdering(originalOrdering, sortedAnnotations, state));
+        originalOrdering.getFirst(), fixOrdering(originalOrdering, sortedAnnotations, state));
   }
 
   private static ImmutableList<? extends AnnotationTree> sort(

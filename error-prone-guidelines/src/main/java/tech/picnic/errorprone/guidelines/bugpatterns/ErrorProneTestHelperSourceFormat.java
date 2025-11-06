@@ -97,8 +97,8 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
       return buildDescription(tree).setMessage("No source code provided").build();
     }
 
-    int startPos = ASTHelpers.getStartPosition(sourceLines.get(0));
-    int endPos = state.getEndPosition(sourceLines.get(sourceLines.size() - 1));
+    int startPos = ASTHelpers.getStartPosition(sourceLines.getFirst());
+    int endPos = state.getEndPosition(sourceLines.getLast());
 
     /* Attempt to format the source code only if it fully consists of constant expressions. */
     return getConstantSourceCode(sourceLines)
