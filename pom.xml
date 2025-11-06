@@ -353,7 +353,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
-                <version>0.12.10</version>
+                <version>0.12.11</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
@@ -469,7 +469,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>6.0.0</version>
+                <version>6.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1929,10 +1929,6 @@
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
                                 </arg>
-                                <!-- XXX: Drop this flag once it's enabled by
-                                default on the lowest supported JDK. See
-                                https://github.com/uber/NullAway/wiki/JSpecify-Support. -->
-                                <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
                                 moment it is invoked. Those assumptions require
