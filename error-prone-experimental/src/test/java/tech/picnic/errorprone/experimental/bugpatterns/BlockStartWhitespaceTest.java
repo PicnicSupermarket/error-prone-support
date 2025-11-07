@@ -190,19 +190,9 @@ final class BlockStartWhitespaceTest {
   void handlesCommentsOddCommentsContainingLBraces() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
         .addInputLines(
-            "A.java",
-            "class A /* { */",
-            "",
-            "{",
-            "",
-            "  private static final int foo = 1;",
-            "}")
+            "A.java", "class A /* { */", "", "{", "", "  private static final int foo = 1;", "}")
         .addOutputLines(
-            "A.java",
-            "class A /* { */ {",
-            "",
-            "  private static final int foo = 1;",
-            "}")
+            "A.java", "class A /* { */ {", "", "  private static final int foo = 1;", "}")
         .doTest(TestMode.TEXT_MATCH);
   }
 }
