@@ -43,16 +43,15 @@ public final class ConflictDetection {
       MethodSymbol method, String newName, VisitorState state) {
     if (isExistingMethodName(method.owner.type, newName, state)) {
       return Optional.of(
-          String.format(
-              "a method named `%s` is already defined in this class or a supertype", newName));
+          "a method named `%s` is already defined in this class or a supertype".formatted(newName));
     }
 
     if (isLocalMethodInvocation(newName, state)) {
-      return Optional.of(String.format("another method named `%s` is in scope", newName));
+      return Optional.of("another method named `%s` is in scope".formatted(newName));
     }
 
     if (!SourceCode.isValidIdentifier(newName)) {
-      return Optional.of(String.format("`%s` is not a valid identifier", newName));
+      return Optional.of("`%s` is not a valid identifier".formatted(newName));
     }
 
     return Optional.empty();
