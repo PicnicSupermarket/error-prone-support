@@ -356,6 +356,11 @@
                 <version>0.12.11</version>
             </dependency>
             <dependency>
+                <groupId>io.github.eisop</groupId>
+                <artifactId>dataflow-errorprone</artifactId>
+                <version>3.41.0-eisop1</version>
+            </dependency>
+            <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
                 <version>1.15.5</version>
