@@ -13,6 +13,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -404,6 +405,21 @@ final class StringRules {
     @AfterTemplate
     boolean after(String string, String prefix, int fromIndex) {
       return string.startsWith(prefix, fromIndex);
+    }
+  }
+
+  /** Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}. */
+  static final class StringFormatted {
+    @BeforeTemplate
+    @SuppressWarnings("AnnotateFormatMethod" /* This violation will be rewritten. */)
+    String before(String format, @Repeated Object args) {
+      return String.format(format, args);
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("AnnotateFormatMethod" /* This violation will be rewritten. */)
+    String after(String format, @Repeated Object args) {
+      return format.formatted(args);
     }
   }
 }
