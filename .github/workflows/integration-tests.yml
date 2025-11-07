@@ -5,13 +5,17 @@
 # - When a user leaves a pull request comment containing the string
 #   `/integration-test`.
 #
-# XXX: Review whether then build matrix should also vary JDK or OS versions.
+# XXX: Review whether the build matrix should also vary JDK or OS versions.
+# XXX: Have the integration test scripts select the JDK version to use, rather
+# than having this workflow set the same `JAVA_HOME` override for all.
 # XXX: Support `/integration-test [name...]` comment syntax to specify the
 # subset of integration tests to run.
 # See this example of a dynamic build matrix:
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: Integration tests
 on:
+  # XXX: Revert.
+  pull_request:
   issue_comment:
     types: [ created ]
   push:
@@ -63,13 +67,17 @@ jobs:
         uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
           checkout-ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
-          java-version: 25
+          java-version: |
+            21.0.8
+            25
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Run integration test
         run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
+        env:
+          JAVA_HOME: "${{ env.JAVA_HOME_21_X64 }}"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
