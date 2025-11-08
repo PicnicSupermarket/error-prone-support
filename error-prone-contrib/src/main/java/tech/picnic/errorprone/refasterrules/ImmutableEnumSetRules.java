@@ -88,7 +88,7 @@ final class ImmutableEnumSetRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSet<T> after(T e1) {
       return Sets.immutableEnumSet(e1);
     }
@@ -110,7 +110,7 @@ final class ImmutableEnumSetRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSet<T> after(T e1, T e2) {
       return Sets.immutableEnumSet(e1, e2);
     }
@@ -133,7 +133,7 @@ final class ImmutableEnumSetRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSet<T> after(T e1, T e2, T e3) {
       return Sets.immutableEnumSet(e1, e2, e3);
     }
@@ -156,7 +156,7 @@ final class ImmutableEnumSetRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSet<T> after(T e1, T e2, T e3, T e4) {
       return Sets.immutableEnumSet(e1, e2, e3, e4);
     }
@@ -179,7 +179,7 @@ final class ImmutableEnumSetRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5) {
       return Sets.immutableEnumSet(e1, e2, e3, e4, e5);
     }
@@ -200,7 +200,7 @@ final class ImmutableEnumSetRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6) {
       return Sets.immutableEnumSet(e1, e2, e3, e4, e5, e6);
     }

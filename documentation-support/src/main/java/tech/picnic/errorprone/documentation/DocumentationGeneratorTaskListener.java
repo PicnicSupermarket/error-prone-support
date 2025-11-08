@@ -26,7 +26,7 @@ import javax.tools.JavaFileObject;
  */
 // XXX: Find a better name for this class; it doesn't generate documentation per se.
 final class DocumentationGeneratorTaskListener implements TaskListener {
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({"rawtypes", "unchecked"} /* Unbounded wildcard type introduction is safe. */)
   private static final ImmutableList<Extractor<?>> EXTRACTORS =
       (ImmutableList)
           ImmutableList.copyOf(

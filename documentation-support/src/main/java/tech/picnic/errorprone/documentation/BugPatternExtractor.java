@@ -85,7 +85,7 @@ public final class BugPatternExtractor implements Extractor<BugPatternDocumentat
         .collect(toImmutableList());
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked" /* Type safety is validated, but a caller responsibility. */)
   private static <T extends AnnotationValue> T doCast(AnnotationValue value, Class<T> target) {
     verify(target.isInstance(value), "Value '%s' is not of type '%s'", value, target);
     return (T) value;
