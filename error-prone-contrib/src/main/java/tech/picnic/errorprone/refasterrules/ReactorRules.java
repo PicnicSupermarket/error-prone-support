@@ -2345,7 +2345,7 @@ final class ReactorRules {
   /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
   static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     StepVerifier.Step<T> before(
         StepVerifier.Step<T> step, @Matches(IsEmpty.class) Iterable<? extends T> iterable) {
       return Refaster.anyOf(

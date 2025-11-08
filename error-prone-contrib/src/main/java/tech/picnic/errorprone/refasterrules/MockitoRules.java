@@ -67,7 +67,7 @@ final class MockitoRules {
 
   static final class InvocationOnMockGetArgumentsWithTypeParameter<T> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Cast is presumed safe in matched context. */)
     T before(InvocationOnMock invocation, int i) {
       return Refaster.anyOf(
           invocation.getArgument(i, Refaster.<T>clazz()), (T) invocation.getArgument(i));
