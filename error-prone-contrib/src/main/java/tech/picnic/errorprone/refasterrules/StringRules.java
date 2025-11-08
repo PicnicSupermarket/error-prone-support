@@ -9,6 +9,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Utf8;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -408,16 +409,20 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}. */
+  /**
+   * Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}, as
+   * the former works more nicely with text blocks, while the latter does not appear advantageous in
+   * any circumstance (assuming one targets JDK 15+).
+   */
   static final class StringFormatted {
     @BeforeTemplate
-    @SuppressWarnings("AnnotateFormatMethod" /* This violation will be rewritten. */)
+    @FormatMethod
     String before(String format, @Repeated Object args) {
       return String.format(format, args);
     }
 
     @AfterTemplate
-    @SuppressWarnings("AnnotateFormatMethod" /* This violation will be rewritten. */)
+    @FormatMethod
     String after(String format, @Repeated Object args) {
       return format.formatted(args);
     }

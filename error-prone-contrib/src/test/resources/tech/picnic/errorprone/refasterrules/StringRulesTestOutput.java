@@ -139,6 +139,6 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<String> testStringFormatted() {
     return ImmutableSet.of(
-        "Hello %s".formatted("world"), "Number: %d".formatted(42), "%s %s".formatted("foo", "bar"));
+        "Constant".formatted(), "Number: %d".formatted(42), "%s %s".formatted("foo", "bar"));
   }
 }

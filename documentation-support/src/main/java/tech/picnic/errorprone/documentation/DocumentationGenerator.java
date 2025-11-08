@@ -50,7 +50,7 @@ public final class DocumentationGenerator implements Plugin {
     try {
       return Path.of(path);
     } catch (InvalidPathException e) {
-      throw new IllegalArgumentException(String.format("Invalid path '%s'", path), e);
+      throw new IllegalArgumentException("Invalid path '%s'".formatted(path), e);
     }
   }
 }

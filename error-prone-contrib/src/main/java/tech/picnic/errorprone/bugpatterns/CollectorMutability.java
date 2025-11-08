@@ -101,7 +101,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
         .addFix(replaceMethodInvocation(tree, immutableReplacement, state))
         .addFix(
             mutableFix
-                .replace(tree, String.format("%s(%s::new)", toCollectionSelect, mutableCollection))
+                .replace(tree, "%s(%s::new)".formatted(toCollectionSelect, mutableCollection))
                 .build())
         .build();
   }
@@ -125,7 +125,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
                 .postfixWith(
                     tree.getArguments().get(argCount - 1),
                     (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
-                        + String.format(", %s::new", hashMap))
+                        + ", %s::new".formatted(hashMap))
                 .build())
         .build();
   }

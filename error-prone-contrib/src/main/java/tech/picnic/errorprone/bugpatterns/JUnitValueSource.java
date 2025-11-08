@@ -217,11 +217,11 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
                       state, fix, "org.junit.jupiter.params.provider.ValueSource");
               return fix.replace(
                       methodSourceAnnotation,
-                      String.format(
-                          "@%s(%s = %s)",
-                          valueSource,
-                          toValueSourceAttributeName(parameterType),
-                          valueSourceAttributeValue))
+                      "@%s(%s = %s)"
+                          .formatted(
+                              valueSource,
+                              toValueSourceAttributeName(parameterType),
+                              valueSourceAttributeValue))
                   .delete(valueFactoryMethod)
                   .build();
             });
@@ -278,7 +278,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
                             : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
-        .map(value -> arguments.size() > 1 ? String.format("{%s}", value) : value);
+        .map(value -> arguments.size() > 1 ? "{%s}".formatted(value) : value);
   }
 
   private static String toValueSourceAttributeName(Type type) {

@@ -117,7 +117,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
         @SuppressWarnings("java:S1166" /* Stack trace not relevant. */)
         FormatterException e) {
       return buildDescription(methodInvocation)
-          .setMessage(String.format("Source code is malformed: %s", e.getMessage()))
+          .setMessage("Source code is malformed: %s".formatted(e.getMessage()))
           .build();
     }
 

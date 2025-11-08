@@ -133,9 +133,8 @@ public final class Slf4jLogStatement extends BugChecker implements MethodInvocat
     }
 
     description.setMessage(
-        String.format(
-            "Log statement contains %s placeholders, but specifies %s matching argument(s)",
-            placeholders, args.size()));
+        "Log statement contains %s placeholders, but specifies %s matching argument(s)"
+            .formatted(placeholders, args.size()));
     return false;
   }
 }

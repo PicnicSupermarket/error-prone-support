@@ -98,7 +98,7 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
                     SuggestedFix.builder()
                         .replace(
                             precedingStatement,
-                            String.format("return %s;", SourceCode.treeToString(resultExpr, state)))
+                            "return %s;".formatted(SourceCode.treeToString(resultExpr, state)))
                         .delete(finalStatement)
                         .build()))
         .orElse(Description.NO_MATCH);

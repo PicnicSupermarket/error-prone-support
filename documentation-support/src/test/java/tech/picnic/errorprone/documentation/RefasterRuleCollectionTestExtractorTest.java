@@ -159,7 +159,7 @@ final class RefasterRuleCollectionTestExtractorTest {
       Path outputDirectory, String testIdentifier, RefasterTestCases expected) {
     assertThat(
             outputDirectory.resolve(
-                String.format("refaster-rule-collection-test-%s.json", testIdentifier)))
+                "refaster-rule-collection-test-%s.json".formatted(testIdentifier)))
         .exists()
         .returns(expected, path -> Json.read(path, RefasterTestCases.class));
   }

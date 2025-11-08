@@ -728,7 +728,7 @@ final class AssertJThrowingCallableRules {
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
         @Repeated Object parameters) {
-      return abstractThrowableAssert.hasMessage(String.format(message, parameters));
+      return abstractThrowableAssert.hasMessage(message.formatted(parameters));
     }
 
     @AfterTemplate
@@ -748,7 +748,7 @@ final class AssertJThrowingCallableRules {
         AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
         String message,
         @Repeated Object args) {
-      return abstractThrowableAssert.withFailMessage(String.format(message, args));
+      return abstractThrowableAssert.withFailMessage(message.formatted(args));
     }
 
     @AfterTemplate

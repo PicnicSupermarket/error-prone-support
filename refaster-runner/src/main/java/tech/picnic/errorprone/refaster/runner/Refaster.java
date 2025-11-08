@@ -140,8 +140,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
       case DEFAULT -> Optional.empty();
       case WARN -> Optional.of(WARNING);
       case ERROR -> Optional.of(ERROR);
-      default ->
-          throw new IllegalStateException(String.format("Unsupported severity='%s'", severity));
+      default -> throw new IllegalStateException("Unsupported severity='%s'".formatted(severity));
     };
   }
 

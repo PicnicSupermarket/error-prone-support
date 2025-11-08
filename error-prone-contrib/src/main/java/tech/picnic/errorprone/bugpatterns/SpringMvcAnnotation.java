@@ -109,6 +109,6 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
 
     SuggestedFix.Builder fix = SuggestedFix.builder();
     String annotation = SuggestedFixes.qualifyType(state, fix, ANN_PACKAGE_PREFIX + newAnnotation);
-    return fix.replace(tree, String.format("@%s(%s)", annotation, newArguments)).build();
+    return fix.replace(tree, "@%s(%s)".formatted(annotation, newArguments)).build();
   }
 }

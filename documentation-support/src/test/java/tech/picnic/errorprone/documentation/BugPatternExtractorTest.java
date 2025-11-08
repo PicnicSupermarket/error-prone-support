@@ -135,7 +135,7 @@ final class BugPatternExtractorTest {
 
   private static void verifyGeneratedFileContent(
       Path outputDirectory, String testClass, BugPatternDocumentation expected) {
-    assertThat(outputDirectory.resolve(String.format("bugpattern-%s.json", testClass)))
+    assertThat(outputDirectory.resolve("bugpattern-%s.json".formatted(testClass)))
         .exists()
         .returns(expected, path -> Json.read(path, BugPatternDocumentation.class));
   }

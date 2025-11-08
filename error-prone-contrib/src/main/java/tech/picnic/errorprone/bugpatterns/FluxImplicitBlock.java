@@ -85,8 +85,8 @@ public final class FluxImplicitBlock extends BugChecker implements MethodInvocat
     boolean isStream =
         ASTHelpers.isSubtype(ASTHelpers.getResultType(tree), STREAM.get(state), state);
     String replacement =
-        String.format(
-            ".collect(%s()).block()%s", replacementMethodInvocation, isStream ? ".stream()" : "");
+        ".collect(%s()).block()%s"
+            .formatted(replacementMethodInvocation, isStream ? ".stream()" : "");
     return importSuggestion.merge(replaceMethodInvocation(tree, replacement, state)).build();
   }
 
