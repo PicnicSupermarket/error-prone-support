@@ -59,9 +59,8 @@ jobs:
             | reviewdog \
                 -name=javac \
                 -efm='[WARNING] %f:[%l,%c] %m' \
-                -filter-mode=file \
-                -reporter=github-pr-review \
-                -tee
+                -filter-mode=nofilter \
+                -reporter=github-pr-review
           find -name checkstyle-result.json -exec sh -c '
             reviewdog -name=Checkstyle -f=sarif -reporter=github-pr-review < "{}"
           ' \;
