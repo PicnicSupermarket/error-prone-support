@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Constants;
 import com.sun.tools.javac.util.Convert;
 import javax.lang.model.element.Name;
@@ -13,7 +15,7 @@ import tech.picnic.errorprone.utils.SourceCode;
 final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Constants.class, Convert.class, FixChoosers.class);
+    return ImmutableSet.of(Constants.class, Convert.class, FixChoosers.class, JCTree.class);
   }
 
   ImmutableSet<BugCheckerRefactoringTestHelper> testBugCheckerRefactoringTestHelperIdentity() {
@@ -39,5 +41,9 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         ((Name) null).contentEquals("foo".subSequence(0, 1)),
         ((com.sun.tools.javac.util.Name) null).contentEquals("bar"));
+  }
+
+  int testASTHelpersGetStartPosition() {
+    return ASTHelpers.getStartPosition(null);
   }
 }
