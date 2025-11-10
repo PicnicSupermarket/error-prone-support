@@ -97,6 +97,7 @@ that your build is executed using JDK 21 or above, but supports builds that
                                https://errorprone.info/docs/flags. -->
                            </arg>
                            <arg>-XDcompilePolicy=simple</arg>
+                           <arg>--should-stop=ifError=FLOW</arg>
                        </compilerArgs>
                        <!-- Enable this if you'd like to fail your build upon warnings. -->
                        <!-- <failOnWarning>true</failOnWarning> -->
