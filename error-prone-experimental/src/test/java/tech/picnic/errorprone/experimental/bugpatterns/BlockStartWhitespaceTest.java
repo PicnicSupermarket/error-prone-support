@@ -98,8 +98,8 @@ final class BlockStartWhitespaceTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  // This test intentionally uses tabs for indentation, and so disables the format checker.
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
+  @SuppressWarnings(
+      "ErrorProneTestHelperSourceFormat" /* This test intentionally uses tabs for indentation. */)
   @Test
   void replacementMethodBodyBlock() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())
@@ -184,8 +184,6 @@ final class BlockStartWhitespaceTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
-  // Disable the formatter to prevent collapsing the test's input and output lines.
-  @SuppressWarnings("ErrorProneTestHelperSourceFormat")
   @Test
   void handlesCommentsOddCommentsContainingLBraces() {
     BugCheckerRefactoringTestHelper.newInstance(BlockStartWhitespace.class, getClass())

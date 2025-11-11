@@ -67,6 +67,7 @@ final class TypeMemberOrderTest {
     CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addSourceLines(
             "A.java", "@interface A {", "  final int baz = 2;", "  static final int BAR = 1;", "}")
+        .expectNoDiagnostics()
         .doTest();
   }
 
@@ -75,6 +76,7 @@ final class TypeMemberOrderTest {
     CompilationTestHelper.newInstance(TypeMemberOrder.class, getClass())
         .addSourceLines(
             "A.java", "record A() {", "  void baz() {}", "", "  static final int BAR = 1;", "}")
+        .expectNoDiagnostics()
         .doTest();
   }
 
@@ -520,12 +522,12 @@ final class TypeMemberOrderTest {
             "A.java",
             "class A {",
             "",
-            "  void foo () {}",
+            "  void foo() {}",
             "",
             "  @org.junit.jupiter.api.Nested",
             "  class JUnitNested1 {}",
             "",
-            "  void bar () {}",
+            "  void bar() {}",
             "",
             "  class NormalClass {}",
             "",
@@ -536,12 +538,12 @@ final class TypeMemberOrderTest {
             "A.java",
             "class A {",
             "",
-            "  void foo () {}",
+            "  void foo() {}",
             "",
             "  @org.junit.jupiter.api.Nested",
             "  class JUnitNested1 {}",
             "",
-            "  void bar () {}",
+            "  void bar() {}",
             "",
             "  @org.junit.jupiter.api.Nested",
             "  class JUnitNested2 {}",

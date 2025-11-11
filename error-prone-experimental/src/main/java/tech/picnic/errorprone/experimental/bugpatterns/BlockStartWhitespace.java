@@ -77,7 +77,7 @@ public final class BlockStartWhitespace extends BugChecker
         lastNewLinePos = pos;
         continue;
       }
-      // Ignore whitespace
+      // Ignore whitespace.
       if (source.charAt(pos) == ' ' || source.charAt(pos) == '\t') {
         continue;
       }
