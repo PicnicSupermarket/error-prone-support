@@ -192,7 +192,7 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
     return builder.build();
   }
 
-  /** Returns the preferred ordinal of the given member if any. */
+  /** Returns the preferred ordinal of the given member, if any. */
   private static Optional<Integer> getMemberTypeOrdinal(Tree tree, VisitorState state) {
     return switch (tree.getKind()) {
       case VARIABLE -> Optional.of(isStatic((VariableTree) tree) ? 1 : 2);
@@ -200,9 +200,9 @@ public final class TypeMemberOrder extends BugChecker implements CompilationUnit
       case METHOD -> Optional.of(isConstructor((MethodTree) tree) ? 5 : 6);
       case CLASS, INTERFACE, ENUM ->
           /*
-           * XXX: To enable a Picnic specific preference, we order @Nested test classes as they were
-           * methods. This could be replaced with a plugin system where downstream projects could
-           * specify their own "canonical member type order".
+           * XXX: To enable a Picnic specific preference, we order `@Nested` test classes as if they
+           * are methods. This could be replaced with a plugin system where downstream projects
+           * could specify their own "canonical member type order".
            */
           ASTHelpers.hasAnnotation(tree, "org.junit.jupiter.api.Nested", state)
               ? Optional.of(6)

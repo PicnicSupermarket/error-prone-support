@@ -1,10 +1,10 @@
 package tech.picnic.errorprone.experimental.bugpatterns;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static java.util.Objects.requireNonNull;
-import static org.checkerframework.errorprone.com.google.common.base.Preconditions.checkState;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
