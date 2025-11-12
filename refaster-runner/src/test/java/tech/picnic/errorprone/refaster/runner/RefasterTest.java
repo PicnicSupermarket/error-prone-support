@@ -181,8 +181,8 @@ final class RefasterTest {
   private static ImmutableList<SeverityLevel> extractRefasterSeverities(
       String fileName, String message) {
     return Pattern.compile(
-            String.format(
-                "/%s:(\\d+): (Note|warning|error): \\[Refaster Rule\\]", Pattern.quote(fileName)))
+            "/%s:(\\d+): (Note|warning|error): \\[Refaster Rule\\]"
+                .formatted(Pattern.quote(fileName)))
         .matcher(message)
         .results()
         .sorted(comparingInt(r -> Integer.parseInt(r.group(1))))
@@ -197,7 +197,7 @@ final class RefasterTest {
       case "error" -> ERROR;
       default ->
           throw new IllegalStateException(
-              String.format("Unrecognized diagnostics prefix '%s'", compilerDiagnosticsPrefix));
+              "Unrecognized diagnostics prefix '%s'".formatted(compilerDiagnosticsPrefix));
     };
   }
 

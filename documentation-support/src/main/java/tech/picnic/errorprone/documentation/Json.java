@@ -40,6 +40,6 @@ final class Json {
 
   @FormatMethod
   private static UncheckedIOException failure(IOException cause, String format, Object... args) {
-    return new UncheckedIOException(String.format(format, args), cause);
+    return new UncheckedIOException(format.formatted(args), cause);
   }
 }

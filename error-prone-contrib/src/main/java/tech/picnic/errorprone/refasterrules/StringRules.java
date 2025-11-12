@@ -9,10 +9,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Utf8;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -404,6 +406,25 @@ final class StringRules {
     @AfterTemplate
     boolean after(String string, String prefix, int fromIndex) {
       return string.startsWith(prefix, fromIndex);
+    }
+  }
+
+  /**
+   * Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}, as
+   * the former works more nicely with text blocks, while the latter does not appear advantageous in
+   * any circumstance (assuming one targets JDK 15+).
+   */
+  static final class StringFormatted {
+    @BeforeTemplate
+    @FormatMethod
+    String before(String format, @Repeated Object args) {
+      return String.format(format, args);
+    }
+
+    @AfterTemplate
+    @FormatMethod
+    String after(String format, @Repeated Object args) {
+      return format.formatted(args);
     }
   }
 }

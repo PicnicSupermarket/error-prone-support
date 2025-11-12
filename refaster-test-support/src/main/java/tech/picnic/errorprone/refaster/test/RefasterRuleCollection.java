@@ -98,8 +98,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
         .orElseThrow(
             () ->
                 new IllegalStateException(
-                    String.format(
-                        "Error Prone flag `%s` must be specified", RULE_COLLECTION_FLAG)));
+                    "Error Prone flag `%s` must be specified".formatted(RULE_COLLECTION_FLAG)));
   }
 
   private static Refaster createRefasterChecker(String ruleCollectionUnderTest) {
@@ -173,15 +172,14 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
                   typeDeclaration,
                   SuggestedFix.prefixWith(
                       typeDeclaration,
-                      String.format(
-                          "/* ERROR: Class should be named `%s`. */%n", expectedClassName))));
+                      "/* ERROR: Class should be named `%s`. */%n".formatted(expectedClassName))));
         }
       } else {
         state.reportMatch(
             describeMatch(
                 typeDeclaration,
                 SuggestedFix.prefixWith(
-                    typeDeclaration, String.format("/* ERROR: Unexpected token. */%n"))));
+                    typeDeclaration, "/* ERROR: Unexpected token. */%n".formatted())));
       }
     }
   }
@@ -214,9 +212,8 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       String sourceFile = ((JCCompilationUnit) tree).sourcefile.getName();
       reportViolations(
           tree,
-          String.format(
-              "Did not encounter a test in `%s` for the following rule(s)",
-              getSubstringAfterFinalDelimiter('/', sourceFile)),
+          "Did not encounter a test in `%s` for the following rule(s)"
+              .formatted(getSubstringAfterFinalDelimiter('/', sourceFile)),
           rulesWithoutMatch,
           state);
     }
@@ -232,13 +229,12 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
 
   private void reportViolations(
       Tree tree, String message, ImmutableSet<String> violations, VisitorState state) {
-    String violationEnumeration = String.join(String.format("%n*  - "), violations);
-    String comment =
-        String.format("/*%n*  ERROR: %s:%n*  - %s%n*/%n", message, violationEnumeration);
+    String violationEnumeration = String.join("%n*  - ".formatted(), violations);
+    String comment = "/*%n*  ERROR: %s:%n*  - %s%n*/%n".formatted(message, violationEnumeration);
     SuggestedFix fixWithComment =
         tree instanceof MethodTree
             ? SuggestedFix.prefixWith(tree, comment)
-            : SuggestedFix.postfixWith(tree, String.format("%n%s", comment));
+            : SuggestedFix.postfixWith(tree, "%n%s".formatted(comment));
     state.reportMatch(describeMatch(tree, fixWithComment));
   }
 
@@ -292,8 +288,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
       if (!unexpectedMatchesByLineNumber.isEmpty()) {
         reportViolations(
             tree,
-            String.format(
-                "The following matches unexpectedly occurred in method `%s`", tree.getName()),
+            "The following matches unexpectedly occurred in method `%s`".formatted(tree.getName()),
             unexpectedMatchesByLineNumber.entries().stream()
                 .map(
                     e ->
@@ -321,7 +316,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             describeMatch(
                 tree,
                 SuggestedFix.prefixWith(
-                    tree, String.format("/* ERROR: Method names should start with `test`. */%n"))));
+                    tree, "/* ERROR: Method names should start with `test`. */%n".formatted())));
       }
 
       return Optional.empty();

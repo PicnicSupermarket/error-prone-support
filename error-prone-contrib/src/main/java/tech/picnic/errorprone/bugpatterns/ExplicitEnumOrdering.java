@@ -62,9 +62,8 @@ public final class ExplicitEnumOrdering extends BugChecker implements MethodInvo
 
     return buildDescription(tree)
         .setMessage(
-            String.format(
-                "Explicit ordering lacks some enum values: %s",
-                String.join(", ", missingEnumValues)))
+            "Explicit ordering lacks some enum values: %s"
+                .formatted(String.join(", ", missingEnumValues)))
         .build();
   }
 

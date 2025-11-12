@@ -141,4 +141,11 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
   boolean testStringStartsWith() {
     return "foo".substring(1).startsWith("bar");
   }
+
+  ImmutableSet<String> testStringFormatted() {
+    return ImmutableSet.of(
+        String.format("Constant"),
+        String.format("Number: %d", 42),
+        String.format("%s %s", "foo", "bar"));
+  }
 }

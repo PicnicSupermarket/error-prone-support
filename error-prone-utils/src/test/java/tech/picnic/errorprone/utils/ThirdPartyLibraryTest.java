@@ -80,9 +80,8 @@ final class ThirdPartyLibraryTest {
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
-            String.format(
-                "// BUG: Diagnostic contains: ASSERTJ: %s, GUAVA: true, REACTOR: true",
-                ignoreClassPath),
+            "// BUG: Diagnostic contains: ASSERTJ: %s, GUAVA: true, REACTOR: true"
+                .formatted(ignoreClassPath),
             "class A {}")
         .doTest();
   }

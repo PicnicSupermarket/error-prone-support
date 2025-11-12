@@ -230,10 +230,9 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
 
     private String deriveFormatStringExpression(String newPlaceholder, VisitorState state) {
       String derivative =
-          String.format(
-              simplifiableFormatString()
-                  .orElseThrow(() -> new VerifyException("Format string cannot be simplified")),
-              Collections.nCopies(arguments().size(), newPlaceholder).toArray());
+          simplifiableFormatString()
+              .orElseThrow(() -> new VerifyException("Format string cannot be simplified"))
+              .formatted(Collections.nCopies(arguments().size(), newPlaceholder).toArray());
 
       /*
        * If the suggested replacement format string is the same as the original, then use the

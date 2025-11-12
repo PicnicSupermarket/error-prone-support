@@ -203,10 +203,10 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return ImmutableSet.of(
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(String.format("foo %s", "bar")),
+            .hasMessage("foo %s".formatted("bar")),
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage(String.format("foo %s %s", "bar", 1)));
+            .hasMessage("foo %s %s".formatted("bar", 1)));
   }
 
   ImmutableSet<AbstractThrowableAssert<?, ? extends Throwable>>
@@ -214,10 +214,10 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return ImmutableSet.of(
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage(String.format("foo %s", "bar")),
+            .withFailMessage("foo %s".formatted("bar")),
         assertThatThrownBy(() -> {})
             .isInstanceOf(IllegalArgumentException.class)
-            .withFailMessage(String.format("foo %s %s", "bar", 1)));
+            .withFailMessage("foo %s %s".formatted("bar", 1)));
   }
 
   @SuppressWarnings("deprecation" /* Rule targets deprecated API. */)

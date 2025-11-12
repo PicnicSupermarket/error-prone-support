@@ -183,6 +183,6 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
 
   private static String withStringConversionExpression(
       ExpressionTree argument, VisitorState state) {
-    return String.format("String.valueOf(%s)", SourceCode.treeToString(argument, state));
+    return "String.valueOf(%s)".formatted(SourceCode.treeToString(argument, state));
   }
 }
