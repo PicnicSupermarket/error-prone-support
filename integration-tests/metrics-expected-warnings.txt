@@ -15,52 +15,11 @@ metrics-core/src/main/java/io/dropwizard/metrics5/ScheduledReporter.java:[40,38]
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[431,17] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[436,19] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[449,20] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java:[270,32] [removal] getSecurityManager() in System has been deprecated and marked for removal
-metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java:[270,6] [removal] SecurityManager in java.lang has been deprecated and marked for removal
-metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest.java:[189,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
-metrics-healthchecks/src/test/java/io/dropwizard/metrics5/health/HealthCheckTest.java:[203,46] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
-metrics-httpasyncclient/src/main/java/io/dropwizard/metrics5/httpasyncclient/InstrumentedNClientConnManager.java:[40,8] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-httpclient/src/main/java/io/dropwizard/metrics5/httpclient/InstrumentedHttpClientConnectionManager.java:[114,8] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-httpclient/src/test/java/io/dropwizard/metrics5/httpclient/HttpClientMetricNameStrategiesTest.java:[124,22] [deprecation] rewriteURI(URI,HttpHost,boolean) in URIUtils has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedAsyncClientConnectionManager.java:[29,62] [deprecation] getDefault() in DefaultClientTlsStrategy has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[116,50] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[160,12] [deprecation] DefaultHttpClientConnectionOperator(Lookup<ConnectionSocketFactory>,SchemePortResolver,DnsResolver) in DefaultHttpClientConnectionOperator has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[30,28] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[31,28] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[32,37] [deprecation] PlainConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[33,38] [deprecation] SSLConnectionSocketFactory in org.apache.hc.client5.http.ssl has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientConnectionManager.java:[96,21] [deprecation] ConnectionSocketFactory in org.apache.hc.client5.http.socket has been deprecated
-metrics-httpclient5/src/main/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpRequestExecutor.java:[49,4] [deprecation] HttpRequestExecutor(Timeout,ConnectionReuseStrategy,Http1StreamListener) in HttpRequestExecutor has been deprecated
-metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientsTest.java:[46,10] [deprecation] execute(ClassicHttpRequest) in HttpClient has been deprecated
-metrics-httpclient5/src/test/java/io/dropwizard/metrics5/httpclient5/InstrumentedHttpClientsTest.java:[68,12] [deprecation] execute(ClassicHttpRequest) in HttpClient has been deprecated
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[282,17] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-influxdb/src/main/java/io/dropwizard/metrics5/influxdb/InfluxDbReporter.java:[287,19] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
-metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/CpuProfileServlet.java:[23,21] [serial] non-transient instance field of a serializable class declared with a non-serializable type
-metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/HealthCheckServletTest.java:[31,67] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
-metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/InstrumentedTimingCollector.java:[20,52] [removal] TimingCollector in org.jdbi.v3.core.statement has been deprecated and marked for removal
-metrics-jdbi3/src/main/java/io/dropwizard/metrics5/jdbi3/InstrumentedTimingCollector.java:[36,14] [removal] collect(long,StatementContext) in TimingCollector has been deprecated and marked for removal
-metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[18,10] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
-metrics-jdbi3/src/test/java/io/dropwizard/metrics5/jdbi3/strategies/SmartNameStrategyTest.java:[24,20] [deprecation] InstrumentedTimingCollector in io.dropwizard.metrics5.jdbi3 has been deprecated
-metrics-jetty10/src/main/java/io/dropwizard/metrics5/jetty10/InstrumentedConnectionFactory.java:[26,11] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-jetty11/src/main/java/io/dropwizard/metrics5/jetty11/InstrumentedConnectionFactory.java:[26,11] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-jetty12/src/main/java/io/dropwizard/metrics/jetty12/InstrumentedConnectionFactory.java:[26,11] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-json/src/main/java/io/dropwizard/metrics5/json/MetricsModule.java:[189,31] [serial] non-transient instance field of a serializable class declared with a non-serializable type
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[101,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[56,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[65,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[74,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[83,74] [unchecked] unchecked cast
 metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/BufferPoolMetricSetTest.java:[92,74] [unchecked] unchecked cast
-metrics-legacy-adapter/src/main/java/com/codahale/metrics/MetricRegistry.java:[108,27] [rawtypes] found raw type: Gauge
-metrics-legacy-adapter/src/main/java/com/codahale/metrics/MetricRegistry.java:[112,27] [rawtypes] found raw type: Gauge
-metrics-legacy-adapter/src/main/java/com/codahale/metrics/MetricRegistry.java:[51,49] [rawtypes] found raw type: Gauge
-metrics-legacy-adapter/src/main/java/com/codahale/metrics/MetricRegistry.java:[51,9] [rawtypes] found raw type: Gauge
-metrics-legacy-adapter/src/test/java/com/codahale/metrics/MetricRegistryTest.java:[367,22] [rawtypes] found raw type: Gauge
-metrics-legacy-adapter/src/test/java/com/codahale/metrics/MetricRegistryTest.java:[50,4] [rawtypes] found raw type: Gauge
-metrics-log4j2/src/main/java/io/dropwizard/metrics5/log4j2/InstrumentedAppender.java:[85,4] [deprecation] AbstractAppender(String,Filter,Layout<? extends Serializable>,boolean) in AbstractAppender has been deprecated
-metrics-log4j2/src/main/java/io/dropwizard/metrics5/log4j2/InstrumentedAppender.java:[96,4] [deprecation] AbstractAppender(String,Filter,Layout<? extends Serializable>,boolean) in AbstractAppender has been deprecated
-metrics-logback13/src/main/java/io/dropwizard/metrics/logback13/InstrumentedAppender.java:[51,11] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-logback14/src/main/java/io/dropwizard/metrics/logback14/InstrumentedAppender.java:[51,11] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-logback15/src/main/java/io/dropwizard/metrics5/logback15/InstrumentedAppender.java:[51,11] [this-escape] possible 'this' escape before subclass is fully initialized
-metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/CpuProfileServlet.java:[23,21] [serial] non-transient instance field of a serializable class declared with a non-serializable type
-metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/HealthCheckServletTest.java:[31,67] [TimeZoneUsage] Derive the current time from an existing `Clock` Spring bean, and don't rely on a `Clock`'s time zone
