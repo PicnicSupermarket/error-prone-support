@@ -457,7 +457,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.8</version>
+                <version>3.20.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
