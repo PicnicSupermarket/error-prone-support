@@ -169,7 +169,7 @@ final class AssertJRules {
 
   static final class ObjectEnumerableContainsOneElement<S, T extends S> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return Refaster.anyOf(
           iterAssert.containsAnyOf(element),
@@ -178,7 +178,7 @@ final class AssertJRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return iterAssert.contains(element);
     }
@@ -186,13 +186,13 @@ final class AssertJRules {
 
   static final class ObjectEnumerableDoesNotContainOneElement<S, T extends S> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return iterAssert.doesNotContainSequence(element);
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return iterAssert.doesNotContain(element);
     }
@@ -200,14 +200,14 @@ final class AssertJRules {
 
   static final class ObjectEnumerableContainsExactlyOneElement<S, T extends S> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(
         ObjectEnumerableAssert<?, S> iterAssert, @NotMatches(IsArray.class) T element) {
       return iterAssert.containsExactlyInAnyOrder(element);
     }
 
     @AfterTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
       return iterAssert.containsExactly(element);
     }
