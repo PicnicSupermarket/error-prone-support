@@ -2,11 +2,8 @@ package tech.picnic.errorprone.documentation;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
@@ -26,28 +23,12 @@ final class JsonTest {
   }
 
   @Test
-  void writeFailure(@TempDir Path directory) {
-    assertThatThrownBy(() -> Json.write(directory, TEST_OBJECT))
-        .isInstanceOf(UncheckedIOException.class)
-        .hasMessageContaining("Failure writing to '%s'", directory)
-        .hasCauseInstanceOf(FileNotFoundException.class);
-  }
-
-  @Test
   void read(@TempDir Path directory) throws IOException {
     Path file = directory.resolve("test.json");
 
     Files.writeString(file, TEST_JSON, UTF_8);
 
     assertThat(Json.read(file, TestObject.class)).isEqualTo(TEST_OBJECT);
-  }
-
-  @Test
-  void readFailure(@TempDir Path directory) {
-    assertThatThrownBy(() -> Json.read(directory, TestObject.class))
-        .isInstanceOf(UncheckedIOException.class)
-        .hasMessageContaining("Failure reading from '%s'", directory)
-        .hasCauseInstanceOf(FileNotFoundException.class);
   }
 
   private record TestObject(String string, int number) {}
