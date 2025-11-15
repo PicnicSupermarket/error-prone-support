@@ -7,10 +7,10 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster rules related to Jackson expressions and statements. */
+/** Refaster rules related to Jackson 2.x expressions and statements. */
 @OnlineDocumentation
-final class JacksonRules {
-  private JacksonRules() {}
+final class Jackson2Rules {
+  private Jackson2Rules() {}
 
   /** Prefer {@link JsonNode#optional(int)} over more contrived alternatives. */
   static final class JsonNodeOptionalInt {

@@ -1,12 +1,12 @@
 package tech.picnic.errorprone.refasterrules;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.NullNode;
 
-final class JacksonRulesTest implements RefasterRuleCollectionTestCase {
+final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Optional<JsonNode>> testJsonNodeOptionalInt() {
     return ImmutableSet.of(
         NullNode.getInstance().get(1).asOptional(),
