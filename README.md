@@ -304,7 +304,7 @@ OSS license generously provided by [Arcmutate][arcmutate]. Check them out!
 [license-badge]: https://img.shields.io/github/license/PicnicSupermarket/error-prone-support
 [license]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/LICENSE.md
 [maven-central-badge]: https://img.shields.io/maven-central/v/tech.picnic.error-prone-support/error-prone-support?color=blue
-[maven-central-search]: https://search.maven.org/artifact/tech.picnic.error-prone-support/error-prone-support
+[maven-central-search]: https://central.sonatype.com/artifact/tech.picnic.error-prone-support/error-prone-support
 [maven]: https://maven.apache.org
 [maven-toolchains]: https://maven.apache.org/guides/mini/guide-using-toolchains.html
 [openssf-best-practices-badge]: https://bestpractices.coreinfrastructure.org/projects/7199/badge

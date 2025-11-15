@@ -22,6 +22,7 @@ jobs:
             api.github.com:443
             bestpractices.coreinfrastructure.org:443
             blog.picnic.nl:443
+            central.sonatype.com:443
             docs.github.com:443
             errorprone.info:443
             github.com:443
@@ -33,7 +34,6 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             rubygems.org:443
-            search.maven.org:443
             securityscorecards.dev:443
             sonarcloud.io:443
             www.baeldung.com:443
