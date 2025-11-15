@@ -1,10 +1,13 @@
 package tech.picnic.errorprone.refasterrules;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.type.SimpleType;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -25,7 +28,28 @@ final class Jackson2RulesTest implements RefasterRuleCollectionTestCase {
         NullNode.getInstance().optional("qux"));
   }
 
-  JsonNode testObjectMapperValueToTree() throws JsonProcessingException {
-    return new ObjectMapper().valueToTree("foo");
+  ImmutableSet<JsonNode> testObjectMapperValueToTree() throws IOException {
+    return ImmutableSet.of(
+        new ObjectMapper().valueToTree("foo"),
+        new ObjectMapper(new JsonFactory()).valueToTree("bar"));
+  }
+
+  ImmutableSet<Number> testObjectMapperConvertValueWithClass() throws IOException {
+    return ImmutableSet.of(
+        new ObjectMapper().convertValue("1", Integer.class),
+        new ObjectMapper(new JsonFactory()).convertValue("2.0", Double.class));
+  }
+
+  ImmutableSet<Number> testObjectMapperConvertValueWithJavaType() throws IOException {
+    return ImmutableSet.of(
+        new ObjectMapper().convertValue("1", SimpleType.constructUnsafe(Integer.class)),
+        new ObjectMapper(new JsonFactory())
+            .convertValue("2.0", SimpleType.constructUnsafe(Double.class)));
+  }
+
+  ImmutableSet<Number> testObjectMapperConvertValueWithTypeReference() throws IOException {
+    return ImmutableSet.of(
+        new ObjectMapper().convertValue("1", new TypeReference<Integer>() {}),
+        new ObjectMapper(new JsonFactory()).convertValue("2.0", new TypeReference<Double>() {}));
   }
 }

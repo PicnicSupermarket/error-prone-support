@@ -5,6 +5,8 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JavaType;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -54,12 +56,68 @@ final class Jackson3Rules {
   static final class ObjectMapperValueToTree {
     @BeforeTemplate
     JsonNode before(ObjectMapper objectMapper, Object object) {
-      return objectMapper.readTree(objectMapper.writeValueAsString(object));
+      return Refaster.anyOf(
+          objectMapper.readTree(objectMapper.writeValueAsBytes(object)),
+          objectMapper.readTree(objectMapper.writeValueAsString(object)));
     }
 
     @AfterTemplate
     JsonNode after(ObjectMapper objectMapper, Object object) {
       return objectMapper.valueToTree(object);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectMapper#convertValue(Object, Class)} over more contrived and less efficient
+   * alternatives.
+   */
+  static final class ObjectMapperConvertValueWithClass<T> {
+    @BeforeTemplate
+    T before(ObjectMapper objectMapper, Object object, Class<T> valueType) {
+      return Refaster.anyOf(
+          objectMapper.readValue(objectMapper.writeValueAsBytes(object), valueType),
+          objectMapper.readValue(objectMapper.writeValueAsString(object), valueType));
+    }
+
+    @AfterTemplate
+    T after(ObjectMapper objectMapper, Object object, Class<T> valueType) {
+      return objectMapper.convertValue(object, valueType);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectMapper#convertValue(Object, JavaType)} over more contrived and less
+   * efficient alternatives.
+   */
+  static final class ObjectMapperConvertValueWithJavaType<T> {
+    @BeforeTemplate
+    T before(ObjectMapper objectMapper, Object object, JavaType valueType) {
+      return Refaster.anyOf(
+          objectMapper.readValue(objectMapper.writeValueAsBytes(object), valueType),
+          objectMapper.readValue(objectMapper.writeValueAsString(object), valueType));
+    }
+
+    @AfterTemplate
+    T after(ObjectMapper objectMapper, Object object, JavaType valueType) {
+      return objectMapper.convertValue(object, valueType);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectMapper#convertValue(Object, TypeReference)} over more contrived and less
+   * efficient alternatives.
+   */
+  static final class ObjectMapperConvertValueWithTypeReference<T> {
+    @BeforeTemplate
+    T before(ObjectMapper objectMapper, Object object, TypeReference<T> valueTypeRef) {
+      return Refaster.anyOf(
+          objectMapper.readValue(objectMapper.writeValueAsBytes(object), valueTypeRef),
+          objectMapper.readValue(objectMapper.writeValueAsString(object), valueTypeRef));
+    }
+
+    @AfterTemplate
+    T after(ObjectMapper objectMapper, Object object, TypeReference<T> valueTypeRef) {
+      return objectMapper.convertValue(object, valueTypeRef);
     }
   }
 }
