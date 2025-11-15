@@ -10814,7 +10814,7 @@
  
    @BeforeEach
    void setUp() {
-@@ -42,8 +42,8 @@ class ThreadDumpTest {
+@@ -43,8 +43,8 @@ class ThreadDumpTest {
      final ByteArrayOutputStream output = new ByteArrayOutputStream();
      threadDump.dump(output);
  
