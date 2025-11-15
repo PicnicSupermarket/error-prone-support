@@ -356,7 +356,7 @@ final class JekyllCollectionGeneratorTest {
     static TestInput create(
         Path projectRoot, String module, BiFunction<Path, String, ProjectInfo> projectInfoFactory) {
       ProjectInfo projectInfo = projectInfoFactory.apply(projectRoot, module);
-      String fileName = String.format("input-%s.json", Path.of(projectInfo.source()).getFileName());
+      String fileName = "input-%s.json".formatted(Path.of(projectInfo.source()).getFileName());
       return new TestInput(
           resolvePath(projectRoot, module, "target", "docs", fileName), projectInfo);
     }
