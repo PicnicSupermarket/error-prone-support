@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.documentation;
 
 import java.nio.file.Path;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.datatype.guava.GuavaModule;
 
@@ -10,16 +9,16 @@ import tools.jackson.datatype.guava.GuavaModule;
  * without further specifying the exact schema used.
  */
 final class Json {
-  private static final ObjectMapper OBJECT_MAPPER =
+  private static final JsonMapper JSON_MAPPER =
       JsonMapper.builder().addModule(new GuavaModule()).build();
 
   private Json() {}
 
   static <T> T read(Path path, Class<T> clazz) {
-    return OBJECT_MAPPER.readValue(path.toFile(), clazz);
+    return JSON_MAPPER.readValue(path.toFile(), clazz);
   }
 
   static <T> void write(Path path, T object) {
-    OBJECT_MAPPER.writeValue(path.toFile(), object);
+    JSON_MAPPER.writeValue(path.toFile(), object);
   }
 }
