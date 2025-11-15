@@ -1,14 +1,13 @@
 package tech.picnic.errorprone.refasterrules;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.NullNode;
 
-final class JacksonRulesTest implements RefasterRuleCollectionTestCase {
+final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Optional<JsonNode>> testJsonNodeOptionalInt() {
     return ImmutableSet.of(
         NullNode.getInstance().optional(1),
@@ -25,7 +24,7 @@ final class JacksonRulesTest implements RefasterRuleCollectionTestCase {
         NullNode.getInstance().optional("qux"));
   }
 
-  JsonNode testObjectMapperValueToTree() throws JsonProcessingException {
+  JsonNode testObjectMapperValueToTree() {
     return new ObjectMapper().valueToTree("foo");
   }
 }

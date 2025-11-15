@@ -152,6 +152,10 @@
         coverage computation, because they are tested using a custom method
         that does not cause code coverage to be registered. -->
         <sonar.coverage.exclusions>${refaster-rules.path-pattern}</sonar.coverage.exclusions>
+        <!-- The Jackson 2.x and Jackson 3.x Refaster rule collections contain
+        nearly identical code, but match different types. SonarCloud should not
+        flag this as duplicated code. -->
+        <sonar.cpd.exclusions>**tech/picnic/errorprone/refasterrules/Jackson2Rules.java</sonar.cpd.exclusions>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- SonarCloud partial rule suppressions. These fall in two
         categories:
@@ -524,6 +528,13 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>7.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>3.0.2</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

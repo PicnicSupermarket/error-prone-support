@@ -1,0 +1,66 @@
+package tech.picnic.errorprone.refasterrules;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.errorprone.refaster.Refaster;
+import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.Optional;
+import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+
+/** Refaster rules related to Jackson 2.x expressions and statements. */
+@OnlineDocumentation
+final class Jackson2Rules {
+  private Jackson2Rules() {}
+
+  /** Prefer {@link JsonNode#optional(int)} over more contrived alternatives. */
+  static final class JsonNodeOptionalInt {
+    @BeforeTemplate
+    Optional<JsonNode> before(JsonNode node, int index) {
+      return Refaster.anyOf(
+          node.get(index).asOptional(),
+          node.path(index).asOptional(),
+          Optional.of(node.get(index)),
+          Optional.ofNullable(node.get(index)));
+    }
+
+    @AfterTemplate
+    Optional<JsonNode> after(JsonNode node, int index) {
+      return node.optional(index);
+    }
+  }
+
+  /** Prefer {@link JsonNode#optional(String)} over more contrived alternatives. */
+  static final class JsonNodeOptionalString {
+    @BeforeTemplate
+    Optional<JsonNode> before(JsonNode node, String fieldName) {
+      return Refaster.anyOf(
+          node.get(fieldName).asOptional(),
+          node.path(fieldName).asOptional(),
+          Optional.of(node.get(fieldName)),
+          Optional.ofNullable(node.get(fieldName)));
+    }
+
+    @AfterTemplate
+    Optional<JsonNode> after(JsonNode node, String fieldName) {
+      return node.optional(fieldName);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectMapper#valueToTree(Object)} over more contrived and less efficient
+   * alternatives.
+   */
+  static final class ObjectMapperValueToTree {
+    @BeforeTemplate
+    JsonNode before(ObjectMapper objectMapper, Object object) throws JsonProcessingException {
+      return objectMapper.readTree(objectMapper.writeValueAsString(object));
+    }
+
+    @AfterTemplate
+    JsonNode after(ObjectMapper objectMapper, Object object) {
+      return objectMapper.valueToTree(object);
+    }
+  }
+}
