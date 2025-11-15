@@ -844,6 +844,15 @@
        return key;
      }
      StringBuilder escaped = new StringBuilder(key.length());
+@@ -315,7 +307,7 @@ public class MetricName implements Comparable<MetricName> {
+           break;
+         default:
+           if (c < 32 || c == 127) { // Control characters and DEL
+-            escaped.append(String.format("\\u%04x", (int) c));
++            escaped.append("\\u%04x".formatted((int) c));
+           } else {
+             escaped.append(c);
+           }
 @@ -326,7 +318,7 @@ public class MetricName implements Comparable<MetricName> {
    }
  
@@ -853,6 +862,15 @@
        return tag;
      }
      StringBuilder escaped = new StringBuilder(tag.length());
+@@ -356,7 +348,7 @@ public class MetricName implements Comparable<MetricName> {
+           break;
+         default:
+           if (c < 32 || c == 127) { // Control characters and DEL
+-            escaped.append(String.format("\\u%04x", (int) c));
++            escaped.append("\\u%04x".formatted((int) c));
+           } else {
+             escaped.append(c);
+           }
 @@ -367,7 +359,7 @@ public class MetricName implements Comparable<MetricName> {
    }
  
@@ -1576,6 +1594,15 @@
      when(snapshot.getMax()).thenReturn(2L);
      when(snapshot.getMean()).thenReturn(3.0);
      when(snapshot.getMin()).thenReturn(4L);
+@@ -392,7 +392,7 @@ class ConsoleReporterTest {
+   private String lines(String... lines) {
+     final StringBuilder builder = new StringBuilder();
+     for (String line : lines) {
+-      builder.append(line).append(String.format("%n"));
++      builder.append(line).append("%n".formatted());
+     }
+     return builder.toString();
+   }
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/CounterTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/CounterTest.java
 @@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
@@ -1679,7 +1706,14 @@
      when(meter.getCount()).thenReturn(1L);
      when(meter.getSum()).thenReturn(6L);
      when(meter.getMeanRate()).thenReturn(2.0);
-@@ -197,8 +196,7 @@ public class CsvReporterTest {
+@@ -191,14 +190,13 @@ public class CsvReporterTest {
+   private String csv(String... lines) {
+     final StringBuilder builder = new StringBuilder();
+     for (String line : lines) {
+-      builder.append(line).append(String.format("%n"));
++      builder.append(line).append("%n".formatted());
+     }
+     return builder.toString();
    }
  
    private String fileContents(String filename) throws IOException {
@@ -3309,7 +3343,7 @@
      MetricName nameWithNullArray = MetricName.build("test").tagged((String[]) null);
      assertThat(nameWithNullArray.getTags()).isEmpty();
  
-@@ -787,55 +790,55 @@ class MetricNameTest {
+@@ -787,59 +790,59 @@ class MetricNameTest {
    }
  
    @Test
@@ -3379,6 +3413,11 @@
      // Test performance doesn't degrade significantly with many tags
      Map<String, String> manyTags = new HashMap<>();
      for (int i = 0; i < 100; i++) {
+-      manyTags.put("key" + String.format("%03d", i), "value" + i);
++      manyTags.put("key" + "%03d".formatted(i), "value" + i);
+     }
+ 
+     long startTime = System.currentTimeMillis();
 @@ -854,13 +857,13 @@ class MetricNameTest {
    }
  
@@ -4343,7 +4382,7 @@
      snapshot.dump(output);
  
 -    assertThat(output.toString()).isEqualTo(String.format("1%n2%n3%n4%n5%n"));
-+    assertThat(output).hasToString(String.format("1%n2%n3%n4%n5%n"));
++    assertThat(output).hasToString("1%n2%n3%n4%n5%n".formatted());
    }
  
    @Test
@@ -4548,7 +4587,7 @@
      snapshot.dump(output);
  
 -    assertThat(output.toString()).isEqualTo(String.format("1%n2%n3%n4%n5%n"));
-+    assertThat(output).hasToString(String.format("1%n2%n3%n4%n5%n"));
++    assertThat(output).hasToString("1%n2%n3%n4%n5%n".formatted());
    }
  
    @Test
@@ -5185,6 +5224,24 @@
  import java.util.LinkedHashMap;
  import java.util.Map;
  import java.util.concurrent.TimeUnit;
+@@ -52,7 +53,7 @@ public interface HealthCheck {
+      * @see String#format(String, Object...)
+      */
+     public static Result healthy(String message, Object... args) {
+-      return healthy(String.format(message, args));
++      return healthy(message.formatted(args));
+     }
+ 
+     /**
+@@ -76,7 +77,7 @@ public interface HealthCheck {
+      * @see String#format(String, Object...)
+      */
+     public static Result unhealthy(String message, Object... args) {
+-      return unhealthy(String.format(message, args));
++      return unhealthy(message.formatted(args));
+     }
+ 
+     /**
 @@ -123,7 +124,7 @@ public interface HealthCheck {
        this.healthy = isHealthy;
        this.message = message;
@@ -5222,6 +5279,15 @@
          }
        }
        builder.append('}');
+@@ -315,7 +315,7 @@ public interface HealthCheck {
+      * @see String#format(String, Object...)
+      */
+     public ResultBuilder withMessage(String message, Object... args) {
+-      return withMessage(String.format(message, args));
++      return withMessage(message.formatted(args));
+     }
+ 
+     /**
 --- a/metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java
 +++ b/metrics-healthchecks/src/main/java/io/dropwizard/metrics5/health/HealthCheckRegistry.java
 @@ -1,9 +1,11 @@
@@ -5826,7 +5892,8 @@
 +  @Test
    void timerIsStoppedCorrectlyWithProvidedFutureCallbackFailed() throws Exception {
      // There should be nothing listening on this port
-     HttpHost host = HttpHost.create(String.format("http://127.0.0.1:%d", findAvailableLocalPort()));
+-    HttpHost host = HttpHost.create(String.format("http://127.0.0.1:%d", findAvailableLocalPort()));
++    HttpHost host = HttpHost.create("http://127.0.0.1:%d".formatted(findAvailableLocalPort()));
      HttpGet get = new HttpGet("/?q=something");
  
 -    FutureCallback<HttpResponse> futureCallback = mock(FutureCallback.class);
@@ -6395,6 +6462,17 @@
      when(event.getServletContext()).thenReturn(context);
  
      listener.contextInitialized(event);
+--- a/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/AdminServlet.java
++++ b/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/AdminServlet.java
+@@ -123,7 +123,7 @@ public class AdminServlet extends HttpServlet {
+     this.cpuProfileServlet = new CpuProfileServlet();
+     cpuProfileServlet.init(config);
+ 
+-    pageContentTemplate = String.format(BASE_TEMPLATE, String.format(servletLinks.toString()));
++    pageContentTemplate = BASE_TEMPLATE.formatted(servletLinks.toString().formatted());
+ 
+     this.metricsUri =
+         getParam(context.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);
 --- a/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/HealthCheckServlet.java
 +++ b/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/HealthCheckServlet.java
 @@ -99,7 +99,7 @@ public class HealthCheckServlet extends HttpServlet {
@@ -6428,6 +6506,31 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
+@@ -39,22 +39,8 @@ class AdminServletExclusionTest extends AbstractServletTest {
+     assertThat(response.getStatus()).isEqualTo(200);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+-                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+-                    + "<html>%n"
+-                    + "<head>%n"
+-                    + "  <title>Metrics</title>%n"
+-                    + "</head>%n"
+-                    + "<body>%n"
+-                    + "  <h1>Operational Menu</h1>%n"
+-                    + "  <ul>%n"
+-                    + "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
+-                    + "  </ul>%n"
+-                    + "</body>%n"
+-                    + "</html>%n"));
++            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping\">Ping</a></li>%n    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n  </ul>%n</body>%n%s",
++            "</html>%n".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
+   }
+ }
 --- a/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/AdminServletTest.java
 +++ b/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/AdminServletTest.java
 @@ -9,7 +9,7 @@ import org.eclipse.jetty.servlet.ServletTester;
@@ -6439,6 +6542,34 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
+@@ -37,25 +37,8 @@ class AdminServletTest extends AbstractServletTest {
+     assertThat(response.getStatus()).isEqualTo(200);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+-                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+-                    + "<html>%n"
+-                    + "<head>%n"
+-                    + "  <title>Metrics</title>%n"
+-                    + "</head>%n"
+-                    + "<body>%n"
+-                    + "  <h1>Operational Menu</h1>%n"
+-                    + "  <ul>%n"
+-                    + "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n"
+-                    + "  </ul>%n"
+-                    + "</body>%n"
+-                    + "</html>%n"));
++            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping\">Ping</a></li>%n    <li><a href=\"/context/admin/threads\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
++            "</html>%n".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
+   }
+ }
 --- a/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/AdminServletUriTest.java
 +++ b/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/AdminServletUriTest.java
 @@ -9,7 +9,7 @@ import org.eclipse.jetty.servlet.ServletTester;
@@ -6450,6 +6581,34 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
+@@ -42,25 +42,8 @@ class AdminServletUriTest extends AbstractServletTest {
+     assertThat(response.getStatus()).isEqualTo(200);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+-                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+-                    + "<html>%n"
+-                    + "<head>%n"
+-                    + "  <title>Metrics</title>%n"
+-                    + "</head>%n"
+-                    + "<body>%n"
+-                    + "  <h1>Operational Menu</h1>%n"
+-                    + "  <ul>%n"
+-                    + "    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n"
+-                    + "  </ul>%n"
+-                    + "</body>%n"
+-                    + "</html>%n"));
++            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
++            "</html>%n".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
+   }
+ }
 --- a/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/CpuProfileServletTest.java
 +++ b/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/CpuProfileServletTest.java
 @@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletTester;
@@ -6508,10 +6667,11 @@
    }
  
    @Test
-@@ -168,15 +165,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -167,16 +164,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
      assertThat(response.getContent())
          .isEqualTo(
-             String.format(
+-            String.format(
 -                "{%n"
 -                    + "  \"fun\" : {%n"
 -                    + "    \"healthy\" : true,%n"
@@ -6521,12 +6681,12 @@
 -                    + EXPECTED_TIMESTAMP
 -                    + "\""
 -                    + "%n  }%n}"));
-+                "{%n  \"fun\" : {%n    \"healthy\" : true,%n    \"message\" : \"foo bar 123\",%n    \"duration\" : 0,%n    \"timestamp\" : \"%s\"%n  }%n}",
-+                EXPECTED_TIMESTAMP));
++            "{%n  \"fun\" : {%n    \"healthy\" : true,%n    \"message\" : \"foo bar 123\",%n    \"duration\" : 0,%n    \"timestamp\" : \"%s\"%s",
++            EXPECTED_TIMESTAMP, "%n  }%n}".formatted());
    }
  
    private static HealthCheck.Result healthyResultWithMessage(String message) {
-@@ -197,23 +187,23 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -197,23 +186,23 @@ class HealthCheckServletTest extends AbstractServletTest {
  
    @Test
    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
@@ -6557,7 +6717,7 @@
      when(servletConfig.getServletContext()).thenReturn(servletContext);
      when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
          .thenReturn(healthCheckRegistry);
-@@ -221,32 +211,32 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -221,32 +210,32 @@ class HealthCheckServletTest extends AbstractServletTest {
      final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
      healthCheckServlet.init(servletConfig);
  
@@ -6619,6 +6779,75 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final String allowedOrigin = "some.other.origin";
  
+@@ -108,66 +108,8 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
+     assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo(allowedOrigin);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "{%n"
+-                    + "  \"version\" : \"5.0.0\",%n"
+-                    + "  \"gauges\" : {%n"
+-                    + "    \"g1\" : {%n"
+-                    + "      \"value\" : 100%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"counters\" : {%n"
+-                    + "    \"c\" : {%n"
+-                    + "      \"count\" : 1%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"histograms\" : {%n"
+-                    + "    \"h\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1,%n"
+-                    + "      \"mean\" : 1.0,%n"
+-                    + "      \"min\" : 1,%n"
+-                    + "      \"p50\" : 1.0,%n"
+-                    + "      \"p75\" : 1.0,%n"
+-                    + "      \"p95\" : 1.0,%n"
+-                    + "      \"p98\" : 1.0,%n"
+-                    + "      \"p99\" : 1.0,%n"
+-                    + "      \"p999\" : 1.0,%n"
+-                    + "      \"stddev\" : 0.0%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"meters\" : {%n"
+-                    + "    \"m\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 2.0E8,%n"
+-                    + "      \"units\" : \"events/minute\"%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"timers\" : {%n"
+-                    + "    \"t\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1000.0,%n"
+-                    + "      \"mean\" : 1000.0,%n"
+-                    + "      \"min\" : 1000.0,%n"
+-                    + "      \"p50\" : 1000.0,%n"
+-                    + "      \"p75\" : 1000.0,%n"
+-                    + "      \"p95\" : 1000.0,%n"
+-                    + "      \"p98\" : 1000.0,%n"
+-                    + "      \"p99\" : 1000.0,%n"
+-                    + "      \"p999\" : 1000.0,%n"
+-                    + "      \"stddev\" : 0.0,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 6.0E8,%n"
+-                    + "      \"duration_units\" : \"milliseconds\",%n"
+-                    + "      \"rate_units\" : \"calls/minute\"%n"
+-                    + "    }%n"
+-                    + "  }%n"
+-                    + "}"));
++            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 2.0E8,%n      \"units\" : \"events/minute\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1000.0,%n      \"mean\" : 1000.0,%n      \"min\" : 1000.0,%n      \"p50\" : 1000.0,%n      \"p75\" : 1000.0,%n      \"p95\" : 1000.0,%n      \"p98\" : 1000.0,%n      \"p99\" : 1000.0,%n      \"p999\" : 1000.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 6.0E8,%n      \"duration_units\" : \"milliseconds\",%n      \"rate_units\" : \"calls/minute\"%n    }%n  }%n%s",
++            "}".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+   }
+ }
 --- a/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/MetricsServletTest.java
 +++ b/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/MetricsServletTest.java
 @@ -1,11 +1,9 @@
@@ -6670,7 +6899,74 @@
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  
-@@ -224,48 +208,47 @@ class MetricsServletTest extends AbstractServletTest {
+@@ -159,113 +143,54 @@ class MetricsServletTest extends AbstractServletTest {
+     assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "{%n"
+-                    + "  \"version\" : \"5.0.0\",%n"
+-                    + "  \"gauges\" : {%n"
+-                    + "    \"g1\" : {%n"
+-                    + "      \"value\" : 100%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"counters\" : {%n"
+-                    + "    \"c\" : {%n"
+-                    + "      \"count\" : 1%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"histograms\" : {%n"
+-                    + "    \"h\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1,%n"
+-                    + "      \"mean\" : 1.0,%n"
+-                    + "      \"min\" : 1,%n"
+-                    + "      \"p50\" : 1.0,%n"
+-                    + "      \"p75\" : 1.0,%n"
+-                    + "      \"p95\" : 1.0,%n"
+-                    + "      \"p98\" : 1.0,%n"
+-                    + "      \"p99\" : 1.0,%n"
+-                    + "      \"p999\" : 1.0,%n"
+-                    + "      \"stddev\" : 0.0%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"meters\" : {%n"
+-                    + "    \"m\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 3333333.3333333335,%n"
+-                    + "      \"units\" : \"events/second\"%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"timers\" : {%n"
+-                    + "    \"t\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1.0,%n"
+-                    + "      \"mean\" : 1.0,%n"
+-                    + "      \"min\" : 1.0,%n"
+-                    + "      \"p50\" : 1.0,%n"
+-                    + "      \"p75\" : 1.0,%n"
+-                    + "      \"p95\" : 1.0,%n"
+-                    + "      \"p98\" : 1.0,%n"
+-                    + "      \"p99\" : 1.0,%n"
+-                    + "      \"p999\" : 1.0,%n"
+-                    + "      \"stddev\" : 0.0,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 1.0E7,%n"
+-                    + "      \"duration_units\" : \"seconds\",%n"
+-                    + "      \"rate_units\" : \"calls/second\"%n"
+-                    + "    }%n"
+-                    + "  }%n"
+-                    + "}"));
++            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 3333333.3333333335,%n      \"units\" : \"events/second\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1.0,%n      \"mean\" : 1.0,%n      \"min\" : 1.0,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 1.0E7,%n      \"duration_units\" : \"seconds\",%n      \"rate_units\" : \"calls/second\"%n    }%n  }%n%s",
++            "}".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+   }
  
    @Test
    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
@@ -6753,6 +7049,15 @@
    @Override
    protected void setUp(ServletTester tester) {
      tester.addServlet(PingServlet.class, "/ping");
+@@ -29,7 +29,7 @@ class PingServletTest extends AbstractServletTest {
+ 
+   @Test
+   void returnsPong() {
+-    assertThat(response.getContent()).isEqualTo(String.format("pong%n"));
++    assertThat(response.getContent()).isEqualTo("pong%n".formatted());
+   }
+ 
+   @Test
 --- a/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/ThreadDumpServletTest.java
 +++ b/metrics-jakarta-servlets/src/test/java/io/dropwizard/metrics5/servlets/ThreadDumpServletTest.java
 @@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletTester;
@@ -7067,7 +7372,17 @@
        this.metricRegistry = registry;
      }
  
-@@ -305,9 +306,9 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -190,8 +191,7 @@ public class InstrumentedResourceMethodApplicationListener
+ 
+     private Meter getResponseCodeMeter(int statusCode) {
+       return responseCodeMeters.computeIfAbsent(
+-          statusCode,
+-          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
++          statusCode, sc -> metricRegistry.meter(metricName.resolve("%d-responses".formatted(sc))));
+     }
+   }
+ 
+@@ -305,9 +305,9 @@ public class InstrumentedResourceMethodApplicationListener
                  : null;
  
          if (metric != null) {
@@ -7079,7 +7394,7 @@
              metric.meter.mark();
            }
          }
-@@ -418,14 +419,11 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -418,14 +418,11 @@ public class InstrumentedResourceMethodApplicationListener
  
    @Override
    public RequestEventListener onRequest(final RequestEvent event) {
@@ -7099,7 +7414,7 @@
    }
  
    private <T extends Annotation> T getClassLevelAnnotation(
-@@ -543,7 +541,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -543,7 +540,7 @@ public class InstrumentedResourceMethodApplicationListener
        final String... suffixes) {
      final Method definitionMethod = method.getInvocable().getDefinitionMethod();
      MetricName metricName;
@@ -7108,7 +7423,7 @@
        metricName =
            absolute
                ? MetricRegistry.name(explicitName)
-@@ -604,8 +602,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -604,8 +601,7 @@ public class InstrumentedResourceMethodApplicationListener
      @Override
      public int hashCode() {
        int result = type.hashCode();
@@ -7572,7 +7887,17 @@
        this.metricRegistry = registry;
      }
  
-@@ -306,9 +307,9 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -191,8 +192,7 @@ public class InstrumentedResourceMethodApplicationListener
+ 
+     private Meter getResponseCodeMeter(int statusCode) {
+       return responseCodeMeters.computeIfAbsent(
+-          statusCode,
+-          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
++          statusCode, sc -> metricRegistry.meter(metricName.resolve("%d-responses".formatted(sc))));
+     }
+   }
+ 
+@@ -306,9 +306,9 @@ public class InstrumentedResourceMethodApplicationListener
                  : null;
  
          if (metric != null) {
@@ -7584,7 +7909,7 @@
              metric.meter.mark();
            }
          }
-@@ -419,14 +420,11 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -419,14 +419,11 @@ public class InstrumentedResourceMethodApplicationListener
  
    @Override
    public RequestEventListener onRequest(final RequestEvent event) {
@@ -7604,7 +7929,7 @@
    }
  
    private <T extends Annotation> T getClassLevelAnnotation(
-@@ -544,7 +542,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -544,7 +541,7 @@ public class InstrumentedResourceMethodApplicationListener
        final String... suffixes) {
      final Method definitionMethod = method.getInvocable().getDefinitionMethod();
      MetricName metricName;
@@ -7613,7 +7938,7 @@
        metricName =
            absolute ? name(explicitName) : name(definitionMethod.getDeclaringClass(), explicitName);
      } else {
-@@ -602,8 +600,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -602,8 +599,7 @@ public class InstrumentedResourceMethodApplicationListener
      @Override
      public int hashCode() {
        int result = type.hashCode();
@@ -8140,7 +8465,17 @@
        this.metricRegistry = registry;
      }
  
-@@ -306,9 +307,9 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -191,8 +192,7 @@ public class InstrumentedResourceMethodApplicationListener
+ 
+     private Meter getResponseCodeMeter(int statusCode) {
+       return responseCodeMeters.computeIfAbsent(
+-          statusCode,
+-          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
++          statusCode, sc -> metricRegistry.meter(metricName.resolve("%d-responses".formatted(sc))));
+     }
+   }
+ 
+@@ -306,9 +306,9 @@ public class InstrumentedResourceMethodApplicationListener
                  : null;
  
          if (metric != null) {
@@ -8152,7 +8487,7 @@
              metric.meter.mark();
            }
          }
-@@ -419,14 +420,11 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -419,14 +419,11 @@ public class InstrumentedResourceMethodApplicationListener
  
    @Override
    public RequestEventListener onRequest(final RequestEvent event) {
@@ -8172,7 +8507,7 @@
    }
  
    private <T extends Annotation> T getClassLevelAnnotation(
-@@ -544,7 +542,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -544,7 +541,7 @@ public class InstrumentedResourceMethodApplicationListener
        final String... suffixes) {
      final Method definitionMethod = method.getInvocable().getDefinitionMethod();
      MetricName metricName;
@@ -8181,7 +8516,7 @@
        metricName =
            absolute ? name(explicitName) : name(definitionMethod.getDeclaringClass(), explicitName);
      } else {
-@@ -602,8 +600,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -602,8 +599,7 @@ public class InstrumentedResourceMethodApplicationListener
      @Override
      public int hashCode() {
        int result = type.hashCode();
@@ -8734,6 +9069,24 @@
      }
  
      this.listener = new AsyncAttachingListener();
+@@ -294,7 +296,7 @@ public class InstrumentedHandler extends HandlerWrapper {
+ 
+     if (responseCodeMeters != null) {
+       responseCodeMeters.keySet().stream()
+-          .map(sc -> getMetricPrefix().resolve(String.format("%d-responses", sc)))
++          .map(sc -> getMetricPrefix().resolve("%d-responses".formatted(sc)))
+           .forEach(metricRegistry::remove);
+     }
+ 
+@@ -405,7 +407,7 @@ public class InstrumentedHandler extends HandlerWrapper {
+   private Meter getResponseCodeMeter(int statusCode) {
+     return responseCodeMeters.computeIfAbsent(
+         statusCode,
+-        sc -> metricRegistry.meter(getMetricPrefix().resolve(String.format("%d-responses", sc))));
++        sc -> metricRegistry.meter(getMetricPrefix().resolve("%d-responses".formatted(sc))));
+   }
+ 
+   private MetricName getMetricPrefix() {
 --- a/metrics-jetty10/src/main/java/io/dropwizard/metrics5/jetty10/InstrumentedHttpChannelListener.java
 +++ b/metrics-jetty10/src/main/java/io/dropwizard/metrics5/jetty10/InstrumentedHttpChannelListener.java
 @@ -3,7 +3,10 @@ package io.dropwizard.metrics5.jetty10;
@@ -8777,6 +9130,15 @@
  
      this.getRequests = metricRegistry.timer(prefix.resolve("get-requests"));
      this.postRequests = metricRegistry.timer(prefix.resolve("post-requests"));
+@@ -330,7 +332,7 @@ public class InstrumentedHttpChannelListener implements Listener {
+ 
+   private Meter getResponseCodeMeter(int statusCode) {
+     return responseCodeMeters.computeIfAbsent(
+-        statusCode, sc -> metricRegistry.meter(prefix.resolve(String.format("%d-responses", sc))));
++        statusCode, sc -> metricRegistry.meter(prefix.resolve("%d-responses".formatted(sc))));
+   }
+ 
+   private Timer requestTimer(String method) {
 --- a/metrics-jetty10/src/test/java/io/dropwizard/metrics5/jetty10/InstrumentedConnectionFactoryTest.java
 +++ b/metrics-jetty10/src/test/java/io/dropwizard/metrics5/jetty10/InstrumentedConnectionFactoryTest.java
 @@ -21,7 +21,7 @@ import org.junit.jupiter.api.AfterEach;
@@ -8967,6 +9329,24 @@
      }
  
      this.listener = new AsyncAttachingListener();
+@@ -294,7 +296,7 @@ public class InstrumentedHandler extends HandlerWrapper {
+ 
+     if (responseCodeMeters != null) {
+       responseCodeMeters.keySet().stream()
+-          .map(sc -> getMetricPrefix().resolve(String.format("%d-responses", sc)))
++          .map(sc -> getMetricPrefix().resolve("%d-responses".formatted(sc)))
+           .forEach(metricRegistry::remove);
+     }
+     super.doStop();
+@@ -408,7 +410,7 @@ public class InstrumentedHandler extends HandlerWrapper {
+   private Meter getResponseCodeMeter(int statusCode) {
+     return responseCodeMeters.computeIfAbsent(
+         statusCode,
+-        sc -> metricRegistry.meter(getMetricPrefix().resolve(String.format("%d-responses", sc))));
++        sc -> metricRegistry.meter(getMetricPrefix().resolve("%d-responses".formatted(sc))));
+   }
+ 
+   private class AsyncAttachingListener implements AsyncListener {
 --- a/metrics-jetty11/src/main/java/io/dropwizard/metrics5/jetty11/InstrumentedHttpChannelListener.java
 +++ b/metrics-jetty11/src/main/java/io/dropwizard/metrics5/jetty11/InstrumentedHttpChannelListener.java
 @@ -3,7 +3,10 @@ package io.dropwizard.metrics5.jetty11;
@@ -9010,6 +9390,15 @@
  
      this.getRequests = metricRegistry.timer(prefix.resolve("get-requests"));
      this.postRequests = metricRegistry.timer(prefix.resolve("post-requests"));
+@@ -330,7 +332,7 @@ public class InstrumentedHttpChannelListener implements Listener {
+ 
+   private Meter getResponseCodeMeter(int statusCode) {
+     return responseCodeMeters.computeIfAbsent(
+-        statusCode, sc -> metricRegistry.meter(prefix.resolve(String.format("%d-responses", sc))));
++        statusCode, sc -> metricRegistry.meter(prefix.resolve("%d-responses".formatted(sc))));
+   }
+ 
+   private Timer requestTimer(String method) {
 --- a/metrics-jetty11/src/test/java/io/dropwizard/metrics5/jetty11/InstrumentedConnectionFactoryTest.java
 +++ b/metrics-jetty11/src/test/java/io/dropwizard/metrics5/jetty11/InstrumentedConnectionFactoryTest.java
 @@ -21,7 +21,7 @@ import org.junit.jupiter.api.AfterEach;
@@ -9493,6 +9882,24 @@
      }
    }
  
+@@ -283,7 +285,7 @@ public abstract class AbstractInstrumentedHandler extends Handler.Wrapper {
+ 
+     if (responseCodeMeters != null) {
+       responseCodeMeters.keySet().stream()
+-          .map(sc -> getMetricPrefix().resolve(String.format("%d-responses", sc)))
++          .map(sc -> getMetricPrefix().resolve("%d-responses".formatted(sc)))
+           .forEach(metricRegistry::remove);
+     }
+     super.doStop();
+@@ -348,7 +350,7 @@ public abstract class AbstractInstrumentedHandler extends Handler.Wrapper {
+   protected Meter getResponseCodeMeter(int statusCode) {
+     return responseCodeMeters.computeIfAbsent(
+         statusCode,
+-        sc -> metricRegistry.meter(getMetricPrefix().resolve(String.format("%d-responses", sc))));
++        sc -> metricRegistry.meter(getMetricPrefix().resolve("%d-responses".formatted(sc))));
+   }
+ 
+   protected MetricName getMetricPrefix() {
 --- a/metrics-jetty12/src/test/java/io/dropwizard/metrics/jetty12/InstrumentedConnectionFactoryTest.java
 +++ b/metrics-jetty12/src/test/java/io/dropwizard/metrics/jetty12/InstrumentedConnectionFactoryTest.java
 @@ -19,7 +19,7 @@ import org.junit.jupiter.api.AfterEach;
@@ -10074,22 +10481,27 @@
  import java.util.HashSet;
  import java.util.Set;
  
-@@ -40,19 +42,16 @@ public class ThreadDeadlockDetector {
+@@ -40,19 +42,19 @@ public class ThreadDeadlockDetector {
        for (ThreadInfo info : threads.getThreadInfo(ids, MAX_STACK_TRACE_DEPTH)) {
          final StringBuilder stackTrace = new StringBuilder();
          for (StackTraceElement element : info.getStackTrace()) {
 -          stackTrace.append("\t at ").append(element.toString()).append(String.format("%n"));
-+          stackTrace.append("\t at ").append(element).append(String.format("%n"));
++          stackTrace.append("\t at ").append(element).append("%n".formatted());
          }
  
          deadlocks.add(
-             String.format(
-                 "%s locked on %s (owned by %s):%n%s",
+-            String.format(
+-                "%s locked on %s (owned by %s):%n%s",
 -                info.getThreadName(),
 -                info.getLockName(),
 -                info.getLockOwnerName(),
 -                stackTrace.toString()));
-+                info.getThreadName(), info.getLockName(), info.getLockOwnerName(), stackTrace));
++            "%s locked on %s (owned by %s):%n%s"
++                .formatted(
++                    info.getThreadName(),
++                    info.getLockName(),
++                    info.getLockOwnerName(),
++                    stackTrace.toString()));
        }
 -      return Collections.unmodifiableSet(deadlocks);
 +      return unmodifiableSet(deadlocks);
@@ -10402,7 +10814,7 @@
  
    @BeforeEach
    void setUp() {
-@@ -39,8 +39,8 @@ class ThreadDumpTest {
+@@ -43,8 +43,8 @@ class ThreadDumpTest {
      final ByteArrayOutputStream output = new ByteArrayOutputStream();
      threadDump.dump(output);
  
@@ -11759,6 +12171,17 @@
      when(event.getServletContext()).thenReturn(context);
  
      listener.contextInitialized(event);
+--- a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/AdminServlet.java
++++ b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/AdminServlet.java
+@@ -123,7 +123,7 @@ public class AdminServlet extends HttpServlet {
+     this.cpuProfileServlet = new CpuProfileServlet();
+     cpuProfileServlet.init(config);
+ 
+-    pageContentTemplate = String.format(BASE_TEMPLATE, String.format(servletLinks.toString()));
++    pageContentTemplate = BASE_TEMPLATE.formatted(servletLinks.toString().formatted());
+ 
+     this.metricsUri =
+         getParam(context.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);
 --- a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/HealthCheckServlet.java
 +++ b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/HealthCheckServlet.java
 @@ -99,7 +99,7 @@ public class HealthCheckServlet extends HttpServlet {
@@ -11792,6 +12215,34 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
+@@ -37,25 +37,8 @@ class AdminServletTest extends AbstractServletTest {
+     assertThat(response.getStatus()).isEqualTo(200);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+-                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+-                    + "<html>%n"
+-                    + "<head>%n"
+-                    + "  <title>Metrics</title>%n"
+-                    + "</head>%n"
+-                    + "<body>%n"
+-                    + "  <h1>Operational Menu</h1>%n"
+-                    + "  <ul>%n"
+-                    + "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n"
+-                    + "  </ul>%n"
+-                    + "</body>%n"
+-                    + "</html>%n"));
++            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping\">Ping</a></li>%n    <li><a href=\"/context/admin/threads\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
++            "</html>%n".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
+   }
+ }
 --- a/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/AdminServletUriTest.java
 +++ b/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/AdminServletUriTest.java
 @@ -9,7 +9,7 @@ import org.eclipse.jetty.servlet.ServletTester;
@@ -11803,6 +12254,34 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
+@@ -42,25 +42,8 @@ class AdminServletUriTest extends AbstractServletTest {
+     assertThat(response.getStatus()).isEqualTo(200);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+-                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+-                    + "<html>%n"
+-                    + "<head>%n"
+-                    + "  <title>Metrics</title>%n"
+-                    + "</head>%n"
+-                    + "<body>%n"
+-                    + "  <h1>Operational Menu</h1>%n"
+-                    + "  <ul>%n"
+-                    + "    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n"
+-                    + "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n"
+-                    + "  </ul>%n"
+-                    + "</body>%n"
+-                    + "</html>%n"));
++            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
++            "</html>%n".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
+   }
+ }
 --- a/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/CpuProfileServletTest.java
 +++ b/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/CpuProfileServletTest.java
 @@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletTester;
@@ -11861,10 +12340,11 @@
    }
  
    @Test
-@@ -168,15 +165,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -167,16 +164,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
      assertThat(response.getContent())
          .isEqualTo(
-             String.format(
+-            String.format(
 -                "{%n"
 -                    + "  \"fun\" : {%n"
 -                    + "    \"healthy\" : true,%n"
@@ -11874,12 +12354,12 @@
 -                    + EXPECTED_TIMESTAMP
 -                    + "\""
 -                    + "%n  }%n}"));
-+                "{%n  \"fun\" : {%n    \"healthy\" : true,%n    \"message\" : \"foo bar 123\",%n    \"duration\" : 0,%n    \"timestamp\" : \"%s\"%n  }%n}",
-+                EXPECTED_TIMESTAMP));
++            "{%n  \"fun\" : {%n    \"healthy\" : true,%n    \"message\" : \"foo bar 123\",%n    \"duration\" : 0,%n    \"timestamp\" : \"%s\"%s",
++            EXPECTED_TIMESTAMP, "%n  }%n}".formatted());
    }
  
    private static HealthCheck.Result healthyResultWithMessage(String message) {
-@@ -197,23 +187,23 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -197,23 +186,23 @@ class HealthCheckServletTest extends AbstractServletTest {
  
    @Test
    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
@@ -11910,7 +12390,7 @@
      when(servletConfig.getServletContext()).thenReturn(servletContext);
      when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
          .thenReturn(healthCheckRegistry);
-@@ -221,32 +211,32 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -221,32 +210,32 @@ class HealthCheckServletTest extends AbstractServletTest {
      final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
      healthCheckServlet.init(servletConfig);
  
@@ -11972,6 +12452,75 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final String allowedOrigin = "some.other.origin";
  
+@@ -108,66 +108,8 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
+     assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo(allowedOrigin);
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "{%n"
+-                    + "  \"version\" : \"5.0.0\",%n"
+-                    + "  \"gauges\" : {%n"
+-                    + "    \"g1\" : {%n"
+-                    + "      \"value\" : 100%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"counters\" : {%n"
+-                    + "    \"c\" : {%n"
+-                    + "      \"count\" : 1%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"histograms\" : {%n"
+-                    + "    \"h\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1,%n"
+-                    + "      \"mean\" : 1.0,%n"
+-                    + "      \"min\" : 1,%n"
+-                    + "      \"p50\" : 1.0,%n"
+-                    + "      \"p75\" : 1.0,%n"
+-                    + "      \"p95\" : 1.0,%n"
+-                    + "      \"p98\" : 1.0,%n"
+-                    + "      \"p99\" : 1.0,%n"
+-                    + "      \"p999\" : 1.0,%n"
+-                    + "      \"stddev\" : 0.0%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"meters\" : {%n"
+-                    + "    \"m\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 2.0E8,%n"
+-                    + "      \"units\" : \"events/minute\"%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"timers\" : {%n"
+-                    + "    \"t\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1000.0,%n"
+-                    + "      \"mean\" : 1000.0,%n"
+-                    + "      \"min\" : 1000.0,%n"
+-                    + "      \"p50\" : 1000.0,%n"
+-                    + "      \"p75\" : 1000.0,%n"
+-                    + "      \"p95\" : 1000.0,%n"
+-                    + "      \"p98\" : 1000.0,%n"
+-                    + "      \"p99\" : 1000.0,%n"
+-                    + "      \"p999\" : 1000.0,%n"
+-                    + "      \"stddev\" : 0.0,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 6.0E8,%n"
+-                    + "      \"duration_units\" : \"milliseconds\",%n"
+-                    + "      \"rate_units\" : \"calls/minute\"%n"
+-                    + "    }%n"
+-                    + "  }%n"
+-                    + "}"));
++            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 2.0E8,%n      \"units\" : \"events/minute\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1000.0,%n      \"mean\" : 1000.0,%n      \"min\" : 1000.0,%n      \"p50\" : 1000.0,%n      \"p75\" : 1000.0,%n      \"p95\" : 1000.0,%n      \"p98\" : 1000.0,%n      \"p99\" : 1000.0,%n      \"p999\" : 1000.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 6.0E8,%n      \"duration_units\" : \"milliseconds\",%n      \"rate_units\" : \"calls/minute\"%n    }%n  }%n%s",
++            "}".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+   }
+ }
 --- a/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/MetricsServletTest.java
 +++ b/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/MetricsServletTest.java
 @@ -1,11 +1,9 @@
@@ -12023,7 +12572,74 @@
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  
-@@ -224,48 +208,47 @@ class MetricsServletTest extends AbstractServletTest {
+@@ -159,113 +143,54 @@ class MetricsServletTest extends AbstractServletTest {
+     assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
+     assertThat(response.getContent())
+         .isEqualTo(
+-            String.format(
+-                "{%n"
+-                    + "  \"version\" : \"5.0.0\",%n"
+-                    + "  \"gauges\" : {%n"
+-                    + "    \"g1\" : {%n"
+-                    + "      \"value\" : 100%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"counters\" : {%n"
+-                    + "    \"c\" : {%n"
+-                    + "      \"count\" : 1%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"histograms\" : {%n"
+-                    + "    \"h\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1,%n"
+-                    + "      \"mean\" : 1.0,%n"
+-                    + "      \"min\" : 1,%n"
+-                    + "      \"p50\" : 1.0,%n"
+-                    + "      \"p75\" : 1.0,%n"
+-                    + "      \"p95\" : 1.0,%n"
+-                    + "      \"p98\" : 1.0,%n"
+-                    + "      \"p99\" : 1.0,%n"
+-                    + "      \"p999\" : 1.0,%n"
+-                    + "      \"stddev\" : 0.0%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"meters\" : {%n"
+-                    + "    \"m\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 3333333.3333333335,%n"
+-                    + "      \"units\" : \"events/second\"%n"
+-                    + "    }%n"
+-                    + "  },%n"
+-                    + "  \"timers\" : {%n"
+-                    + "    \"t\" : {%n"
+-                    + "      \"count\" : 1,%n"
+-                    + "      \"max\" : 1.0,%n"
+-                    + "      \"mean\" : 1.0,%n"
+-                    + "      \"min\" : 1.0,%n"
+-                    + "      \"p50\" : 1.0,%n"
+-                    + "      \"p75\" : 1.0,%n"
+-                    + "      \"p95\" : 1.0,%n"
+-                    + "      \"p98\" : 1.0,%n"
+-                    + "      \"p99\" : 1.0,%n"
+-                    + "      \"p999\" : 1.0,%n"
+-                    + "      \"stddev\" : 0.0,%n"
+-                    + "      \"m15_rate\" : 0.0,%n"
+-                    + "      \"m1_rate\" : 0.0,%n"
+-                    + "      \"m5_rate\" : 0.0,%n"
+-                    + "      \"mean_rate\" : 1.0E7,%n"
+-                    + "      \"duration_units\" : \"seconds\",%n"
+-                    + "      \"rate_units\" : \"calls/second\"%n"
+-                    + "    }%n"
+-                    + "  }%n"
+-                    + "}"));
++            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 3333333.3333333335,%n      \"units\" : \"events/second\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1.0,%n      \"mean\" : 1.0,%n      \"min\" : 1.0,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 1.0E7,%n      \"duration_units\" : \"seconds\",%n      \"rate_units\" : \"calls/second\"%n    }%n  }%n%s",
++            "}".formatted());
+     assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
+   }
  
    @Test
    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
@@ -12106,6 +12722,15 @@
    @Override
    protected void setUp(ServletTester tester) {
      tester.addServlet(PingServlet.class, "/ping");
+@@ -29,7 +29,7 @@ class PingServletTest extends AbstractServletTest {
+ 
+   @Test
+   void returnsPong() {
+-    assertThat(response.getContent()).isEqualTo(String.format("pong%n"));
++    assertThat(response.getContent()).isEqualTo("pong%n".formatted());
+   }
+ 
+   @Test
 --- a/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/ThreadDumpServletTest.java
 +++ b/metrics-servlets/src/test/java/io/dropwizard/metrics5/servlets/ThreadDumpServletTest.java
 @@ -7,7 +7,7 @@ import org.eclipse.jetty.servlet.ServletTester;

@@ -10,6 +10,19 @@
      protected TimeUnit parseTimeUnit(String value, TimeUnit defaultValue) {
          try {
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
+--- a/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadDumpTest.java
++++ b/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadDumpTest.java
+@@ -37,6 +37,10 @@ class ThreadDumpTest {
+         });
+     }
+ 
++    // XXX: The Refaster `StringFormatted` rule doesn't properly wrap the string concatenation,
++    // causing only the final `%n` occurrence to be replaced with a system line separator.
++    // See https://github.com/google/error-prone/issues/4866.
++    @SuppressWarnings("StringFormatted")
+     @Test
+     void dumpsAllThreads() {
+         final ByteArrayOutputStream output = new ByteArrayOutputStream();
 --- a/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 +++ b/metrics-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 @@ -188,6 +188,9 @@ public class MetricsServlet extends HttpServlet {
