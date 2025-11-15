@@ -123,11 +123,19 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Stream<Integer> testStreamFilterSorted() {
-    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted();
+    return Stream.of(1).filter(i -> i % 2 == 0).sorted();
   }
 
   Stream<Integer> testStreamFilterSortedWithComparator() {
-    return Stream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted(reverseOrder());
+    return Stream.of(1).filter(i -> i % 2 == 0).sorted(reverseOrder());
+  }
+
+  Stream<Integer> testStreamDistinctSorted() {
+    return Stream.of(1).distinct().sorted();
+  }
+
+  Stream<Integer> testStreamDistinctSortedWithComparator() {
+    return Stream.of(1).distinct().sorted(reverseOrder());
   }
 
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {
