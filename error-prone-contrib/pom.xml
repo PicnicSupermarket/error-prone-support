@@ -290,6 +290,11 @@
         </dependency>
         <dependency>
             <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <scope>provided</scope>
         </dependency>
