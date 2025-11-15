@@ -11,12 +11,6 @@ import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.stream.Collectors.joining;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
@@ -48,6 +42,10 @@ import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.Test
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Replacement;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
+import tools.jackson.core.StreamWriteFeature;
+import tools.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
+import tools.jackson.dataformat.yaml.YAMLMapper;
+import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 
 /**
  * A command line utility that produces configuration files for the Jekyll-based Error Prone Support
@@ -64,11 +62,9 @@ public record JekyllCollectionGenerator() {
       FileSystems.getDefault().getPathMatcher("glob:**/target/docs/*.json");
   private static final YAMLMapper YAML_MAPPER =
       YAMLMapper.builder()
-          .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET)
-          .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
-          .enable(YAMLGenerator.Feature.USE_PLATFORM_LINE_BREAKS)
+          .disable(StreamWriteFeature.AUTO_CLOSE_TARGET)
+          .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
           .propertyNamingStrategy(new SnakeCaseStrategy())
-          .visibility(PropertyAccessor.FIELD, Visibility.ANY)
           .build();
   @VisibleForTesting static final Path WEBSITE_ROOT = Path.of("website");
   @VisibleForTesting static final Path BUGPATTERNS_ROOT = WEBSITE_ROOT.resolve("_bugpatterns");
