@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -43,6 +45,22 @@ final class JacksonRules {
     @AfterTemplate
     Optional<JsonNode> after(JsonNode node, String fieldName) {
       return node.optional(fieldName);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectMapper#valueToTree(Object)} over more contrived and less efficient
+   * alternatives.
+   */
+  static final class ObjectMapperValueToTree {
+    @BeforeTemplate
+    JsonNode before(ObjectMapper objectMapper, Object object) throws JsonProcessingException {
+      return objectMapper.readTree(objectMapper.writeValueAsString(object));
+    }
+
+    @AfterTemplate
+    JsonNode after(ObjectMapper objectMapper, Object object) {
+      return objectMapper.valueToTree(object);
     }
   }
 }
