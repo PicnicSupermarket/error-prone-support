@@ -444,10 +444,13 @@ final class StringRules {
       return String.format(format, args);
     }
 
+    // XXX: Drop the unnecessary parentheses once Refaster automatically wraps string
+    // concatenations. See https://github.com/google/error-prone/issues/4866.
     @AfterTemplate
     @FormatMethod
+    @SuppressWarnings("UnnecessaryParentheses" /* Parentheses compensate for a Refaster bug. */)
     String after(String format, @Repeated Object args) {
-      return format.formatted(args);
+      return (format).formatted(args);
     }
   }
 }

@@ -849,7 +849,7 @@
          default:
            if (c < 32 || c == 127) { // Control characters and DEL
 -            escaped.append(String.format("\\u%04x", (int) c));
-+            escaped.append("\\u%04x".formatted((int) c));
++            escaped.append(("\\u%04x").formatted((int) c));
            } else {
              escaped.append(c);
            }
@@ -867,7 +867,7 @@
          default:
            if (c < 32 || c == 127) { // Control characters and DEL
 -            escaped.append(String.format("\\u%04x", (int) c));
-+            escaped.append("\\u%04x".formatted((int) c));
++            escaped.append(("\\u%04x").formatted((int) c));
            } else {
              escaped.append(c);
            }
@@ -1599,7 +1599,7 @@
      final StringBuilder builder = new StringBuilder();
      for (String line : lines) {
 -      builder.append(line).append(String.format("%n"));
-+      builder.append(line).append("%n".formatted());
++      builder.append(line).append(("%n").formatted());
      }
      return builder.toString();
    }
@@ -1711,7 +1711,7 @@
      final StringBuilder builder = new StringBuilder();
      for (String line : lines) {
 -      builder.append(line).append(String.format("%n"));
-+      builder.append(line).append("%n".formatted());
++      builder.append(line).append(("%n").formatted());
      }
      return builder.toString();
    }
@@ -3414,7 +3414,7 @@
      Map<String, String> manyTags = new HashMap<>();
      for (int i = 0; i < 100; i++) {
 -      manyTags.put("key" + String.format("%03d", i), "value" + i);
-+      manyTags.put("key" + "%03d".formatted(i), "value" + i);
++      manyTags.put("key" + ("%03d").formatted(i), "value" + i);
      }
  
      long startTime = System.currentTimeMillis();
@@ -4382,7 +4382,7 @@
      snapshot.dump(output);
  
 -    assertThat(output.toString()).isEqualTo(String.format("1%n2%n3%n4%n5%n"));
-+    assertThat(output).hasToString("1%n2%n3%n4%n5%n".formatted());
++    assertThat(output).hasToString(("1%n2%n3%n4%n5%n").formatted());
    }
  
    @Test
@@ -4587,7 +4587,7 @@
      snapshot.dump(output);
  
 -    assertThat(output.toString()).isEqualTo(String.format("1%n2%n3%n4%n5%n"));
-+    assertThat(output).hasToString("1%n2%n3%n4%n5%n".formatted());
++    assertThat(output).hasToString(("1%n2%n3%n4%n5%n").formatted());
    }
  
    @Test
@@ -5229,7 +5229,7 @@
       */
      public static Result healthy(String message, Object... args) {
 -      return healthy(String.format(message, args));
-+      return healthy(message.formatted(args));
++      return healthy((message).formatted(args));
      }
  
      /**
@@ -5238,7 +5238,7 @@
       */
      public static Result unhealthy(String message, Object... args) {
 -      return unhealthy(String.format(message, args));
-+      return unhealthy(message.formatted(args));
++      return unhealthy((message).formatted(args));
      }
  
      /**
@@ -5284,7 +5284,7 @@
       */
      public ResultBuilder withMessage(String message, Object... args) {
 -      return withMessage(String.format(message, args));
-+      return withMessage(message.formatted(args));
++      return withMessage((message).formatted(args));
      }
  
      /**
@@ -5893,7 +5893,7 @@
    void timerIsStoppedCorrectlyWithProvidedFutureCallbackFailed() throws Exception {
      // There should be nothing listening on this port
 -    HttpHost host = HttpHost.create(String.format("http://127.0.0.1:%d", findAvailableLocalPort()));
-+    HttpHost host = HttpHost.create("http://127.0.0.1:%d".formatted(findAvailableLocalPort()));
++    HttpHost host = HttpHost.create(("http://127.0.0.1:%d").formatted(findAvailableLocalPort()));
      HttpGet get = new HttpGet("/?q=something");
  
 -    FutureCallback<HttpResponse> futureCallback = mock(FutureCallback.class);
@@ -6469,7 +6469,7 @@
      cpuProfileServlet.init(config);
  
 -    pageContentTemplate = String.format(BASE_TEMPLATE, String.format(servletLinks.toString()));
-+    pageContentTemplate = BASE_TEMPLATE.formatted(servletLinks.toString().formatted());
++    pageContentTemplate = (BASE_TEMPLATE).formatted((servletLinks.toString()).formatted());
  
      this.metricsUri =
          getParam(context.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);
@@ -6506,28 +6506,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
-@@ -39,22 +39,8 @@ class AdminServletExclusionTest extends AbstractServletTest {
+@@ -39,8 +39,7 @@ class AdminServletExclusionTest extends AbstractServletTest {
      assertThat(response.getStatus()).isEqualTo(200);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
--                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
--                    + "<html>%n"
--                    + "<head>%n"
--                    + "  <title>Metrics</title>%n"
--                    + "</head>%n"
--                    + "<body>%n"
--                    + "  <h1>Operational Menu</h1>%n"
--                    + "  <ul>%n"
--                    + "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n"
--                    + "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n"
--                    + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
--                    + "  </ul>%n"
--                    + "</body>%n"
++            ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+                     + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+                     + "<html>%n"
+                     + "<head>%n"
+@@ -54,7 +53,8 @@ class AdminServletExclusionTest extends AbstractServletTest {
+                     + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
+                     + "  </ul>%n"
+                     + "</body>%n"
 -                    + "</html>%n"));
-+            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping\">Ping</a></li>%n    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n  </ul>%n</body>%n%s",
-+            "</html>%n".formatted());
++                    + "</html>%n")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
    }
  }
@@ -6542,31 +6537,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
-@@ -37,25 +37,8 @@ class AdminServletTest extends AbstractServletTest {
+@@ -37,8 +37,7 @@ class AdminServletTest extends AbstractServletTest {
      assertThat(response.getStatus()).isEqualTo(200);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
--                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
--                    + "<html>%n"
--                    + "<head>%n"
--                    + "  <title>Metrics</title>%n"
--                    + "</head>%n"
--                    + "<body>%n"
--                    + "  <h1>Operational Menu</h1>%n"
--                    + "  <ul>%n"
--                    + "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n"
--                    + "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n"
--                    + "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n"
--                    + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n"
--                    + "  </ul>%n"
--                    + "</body>%n"
++            ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+                     + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+                     + "<html>%n"
+                     + "<head>%n"
+@@ -55,7 +54,8 @@ class AdminServletTest extends AbstractServletTest {
+                     + "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n"
+                     + "  </ul>%n"
+                     + "</body>%n"
 -                    + "</html>%n"));
-+            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping\">Ping</a></li>%n    <li><a href=\"/context/admin/threads\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
-+            "</html>%n".formatted());
++                    + "</html>%n")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
    }
  }
@@ -6581,31 +6568,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
-@@ -42,25 +42,8 @@ class AdminServletUriTest extends AbstractServletTest {
+@@ -42,8 +42,7 @@ class AdminServletUriTest extends AbstractServletTest {
      assertThat(response.getStatus()).isEqualTo(200);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
--                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
--                    + "<html>%n"
--                    + "<head>%n"
--                    + "  <title>Metrics</title>%n"
--                    + "</head>%n"
--                    + "<body>%n"
--                    + "  <h1>Operational Menu</h1>%n"
--                    + "  <ul>%n"
--                    + "    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n"
--                    + "    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n"
--                    + "    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n"
--                    + "    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n"
--                    + "  </ul>%n"
--                    + "</body>%n"
++            ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+                     + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+                     + "<html>%n"
+                     + "<head>%n"
+@@ -60,7 +59,8 @@ class AdminServletUriTest extends AbstractServletTest {
+                     + "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n"
+                     + "  </ul>%n"
+                     + "</body>%n"
 -                    + "</html>%n"));
-+            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
-+            "</html>%n".formatted());
++                    + "</html>%n")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
    }
  }
@@ -6667,26 +6646,27 @@
    }
  
    @Test
-@@ -167,16 +164,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -167,8 +164,7 @@ class HealthCheckServletTest extends AbstractServletTest {
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "{%n"
--                    + "  \"fun\" : {%n"
--                    + "    \"healthy\" : true,%n"
--                    + "    \"message\" : \"foo bar 123\",%n"
--                    + "    \"duration\" : 0,%n"
--                    + "    \"timestamp\" : \""
--                    + EXPECTED_TIMESTAMP
--                    + "\""
++            ("{%n"
+                     + "  \"fun\" : {%n"
+                     + "    \"healthy\" : true,%n"
+                     + "    \"message\" : \"foo bar 123\",%n"
+@@ -176,7 +172,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+                     + "    \"timestamp\" : \""
+                     + EXPECTED_TIMESTAMP
+                     + "\""
 -                    + "%n  }%n}"));
-+            "{%n  \"fun\" : {%n    \"healthy\" : true,%n    \"message\" : \"foo bar 123\",%n    \"duration\" : 0,%n    \"timestamp\" : \"%s\"%s",
-+            EXPECTED_TIMESTAMP, "%n  }%n}".formatted());
++                    + "%n  }%n}")
++                .formatted());
    }
  
    private static HealthCheck.Result healthyResultWithMessage(String message) {
-@@ -197,23 +186,23 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -197,23 +194,23 @@ class HealthCheckServletTest extends AbstractServletTest {
  
    @Test
    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
@@ -6717,7 +6697,7 @@
      when(servletConfig.getServletContext()).thenReturn(servletContext);
      when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
          .thenReturn(healthCheckRegistry);
-@@ -221,32 +210,32 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -221,32 +218,32 @@ class HealthCheckServletTest extends AbstractServletTest {
      final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
      healthCheckServlet.init(servletConfig);
  
@@ -6779,72 +6759,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final String allowedOrigin = "some.other.origin";
  
-@@ -108,66 +108,8 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
+@@ -108,8 +108,7 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
      assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo(allowedOrigin);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "{%n"
--                    + "  \"version\" : \"5.0.0\",%n"
--                    + "  \"gauges\" : {%n"
--                    + "    \"g1\" : {%n"
--                    + "      \"value\" : 100%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"counters\" : {%n"
--                    + "    \"c\" : {%n"
--                    + "      \"count\" : 1%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"histograms\" : {%n"
--                    + "    \"h\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1,%n"
--                    + "      \"mean\" : 1.0,%n"
--                    + "      \"min\" : 1,%n"
--                    + "      \"p50\" : 1.0,%n"
--                    + "      \"p75\" : 1.0,%n"
--                    + "      \"p95\" : 1.0,%n"
--                    + "      \"p98\" : 1.0,%n"
--                    + "      \"p99\" : 1.0,%n"
--                    + "      \"p999\" : 1.0,%n"
--                    + "      \"stddev\" : 0.0%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"meters\" : {%n"
--                    + "    \"m\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 2.0E8,%n"
--                    + "      \"units\" : \"events/minute\"%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"timers\" : {%n"
--                    + "    \"t\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1000.0,%n"
--                    + "      \"mean\" : 1000.0,%n"
--                    + "      \"min\" : 1000.0,%n"
--                    + "      \"p50\" : 1000.0,%n"
--                    + "      \"p75\" : 1000.0,%n"
--                    + "      \"p95\" : 1000.0,%n"
--                    + "      \"p98\" : 1000.0,%n"
--                    + "      \"p99\" : 1000.0,%n"
--                    + "      \"p999\" : 1000.0,%n"
--                    + "      \"stddev\" : 0.0,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 6.0E8,%n"
--                    + "      \"duration_units\" : \"milliseconds\",%n"
--                    + "      \"rate_units\" : \"calls/minute\"%n"
--                    + "    }%n"
--                    + "  }%n"
++            ("{%n"
+                     + "  \"version\" : \"5.0.0\",%n"
+                     + "  \"gauges\" : {%n"
+                     + "    \"g1\" : {%n"
+@@ -167,7 +166,8 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
+                     + "      \"rate_units\" : \"calls/minute\"%n"
+                     + "    }%n"
+                     + "  }%n"
 -                    + "}"));
-+            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 2.0E8,%n      \"units\" : \"events/minute\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1000.0,%n      \"mean\" : 1000.0,%n      \"min\" : 1000.0,%n      \"p50\" : 1000.0,%n      \"p75\" : 1000.0,%n      \"p95\" : 1000.0,%n      \"p98\" : 1000.0,%n      \"p99\" : 1000.0,%n      \"p999\" : 1000.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 6.0E8,%n      \"duration_units\" : \"milliseconds\",%n      \"rate_units\" : \"calls/minute\"%n    }%n  }%n%s",
-+            "}".formatted());
++                    + "}")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  }
@@ -6899,72 +6830,23 @@
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  
-@@ -159,113 +143,54 @@ class MetricsServletTest extends AbstractServletTest {
+@@ -159,8 +143,7 @@ class MetricsServletTest extends AbstractServletTest {
      assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "{%n"
--                    + "  \"version\" : \"5.0.0\",%n"
--                    + "  \"gauges\" : {%n"
--                    + "    \"g1\" : {%n"
--                    + "      \"value\" : 100%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"counters\" : {%n"
--                    + "    \"c\" : {%n"
--                    + "      \"count\" : 1%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"histograms\" : {%n"
--                    + "    \"h\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1,%n"
--                    + "      \"mean\" : 1.0,%n"
--                    + "      \"min\" : 1,%n"
--                    + "      \"p50\" : 1.0,%n"
--                    + "      \"p75\" : 1.0,%n"
--                    + "      \"p95\" : 1.0,%n"
--                    + "      \"p98\" : 1.0,%n"
--                    + "      \"p99\" : 1.0,%n"
--                    + "      \"p999\" : 1.0,%n"
--                    + "      \"stddev\" : 0.0%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"meters\" : {%n"
--                    + "    \"m\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 3333333.3333333335,%n"
--                    + "      \"units\" : \"events/second\"%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"timers\" : {%n"
--                    + "    \"t\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1.0,%n"
--                    + "      \"mean\" : 1.0,%n"
--                    + "      \"min\" : 1.0,%n"
--                    + "      \"p50\" : 1.0,%n"
--                    + "      \"p75\" : 1.0,%n"
--                    + "      \"p95\" : 1.0,%n"
--                    + "      \"p98\" : 1.0,%n"
--                    + "      \"p99\" : 1.0,%n"
--                    + "      \"p999\" : 1.0,%n"
--                    + "      \"stddev\" : 0.0,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 1.0E7,%n"
--                    + "      \"duration_units\" : \"seconds\",%n"
--                    + "      \"rate_units\" : \"calls/second\"%n"
--                    + "    }%n"
--                    + "  }%n"
++            ("{%n"
+                     + "  \"version\" : \"5.0.0\",%n"
+                     + "  \"gauges\" : {%n"
+                     + "    \"g1\" : {%n"
+@@ -218,54 +201,54 @@ class MetricsServletTest extends AbstractServletTest {
+                     + "      \"rate_units\" : \"calls/second\"%n"
+                     + "    }%n"
+                     + "  }%n"
 -                    + "}"));
-+            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 3333333.3333333335,%n      \"units\" : \"events/second\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1.0,%n      \"mean\" : 1.0,%n      \"min\" : 1.0,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 1.0E7,%n      \"duration_units\" : \"seconds\",%n      \"rate_units\" : \"calls/second\"%n    }%n  }%n%s",
-+            "}".formatted());
++                    + "}")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  
@@ -7054,7 +6936,7 @@
    @Test
    void returnsPong() {
 -    assertThat(response.getContent()).isEqualTo(String.format("pong%n"));
-+    assertThat(response.getContent()).isEqualTo("pong%n".formatted());
++    assertThat(response.getContent()).isEqualTo(("pong%n").formatted());
    }
  
    @Test
@@ -7372,17 +7254,16 @@
        this.metricRegistry = registry;
      }
  
-@@ -190,8 +191,7 @@ public class InstrumentedResourceMethodApplicationListener
- 
+@@ -191,7 +192,7 @@ public class InstrumentedResourceMethodApplicationListener
      private Meter getResponseCodeMeter(int statusCode) {
        return responseCodeMeters.computeIfAbsent(
--          statusCode,
+           statusCode,
 -          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
-+          statusCode, sc -> metricRegistry.meter(metricName.resolve("%d-responses".formatted(sc))));
++          sc -> metricRegistry.meter(metricName.resolve(("%d-responses").formatted(sc))));
      }
    }
  
-@@ -305,9 +305,9 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -305,9 +306,9 @@ public class InstrumentedResourceMethodApplicationListener
                  : null;
  
          if (metric != null) {
@@ -7394,7 +7275,7 @@
              metric.meter.mark();
            }
          }
-@@ -418,14 +418,11 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -418,14 +419,11 @@ public class InstrumentedResourceMethodApplicationListener
  
    @Override
    public RequestEventListener onRequest(final RequestEvent event) {
@@ -7414,7 +7295,7 @@
    }
  
    private <T extends Annotation> T getClassLevelAnnotation(
-@@ -543,7 +540,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -543,7 +541,7 @@ public class InstrumentedResourceMethodApplicationListener
        final String... suffixes) {
      final Method definitionMethod = method.getInvocable().getDefinitionMethod();
      MetricName metricName;
@@ -7423,7 +7304,7 @@
        metricName =
            absolute
                ? MetricRegistry.name(explicitName)
-@@ -604,8 +601,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -604,8 +602,7 @@ public class InstrumentedResourceMethodApplicationListener
      @Override
      public int hashCode() {
        int result = type.hashCode();
@@ -7887,17 +7768,16 @@
        this.metricRegistry = registry;
      }
  
-@@ -191,8 +192,7 @@ public class InstrumentedResourceMethodApplicationListener
- 
+@@ -192,7 +193,7 @@ public class InstrumentedResourceMethodApplicationListener
      private Meter getResponseCodeMeter(int statusCode) {
        return responseCodeMeters.computeIfAbsent(
--          statusCode,
+           statusCode,
 -          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
-+          statusCode, sc -> metricRegistry.meter(metricName.resolve("%d-responses".formatted(sc))));
++          sc -> metricRegistry.meter(metricName.resolve(("%d-responses").formatted(sc))));
      }
    }
  
-@@ -306,9 +306,9 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -306,9 +307,9 @@ public class InstrumentedResourceMethodApplicationListener
                  : null;
  
          if (metric != null) {
@@ -7909,7 +7789,7 @@
              metric.meter.mark();
            }
          }
-@@ -419,14 +419,11 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -419,14 +420,11 @@ public class InstrumentedResourceMethodApplicationListener
  
    @Override
    public RequestEventListener onRequest(final RequestEvent event) {
@@ -7929,7 +7809,7 @@
    }
  
    private <T extends Annotation> T getClassLevelAnnotation(
-@@ -544,7 +541,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -544,7 +542,7 @@ public class InstrumentedResourceMethodApplicationListener
        final String... suffixes) {
      final Method definitionMethod = method.getInvocable().getDefinitionMethod();
      MetricName metricName;
@@ -7938,7 +7818,7 @@
        metricName =
            absolute ? name(explicitName) : name(definitionMethod.getDeclaringClass(), explicitName);
      } else {
-@@ -602,8 +599,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -602,8 +600,7 @@ public class InstrumentedResourceMethodApplicationListener
      @Override
      public int hashCode() {
        int result = type.hashCode();
@@ -8465,17 +8345,16 @@
        this.metricRegistry = registry;
      }
  
-@@ -191,8 +192,7 @@ public class InstrumentedResourceMethodApplicationListener
- 
+@@ -192,7 +193,7 @@ public class InstrumentedResourceMethodApplicationListener
      private Meter getResponseCodeMeter(int statusCode) {
        return responseCodeMeters.computeIfAbsent(
--          statusCode,
+           statusCode,
 -          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
-+          statusCode, sc -> metricRegistry.meter(metricName.resolve("%d-responses".formatted(sc))));
++          sc -> metricRegistry.meter(metricName.resolve(("%d-responses").formatted(sc))));
      }
    }
  
-@@ -306,9 +306,9 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -306,9 +307,9 @@ public class InstrumentedResourceMethodApplicationListener
                  : null;
  
          if (metric != null) {
@@ -8487,7 +8366,7 @@
              metric.meter.mark();
            }
          }
-@@ -419,14 +419,11 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -419,14 +420,11 @@ public class InstrumentedResourceMethodApplicationListener
  
    @Override
    public RequestEventListener onRequest(final RequestEvent event) {
@@ -8507,7 +8386,7 @@
    }
  
    private <T extends Annotation> T getClassLevelAnnotation(
-@@ -544,7 +541,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -544,7 +542,7 @@ public class InstrumentedResourceMethodApplicationListener
        final String... suffixes) {
      final Method definitionMethod = method.getInvocable().getDefinitionMethod();
      MetricName metricName;
@@ -8516,7 +8395,7 @@
        metricName =
            absolute ? name(explicitName) : name(definitionMethod.getDeclaringClass(), explicitName);
      } else {
-@@ -602,8 +599,7 @@ public class InstrumentedResourceMethodApplicationListener
+@@ -602,8 +600,7 @@ public class InstrumentedResourceMethodApplicationListener
      @Override
      public int hashCode() {
        int result = type.hashCode();
@@ -9074,7 +8953,7 @@
      if (responseCodeMeters != null) {
        responseCodeMeters.keySet().stream()
 -          .map(sc -> getMetricPrefix().resolve(String.format("%d-responses", sc)))
-+          .map(sc -> getMetricPrefix().resolve("%d-responses".formatted(sc)))
++          .map(sc -> getMetricPrefix().resolve(("%d-responses").formatted(sc)))
            .forEach(metricRegistry::remove);
      }
  
@@ -9083,7 +8962,7 @@
      return responseCodeMeters.computeIfAbsent(
          statusCode,
 -        sc -> metricRegistry.meter(getMetricPrefix().resolve(String.format("%d-responses", sc))));
-+        sc -> metricRegistry.meter(getMetricPrefix().resolve("%d-responses".formatted(sc))));
++        sc -> metricRegistry.meter(getMetricPrefix().resolve(("%d-responses").formatted(sc))));
    }
  
    private MetricName getMetricPrefix() {
@@ -9135,7 +9014,7 @@
    private Meter getResponseCodeMeter(int statusCode) {
      return responseCodeMeters.computeIfAbsent(
 -        statusCode, sc -> metricRegistry.meter(prefix.resolve(String.format("%d-responses", sc))));
-+        statusCode, sc -> metricRegistry.meter(prefix.resolve("%d-responses".formatted(sc))));
++        statusCode, sc -> metricRegistry.meter(prefix.resolve(("%d-responses").formatted(sc))));
    }
  
    private Timer requestTimer(String method) {
@@ -9334,7 +9213,7 @@
      if (responseCodeMeters != null) {
        responseCodeMeters.keySet().stream()
 -          .map(sc -> getMetricPrefix().resolve(String.format("%d-responses", sc)))
-+          .map(sc -> getMetricPrefix().resolve("%d-responses".formatted(sc)))
++          .map(sc -> getMetricPrefix().resolve(("%d-responses").formatted(sc)))
            .forEach(metricRegistry::remove);
      }
      super.doStop();
@@ -9343,7 +9222,7 @@
      return responseCodeMeters.computeIfAbsent(
          statusCode,
 -        sc -> metricRegistry.meter(getMetricPrefix().resolve(String.format("%d-responses", sc))));
-+        sc -> metricRegistry.meter(getMetricPrefix().resolve("%d-responses".formatted(sc))));
++        sc -> metricRegistry.meter(getMetricPrefix().resolve(("%d-responses").formatted(sc))));
    }
  
    private class AsyncAttachingListener implements AsyncListener {
@@ -9395,7 +9274,7 @@
    private Meter getResponseCodeMeter(int statusCode) {
      return responseCodeMeters.computeIfAbsent(
 -        statusCode, sc -> metricRegistry.meter(prefix.resolve(String.format("%d-responses", sc))));
-+        statusCode, sc -> metricRegistry.meter(prefix.resolve("%d-responses".formatted(sc))));
++        statusCode, sc -> metricRegistry.meter(prefix.resolve(("%d-responses").formatted(sc))));
    }
  
    private Timer requestTimer(String method) {
@@ -9887,7 +9766,7 @@
      if (responseCodeMeters != null) {
        responseCodeMeters.keySet().stream()
 -          .map(sc -> getMetricPrefix().resolve(String.format("%d-responses", sc)))
-+          .map(sc -> getMetricPrefix().resolve("%d-responses".formatted(sc)))
++          .map(sc -> getMetricPrefix().resolve(("%d-responses").formatted(sc)))
            .forEach(metricRegistry::remove);
      }
      super.doStop();
@@ -9896,7 +9775,7 @@
      return responseCodeMeters.computeIfAbsent(
          statusCode,
 -        sc -> metricRegistry.meter(getMetricPrefix().resolve(String.format("%d-responses", sc))));
-+        sc -> metricRegistry.meter(getMetricPrefix().resolve("%d-responses".formatted(sc))));
++        sc -> metricRegistry.meter(getMetricPrefix().resolve(("%d-responses").formatted(sc))));
    }
  
    protected MetricName getMetricPrefix() {
@@ -10486,7 +10365,7 @@
          final StringBuilder stackTrace = new StringBuilder();
          for (StackTraceElement element : info.getStackTrace()) {
 -          stackTrace.append("\t at ").append(element.toString()).append(String.format("%n"));
-+          stackTrace.append("\t at ").append(element).append("%n".formatted());
++          stackTrace.append("\t at ").append(element).append(("%n").formatted());
          }
  
          deadlocks.add(
@@ -10496,7 +10375,7 @@
 -                info.getLockName(),
 -                info.getLockOwnerName(),
 -                stackTrace.toString()));
-+            "%s locked on %s (owned by %s):%n%s"
++            ("%s locked on %s (owned by %s):%n%s")
 +                .formatted(
 +                    info.getThreadName(),
 +                    info.getLockName(),
@@ -10814,17 +10693,24 @@
  
    @BeforeEach
    void setUp() {
-@@ -43,8 +43,8 @@ class ThreadDumpTest {
+@@ -39,12 +39,12 @@ class ThreadDumpTest {
      final ByteArrayOutputStream output = new ByteArrayOutputStream();
      threadDump.dump(output);
  
 -    assertThat(output.toString())
 -        .isEqualTo(
+-            String.format(
+-                "\"runnable\" id=100 state=RUNNABLE%n"
 +    assertThat(output)
 +        .hasToString(
-             String.format(
-                 "\"runnable\" id=100 state=RUNNABLE%n"
++            ("\"runnable\" id=100 state=RUNNABLE%n"
                      + "    at Blah.blee(Blah.java:100)%n"
+                     + "%n"
+-                    + "%n"));
++                    + "%n")
++                .formatted());
+   }
+ }
 --- a/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadStatesGaugeSetTest.java
 +++ b/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadStatesGaugeSetTest.java
 @@ -10,22 +10,21 @@ import java.lang.management.ThreadInfo;
@@ -12178,7 +12064,7 @@
      cpuProfileServlet.init(config);
  
 -    pageContentTemplate = String.format(BASE_TEMPLATE, String.format(servletLinks.toString()));
-+    pageContentTemplate = BASE_TEMPLATE.formatted(servletLinks.toString().formatted());
++    pageContentTemplate = (BASE_TEMPLATE).formatted((servletLinks.toString()).formatted());
  
      this.metricsUri =
          getParam(context.getInitParameter(METRICS_URI_PARAM_KEY), DEFAULT_METRICS_URI);
@@ -12215,31 +12101,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
-@@ -37,25 +37,8 @@ class AdminServletTest extends AbstractServletTest {
+@@ -37,8 +37,7 @@ class AdminServletTest extends AbstractServletTest {
      assertThat(response.getStatus()).isEqualTo(200);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
--                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
--                    + "<html>%n"
--                    + "<head>%n"
--                    + "  <title>Metrics</title>%n"
--                    + "</head>%n"
--                    + "<body>%n"
--                    + "  <h1>Operational Menu</h1>%n"
--                    + "  <ul>%n"
--                    + "    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n"
--                    + "    <li><a href=\"/context/admin/ping\">Ping</a></li>%n"
--                    + "    <li><a href=\"/context/admin/threads\">Threads</a></li>%n"
--                    + "    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n"
--                    + "  </ul>%n"
--                    + "</body>%n"
++            ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+                     + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+                     + "<html>%n"
+                     + "<head>%n"
+@@ -55,7 +54,8 @@ class AdminServletTest extends AbstractServletTest {
+                     + "    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n"
+                     + "  </ul>%n"
+                     + "</body>%n"
 -                    + "</html>%n"));
-+            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping\">Ping</a></li>%n    <li><a href=\"/context/admin/threads\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
-+            "</html>%n".formatted());
++                    + "</html>%n")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
    }
  }
@@ -12254,31 +12132,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final HealthCheckRegistry healthCheckRegistry = new HealthCheckRegistry();
  
-@@ -42,25 +42,8 @@ class AdminServletUriTest extends AbstractServletTest {
+@@ -42,8 +42,7 @@ class AdminServletUriTest extends AbstractServletTest {
      assertThat(response.getStatus()).isEqualTo(200);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
--                    + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
--                    + "<html>%n"
--                    + "<head>%n"
--                    + "  <title>Metrics</title>%n"
--                    + "</head>%n"
--                    + "<body>%n"
--                    + "  <h1>Operational Menu</h1>%n"
--                    + "  <ul>%n"
--                    + "    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n"
--                    + "    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n"
--                    + "    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n"
--                    + "    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n"
--                    + "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n"
--                    + "  </ul>%n"
--                    + "</body>%n"
++            ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n"
+                     + "        \"http://www.w3.org/TR/html4/loose.dtd\">%n"
+                     + "<html>%n"
+                     + "<head>%n"
+@@ -60,7 +59,8 @@ class AdminServletUriTest extends AbstractServletTest {
+                     + "    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n"
+                     + "  </ul>%n"
+                     + "</body>%n"
 -                    + "</html>%n"));
-+            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"%n        \"http://www.w3.org/TR/html4/loose.dtd\">%n<html>%n<head>%n  <title>Metrics</title>%n</head>%n<body>%n  <h1>Operational Menu</h1>%n  <ul>%n    <li><a href=\"/context/admin/metrics-test?pretty=true\">Metrics</a></li>%n    <li><a href=\"/context/admin/ping-test\">Ping</a></li>%n    <li><a href=\"/context/admin/threads-test\">Threads</a></li>%n    <li><a href=\"/context/admin/healthcheck-test?pretty=true\">Healthcheck</a></li>%n    <li><a href=\"/context/admin/pprof-test\">CPU Profile</a></li>%n    <li><a href=\"/context/admin/pprof-test?state=blocked\">CPU Contention</a></li>%n  </ul>%n</body>%n%s",
-+            "</html>%n".formatted());
++                    + "</html>%n")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("text/html;charset=UTF-8");
    }
  }
@@ -12340,26 +12210,27 @@
    }
  
    @Test
-@@ -167,16 +164,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -167,8 +164,7 @@ class HealthCheckServletTest extends AbstractServletTest {
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "{%n"
--                    + "  \"fun\" : {%n"
--                    + "    \"healthy\" : true,%n"
--                    + "    \"message\" : \"foo bar 123\",%n"
--                    + "    \"duration\" : 0,%n"
--                    + "    \"timestamp\" : \""
--                    + EXPECTED_TIMESTAMP
--                    + "\""
++            ("{%n"
+                     + "  \"fun\" : {%n"
+                     + "    \"healthy\" : true,%n"
+                     + "    \"message\" : \"foo bar 123\",%n"
+@@ -176,7 +172,8 @@ class HealthCheckServletTest extends AbstractServletTest {
+                     + "    \"timestamp\" : \""
+                     + EXPECTED_TIMESTAMP
+                     + "\""
 -                    + "%n  }%n}"));
-+            "{%n  \"fun\" : {%n    \"healthy\" : true,%n    \"message\" : \"foo bar 123\",%n    \"duration\" : 0,%n    \"timestamp\" : \"%s\"%s",
-+            EXPECTED_TIMESTAMP, "%n  }%n}".formatted());
++                    + "%n  }%n}")
++                .formatted());
    }
  
    private static HealthCheck.Result healthyResultWithMessage(String message) {
-@@ -197,23 +186,23 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -197,23 +194,23 @@ class HealthCheckServletTest extends AbstractServletTest {
  
    @Test
    void constructorWithRegistryAsArgumentIsUsedInPreferenceOverServletConfig() throws Exception {
@@ -12390,7 +12261,7 @@
      when(servletConfig.getServletContext()).thenReturn(servletContext);
      when(servletContext.getAttribute(HealthCheckServlet.HEALTH_CHECK_REGISTRY))
          .thenReturn(healthCheckRegistry);
-@@ -221,32 +210,32 @@ class HealthCheckServletTest extends AbstractServletTest {
+@@ -221,32 +218,32 @@ class HealthCheckServletTest extends AbstractServletTest {
      final HealthCheckServlet healthCheckServlet = new HealthCheckServlet(null);
      healthCheckServlet.init(servletConfig);
  
@@ -12452,72 +12323,23 @@
    private final MetricRegistry registry = new MetricRegistry();
    private final String allowedOrigin = "some.other.origin";
  
-@@ -108,66 +108,8 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
+@@ -108,8 +108,7 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
      assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo(allowedOrigin);
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "{%n"
--                    + "  \"version\" : \"5.0.0\",%n"
--                    + "  \"gauges\" : {%n"
--                    + "    \"g1\" : {%n"
--                    + "      \"value\" : 100%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"counters\" : {%n"
--                    + "    \"c\" : {%n"
--                    + "      \"count\" : 1%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"histograms\" : {%n"
--                    + "    \"h\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1,%n"
--                    + "      \"mean\" : 1.0,%n"
--                    + "      \"min\" : 1,%n"
--                    + "      \"p50\" : 1.0,%n"
--                    + "      \"p75\" : 1.0,%n"
--                    + "      \"p95\" : 1.0,%n"
--                    + "      \"p98\" : 1.0,%n"
--                    + "      \"p99\" : 1.0,%n"
--                    + "      \"p999\" : 1.0,%n"
--                    + "      \"stddev\" : 0.0%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"meters\" : {%n"
--                    + "    \"m\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 2.0E8,%n"
--                    + "      \"units\" : \"events/minute\"%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"timers\" : {%n"
--                    + "    \"t\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1000.0,%n"
--                    + "      \"mean\" : 1000.0,%n"
--                    + "      \"min\" : 1000.0,%n"
--                    + "      \"p50\" : 1000.0,%n"
--                    + "      \"p75\" : 1000.0,%n"
--                    + "      \"p95\" : 1000.0,%n"
--                    + "      \"p98\" : 1000.0,%n"
--                    + "      \"p99\" : 1000.0,%n"
--                    + "      \"p999\" : 1000.0,%n"
--                    + "      \"stddev\" : 0.0,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 6.0E8,%n"
--                    + "      \"duration_units\" : \"milliseconds\",%n"
--                    + "      \"rate_units\" : \"calls/minute\"%n"
--                    + "    }%n"
--                    + "  }%n"
++            ("{%n"
+                     + "  \"version\" : \"5.0.0\",%n"
+                     + "  \"gauges\" : {%n"
+                     + "    \"g1\" : {%n"
+@@ -167,7 +166,8 @@ class MetricsServletContextListenerTest extends AbstractServletTest {
+                     + "      \"rate_units\" : \"calls/minute\"%n"
+                     + "    }%n"
+                     + "  }%n"
 -                    + "}"));
-+            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 2.0E8,%n      \"units\" : \"events/minute\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1000.0,%n      \"mean\" : 1000.0,%n      \"min\" : 1000.0,%n      \"p50\" : 1000.0,%n      \"p75\" : 1000.0,%n      \"p95\" : 1000.0,%n      \"p98\" : 1000.0,%n      \"p99\" : 1000.0,%n      \"p999\" : 1000.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 6.0E8,%n      \"duration_units\" : \"milliseconds\",%n      \"rate_units\" : \"calls/minute\"%n    }%n  }%n%s",
-+            "}".formatted());
++                    + "}")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  }
@@ -12572,72 +12394,23 @@
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  
-@@ -159,113 +143,54 @@ class MetricsServletTest extends AbstractServletTest {
+@@ -159,8 +143,7 @@ class MetricsServletTest extends AbstractServletTest {
      assertThat(response.get("Access-Control-Allow-Origin")).isEqualTo("*");
      assertThat(response.getContent())
          .isEqualTo(
 -            String.format(
 -                "{%n"
--                    + "  \"version\" : \"5.0.0\",%n"
--                    + "  \"gauges\" : {%n"
--                    + "    \"g1\" : {%n"
--                    + "      \"value\" : 100%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"counters\" : {%n"
--                    + "    \"c\" : {%n"
--                    + "      \"count\" : 1%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"histograms\" : {%n"
--                    + "    \"h\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1,%n"
--                    + "      \"mean\" : 1.0,%n"
--                    + "      \"min\" : 1,%n"
--                    + "      \"p50\" : 1.0,%n"
--                    + "      \"p75\" : 1.0,%n"
--                    + "      \"p95\" : 1.0,%n"
--                    + "      \"p98\" : 1.0,%n"
--                    + "      \"p99\" : 1.0,%n"
--                    + "      \"p999\" : 1.0,%n"
--                    + "      \"stddev\" : 0.0%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"meters\" : {%n"
--                    + "    \"m\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 3333333.3333333335,%n"
--                    + "      \"units\" : \"events/second\"%n"
--                    + "    }%n"
--                    + "  },%n"
--                    + "  \"timers\" : {%n"
--                    + "    \"t\" : {%n"
--                    + "      \"count\" : 1,%n"
--                    + "      \"max\" : 1.0,%n"
--                    + "      \"mean\" : 1.0,%n"
--                    + "      \"min\" : 1.0,%n"
--                    + "      \"p50\" : 1.0,%n"
--                    + "      \"p75\" : 1.0,%n"
--                    + "      \"p95\" : 1.0,%n"
--                    + "      \"p98\" : 1.0,%n"
--                    + "      \"p99\" : 1.0,%n"
--                    + "      \"p999\" : 1.0,%n"
--                    + "      \"stddev\" : 0.0,%n"
--                    + "      \"m15_rate\" : 0.0,%n"
--                    + "      \"m1_rate\" : 0.0,%n"
--                    + "      \"m5_rate\" : 0.0,%n"
--                    + "      \"mean_rate\" : 1.0E7,%n"
--                    + "      \"duration_units\" : \"seconds\",%n"
--                    + "      \"rate_units\" : \"calls/second\"%n"
--                    + "    }%n"
--                    + "  }%n"
++            ("{%n"
+                     + "  \"version\" : \"5.0.0\",%n"
+                     + "  \"gauges\" : {%n"
+                     + "    \"g1\" : {%n"
+@@ -218,54 +201,54 @@ class MetricsServletTest extends AbstractServletTest {
+                     + "      \"rate_units\" : \"calls/second\"%n"
+                     + "    }%n"
+                     + "  }%n"
 -                    + "}"));
-+            "{%n  \"version\" : \"5.0.0\",%n  \"gauges\" : {%n    \"g1\" : {%n      \"value\" : 100%n    }%n  },%n  \"counters\" : {%n    \"c\" : {%n      \"count\" : 1%n    }%n  },%n  \"histograms\" : {%n    \"h\" : {%n      \"count\" : 1,%n      \"max\" : 1,%n      \"mean\" : 1.0,%n      \"min\" : 1,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0%n    }%n  },%n  \"meters\" : {%n    \"m\" : {%n      \"count\" : 1,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 3333333.3333333335,%n      \"units\" : \"events/second\"%n    }%n  },%n  \"timers\" : {%n    \"t\" : {%n      \"count\" : 1,%n      \"max\" : 1.0,%n      \"mean\" : 1.0,%n      \"min\" : 1.0,%n      \"p50\" : 1.0,%n      \"p75\" : 1.0,%n      \"p95\" : 1.0,%n      \"p98\" : 1.0,%n      \"p99\" : 1.0,%n      \"p999\" : 1.0,%n      \"stddev\" : 0.0,%n      \"m15_rate\" : 0.0,%n      \"m1_rate\" : 0.0,%n      \"m5_rate\" : 0.0,%n      \"mean_rate\" : 1.0E7,%n      \"duration_units\" : \"seconds\",%n      \"rate_units\" : \"calls/second\"%n    }%n  }%n%s",
-+            "}".formatted());
++                    + "}")
++                .formatted());
      assertThat(response.get(HttpHeader.CONTENT_TYPE)).isEqualTo("application/json");
    }
  
@@ -12727,7 +12500,7 @@
    @Test
    void returnsPong() {
 -    assertThat(response.getContent()).isEqualTo(String.format("pong%n"));
-+    assertThat(response.getContent()).isEqualTo("pong%n".formatted());
++    assertThat(response.getContent()).isEqualTo(("pong%n").formatted());
    }
  
    @Test
