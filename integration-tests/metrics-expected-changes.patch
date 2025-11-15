@@ -10814,25 +10814,17 @@
  
    @BeforeEach
    void setUp() {
-@@ -39,12 +39,11 @@ class ThreadDumpTest {
+@@ -42,8 +42,8 @@ class ThreadDumpTest {
      final ByteArrayOutputStream output = new ByteArrayOutputStream();
      threadDump.dump(output);
  
 -    assertThat(output.toString())
 -        .isEqualTo(
--            String.format(
--                "\"runnable\" id=100 state=RUNNABLE%n"
--                    + "    at Blah.blee(Blah.java:100)%n"
--                    + "%n"
--                    + "%n"));
 +    assertThat(output)
 +        .hasToString(
-+            "\"runnable\" id=100 state=RUNNABLE%n"
-+                + "    at Blah.blee(Blah.java:100)%n"
-+                + "%n"
-+                + "%n".formatted());
-   }
- }
+             String.format(
+                 "\"runnable\" id=100 state=RUNNABLE%n"
+                     + "    at Blah.blee(Blah.java:100)%n"
 --- a/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadStatesGaugeSetTest.java
 +++ b/metrics-jvm/src/test/java/io/dropwizard/metrics5/jvm/ThreadStatesGaugeSetTest.java
 @@ -10,22 +10,21 @@ import java.lang.management.ThreadInfo;
