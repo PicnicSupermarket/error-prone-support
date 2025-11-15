@@ -36,6 +36,7 @@ jobs:
             rubygems.org:443
             securityscorecards.dev:443
             sonarcloud.io:443
+            www.arcmutate.com:443
             www.baeldung.com:443
             www.bestpractices.dev:443
             www.youtube.com:443
