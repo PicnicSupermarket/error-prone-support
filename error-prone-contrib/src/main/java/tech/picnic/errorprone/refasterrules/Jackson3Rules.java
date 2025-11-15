@@ -6,6 +6,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /** Refaster rules related to Jackson 3.x expressions and statements. */
 @OnlineDocumentation
@@ -43,6 +44,22 @@ final class Jackson3Rules {
     @AfterTemplate
     Optional<JsonNode> after(JsonNode node, String fieldName) {
       return node.optional(fieldName);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectMapper#valueToTree(Object)} over more contrived and less efficient
+   * alternatives.
+   */
+  static final class ObjectMapperValueToTree {
+    @BeforeTemplate
+    JsonNode before(ObjectMapper objectMapper, Object object) {
+      return objectMapper.readTree(objectMapper.writeValueAsString(object));
+    }
+
+    @AfterTemplate
+    JsonNode after(ObjectMapper objectMapper, Object object) {
+      return objectMapper.valueToTree(object);
     }
   }
 }

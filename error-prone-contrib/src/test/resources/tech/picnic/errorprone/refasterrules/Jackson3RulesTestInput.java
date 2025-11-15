@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.NullNode;
 
 final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
@@ -21,5 +22,9 @@ final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
         NullNode.getInstance().path("bar").asOptional(),
         Optional.of(NullNode.getInstance().get("baz")),
         Optional.ofNullable(NullNode.getInstance().get("qux")));
+  }
+
+  JsonNode testObjectMapperValueToTree() {
+    return new ObjectMapper().readTree(new ObjectMapper().writeValueAsString("foo"));
   }
 }
