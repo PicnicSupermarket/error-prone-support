@@ -243,9 +243,8 @@ public record JekyllCollectionGenerator() {
           // XXX: Derive tags from input (or drop this feature).
           ImmutableList.of("Simplification"),
           // XXX: Derive source location from input.
-          String.format(
-              "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java",
-              name),
+          "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java"
+              .formatted(name),
           createRefasterRule(inputTests, outputTests));
     }
 
