@@ -261,8 +261,25 @@ jobs:
               return;
             }
 
-            // XXX: Consider backing off if the comment has most recently been
-            // edited by another user.
+            const commentNode = await github.graphql(
+              `query ($id: ID!) {
+                 node(id: $id) {
+                   ... on IssueComment {
+                     editor {
+                       login
+                     }
+                   }
+                 }
+               }`,
+              { id: existing.node_id },
+            );
+
+            const lastEditor = commentNode.node.editor?.login;
+            if (lastEditor !== existing.user.login) {
+              core.info(`Skipping update because comment was last edited by ${lastEditor}.`);
+              return;
+            }
+
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
