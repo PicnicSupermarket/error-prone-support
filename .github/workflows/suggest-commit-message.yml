@@ -261,6 +261,7 @@ jobs:
               return;
             }
 
+            // Determine who, if anybody, last edited the existing comment.
             const commentNode = await github.graphql(
               `query ($id: ID!) {
                  node(id: $id) {
@@ -274,12 +275,13 @@ jobs:
               { id: existing.node_id },
             );
 
-            const originalCommenter = existing.user.login;
-            const workflowEditors = [originalCommenter, 'github-actions', 'github-actions[bot]'];
-            const lastEditor = commentNode.node.editor?.login;
-            if (lastEditor && !workflowEditors.includes(lastEditor)) {
+            // If another user last edited the comment, skip the update. Note that the `[bot]` suffix is stripped
+            // because it does not seem to be present consistently.
+            const originalCommenter = existing.user.login.replace(/\[bot\]$/, '');
+            const lastEditor = commentNode.node.editor?.login?.replace(/\[bot\]$/, '');
+            if (lastEditor && lastEditor !== originalCommenter) {
               core.info(
-                `Skipping update because comment was last edited by ${lastEditor} rather than an allowed editor (${workflowEditors.join(', ')}).`,
+                `Skipping update because comment was last edited by ${lastEditor} rather than ${originalCommenter}.`,
               );
               return;
             }
