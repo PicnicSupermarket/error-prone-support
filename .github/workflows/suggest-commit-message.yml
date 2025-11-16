@@ -274,10 +274,13 @@ jobs:
               { id: existing.node_id },
             );
 
-            const workflowUser = existing.user.login;
+            const originalCommenter = existing.user.login;
+            const workflowEditors = [originalCommenter, 'github-actions', 'github-actions[bot]'];
             const lastEditor = commentNode.node.editor?.login;
-            if (lastEditor !== workflowUser) {
-              core.info(`Skipping update because comment was last edited by ${lastEditor} rather than ${workflowUser}.`);
+            if (lastEditor && !workflowEditors.includes(lastEditor)) {
+              core.info(
+                `Skipping update because comment was last edited by ${lastEditor} rather than an allowed editor (${workflowEditors.join(', ')}).`,
+              );
               return;
             }
 
@@ -287,4 +290,4 @@ jobs:
               comment_id: existing.id,
               body: commentBody,
             });
-            core.info(`Updated comment ${existing.id}.`);
+            core.info(`Updated comment ${existing.id} by ${originalCommenter}.`);
