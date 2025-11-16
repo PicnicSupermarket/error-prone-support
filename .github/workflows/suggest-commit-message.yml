@@ -122,7 +122,8 @@ jobs:
             You are an experienced maintainer helping to craft the squash commit message for PR #${prNumber} in the PicnicSupermarket/error-prone-support repository.
 
             Requirements:
-            1. Write the summary line in the imperative mood. Keep it at or below 72 characters.
+            1. Write the summary line in the imperative mood. Try not to exceed 80 characters.
+            2. End the summary line with the PR number in parentheses, i.e., " (#${prNumber})".
             2. Wrap each body paragraph at 72 characters. Focus on the "what" and "why" rather than implementation details.
             3. Keep the overall message concise.
             4. Match the established format used in similar past commits.
@@ -130,6 +131,7 @@ jobs:
             6. For dependency upgrades in particular, *very precisely* follow the pattern of past commit messages: reuse the summary wording (only adjust version numbers) and list updated changelog, release note, and diff URLs in the body.
             7. Don't hallucinate URLs, version numbers, or other factual information.
             8. Never split URLs across multiple lines, even if they exceed 72 characters.
+            9. If the pull request description already contains a suitable commit message, prefer using that as-is.
 
             Some further guidelines to help you craft good upgrade commit messages:
             - Unless highly salient, don't summarize code changes made as part of the upgrade.
@@ -227,9 +229,7 @@ jobs:
             const prNumber = process.env.PR_NUMBER;
             const codexResult = JSON.parse(process.env.CODEX_RESULT);
 
-            // The PR summary may or may not already include the PR number;
-            // ensure that the correct number is present exactly once.
-            const summary = codexResult.summary.trim().replace(/(\s+\(#\d+\))*$/, ` (#${prNumber})`);
+            const summary = codexResult.summary.trim();
             const body = codexResult.body.trim();
             const commitMessage = body ? `${summary}\n\n${body}` : summary;
 
