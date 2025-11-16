@@ -274,9 +274,10 @@ jobs:
               { id: existing.node_id },
             );
 
+            const workflowUser = existing.user.login;
             const lastEditor = commentNode.node.editor?.login;
-            if (lastEditor !== existing.user.login) {
-              core.info(`Skipping update because comment was last edited by ${lastEditor}.`);
+            if (lastEditor !== workflowUser) {
+              core.info(`Skipping update because comment was last edited by ${lastEditor} rather than ${workflowUser}.`);
               return;
             }
 
