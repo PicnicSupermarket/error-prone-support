@@ -111,9 +111,11 @@ jobs:
 
             const diffStat = git(['diff', '--name-status', `${baseSha}...${headSha}`]) || '<no changed files>';
             const diffExcerpt = git(['diff', '--unified=3', `${baseSha}...${headSha}`], 500) || '<no diff>';
-            const recentCommits = git(['log', '--pretty=format:%h %s', '-n', '100']) || '<no recent commits available>';
-            const upgradeExamples =
-              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %s%n%b%n---', '-n', '100']) ||
+            const nonUpgradeCommits =
+              git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '100', 'origin/HEAD']) ||
+              '<no non-upgrade commits found>';
+            const upgradeCommits =
+              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '100', 'origin/HEAD']) ||
               '<no upgrade commits found>';
 
             const cleanedBody = (body || '').trim() || '<no pull request description>';
@@ -147,6 +149,7 @@ jobs:
             - When the Maven \u0060version.error-prone-orig\u0060 property is changed, this upgrades both Error Prone and Picnic's Error Prone fork. In this case:
               1. Make sure that the commit message includes a diff URL for the latter.
               2. Don't explicitly mention that \u0060version.error-prone-orig\u0060 got changed; just focus on the fact that Error Prone is being upgraded.
+            - If the example upgrade commits shown below don't include at least one upgrade of the same dependency being upgraded in this pull request, check the full Git history to find relevant past upgrade commit messages to mimic.
 
             Return a JSON object with the following shape:
             {
@@ -173,19 +176,19 @@ jobs:
             ${diffStat}
             \u0060\u0060\u0060
 
-            Diff excerpt (\u0060git diff --unified=3 ${baseSha}...${headSha}\u0060, truncated to 500 lines when necessary):
+            Diff excerpt (\u0060git diff --unified=3 ${baseSha}...${headSha}\u0060, truncated to 500 lines if necessary):
             \u0060\u0060\u0060
             ${diffExcerpt}
             \u0060\u0060\u0060
 
-            Recent commit history (\u0060git log --pretty='format:%h %s' -n 100\u0060):
+            Recent non-upgrade commits examples (\u0060git log --grep '^Upgrade' --invert-grep --pretty='format:%h %B%n---' -n 100\u0060):
             \u0060\u0060\u0060
-            ${recentCommits}
+            ${nonUpgradeCommits}
             \u0060\u0060\u0060
 
-            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %s%n%b%n---' -n 100\u0060):
+            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %B%n---' -n 100\u0060):
             \u0060\u0060\u0060
-            ${upgradeExamples}
+            ${upgradeCommits}
             \u0060\u0060\u0060
             `;
 
