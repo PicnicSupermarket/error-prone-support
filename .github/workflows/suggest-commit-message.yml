@@ -112,10 +112,10 @@ jobs:
             const diffStat = git(['diff', '--name-status', `${baseSha}...${headSha}`]) || '<no changed files>';
             const diffExcerpt = git(['diff', '--unified=3', `${baseSha}...${headSha}`], 500) || '<no diff>';
             const nonUpgradeCommits =
-              git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '100', 'origin/HEAD']) ||
+              git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '100', 'master']) ||
               '<no non-upgrade commits found>';
             const upgradeCommits =
-              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '100', 'origin/HEAD']) ||
+              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '100', 'master']) ||
               '<no upgrade commits found>';
 
             const cleanedBody = (body || '').trim() || '<no pull request description>';
