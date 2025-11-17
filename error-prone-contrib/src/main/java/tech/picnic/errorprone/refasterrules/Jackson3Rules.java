@@ -1,18 +1,17 @@
 package tech.picnic.errorprone.refasterrules;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Optional;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
-/** Refaster rules related to Jackson expressions and statements. */
+/** Refaster rules related to Jackson 3.x expressions and statements. */
 @OnlineDocumentation
-final class JacksonRules {
-  private JacksonRules() {}
+final class Jackson3Rules {
+  private Jackson3Rules() {}
 
   /** Prefer {@link JsonNode#optional(int)} over more contrived alternatives. */
   static final class JsonNodeOptionalInt {
@@ -54,7 +53,7 @@ final class JacksonRules {
    */
   static final class ObjectMapperValueToTree {
     @BeforeTemplate
-    JsonNode before(ObjectMapper objectMapper, Object object) throws JsonProcessingException {
+    JsonNode before(ObjectMapper objectMapper, Object object) {
       return objectMapper.readTree(objectMapper.writeValueAsString(object));
     }
 
