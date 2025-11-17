@@ -31,7 +31,7 @@ final class AssertJEnumerableRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     void before(
         ObjectEnumerableAssert<?, E> enumAssert,
         @Matches(IsEmpty.class) Iterable<? extends E> emptyIterable) {

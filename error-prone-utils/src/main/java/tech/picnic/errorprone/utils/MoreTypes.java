@@ -114,7 +114,7 @@ public final class MoreTypes {
   }
 
   /**
-   * Creates an unbound wildcard type ({@code ?}).
+   * Creates an unbounded wildcard type ({@code ?}).
    *
    * @return A supplier which returns the described type.
    */
