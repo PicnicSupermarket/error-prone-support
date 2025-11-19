@@ -1936,6 +1936,38 @@ final class ReactorRules {
   }
 
   /**
+   * Apply {@link Flux#distinct()} before {@link Flux#sort()} to reduce the number of elements to
+   * sort.
+   */
+  static final class FluxDistinctSort<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return flux.sort().distinct();
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux.distinct().sort();
+    }
+  }
+
+  /**
+   * Apply {@link Flux#distinct()} before {@link Flux#sort(Comparator)} to reduce the number of
+   * elements to sort.
+   */
+  static final class FluxDistinctSortWithComparator<S, T extends S> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Comparator<S> comparator) {
+      return flux.sort(comparator).distinct();
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Comparator<S> comparator) {
+      return flux.distinct().sort(comparator);
+    }
+  }
+
+  /**
    * Do not unnecessarily {@link Flux#filter(Predicate) filter} the result of {@link
    * Flux#takeWhile(Predicate)} using the same {@link Predicate}.
    */
