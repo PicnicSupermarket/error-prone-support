@@ -73,6 +73,7 @@ final class RefasterRulesTest {
           MapRules.class,
           MicrometerRules.class,
           MockitoRules.class,
+          MongoDBRules.class,
           MultimapRules.class,
           NullRules.class,
           OptionalRules.class,
