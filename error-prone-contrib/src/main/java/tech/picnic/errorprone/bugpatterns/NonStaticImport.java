@@ -144,7 +144,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "newInstance",
           "of",
           "parse",
-          "valueOf");
+          "valueOf",
+          "values");
 
   /** Instantiates a new {@link NonStaticImport} instance. */
   public NonStaticImport() {}
