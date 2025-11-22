@@ -149,9 +149,13 @@ jobs:
               3. Finally, provide the full diff link.
             - If the upgrade involves multiple dependencies, group the links by dependency.
             - When the Maven \u0060version.error-prone-orig\u0060 property is changed, this upgrades both Error Prone and Picnic's Error Prone fork. In this case:
-              1. Make sure that the commit message includes a diff URL for the latter.
-              2. Don't explicitly mention that \u0060version.error-prone-orig\u0060 got changed; just focus on the fact that Error Prone is being upgraded.
+              - Make sure that the commit message includes a diff URL for the latter.
+              - Don't explicitly mention that \u0060version.error-prone-orig\u0060 got changed; just focus on the fact that Error Prone is being upgraded.
             - If the example upgrade commits shown below don't include at least one upgrade of the same dependency being upgraded in this pull request, check the full Git history to find relevant past upgrade commit messages to mimic.
+            - For major and minor version upgrades, check past dependency upgrade commit messages to infer blog or wiki URLs to which to link. Do this for at least the following libraries:
+              - Jackson
+              - Spring
+              - Spring Boot
 
             Return a JSON object with the following shape:
             {
