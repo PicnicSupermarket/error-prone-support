@@ -154,6 +154,6 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         String.format("Constant"),
         String.format("Number: %d", 42),
-        String.format("%s %s", "foo", "bar"));
+        String.format("%s" + "%s", "foo", "bar"));
   }
 }
