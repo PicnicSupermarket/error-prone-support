@@ -142,6 +142,14 @@ jobs:
             - Don't bother linking to anchors within changelogs or release notes; just link to the main page.
             - For GitHub-hosted projects, always link to all relevant GitHub release pages, including those for intermediate versions.
               - This includes milestones and release candidates; if necessary, use the GitHub API to identify these.
+              - Libraries that often use milestone and release candidates include, but are not limited to, the following:
+                - Jackson
+                - JUnit
+                - Micrometer
+                - Project Reactor
+                - Spring Framework
+                - Spring Boot
+                - Spring Security
             - For GitHub-hosted projects, always link to the full diff between versions.
             - Enumerate links in the following order:
               1. First, link to custom release note documents.
@@ -152,10 +160,11 @@ jobs:
               - Make sure that the commit message includes a diff URL for the latter.
               - Don't explicitly mention that \u0060version.error-prone-orig\u0060 got changed; just focus on the fact that Error Prone is being upgraded.
             - If the example upgrade commits shown below don't include at least one upgrade of the same dependency being upgraded in this pull request, check the full Git history to find relevant past upgrade commit messages to mimic.
-            - For major and minor version upgrades, check past dependency upgrade commit messages to infer blog or wiki URLs to which to link. Do this for at least the following libraries:
+            - For major and minor version upgrades, check past dependency upgrade commit messages to infer documentation, blog or wiki URLs to which to link. Do this for at least the following libraries:
               - Jackson
-              - Spring
+              - Spring Framework
               - Spring Boot
+              - Spring Security
 
             Return a JSON object with the following shape:
             {
