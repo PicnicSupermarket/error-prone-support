@@ -1,0 +1,313 @@
+name: Suggest PR commit message
+on:
+  pull_request:
+    types:
+      - edited
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number of interest
+        required: true
+        type: number
+permissions:
+  contents: read
+concurrency:
+  group: suggest-commit-message-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+  cancel-in-progress: true
+jobs:
+  suggest:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    environment: codex
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        with:
+          # We can't disable `sudo`, as `openai/codex-action` unconditionally
+          # invokes `sudo`. That step does disable `sudo` for itself and
+          # subsequent steps.
+          # XXX: Consider splitting this workflow into two jobs, with
+          # `openai/codex-action` being the first step of the second job.
+          disable-sudo-and-containers: false
+          # XXX: Change to `egress-policy: block` once we better understand
+          # whether Codex attempts to access arbitrary URLs.
+          egress-policy: audit
+      - name: Resolve pull request metadata
+        id: pr-details
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = Number(context.payload.pull_request?.number ?? context.payload.inputs?.pr_number);
+            if (!Number.isFinite(prNumber) || prNumber <= 0) {
+              throw new Error('Unable to determine pull request number');
+            }
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            core.setOutput('number', String(pr.number));
+            core.setOutput('title', pr.title ?? '');
+            core.setOutput('body', pr.body ?? '');
+            core.setOutput('author', pr.user?.login ?? '');
+            core.setOutput('baseRef', pr.base.ref ?? '');
+            core.setOutput('baseSha', pr.base.sha ?? '');
+            core.setOutput('headRef', pr.head.ref ?? '');
+            core.setOutput('headSha', pr.head.sha ?? '');
+      - name: Check out pull request head
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: ${{ steps.pr-details.outputs.headSha }}
+          fetch-depth: 0
+      - name: Prepare Codex prompt
+        id: prompt
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ steps.pr-details.outputs.number }}
+          PR_TITLE: ${{ steps.pr-details.outputs.title }}
+          PR_BODY: ${{ steps.pr-details.outputs.body }}
+          PR_AUTHOR: ${{ steps.pr-details.outputs.author }}
+          BASE_REF: ${{ steps.pr-details.outputs.baseRef }}
+          BASE_SHA: ${{ steps.pr-details.outputs.baseSha }}
+          HEAD_REF: ${{ steps.pr-details.outputs.headRef }}
+          HEAD_SHA: ${{ steps.pr-details.outputs.headSha }}
+        with:
+          script: |
+            const { execFileSync } = require('child_process');
+            const fs = require('fs');
+
+            const git = (args, limit) => {
+              const output = execFileSync('git', args, { encoding: 'utf8' }).trim();
+              if (!limit || !output) {
+                return output;
+              }
+
+              const lines = output.split(/\r?\n/);
+              if (lines.length <= limit) {
+                return output;
+              }
+
+              const truncated = lines.slice(0, limit).join('\n');
+              return `${truncated}\n... (${limit} of ${lines.length} lines shown)`;
+            };
+
+            const env = process.env;
+            const repository = env.REPOSITORY;
+            const prNumber = env.PR_NUMBER;
+            const title = env.PR_TITLE;
+            const body = env.PR_BODY;
+            const author = env.PR_AUTHOR;
+            const baseRef = env.BASE_REF;
+            const baseSha = env.BASE_SHA;
+            const headRef = env.HEAD_REF;
+            const headSha = env.HEAD_SHA;
+
+            const diffStat = git(['diff', '--name-status', `${baseSha}...${headSha}`]) || '<no changed files>';
+            const diffExcerpt = git(['diff', '--unified=3', `${baseSha}...${headSha}`], 500) || '<no diff>';
+            const nonUpgradeCommits =
+              git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '50', baseSha]) ||
+              '<no non-upgrade commits found>';
+            const upgradeCommits =
+              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '150', baseSha]) ||
+              '<no upgrade commits found>';
+
+            const cleanedBody = (body || '').trim() || '<no pull request description>';
+
+            const instructions = `
+            You are an experienced maintainer helping to craft the squash commit message for PR #${prNumber} in the ${repository} repository.
+
+            Requirements:
+            1. Write the summary line in the imperative mood. Try not to exceed 80 characters.
+            2. End the summary line with the PR number in parentheses, i.e., " (#${prNumber})".
+            3. Wrap each body paragraph at 72 characters. Focus on the "what" and "why" rather than implementation details.
+            4. Keep the overall message concise.
+            5. Match the established format used in similar past commits.
+            6. Wrap code references in backticks.
+            7. For dependency upgrades in particular, *very precisely* follow the pattern of past commit messages: reuse the summary wording (only adjust version numbers) and list updated changelog, release note, and diff URLs in the body.
+            8. Don't hallucinate URLs, version numbers, or other factual information.
+            9. Never split URLs across multiple lines, even if they exceed 72 characters.
+            10. If the pull request description already contains a suitable commit message, prefer using that as-is.
+
+            Some further guidelines to help you craft good upgrade commit messages:
+            - Unless highly salient, don't summarize code changes made as part of the upgrade.
+            - Don't bother linking to anchors within changelogs or release notes; just link to the main page.
+            - For GitHub-hosted projects, always link to all relevant GitHub release pages, including those for intermediate versions.
+              - This includes milestones and release candidates; if necessary, use the GitHub API to identify these.
+              - Libraries that often use milestone and release candidates include, but are not limited to:
+                - Jackson
+                - JUnit
+                - Micrometer
+                - Project Reactor
+                - Spring Framework
+                - Spring Boot
+                - Spring Security
+            - For GitHub-hosted projects, always link to the full diff between versions.
+            - Enumerate links in the following order:
+              1. First, link to custom release note documents.
+              2. Then list all GitHub release links in ascending order.
+              3. Finally, provide the full diff link.
+            - If the upgrade involves multiple dependencies, group the links by dependency.
+            - When the Maven \u0060version.error-prone-orig\u0060 property is changed, this upgrades both Error Prone and Picnic's Error Prone fork. In this case:
+              - Make sure that the commit message includes a diff URL for the latter.
+              - Don't explicitly mention that \u0060version.error-prone-orig\u0060 got changed; just focus on the fact that Error Prone is being upgraded.
+            - If the example upgrade commits shown below don't include at least one upgrade of the same dependency being upgraded in this pull request, check the full Git history to find relevant past upgrade commit messages to mimic.
+            - For major and minor version upgrades, check past dependency upgrade commit messages to infer documentation, blog or wiki URLs to which to link. Do this for at least the following libraries:
+              - Jackson
+              - Spring Framework
+              - Spring Boot
+              - Spring Security
+
+            Return a JSON object with the following shape:
+            {
+              "summary": "<summary line>",
+              "body": "<commit body with paragraphs wrapped at 72 characters, or empty string>"
+            }
+
+            Ensure the JSON is valid. Do not include additional commentary outside the JSON structure.
+
+            Pull request metadata:
+            - Number: ${prNumber}
+            - Title: ${title}
+            - Author: ${author}
+            - Base branch: ${baseRef} (${baseSha})
+            - Head branch: ${headRef} (${headSha})
+
+            Pull request description:
+            \u0060\u0060\u0060
+            ${cleanedBody}
+            \u0060\u0060\u0060
+
+            Changed files (\u0060git diff --name-status ${baseSha}...${headSha}\u0060):
+            \u0060\u0060\u0060
+            ${diffStat}
+            \u0060\u0060\u0060
+
+            Diff excerpt (\u0060git diff --unified=3 ${baseSha}...${headSha}\u0060, truncated to 500 lines if necessary):
+            \u0060\u0060\u0060
+            ${diffExcerpt}
+            \u0060\u0060\u0060
+
+            Recent non-upgrade commits examples (\u0060git log --grep '^Upgrade' --invert-grep --pretty='format:%h %B%n---' -n 50\u0060):
+            \u0060\u0060\u0060
+            ${nonUpgradeCommits}
+            \u0060\u0060\u0060
+
+            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %B%n---' -n 150\u0060):
+            \u0060\u0060\u0060
+            ${upgradeCommits}
+            \u0060\u0060\u0060
+            `;
+
+            const promptPath = '/tmp/codex-prompt-suggest-commit-message.md';
+            fs.writeFileSync(promptPath, instructions.trim() + '\n', { encoding: 'utf8' });
+      - name: Suggest commit message with Codex
+        id: codex
+        uses: openai/codex-action@02e7b2943818fbac9f077c3d1249a198ab358352 # v1.2
+        with:
+          # XXX: Consider whether to set `safety-strategy: read-only`. In some
+          # cases the agent may be able to suggest a better commit message by
+          # following links or otherwise looking up information online. See
+          # also the `egress-policy` discussion further up.
+          sandbox: read-only
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          prompt-file: /tmp/codex-prompt-suggest-commit-message.md
+          output-schema: |
+            {
+              "type": "object",
+              "properties": {
+                "summary": {
+                  "type": "string",
+                  "description": "Summary line in imperative mood, preferably at most 72 characters"
+                },
+                "body": {
+                  "type": "string",
+                  "description": "Commit message body explaining what and why, wrapped at 72 characters"
+                }
+              },
+              "required": ["summary", "body"],
+              "additionalProperties": false
+            }
+      - name: Upsert pull request comment
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          PR_NUMBER: ${{ steps.pr-details.outputs.number }}
+          CODEX_RESULT: ${{ steps.codex.outputs.final-message }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = process.env.PR_NUMBER;
+            const codexResult = JSON.parse(process.env.CODEX_RESULT);
+
+            const summary = codexResult.summary.trim();
+            const body = codexResult.body.trim();
+            const commitMessage = body ? `${summary}\n\n${body}` : summary;
+
+            // The comment to be upserted includes a hidden marker to identify it.
+            const marker = '<!-- codex-suggested-commit-message -->';
+            const commentBody = `Suggested commit message:\n${marker}\n\n\u0060\u0060\u0060\n${commitMessage}\n\u0060\u0060\u0060\n`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+
+            const existing = comments.find((comment) => comment.body?.includes(marker));
+            if (!existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody,
+              });
+              core.info('Created new commit message suggestion comment.');
+              return;
+            }
+
+            if (existing.body === commentBody) {
+              core.info('Existing comment already up to date.');
+              return;
+            }
+
+            // Determine who, if anybody, last edited the existing comment.
+            const commentNode = await github.graphql(
+              `query ($id: ID!) {
+                 node(id: $id) {
+                   ... on IssueComment {
+                     editor {
+                       login
+                     }
+                   }
+                 }
+               }`,
+              { id: existing.node_id },
+            );
+
+            // If another user last edited the comment, skip the update. Note that the `[bot]` suffix is stripped
+            // because it does not seem to be present consistently.
+            const originalCommenter = existing.user.login.replace(/\[bot\]$/, '');
+            const lastEditor = commentNode.node.editor?.login?.replace(/\[bot\]$/, '');
+            if (lastEditor && lastEditor !== originalCommenter) {
+              core.info(
+                `Skipping update because comment was last edited by ${lastEditor} rather than ${originalCommenter}.`,
+              );
+              return;
+            }
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: existing.id,
+              body: commentBody,
+            });
+            core.info(`Updated comment ${existing.id} by ${originalCommenter}.`);
