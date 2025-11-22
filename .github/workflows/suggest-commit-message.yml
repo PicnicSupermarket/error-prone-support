@@ -114,10 +114,10 @@ jobs:
             const diffStat = git(['diff', '--name-status', `${baseSha}...${headSha}`]) || '<no changed files>';
             const diffExcerpt = git(['diff', '--unified=3', `${baseSha}...${headSha}`], 500) || '<no diff>';
             const nonUpgradeCommits =
-              git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '100', baseSha]) ||
+              git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '50', baseSha]) ||
               '<no non-upgrade commits found>';
             const upgradeCommits =
-              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '100', baseSha]) ||
+              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '50', baseSha]) ||
               '<no upgrade commits found>';
 
             const cleanedBody = (body || '').trim() || '<no pull request description>';
@@ -142,7 +142,7 @@ jobs:
             - Don't bother linking to anchors within changelogs or release notes; just link to the main page.
             - For GitHub-hosted projects, always link to all relevant GitHub release pages, including those for intermediate versions.
               - This includes milestones and release candidates; if necessary, use the GitHub API to identify these.
-              - Libraries that often use milestone and release candidates include, but are not limited to, the following:
+              - Libraries that often use milestone and release candidates include, but are not limited to:
                 - Jackson
                 - JUnit
                 - Micrometer
@@ -196,12 +196,12 @@ jobs:
             ${diffExcerpt}
             \u0060\u0060\u0060
 
-            Recent non-upgrade commits examples (\u0060git log --grep '^Upgrade' --invert-grep --pretty='format:%h %B%n---' -n 100\u0060):
+            Recent non-upgrade commits examples (\u0060git log --grep '^Upgrade' --invert-grep --pretty='format:%h %B%n---' -n 50\u0060):
             \u0060\u0060\u0060
             ${nonUpgradeCommits}
             \u0060\u0060\u0060
 
-            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %B%n---' -n 100\u0060):
+            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %B%n---' -n 50\u0060):
             \u0060\u0060\u0060
             ${upgradeCommits}
             \u0060\u0060\u0060
