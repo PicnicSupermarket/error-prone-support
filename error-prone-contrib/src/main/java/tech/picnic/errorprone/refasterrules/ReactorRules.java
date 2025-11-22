@@ -1658,11 +1658,23 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#onErrorComplete()} over more contrived alternatives. */
-  static final class MonoOnErrorComplete<T> {
+  /**
+   * Prefer {@link Mono#onErrorComplete()} over more contrived alternatives, and don't chain it with
+   * redundant calls to {@link Mono#doOnError}.
+   */
+  static final class MonoOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono) {
-      return mono.onErrorResume(e -> Mono.empty());
+    Mono<T> before(
+        Mono<T> mono,
+        Consumer<? super Throwable> onThrowable,
+        Class<E> clazz,
+        Consumer<? super E> onError,
+        Predicate<? super Throwable> predicate) {
+      return Refaster.anyOf(
+          mono.onErrorResume(e -> Mono.empty()),
+          mono.onErrorComplete().doOnError(onThrowable),
+          mono.onErrorComplete().doOnError(clazz, onError),
+          mono.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
     @AfterTemplate
@@ -1671,11 +1683,23 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete()} over more contrived alternatives. */
-  static final class FluxOnErrorComplete<T> {
+  /**
+   * Prefer {@link Flux#onErrorComplete()} over more contrived alternatives, and don't chain it with
+   * redundant calls to {@link Flux#doOnError}.
+   */
+  static final class FluxOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux) {
-      return flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty()));
+    Flux<T> before(
+        Flux<T> flux,
+        Consumer<? super Throwable> onThrowable,
+        Class<E> clazz,
+        Consumer<? super E> onError,
+        Predicate<? super Throwable> predicate) {
+      return Refaster.anyOf(
+          flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty())),
+          flux.onErrorComplete().doOnError(onThrowable),
+          flux.onErrorComplete().doOnError(clazz, onError),
+          flux.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
     @AfterTemplate
