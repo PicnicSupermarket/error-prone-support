@@ -117,7 +117,7 @@ jobs:
               git(['log', '--grep', '^Upgrade', '--invert-grep', '--pretty=format:%h %B%n---', '-n', '50', baseSha]) ||
               '<no non-upgrade commits found>';
             const upgradeCommits =
-              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '50', baseSha]) ||
+              git(['log', '--grep', '^Upgrade', '--pretty=format:%h %B%n---', '-n', '150', baseSha]) ||
               '<no upgrade commits found>';
 
             const cleanedBody = (body || '').trim() || '<no pull request description>';
@@ -201,7 +201,7 @@ jobs:
             ${nonUpgradeCommits}
             \u0060\u0060\u0060
 
-            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %B%n---' -n 50\u0060):
+            Recent upgrade commit examples (\u0060git log --grep '^Upgrade' --pretty='format:%h %B%n---' -n 150\u0060):
             \u0060\u0060\u0060
             ${upgradeCommits}
             \u0060\u0060\u0060
