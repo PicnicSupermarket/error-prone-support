@@ -203,7 +203,6 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
-        <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.44.0</version.error-prone-orig>
@@ -289,7 +288,7 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
-                <version>${version.auto-value}</version>
+                <version>1.11.1</version>
             </dependency>
             <!-- XXX: When compiling with JDK 23+, JSR-305 (meta-)annotation
             usage by dependencies, such as Project Reactor, triggers NullAway
