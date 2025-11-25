@@ -2803,6 +2803,15 @@
  import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
  import com.puppycrawl.tools.checkstyle.Checker;
  import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+@@ -113,7 +115,7 @@ public abstract class AbstractItModuleTestSupport extends AbstractPathTestSuppor
+     final Configuration result;
+     final List<Configuration> configs = getModuleConfigs(masterConfig, moduleName);
+     if (configs.size() == 1) {
+-      result = configs.get(0);
++      result = configs.getFirst();
+     } else if (configs.isEmpty()) {
+       throw new IllegalStateException("no instances of the Module was found: " + moduleName);
+     } else if (moduleId == null) {
 @@ -401,8 +403,7 @@ public abstract class AbstractItModuleTestSupport extends AbstractPathTestSuppor
  
      // process each of the lines
@@ -12865,6 +12874,15 @@
  import org.antlr.v4.runtime.BufferedTokenStream;
  import org.antlr.v4.runtime.CommonTokenStream;
  import org.antlr.v4.runtime.ParserRuleContext;
+@@ -175,7 +176,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+   public DetailAstImpl visitTypeDeclaration(JavaLanguageParser.TypeDeclarationContext ctx) {
+     final DetailAstImpl typeDeclaration;
+     if (ctx.type == null) {
+-      typeDeclaration = create(ctx.semi.get(0));
++      typeDeclaration = create(ctx.semi.getFirst());
+       ctx.semi
+           .subList(1, ctx.semi.size())
+           .forEach(semi -> addLastSibling(typeDeclaration, create(semi)));
 @@ -780,7 +781,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
      final DetailAstImpl dummyNode = new DetailAstImpl();
      // Since the TYPE AST is built by visitAnnotationMethodOrConstantRest(), we skip it
@@ -12894,6 +12912,15 @@
  
      methodCall.addChild(expressionList);
      methodCall.addChild(create((Token) ctx.RPAREN().getPayload()));
+@@ -1529,7 +1528,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
+     }
+ 
+     if (binOpList.isEmpty()) {
+-      final DetailAstImpl leftChild = visit(ctx.children.get(0));
++      final DetailAstImpl leftChild = visit(ctx.children.getFirst());
+       bop.addChild(leftChild);
+     } else {
+       // Map all descendants to individual AST's since we can parallelize this
 @@ -1537,7 +1536,7 @@ public final class JavaAstVisitor extends JavaLanguageParserBaseVisitor<DetailAs
        final Queue<DetailAstImpl> descendantList =
            binOpList.parallelStream()
@@ -13028,15 +13055,42 @@
  import org.apache.commons.logging.Log;
  import org.apache.commons.logging.LogFactory;
  import picocli.CommandLine;
-@@ -285,7 +285,7 @@ public final class Main {
+@@ -281,28 +281,28 @@ public final class Main {
+     // create config helper object
+     if (options.printAst) {
+       // print AST
+-      final File file = filesToProcess.get(0);
++      final File file = filesToProcess.getFirst();
        final String stringAst =
            AstTreeStringPrinter.printFileAst(file, JavaParser.Options.WITHOUT_COMMENTS);
        System.out.print(stringAst);
 -    } else if (Objects.nonNull(options.xpath)) {
+-      final String branch = XpathUtil.printXpathBranch(options.xpath, filesToProcess.get(0));
 +    } else if (options.xpath != null) {
-       final String branch = XpathUtil.printXpathBranch(options.xpath, filesToProcess.get(0));
++      final String branch = XpathUtil.printXpathBranch(options.xpath, filesToProcess.getFirst());
        System.out.print(branch);
      } else if (options.printAstWithComments) {
+-      final File file = filesToProcess.get(0);
++      final File file = filesToProcess.getFirst();
+       final String stringAst =
+           AstTreeStringPrinter.printFileAst(file, JavaParser.Options.WITH_COMMENTS);
+       System.out.print(stringAst);
+     } else if (options.printJavadocTree) {
+-      final File file = filesToProcess.get(0);
++      final File file = filesToProcess.getFirst();
+       final String stringAst = DetailNodeTreeStringPrinter.printFileAst(file);
+       System.out.print(stringAst);
+     } else if (options.printTreeWithJavadoc) {
+-      final File file = filesToProcess.get(0);
++      final File file = filesToProcess.getFirst();
+       final String stringAst = AstTreeStringPrinter.printJavaAndJavadocTree(file);
+       System.out.print(stringAst);
+     } else if (hasSuppressionLineColumnNumber) {
+-      final File file = filesToProcess.get(0);
++      final File file = filesToProcess.getFirst();
+       final String stringSuppressions =
+           SuppressionsStringPrinter.printSuppressions(
+               file, options.suppressionLineColumnNumber, options.tabWidth);
 @@ -813,7 +813,7 @@ public final class Main {
                .map(File::getAbsolutePath)
                .map(Pattern::quote)
@@ -13659,6 +13713,17 @@
          && Objects.equals(moduleId, violation.moduleId)
          && Objects.equals(key, violation.key)
          && Objects.equals(bundle, violation.bundle)
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/AvoidEscapedUnicodeCharactersCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/AvoidEscapedUnicodeCharactersCheck.java
+@@ -312,7 +312,7 @@ public class AvoidEscapedUnicodeCharactersCheck extends AbstractCheck {
+     } else {
+       final List<TextBlock> commentList = blockComments.get(lineNo);
+       if (commentList != null) {
+-        final TextBlock comment = commentList.get(commentList.size() - 1);
++        final TextBlock comment = commentList.getLast();
+         final int[] codePoints = getLineCodePoints(lineNo - 1);
+         result = isTrailingBlockComment(comment, codePoints);
+       }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/LineSeparatorOption.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/LineSeparatorOption.java
 @@ -19,7 +19,8 @@
@@ -14110,6 +14175,17 @@
    }
  
    /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleStringLiteralsCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleStringLiteralsCheck.java
+@@ -184,7 +184,7 @@ public class MultipleStringLiteralsCheck extends AbstractCheck {
+     for (Map.Entry<String, List<DetailAST>> stringListEntry : stringMap.entrySet()) {
+       final List<DetailAST> hits = stringListEntry.getValue();
+       if (hits.size() > allowedDuplicates) {
+-        final DetailAST firstFinding = hits.get(0);
++        final DetailAST firstFinding = hits.getFirst();
+         final String recurringString =
+             ALL_NEW_LINES.matcher(stringListEntry.getKey()).replaceAll("\\\\n");
+         log(firstFinding, MSG_KEY, recurringString, hits.size());
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheck.java
 @@ -19,6 +19,7 @@
@@ -14165,6 +14241,53 @@
    }
  
    /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/VariableDeclarationUsageDistanceCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/VariableDeclarationUsageDistanceCheck.java
+@@ -297,7 +297,7 @@ public class VariableDeclarationUsageDistanceCheck extends AbstractCheck {
+       // If variable usage exists in a single scope, then look into
+       // this scope and count distance until variable usage.
+       if (variableUsageExpressions.size() == 1) {
+-        final DetailAST blockWithVariableUsage = variableUsageExpressions.get(0);
++        final DetailAST blockWithVariableUsage = variableUsageExpressions.getFirst();
+         currentScopeAst =
+             switch (blockWithVariableUsage.getType()) {
+               case TokenTypes.VARIABLE_DEF, TokenTypes.EXPR -> {
+@@ -325,7 +325,7 @@ public class VariableDeclarationUsageDistanceCheck extends AbstractCheck {
+       // distance until variable first usage.
+       else {
+         dist++;
+-        variableUsageAst = variableUsageExpressions.get(0);
++        variableUsageAst = variableUsageExpressions.getFirst();
+       }
+     }
+     return new SimpleEntry<>(variableUsageAst, dist);
+@@ -436,7 +436,7 @@ public class VariableDeclarationUsageDistanceCheck extends AbstractCheck {
+       // only inside one block, then get node from
+       // variableUsageExpressions.
+       if (variableUsageExpressions.size() == 1) {
+-        firstNodeInsideBlock = variableUsageExpressions.get(0);
++        firstNodeInsideBlock = variableUsageExpressions.getFirst();
+       }
+     }
+ 
+@@ -462,7 +462,7 @@ public class VariableDeclarationUsageDistanceCheck extends AbstractCheck {
+     // variableUsageExpressions.
+     DetailAST firstNodeInsideBlock = null;
+     if (variableUsageExpressions.size() == 1) {
+-      firstNodeInsideBlock = variableUsageExpressions.get(0);
++      firstNodeInsideBlock = variableUsageExpressions.getFirst();
+     }
+ 
+     return firstNodeInsideBlock;
+@@ -552,7 +552,7 @@ public class VariableDeclarationUsageDistanceCheck extends AbstractCheck {
+     // only inside one block, then get node from
+     // variableUsageExpressions.
+     if (variableUsageExpressions.size() == 1) {
+-      variableUsageNode = variableUsageExpressions.get(0).getFirstChild();
++      variableUsageNode = variableUsageExpressions.getFirst().getFirstChild();
+     }
+ 
+     return variableUsageNode;
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/WhenShouldBeUsedCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/WhenShouldBeUsedCheck.java
 @@ -19,13 +19,14 @@
@@ -14438,6 +14561,15 @@
    }
  
    @Override
+@@ -133,7 +136,7 @@ public class MultiFileRegexpHeaderCheck extends AbstractFileSetCheck
+               .toList();
+ 
+       if (matchResult.stream().noneMatch(match -> match.isMatching)) {
+-        final MatchResult mismatch = matchResult.get(0);
++        final MatchResult mismatch = matchResult.getFirst();
+         final String allConfiguredHeaderPaths = getConfiguredHeaderPaths();
+         log(
+             mismatch.lineNumber,
 @@ -220,8 +223,7 @@ public class MultiFileRegexpHeaderCheck extends AbstractFileSetCheck
      final List<String> readerLines = new ArrayList<>();
      try (LineNumberReader lineReader =
@@ -14503,6 +14635,15 @@
  import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
  import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -381,7 +383,7 @@ public class CustomImportOrderCheck extends AbstractCheck {
+    * @return first import group of file.
+    */
+   private String getFirstGroup() {
+-    final ImportDetails firstImport = importToGroupList.get(0);
++    final ImportDetails firstImport = importToGroupList.getFirst();
+     return getImportGroup(firstImport.isStaticImport(), firstImport.getImportFullPath());
+   }
+ 
 @@ -624,10 +626,10 @@ public class CustomImportOrderCheck extends AbstractCheck {
      } else if (ruleStr.startsWith(SAME_PACKAGE_RULE_GROUP)) {
        final String rule = ruleStr.substring(ruleStr.indexOf('(') + 1, ruleStr.indexOf(')'));
@@ -14671,6 +14812,15 @@
  
    /**
     * Setter to control whether to allow inline return tags.
+@@ -394,7 +395,7 @@ public class JavadocMethodCheck extends AbstractCheck {
+   private boolean hasShortCircuitTag(final DetailAST ast, final List<JavadocTag> tags) {
+     boolean result = true;
+     // Check if it contains {@inheritDoc} tag
+-    if (tags.size() == 1 && tags.get(0).isInheritDocTag()) {
++    if (tags.size() == 1 && tags.getFirst().isInheritDocTag()) {
+       // Invalid if private, a constructor, or a static method
+       if (!JavadocTagInfo.INHERIT_DOC.isValidOn(ast)) {
+         log(ast, MSG_INVALID_INHERIT_DOC);
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagInfo.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagInfo.java
 @@ -19,6 +19,10 @@
@@ -14865,6 +15015,17 @@
      }
      return result;
    }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/TagParser.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/TagParser.java
+@@ -57,7 +57,7 @@ class TagParser {
+    * @throws IndexOutOfBoundsException if there are no HtmlTags left to return.
+    */
+   public HtmlTag nextTag() {
+-    return tags.remove(0);
++    return tags.removeFirst();
+   }
+ 
+   /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/utils/InlineTagUtil.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/utils/InlineTagUtil.java
 @@ -19,6 +19,10 @@
@@ -15318,6 +15479,54 @@
    }
  
    /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/meta/XmlMetaReader.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/meta/XmlMetaReader.java
+@@ -122,8 +122,8 @@ public final class XmlMetaReader {
+       final DocumentBuilder builder = factory.newDocumentBuilder();
+       final Document document = builder.parse(moduleMetadataStream);
+       final Element root = document.getDocumentElement();
+-      final Element element = getDirectChildsByTag(root, "module").get(0);
+-      final Element module = getDirectChildsByTag(element, moduleType.getLabel()).get(0);
++      final Element element = getDirectChildsByTag(root, "module").getFirst();
++      final Element module = getDirectChildsByTag(element, moduleType.getLabel()).getFirst();
+       result = new ModuleDetails();
+ 
+       result.setModuleType(moduleType);
+@@ -143,11 +143,11 @@ public final class XmlMetaReader {
+     moduleDetails.setFullQualifiedName(getAttributeValue(mod, "fully-qualified-name"));
+     moduleDetails.setParent(getAttributeValue(mod, "parent"));
+     moduleDetails.setDescription(
+-        getDirectChildsByTag(mod, XML_TAG_DESCRIPTION).get(0).getFirstChild().getNodeValue());
++        getDirectChildsByTag(mod, XML_TAG_DESCRIPTION).getFirst().getFirstChild().getNodeValue());
+     final List<Element> properties = getDirectChildsByTag(mod, "properties");
+     if (!properties.isEmpty()) {
+       final List<ModulePropertyDetails> modulePropertyDetailsList =
+-          createProperties(properties.get(0));
++          createProperties(properties.getFirst());
+       moduleDetails.addToProperties(modulePropertyDetailsList);
+     }
+     final List<String> messageKeys =
+@@ -181,7 +181,10 @@ public final class XmlMetaReader {
+         propertyDetails.setValidationType(getAttributeValue(prop, validationTypeTag));
+       }
+       propertyDetails.setDescription(
+-          getDirectChildsByTag(prop, XML_TAG_DESCRIPTION).get(0).getFirstChild().getNodeValue());
++          getDirectChildsByTag(prop, XML_TAG_DESCRIPTION)
++              .getFirst()
++              .getFirstChild()
++              .getNodeValue());
+       result.add(propertyDetails);
+     }
+     return result;
+@@ -201,7 +204,7 @@ public final class XmlMetaReader {
+     final List<Element> children = getDirectChildsByTag(element, listParent);
+     List<String> result = null;
+     if (!children.isEmpty()) {
+-      final NodeList nodeList = children.get(0).getElementsByTagName(listOption);
++      final NodeList nodeList = children.getFirst().getElementsByTagName(listOption);
+       final int nodeListLength = nodeList.getLength();
+       final List<String> listContent = new ArrayList<>(nodeListLength);
+       for (int j = 0; j < nodeListLength; j++) {
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/ExampleMacro.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/ExampleMacro.java
 @@ -19,6 +19,9 @@
@@ -15542,6 +15751,28 @@
      return Arrays.stream(tokens).boxed().filter(token -> !subtractionsSet.contains(token)).toList();
    }
  
+@@ -1272,8 +1278,8 @@ public final class SiteUtil {
+     boolean isInHrefAttribute = false;
+     final StringBuilder description = new StringBuilder(128);
+     final List<DetailNode> descriptionNodes = getFirstJavadocParagraphNodes(javadoc);
+-    DetailNode node = descriptionNodes.get(0);
+-    final DetailNode endNode = descriptionNodes.get(descriptionNodes.size() - 1);
++    DetailNode node = descriptionNodes.getFirst();
++    final DetailNode endNode = descriptionNodes.getLast();
+ 
+     while (node != null) {
+       if (node.getType() == JavadocCommentsTokenTypes.TAG_ATTR_NAME
+@@ -1345,8 +1351,8 @@ public final class SiteUtil {
+     if (firstParagraphNodes.isEmpty()) {
+       result = "";
+     } else {
+-      final DetailNode startNode = firstParagraphNodes.get(0);
+-      final DetailNode endNode = firstParagraphNodes.get(firstParagraphNodes.size() - 1);
++      final DetailNode startNode = firstParagraphNodes.getFirst();
++      final DetailNode endNode = firstParagraphNodes.getLast();
+       result = JavadocMetadataScraperUtil.constructSubTreeText(startNode, endNode);
+     }
+     return result;
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/site/XdocsTemplateParser.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/site/XdocsTemplateParser.java
 @@ -19,6 +19,7 @@
@@ -16682,7 +16913,13 @@
      final Checker checker = new Checker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -580,7 +581,7 @@ public class CheckerTest extends AbstractModuleTestSupport {
+@@ -575,12 +576,12 @@ public class CheckerTest extends AbstractModuleTestSupport {
+     final List<AuditListener> listeners =
+         TestUtil.getInternalStateListAuditListener(checker, "listeners");
+     assertWithMessage("Invalid child listener class")
+-        .that(listeners.get(listeners.size() - 1) instanceof DebugAuditAdapter)
++        .that(listeners.getLast() instanceof DebugAuditAdapter)
+         .isTrue();
    }
  
    @Test
@@ -22041,7 +22278,13 @@
      // given
      TestRootModuleChecker.reset();
  
-@@ -120,7 +121,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -115,12 +116,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+     final List<File> filesToCheck = TestRootModuleChecker.getFilesToCheck();
+     assertWithMessage("There are more files to check than expected").that(filesToCheck).hasSize(1);
+     assertWithMessage("The path of file differs from expected")
+-        .that(filesToCheck.get(0).getAbsolutePath())
++        .that(filesToCheck.getFirst().getAbsolutePath())
+         .isEqualTo(getPath(FLAWLESS_INPUT));
    }
  
    @Test
@@ -22050,7 +22293,13 @@
      // given
      TestRootModuleChecker.reset();
      final CheckstyleAntTaskLogStub antTask = new CheckstyleAntTaskLogStub();
-@@ -171,7 +172,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -166,12 +167,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+     final List<File> filesToCheck = TestRootModuleChecker.getFilesToCheck();
+     assertWithMessage("There are more files to check than expected").that(filesToCheck).hasSize(1);
+     assertWithMessage("The path of file differs from expected")
+-        .that(filesToCheck.get(0).getAbsolutePath())
++        .that(filesToCheck.getFirst().getAbsolutePath())
+         .isEqualTo(getPath(FLAWLESS_INPUT));
    }
  
    @Test
@@ -22086,7 +22335,13 @@
      TestRootModuleChecker.reset();
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
      final FileSet examinationFileSet = new FileSet();
-@@ -260,7 +261,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -255,12 +256,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+     final List<File> filesToCheck = TestRootModuleChecker.getFilesToCheck();
+     assertWithMessage("There are more files to check than expected").that(filesToCheck).hasSize(1);
+     assertWithMessage("The path of file differs from expected")
+-        .that(filesToCheck.get(0).getAbsolutePath())
++        .that(filesToCheck.getFirst().getAbsolutePath())
+         .isEqualTo(getPath(FLAWLESS_INPUT));
    }
  
    @Test
@@ -22185,6 +22440,15 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(VIOLATED_INPUT)));
      antTask.setFailOnViolation(false);
+@@ -452,7 +453,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+     final String auditFinishedMessage = bundle.getString(DefaultLogger.AUDIT_FINISHED_MESSAGE);
+     final List<String> output = readWholeFile(outputFile);
+     final String errorMessage = "Content of file with violations differs from expected";
+-    assertWithMessage(errorMessage).that(output.get(0)).isEqualTo(auditStartedMessage);
++    assertWithMessage(errorMessage).that(output.getFirst()).isEqualTo(auditStartedMessage);
+     assertWithMessage(errorMessage)
+         .that(output.get(1))
+         .matches(
 @@ -472,7 +473,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
@@ -22615,7 +22879,14 @@
  
      check.setFileContents(new FileContents(theText));
      check.clearViolations();
-@@ -362,7 +362,7 @@ public class AbstractCheckTest extends AbstractModuleTestSupport {
+@@ -356,13 +356,13 @@ public class AbstractCheckTest extends AbstractModuleTestSupport {
+ 
+     assertWithMessage("Internal violation should only have 1").that(internalViolations).hasSize(1);
+ 
+-    final Violation firstViolation = internalViolations.iterator().next();
++    final Violation firstViolation = internalViolations.first();
+     assertWithMessage("expected line").that(firstViolation.getLineNo()).isEqualTo(1);
+     assertWithMessage("expected column").that(firstViolation.getColumnNo()).isEqualTo(5);
    }
  
    @Test
@@ -22760,7 +23031,14 @@
      final ViolationFileSetCheck check = new ViolationFileSetCheck();
      check.configure(new DefaultConfiguration("filesetcheck"));
      final File file = new File(getPath("InputAbstractFileSetLineColumn.java"));
-@@ -174,7 +174,7 @@ public class AbstractFileSetCheckTest extends AbstractModuleTestSupport {
+@@ -168,13 +168,13 @@ public class AbstractFileSetCheckTest extends AbstractModuleTestSupport {
+ 
+     assertWithMessage("Internal violation should only have 1").that(internalViolations).hasSize(1);
+ 
+-    final Violation violation = internalViolations.iterator().next();
++    final Violation violation = internalViolations.first();
+     assertWithMessage("expected line").that(violation.getLineNo()).isEqualTo(1);
+     assertWithMessage("expected column").that(violation.getColumnNo()).isEqualTo(1);
    }
  
    @Test
@@ -22787,6 +23065,15 @@
      final MultiFileViolationFileSetCheck check = new MultiFileViolationFileSetCheck();
      check.configure(new DefaultConfiguration("filesetcheck"));
      final ViolationDispatcher dispatcher = new ViolationDispatcher();
+@@ -205,7 +205,7 @@ public class AbstractFileSetCheckTest extends AbstractModuleTestSupport {
+ 
+     assertWithMessage("errors should only have 1").that(dispatcher.errorList).hasSize(1);
+ 
+-    final Violation violation = dispatcher.errorList.iterator().next();
++    final Violation violation = dispatcher.errorList.first();
+     assertWithMessage("expected line").that(violation.getLineNo()).isEqualTo(1);
+     assertWithMessage("expected column").that(violation.getColumnNo()).isEqualTo(0);
+ 
 @@ -227,7 +227,7 @@ public class AbstractFileSetCheckTest extends AbstractModuleTestSupport {
     * as none of the checks try to modify the fileExtensions.
     */
@@ -23089,7 +23376,13 @@
      // just to make UT coverage 100%
      final FileContents fileContents =
          new FileContents(new FileText(new File("filename"), Arrays.asList("123", "456")));
-@@ -93,10 +92,10 @@ public class FileContentsTest {
+@@ -88,15 +87,15 @@ public class FileContentsTest {
+     final Comment cComment = new Comment(new String[] {"2"}, 1, 1, 1);
+     final String lineComment = fileContents.getSingleLineComments().get(1).toString();
+     assertWithMessage("Invalid cpp comment").that(lineComment).isEqualTo(cppComment.toString());
+-    final String blockComment = fileContents.getBlockComments().get(1).get(0).toString();
++    final String blockComment = fileContents.getBlockComments().get(1).getFirst().toString();
+     assertWithMessage("Invalid c comment").that(blockComment).isEqualTo(cComment.toString());
    }
  
    @Test
@@ -23136,7 +23429,7 @@
      final FileContents fileContents =
          new FileContents(
              new FileText(
-@@ -141,9 +140,9 @@ public class FileContentsTest {
+@@ -141,22 +140,21 @@ public class FileContentsTest {
    }
  
    @Test
@@ -23148,7 +23441,10 @@
      fileContents.reportBlockComment("type", 1, 2, 1, 2);
      final Map<Integer, List<TextBlock>> comments = fileContents.getBlockComments();
  
-@@ -153,10 +152,9 @@ public class FileContentsTest {
+     assertWithMessage("Invalid comment")
+-        .that(comments.get(1).get(0).toString())
++        .that(comments.get(1).getFirst().toString())
+         .isEqualTo(new Comment(new String[] {"/"}, 2, 1, 2).toString());
    }
  
    @Test
@@ -23276,6 +23572,15 @@
      final FileContents fileContents =
          new FileContents(
              new FileText(
+@@ -314,7 +308,7 @@ public class FileContentsTest {
+                 Arrays.asList("   ", "    ", "  /* test   ", "  */  ", "   ")));
+     fileContents.reportBlockComment(3, 2, 4, 2);
+     final Map<Integer, List<TextBlock>> blockComments = fileContents.getBlockComments();
+-    final String[] text = blockComments.get(3).get(0).getText();
++    final String[] text = blockComments.get(3).getFirst().getText();
+ 
+     assertWithMessage("Invalid comment text")
+         .that(text)
 @@ -322,14 +316,14 @@ public class FileContentsTest {
    }
  
@@ -24131,6 +24436,24 @@
  import org.xml.sax.InputSource;
  
  public final class InlineConfigParser {
+@@ -562,7 +564,7 @@ public final class InlineConfigParser {
+    * @return true if a file provides xml configuration, otherwise false.
+    */
+   private static boolean checkIsXmlConfig(List<String> lines) {
+-    return "/*xml".equals(lines.get(0));
++    return "/*xml".equals(lines.getFirst());
+   }
+ 
+   private static void setModules(
+@@ -570,7 +572,7 @@ public final class InlineConfigParser {
+       String inputFilePath,
+       List<String> lines)
+       throws Exception {
+-    if (!lines.get(0).startsWith("/*")) {
++    if (!lines.getFirst().startsWith("/*")) {
+       throw new CheckstyleException(
+           "Config not specified on top."
+               + "Please see other inputs for examples of what is required.");
 @@ -663,7 +665,7 @@ public final class InlineConfigParser {
                      return prop.getName() != null && prop.getDefaultValue() != null;
                    })
@@ -24184,6 +24507,17 @@
  
        final String message =
            String.format(
+@@ -1045,8 +1047,8 @@ public final class InlineConfigParser {
+     final List<ModuleInputConfiguration> moduleLists = inputConfigBuilder.getChildrenModules();
+     final boolean specifyViolationMessage =
+         moduleLists.size() == 1
+-            && !PERMANENT_SUPPRESSED_CHECKS.contains(moduleLists.get(0).getModuleName())
+-            && !SUPPRESSED_CHECKS.contains(moduleLists.get(0).getModuleName());
++            && !PERMANENT_SUPPRESSED_CHECKS.contains(moduleLists.getFirst().getModuleName())
++            && !SUPPRESSED_CHECKS.contains(moduleLists.getFirst().getModuleName());
+     for (int lineNo = 0; lineNo < lines.size(); lineNo++) {
+       setViolations(
+           inputConfigBuilder, lines, useFilteredViolations, lineNo, specifyViolationMessage);
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/bdd/ModuleInputConfiguration.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/bdd/ModuleInputConfiguration.java
 @@ -19,8 +19,9 @@
@@ -24259,6 +24593,17 @@
    }
  
    public DefaultConfiguration createConfiguration() {
+@@ -149,8 +150,8 @@ public final class TestInputConfiguration {
+ 
+   private DefaultConfiguration createTreeWalker() {
+     final DefaultConfiguration treeWalker;
+-    if (childrenModules.get(0).getModuleName().equals(TreeWalker.class.getName())) {
+-      treeWalker = childrenModules.get(0).createConfiguration();
++    if (childrenModules.getFirst().getModuleName().equals(TreeWalker.class.getName())) {
++      treeWalker = childrenModules.getFirst().createConfiguration();
+     } else {
+       treeWalker = new DefaultConfiguration(TreeWalker.class.getName());
+     }
 @@ -196,7 +197,7 @@ public final class TestInputConfiguration {
      }
  
@@ -25077,7 +25422,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(OrderedPropertiesCheck.class);
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
      verify(checkConfig, getPath("InputOrderedProperties.txt"), expected);
-@@ -114,13 +114,13 @@ public class OrderedPropertiesCheckTest extends AbstractModuleTestSupport {
+@@ -114,17 +114,17 @@ public class OrderedPropertiesCheckTest extends AbstractModuleTestSupport {
  
    /** Tests IO exception, that can occur during reading of properties file. */
    @Test
@@ -25092,7 +25437,13 @@
 +    final FileText fileText = new FileText(file, ImmutableList.of());
      final SortedSet<Violation> violations = check.process(file, fileText);
      assertWithMessage("Wrong violations count").that(violations).hasSize(1);
-     final Violation violation = violations.iterator().next();
+-    final Violation violation = violations.iterator().next();
+-    final String retrievedMessage = violations.iterator().next().getKey();
++    final Violation violation = violations.first();
++    final String retrievedMessage = violations.first().getKey();
+     assertWithMessage("violation key is not valid")
+         .that(retrievedMessage)
+         .isEqualTo("unable.open.cause");
 @@ -140,21 +140,21 @@ public class OrderedPropertiesCheckTest extends AbstractModuleTestSupport {
     * returning zero size. This will keep the for loop intact.
     */
@@ -26228,7 +26579,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(UniquePropertiesCheck.class);
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
      verify(checkConfig, getPath("InputUniqueProperties.txt"), expected);
-@@ -117,13 +117,13 @@ public class UniquePropertiesCheckTest extends AbstractModuleTestSupport {
+@@ -117,17 +117,17 @@ public class UniquePropertiesCheckTest extends AbstractModuleTestSupport {
  
    /** Tests IO exception, that can occur during reading of properties file. */
    @Test
@@ -26243,7 +26594,13 @@
 +    final FileText fileText = new FileText(file, ImmutableList.of());
      final SortedSet<Violation> violations = check.process(file, fileText);
      assertWithMessage("Wrong messages count: " + violations.size()).that(violations).hasSize(1);
-     final Violation violation = violations.iterator().next();
+-    final Violation violation = violations.iterator().next();
+-    final String retrievedMessage = violations.iterator().next().getKey();
++    final Violation violation = violations.first();
++    final String retrievedMessage = violations.first().getKey();
+     assertWithMessage("violation key '" + retrievedMessage + "' is not valid")
+         .that(retrievedMessage)
+         .isEqualTo("unable.open.cause");
 @@ -137,7 +137,7 @@ public class UniquePropertiesCheckTest extends AbstractModuleTestSupport {
    }
  
@@ -36775,7 +37132,14 @@
      final RegexpHeaderCheck instance = new RegexpHeaderCheck();
      // check valid header passes
      final String header = "abc.*";
-@@ -90,7 +90,7 @@ public class RegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -84,13 +84,13 @@ public class RegexpHeaderCheckTest extends AbstractModuleTestSupport {
+         TestUtil.getInternalStateListPattern(instance, "headerRegexps");
+     assertWithMessage("Expected one pattern").that(headerRegexps.size()).isEqualTo(1);
+     assertWithMessage("Invalid header regexp")
+-        .that(headerRegexps.get(0).pattern())
++        .that(headerRegexps.getFirst().pattern())
+         .isEqualTo(header);
+   }
  
    /** Test of setHeader method, of class RegexpHeaderCheck. */
    @Test
@@ -45944,6 +46308,15 @@
      final String[] text = {
        "/** @foo abc ", " * @bar def  ", "   @baz ghi  ", " * @qux jkl", " * @mytag", " */",
      };
+@@ -43,7 +43,7 @@ public class BlockTagUtilTest {
+     final List<TagInfo> tags = BlockTagUtil.extractBlockTags(text);
+     assertWithMessage("Invalid tags size").that(tags).hasSize(5);
+ 
+-    final TagInfo tag1 = tags.get(0);
++    final TagInfo tag1 = tags.getFirst();
+     assertTagEquals(tag1, "foo", "abc", 1, 4);
+ 
+     final TagInfo tag2 = tags.get(1);
 @@ -60,7 +60,7 @@ public class BlockTagUtilTest {
    }
  
@@ -45953,7 +46326,13 @@
      final String[] text = {
        "/** @foo", " */",
      };
-@@ -73,7 +73,7 @@ public class BlockTagUtilTest {
+@@ -68,29 +68,29 @@ public class BlockTagUtilTest {
+     final List<TagInfo> tags = BlockTagUtil.extractBlockTags(text);
+     assertWithMessage("Invalid tags size").that(tags).hasSize(1);
+ 
+-    final TagInfo tag1 = tags.get(0);
++    final TagInfo tag1 = tags.getFirst();
+     assertTagEquals(tag1, "foo", "", 1, 4);
    }
  
    @Test
@@ -45962,7 +46341,12 @@
      final String[] text = {
        "/** ", " * @version 1.0", " */",
      };
-@@ -84,7 +84,7 @@ public class BlockTagUtilTest {
+     final List<TagInfo> tags = BlockTagUtil.extractBlockTags(text);
+     assertWithMessage("Invalid tags size").that(tags).hasSize(1);
+-    assertWithMessage("Invalid tag name").that(tags.get(0).getName()).isEqualTo("version");
+-    assertWithMessage("Invalid tag value").that(tags.get(0).getValue()).isEqualTo("1.0");
++    assertWithMessage("Invalid tag name").that(tags.getFirst().getName()).isEqualTo("version");
++    assertWithMessage("Invalid tag value").that(tags.getFirst().getValue()).isEqualTo("1.0");
    }
  
    @Test
@@ -45971,6 +46355,14 @@
      final String[] text = {"/**", " * Foo", " * @version 1.0 */"};
  
      final List<TagInfo> tags = BlockTagUtil.extractBlockTags(text);
+     assertWithMessage("Invalid tags size").that(tags).hasSize(1);
+-    assertWithMessage("Invalid tag name").that(tags.get(0).getName()).isEqualTo("version");
+-    assertWithMessage("Invalid tag value").that(tags.get(0).getValue()).isEqualTo("1.0");
++    assertWithMessage("Invalid tag name").that(tags.getFirst().getName()).isEqualTo("version");
++    assertWithMessage("Invalid tag value").that(tags.getFirst().getValue()).isEqualTo("1.0");
+   }
+ 
+   private static void assertTagEquals(
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/checks/javadoc/utils/InlineTagUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/checks/javadoc/utils/InlineTagUtilTest.java
 @@ -25,17 +25,17 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
@@ -45994,7 +46386,15 @@
      final String[] text = {
        "/** @see elsewhere ",
        " * {@link List }, {@link List link text }",
-@@ -54,7 +54,7 @@ public class InlineTagUtilTest {
+@@ -47,34 +47,34 @@ public class InlineTagUtilTest {
+ 
+     assertWithMessage("Unexpected tags size").that(tags).hasSize(4);
+ 
+-    assertTag(tags.get(0), "link", "List", 2, 4);
++    assertTag(tags.getFirst(), "link", "List", 2, 4);
+     assertTag(tags.get(1), "link", "List link text", 2, 19);
+     assertTag(tags.get(2), "link", "List#add(Object) link text", 3, 4);
+     assertTag(tags.get(3), "link", "Class link text", 4, 4);
    }
  
    @Test
@@ -46003,7 +46403,10 @@
      final String[] text = {"/**", " * {@link foo", " *        bar baz}", " */"};
  
      final List<TagInfo> tags = InlineTagUtil.extractInlineTags(text);
-@@ -64,7 +64,7 @@ public class InlineTagUtilTest {
+ 
+     assertWithMessage("Unexpected tags size").that(tags).hasSize(1);
+-    assertTag(tags.get(0), "link", "foo bar baz", 2, 4);
++    assertTag(tags.getFirst(), "link", "foo bar baz", 2, 4);
    }
  
    @Test
@@ -46012,7 +46415,10 @@
      final String[] text = {"/**", " * {@code     foo\t\t   bar   baz\t    }", " */"};
  
      final List<TagInfo> tags = InlineTagUtil.extractInlineTags(text);
-@@ -74,7 +74,7 @@ public class InlineTagUtilTest {
+ 
+     assertWithMessage("Unexpected tags size").that(tags).hasSize(1);
+-    assertTag(tags.get(0), "code", "foo bar baz", 2, 4);
++    assertTag(tags.getFirst(), "code", "foo bar baz", 2, 4);
    }
  
    @Test
@@ -46021,7 +46427,13 @@
      final String[] source = {
        "  {@link foo}",
      };
-@@ -88,7 +88,7 @@ public class InlineTagUtilTest {
+@@ -83,12 +83,12 @@ public class InlineTagUtilTest {
+ 
+     assertWithMessage("Unexpected tags size").that(tags).hasSize(1);
+ 
+-    final TagInfo tag = tags.get(0);
++    final TagInfo tag = tags.getFirst();
+     assertTag(tag, "link", "foo", 1, 3);
    }
  
    @Test
@@ -54359,7 +54771,7 @@
      final String[] suppressed = {
        "74:30: "
            + getCheckMessage(
-@@ -336,7 +336,7 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
+@@ -336,10 +336,10 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
    }
  
    @Test
@@ -54367,7 +54779,11 @@
 +  void equalsAndHashCodeOfTagClass() {
      final SuppressWithNearbyCommentFilter filter = new SuppressWithNearbyCommentFilter();
      final Object tag =
-         getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").get(0);
+-        getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").get(0);
++        getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").getFirst();
+     final EqualsVerifierReport ev =
+         EqualsVerifier.forClass(tag.getClass()).usingGetClass().report();
+     assertWithMessage("Error: " + ev.getMessage()).that(ev.isSuccessful()).isTrue();
 @@ -356,7 +356,7 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
    }
  
@@ -54419,7 +54835,7 @@
      final SuppressWithNearbyCommentFilter filter = new SuppressWithNearbyCommentFilter();
      final FileContents contents = null;
      final TreeWalkerAuditEvent auditEvent =
-@@ -461,7 +460,7 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
+@@ -461,10 +460,10 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
    }
  
    @Test
@@ -54427,8 +54843,12 @@
 +  void toStringOfTagClass() {
      final SuppressWithNearbyCommentFilter filter = new SuppressWithNearbyCommentFilter();
      final Object tag =
-         getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").get(0);
-@@ -473,7 +472,7 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
+-        getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").get(0);
++        getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").getFirst();
+     assertWithMessage("Invalid toString result")
+         .that(tag.toString())
+         .isEqualTo(
+@@ -473,11 +472,11 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
    }
  
    @Test
@@ -54437,6 +54857,11 @@
      final SuppressWithNearbyCommentFilter filter = new SuppressWithNearbyCommentFilter();
      filter.setIdFormat(".*");
      final Object tag =
+-        getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").get(0);
++        getTagsAfterExecution(filter, "filename", "//SUPPRESS CHECKSTYLE ignore").getFirst();
+     assertWithMessage("Invalid toString result")
+         .that(tag.toString())
+         .isEqualTo(
 @@ -486,14 +485,14 @@ public class SuppressWithNearbyCommentFilterTest extends AbstractModuleTestSuppo
    }
  
@@ -55036,25 +55461,28 @@
      final String[] suppressed = CommonUtil.EMPTY_STRING_ARRAY;
      verifySuppressedWithParser("InputSuppressionCommentFilter9.java", suppressed);
    }
-@@ -259,7 +259,7 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
+@@ -259,16 +259,16 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testEqualsAndHashCodeOfTagClass() {
+-    final Object tag = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF").get(0);
 +  void equalsAndHashCodeOfTagClass() {
-     final Object tag = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF").get(0);
++    final Object tag = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF").getFirst();
      final EqualsVerifierReport ev =
          EqualsVerifier.forClass(tag.getClass()).usingGetClass().report();
-@@ -267,7 +267,7 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
+     assertWithMessage("Error: " + ev.getMessage()).that(ev.isSuccessful()).isTrue();
    }
  
    @Test
 -  public void testToStringOfTagClass() {
+-    final Object tag = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF").get(0);
 +  void toStringOfTagClass() {
-     final Object tag = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF").get(0);
++    final Object tag = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF").getFirst();
      assertWithMessage("Invalid toString result")
          .that(tag.toString())
-@@ -277,7 +277,7 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
+         .isEqualTo(
+@@ -277,10 +277,10 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -55062,8 +55490,12 @@
 +  void toStringOfTagClassWithMessage() {
      final SuppressionCommentFilter filter = new SuppressionCommentFilter();
      filter.setMessageFormat(".*");
-     final Object tag = getTagsAfterExecution(filter, "filename", "//CHECKSTYLE:ON").get(0);
-@@ -289,7 +289,7 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
+-    final Object tag = getTagsAfterExecution(filter, "filename", "//CHECKSTYLE:ON").get(0);
++    final Object tag = getTagsAfterExecution(filter, "filename", "//CHECKSTYLE:ON").getFirst();
+     assertWithMessage("Invalid toString result")
+         .that(tag.toString())
+         .isEqualTo(
+@@ -289,18 +289,18 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -55071,7 +55503,21 @@
 +  void compareToOfTagClass() {
      final List<Comparable<Object>> tags1 =
          getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:OFF", " //CHECKSTYLE:ON");
-     final Comparable<Object> tag1 = tags1.get(0);
+-    final Comparable<Object> tag1 = tags1.get(0);
++    final Comparable<Object> tag1 = tags1.getFirst();
+     final Comparable<Object> tag2 = tags1.get(1);
+ 
+     final List<Comparable<Object>> tags2 =
+         getTagsAfterExecutionOnDefaultFilter(" //CHECKSTYLE:OFF");
+-    final Comparable<Object> tag3 = tags2.get(0);
++    final Comparable<Object> tag3 = tags2.getFirst();
+ 
+     final List<Comparable<Object>> tags3 = getTagsAfterExecutionOnDefaultFilter("//CHECKSTYLE:ON");
+-    final Comparable<Object> tag4 = tags3.get(0);
++    final Comparable<Object> tag4 = tags3.getFirst();
+ 
+     assertWithMessage("Invalid comparing result").that(tag1.compareTo(tag2) < 0).isTrue();
+     assertWithMessage("Invalid comparing result").that(tag2.compareTo(tag1) > 0).isTrue();
 @@ -311,7 +311,7 @@ public class SuppressionCommentFilterTest extends AbstractModuleTestSupport {
    }
  
@@ -58396,6 +58842,15 @@
      model = new MainFrameModel();
      model.setParseMode(ParseMode.JAVA_WITH_JAVADOC_AND_COMMENTS);
      model.openFile(new File(getPath("InputCodeSelectorPresentation.java")));
+@@ -64,7 +64,7 @@ public class CodeSelectorPresentationTest extends AbstractPathTestSupport {
+   private static List<Integer> convertLinesToPosition(List<Integer> systemLinesToPosition) {
+     final List<Integer> convertedLinesToPosition = new ArrayList<>();
+     final int lineSeparationCorrection = System.lineSeparator().length() - 1;
+-    convertedLinesToPosition.add(0, systemLinesToPosition.get(0));
++    convertedLinesToPosition.addFirst(systemLinesToPosition.getFirst());
+     for (int i = 1; i < systemLinesToPosition.size(); i++) {
+       convertedLinesToPosition.add(
+           i, systemLinesToPosition.get(i) - lineSeparationCorrection * (i - 1));
 @@ -73,7 +73,7 @@ public class CodeSelectorPresentationTest extends AbstractPathTestSupport {
    }
  
@@ -58635,6 +59090,15 @@
      final JButton openFileButton = findComponentByName(mainFrame, "openFileButton", JButton.class);
      try (MockedConstruction<JFileChooser> mocked =
          mockConstruction(
+@@ -154,7 +154,7 @@ public class MainFrameTest extends AbstractGuiTestSupport {
+             })) {
+       openFileButton.doClick();
+ 
+-      final FileFilter fileFilter = mocked.constructed().get(0).getFileFilter();
++      final FileFilter fileFilter = mocked.constructed().getFirst().getFileFilter();
+       assertWithMessage("The file should be accepted")
+           .that(fileFilter.accept(new File(TEST_FILE_NAME)))
+           .isTrue();
 @@ -165,7 +165,7 @@ public class MainFrameTest extends AbstractGuiTestSupport {
    }
  
@@ -59821,6 +60285,15 @@
          }
        }
      }
+@@ -375,7 +375,7 @@ public class XdocsCategoryIndexTest extends AbstractModuleTestSupport {
+       Element rowElement, Map<String, CheckIndexInfo> indexedChecks) {
+     final List<Element> cellElements = getChildrenElementsByTagName(rowElement, "td");
+     if (cellElements.size() >= 2) {
+-      final Element nameCell = cellElements.get(0);
++      final Element nameCell = cellElements.getFirst();
+       final Element descCell = cellElements.get(1);
+ 
+       getFirstChildElementByTagName(nameCell, "a")
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsExampleFileTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsExampleFileTest.java
 @@ -19,21 +19,23 @@
@@ -60167,6 +60640,33 @@
      final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
  
      final Path path = Path.of(XdocUtil.DIRECTORY_PATH + "/config.xml");
+@@ -1122,7 +1124,7 @@ public class XdocsPagesTest {
+                   .that(columns)
+                   .hasSize(5);
+ 
+-              final String propertyName = columns.get(0).getTextContent();
++              final String propertyName = columns.getFirst().getTextContent();
+               tablePropertyNames.add(propertyName);
+             });
+ 
+@@ -1212,7 +1214,7 @@ public class XdocsPagesTest {
+       if (skip) {
+         assertWithMessage(
+                 fileName + " section '" + sectionName + "' should have the specific title")
+-            .that(columns.get(0).getTextContent())
++            .that(columns.getFirst().getTextContent())
+             .isEqualTo("name");
+         assertWithMessage(
+                 fileName + " section '" + sectionName + "' should have the specific title")
+@@ -1240,7 +1242,7 @@ public class XdocsPagesTest {
+           .that(didTokens)
+           .isFalse();
+ 
+-      final String propertyName = columns.get(0).getTextContent();
++      final String propertyName = columns.getFirst().getTextContent();
+       assertWithMessage(
+               fileName
+                   + " section '"
 @@ -1318,7 +1320,7 @@ public class XdocsPagesTest {
              .map(nonNullField -> nonNullField.getAnnotation(XdocsPropertyType.class))
              .map(propertyType -> propertyType.value().getDescription())
@@ -60213,6 +60713,15 @@
      for (Path path : XdocUtil.getXdocsStyleFilePaths(XdocUtil.getXdocsFilePaths())) {
        final String fileName = path.getFileName().toString();
        final String styleName = fileName.substring(0, fileName.lastIndexOf('_'));
+@@ -1962,7 +1963,7 @@ public class XdocsPagesTest {
+ 
+         if (!"--".equals(ruleName)) {
+           validateStyleAnchors(
+-              XmlUtil.findChildElementsByTag(columns.get(0), "a"), fileName, ruleName);
++              XmlUtil.findChildElementsByTag(columns.getFirst(), "a"), fileName, ruleName);
+         }
+ 
+         validateStyleModules(
 @@ -2393,7 +2394,7 @@ public class XdocsPagesTest {
    }
  
@@ -60275,6 +60784,15 @@
      final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
      final SAXParser parser = parserFactory.newSAXParser();
      final DummyHandler checkHandler = new DummyHandler();
+@@ -104,7 +104,7 @@ public class XdocsUrlTest {
+     }
+     final Map<String, List<String>> checksNamesMap = getXdocsMap();
+     for (List<String> sub : checkHandler.checkNamesList) {
+-      final String moduleName = sub.get(0);
++      final String moduleName = sub.getFirst();
+       final String checkNameInAttribute = sub.get(1);
+       final String checkNameInText = sub.get(2);
+       final String checkNameInconsistentErrorMsg =
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XpathRegressionTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XpathRegressionTest.java
 @@ -20,7 +20,12 @@
@@ -60699,6 +61217,19 @@
      final String path = getPath("InputXmlMetaReaderCheckWithProps.xml");
      try (InputStream is = Files.newInputStream(Path.of(path))) {
        final ModuleDetails result = XmlMetaReader.read(is, ModuleType.CHECK);
+@@ -68,10 +68,10 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
+       assertThat(result.getName()).isEqualTo("InputCheck");
+       final List<String> violationMessageKeys = result.getViolationMessageKeys();
+       assertThat(violationMessageKeys).hasSize(1);
+-      assertThat(violationMessageKeys.get(0)).isEqualTo("test.key");
++      assertThat(violationMessageKeys.getFirst()).isEqualTo("test.key");
+       final List<ModulePropertyDetails> props = result.getProperties();
+       assertThat(props).hasSize(2);
+-      final ModulePropertyDetails prop1 = props.get(0);
++      final ModulePropertyDetails prop1 = props.getFirst();
+       checkProperty(
+           prop1,
+           "propertyOne",
 @@ -87,7 +87,7 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
    }
  
@@ -60708,7 +61239,15 @@
      final String path = getPath("InputXmlMetaReaderCheckNoProps.xml");
      try (InputStream is = Files.newInputStream(Path.of(path))) {
        final ModuleDetails result = XmlMetaReader.read(is, ModuleType.CHECK);
-@@ -107,7 +107,7 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
+@@ -100,14 +100,14 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
+       assertThat(result.getName()).isEqualTo("InputCheckNoProps");
+       final List<String> violationMessageKeys = result.getViolationMessageKeys();
+       assertThat(violationMessageKeys).hasSize(2);
+-      assertThat(violationMessageKeys.get(0)).isEqualTo("test.key1");
++      assertThat(violationMessageKeys.getFirst()).isEqualTo("test.key1");
+       assertThat(violationMessageKeys.get(1)).isEqualTo("test.key2");
+       assertThat(result.getProperties()).isEmpty();
+     }
    }
  
    @Test
@@ -60717,6 +61256,15 @@
      final String path = getPath("InputXmlMetaReaderFilter.xml");
      try (InputStream is = Files.newInputStream(Path.of(path))) {
        final ModuleDetails result = XmlMetaReader.read(is, ModuleType.FILTER);
+@@ -121,7 +121,7 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
+       assertThat(result.getViolationMessageKeys()).isEmpty();
+       final List<ModulePropertyDetails> props = result.getProperties();
+       assertThat(props).hasSize(1);
+-      final ModulePropertyDetails prop1 = props.get(0);
++      final ModulePropertyDetails prop1 = props.getFirst();
+       checkProperty(
+           prop1,
+           "propertyOne",
 @@ -133,7 +133,7 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
    }
  
@@ -60726,6 +61274,15 @@
      final String path = getPath("InputXmlMetaReaderFileFilter.xml");
      try (InputStream is = Files.newInputStream(Path.of(path))) {
        final ModuleDetails result = XmlMetaReader.read(is, ModuleType.FILEFILTER);
+@@ -147,7 +147,7 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
+       assertThat(result.getViolationMessageKeys()).isEmpty();
+       final List<ModulePropertyDetails> props = result.getProperties();
+       assertThat(props).hasSize(1);
+-      final ModulePropertyDetails prop1 = props.get(0);
++      final ModulePropertyDetails prop1 = props.getFirst();
+       assertThat(prop1.getName()).isEqualTo("fileNamePattern");
+       assertThat(prop1.getType()).isEqualTo("java.util.regex.Pattern");
+       assertThat(prop1.getDefaultValue()).isNull();
 @@ -158,7 +158,7 @@ public class XmlMetaReaderTest extends AbstractPathTestSupport {
    }
  
@@ -61796,7 +62353,13 @@
      final String[] text = {
        "/** {@link List link text }",
      };
-@@ -86,7 +86,7 @@ public class JavadocUtilTest {
+@@ -81,12 +81,12 @@ public class JavadocUtilTest {
+     final List<JavadocTag> tags =
+         JavadocUtil.getJavadocTags(comment, JavadocUtil.JavadocTagType.ALL).getValidTags();
+     assertWithMessage("Invalid first arg")
+-        .that(tags.get(0).getFirstArg())
++        .that(tags.getFirst().getFirstArg())
+         .isEqualTo("List link text");
    }
  
    @Test
@@ -61805,7 +62368,13 @@
      final String[] text = {
        "/** {@link List#add(Object)}",
      };
-@@ -99,7 +99,7 @@ public class JavadocUtilTest {
+@@ -94,12 +94,12 @@ public class JavadocUtilTest {
+     final List<JavadocTag> tags =
+         JavadocUtil.getJavadocTags(comment, JavadocUtil.JavadocTagType.ALL).getValidTags();
+     assertWithMessage("Invalid first arg")
+-        .that(tags.get(0).getFirstArg())
++        .that(tags.getFirst().getFirstArg())
+         .isEqualTo("List#add(Object)");
    }
  
    @Test
@@ -61814,6 +62383,15 @@
      final String[] text = {
        "/** @see elsewhere", "    also {@link Name value} */",
      };
+@@ -110,7 +110,7 @@ public class JavadocUtilTest {
+ 
+     assertWithMessage("Invalid tags size").that(tags).hasSize(2);
+ 
+-    final JavadocTag seeTag = tags.get(0);
++    final JavadocTag seeTag = tags.getFirst();
+     assertWithMessage("Invalid tag name")
+         .that(seeTag.getTagName())
+         .isEqualTo(JavadocTagInfo.SEE.getName());
 @@ -126,7 +126,7 @@ public class JavadocUtilTest {
    }
  
@@ -61823,7 +62401,16 @@
      final String[] text = {"/** Also {@link Name value} */"};
      final Comment comment = new Comment(text, 1, 0, text[0].length());
  
-@@ -141,7 +141,7 @@ public class JavadocUtilTest {
+@@ -134,14 +134,14 @@ public class JavadocUtilTest {
+         JavadocUtil.getJavadocTags(comment, JavadocUtil.JavadocTagType.INLINE).getValidTags();
+ 
+     assertWithMessage("Invalid tags size").that(tags).hasSize(1);
+-    final int lineNo = tags.get(0).getLineNo();
++    final int lineNo = tags.getFirst().getLineNo();
+     assertWithMessage("Unexpected line number").that(lineNo).isEqualTo(0);
+-    final int columnNo = tags.get(0).getColumnNo();
++    final int columnNo = tags.getFirst().getColumnNo();
+     assertWithMessage("Unexpected column number").that(columnNo).isEqualTo(10);
    }
  
    @Test
@@ -61832,7 +62419,21 @@
      final String[] text = {
        "/** @fake block", " * {@bogus inline}", " * {@link List valid}",
      };
-@@ -164,7 +164,7 @@ public class JavadocUtilTest {
+@@ -151,7 +151,7 @@ public class JavadocUtilTest {
+     assertTag(
+         "Unexpected invalid tag",
+         new InvalidJavadocTag(1, 4, "fake"),
+-        allTags.getInvalidTags().get(0));
++        allTags.getInvalidTags().getFirst());
+     assertTag(
+         "Unexpected invalid tag",
+         new InvalidJavadocTag(2, 4, "bogus"),
+@@ -160,11 +160,11 @@ public class JavadocUtilTest {
+     assertTag(
+         "Unexpected valid tag",
+         new JavadocTag(3, 4, "link", "List valid"),
+-        allTags.getValidTags().get(0));
++        allTags.getValidTags().getFirst());
    }
  
    @Test
@@ -62461,7 +63062,15 @@
      final DetailAstImpl astForTest = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      final DetailAstImpl firstSibling = new DetailAstImpl();
-@@ -296,7 +296,7 @@ public class TokenUtilTest {
+@@ -289,14 +289,14 @@ public class TokenUtilTest {
+     astForTest.setFirstChild(child);
+     final List<DetailAST> children = new ArrayList<>();
+     TokenUtil.forEachChild(astForTest, TokenTypes.CLASS_DEF, children::add);
+-    final DetailAST firstChild = children.get(0);
++    final DetailAST firstChild = children.getFirst();
+ 
+     assertWithMessage("Must be one match").that(children).hasSize(1);
+     assertWithMessage("Mismatched child node").that(firstChild).isEqualTo(secondSibling);
    }
  
    @Test
@@ -62616,6 +63225,15 @@
      final DetailAstImpl rootAst = new DetailAstImpl();
      final DetailAstImpl elementAst = new DetailAstImpl();
      rootAst.addChild(elementAst);
+@@ -189,7 +189,7 @@ public class XpathUtilTest {
+     final List<AbstractNode> children = XpathUtil.createChildren(rootNode, rootNode, elementAst);
+ 
+     assertWithMessage("Expected one child node").that(children).hasSize(1);
+-    assertWithMessage("Node depth should be 1").that(children.get(0).getDepth()).isEqualTo(1);
++    assertWithMessage("Node depth should be 1").that(children.getFirst().getDepth()).isEqualTo(1);
+   }
+ 
+   private static DetailAST createDetailAST(int type) {
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/xpath/AttributeNodeTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/xpath/AttributeNodeTest.java
 @@ -28,31 +28,31 @@ import net.sf.saxon.tree.iter.AxisIterator;
@@ -62807,7 +63425,17 @@
      final DetailAstImpl detailAst1 = new DetailAstImpl();
      detailAst1.setType(TokenTypes.VARIABLE_DEF);
  
-@@ -99,7 +99,7 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+@@ -91,38 +91,38 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+     final List<AbstractNode> children = parentNode.getChildren();
+ 
+     assertWithMessage("Incorrect ordering value")
+-        .that(children.get(0).compareOrder(children.get(1)))
++        .that(children.getFirst().compareOrder(children.get(1)))
+         .isEqualTo(-1);
+     assertWithMessage("Incorrect ordering value")
+-        .that(children.get(1).compareOrder(children.get(0)))
++        .that(children.get(1).compareOrder(children.getFirst()))
+         .isEqualTo(1);
    }
  
    @Test
@@ -62815,8 +63443,9 @@
 +  void compareOrderWrongInstance() throws Exception {
      final String xpath = "//OBJBLOCK";
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
-     final int result = nodes.get(0).compareOrder(null);
-@@ -107,7 +107,7 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+-    final int result = nodes.get(0).compareOrder(null);
++    final int result = nodes.getFirst().compareOrder(null);
+     assertWithMessage("Expected result wrong").that(result).isEqualTo(0);
    }
  
    @Test
@@ -62825,7 +63454,11 @@
      final String xpath = "//OBJBLOCK";
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
      assertWithMessage("Invalid number of nodes").that(nodes).hasSize(1);
-@@ -118,7 +118,7 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+-    final AbstractNode parent = (AbstractNode) nodes.get(0).getParent();
++    final AbstractNode parent = (AbstractNode) nodes.getFirst().getParent();
+     assertWithMessage("Invalid token type")
+         .that(parent.getTokenType())
+         .isEqualTo(TokenTypes.CLASS_DEF);
    }
  
    @Test
@@ -62834,7 +63467,12 @@
      final String xpath = "//OBJBLOCK";
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
      assertWithMessage("Invalid number of nodes").that(nodes).hasSize(1);
-@@ -132,7 +132,7 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+-    final AbstractNode root = (AbstractNode) nodes.get(0).getRoot();
++    final AbstractNode root = (AbstractNode) nodes.getFirst().getRoot();
+     assertWithMessage("Invalid token type")
+         .that(root.getTokenType())
+         .isEqualTo(TokenTypes.COMPILATION_UNIT);
+@@ -132,32 +132,32 @@ public class ElementNodeTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -62843,7 +63481,9 @@
      final String xPath = "//NUM_INT[@text = 123]";
      final List<NodeInfo> nodes = getXpathItems(xPath, rootNode);
      assertWithMessage("Invalid number of nodes").that(nodes).hasSize(1);
-@@ -141,7 +141,7 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+-    final int tokenType = ((AbstractNode) nodes.get(0)).getTokenType();
++    final int tokenType = ((AbstractNode) nodes.getFirst()).getTokenType();
+     assertWithMessage("Invalid token type").that(tokenType).isEqualTo(TokenTypes.NUM_INT);
    }
  
    @Test
@@ -62852,7 +63492,9 @@
      final String xPath = "//STRING_LITERAL[@text = 'HelloWorld']";
      final List<NodeInfo> nodes = getXpathItems(xPath, rootNode);
      assertWithMessage("Invalid number of nodes").that(nodes).hasSize(2);
-@@ -150,14 +150,14 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+-    final int tokenType = ((AbstractNode) nodes.get(0)).getTokenType();
++    final int tokenType = ((AbstractNode) nodes.getFirst()).getTokenType();
+     assertWithMessage("Invalid token type").that(tokenType).isEqualTo(TokenTypes.STRING_LITERAL);
    }
  
    @Test
@@ -62923,6 +63565,15 @@
      final DetailAstImpl detailAST = new DetailAstImpl();
      detailAST.setType(TokenTypes.VARIABLE_DEF);
  
+@@ -249,7 +249,7 @@ public class ElementNodeTest extends AbstractPathTestSupport {
+     parentAST.setType(TokenTypes.METHOD_DEF);
+     final AbstractNode parentNode = new ElementNode(rootNode, rootNode, parentAST, 1, 0);
+ 
+-    final AbstractNode elementNode = parentNode.getChildren().get(0);
++    final AbstractNode elementNode = parentNode.getChildren().getFirst();
+     try (AxisIterator iterator = elementNode.iterateAxis(AxisInfo.FOLLOWING_SIBLING)) {
+       assertWithMessage("Invalid iterator").that(iterator).isInstanceOf(EmptyIterator.class);
+     }
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/xpath/RootNodeTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/xpath/RootNodeTest.java
 @@ -36,7 +36,7 @@ import net.sf.saxon.tree.iter.EmptyIterator;
@@ -62951,7 +63602,7 @@
      try {
        rootNode.compareOrder(null);
        assertWithMessage("Exception is excepted").fail();
-@@ -65,7 +65,7 @@ public class RootNodeTest extends AbstractPathTestSupport {
+@@ -65,11 +65,11 @@ public class RootNodeTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -62960,6 +63611,11 @@
      final String xpath = "/";
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
      assertWithMessage("Invalid number of nodes").that(nodes).hasSize(1);
+-    final NodeInfo firstNode = nodes.get(0);
++    final NodeInfo firstNode = nodes.getFirst();
+     assertWithMessage("Should return true, because selected node is RootNode")
+         .that(firstNode)
+         .isInstanceOf(RootNode.class);
 @@ -79,24 +79,24 @@ public class RootNodeTest extends AbstractPathTestSupport {
    }
  
@@ -63366,7 +64022,7 @@
      final String xpath = "//VARIABLE_DEF[@qwe]";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
-@@ -253,7 +253,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+@@ -253,12 +253,12 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -63375,7 +64031,13 @@
      final String objectXpath = "//CLASS_DEF[./IDENT[@text='InputXpathMapperAst']]//OBJBLOCK";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final List<NodeInfo> objectNodes = getXpathItems(objectXpath, rootNode);
-@@ -279,7 +279,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+     assertWithMessage("Invalid number of nodes").that(objectNodes).hasSize(1);
+-    final AbstractNode objNode = (AbstractNode) objectNodes.get(0);
++    final AbstractNode objNode = (AbstractNode) objectNodes.getFirst();
+     final String methodsXpath = "METHOD_DEF";
+     final List<NodeInfo> methodsNodes = getXpathItems(methodsXpath, objNode);
+     assertWithMessage("Invalid number of nodes").that(methodsNodes).hasSize(2);
+@@ -279,12 +279,12 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -63384,6 +64046,12 @@
      final String xpath = "/COMPILATION_UNIT/CLASS_DEF";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
+     assertWithMessage("Invalid number of nodes").that(nodes).hasSize(1);
+-    final AbstractNode classDefNode = (AbstractNode) nodes.get(0);
++    final AbstractNode classDefNode = (AbstractNode) nodes.getFirst();
+     assertWithMessage("Invalid line number").that(classDefNode.getLineNumber()).isEqualTo(3);
+     assertWithMessage("Invalid column number").that(classDefNode.getColumnNumber()).isEqualTo(0);
+     final DetailAST[] actual = convertToArray(nodes);
 @@ -296,7 +296,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
    }
  
@@ -63420,7 +64088,14 @@
      final String xpath = "//CLASS_DEF[./IDENT[@text='InputXpathMapperAst']]";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
-@@ -364,7 +364,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+@@ -358,13 +358,13 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+         getSiblingByType(rootNode.getUnderlyingNode(), TokenTypes.COMPILATION_UNIT)
+             .findFirstToken(TokenTypes.CLASS_DEF);
+     final DetailAST[] expected = {expectedClassDefNode};
+-    final ElementNode classDefNode = (ElementNode) nodes.get(0);
++    final ElementNode classDefNode = (ElementNode) nodes.getFirst();
+     assertWithMessage("Invalid node name").that(classDefNode.getLocalPart()).isEqualTo("CLASS_DEF");
+     assertWithMessage("Result nodes differ from expected").that(actual).isEqualTo(expected);
    }
  
    @Test
@@ -63510,7 +64185,7 @@
      final String xpath = "/COMPILATION_UNIT/CLASS_DEF//namespace::*";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      try {
-@@ -485,7 +485,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+@@ -485,12 +485,12 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -63519,7 +64194,13 @@
      final String objectXpath = "//CLASS_DEF[./IDENT[@text='InputXpathMapperAst']]//OBJBLOCK";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final List<NodeInfo> objectNodes = getXpathItems(objectXpath, rootNode);
-@@ -502,7 +502,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+     assertWithMessage("Invalid number of nodes").that(objectNodes).hasSize(1);
+-    final AbstractNode objNode = (AbstractNode) objectNodes.get(0);
++    final AbstractNode objNode = (AbstractNode) objectNodes.getFirst();
+     final String methodsXpath = "self::OBJBLOCK";
+     final DetailAST[] actual = convertToArray(getXpathItems(methodsXpath, objNode));
+     final DetailAST expectedObjBlockNode =
+@@ -502,18 +502,18 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -63528,7 +64209,11 @@
      final String xpath = "//CLASS_DEF[./IDENT[@text='InputXpathMapperAst']]";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final List<NodeInfo> nodes = getXpathItems(xpath, rootNode);
-@@ -513,7 +513,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+-    final ElementNode classDefNode = (ElementNode) nodes.get(0);
++    final ElementNode classDefNode = (ElementNode) nodes.getFirst();
+     assertWithMessage("Not existing attribute should have null value")
+         .that(classDefNode.getAttributeValue("", "noneExistingAttribute"))
+         .isNull();
    }
  
    @Test
@@ -63825,7 +64510,7 @@
      final String xpath = "//VARIABLE_DEF[./IDENT[@text='array']]/preceding-sibling::*[1]";
      final RootNode rootNode = getRootNode("InputXpathMapperAst.java");
      final DetailAST[] actual = convertToArray(getXpathItems(xpath, rootNode));
-@@ -1014,7 +1014,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+@@ -1014,16 +1014,16 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -63834,7 +64519,9 @@
      final String xpath = "//LITERAL_CLASS/preceding::*";
      final RootNode rootNode = getRootNode("InputXpathMapperSingleTopClass.java");
      final DetailAST[] actual =
-@@ -1023,7 +1023,7 @@ public class XpathMapperTest extends AbstractModuleTestSupport {
+-        convertToArray(getXpathItems(xpath, rootNode.createChildren().get(0)));
++        convertToArray(getXpathItems(xpath, rootNode.createChildren().getFirst()));
+     assertWithMessage("Invalid number of nodes").that(actual).hasLength(18);
    }
  
    @Test
