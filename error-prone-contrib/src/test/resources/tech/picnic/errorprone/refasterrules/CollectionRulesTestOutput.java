@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,7 +20,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Iterables.class, Lists.class);
+    return ImmutableSet.of(Iterables.class, Lists.class, Streams.class);
   }
 
   ImmutableSet<Boolean> testCollectionIsEmpty() {
@@ -155,5 +156,45 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   void testCollectionForEach() {
     ImmutableSet.of(1).forEach(String::valueOf);
+  }
+
+  String testCollectionIteratorNext() {
+    return ImmutableSet.of("foo").iterator().next();
+  }
+
+  ImmutableSet<String> testSequencedCollectionGetFirst() {
+    return ImmutableSet.of(ImmutableList.of("foo").getFirst(), ImmutableList.of("bar").getFirst());
+  }
+
+  ImmutableSet<String> testSequencedCollectionGetLast() {
+    return ImmutableSet.of(
+        ImmutableList.of("foo").getLast(),
+        ImmutableList.of("bar").getLast(),
+        ImmutableList.of("baz").getLast());
+  }
+
+  void testListAddFirst() {
+    new ArrayList<String>().addFirst("foo");
+  }
+
+  void testListAdd() {
+    new ArrayList<String>(0).add("bar");
+    new ArrayList<String>(1).add("qux");
+  }
+
+  String testListRemoveFirst() {
+    return new ArrayList<String>().removeFirst();
+  }
+
+  String testListRemoveLast() {
+    return new ArrayList<String>().removeLast();
+  }
+
+  String testSortedSetFirst() {
+    return ImmutableSortedSet.of("foo").first();
+  }
+
+  String testSortedSetLast() {
+    return ImmutableSortedSet.of("foo").last();
   }
 }
