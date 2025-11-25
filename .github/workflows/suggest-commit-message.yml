@@ -211,7 +211,7 @@ jobs:
             fs.writeFileSync(promptPath, instructions.trim() + '\n', { encoding: 'utf8' });
       - name: Suggest commit message with Codex
         id: codex
-        uses: openai/codex-action@02e7b2943818fbac9f077c3d1249a198ab358352 # v1.2
+        uses: openai/codex-action@086169432f1d2ab2f4057540b1754d550f6a1189 # v1.4
         with:
           # XXX: Consider whether to set `safety-strategy: read-only`. In some
           # cases the agent may be able to suggest a better commit message by
