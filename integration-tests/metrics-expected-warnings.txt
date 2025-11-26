@@ -12,6 +12,7 @@ metrics-core/src/main/java/io/dropwizard/metrics5/InstrumentedExecutorService.ja
 metrics-core/src/main/java/io/dropwizard/metrics5/MetricRegistry.java:[56,27] [this-escape] possible 'this' escape before subclass is fully initialized
 metrics-core/src/main/java/io/dropwizard/metrics5/ScheduledReporter.java:[40,12] [removal] SecurityManager in java.lang has been deprecated and marked for removal
 metrics-core/src/main/java/io/dropwizard/metrics5/ScheduledReporter.java:[40,38] [removal] getSecurityManager() in System has been deprecated and marked for removal
+metrics-core/src/test/java/io/dropwizard/metrics5/MetricNameTest.java:[882,83] [deprecation] getId() in Thread has been deprecated
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[431,17] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[436,19] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)
 metrics-graphite/src/main/java/io/dropwizard/metrics5/graphite/GraphiteReporter.java:[449,20] [Slf4jLogStatement] Log statement contains 0 placeholders, but specifies 1 matching argument(s)

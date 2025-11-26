@@ -9,6 +9,15 @@
      return null; // will not happen
    }
  
+@@ -127,7 +127,7 @@ public abstract class ExporterTest {
+       for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+         if (entry.getKey()
+             != null) { // HttpUrlConnection uses pseudo key "null" for the status line
+-          this.headers.put(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue().get(0));
++          this.headers.put(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue().getFirst());
+         }
+       }
+     }
 --- a/integration-tests/it-common/src/test/java/io/prometheus/client/it/common/Volume.java
 +++ b/integration-tests/it-common/src/test/java/io/prometheus/client/it/common/Volume.java
 @@ -8,6 +8,7 @@ import java.io.File;
@@ -39,7 +48,13 @@
    }
 --- a/integration-tests/it-exporter/it-exporter-test/src/test/java/io/prometheus/metrics/it/exporter/test/ExporterIT.java
 +++ b/integration-tests/it-exporter/it-exporter-test/src/test/java/io/prometheus/metrics/it/exporter/test/ExporterIT.java
-@@ -89,12 +89,12 @@ abstract class ExporterIT extends ExporterTest {
+@@ -84,17 +84,17 @@ abstract class ExporterIT extends ExporterTest {
+     List<Metrics.MetricFamily> metrics = response.protoBody();
+     assertThat(metrics).hasSize(3);
+     // metrics are sorted by name
+-    assertThat(metrics.get(0).getName()).isEqualTo("integration_test_info");
++    assertThat(metrics.getFirst().getName()).isEqualTo("integration_test_info");
+     assertThat(metrics.get(1).getName()).isEqualTo("temperature_celsius");
      assertThat(metrics.get(2).getName()).isEqualTo("uptime_seconds_total");
    }
  
@@ -156,15 +171,26 @@
      pushGatewayContainer.start();
      sampleAppContainer
          .withCommand(
-@@ -197,7 +197,7 @@ public class PushGatewayIT {
+@@ -197,8 +197,8 @@ public class PushGatewayIT {
      JSONArray result =
          JsonPath.parse(scrapeResponseJson)
              .read("$.data.result" + Filter.filter(criteria) + ".value[1]");
 -    assertThat(result.size()).isOne();
+-    return Double.parseDouble(result.get(0).toString());
 +    assertThat(result).hasSize(1);
-     return Double.parseDouble(result.get(0).toString());
++    return Double.parseDouble(result.getFirst().toString());
    }
  
+   private void assertNativeHistogram() throws IOException, InterruptedException {
+@@ -213,7 +213,7 @@ public class PushGatewayIT {
+     JSONArray result =
+         JsonPath.parse(scrapeResponseJson)
+             .read("$.data.result" + Filter.filter(criteria) + ".value[1]");
+-    return Double.parseDouble(result.get(0).toString());
++    return Double.parseDouble(result.getFirst().toString());
+   }
+ 
+   private String scrape(String query) throws IOException, InterruptedException {
 @@ -244,7 +244,7 @@ public class PushGatewayIT {
        Thread.sleep(250);
        timeRemaining -= 250;
@@ -2586,16 +2612,18 @@
      CounterSnapshot snapshot = counter.collect();
  
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    CounterSnapshot.CounterDataPointSnapshot datapoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     CounterSnapshot.CounterDataPointSnapshot datapoint = snapshot.getDataPoints().get(0);
++    CounterSnapshot.CounterDataPointSnapshot datapoint = snapshot.getDataPoints().getFirst();
      assertThat(datapoint.getValue()).isCloseTo(value.doubleValue(), offset(0.1));
      assertThat(datapoint.getLabels().size()).isEqualTo(labelValues.size());
  
      value.incrementAndGet();
      snapshot = counter.collect();
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    datapoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     datapoint = snapshot.getDataPoints().get(0);
++    datapoint = snapshot.getDataPoints().getFirst();
      assertThat(datapoint.getValue()).isCloseTo(value.doubleValue(), offset(0.1));
    }
  
@@ -2794,16 +2822,18 @@
      GaugeSnapshot snapshot = gauge.collect();
  
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    GaugeSnapshot.GaugeDataPointSnapshot datapoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     GaugeSnapshot.GaugeDataPointSnapshot datapoint = snapshot.getDataPoints().get(0);
++    GaugeSnapshot.GaugeDataPointSnapshot datapoint = snapshot.getDataPoints().getFirst();
      assertThat(datapoint.getValue()).isCloseTo(value.doubleValue(), offset(0.1));
      assertThat(datapoint.getLabels().size()).isEqualTo(labelValues.size());
  
      value.incrementAndGet();
      snapshot = gauge.collect();
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    datapoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     datapoint = snapshot.getDataPoints().get(0);
++    datapoint = snapshot.getDataPoints().getFirst();
      assertThat(datapoint.getValue()).isCloseTo(value.doubleValue(), offset(0.1));
    }
  
@@ -3029,7 +3059,8 @@
 -    exemplarList.sort(Comparator.comparingDouble(Exemplar::getValue));
 +    exemplarList.sort(comparingDouble(Exemplar::getValue));
      assertThat(exemplars.size()).isEqualTo(2);
-     assertExemplarEquals(ex2, exemplarList.get(0));
+-    assertExemplarEquals(ex2, exemplarList.get(0));
++    assertExemplarEquals(ex2, exemplarList.getFirst());
      assertExemplarEquals(ex3, exemplarList.get(1));
    }
  
@@ -3597,6 +3628,15 @@
      Counter counter =
          Counter.builder().name("testLabelRemoveIf").labelNames("label1", "label2").build();
      Field data = counter.getClass().getSuperclass().getDeclaredField("data");
+@@ -50,7 +50,7 @@ class StatefulMetricTest {
+     counter.labelValues("a", "d").inc(7.0);
+     counter.labelValues("e", "f").inc(8.0);
+ 
+-    counter.removeIf(labels -> labels.size() == 2 && labels.get(0).equals("a"));
++    counter.removeIf(labels -> labels.size() == 2 && labels.getFirst().equals("a"));
+ 
+     Map<List<String>, Counter.DataPoint> dataPoints =
+         (Map<List<String>, Counter.DataPoint>) data.get(counter);
 @@ -61,7 +61,7 @@ class StatefulMetricTest {
    }
  
@@ -3606,7 +3646,7 @@
      Counter counter = Counter.builder().name("test").labelNames("label1", "label2").build();
      counter.labelValues("a", "b").inc(3.0);
      counter.labelValues("c", "d").inc(3.0);
-@@ -76,7 +76,7 @@ class StatefulMetricTest {
+@@ -76,29 +76,29 @@ class StatefulMetricTest {
    }
  
    @Test
@@ -3615,7 +3655,21 @@
      Counter counter = Counter.builder().name("test").build();
      counter.inc();
      assertThat(counter.collect().getDataPoints()).hasSize(1);
-@@ -95,10 +95,10 @@ class StatefulMetricTest {
+-    assertThat(counter.collect().getDataPoints().get(0).getValue()).isEqualTo(1.0);
++    assertThat(counter.collect().getDataPoints().getFirst().getValue()).isEqualTo(1.0);
+ 
+     counter.clear();
+     // No labels is always present, but as no value has been observed after clear() the value should
+     // be 0.0
+     assertThat(counter.collect().getDataPoints()).hasSize(1);
+-    assertThat(counter.collect().getDataPoints().get(0).getValue()).isEqualTo(0.0);
++    assertThat(counter.collect().getDataPoints().getFirst().getValue()).isEqualTo(0.0);
+ 
+     // Making inc() works correctly after clear()
+     counter.inc();
+     assertThat(counter.collect().getDataPoints()).hasSize(1);
+-    assertThat(counter.collect().getDataPoints().get(0).getValue()).isEqualTo(1.0);
++    assertThat(counter.collect().getDataPoints().getFirst().getValue()).isEqualTo(1.0);
    }
  
    @Test
@@ -3767,15 +3821,17 @@
    }
  
    private double getQuantile(Summary summary, double quantile, Labels labels) {
-@@ -188,7 +188,7 @@ class SummaryTest {
+@@ -188,8 +188,8 @@ class SummaryTest {
    private SummarySnapshot.SummaryDataPointSnapshot getDatapoint(Summary summary, Labels labels) {
      SummarySnapshot snapshot = summary.collect();
      List<SummarySnapshot.SummaryDataPointSnapshot> datapoints = snapshot.getDataPoints();
 -    assertThat(datapoints.size()).isOne();
+-    SummarySnapshot.SummaryDataPointSnapshot datapoint = datapoints.get(0);
 +    assertThat(datapoints).hasSize(1);
-     SummarySnapshot.SummaryDataPointSnapshot datapoint = datapoints.get(0);
++    SummarySnapshot.SummaryDataPointSnapshot datapoint = datapoints.getFirst();
      assertThat((Iterable<? extends Label>) datapoint.getLabels()).isEqualTo(labels);
      return datapoint;
+   }
 --- a/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/SummaryWithCallbackTest.java
 +++ b/prometheus-metrics-core/src/test/java/io/prometheus/metrics/core/metrics/SummaryWithCallbackTest.java
 @@ -1,7 +1,7 @@
@@ -3800,22 +3856,25 @@
      final AtomicInteger count = new AtomicInteger(1);
      final AtomicInteger sum = new AtomicInteger(1);
      final Quantiles quantiles = Quantiles.of(new Quantile(0.5, 10));
-@@ -32,7 +32,7 @@ class SummaryWithCallbackTest {
+@@ -32,8 +32,8 @@ class SummaryWithCallbackTest {
              .build();
      SummarySnapshot snapshot = gauge.collect();
  
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    SummarySnapshot.SummaryDataPointSnapshot datapoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     SummarySnapshot.SummaryDataPointSnapshot datapoint = snapshot.getDataPoints().get(0);
++    SummarySnapshot.SummaryDataPointSnapshot datapoint = snapshot.getDataPoints().getFirst();
      assertThat(datapoint.getCount()).isEqualTo(count.get());
      assertThat(datapoint.getSum()).isCloseTo(sum.doubleValue(), offset(0.1));
+     assertThat(datapoint.getQuantiles()).isEqualTo(quantiles);
 @@ -42,16 +42,16 @@ class SummaryWithCallbackTest {
      count.incrementAndGet();
      sum.incrementAndGet();
      snapshot = gauge.collect();
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    datapoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     datapoint = snapshot.getDataPoints().get(0);
++    datapoint = snapshot.getDataPoints().getFirst();
      assertThat(datapoint.getCount()).isEqualTo(count.get());
      assertThat(datapoint.getSum()).isCloseTo(sum.doubleValue(), offset(0.1));
    }
@@ -4278,6 +4337,38 @@
        return InstrumentationScopeInfo.builder(instrumentationScopeName)
            .setVersion(instrumentationScopeVersion)
            .build();
+--- a/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusMetricProducer.java
++++ b/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/PrometheusMetricProducer.java
+@@ -83,7 +83,7 @@ class PrometheusMetricProducer implements CollectionRegistration {
+       if (snapshot.getMetadata().getName().equals("target") && snapshot instanceof InfoSnapshot) {
+         InfoSnapshot targetInfo = (InfoSnapshot) snapshot;
+         if (!targetInfo.getDataPoints().isEmpty()) {
+-          InfoSnapshot.InfoDataPointSnapshot data = targetInfo.getDataPoints().get(0);
++          InfoSnapshot.InfoDataPointSnapshot data = targetInfo.getDataPoints().getFirst();
+           Labels labels = data.getLabels();
+           for (int i = 0; i < labels.size(); i++) {
+             result.put(labels.getName(i), labels.getValue(i));
+@@ -102,7 +102,7 @@ class PrometheusMetricProducer implements CollectionRegistration {
+           && snapshot instanceof InfoSnapshot) {
+         InfoSnapshot scopeInfo = (InfoSnapshot) snapshot;
+         if (!scopeInfo.getDataPoints().isEmpty()) {
+-          Labels labels = scopeInfo.getDataPoints().get(0).getLabels();
++          Labels labels = scopeInfo.getDataPoints().getFirst().getLabels();
+           String name = null;
+           String version = null;
+           AttributesBuilder attributesBuilder = Attributes.builder();
+--- a/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/MetricDataFactory.java
++++ b/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/MetricDataFactory.java
+@@ -46,7 +46,8 @@ public class MetricDataFactory {
+   @Nullable
+   public MetricData create(HistogramSnapshot snapshot) {
+     if (!snapshot.getDataPoints().isEmpty()) {
+-      HistogramSnapshot.HistogramDataPointSnapshot firstDataPoint = snapshot.getDataPoints().get(0);
++      HistogramSnapshot.HistogramDataPointSnapshot firstDataPoint =
++          snapshot.getDataPoints().getFirst();
+       if (firstDataPoint.hasNativeHistogramData()) {
+         return new PrometheusMetricData<>(
+             snapshot.getMetadata(),
 --- a/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusClassicHistogram.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/main/java/io/prometheus/metrics/exporter/opentelemetry/otelmodel/PrometheusClassicHistogram.java
 @@ -1,5 +1,7 @@
@@ -4674,6 +4765,14 @@
    }
  
    @Test
+@@ -307,6 +307,6 @@ public class ExportTest {
+   private MetricAssert metricAssert() {
+     List<MetricData> metrics = testing.getMetrics();
+     assertThat(metrics).hasSize(1);
+-    return OpenTelemetryAssertions.assertThat(metrics.get(0));
++    return OpenTelemetryAssertions.assertThat(metrics.getFirst());
+   }
+ }
 --- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/OtelAutoConfigTest.java
 +++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/OtelAutoConfigTest.java
 @@ -1,6 +1,7 @@
@@ -6533,7 +6632,7 @@
      // just test the standard mapper
      final MetricRegistry metricRegistry = new MetricRegistry();
      PrometheusRegistry pmRegistry = new PrometheusRegistry();
-@@ -175,14 +175,14 @@ long_gauge 1234.0
+@@ -175,15 +175,15 @@ long_gauge 1234.0
      // The following asserts the values, but allows an error of 1.0 for quantile values.
  
      MetricSnapshots snapshots = pmRegistry.scrape(name -> name.equals("hist"));
@@ -6546,10 +6645,12 @@
              "Generated from Dropwizard metric import (metric=hist,"
                  + " type=io.dropwizard.metrics5.Histogram)");
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    SummarySnapshot.SummaryDataPointSnapshot dataPoint = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     SummarySnapshot.SummaryDataPointSnapshot dataPoint = snapshot.getDataPoints().get(0);
++    SummarySnapshot.SummaryDataPointSnapshot dataPoint = snapshot.getDataPoints().getFirst();
      assertThat(dataPoint.hasCount()).isTrue();
      assertThat(dataPoint.getCount()).isEqualTo(100);
+     assertThat(dataPoint.hasSum()).isFalse();
 @@ -204,7 +204,7 @@ long_gauge 1234.0
    }
  
@@ -9298,8 +9399,9 @@
              .bucket(Double.POSITIVE_INFINITY, 0)
              .build();
 -    List<ClassicHistogramBucket> list = buckets.stream().collect(Collectors.toList());
+-    assertThat(list.get(0)).isNotEqualByComparingTo(list.get(1));
 +    List<ClassicHistogramBucket> list = buckets.stream().collect(toImmutableList());
-     assertThat(list.get(0)).isNotEqualByComparingTo(list.get(1));
++    assertThat(list.getFirst()).isNotEqualByComparingTo(list.get(1));
    }
  }
 --- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/CounterSnapshotTest.java
@@ -9325,6 +9427,15 @@
      long createdTimestamp1 = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
      long createdTimestamp2 = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
      long exemplarTimestamp = System.currentTimeMillis();
+@@ -53,7 +53,7 @@ class CounterSnapshotTest {
+     CounterDataPointSnapshot data =
+         snapshot
+             .getDataPoints()
+-            .get(0); // data is sorted by labels, so the first one should be path="/hello"
++            .getFirst(); // data is sorted by labels, so the first one should be path="/hello"
+     assertThat((Iterable<? extends Label>) data.getLabels()).isEqualTo(Labels.of("path", "/hello"));
+     assertThat(data.getValue()).isEqualTo(2.0);
+     assertThat(data.getExemplar().getValue()).isEqualTo(4.0);
 @@ -68,7 +68,7 @@ class CounterSnapshotTest {
    }
  
@@ -9334,6 +9445,15 @@
      CounterSnapshot snapshot =
          CounterSnapshot.builder()
              .name("events")
+@@ -76,7 +76,7 @@ class CounterSnapshotTest {
+             .build();
+     SnapshotTestUtil.assertMetadata(snapshot, "events", null, null);
+     assertThat(snapshot.getDataPoints()).hasSize(1);
+-    CounterDataPointSnapshot data = snapshot.getDataPoints().get(0);
++    CounterDataPointSnapshot data = snapshot.getDataPoints().getFirst();
+     assertThat((Iterable<? extends Label>) data.getLabels()).isEmpty();
+     assertThat(data.getValue()).isEqualTo(1.0);
+     assertThat(data.getExemplar()).isNull();
 @@ -85,25 +85,25 @@ class CounterSnapshotTest {
    }
  
@@ -9516,7 +9636,16 @@
      long exemplarTimestamp = System.currentTimeMillis();
      GaugeSnapshot snapshot =
          GaugeSnapshot.builder()
-@@ -63,14 +63,14 @@ class GaugeSnapshotTest {
+@@ -48,7 +48,7 @@ class GaugeSnapshotTest {
+     GaugeDataPointSnapshot data =
+         snapshot
+             .getDataPoints()
+-            .get(0); // data is sorted by labels, so the first one should be path="/hello"
++            .getFirst(); // data is sorted by labels, so the first one should be path="/hello"
+     assertThat((Iterable<? extends Label>) data.getLabels()).isEqualTo(Labels.of("env", "dev"));
+     assertThat(data.getValue()).isEqualTo(128.0);
+     assertThat(data.getExemplar().getValue()).isEqualTo(128.0);
+@@ -63,15 +63,15 @@ class GaugeSnapshotTest {
    }
  
    @Test
@@ -9529,10 +9658,12 @@
              .build();
      SnapshotTestUtil.assertMetadata(snapshot, "temperature", null, null);
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    GaugeDataPointSnapshot data = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     GaugeDataPointSnapshot data = snapshot.getDataPoints().get(0);
++    GaugeDataPointSnapshot data = snapshot.getDataPoints().getFirst();
      assertThat((Iterable<? extends Label>) data.getLabels()).isEmpty();
      assertThat(data.getValue()).isEqualTo(23.0);
+     assertThat(data.getExemplar()).isNull();
 @@ -80,31 +80,31 @@ class GaugeSnapshotTest {
    }
  
@@ -9611,6 +9742,15 @@
      long createdTimestamp = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
      long scrapeTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
      long exemplarTimestamp = System.currentTimeMillis();
+@@ -90,7 +90,7 @@ class HistogramSnapshotTest {
+     HistogramDataPointSnapshot data =
+         snapshot
+             .getDataPoints()
+-            .get(0); // data is sorted by labels, so the first one should be path="/"
++            .getFirst(); // data is sorted by labels, so the first one should be path="/"
+     assertThat(data.hasSum()).isTrue();
+     assertThat(data.hasCount()).isTrue();
+     assertThat(data.hasCreatedTimestamp()).isTrue();
 @@ -115,7 +115,7 @@ class HistogramSnapshotTest {
          }
          case 2 -> {
@@ -9671,12 +9811,15 @@
      HistogramSnapshot snapshot =
          HistogramSnapshot.builder()
              .name("minimal_histogram")
-@@ -194,11 +194,11 @@ class HistogramSnapshotTest {
+@@ -192,13 +192,13 @@ class HistogramSnapshotTest {
+                             new double[] {Double.POSITIVE_INFINITY}, new long[] {0}))
+                     .build())
              .build();
-     HistogramDataPointSnapshot data = snapshot.getDataPoints().get(0);
+-    HistogramDataPointSnapshot data = snapshot.getDataPoints().get(0);
++    HistogramDataPointSnapshot data = snapshot.getDataPoints().getFirst();
      assertThat(data.hasSum()).isFalse();
 -    assertThat(snapshot.getDataPoints().get(0).getClassicBuckets().size()).isOne();
-+    assertThat(snapshot.getDataPoints().get(0).getClassicBuckets().size()).isEqualTo(1);
++    assertThat(snapshot.getDataPoints().getFirst().getClassicBuckets().size()).isEqualTo(1);
    }
  
    @Test
@@ -9690,8 +9833,9 @@
      assertThat(snapshot.getMetadata().getName()).isEqualTo("hist");
      assertThat(snapshot.getMetadata().hasUnit()).isFalse();
 -    assertThat(snapshot.getDataPoints().size()).isOne();
+-    HistogramDataPointSnapshot data = snapshot.getDataPoints().get(0);
 +    assertThat(snapshot.getDataPoints()).hasSize(1);
-     HistogramDataPointSnapshot data = snapshot.getDataPoints().get(0);
++    HistogramDataPointSnapshot data = snapshot.getDataPoints().getFirst();
      assertThat(data.hasCreatedTimestamp()).isFalse();
      assertThat(data.hasScrapeTimestamp()).isFalse();
      assertThat(data.hasCount()).isTrue();
@@ -9710,7 +9854,15 @@
      HistogramSnapshot snapshot =
          HistogramSnapshot.builder()
              .name("test_histogram")
-@@ -239,21 +239,21 @@ class HistogramSnapshotTest {
+@@ -232,28 +232,28 @@ class HistogramSnapshotTest {
+                             .build())
+                     .build())
+             .build();
+-    HistogramDataPointSnapshot data = snapshot.getDataPoints().get(0);
++    HistogramDataPointSnapshot data = snapshot.getDataPoints().getFirst();
+     assertThat(data.hasSum()).isFalse();
+     assertThat(data.hasCount()).isTrue();
+     assertThat(data.getCount()).isEqualTo(5);
    }
  
    @Test
@@ -10628,6 +10780,24 @@
      testEscapeMetricSnapshot(
          "unicode.and.dots.花火",
          "some_label",
+@@ -91,7 +92,7 @@ class SnapshotEscaperTest {
+     assertThat(got.getMetadata().getHelp()).isEqualTo("some help text");
+     assertThat(got.getDataPoints()).hasSize(1);
+ 
+-    DataPointSnapshot escapedData = got.getDataPoints().get(0);
++    DataPointSnapshot escapedData = got.getDataPoints().getFirst();
+     assertThat((Iterable<? extends Label>) escapedData.getLabels())
+         .isEqualTo(Labels.builder().label(expectedLabelName, expectedLabelValue).build());
+ 
+@@ -99,7 +100,7 @@ class SnapshotEscaperTest {
+     assertThat(original.getMetadata().getHelp()).isEqualTo("some help text");
+     assertThat(original.getDataPoints()).hasSize(1);
+ 
+-    DataPointSnapshot originalData = original.getDataPoints().get(0);
++    DataPointSnapshot originalData = original.getDataPoints().getFirst();
+     assertThat((Iterable<? extends Label>) originalData.getLabels())
+         .isEqualTo(Labels.builder().label(labelName, labelValue).build());
+   }
 @@ -130,8 +131,8 @@ class SnapshotEscaperTest {
      throw new IllegalArgumentException("Unsupported snapshot type: " + snapshotType);
    }
@@ -10832,6 +11002,15 @@
      long createdTimestamp = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1);
      long scrapeTimestamp = System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(2);
      long exemplarTimestamp = System.currentTimeMillis();
+@@ -58,7 +58,7 @@ class SummarySnapshotTest {
+             .build();
+     SnapshotTestUtil.assertMetadata(snapshot, "latency_seconds", "latency in seconds", "seconds");
+     assertThat(snapshot.getDataPoints()).hasSize(2);
+-    SummarySnapshot.SummaryDataPointSnapshot data = snapshot.getDataPoints().get(0);
++    SummarySnapshot.SummaryDataPointSnapshot data = snapshot.getDataPoints().getFirst();
+     assertThat((Iterable<? extends Label>) data.getLabels()).isEqualTo(Labels.of("endpoint", "/"));
+     assertThat(data.hasCount()).isTrue();
+     assertThat(data.getCount()).isEqualTo(1093);
 @@ -82,7 +82,7 @@ class SummarySnapshotTest {
    }
  
@@ -10841,7 +11020,13 @@
      SummarySnapshot snapshot =
          SummarySnapshot.builder()
              .name("size_bytes")
-@@ -95,21 +95,21 @@ class SummarySnapshotTest {
+@@ -90,26 +90,26 @@ class SummarySnapshotTest {
+                 SummarySnapshot.SummaryDataPointSnapshot.builder().count(10).sum(12.0).build())
+             .build();
+     assertThat(snapshot.getDataPoints()).hasSize(1);
+-    assertThat((Iterable<? extends Label>) snapshot.getDataPoints().get(0).getLabels())
++    assertThat((Iterable<? extends Label>) snapshot.getDataPoints().getFirst().getLabels())
+         .isEqualTo(Labels.EMPTY);
    }
  
    @Test
