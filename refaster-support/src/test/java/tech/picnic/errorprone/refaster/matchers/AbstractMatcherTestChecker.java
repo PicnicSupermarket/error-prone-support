@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refaster.matchers;
 
+import com.google.errorprone.BugPattern;
+import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
