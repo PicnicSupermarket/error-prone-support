@@ -12765,8 +12765,35 @@
            Map.entry(DTD_PUBLIC_ID_1_0, DTD_CONFIGURATION_NAME_1_0),
            Map.entry(DTD_PUBLIC_ID_1_1, DTD_CONFIGURATION_NAME_1_1),
            Map.entry(DTD_PUBLIC_ID_1_2, DTD_CONFIGURATION_NAME_1_2),
-@@ -508,9 +511,7 @@ public final class ConfigurationLoader {
-         final DefaultConfiguration top = configStack.peek();
+@@ -476,11 +479,11 @@ public final class ConfigurationLoader {
+           configuration = conf;
+         } else {
+           // add configuration to it's parent
+-          final DefaultConfiguration top = configStack.peek();
++          final DefaultConfiguration top = configStack.peekFirst();
+           top.addChild(conf);
+         }
+ 
+-        configStack.push(conf);
++        configStack.addFirst(conf);
+       } else if (PROPERTY.equals(qName)) {
+         // extract value and name
+         final String attributesValue = attributes.getValue(VALUE);
+@@ -497,7 +500,7 @@ public final class ConfigurationLoader {
+         final String name = attributes.getValue(NAME);
+ 
+         // add to attributes of configuration
+-        final DefaultConfiguration top = configStack.peek();
++        final DefaultConfiguration top = configStack.peekFirst();
+         top.addProperty(name, value);
+       } else if (MESSAGE.equals(qName)) {
+         // extract key and value
+@@ -505,19 +508,17 @@ public final class ConfigurationLoader {
+         final String value = attributes.getValue(VALUE);
+ 
+         // add to messages of configuration
+-        final DefaultConfiguration top = configStack.peek();
++        final DefaultConfiguration top = configStack.peekFirst();
          top.addMessage(key, value);
        } else {
 -        if (!METADATA.equals(qName)) {
@@ -12776,6 +12803,23 @@
        }
      }
  
+     @Override
+     public void endElement(String uri, String localName, String qName) throws SAXException {
+       if (MODULE.equals(qName)) {
+-        final Configuration recentModule = configStack.pop();
++        final Configuration recentModule = configStack.removeFirst();
+ 
+         // get severity attribute if it exists
+         SeverityLevel level = null;
+@@ -542,7 +543,7 @@ public final class ConfigurationLoader {
+         final boolean omitModule = omitIgnoredModules && level == SeverityLevel.IGNORE;
+ 
+         if (omitModule && !configStack.isEmpty()) {
+-          final DefaultConfiguration parentModule = configStack.peek();
++          final DefaultConfiguration parentModule = configStack.peekFirst();
+           parentModule.removeChild(recentModule);
+         }
+       }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/DefaultLogger.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/DefaultLogger.java
 @@ -19,6 +19,9 @@
@@ -13146,6 +13190,24 @@
  import java.util.Deque;
  import java.util.Enumeration;
  import java.util.HashMap;
+@@ -79,7 +80,7 @@ public final class PackageNamesLoader extends XmlLoader {
+     if (PACKAGE_ELEMENT_NAME.equals(qName)) {
+       // push package name, name is mandatory attribute with not empty value by DTD
+       final String name = attributes.getValue("name");
+-      packageStack.push(name);
++      packageStack.addFirst(name);
+     }
+   }
+ 
+@@ -105,7 +106,7 @@ public final class PackageNamesLoader extends XmlLoader {
+   public void endElement(String uri, String localName, String qName) {
+     if (PACKAGE_ELEMENT_NAME.equals(qName)) {
+       packageNames.add(getPackageName());
+-      packageStack.pop();
++      packageStack.removeFirst();
+     }
+   }
+ 
 @@ -137,7 +138,7 @@ public final class PackageNamesLoader extends XmlLoader {
        throw new CheckstyleException("unable to open one of package files", exc);
      }
@@ -13680,6 +13742,26 @@
    }
  
    @Override
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/api/FullIdent.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/FullIdent.java
+@@ -79,7 +79,7 @@ public final class FullIdent {
+     boolean bracketsExist = false;
+     int dotCounter = 0;
+     while (!identStack.isEmpty()) {
+-      final DetailAST currentAst = identStack.pop();
++      final DetailAST currentAst = identStack.removeFirst();
+ 
+       final DetailAST nextSibling = currentAst.getNextSibling();
+ 
+@@ -148,7 +148,7 @@ public final class FullIdent {
+    */
+   private static void pushToIdentStack(Deque<DetailAST> stack, DetailAST ast) {
+     if (ast != null) {
+-      stack.push(ast);
++      stack.addFirst(ast);
+     }
+   }
+ 
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/api/SeverityLevelCounter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/api/SeverityLevelCounter.java
 @@ -19,6 +19,8 @@
@@ -13957,6 +14039,90 @@
    }
  
    /**
+@@ -250,13 +251,13 @@ public class SuppressWarningsCheck extends AbstractCheck {
+    */
+   private void walkConditional(final DetailAST cond) {
+     final Deque<DetailAST> condStack = new ArrayDeque<>();
+-    condStack.push(cond);
++    condStack.addFirst(cond);
+ 
+     while (!condStack.isEmpty()) {
+-      final DetailAST currentCond = condStack.pop();
++      final DetailAST currentCond = condStack.removeFirst();
+       if (currentCond.getType() == TokenTypes.QUESTION) {
+-        condStack.push(getCondRight(currentCond));
+-        condStack.push(getCondLeft(currentCond));
++        condStack.addFirst(getCondRight(currentCond));
++        condStack.addFirst(getCondLeft(currentCond));
+       } else {
+         final String warningText = removeQuotes(currentCond.getText());
+         logMatch(currentCond, warningText);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/AbstractSuperCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/AbstractSuperCheck.java
+@@ -72,7 +72,7 @@ public abstract class AbstractSuperCheck extends AbstractCheck {
+   @Override
+   public void visitToken(DetailAST ast) {
+     if (isOverridingMethod(ast)) {
+-      methodStack.add(new MethodNode(ast));
++      methodStack.addLast(new MethodNode(ast));
+     } else if (isSuperCall(ast)) {
+       final MethodNode methodNode = methodStack.getLast();
+       methodNode.setCallingSuper();
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/DeclarationOrderCheck.java
+@@ -161,7 +161,7 @@ public class DeclarationOrderCheck extends AbstractCheck {
+ 
+       case TokenTypes.METHOD_DEF -> {
+         if (parentType == TokenTypes.OBJBLOCK) {
+-          final ScopeState state = scopeStates.peek();
++          final ScopeState state = scopeStates.peekFirst();
+           // nothing can be bigger than method's state
+           state.currentScopeState = STATE_METHOD_DEF;
+         }
+@@ -186,7 +186,7 @@ public class DeclarationOrderCheck extends AbstractCheck {
+    * @param ast constructor AST.
+    */
+   private void processConstructor(DetailAST ast) {
+-    final ScopeState state = scopeStates.peek();
++    final ScopeState state = scopeStates.peekFirst();
+     if (state.currentScopeState > STATE_CTOR_DEF) {
+       if (!ignoreConstructors) {
+         log(ast, MSG_CONSTRUCTOR);
+@@ -202,7 +202,7 @@ public class DeclarationOrderCheck extends AbstractCheck {
+    * @param ast ast of Modifiers.
+    */
+   private void processModifiers(DetailAST ast) {
+-    final ScopeState state = scopeStates.peek();
++    final ScopeState state = scopeStates.peekFirst();
+     final boolean isStateValid = processModifiersState(ast, state);
+     processModifiersSubState(ast, state, isStateValid);
+   }
+@@ -286,14 +286,14 @@ public class DeclarationOrderCheck extends AbstractCheck {
+     final Deque<DetailAST> stack = new ArrayDeque<>();
+     while (vertex != null || !stack.isEmpty()) {
+       if (!stack.isEmpty()) {
+-        vertex = stack.pop();
++        vertex = stack.removeFirst();
+       }
+       while (vertex != null) {
+         if (vertex.getType() == tokenType && !vertex.equals(ast)) {
+           result.add(vertex);
+         }
+         if (vertex.getNextSibling() != null) {
+-          stack.push(vertex.getNextSibling());
++          stack.addFirst(vertex.getNextSibling());
+         }
+         vertex = vertex.getFirstChild();
+       }
+@@ -304,7 +304,7 @@ public class DeclarationOrderCheck extends AbstractCheck {
+   @Override
+   public void leaveToken(DetailAST ast) {
+     if (ast.getType() == TokenTypes.OBJBLOCK) {
+-      scopeStates.pop();
++      scopeStates.removeFirst();
+     }
+   }
+ 
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsAvoidNullCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/EqualsAvoidNullCheck.java
 @@ -19,12 +19,13 @@
@@ -13992,6 +14158,134 @@
      }
  
      /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/FinalLocalVariableCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/FinalLocalVariableCheck.java
+@@ -174,12 +174,12 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+           scopeStack.push(new ScopeData());
+ 
+       case TokenTypes.SLIST -> {
+-        currentScopeAssignedVariables.push(new ArrayDeque<>());
++        currentScopeAssignedVariables.addFirst(new ArrayDeque<>());
+         if (ast.getParent().getType() != TokenTypes.CASE_GROUP
+             || ast.getParent().getParent().findFirstToken(TokenTypes.CASE_GROUP)
+                 == ast.getParent()) {
+           storePrevScopeUninitializedVariableData();
+-          scopeStack.push(new ScopeData());
++          scopeStack.addFirst(new ScopeData());
+         }
+       }
+ 
+@@ -209,13 +209,13 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+           final Optional<FinalVariableCandidate> candidate = getFinalCandidate(ast);
+           if (candidate.isPresent()) {
+             determineAssignmentConditions(ast, candidate.orElseThrow());
+-            currentScopeAssignedVariables.peek().add(ast);
++            currentScopeAssignedVariables.peekFirst().addLast(ast);
+           }
+           removeFinalVariableCandidateFromStack(ast);
+         }
+       }
+ 
+-      case TokenTypes.LITERAL_BREAK -> scopeStack.peek().containsBreak = true;
++      case TokenTypes.LITERAL_BREAK -> scopeStack.peekFirst().containsBreak = true;
+ 
+       case TokenTypes.EXPR -> {
+         // Switch labeled expression has no slist
+@@ -237,7 +237,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+           TokenTypes.CTOR_DEF,
+           TokenTypes.METHOD_DEF,
+           TokenTypes.LITERAL_FOR ->
+-          scope = scopeStack.pop().scope;
++          scope = scopeStack.removeFirst().scope;
+ 
+       case TokenTypes.EXPR -> {
+         // Switch labeled expression has no slist
+@@ -251,8 +251,8 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+         boolean containsBreak = false;
+         if (parentAst.getType() != TokenTypes.CASE_GROUP
+             || findLastCaseGroupWhichContainsSlist(parentAst.getParent()) == parentAst) {
+-          containsBreak = scopeStack.peek().containsBreak;
+-          scope = scopeStack.pop().scope;
++          containsBreak = scopeStack.peekFirst().containsBreak;
++          scope = scopeStack.removeFirst().scope;
+         }
+         if (containsBreak || shouldUpdateUninitializedVariables(parentAst)) {
+           updateAllUninitializedVariables();
+@@ -276,8 +276,10 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+   /** Update assigned variables in a temporary stack. */
+   private void updateCurrentScopeAssignedVariables() {
+     // -@cs[MoveVariableInsideIf] assignment value is a modification call, so it can't be moved
+-    final Deque<DetailAST> poppedScopeAssignedVariableData = currentScopeAssignedVariables.pop();
+-    final Deque<DetailAST> currentScopeAssignedVariableData = currentScopeAssignedVariables.peek();
++    final Deque<DetailAST> poppedScopeAssignedVariableData =
++        currentScopeAssignedVariables.removeFirst();
++    final Deque<DetailAST> currentScopeAssignedVariableData =
++        currentScopeAssignedVariables.peekFirst();
+     if (currentScopeAssignedVariableData != null) {
+       currentScopeAssignedVariableData.addAll(poppedScopeAssignedVariableData);
+     }
+@@ -342,7 +344,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+ 
+   /** Store un-initialized variables in a temporary stack for future use. */
+   private void storePrevScopeUninitializedVariableData() {
+-    final ScopeData scopeData = scopeStack.peek();
++    final ScopeData scopeData = scopeStack.peekFirst();
+     final Deque<DetailAST> prevScopeUninitializedVariableData = new ArrayDeque<>();
+     scopeData.uninitializedVariables.forEach(prevScopeUninitializedVariableData::push);
+     scopeData.prevScopeUninitializedVariables = prevScopeUninitializedVariableData;
+@@ -365,7 +367,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+    * @param scopeUninitializedVariableData variable for specific stack of uninitialized variables
+    */
+   private void updateUninitializedVariables(Deque<DetailAST> scopeUninitializedVariableData) {
+-    final Iterator<DetailAST> iterator = currentScopeAssignedVariables.peek().iterator();
++    final Iterator<DetailAST> iterator = currentScopeAssignedVariables.peekFirst().iterator();
+     while (iterator.hasNext()) {
+       final DetailAST assignedVariable = iterator.next();
+       boolean shouldRemove = false;
+@@ -377,7 +379,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+             storedVariable = candidate.variableIdent;
+           }
+           if (storedVariable != null && isSameVariables(assignedVariable, variable)) {
+-            scopeData.uninitializedVariables.push(variable);
++            scopeData.uninitializedVariables.addFirst(variable);
+             shouldRemove = true;
+           }
+         }
+@@ -463,7 +465,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+    * @param ast the variable to insert.
+    */
+   private void insertParameter(DetailAST ast) {
+-    final Map<String, FinalVariableCandidate> scope = scopeStack.peek().scope;
++    final Map<String, FinalVariableCandidate> scope = scopeStack.peekFirst().scope;
+     final DetailAST astNode = ast.findFirstToken(TokenTypes.IDENT);
+     scope.put(astNode.getText(), new FinalVariableCandidate(astNode));
+   }
+@@ -474,14 +476,14 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+    * @param ast the variable to insert.
+    */
+   private void insertVariable(DetailAST ast) {
+-    final Map<String, FinalVariableCandidate> scope = scopeStack.peek().scope;
++    final Map<String, FinalVariableCandidate> scope = scopeStack.peekFirst().scope;
+     final DetailAST astNode = ast.findFirstToken(TokenTypes.IDENT);
+     final FinalVariableCandidate candidate = new FinalVariableCandidate(astNode);
+     // for-each variables are implicitly assigned
+     candidate.assigned = ast.getParent().getType() == TokenTypes.FOR_EACH_CLAUSE;
+     scope.put(astNode.getText(), candidate);
+     if (!isInitialized(astNode)) {
+-      scopeStack.peek().uninitializedVariables.add(astNode);
++      scopeStack.peekFirst().uninitializedVariables.addLast(astNode);
+     }
+   }
+ 
+@@ -561,7 +563,7 @@ public class FinalLocalVariableCheck extends AbstractCheck {
+           final FinalVariableCandidate candidate = scopeData.scope.get(ast.getText());
+           shouldRemove = candidate.alreadyAssigned;
+         }
+-        scopeData.uninitializedVariables.remove(variable);
++        scopeData.uninitializedVariables.removeFirstOccurrence(variable);
+         break;
+       }
+     }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalCatchCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalCatchCheck.java
 @@ -19,6 +19,8 @@
@@ -14166,6 +14460,39 @@
  
  /**
   * <div> Checks that for loop control variables are not modified inside the for block. An example
+@@ -232,12 +233,12 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+ 
+   /** Enters an inner class, which requires a new variable set. */
+   private void enterBlock() {
+-    variableStack.push(new ArrayDeque<>());
++    variableStack.addFirst(new ArrayDeque<>());
+   }
+ 
+   /** Leave an inner class, so restore variable set. */
+   private void exitBlock() {
+-    variableStack.pop();
++    variableStack.removeFirst();
+   }
+ 
+   /**
+@@ -246,7 +247,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+    * @return current variable stack
+    */
+   private Deque<String> getCurrentVariables() {
+-    return variableStack.peek();
++    return variableStack.peekFirst();
+   }
+ 
+   /**
+@@ -273,7 +274,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+   private void leaveForIter(DetailAST ast) {
+     final Set<String> variablesToPutInScope = getVariablesManagedByForLoop(ast);
+     for (String variableName : variablesToPutInScope) {
+-      getCurrentVariables().push(variableName);
++      getCurrentVariables().addFirst(variableName);
+     }
+   }
+ 
 @@ -288,7 +289,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
      final Set<String> iteratingVariables = getForIteratorVariables(ast);
      return initializedVariables.stream()
@@ -14175,6 +14502,33 @@
    }
  
    /**
+@@ -303,7 +304,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+ 
+     if (!isRecordPattern) {
+       final DetailAST paramName = paramDef.findFirstToken(TokenTypes.IDENT);
+-      getCurrentVariables().push(paramName.getText());
++      getCurrentVariables().addFirst(paramName.getText());
+     }
+   }
+ 
+@@ -318,7 +319,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+       final Deque<String> currentVariables = getCurrentVariables();
+       if (!skipEnhancedForLoopVariable && !currentVariables.isEmpty()) {
+         // this is for-each loop, just pop variables
+-        currentVariables.pop();
++        currentVariables.removeFirst();
+       }
+     } else {
+       final Set<String> variablesManagedByForLoop = getVariablesManagedByForLoop(ast);
+@@ -333,7 +334,7 @@ public final class ModifiedControlVariableCheck extends AbstractCheck {
+    */
+   private void popCurrentVariables(int count) {
+     for (int i = 0; i < count; i++) {
+-      getCurrentVariables().pop();
++      getCurrentVariables().removeFirst();
+     }
+   }
+ 
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleStringLiteralsCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/MultipleStringLiteralsCheck.java
 @@ -184,7 +184,7 @@ public class MultipleStringLiteralsCheck extends AbstractCheck {
@@ -14186,6 +14540,38 @@
          final String recurringString =
              ALL_NEW_LINES.matcher(stringListEntry.getKey()).replaceAll("\\\\n");
          log(firstFinding, MSG_KEY, recurringString, hits.size());
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/OneStatementPerLineCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/OneStatementPerLineCheck.java
+@@ -112,7 +112,7 @@ public final class OneStatementPerLineCheck extends AbstractCheck {
+       case TokenTypes.FOR_ITERATOR -> forStatementEnd = ast.getLineNo();
+       case TokenTypes.LAMBDA -> {
+         isInLambda = true;
+-        countOfSemiInLambda.push(0);
++        countOfSemiInLambda.addFirst(0);
+       }
+       default -> inForHeader = true;
+     }
+@@ -128,7 +128,7 @@ public final class OneStatementPerLineCheck extends AbstractCheck {
+       }
+       case TokenTypes.FOR_ITERATOR -> inForHeader = false;
+       case TokenTypes.LAMBDA -> {
+-        countOfSemiInLambda.pop();
++        countOfSemiInLambda.removeFirst();
+         if (countOfSemiInLambda.isEmpty()) {
+           isInLambda = false;
+         }
+@@ -173,9 +173,9 @@ public final class OneStatementPerLineCheck extends AbstractCheck {
+    * @param currentStatement current statement
+    */
+   private void checkLambda(DetailAST ast, DetailAST currentStatement) {
+-    int countOfSemiInCurrentLambda = countOfSemiInLambda.pop();
++    int countOfSemiInCurrentLambda = countOfSemiInLambda.removeFirst();
+     countOfSemiInCurrentLambda++;
+-    countOfSemiInLambda.push(countOfSemiInCurrentLambda);
++    countOfSemiInLambda.addFirst(countOfSemiInCurrentLambda);
+     if (!inForHeader
+         && countOfSemiInCurrentLambda > 1
+         && isOnTheSameLine(
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ParameterAssignmentCheck.java
 @@ -19,6 +19,7 @@
@@ -14213,6 +14599,171 @@
    }
  
    @Override
+@@ -113,7 +113,7 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
+     final int type = ast.getType();
+     if (TokenUtil.isOfType(type, TokenTypes.CTOR_DEF, TokenTypes.METHOD_DEF)
+         || type == TokenTypes.LAMBDA && ast.getParent().getType() != TokenTypes.SWITCH_RULE) {
+-      parameterNames = parameterNamesStack.pop();
++      parameterNames = parameterNamesStack.removeFirst();
+     }
+   }
+ 
+@@ -138,7 +138,7 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
+    * @param ast a method to process.
+    */
+   private void visitMethodDef(DetailAST ast) {
+-    parameterNamesStack.push(parameterNames);
++    parameterNamesStack.addFirst(parameterNames);
+     parameterNames = new HashSet<>();
+ 
+     visitMethodParameters(ast.findFirstToken(TokenTypes.PARAMETERS));
+@@ -150,7 +150,7 @@ public final class ParameterAssignmentCheck extends AbstractCheck {
+    * @param lambdaAst node of type {@link TokenTypes#LAMBDA}.
+    */
+   private void visitLambda(DetailAST lambdaAst) {
+-    parameterNamesStack.push(parameterNames);
++    parameterNamesStack.addFirst(parameterNames);
+     parameterNames = new HashSet<>();
+ 
+     DetailAST parameterAst = lambdaAst.findFirstToken(TokenTypes.PARAMETERS);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/RequireThisCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/RequireThisCheck.java
+@@ -222,7 +222,7 @@ public class RequireThisCheck extends AbstractCheck {
+           current.push(frames.get(ast));
+       case TokenTypes.LITERAL_TRY -> {
+         if (ast.getFirstChild().getType() == TokenTypes.RESOURCE_SPECIFICATION) {
+-          current.push(frames.get(ast));
++          current.addFirst(frames.get(ast));
+         }
+       }
+       default -> {
+@@ -243,10 +243,10 @@ public class RequireThisCheck extends AbstractCheck {
+           TokenTypes.CTOR_DEF,
+           TokenTypes.LITERAL_FOR,
+           TokenTypes.RECORD_DEF ->
+-          current.pop();
++          current.removeFirst();
+       case TokenTypes.LITERAL_TRY -> {
+-        if (current.peek().getType() == FrameType.TRY_WITH_RESOURCES_FRAME) {
+-          current.pop();
++        if (current.peekFirst().getType() == FrameType.TRY_WITH_RESOURCES_FRAME) {
++          current.removeFirst();
+         }
+       }
+       default -> {
+@@ -362,7 +362,7 @@ public class RequireThisCheck extends AbstractCheck {
+    */
+   // -@cs[JavaNCSS] This method is a big switch and is too hard to remove.
+   private static void collectDeclarations(Deque<AbstractFrame> frameStack, DetailAST ast) {
+-    final AbstractFrame frame = frameStack.peek();
++    final AbstractFrame frame = frameStack.peekFirst();
+ 
+     switch (ast.getType()) {
+       case TokenTypes.VARIABLE_DEF -> collectVariableDeclarations(ast, frame);
+@@ -803,14 +803,14 @@ public class RequireThisCheck extends AbstractCheck {
+     final Deque<DetailAST> stack = new ArrayDeque<>();
+     while (vertex != null || !stack.isEmpty()) {
+       if (!stack.isEmpty()) {
+-        vertex = stack.pop();
++        vertex = stack.removeFirst();
+       }
+       while (vertex != null) {
+         if (vertex.getType() == tokenType) {
+           result.add(vertex);
+         }
+         if (vertex.getNextSibling() != null) {
+-          stack.push(vertex.getNextSibling());
++          stack.addFirst(vertex.getNextSibling());
+         }
+         vertex = vertex.getFirstChild();
+       }
+@@ -835,14 +835,14 @@ public class RequireThisCheck extends AbstractCheck {
+     final Deque<DetailAST> stack = new ArrayDeque<>();
+     while (vertex != null || !stack.isEmpty()) {
+       if (!stack.isEmpty()) {
+-        vertex = stack.pop();
++        vertex = stack.removeFirst();
+       }
+       while (vertex != null) {
+         if (tokenType == vertex.getType() && vertex.getLineNo() <= endLineNumber) {
+           result.add(vertex);
+         }
+         if (vertex.getNextSibling() != null) {
+-          stack.push(vertex.getNextSibling());
++          stack.addFirst(vertex.getNextSibling());
+         }
+         vertex = vertex.getFirstChild();
+       }
+@@ -867,14 +867,14 @@ public class RequireThisCheck extends AbstractCheck {
+     final Deque<DetailAST> stack = new ArrayDeque<>();
+     while (vertex != null || !stack.isEmpty()) {
+       if (!stack.isEmpty()) {
+-        vertex = stack.pop();
++        vertex = stack.removeFirst();
+       }
+       while (vertex != null) {
+         if (isAstSimilar(token, vertex) && vertex.getLineNo() <= endLineNumber) {
+           result.add(vertex);
+         }
+         if (vertex.getNextSibling() != null) {
+-          stack.push(vertex.getNextSibling());
++          stack.addFirst(vertex.getNextSibling());
+         }
+         vertex = vertex.getFirstChild();
+       }
+@@ -911,7 +911,7 @@ public class RequireThisCheck extends AbstractCheck {
+    * @return AbstractFrame containing declaration or null.
+    */
+   private AbstractFrame findClassFrame(DetailAST name, boolean lookForMethod) {
+-    AbstractFrame frame = current.peek();
++    AbstractFrame frame = current.peekFirst();
+ 
+     while (true) {
+       frame = findFrame(frame, name, lookForMethod);
+@@ -934,7 +934,7 @@ public class RequireThisCheck extends AbstractCheck {
+    * @return AbstractFrame containing declaration or null.
+    */
+   private AbstractFrame findFrame(DetailAST name, boolean lookForMethod) {
+-    return findFrame(current.peek(), name, lookForMethod);
++    return findFrame(current.peekFirst(), name, lookForMethod);
+   }
+ 
+   /**
+@@ -986,7 +986,7 @@ public class RequireThisCheck extends AbstractCheck {
+    * @return the name of the nearest parent ClassFrame.
+    */
+   private String getNearestClassFrameName() {
+-    AbstractFrame frame = current.peek();
++    AbstractFrame frame = current.peekFirst();
+     while (frame.getType() != FrameType.CLASS_FRAME) {
+       frame = frame.getParent();
+     }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ReturnCountCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/ReturnCountCheck.java
+@@ -157,7 +157,7 @@ public final class ReturnCountCheck extends AbstractCheck {
+    * @param ast method definition for check.
+    */
+   private void visitMethodDef(DetailAST ast) {
+-    contextStack.push(context);
++    contextStack.addFirst(context);
+     final DetailAST methodNameAST = ast.findFirstToken(TokenTypes.IDENT);
+     final boolean check = !format.matcher(methodNameAST.getText()).find();
+     context = new Context(check);
+@@ -170,12 +170,12 @@ public final class ReturnCountCheck extends AbstractCheck {
+    */
+   private void leave(DetailAST ast) {
+     context.checkCount(ast);
+-    context = contextStack.pop();
++    context = contextStack.removeFirst();
+   }
+ 
+   /** Creates new lambda context and places old one on the stack. */
+   private void visitLambda() {
+-    contextStack.push(context);
++    contextStack.addFirst(context);
+     context = new Context(true);
+   }
+ 
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnnecessaryParenthesesCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnnecessaryParenthesesCheck.java
 @@ -19,6 +19,8 @@
@@ -14241,6 +14792,152 @@
    }
  
    /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedCatchParameterShouldBeUnnamedCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedCatchParameterShouldBeUnnamedCheck.java
+@@ -86,7 +86,7 @@ public class UnusedCatchParameterShouldBeUnnamedCheck extends AbstractCheck {
+   public void visitToken(DetailAST ast) {
+     if (ast.getType() == TokenTypes.LITERAL_CATCH) {
+       final CatchParameterDetails catchParameter = new CatchParameterDetails(ast);
+-      catchParameters.push(catchParameter);
++      catchParameters.addFirst(catchParameter);
+     } else if (isCatchParameterIdentifierCandidate(ast) && !isLeftHandOfAssignment(ast)) {
+       // we do not count reassignment as usage
+       catchParameters.stream()
+@@ -100,7 +100,7 @@ public class UnusedCatchParameterShouldBeUnnamedCheck extends AbstractCheck {
+   public void leaveToken(DetailAST ast) {
+     if (ast.getType() == TokenTypes.LITERAL_CATCH) {
+       final Optional<CatchParameterDetails> unusedCatchParameter =
+-          Optional.ofNullable(catchParameters.peek())
++          Optional.ofNullable(catchParameters.peekFirst())
+               .filter(parameter -> !parameter.isUsed())
+               .filter(parameter -> !"_".equals(parameter.getName()));
+ 
+@@ -111,7 +111,7 @@ public class UnusedCatchParameterShouldBeUnnamedCheck extends AbstractCheck {
+                 MSG_UNUSED_CATCH_PARAMETER,
+                 parameter.getName());
+           });
+-      catchParameters.pop();
++      catchParameters.removeFirst();
+     }
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedLambdaParameterShouldBeUnnamedCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedLambdaParameterShouldBeUnnamedCheck.java
+@@ -100,13 +100,13 @@ public class UnusedLambdaParameterShouldBeUnnamedCheck extends AbstractCheck {
+               final DetailAST identifierAst = parameter.findFirstToken(TokenTypes.IDENT);
+               final LambdaParameterDetails lambdaParameter =
+                   new LambdaParameterDetails(ast, identifierAst);
+-              lambdaParameters.push(lambdaParameter);
++              lambdaParameters.addFirst(lambdaParameter);
+             });
+       } else if (ast.getChildCount() != 0) {
+         // we are not switch rule and have a single parameter
+         final LambdaParameterDetails lambdaParameter =
+             new LambdaParameterDetails(ast, ast.findFirstToken(TokenTypes.IDENT));
+-        lambdaParameters.push(lambdaParameter);
++        lambdaParameters.addFirst(lambdaParameter);
+       }
+     } else if (isLambdaParameterIdentifierCandidate(ast) && !isLeftHandOfAssignment(ast)) {
+       // we do not count reassignment as usage
+@@ -119,10 +119,11 @@ public class UnusedLambdaParameterShouldBeUnnamedCheck extends AbstractCheck {
+ 
+   @Override
+   public void leaveToken(DetailAST ast) {
+-    while (lambdaParameters.peek() != null && ast.equals(lambdaParameters.peek().enclosingLambda)) {
++    while (lambdaParameters.peekFirst() != null
++        && ast.equals(lambdaParameters.peekFirst().enclosingLambda)) {
+ 
+       final Optional<LambdaParameterDetails> unusedLambdaParameter =
+-          Optional.ofNullable(lambdaParameters.peek())
++          Optional.ofNullable(lambdaParameters.peekFirst())
+               .filter(parameter -> !parameter.isUsed())
+               .filter(parameter -> !"_".equals(parameter.getName()));
+ 
+@@ -130,7 +131,7 @@ public class UnusedLambdaParameterShouldBeUnnamedCheck extends AbstractCheck {
+           parameter -> {
+             log(parameter.getIdentifierAst(), MSG_UNUSED_LAMBDA_PARAMETER, parameter.getName());
+           });
+-      lambdaParameters.pop();
++      lambdaParameters.removeFirst();
+     }
+   }
+ 
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedLocalVariableCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/UnusedLocalVariableCheck.java
+@@ -228,7 +228,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+       leaveCompilationUnit();
+     } else if (isNonLocalTypeDeclaration(ast)) {
+       depth--;
+-      typeDeclarations.pop();
++      typeDeclarations.removeFirst();
+     }
+   }
+ 
+@@ -292,7 +292,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+     final String qualifiedName = getQualifiedTypeDeclarationName(typeDeclAst);
+     final TypeDeclDesc currTypeDecl = new TypeDeclDesc(qualifiedName, depth, typeDeclAst);
+     depth++;
+-    typeDeclarations.push(currTypeDecl);
++    typeDeclarations.addFirst(currTypeDecl);
+     typeDeclAstToTypeDeclDesc.put(typeDeclAst, currTypeDecl);
+   }
+ 
+@@ -302,7 +302,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+    * @param literalNewAst literalNewAst
+    */
+   private void visitLocalAnonInnerClass(DetailAST literalNewAst) {
+-    anonInnerAstToTypeDeclDesc.put(literalNewAst, typeDeclarations.peek());
++    anonInnerAstToTypeDeclDesc.put(literalNewAst, typeDeclarations.peekFirst());
+     anonInnerClassHolders.add(getBlockContainingLocalAnonInnerClass(literalNewAst));
+   }
+ 
+@@ -348,8 +348,8 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+    * @param variablesStack stack of all the relevant variables in the scope
+    */
+   private void logViolations(DetailAST scopeAst, Deque<VariableDesc> variablesStack) {
+-    while (!variablesStack.isEmpty() && variablesStack.peek().getScope() == scopeAst) {
+-      final VariableDesc variableDesc = variablesStack.pop();
++    while (!variablesStack.isEmpty() && variablesStack.peekFirst().getScope() == scopeAst) {
++      final VariableDesc variableDesc = variablesStack.removeFirst();
+       if (!variableDesc.isUsed() && !variableDesc.isInstVarOrClassVar()) {
+         final DetailAST typeAst = variableDesc.getTypeAst();
+         if (allowUnnamedVariables) {
+@@ -431,7 +431,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+       if (isInstanceVarInInnerClass) {
+         desc.registerAsInstOrClassVar();
+       }
+-      variablesStack.push(desc);
++      variablesStack.addFirst(desc);
+     }
+   }
+ 
+@@ -630,7 +630,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+     final String className = typeDeclAst.findFirstToken(TokenTypes.IDENT).getText();
+     String outerClassQualifiedName = null;
+     if (!typeDeclarations.isEmpty()) {
+-      outerClassQualifiedName = typeDeclarations.peek().getQualifiedName();
++      outerClassQualifiedName = typeDeclarations.peekFirst().getQualifiedName();
+     }
+     return CheckUtil.getQualifiedTypeDeclarationName(
+         packageName, outerClassQualifiedName, className);
+@@ -963,7 +963,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+           instVar -> {
+             final VariableDesc variableDesc = new VariableDesc(instVar.getName(), updatedScope);
+             variableDesc.registerAsInstOrClassVar();
+-            instAndClassVarDeque.push(variableDesc);
++            instAndClassVarDeque.addFirst(variableDesc);
+           });
+       return instAndClassVarDeque;
+     }
+@@ -974,7 +974,7 @@ public class UnusedLocalVariableCheck extends AbstractCheck {
+      * @param variableDesc variable to be added
+      */
+     public void addInstOrClassVar(VariableDesc variableDesc) {
+-      instanceAndClassVarStack.push(variableDesc);
++      instanceAndClassVarStack.addFirst(variableDesc);
+     }
+   }
+ }
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/VariableDeclarationUsageDistanceCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/VariableDeclarationUsageDistanceCheck.java
 @@ -297,7 +297,7 @@ public class VariableDeclarationUsageDistanceCheck extends AbstractCheck {
@@ -14380,6 +15077,42 @@
  import com.puppycrawl.tools.checkstyle.FileStatefulCheck;
  import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  import com.puppycrawl.tools.checkstyle.api.DetailAST;
+@@ -123,7 +125,7 @@ public class FinalClassCheck extends AbstractCheck {
+           TokenTypes.RECORD_DEF -> {
+         final TypeDeclarationDescription description =
+             new TypeDeclarationDescription(extractQualifiedTypeName(ast), 0, ast);
+-        typeDeclarations.push(description);
++        typeDeclarations.addFirst(description);
+       }
+ 
+       case TokenTypes.CLASS_DEF -> visitClass(ast);
+@@ -132,7 +134,7 @@ public class FinalClassCheck extends AbstractCheck {
+ 
+       case TokenTypes.LITERAL_NEW -> {
+         if (ast.getFirstChild() != null && ast.getLastChild().getType() == TokenTypes.OBJBLOCK) {
+-          anonInnerClassToOuterTypeDecl.put(ast, typeDeclarations.peek().getQualifiedName());
++          anonInnerClassToOuterTypeDecl.put(ast, typeDeclarations.peekFirst().getQualifiedName());
+         }
+       }
+ 
+@@ -148,7 +150,7 @@ public class FinalClassCheck extends AbstractCheck {
+   private void visitClass(DetailAST ast) {
+     final String qualifiedClassName = extractQualifiedTypeName(ast);
+     final ClassDesc currClass = new ClassDesc(qualifiedClassName, typeDeclarations.size(), ast);
+-    typeDeclarations.push(currClass);
++    typeDeclarations.addFirst(currClass);
+     innerClasses.put(qualifiedClassName, currClass);
+   }
+ 
+@@ -171,7 +173,7 @@ public class FinalClassCheck extends AbstractCheck {
+   @Override
+   public void leaveToken(DetailAST ast) {
+     if (TokenUtil.isTypeDeclaration(ast.getType())) {
+-      typeDeclarations.pop();
++      typeDeclarations.removeFirst();
+     }
+     if (TokenUtil.isRootNode(ast.getParent())) {
+       anonInnerClassToOuterTypeDecl.forEach(this::registerAnonymousInnerClassToSuperClass);
 @@ -296,7 +298,7 @@ public class FinalClassCheck extends AbstractCheck {
    private Optional<ClassDesc> getNearestClassWithSameName(
        String className, ToIntFunction<ClassDesc> countProvider) {
@@ -14389,6 +15122,15 @@
      return innerClasses.entrySet().stream()
          .filter(entry -> entry.getKey().endsWith(dotAndClassName))
          .map(Map.Entry::getValue)
+@@ -313,7 +315,7 @@ public class FinalClassCheck extends AbstractCheck {
+     final String className = typeDeclarationAst.findFirstToken(TokenTypes.IDENT).getText();
+     String outerTypeDeclarationQualifiedName = null;
+     if (!typeDeclarations.isEmpty()) {
+-      outerTypeDeclarationQualifiedName = typeDeclarations.peek().getQualifiedName();
++      outerTypeDeclarationQualifiedName = typeDeclarations.peekFirst().getQualifiedName();
+     }
+     return CheckUtil.getQualifiedTypeDeclarationName(
+         packageName, outerTypeDeclarationQualifiedName, className);
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/HideUtilityClassConstructorCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/HideUtilityClassConstructorCheck.java
 @@ -19,12 +19,12 @@
@@ -14414,6 +15156,24 @@
  
    /**
     * Setter to ignore classes annotated with the specified annotation(s). Annotation names provided
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/MutableExceptionCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/MutableExceptionCheck.java
+@@ -122,13 +122,13 @@ public final class MutableExceptionCheck extends AbstractCheck {
+    * @param ast class definition node
+    */
+   private void visitClassDef(DetailAST ast) {
+-    checkingStack.push(checking);
++    checkingStack.addFirst(checking);
+     checking = isNamedAsException(ast) && isExtendedClassNamedAsException(ast);
+   }
+ 
+   /** Called when we leave class definition. */
+   private void leaveClassDef() {
+-    checking = checkingStack.pop();
++    checking = checkingStack.removeFirst();
+   }
+ 
+   /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/ThrowsCountCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/ThrowsCountCheck.java
 @@ -19,11 +19,12 @@
@@ -14678,6 +15438,60 @@
    }
  
    /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportControlLoader.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportControlLoader.java
+@@ -153,27 +153,27 @@ public final class ImportControlLoader extends XmlLoader {
+       final String pkg = safeGet(attributes, PKG_ATTRIBUTE_NAME);
+       final MismatchStrategy strategyOnMismatch = getStrategyForImportControl(attributes);
+       final boolean regex = containsRegexAttribute(attributes);
+-      stack.push(new PkgImportControl(pkg, regex, strategyOnMismatch));
++      stack.addFirst(new PkgImportControl(pkg, regex, strategyOnMismatch));
+     } else if (SUBPACKAGE_ELEMENT_NAME.equals(qName)) {
+       final String name = safeGet(attributes, NAME_ATTRIBUTE_NAME);
+       final MismatchStrategy strategyOnMismatch = getStrategyForSubpackage(attributes);
+       final boolean regex = containsRegexAttribute(attributes);
+-      final PkgImportControl parentImportControl = (PkgImportControl) stack.peek();
++      final PkgImportControl parentImportControl = (PkgImportControl) stack.peekFirst();
+       final AbstractImportControl importControl =
+           new PkgImportControl(parentImportControl, name, regex, strategyOnMismatch);
+       parentImportControl.addChild(importControl);
+-      stack.push(importControl);
++      stack.addFirst(importControl);
+     } else if (FILE_ELEMENT_NAME.equals(qName)) {
+       final String name = safeGet(attributes, NAME_ATTRIBUTE_NAME);
+       final boolean regex = containsRegexAttribute(attributes);
+-      final PkgImportControl parentImportControl = (PkgImportControl) stack.peek();
++      final PkgImportControl parentImportControl = (PkgImportControl) stack.peekFirst();
+       final AbstractImportControl importControl =
+           new FileImportControl(parentImportControl, name, regex);
+       parentImportControl.addChild(importControl);
+-      stack.push(importControl);
++      stack.addFirst(importControl);
+     } else {
+       final AbstractImportRule rule = createImportRule(qName, attributes);
+-      stack.peek().addImportRule(rule);
++      stack.peekFirst().addImportRule(rule);
+     }
+   }
+ 
+@@ -221,7 +221,7 @@ public final class ImportControlLoader extends XmlLoader {
+   @Override
+   public void endElement(String namespaceUri, String localName, String qName) {
+     if (SUBPACKAGE_ELEMENT_NAME.equals(qName) || FILE_ELEMENT_NAME.equals(qName)) {
+-      stack.pop();
++      stack.removeFirst();
+     }
+   }
+ 
+@@ -280,7 +280,7 @@ public final class ImportControlLoader extends XmlLoader {
+    * @return the root {@link PkgImportControl} object loaded.
+    */
+   private PkgImportControl getRoot() {
+-    return (PkgImportControl) stack.peek();
++    return (PkgImportControl) stack.peekFirst();
+   }
+ 
+   /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportOrderCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/imports/ImportOrderCheck.java
 @@ -19,6 +19,8 @@
@@ -14725,6 +15539,55 @@
  
    /** Suffix for the star import. */
    private static final String STAR_IMPORT_SUFFIX = ".*";
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/CommentsIndentationCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/CommentsIndentationCheck.java
+@@ -489,7 +489,7 @@ public class CommentsIndentationCheck extends AbstractCheck {
+     DetailAST previousStatement = null;
+     while (root != null || !stack.isEmpty()) {
+       if (!stack.isEmpty()) {
+-        root = stack.pop();
++        root = stack.removeFirst();
+       }
+       while (root != null) {
+         previousStatement = findPreviousStatement(comment, root);
+@@ -499,7 +499,7 @@ public class CommentsIndentationCheck extends AbstractCheck {
+           break;
+         }
+         if (root.getNextSibling() != null) {
+-          stack.push(root.getNextSibling());
++          stack.addFirst(root.getNextSibling());
+         }
+         root = root.getFirstChild();
+       }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentationCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentationCheck.java
+@@ -331,21 +331,22 @@ public class IndentationCheck extends AbstractCheck {
+     handlerFactory.clearCreatedHandlers();
+     handlers.clear();
+     final PrimordialHandler primordialHandler = new PrimordialHandler(this);
+-    handlers.push(primordialHandler);
++    handlers.addFirst(primordialHandler);
+     primordialHandler.checkIndentation();
+     incorrectIndentationLines = new HashSet<>();
+   }
+ 
+   @Override
+   public void visitToken(DetailAST ast) {
+-    final AbstractExpressionHandler handler = handlerFactory.getHandler(this, ast, handlers.peek());
+-    handlers.push(handler);
++    final AbstractExpressionHandler handler =
++        handlerFactory.getHandler(this, ast, handlers.peekFirst());
++    handlers.addFirst(handler);
+     handler.checkIndentation();
+   }
+ 
+   @Override
+   public void leaveToken(DetailAST ast) {
+-    handlers.pop();
++    handlers.removeFirst();
+   }
+ 
+   /**
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/AbstractJavadocCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/AbstractJavadocCheck.java
 @@ -19,6 +19,9 @@
@@ -14821,6 +15684,37 @@
        // Invalid if private, a constructor, or a static method
        if (!JavadocTagInfo.INHERIT_DOC.isValidOn(ast)) {
          log(ast, MSG_INVALID_INHERIT_DOC);
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocStyleCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocStyleCheck.java
+@@ -431,7 +431,7 @@ public class JavadocStyleCheck extends AbstractCheck {
+       } else {
+         // We only push html tags that are allowed
+         if (isAllowedTag(tag)) {
+-          htmlStack.push(tag);
++          htmlStack.addFirst(tag);
+         }
+       }
+     }
+@@ -460,15 +460,15 @@ public class JavadocStyleCheck extends AbstractCheck {
+    */
+   private void checkUnclosedTags(Deque<HtmlTag> htmlStack, String token) {
+     final Deque<HtmlTag> unclosedTags = new ArrayDeque<>();
+-    HtmlTag lastOpenTag = htmlStack.pop();
++    HtmlTag lastOpenTag = htmlStack.removeFirst();
+     while (!token.equalsIgnoreCase(lastOpenTag.getId())) {
+       // Find unclosed elements. Put them on a stack so the
+       // output order won't be back-to-front.
+       if (isSingleTag(lastOpenTag)) {
+-        lastOpenTag = htmlStack.pop();
++        lastOpenTag = htmlStack.removeFirst();
+       } else {
+-        unclosedTags.push(lastOpenTag);
+-        lastOpenTag = htmlStack.pop();
++        unclosedTags.addFirst(lastOpenTag);
++        lastOpenTag = htmlStack.removeFirst();
+       }
+     }
+ 
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagInfo.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/javadoc/JavadocTagInfo.java
 @@ -19,6 +19,10 @@
@@ -15121,6 +16015,216 @@
  
      this.excludedPackages = Set.of(excludedPackages);
    }
+@@ -219,7 +221,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+   public final void beginTree(DetailAST ast) {
+     importedClassPackages.clear();
+     classesContexts.clear();
+-    classesContexts.push(new ClassContext("", null));
++    classesContexts.addFirst(new ClassContext("", null));
+     packageName = "";
+   }
+ 
+@@ -294,12 +296,12 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+    * @param ast The class ast.
+    */
+   private void createNewClassContext(String className, DetailAST ast) {
+-    classesContexts.push(new ClassContext(className, ast));
++    classesContexts.addFirst(new ClassContext(className, ast));
+   }
+ 
+   /** Restores previous context. */
+   private void checkCurrentClassAndRestorePrevious() {
+-    classesContexts.pop().checkCoupling();
++    classesContexts.removeFirst().checkCoupling();
+   }
+ 
+   /**
+@@ -308,7 +310,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+    * @param ast TYPE token.
+    */
+   private void visitType(DetailAST ast) {
+-    classesContexts.peek().visitType(ast);
++    classesContexts.peekFirst().visitType(ast);
+   }
+ 
+   /**
+@@ -317,7 +319,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+    * @param ast NEW token.
+    */
+   private void visitLiteralNew(DetailAST ast) {
+-    classesContexts.peek().visitLiteralNew(ast);
++    classesContexts.peekFirst().visitLiteralNew(ast);
+   }
+ 
+   /**
+@@ -326,7 +328,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+    * @param ast THROWS token.
+    */
+   private void visitLiteralThrows(DetailAST ast) {
+-    classesContexts.peek().visitLiteralThrows(ast);
++    classesContexts.peekFirst().visitLiteralThrows(ast);
+   }
+ 
+   /**
+@@ -337,7 +339,7 @@ public abstract class AbstractClassCouplingCheck extends AbstractCheck {
+   private void visitAnnotationType(DetailAST annotationAST) {
+     final DetailAST children = annotationAST.getFirstChild();
+     final DetailAST type = children.getNextSibling();
+-    classesContexts.peek().addReferencedClassName(type.getText());
++    classesContexts.peekFirst().addReferencedClassName(type.getText());
+   }
+ 
+   /** Encapsulates information about class coupling. */
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/BooleanExpressionComplexityCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/BooleanExpressionComplexityCheck.java
+@@ -183,19 +183,19 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
+    * @param ast a method we start to check.
+    */
+   private void visitMethodDef(DetailAST ast) {
+-    contextStack.push(context);
++    contextStack.addFirst(context);
+     final boolean check = !CheckUtil.isEqualsMethod(ast);
+     context = new Context(check);
+   }
+ 
+   /** Removes old context. */
+   private void leaveMethodDef() {
+-    context = contextStack.pop();
++    context = contextStack.removeFirst();
+   }
+ 
+   /** Creates and pushes new context. */
+   private void visitExpr() {
+-    contextStack.push(context);
++    contextStack.addFirst(context);
+     context = new Context(context.isChecking());
+   }
+ 
+@@ -206,7 +206,7 @@ public final class BooleanExpressionComplexityCheck extends AbstractCheck {
+    */
+   private void leaveExpr(DetailAST ast) {
+     context.checkCount(ast);
+-    context = contextStack.pop();
++    context = contextStack.removeFirst();
+   }
+ 
+   /** Represents context (method/expression) in which we check complexity. */
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/CyclomaticComplexityCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/CyclomaticComplexityCheck.java
+@@ -225,13 +225,13 @@ public class CyclomaticComplexityCheck extends AbstractCheck {
+ 
+   /** Push the current value on the stack. */
+   private void pushValue() {
+-    valueStack.push(currentValue);
++    valueStack.addFirst(currentValue);
+     currentValue = INITIAL_VALUE;
+   }
+ 
+   /** Pops a value off the stack and makes it the current value. */
+   private void popValue() {
+-    currentValue = valueStack.pop();
++    currentValue = valueStack.removeFirst();
+   }
+ 
+   /** Process the start of the method definition. */
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/JavaNCSSCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/JavaNCSSCheck.java
+@@ -146,7 +146,7 @@ public class JavaNCSSCheck extends AbstractCheck {
+     counters = new ArrayDeque<>();
+ 
+     // add a counter for the file
+-    counters.push(new Counter());
++    counters.addFirst(new Counter());
+   }
+ 
+   @Override
+@@ -157,7 +157,7 @@ public class JavaNCSSCheck extends AbstractCheck {
+         || tokenType == TokenTypes.RECORD_DEF
+         || isMethodOrCtorOrInitDefinition(tokenType)) {
+       // add a counter for this class/method
+-      counters.push(new Counter());
++      counters.addFirst(new Counter());
+     }
+ 
+     // check if token is countable
+@@ -173,7 +173,7 @@ public class JavaNCSSCheck extends AbstractCheck {
+ 
+     if (isMethodOrCtorOrInitDefinition(tokenType)) {
+       // pop counter from the stack
+-      final Counter counter = counters.pop();
++      final Counter counter = counters.removeFirst();
+ 
+       final int count = counter.getCount();
+       if (count > methodMaximum) {
+@@ -181,7 +181,7 @@ public class JavaNCSSCheck extends AbstractCheck {
+       }
+     } else if (tokenType == TokenTypes.CLASS_DEF) {
+       // pop counter from the stack
+-      final Counter counter = counters.pop();
++      final Counter counter = counters.removeFirst();
+ 
+       final int count = counter.getCount();
+       if (count > classMaximum) {
+@@ -189,7 +189,7 @@ public class JavaNCSSCheck extends AbstractCheck {
+       }
+     } else if (tokenType == TokenTypes.RECORD_DEF) {
+       // pop counter from the stack
+-      final Counter counter = counters.pop();
++      final Counter counter = counters.removeFirst();
+ 
+       final int count = counter.getCount();
+       if (count > recordMaximum) {
+@@ -201,7 +201,7 @@ public class JavaNCSSCheck extends AbstractCheck {
+   @Override
+   public void finishTree(DetailAST rootAST) {
+     // pop counter from the stack
+-    final Counter counter = counters.pop();
++    final Counter counter = counters.removeFirst();
+ 
+     final int count = counter.getCount();
+     if (count > fileMaximum) {
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/NPathComplexityCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/metrics/NPathComplexityCheck.java
+@@ -338,7 +338,7 @@ public final class NPathComplexityCheck extends AbstractCheck {
+    */
+   private void visitUnitaryOperator(DetailAST ast, int basicBranchingFactor) {
+     final boolean isAfter = processingTokenEnd.isAfter(ast);
+-    afterValues.push(isAfter);
++    afterValues.addFirst(isAfter);
+     if (!isAfter) {
+       processingTokenEnd.setToken(getLastToken(ast));
+       final int expressionValue = basicBranchingFactor + countConditionalOperators(ast);
+@@ -348,7 +348,7 @@ public final class NPathComplexityCheck extends AbstractCheck {
+ 
+   /** Leaves ternary operator (?:) and return tokens. */
+   private void leaveUnitaryOperator() {
+-    if (Boolean.FALSE.equals(afterValues.pop())) {
++    if (Boolean.FALSE.equals(afterValues.removeFirst())) {
+       final Values valuePair = popValue();
+       BigInteger basicRangeValue = valuePair.getRangeValue();
+       BigInteger expressionValue = valuePair.getExpressionValue();
+@@ -414,8 +414,8 @@ public final class NPathComplexityCheck extends AbstractCheck {
+    * @param expressionValue value of expression calculated for current token.
+    */
+   private void pushValue(Integer expressionValue) {
+-    rangeValues.push(currentRangeValue);
+-    expressionValues.push(expressionValue);
++    rangeValues.addFirst(currentRangeValue);
++    expressionValues.addFirst(expressionValue);
+     currentRangeValue = INITIAL_VALUE;
+   }
+ 
+@@ -425,8 +425,8 @@ public final class NPathComplexityCheck extends AbstractCheck {
+    * @return pair of head values from both of the stacks.
+    */
+   private Values popValue() {
+-    final int expressionValue = expressionValues.pop();
+-    return new Values(rangeValues.pop(), BigInteger.valueOf(expressionValue));
++    final int expressionValue = expressionValues.removeFirst();
++    return new Values(rangeValues.removeFirst(), BigInteger.valueOf(expressionValue));
+   }
+ 
+   /** Leaves try. */
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/naming/AbbreviationAsWordInNameCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/naming/AbbreviationAsWordInNameCheck.java
 @@ -19,6 +19,8 @@
@@ -15290,6 +16394,74 @@
      }
  
      return result;
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/ExecutableStatementCountCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/ExecutableStatementCountCheck.java
+@@ -128,7 +128,7 @@ public final class ExecutableStatementCountCheck extends AbstractCheck {
+    * @param ast the token representing the container node.
+    */
+   private void visitContainerNode(DetailAST ast) {
+-    contextStack.push(context);
++    contextStack.addFirst(context);
+     context = new Context(ast);
+   }
+ 
+@@ -142,7 +142,7 @@ public final class ExecutableStatementCountCheck extends AbstractCheck {
+     if (count > max) {
+       log(ast, MSG_KEY, count, max);
+     }
+-    context = contextStack.pop();
++    context = contextStack.removeFirst();
+   }
+ 
+   /**
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodCountCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodCountCheck.java
+@@ -141,14 +141,14 @@ public final class MethodCountCheck extends AbstractCheck {
+         raiseCounter(ast);
+       }
+     } else {
+-      counters.push(new MethodCounter(ast));
++      counters.addFirst(new MethodCounter(ast));
+     }
+   }
+ 
+   @Override
+   public void leaveToken(DetailAST ast) {
+     if (ast.getType() != TokenTypes.METHOD_DEF) {
+-      final MethodCounter counter = counters.pop();
++      final MethodCounter counter = counters.removeFirst();
+ 
+       checkCounters(counter, ast);
+     }
+@@ -166,7 +166,7 @@ public final class MethodCountCheck extends AbstractCheck {
+     boolean result = false;
+ 
+     if (!counters.isEmpty()) {
+-      final DetailAST latestDefinition = counters.peek().getScopeDefinition();
++      final DetailAST latestDefinition = counters.peekFirst().getScopeDefinition();
+ 
+       result = latestDefinition == methodDef.getParent().getParent();
+     }
+@@ -180,7 +180,7 @@ public final class MethodCountCheck extends AbstractCheck {
+    * @param method The method-subtree from the AbstractSyntaxTree.
+    */
+   private void raiseCounter(DetailAST method) {
+-    final MethodCounter actualCounter = counters.peek();
++    final MethodCounter actualCounter = counters.peekFirst();
+     final Scope scope = ScopeUtil.getScope(method);
+     actualCounter.increment(scope);
+   }
+--- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheck.java
++++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/MethodLengthCheck.java
+@@ -109,7 +109,7 @@ public class MethodLengthCheck extends AbstractCheck {
+    */
+   private static int countUsedLines(DetailAST ast) {
+     final Deque<DetailAST> nodes = new ArrayDeque<>();
+-    nodes.add(ast);
++    nodes.addLast(ast);
+     final BitSet usedLines = new BitSet();
+     while (!nodes.isEmpty()) {
+       final DetailAST node = nodes.removeFirst();
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/ParameterNumberCheck.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/sizes/ParameterNumberCheck.java
 @@ -19,13 +19,13 @@
@@ -15401,7 +16573,26 @@
  import org.antlr.v4.runtime.Token;
  
  /** Utility class for Javadoc comments lexer operations. */
-@@ -76,7 +77,7 @@ public final class JavadocCommentsLexerUtil {
+@@ -60,23 +61,23 @@ public final class JavadocCommentsLexerUtil {
+     for (Token closingTag : closeTagNameTokens) {
+       final Deque<Token> tempStack = new ArrayDeque<>();
+       while (!unmatchedOpen.isEmpty()) {
+-        final Token openingTag = unmatchedOpen.pop();
++        final Token openingTag = unmatchedOpen.removeFirst();
+         if (openingTag.getText().equalsIgnoreCase(closingTag.getText())
+             && openingTag.getTokenIndex() < closingTag.getTokenIndex()) {
+           break;
+         }
+-        tempStack.push(openingTag);
++        tempStack.addFirst(openingTag);
+       }
+ 
+       // Put unmatched tags back
+       while (!tempStack.isEmpty()) {
+-        unmatchedOpen.push(tempStack.pop());
++        unmatchedOpen.addFirst(tempStack.removeFirst());
+       }
+     }
  
      // We cannot map to SimpleToken until lexing has completed, otherwise
      // the token index will not be set.
