@@ -3,10 +3,12 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import java.util.Deque;
 import java.util.Iterator;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.IsList;
 
 /** Refaster rules related to expressions dealing with {@link Deque} instances. */
 // XXX: Introduce similar rules for `BlockingDeque`.
@@ -27,10 +29,16 @@ final class DequeRules {
     }
   }
 
-  /** Prefer {@link Deque#addLast(Object)} over less clear alternatives. */
+  /**
+   * Prefer {@link Deque#addLast(Object)} over less clear alternatives.
+   *
+   * <p>Note: This rule does not match {@link java.util.List} types (including {@link
+   * java.util.LinkedList}), as {@link java.util.List#add(Object)} is the idiomatic method for those
+   * types.
+   */
   static final class DequeAddLast<S, T extends S> {
     @BeforeTemplate
-    void before(Deque<S> deque, T element) {
+    void before(@NotMatches(IsList.class) Deque<S> deque, T element) {
       deque.add(element);
     }
 

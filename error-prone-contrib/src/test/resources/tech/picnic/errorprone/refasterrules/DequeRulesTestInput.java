@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class DequeRulesTest implements RefasterRuleCollectionTestCase {
@@ -12,6 +13,7 @@ final class DequeRulesTest implements RefasterRuleCollectionTestCase {
 
   void testDequeAddLast() {
     new ArrayDeque<String>().add("foo");
+    new LinkedList<String>().add("bar");
   }
 
   ImmutableSet<String> testDequeRemoveFirst() {
