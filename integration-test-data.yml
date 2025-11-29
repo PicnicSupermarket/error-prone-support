@@ -1,0 +1,45 @@
+tests:
+- pr: 1963
+  expected: |
+    Upgrade Error Prone 2.43.0 -> 2.44.0 (#1963)
+
+    See:
+    - https://github.com/google/error-prone/releases/tag/v2.44.0
+    - https://github.com/google/error-prone/compare/v2.43.0...v2.44.0
+    - https://github.com/PicnicSupermarket/error-prone/compare/v2.43.0-picnic-1...v2.44.0-picnic-1
+- pr: 1976
+  expected: |
+    Upgrade jOOQ 3.20.8 -> 3.20.9 (#1976)
+
+    See:
+    - https://www.jooq.org/notes
+    - https://github.com/jOOQ/jOOQ/releases/tag/version-3.20.9
+    - https://github.com/jOOQ/jOOQ/compare/version-3.20.8...version-3.20.9
+- pr: 1978
+  expected: |
+    Upgrade Spring 6.2.12 -> 7.0.0 (#1978)
+
+    See:
+    - https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-7.0-Release-Notes
+    - https://github.com/spring-projects/spring-framework/releases/tag/v6.2.13
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M1
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M2
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M3
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M4
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M5
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M6
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M7
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M8
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M9
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-RC1
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-RC2
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-RC3
+    - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0
+    - https://github.com/spring-projects/spring-framework/compare/v6.2.12...v7.0.0
+- pr: 1985
+  expected: |
+    Upgrade maven-jar-plugin 3.4.2 -> 3.5.0 (#1985)
+
+    See:
+    - https://github.com/apache/maven-jar-plugin/releases/tag/maven-jar-plugin-3.5.0
+    - https://github.com/apache/maven-jar-plugin/compare/maven-jar-plugin-3.4.2...maven-jar-plugin-3.5.0

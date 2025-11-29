@@ -12,6 +12,11 @@ on:
         description: Pull request number of interest
         required: true
         type: number
+      dry_run:
+        description: Whether to skip upserting a PR comment
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -216,6 +221,7 @@ jobs:
           sandbox: danger-full-access
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           prompt-file: /tmp/codex-prompt-suggest-commit-message.md
+          model: gpt-5.1-codex-mini
           output-schema: |
             {
               "type": "object",
@@ -242,6 +248,7 @@ jobs:
           script: |
             const fs = require('fs');
 
+            const dryRun = context.payload.inputs?.dry_run || false;
             const prNumber = process.env.PR_NUMBER;
             const codexResult = JSON.parse(process.env.CODEX_RESULT);
 
@@ -266,13 +273,15 @@ jobs:
 
             const existing = comments.find((comment) => comment.body?.includes(marker));
             if (!existing) {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: commentBody,
-              });
-              core.info('Created new commit message suggestion comment.');
+              if (!dryRun) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  body: commentBody,
+                });
+              }
+              core.info(`${dryRun ? 'Would have created' : 'Created'} new commit message suggestion comment.`);
               return;
             }
 
@@ -306,13 +315,15 @@ jobs:
               return;
             }
 
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: existing.id,
-              body: commentBody,
-            });
-            core.info(`Updated comment ${existing.id} by ${originalCommenter}.`);
+            if (!dryRun) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: commentBody,
+              });
+            }
+            core.info(`${dryRun ? 'Would have updated' : 'Updated'}  comment ${existing.id} by ${originalCommenter}.`);
       - name: Upload suggested commit message
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
