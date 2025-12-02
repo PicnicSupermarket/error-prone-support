@@ -563,6 +563,26 @@
  
    private Sanitize sanitize = new Sanitize(Sanitize.DEFAULT_MAX_LENGTH);
  
+--- a/metrics-core/src/main/java/io/dropwizard/metrics5/ChunkedAssociativeLongArray.java
++++ b/metrics-core/src/main/java/io/dropwizard/metrics5/ChunkedAssociativeLongArray.java
+@@ -51,7 +51,7 @@ class ChunkedAssociativeLongArray {
+ 
+   private void freeChunk(Chunk chunk) {
+     if (chunksCache.size() < MAX_CACHE_SIZE) {
+-      chunksCache.add(new SoftReference<>(chunk));
++      chunksCache.addLast(new SoftReference<>(chunk));
+     }
+   }
+ 
+@@ -67,7 +67,7 @@ class ChunkedAssociativeLongArray {
+         || activeChunk.cursor - activeChunk.startIndex == activeChunk.chunkSize) {
+       // The last chunk doesn't exist or full
+       activeChunk = allocateChunk();
+-      chunks.add(activeChunk);
++      chunks.addLast(activeChunk);
+     }
+     activeChunk.append(key, value);
+     return true;
 --- a/metrics-core/src/main/java/io/dropwizard/metrics5/ConsoleReporter.java
 +++ b/metrics-core/src/main/java/io/dropwizard/metrics5/ConsoleReporter.java
 @@ -1,8 +1,8 @@
