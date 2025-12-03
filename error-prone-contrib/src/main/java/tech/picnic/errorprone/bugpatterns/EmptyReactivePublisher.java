@@ -37,7 +37,7 @@ import reactor.core.publisher.Mono;
 
 /**
  * A {@link BugChecker} that flags {@link Publisher} operations that are known to be vacuous, given
- * that they are invoked on a {@link Mono} or {@link Flux} that do not emit next signals.
+ * that they are invoked on a {@link Mono} or {@link Flux} that does not emit next signals.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -49,7 +49,6 @@ import reactor.core.publisher.Mono;
 public final class EmptyReactivePublisher extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-
   private static final Supplier<Type> MONO =
       Suppliers.typeFromString("reactor.core.publisher.Mono");
   private static final Supplier<Type> FLUX =
@@ -116,18 +115,16 @@ public final class EmptyReactivePublisher extends BugChecker
     if (EMPTY_FLUX.matches(receiver, state) && VACUOUS_EMPTY_FLUX_OPERATORS.matches(tree, state)) {
       return buildDescription(tree)
           .setMessage(
-              String.format(
-                  "Operator `%s` on an empty `Flux`s is a no-op",
-                  ASTHelpers.getSymbol(tree).getSimpleName()))
+              "Operator `%s` on an empty `Flux`s is a no-op"
+                  .formatted(ASTHelpers.getSymbol(tree).getSimpleName()))
           .build();
     }
 
     if (EMPTY_MONO.matches(receiver, state) && VACUOUS_EMPTY_MONO_OPERATORS.matches(tree, state)) {
       return buildDescription(tree)
           .setMessage(
-              String.format(
-                  "Operator `%s` on an empty `Mono`s is a no-op",
-                  ASTHelpers.getSymbol(tree).getSimpleName()))
+              "Operator `%s` on an empty `Mono`s is a no-op"
+                  .formatted(ASTHelpers.getSymbol(tree).getSimpleName()))
           .build();
     }
     return Description.NO_MATCH;
