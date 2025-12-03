@@ -213,9 +213,7 @@
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
-        <version.nullaway>0.12.5</version.nullaway>
         <version.pitest-git>2.3.0</version.pitest-git>
-        <version.rewrite-templating>1.24.2</version.rewrite-templating>
     </properties>
 
     <dependencyManagement>
@@ -511,11 +509,6 @@
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <version>${version.jmh}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.openrewrite</groupId>
-                <artifactId>rewrite-templating</artifactId>
-                <version>${version.rewrite-templating}</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
@@ -990,10 +983,6 @@
                             <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
-                            </path>
-                            <path>
-                                <groupId>org.openrewrite</groupId>
-                                <artifactId>rewrite-templating</artifactId>
                             </path>
                             <path>
                                 <groupId>org.openjdk.jmh</groupId>

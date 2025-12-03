@@ -117,7 +117,7 @@ record Node<T>(ImmutableMap<String, Node<T>> children, ImmutableList<T> values) 
         values().add(value);
       } else {
         children()
-            .computeIfAbsent(path.get(0), k -> create())
+            .computeIfAbsent(path.getFirst(), k -> create())
             .registerPath(value, path.subList(1, path.size()));
       }
     }

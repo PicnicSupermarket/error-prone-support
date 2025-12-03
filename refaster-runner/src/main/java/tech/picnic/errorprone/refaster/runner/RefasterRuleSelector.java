@@ -172,7 +172,7 @@ final class RefasterRuleSelector {
         results.addAll(extractRuleIdentifiers(statements));
       } else {
         throw new IllegalStateException(
-            String.format("Unexpected template type '%s'", template.getClass()));
+            "Unexpected template type '%s'".formatted(template.getClass()));
       }
     }
 
@@ -298,7 +298,7 @@ final class RefasterRuleSelector {
       try {
         return RefasterIntrospection.class.getClassLoader().loadClass(fqcn);
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException(String.format("Failed to load class `%s`", fqcn), e);
+        throw new IllegalStateException("Failed to load class `%s`".formatted(fqcn), e);
       }
     }
 
@@ -309,16 +309,19 @@ final class RefasterRuleSelector {
         return method;
       } catch (NoSuchMethodException e) {
         throw new IllegalStateException(
-            String.format("No method `%s` on class `%s`", methodName, clazz.getName()), e);
+            "No method `%s` on class `%s`".formatted(methodName, clazz.getName()), e);
       }
     }
 
-    @SuppressWarnings({"TypeParameterUnusedInFormals", "unchecked"})
+    @SuppressWarnings({
+      "TypeParameterUnusedInFormals",
+      "unchecked"
+    } /* Special use of reflection here. */)
     private static <T> T invokeMethod(Method method, Object instance) {
       try {
         return (T) method.invoke(instance);
       } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new IllegalStateException(String.format("Failed to invoke method `%s`", method), e);
+        throw new IllegalStateException("Failed to invoke method `%s`".formatted(method), e);
       }
     }
   }
