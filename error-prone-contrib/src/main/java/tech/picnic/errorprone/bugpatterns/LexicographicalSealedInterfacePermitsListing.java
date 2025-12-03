@@ -34,7 +34,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Sort non-sealed interfaces lexicographically where possible",
+    summary = "Sort listed permitted non-sealed interfaces lexicographically where possible",
     link = BUG_PATTERNS_BASE_URL + "LexicographicalSealedInterfacePermitsListing",
     linkType = CUSTOM,
     severity = SUGGESTION,
