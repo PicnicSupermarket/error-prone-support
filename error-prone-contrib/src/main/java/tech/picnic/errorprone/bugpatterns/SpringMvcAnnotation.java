@@ -22,6 +22,7 @@ import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.NewArrayTree;
 import java.util.Optional;
@@ -86,15 +87,14 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
     return expr instanceof NewArrayTree newArray
         ? Optional.of(newArray.getInitializers())
             .filter(args -> args.size() == 1)
-            .map(args -> extractMethod(args.get(0), state))
+            .map(args -> extractMethod(args.getFirst(), state))
         : Optional.of(extractMethod(expr, state));
   }
 
-  // XXX: Use switch pattern matching once the targeted JDK supports this.
   private static String extractMethod(ExpressionTree expr, VisitorState state) {
-    return switch (expr.getKind()) {
-      case IDENTIFIER -> SourceCode.treeToString(expr, state);
-      case MEMBER_SELECT -> ((MemberSelectTree) expr).getIdentifier().toString();
+    return switch (expr) {
+      case IdentifierTree identifier -> SourceCode.treeToString(identifier, state);
+      case MemberSelectTree memberSelect -> memberSelect.getIdentifier().toString();
       default -> throw new VerifyException("Unexpected type of expression: " + expr.getKind());
     };
   }
@@ -109,6 +109,6 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
 
     SuggestedFix.Builder fix = SuggestedFix.builder();
     String annotation = SuggestedFixes.qualifyType(state, fix, ANN_PACKAGE_PREFIX + newAnnotation);
-    return fix.replace(tree, String.format("@%s(%s)", annotation, newArguments)).build();
+    return fix.replace(tree, "@%s(%s)".formatted(annotation, newArguments)).build();
   }
 }

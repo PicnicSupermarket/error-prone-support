@@ -31,9 +31,8 @@ public final class Compilation {
       String outputDirectory, String path, String... lines) {
     /*
      * The compiler options specified here largely match those used by Error Prone's
-     * `CompilationTestHelper`. A key difference is the stricter linting configuration. When
-     * compiling using JDK 21+, these lint options also require that certain JDK modules are
-     * explicitly exported.
+     * `CompilationTestHelper`. A key difference is the stricter linting configuration, which in
+     * turn also requires that certain JDK modules are explicitly exported.
      */
     compile(
         ImmutableList.of(

@@ -136,7 +136,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
 
   @FormatMethod
   private static Supplier<VerifyException> violation(String format, Object... args) {
-    return () -> new VerifyException(String.format(format, args));
+    return () -> new VerifyException(format.formatted(args));
   }
 
   record RefasterTestCases(

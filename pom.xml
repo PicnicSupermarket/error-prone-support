@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.26.1-SNAPSHOT</version>
+    <version>0.27.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -142,7 +142,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2025-10-27T15:28:40Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-11-29T12:22:07Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -152,6 +152,10 @@
         coverage computation, because they are tested using a custom method
         that does not cause code coverage to be registered. -->
         <sonar.coverage.exclusions>${refaster-rules.path-pattern}</sonar.coverage.exclusions>
+        <!-- The Jackson 2.x and Jackson 3.x Refaster rule collections contain
+        nearly identical code, but match different types. SonarCloud should not
+        flag this as duplicated code. -->
+        <sonar.cpd.exclusions>**tech/picnic/errorprone/refasterrules/Jackson2Rules.java</sonar.cpd.exclusions>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <!-- SonarCloud partial rule suppressions. These fall in two
         categories:
@@ -199,11 +203,10 @@
         one place. We use these to keep dependencies in sync. Version numbers
         that need to be referenced only once should *not* be listed here. -->
         <version.auto-service>1.1.1</version.auto-service>
-        <version.auto-value>1.11.0</version.auto-value>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.42.0</version.error-prone-orig>
-        <version.jdk>17</version.jdk>
+        <version.error-prone-orig>2.45.0</version.error-prone-orig>
+        <version.jdk>21</version.jdk>
         <version.jmh>1.37</version.jmh>
         <version.maven>3.9.11</version.maven>
         <!-- XXX: Consider providing our own implementation with similar
@@ -211,7 +214,7 @@
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
         <version.nullaway>0.12.5</version.nullaway>
-        <version.pitest-git>2.2.5</version.pitest-git>
+        <version.pitest-git>2.3.0</version.pitest-git>
         <version.rewrite-templating>1.24.2</version.rewrite-templating>
     </properties>
 
@@ -265,14 +268,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.20.0</version>
+                <version>2.20.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -289,20 +292,10 @@
                 <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
-            <!-- XXX: This dependency's version is managed because version 1.10
-            contains annotations that are also packaged with
-            `org.jetbrains:annotations`, causing classpath duplication. Try to
-            drop this once https://github.com/google/compile-testing/pull/499
-            is released. (And/or convince OpenRewrite to migrate to JSpecify.) -->
-            <dependency>
-                <groupId>com.google.auto.value</groupId>
-                <artifactId>auto-value</artifactId>
-                <version>${version.auto-value}</version>
-            </dependency>
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value-annotations</artifactId>
-                <version>${version.auto-value}</version>
+                <version>1.11.1</version>
             </dependency>
             <!-- XXX: When compiling with JDK 23+, JSR-305 (meta-)annotation
             usage by dependencies, such as Project Reactor, triggers NullAway
@@ -343,7 +336,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.28.0</version>
+                <version>1.32.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -375,12 +368,12 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway</artifactId>
-                <version>0.12.10</version>
+                <version>0.12.12</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.15.5</version>
+                <version>1.16.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -404,7 +397,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.39</version>
+                <version>2.2.41</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -439,7 +432,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.17.8</version>
+                <version>1.18.2</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -452,7 +445,7 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.24</version>
+                <version>1.9.25</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -464,7 +457,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.51.1</version>
+                <version>3.52.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -474,12 +467,12 @@
             <dependency>
                 <groupId>org.immutables</groupId>
                 <artifactId>value-annotations</artifactId>
-                <version>2.11.6</version>
+                <version>2.11.7</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.8</version>
+                <version>3.20.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -491,7 +484,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>6.0.0</version>
+                <version>6.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -527,7 +520,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.17.0</version>
+                <version>3.19.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -541,19 +534,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.2.12</version>
+                <version>7.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>3.5.7</version>
+                <version>4.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>6.5.6</version>
+                <version>7.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -561,6 +554,13 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>7.11.0</version>
+            </dependency>
+            <dependency>
+                <groupId>tools.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>3.0.3</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -805,10 +805,6 @@
                                             <!-- Instead, please use
                                             `org.jspecify.annotations.Nullable`. -->
                                         </property>
-                                        <property name="illegalClasses" value="io.micrometer.core.lang.Nullable">
-                                            <!-- Instead, please use
-                                            `org.jspecify.annotations.Nullable`. -->
-                                        </property>
                                         <property name="illegalClasses" value="javax.annotation.Nullable">
                                             <!-- Instead, please use
                                             `org.jspecify.annotations.Nullable`. -->
@@ -963,7 +959,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>12.1.1</version>
+                            <version>12.2.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1198,7 +1194,7 @@
                                 <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
                             </requireEncoding>
                             <requireJavaVersion>
-                                <version>21</version>
+                                <version>25</version>
                             </requireJavaVersion>
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
@@ -1251,7 +1247,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.4.2</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                         <archive>
@@ -1274,7 +1270,7 @@
                                 <goal>jar</goal>
                             </goals>
                             <configuration>
-                                <!-- These Java 17 bytecode classes are omitted
+                                <!-- These Java 21 bytecode classes are omitted
                                 from the default JAR, as instead we produce a
                                 separate artifact with Java 8 bytecode variants. -->
                                 <excludes>
@@ -1327,6 +1323,24 @@
                         Javadoc generation. -->
                         <doclint>none</doclint>
                         <source>${version.jdk}</source>
+                        <!-- See https://bugs.openjdk.org/browse/JDK-8068562. -->
+                        <tags>
+                            <tag>
+                                <name>apiNote</name>
+                                <placement>a</placement>
+                                <head>API Note:</head>
+                            </tag>
+                            <tag>
+                                <name>implNote</name>
+                                <placement>a</placement>
+                                <head>Implementation Note:</head>
+                            </tag>
+                            <tag>
+                                <name>implSpec</name>
+                                <placement>a</placement>
+                                <head>Implementation Requirements:</head>
+                            </tag>
+                        </tags>
                     </configuration>
                     <executions>
                         <execution>
@@ -1341,7 +1355,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationProfiles>release</preparationProfiles>
@@ -1352,7 +1366,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                     <configuration>
                         <delimiters>
                             <delimiter>@</delimiter>
@@ -1368,7 +1382,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.4.0</version>
                     <executions>
                         <execution>
                             <id>generate-source-jar</id>
@@ -1546,7 +1560,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.19.1</version>
+                    <version>2.20.1</version>
                     <configuration>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
@@ -1615,7 +1629,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.21.0</version>
+                    <version>1.22.0</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->
@@ -1637,7 +1651,7 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.6.0</version>
+                            <version>1.7.0</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
@@ -1667,7 +1681,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.2.0.4988</version>
+                    <version>5.3.0.6276</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
@@ -1953,8 +1967,6 @@
                                     always contains forward-slash path
                                     separators. -->
                                     -XepExcludedPaths:(?!.*/src/[^/]+/java/.*).*
-                                    <!-- We don't target Android. -->
-                                    -Xep:AndroidJdkLibsChecker:OFF
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF
@@ -1981,14 +1993,11 @@
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
                                     -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
+                                    -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
                                 </arg>
-                                <!-- XXX: Drop this flag once it's enabled by
-                                default on the lowest supported JDK. See
-                                https://github.com/uber/NullAway/wiki/JSpecify-Support. -->
-                                <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                                 <!-- The Error Prone plugin makes certain
                                 assumptions about the state of the AST at the
                                 moment it is invoked. Those assumptions require

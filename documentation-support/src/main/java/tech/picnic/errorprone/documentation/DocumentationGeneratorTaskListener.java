@@ -26,7 +26,7 @@ import javax.tools.JavaFileObject;
  */
 // XXX: Find a better name for this class; it doesn't generate documentation per se.
 final class DocumentationGeneratorTaskListener implements TaskListener {
-  @SuppressWarnings({"rawtypes", "unchecked"})
+  @SuppressWarnings({"rawtypes", "unchecked"} /* Unbounded wildcard type introduction is safe. */)
   private static final ImmutableList<Extractor<?>> EXTRACTORS =
       (ImmutableList)
           ImmutableList.copyOf(
@@ -81,12 +81,12 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
       Files.createDirectories(docsPath);
     } catch (IOException e) {
       throw new IllegalStateException(
-          String.format("Error while creating directory with path '%s'", docsPath), e);
+          "Error while creating directory with path '%s'".formatted(docsPath), e);
     }
   }
 
   private <T> void writeToFile(String identifier, String className, T data) {
-    Json.write(docsPath.resolve(String.format("%s-%s.json", identifier, className)), data);
+    Json.write(docsPath.resolve("%s-%s.json".formatted(identifier, className)), data);
   }
 
   private static String getSimpleClassName(URI path) {

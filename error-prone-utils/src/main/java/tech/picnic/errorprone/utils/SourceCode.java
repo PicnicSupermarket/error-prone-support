@@ -10,11 +10,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.util.ASTHelpers;
 import com.google.errorprone.util.ErrorProneToken;
 import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import com.sun.tools.javac.util.Position;
 import java.util.Optional;
 import javax.lang.model.SourceVersion;
@@ -34,7 +34,7 @@ public final class SourceCode {
    *
    * @param str The string of interest.
    * @return {@code true} if the given string is a valid identifier in the Java language.
-   * @see <a href="https://docs.oracle.com/javase/specs/jls/se17/html/jls-3.html#jls-3.8">JDK 17 JLS
+   * @see <a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.8">JDK 21 JLS
    *     section 3.8: Identifiers</a>
    */
   public static boolean isValidIdentifier(String str) {
@@ -98,7 +98,7 @@ public final class SourceCode {
 
     int whitespaceEndPos = NON_WHITESPACE_MATCHER.indexIn(sourceCode, endPos);
     return SuggestedFix.replace(
-        ((DiagnosticPosition) tree).getStartPosition(),
+        ASTHelpers.getStartPosition(tree),
         whitespaceEndPos == -1 ? sourceCode.length() : whitespaceEndPos,
         "");
   }

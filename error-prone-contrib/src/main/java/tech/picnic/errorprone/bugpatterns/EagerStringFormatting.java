@@ -134,7 +134,7 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
   private Description analyzeRequireNonNullStringFormatContext(
       StringFormatExpression stringFormat, MethodInvocationTree context) {
     List<? extends ExpressionTree> arguments = context.getArguments();
-    if (arguments.size() != 2 || arguments.get(0).equals(stringFormat.expression())) {
+    if (arguments.size() != 2 || arguments.getFirst().equals(stringFormat.expression())) {
       /* Vacuous validation that string formatting doesn't yield `null`. */
       return buildDescription(context).setMessage(MESSAGE_NEVER_NULL_ARGUMENT).build();
     }
@@ -157,7 +157,7 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
   private Description analyzeGuavaGuardStringFormatContext(
       StringFormatExpression stringFormat, MethodInvocationTree context, VisitorState state) {
     List<? extends ExpressionTree> arguments = context.getArguments();
-    if (arguments.get(0).equals(stringFormat.expression())) {
+    if (arguments.getFirst().equals(stringFormat.expression())) {
       /*
        * Vacuous `checkNotNull` or `verifyNotNull` validation that string formatting doesn't yield
        * `null`.
@@ -185,8 +185,8 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
     }
 
     List<? extends ExpressionTree> arguments = context.getArguments();
-    int leftOffset = SLF4J_MARKER.matches(arguments.get(0), state) ? 1 : 0;
-    int rightOffset = THROWABLE.matches(arguments.get(arguments.size() - 1), state) ? 1 : 0;
+    int leftOffset = SLF4J_MARKER.matches(arguments.getFirst(), state) ? 1 : 0;
+    int rightOffset = THROWABLE.matches(arguments.getLast(), state) ? 1 : 0;
     if (arguments.size() != leftOffset + 1 + rightOffset) {
       /*
        * The format string produces a format string itself, or its result is the input to another
@@ -230,10 +230,9 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
 
     private String deriveFormatStringExpression(String newPlaceholder, VisitorState state) {
       String derivative =
-          String.format(
-              simplifiableFormatString()
-                  .orElseThrow(() -> new VerifyException("Format string cannot be simplified")),
-              Collections.nCopies(arguments().size(), newPlaceholder).toArray());
+          simplifiableFormatString()
+              .orElseThrow(() -> new VerifyException("Format string cannot be simplified"))
+              .formatted(Collections.nCopies(arguments().size(), newPlaceholder).toArray());
 
       /*
        * If the suggested replacement format string is the same as the original, then use the
@@ -258,7 +257,7 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
 
       if (STATIC_FORMAT_STRING.matches(tree, state)) {
         List<? extends ExpressionTree> arguments = tree.getArguments();
-        int argOffset = LOCALE.matches(arguments.get(0), state) ? 1 : 0;
+        int argOffset = LOCALE.matches(arguments.getFirst(), state) ? 1 : 0;
         return Optional.of(
             create(
                 tree,

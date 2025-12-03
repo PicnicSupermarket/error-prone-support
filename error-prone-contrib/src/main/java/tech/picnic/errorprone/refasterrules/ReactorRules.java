@@ -1658,11 +1658,23 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#onErrorComplete()} over more contrived alternatives. */
-  static final class MonoOnErrorComplete<T> {
+  /**
+   * Prefer {@link Mono#onErrorComplete()} over more contrived alternatives, and don't chain it with
+   * redundant calls to {@link Mono#doOnError}.
+   */
+  static final class MonoOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono) {
-      return mono.onErrorResume(e -> Mono.empty());
+    Mono<T> before(
+        Mono<T> mono,
+        Consumer<? super Throwable> onThrowable,
+        Class<E> clazz,
+        Consumer<? super E> onError,
+        Predicate<? super Throwable> predicate) {
+      return Refaster.anyOf(
+          mono.onErrorResume(e -> Mono.empty()),
+          mono.onErrorComplete().doOnError(onThrowable),
+          mono.onErrorComplete().doOnError(clazz, onError),
+          mono.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
     @AfterTemplate
@@ -1671,11 +1683,23 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete()} over more contrived alternatives. */
-  static final class FluxOnErrorComplete<T> {
+  /**
+   * Prefer {@link Flux#onErrorComplete()} over more contrived alternatives, and don't chain it with
+   * redundant calls to {@link Flux#doOnError}.
+   */
+  static final class FluxOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux) {
-      return flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty()));
+    Flux<T> before(
+        Flux<T> flux,
+        Consumer<? super Throwable> onThrowable,
+        Class<E> clazz,
+        Consumer<? super E> onError,
+        Predicate<? super Throwable> predicate) {
+      return Refaster.anyOf(
+          flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty())),
+          flux.onErrorComplete().doOnError(onThrowable),
+          flux.onErrorComplete().doOnError(clazz, onError),
+          flux.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
     @AfterTemplate
@@ -1932,6 +1956,38 @@ final class ReactorRules {
     @AfterTemplate
     Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
       return flux.filter(predicate).sort(comparator);
+    }
+  }
+
+  /**
+   * Apply {@link Flux#distinct()} before {@link Flux#sort()} to reduce the number of elements to
+   * sort.
+   */
+  static final class FluxDistinctSort<T> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux) {
+      return flux.sort().distinct();
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux) {
+      return flux.distinct().sort();
+    }
+  }
+
+  /**
+   * Apply {@link Flux#distinct()} before {@link Flux#sort(Comparator)} to reduce the number of
+   * elements to sort.
+   */
+  static final class FluxDistinctSortWithComparator<S, T extends S> {
+    @BeforeTemplate
+    Flux<T> before(Flux<T> flux, Comparator<S> comparator) {
+      return flux.sort(comparator).distinct();
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flux<T> flux, Comparator<S> comparator) {
+      return flux.distinct().sort(comparator);
     }
   }
 
@@ -2345,7 +2401,7 @@ final class ReactorRules {
   /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
   static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     StepVerifier.Step<T> before(
         StepVerifier.Step<T> step, @Matches(IsEmpty.class) Iterable<? extends T> iterable) {
       return Refaster.anyOf(

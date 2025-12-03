@@ -11,6 +11,19 @@
              .withLogConsumer(LogConsumer.withPrefix(sampleApp))
 --- a/pom.xml
 +++ b/pom.xml
+@@ -252,9 +252,9 @@
+           <release>${java.version}</release>
+           <source>${java.version}</source>
+           <target>${java.version}</target>
+-          <testRelease>17</testRelease>
+-          <testSource>17</testSource>
+-          <testTarget>17</testTarget>
++          <testRelease>${java.version}</testRelease>
++          <testSource>${java.version}</testSource>
++          <testTarget>${java.version}</testTarget>
+           <showWarnings>true</showWarnings>
+           <compilerArgs>
+             <arg>-Xlint:all,-serial,-processing,-options</arg>
 @@ -267,21 +267,32 @@
                -Xep:MissingSummary:OFF
                -Xep:LongDoubleConversion:OFF

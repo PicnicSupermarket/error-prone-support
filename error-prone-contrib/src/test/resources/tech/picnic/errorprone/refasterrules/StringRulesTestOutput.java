@@ -109,12 +109,20 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return Utf8.encodedLength("foo");
   }
 
-  int testStringIndexOfChar() {
+  int testStringIndexOfCharFromIndex() {
     return Math.max(-1, "foo".indexOf('a', 1) - 1);
   }
 
-  int testStringIndexOfString() {
+  int testStringIndexOfCharBetweenIndices() {
+    return Math.max(-1, "foo".indexOf('a', 1, 2) - 1);
+  }
+
+  int testStringIndexOfStringFromIndex() {
     return Math.max(-1, "foo".indexOf("bar", 1) - 1);
+  }
+
+  int testStringIndexOfStringBetweenIndices() {
+    return Math.max(-1, "foo".indexOf("bar", 1, 2) - 1);
   }
 
   int testStringLastIndexOfChar() {
@@ -135,5 +143,12 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testStringStartsWith() {
     return "foo".startsWith("bar", 1);
+  }
+
+  ImmutableSet<String> testStringFormatted() {
+    return ImmutableSet.of(
+        ("Constant").formatted(),
+        ("Number: %d").formatted(42),
+        ("%s" + "%s").formatted("foo", "bar"));
   }
 }

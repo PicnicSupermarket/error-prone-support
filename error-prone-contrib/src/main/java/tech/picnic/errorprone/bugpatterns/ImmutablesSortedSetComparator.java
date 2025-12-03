@@ -81,7 +81,6 @@ public final class ImmutablesSortedSetComparator extends BugChecker implements M
     String valueTypeIdentifier =
         SuggestedFixes.qualifyType(state, builder, "org.immutables.value.Value");
     return describeMatch(
-        tree,
-        builder.prefixWith(tree, String.format("@%s.NaturalOrder ", valueTypeIdentifier)).build());
+        tree, builder.prefixWith(tree, "@%s.NaturalOrder ".formatted(valueTypeIdentifier)).build());
   }
 }

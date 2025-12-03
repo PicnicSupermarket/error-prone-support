@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
         with:
           disable-sudo-and-containers: true
           egress-policy: block
@@ -29,7 +29,7 @@ jobs:
         uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
           checkout-fetch-depth: 2
-          java-version: 21.0.8
+          java-version: 25
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Run Pitest

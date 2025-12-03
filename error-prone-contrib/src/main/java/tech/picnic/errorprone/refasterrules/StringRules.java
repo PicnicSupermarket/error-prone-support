@@ -9,10 +9,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.base.Utf8;
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -307,7 +309,7 @@ final class StringRules {
   }
 
   /** Prefer {@link String#indexOf(int, int)} over less efficient alternatives. */
-  static final class StringIndexOfChar {
+  static final class StringIndexOfCharFromIndex {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, int ch, int fromIndex) {
@@ -320,8 +322,21 @@ final class StringRules {
     }
   }
 
+  /** Prefer {@link String#indexOf(int, int, int)} over less efficient alternatives. */
+  static final class StringIndexOfCharBetweenIndices {
+    @BeforeTemplate
+    int before(String string, int ch, int beginIndex, int endIndex) {
+      return string.substring(beginIndex, endIndex).indexOf(ch);
+    }
+
+    @AfterTemplate
+    int after(String string, int ch, int beginIndex, int endIndex) {
+      return Math.max(-1, string.indexOf(ch, beginIndex, endIndex) - beginIndex);
+    }
+  }
+
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
-  static final class StringIndexOfString {
+  static final class StringIndexOfStringFromIndex {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
     int before(String string, String substring, int fromIndex) {
@@ -334,8 +349,18 @@ final class StringRules {
     }
   }
 
-  // XXX: Once we compile Refaster templates with JDK 21 also suggest `String#indexOf(int, int,
-  // int)` and `String#indexOf(String, int, int)`.
+  /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
+  static final class StringIndexOfStringBetweenIndices {
+    @BeforeTemplate
+    int before(String string, String substring, int beginIndex, int endIndex) {
+      return string.substring(beginIndex, endIndex).indexOf(substring);
+    }
+
+    @AfterTemplate
+    int after(String string, String substring, int beginIndex, int endIndex) {
+      return Math.max(-1, string.indexOf(substring, beginIndex, endIndex) - beginIndex);
+    }
+  }
 
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
   static final class StringLastIndexOfChar {
@@ -404,6 +429,28 @@ final class StringRules {
     @AfterTemplate
     boolean after(String string, String prefix, int fromIndex) {
       return string.startsWith(prefix, fromIndex);
+    }
+  }
+
+  /**
+   * Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}, as
+   * the former works more nicely with text blocks, while the latter does not appear advantageous in
+   * any circumstance (assuming one targets JDK 15+).
+   */
+  static final class StringFormatted {
+    @BeforeTemplate
+    @FormatMethod
+    String before(String format, @Repeated Object args) {
+      return String.format(format, args);
+    }
+
+    // XXX: Drop the unnecessary parentheses once Refaster automatically wraps string
+    // concatenations. See https://github.com/google/error-prone/issues/4866.
+    @AfterTemplate
+    @FormatMethod
+    @SuppressWarnings("UnnecessaryParentheses" /* Parentheses compensate for a Refaster bug. */)
+    String after(String format, @Repeated Object args) {
+      return (format).formatted(args);
     }
   }
 }

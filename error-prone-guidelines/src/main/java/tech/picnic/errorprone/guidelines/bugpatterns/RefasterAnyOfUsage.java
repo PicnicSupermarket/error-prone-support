@@ -54,6 +54,6 @@ public final class RefasterAnyOfUsage extends BugChecker implements MethodInvoca
 
     return describeMatch(
         tree,
-        SuggestedFix.replace(tree, SourceCode.treeToString(tree.getArguments().get(0), state)));
+        SuggestedFix.replace(tree, SourceCode.treeToString(tree.getArguments().getFirst(), state)));
   }
 }

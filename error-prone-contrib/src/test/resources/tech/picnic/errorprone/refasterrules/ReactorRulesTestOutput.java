@@ -599,12 +599,21 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).doOnError(IllegalArgumentException.class, e -> {});
   }
 
-  Mono<Integer> testMonoOnErrorComplete() {
-    return Mono.just(1).onErrorComplete();
+  ImmutableSet<Mono<Integer>> testMonoOnErrorComplete() {
+    return ImmutableSet.of(
+        Mono.just(1).onErrorComplete(),
+        Mono.just(2).onErrorComplete(),
+        Mono.just(3).onErrorComplete(),
+        Mono.just(4).onErrorComplete());
   }
 
   ImmutableSet<Flux<Integer>> testFluxOnErrorComplete() {
-    return ImmutableSet.of(Flux.just(1).onErrorComplete(), Flux.just(2).onErrorComplete());
+    return ImmutableSet.of(
+        Flux.just(1).onErrorComplete(),
+        Flux.just(2).onErrorComplete(),
+        Flux.just(3).onErrorComplete(),
+        Flux.just(4).onErrorComplete(),
+        Flux.just(5).onErrorComplete());
   }
 
   ImmutableSet<Mono<Integer>> testMonoOnErrorCompleteClass() {
@@ -663,11 +672,19 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   Flux<Integer> testFluxFilterSort() {
-    return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort();
+    return Flux.just(1).filter(i -> i % 2 == 0).sort();
   }
 
   Flux<Integer> testFluxFilterSortWithComparator() {
-    return Flux.just(1, 4, 3, 2).filter(i -> i % 2 == 0).sort(reverseOrder());
+    return Flux.just(1).filter(i -> i % 2 == 0).sort(reverseOrder());
+  }
+
+  Flux<Integer> testFluxDistinctSort() {
+    return Flux.just(1).distinct().sort();
+  }
+
+  Flux<Integer> testFluxDistinctSortWithComparator() {
+    return Flux.just(1).distinct().sort(reverseOrder());
   }
 
   Flux<Integer> testFluxTakeWhile() {

@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
         with:
           disable-sudo-and-containers: true
           egress-policy: block
@@ -31,11 +31,11 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
-          java-version: 21.0.8
+          java-version: 25
           java-distribution: temurin
           maven-version: 3.9.11
       - name: Set up Reviewdog
-        uses: reviewdog/action-setup@d8edfce3dd5e1ec6978745e801f9c50b5ef80252 # v1.4.0
+        uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
           # XXX: Configure Renovate to maintain this version.
           reviewdog_version: v0.20.3
@@ -59,9 +59,8 @@ jobs:
             | reviewdog \
                 -name=javac \
                 -efm='[WARNING] %f:[%l,%c] %m' \
-                -filter-mode=file \
-                -reporter=github-pr-review \
-                -tee
+                -filter-mode=nofilter \
+                -reporter=github-pr-review
           find -name checkstyle-result.json -exec sh -c '
             reviewdog -name=Checkstyle -f=sarif -reporter=github-pr-review < "{}"
           ' \;

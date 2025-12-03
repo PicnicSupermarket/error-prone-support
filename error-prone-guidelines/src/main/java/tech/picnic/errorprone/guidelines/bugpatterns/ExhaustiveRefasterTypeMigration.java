@@ -104,7 +104,7 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
     if (migratedType.asType().isPrimitive()
         || !(migratedType instanceof ClassSymbol migratedClass)) {
       return buildDescription(migrationAnnotation)
-          .setMessage(String.format("Migration of type '%s' is unsupported", migratedType))
+          .setMessage("Migration of type '%s' is unsupported".formatted(migratedType))
           .build();
     }
 
