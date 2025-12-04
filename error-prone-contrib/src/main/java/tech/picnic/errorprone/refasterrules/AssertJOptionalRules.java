@@ -103,18 +103,6 @@ final class AssertJOptionalRules {
     }
   }
 
-  static final class OptionalAssertHasValue<T> {
-    @BeforeTemplate
-    ObjectAssert<T> before(Optional<T> optional, T value) {
-      return assertThat(optional.orElseThrow()).isEqualTo(value);
-    }
-
-    @AfterTemplate
-    AbstractOptionalAssert<?, T> after(Optional<T> optional, T value) {
-      return assertThat(optional).hasValue(value);
-    }
-  }
-
   static final class AbstractOptionalAssertContainsSame<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
