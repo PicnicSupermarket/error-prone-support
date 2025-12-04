@@ -41,7 +41,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(4)).hasValue(4));
   }
 
-  AbstractAssert<?, ?> testAssertThatHasValue() {
+  AbstractAssert<?, ?> testOptionalAssertHasValue() {
     return assertThat(Optional.of("foo")).hasValue("bar");
   }
 
