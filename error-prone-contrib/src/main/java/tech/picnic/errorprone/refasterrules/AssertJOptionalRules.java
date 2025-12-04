@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractOptionalAssert;
+import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -105,7 +106,7 @@ final class AssertJOptionalRules {
 
   static final class AssertThatHasValue<T> {
     @BeforeTemplate
-    ObjectAssert<T> before(Optional<T> optional, T value) {
+    AbstractStringAssert<?> before(Optional<String> optional, String value) {
       return assertThat(optional.orElseThrow()).isEqualTo(value);
     }
 
