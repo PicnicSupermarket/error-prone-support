@@ -6,7 +6,6 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -18,7 +17,6 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.matchers.method.MethodMatchers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberSelectTree;
@@ -51,7 +49,7 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
           instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isEqualTo"),
           argumentCount(1));
   private static final Matcher<ExpressionTree> OPTIONAL_OR_ELSE_THROW =
-      MethodMatchers.instanceMethod()
+      instanceMethod()
           .onExactClass(Optional.class.getCanonicalName())
           .named("orElseThrow")
           .withNoParameters();
@@ -73,9 +71,11 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
 
   private static Optional<MethodInvocationTree> extractOrElseThrowTree(
       MethodInvocationTree isEqualToTree, VisitorState state) {
-    MethodInvocationTree assertThatTree =
-        (MethodInvocationTree)
-            requireNonNull(ASTHelpers.getReceiver(isEqualToTree), "Receiver unexpectedly absent");
+    ExpressionTree receiver = ASTHelpers.getReceiver(isEqualToTree);
+    if (!(receiver instanceof MethodInvocationTree assertThatTree)
+        || assertThatTree.getArguments().size() != 1) {
+      return Optional.empty();
+    }
 
     ExpressionTree assertThatArg = assertThatTree.getArguments().getFirst();
     if (!(assertThatArg instanceof MethodInvocationTree orElseThrow)
