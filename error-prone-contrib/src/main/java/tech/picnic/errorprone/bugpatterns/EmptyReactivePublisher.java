@@ -9,7 +9,6 @@ import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.typePredicateMatcher;
 import static com.google.errorprone.suppliers.Suppliers.JAVA_LANG_VOID_TYPE;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.utils.MoreTypePredicates.isSubTypeOf;
 import static tech.picnic.errorprone.utils.MoreTypes.generic;
@@ -81,10 +80,8 @@ public final class EmptyReactivePublisher extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    ExpressionTree receiver =
-        requireNonNull(
-            ASTHelpers.getReceiver(tree), "Instance method invocation must have receiver");
-    if (!EMPTY_PUBLISHER.matches(receiver, state)) {
+    ExpressionTree receiver = ASTHelpers.getReceiver(tree);
+    if (receiver == null || !EMPTY_PUBLISHER.matches(receiver, state)) {
       return Description.NO_MATCH;
     }
 
