@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -64,54 +65,40 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
       return Description.NO_MATCH;
     }
 
-    return getOrElseThrowInvocation(tree, state)
-        .flatMap(AssertThatHasValue::getOptionalExpression)
-        .map(optionalExpr -> buildFix(tree, optionalExpr, state))
+    return extractOrElseThrowTree(tree, state)
+        .flatMap(orElseThrow -> tryFix(tree, orElseThrow, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  /**
-   * Returns the {@code optional.orElseThrow()} invocation if the receiver of the given {@code
-   * isEqualTo} call is an {@code assertThat} call with exactly one argument that is a call to
-   * {@link Optional#orElseThrow()}.
-   */
-  private static Optional<MethodInvocationTree> getOrElseThrowInvocation(
-      MethodInvocationTree isEqualToCall, VisitorState state) {
-    ExpressionTree receiver = ASTHelpers.getReceiver(isEqualToCall);
-    if (!(receiver instanceof MethodInvocationTree assertThatCall)
-        || assertThatCall.getArguments().size() != 1) {
+  private static Optional<MethodInvocationTree> extractOrElseThrowTree(
+      MethodInvocationTree isEqualToTree, VisitorState state) {
+    MethodInvocationTree assertThatTree =
+        (MethodInvocationTree)
+            requireNonNull(ASTHelpers.getReceiver(isEqualToTree), "Receiver unexpectedly absent");
+
+    ExpressionTree assertThatArg = assertThatTree.getArguments().getFirst();
+    if (!(assertThatArg instanceof MethodInvocationTree orElseThrow)
+        || !OPTIONAL_OR_ELSE_THROW.matches(orElseThrow, state)) {
       return Optional.empty();
     }
 
-    ExpressionTree assertThatArg = assertThatCall.getArguments().getFirst();
-    if (!(assertThatArg instanceof MethodInvocationTree orElseThrowCall)
-        || !OPTIONAL_OR_ELSE_THROW.matches(orElseThrowCall, state)) {
-      return Optional.empty();
-    }
-
-    return Optional.of(orElseThrowCall);
+    return Optional.of(orElseThrow);
   }
 
-  /** Extracts the Optional expression from an {@code optional.orElseThrow()} call. */
-  private static Optional<ExpressionTree> getOptionalExpression(
-      MethodInvocationTree orElseThrowCall) {
-    ExpressionTree methodSelect = orElseThrowCall.getMethodSelect();
+  private static Optional<SuggestedFix> tryFix(
+      MethodInvocationTree isEqualToTree,
+      MethodInvocationTree orElseThrowTree,
+      VisitorState state) {
+    ExpressionTree methodSelect = orElseThrowTree.getMethodSelect();
     if (!(methodSelect instanceof MemberSelectTree memberSelect)) {
       return Optional.empty();
     }
-    return Optional.of(memberSelect.getExpression());
-  }
 
-  private static SuggestedFix buildFix(
-      MethodInvocationTree isEqualToCall, ExpressionTree optionalExpr, VisitorState state) {
-    MethodInvocationTree assertThatCall =
-        (MethodInvocationTree) ASTHelpers.getReceiver(isEqualToCall);
-    MethodInvocationTree orElseThrowCall =
-        (MethodInvocationTree) assertThatCall.getArguments().getFirst();
-
-    return SuggestedFixes.renameMethodInvocation(isEqualToCall, "hasValue", state).toBuilder()
-        .replace(orElseThrowCall, SourceCode.treeToString(optionalExpr, state))
-        .build();
+    ExpressionTree optionalTree = memberSelect.getExpression();
+    return Optional.of(
+        SuggestedFixes.renameMethodInvocation(isEqualToTree, "hasValue", state).toBuilder()
+            .replace(orElseThrowTree, SourceCode.treeToString(optionalTree, state))
+            .build());
   }
 }
