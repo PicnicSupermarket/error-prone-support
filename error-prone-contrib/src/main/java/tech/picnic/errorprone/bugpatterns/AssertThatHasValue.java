@@ -3,8 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static com.google.errorprone.matchers.Matchers.allOf;
-import static com.google.errorprone.matchers.Matchers.argumentCount;
+import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -26,8 +25,10 @@ import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags AssertJ {@code
- * assertThat(optional.orElseThrow()).isEqualTo(value)} expressions for simplification to {@code
- * assertThat(optional).hasValue(value)}.
+ * assertThat(optional.orElseThrow()).isEqualTo(value)} and {@code
+ * assertThat(optional.orElseThrow()).isSameAs(value)} expressions for simplification to {@code
+ * assertThat(optional).hasValue(value)} and {@code assertThat(optional).containsSame(value)},
+ * respectively.
  *
  * <p>This bug checker cannot be replaced with a simple Refaster rule, as the Refaster approach
  * would require that all overloads of the mentioned methods (such as {@link
@@ -36,18 +37,17 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary =
-        "Prefer `assertThat(optional).hasValue(value)` over `assertThat(optional.orElseThrow()).isEqualTo(value)`",
+    summary = "Prefer `assertThat(optional).hasValue(value)` over more verbose alternatives",
     link = BUG_PATTERNS_BASE_URL + "AssertThatHasValue",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
 public final class AssertThatHasValue extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<MethodInvocationTree> IS_EQUAL_TO_ON_ASSERT =
-      allOf(
+  private static final Matcher<MethodInvocationTree> ASSERT_METHOD =
+      anyOf(
           instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isEqualTo"),
-          argumentCount(1));
+          instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isSameAs"));
   private static final Matcher<ExpressionTree> OPTIONAL_OR_ELSE_THROW =
       instanceMethod()
           .onExactClass(Optional.class.getCanonicalName())
@@ -59,7 +59,7 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!IS_EQUAL_TO_ON_ASSERT.matches(tree, state)) {
+    if (!ASSERT_METHOD.matches(tree, state) || tree.getArguments().size() != 1) {
       return Description.NO_MATCH;
     }
 
@@ -87,7 +87,7 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
   }
 
   private static Optional<SuggestedFix> tryFix(
-      MethodInvocationTree isEqualToTree,
+      MethodInvocationTree assertMethodTree,
       MethodInvocationTree orElseThrowTree,
       VisitorState state) {
     ExpressionTree methodSelect = orElseThrowTree.getMethodSelect();
@@ -97,8 +97,15 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
 
     ExpressionTree optionalTree = memberSelect.getExpression();
     return Optional.of(
-        SuggestedFixes.renameMethodInvocation(isEqualToTree, "hasValue", state).toBuilder()
+        SuggestedFixes.renameMethodInvocation(
+                assertMethodTree, getReplacementMethod(assertMethodTree), state)
+            .toBuilder()
             .replace(orElseThrowTree, SourceCode.treeToString(optionalTree, state))
             .build());
+  }
+
+  private static String getReplacementMethod(MethodInvocationTree tree) {
+    String methodName = ASTHelpers.getSymbol(tree).getSimpleName().toString();
+    return "isSameAs".equals(methodName) ? "containsSame" : "hasValue";
   }
 }
