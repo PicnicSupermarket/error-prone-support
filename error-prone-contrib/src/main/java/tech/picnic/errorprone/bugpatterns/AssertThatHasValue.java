@@ -59,21 +59,19 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ASSERT_METHOD.matches(tree, state) || tree.getArguments().size() != 1) {
+    if (!ASSERT_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
     return extractOrElseThrowTree(tree, state)
-        .flatMap(orElseThrow -> tryFix(tree, orElseThrow, state))
-        .map(fix -> describeMatch(tree, fix))
+        .map(orElseThrow -> describeMatch(tree, createFix(tree, orElseThrow, state)))
         .orElse(Description.NO_MATCH);
   }
 
   private static Optional<MethodInvocationTree> extractOrElseThrowTree(
       MethodInvocationTree isEqualToTree, VisitorState state) {
     ExpressionTree receiver = ASTHelpers.getReceiver(isEqualToTree);
-    if (!(receiver instanceof MethodInvocationTree assertThatTree)
-        || assertThatTree.getArguments().size() != 1) {
+    if (!(receiver instanceof MethodInvocationTree assertThatTree)) {
       return Optional.empty();
     }
 
@@ -86,22 +84,17 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
     return Optional.of(orElseThrow);
   }
 
-  private static Optional<SuggestedFix> tryFix(
+  private static SuggestedFix createFix(
       MethodInvocationTree assertMethodTree,
       MethodInvocationTree orElseThrowTree,
       VisitorState state) {
-    ExpressionTree methodSelect = orElseThrowTree.getMethodSelect();
-    if (!(methodSelect instanceof MemberSelectTree memberSelect)) {
-      return Optional.empty();
-    }
-
-    ExpressionTree optionalTree = memberSelect.getExpression();
-    return Optional.of(
-        SuggestedFixes.renameMethodInvocation(
-                assertMethodTree, getReplacementMethod(assertMethodTree), state)
-            .toBuilder()
-            .replace(orElseThrowTree, SourceCode.treeToString(optionalTree, state))
-            .build());
+    MemberSelectTree methodSelect = (MemberSelectTree) orElseThrowTree.getMethodSelect();
+    ExpressionTree optionalTree = methodSelect.getExpression();
+    return SuggestedFixes.renameMethodInvocation(
+            assertMethodTree, getReplacementMethod(assertMethodTree), state)
+        .toBuilder()
+        .replace(orElseThrowTree, SourceCode.treeToString(optionalTree, state))
+        .build();
   }
 
   private static String getReplacementMethod(MethodInvocationTree tree) {
