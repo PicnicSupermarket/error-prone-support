@@ -3,7 +3,8 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -45,9 +46,11 @@ import tech.picnic.errorprone.utils.SourceCode;
 public final class AssertThatHasValue extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<MethodInvocationTree> ASSERT_METHOD =
-      anyOf(
-          instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isEqualTo"),
-          instanceMethod().onDescendantOf("org.assertj.core.api.Assert").named("isSameAs"));
+      allOf(
+          instanceMethod()
+              .onDescendantOf("org.assertj.core.api.Assert")
+              .namedAnyOf("isEqualTo", "isSameAs"),
+          argumentCount(1));
   private static final Matcher<ExpressionTree> OPTIONAL_OR_ELSE_THROW =
       instanceMethod()
           .onExactClass(Optional.class.getCanonicalName())
