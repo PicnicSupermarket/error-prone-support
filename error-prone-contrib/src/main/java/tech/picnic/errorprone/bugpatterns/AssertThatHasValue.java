@@ -74,8 +74,7 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
   private static Optional<MethodInvocationTree> extractOrElseThrowTree(
       MethodInvocationTree isEqualToTree, VisitorState state) {
     ExpressionTree receiver = ASTHelpers.getReceiver(isEqualToTree);
-    if (!(receiver instanceof MethodInvocationTree assertThatTree)
-        || assertThatTree.getArguments().isEmpty()) {
+    if (!(receiver instanceof MethodInvocationTree assertThatTree)) {
       return Optional.empty();
     }
 
