@@ -35,11 +35,12 @@ import tech.picnic.errorprone.utils.SourceCode;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `assertThat(optional).hasValue(value)` over more verbose alternatives",
-    link = BUG_PATTERNS_BASE_URL + "AssertThatHasValue",
+    link = BUG_PATTERNS_BASE_URL + "AssertJOptionalAssertion",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class AssertJOptionalAssertion extends BugChecker implements MethodInvocationTreeMatcher {
+public final class AssertJOptionalAssertion extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<MethodInvocationTree> ASSERT_METHOD =
       allOf(
@@ -90,8 +91,7 @@ public final class AssertJOptionalAssertion extends BugChecker implements Method
       VisitorState state) {
     ExpressionTree optionalTree =
         requireNonNull(
-            ASTHelpers.getReceiver(orElseThrowTree),
-            "Method invocation must have receiver");
+            ASTHelpers.getReceiver(orElseThrowTree), "Method invocation must have receiver");
     return SuggestedFixes.renameMethodInvocation(
             assertionTree, getReplacementMethod(assertionTree), state)
         .toBuilder()
