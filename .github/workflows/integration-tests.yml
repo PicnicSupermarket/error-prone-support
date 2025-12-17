@@ -69,7 +69,7 @@ jobs:
             21.0.8
             25
           java-distribution: temurin
-          maven-version: 3.9.11
+          maven-version: 3.9.12
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Run integration test
