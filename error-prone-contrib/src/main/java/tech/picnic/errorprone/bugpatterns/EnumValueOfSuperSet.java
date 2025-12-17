@@ -5,7 +5,6 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
-import static com.google.errorprone.matchers.Matchers.methodInvocation;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
@@ -31,7 +30,7 @@ import com.sun.source.tree.MethodInvocationTree;
     link = BUG_PATTERNS_BASE_URL + "EnumValueOfSuperSet",
     linkType = CUSTOM,
     severity = WARNING,
-    tags = {FRAGILE_CODE})
+    tags = FRAGILE_CODE)
 public final class EnumValueOfSuperSet extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
 
@@ -41,10 +40,11 @@ public final class EnumValueOfSuperSet extends BugChecker implements MethodInvoc
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     Matcher<ExpressionTree> valueOfMatcher =
-        methodInvocation(staticMethod().onDescendantOf("java.lang.Enum").named("valueOf"));
+        staticMethod().onDescendantOf(Enum.class.getCanonicalName()).named("valueOf");
     Matcher<ExpressionTree> valueOfArgumentMatcher =
-        methodInvocation(
-            instanceMethod().onDescendantOf("java.lang.Enum").namedAnyOf("name", "toString"));
+        instanceMethod()
+            .onDescendantOf(Enum.class.getCanonicalName())
+            .namedAnyOf("name", "toString");
     if (valueOfMatcher.matches(tree, state)) {
       MethodInvocationTree enumNameInvocation =
           (MethodInvocationTree)
