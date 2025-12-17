@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -19,17 +20,12 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import java.util.Optional;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags AssertJ {@code
- * assertThat(optional.orElseThrow()).isEqualTo(value)} and {@code
- * assertThat(optional.orElseThrow()).isSameAs(value)} expressions for simplification to {@code
- * assertThat(optional).hasValue(value)} and {@code assertThat(optional).containsSame(value)},
- * respectively.
+ * A {@link BugChecker} that flags AssertJ usages of {@code OptionalAssert} for simplification.
  *
  * <p>This bug checker cannot be replaced with a simple Refaster rule, as the Refaster approach
  * would require that all overloads of the mentioned methods (such as {@link
@@ -67,7 +63,7 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
     }
 
     return extractOrElseThrowTree(tree, state)
-        .map(orElseThrow -> describeMatch(tree, createFix(tree, orElseThrow, state)))
+        .map(orElseThrow -> describeMatch(tree, suggestFix(tree, orElseThrow, state)))
         .orElse(Description.NO_MATCH);
   }
 
@@ -88,21 +84,24 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
     return Optional.of(orElseThrow);
   }
 
-  private static SuggestedFix createFix(
-      MethodInvocationTree assertMethodTree,
+  private static SuggestedFix suggestFix(
+      MethodInvocationTree assertionTree,
       MethodInvocationTree orElseThrowTree,
       VisitorState state) {
-    MemberSelectTree methodSelect = (MemberSelectTree) orElseThrowTree.getMethodSelect();
-    ExpressionTree optionalTree = methodSelect.getExpression();
+    ExpressionTree optionalTree =
+        requireNonNull(
+            ASTHelpers.getReceiver(orElseThrowTree),
+            "Method invocation must have receiver");
     return SuggestedFixes.renameMethodInvocation(
-            assertMethodTree, getReplacementMethod(assertMethodTree), state)
+            assertionTree, getReplacementMethod(assertionTree), state)
         .toBuilder()
         .replace(orElseThrowTree, SourceCode.treeToString(optionalTree, state))
         .build();
   }
 
   private static String getReplacementMethod(MethodInvocationTree tree) {
-    String methodName = ASTHelpers.getSymbol(tree).getSimpleName().toString();
-    return "isSameAs".equals(methodName) ? "containsSame" : "hasValue";
+    return ASTHelpers.getSymbol(tree).getSimpleName().contentEquals("isSameAs")
+        ? "containsSame"
+        : "hasValue";
   }
 }
