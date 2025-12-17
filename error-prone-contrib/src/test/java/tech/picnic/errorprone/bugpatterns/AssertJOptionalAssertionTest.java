@@ -5,10 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class AssertThatHasValueTest {
+final class AssertJOptionalAssertionTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(AssertThatHasValue.class, getClass())
+    CompilationTestHelper.newInstance(AssertJOptionalAssertion.class, getClass())
         .addSourceLines(
             "A.java",
             "import static org.assertj.core.api.Assertions.assertThat;",
@@ -63,7 +63,7 @@ final class AssertThatHasValueTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(AssertThatHasValue.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(AssertJOptionalAssertion.class, getClass())
         .addInputLines(
             "A.java",
             "import static org.assertj.core.api.Assertions.assertThat;",
