@@ -39,7 +39,7 @@ import tech.picnic.errorprone.utils.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = SIMPLIFICATION)
-public final class AssertThatHasValue extends BugChecker implements MethodInvocationTreeMatcher {
+public final class AssertJOptionalAssertion extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<MethodInvocationTree> ASSERT_METHOD =
       allOf(
@@ -53,8 +53,8 @@ public final class AssertThatHasValue extends BugChecker implements MethodInvoca
           .named("orElseThrow")
           .withNoParameters();
 
-  /** Instantiates a new {@link AssertThatHasValue} instance. */
-  public AssertThatHasValue() {}
+  /** Instantiates a new {@link AssertJOptionalAssertion} instance. */
+  public AssertJOptionalAssertion() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
