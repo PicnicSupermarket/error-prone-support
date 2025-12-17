@@ -16,11 +16,16 @@ final class EnumValueOfSuperSetTest {
             "  }",
             "",
             "  enum A {",
-            "    ONE, TWO, THREE",
+            "    ONE,",
+            "    TWO,",
+            "    THREE",
             "  }",
             "",
             "  enum B {",
-            "    ONE, TWO, THREE, FOUR",
+            "    ONE,",
+            "    TWO,",
+            "    THREE,",
+            "    FOUR",
             "  }",
             "}")
         .doTest();
