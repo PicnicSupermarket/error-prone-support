@@ -33,35 +33,34 @@ import com.sun.source.tree.MethodInvocationTree;
     tags = FRAGILE_CODE)
 public final class EnumValueOfSuperSet extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private static final Matcher<ExpressionTree> ENUM_VALUE_OF =
+      staticMethod().onDescendantOf(Enum.class.getCanonicalName()).named("valueOf");
+  private static final Matcher<ExpressionTree> STRING_VALUE_ENUM =
+      instanceMethod().onDescendantOf(Enum.class.getCanonicalName()).namedAnyOf("name", "toString");
 
   /** Instantiates a new {@link EnumValueOfSuperSet} instance. */
   public EnumValueOfSuperSet() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    Matcher<ExpressionTree> valueOfMatcher =
-        staticMethod().onDescendantOf(Enum.class.getCanonicalName()).named("valueOf");
-    Matcher<ExpressionTree> valueOfArgumentMatcher =
-        instanceMethod()
-            .onDescendantOf(Enum.class.getCanonicalName())
-            .namedAnyOf("name", "toString");
-    if (valueOfMatcher.matches(tree, state)) {
-      MethodInvocationTree enumNameInvocation =
-          (MethodInvocationTree)
-              tree.getArguments().stream()
-                  .filter(argument -> valueOfArgumentMatcher.matches(argument, state))
-                  .collect(toImmutableList())
-                  .getFirst();
-
-      ImmutableSet<String> valuesOfSource = getEnumValues(tree);
-      ImmutableSet<String> valuesOfTarget = getEnumValues(enumNameInvocation);
-
-      ImmutableSet<String> difference =
-          Sets.difference(valuesOfTarget, valuesOfSource).immutableCopy();
-
-      return difference.isEmpty() ? Description.NO_MATCH : describeMatch(tree);
+    if (!ENUM_VALUE_OF.matches(tree, state)) {
+      return Description.NO_MATCH;
     }
-    return Description.NO_MATCH;
+
+    MethodInvocationTree targetEnum =
+        (MethodInvocationTree)
+            tree.getArguments().stream()
+                .filter(argument -> STRING_VALUE_ENUM.matches(argument, state))
+                .collect(toImmutableList())
+                .getFirst();
+
+    ImmutableSet<String> valuesOfSource = getEnumValues(tree);
+    ImmutableSet<String> valuesOfTarget = getEnumValues(targetEnum);
+
+    ImmutableSet<String> difference =
+        Sets.difference(valuesOfTarget, valuesOfSource).immutableCopy();
+
+    return difference.isEmpty() ? Description.NO_MATCH : describeMatch(tree);
   }
 
   private static ImmutableSet<String> getEnumValues(MethodInvocationTree tree) {
