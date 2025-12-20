@@ -49,7 +49,7 @@ jobs:
             ${{ matrix.target-jdk }}
             ${{ matrix.build-jdk }}
           java-distribution: temurin
-          maven-version: 3.9.11
+          maven-version: 3.9.12
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn install javadoc:jar
       # Note that the `-D` argument is quoted for compatibility with the
@@ -82,7 +82,7 @@ jobs:
         with:
           java-version: 25
           java-distribution: temurin
-          maven-version: 3.9.11
+          maven-version: 3.9.12
       - name: Build and deploy
         run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
         env:
