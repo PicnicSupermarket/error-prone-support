@@ -355,8 +355,10 @@
             </dependency>
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
-                <artifactId>nullaway</artifactId>
-                <version>0.12.14</version>
+                <artifactId>nullaway-bom</artifactId>
+                <version>0.12.15</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
