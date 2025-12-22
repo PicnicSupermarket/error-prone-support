@@ -78,6 +78,7 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       ImmutableSet<String> difference =
           Sets.difference(valuesOfTarget, valuesOfSource).immutableCopy();
 
+      // TODO match if previous code parts contains switch case which filters down possible values.
       return difference.isEmpty() ? Description.NO_MATCH : describeMatch(tree);
     }
 
