@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -43,5 +44,83 @@ final class NodeTest {
     List<Integer> actualReachable = new ArrayList<>();
     tree.collectReachableValues(candidateEdges, actualReachable::add);
     assertThat(actualReachable).hasSameElementsAs(expectedReachable);
+  }
+
+  @Test
+  void collectReachableValuesWithEmptyCandidateEdges() {
+    Node<Integer> tree =
+        Node.create(ImmutableSet.of(1, 2), v -> ImmutableSet.of(ImmutableSet.of("edge" + v)));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of(), result::add);
+
+    assertThat(result).isEmpty();
+  }
+
+  @Test
+  void collectReachableValuesWithEmptyChildren() {
+    Node<Integer> tree = Node.create(ImmutableSet.of(1), v -> ImmutableSet.of(ImmutableSet.of()));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of("anyEdge"), result::add);
+
+    assertThat(result).containsExactly(1);
+  }
+
+  @Test
+  void collectReachableValuesWithEqualSizes() {
+    Node<Integer> tree =
+        Node.create(ImmutableSet.of(1, 2, 3), v -> ImmutableSet.of(ImmutableSet.of("edge" + v)));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of("edge1", "edge2", "edge3"), result::add);
+
+    assertThat(result).containsExactly(1, 2, 3);
+  }
+
+  @Test
+  void collectReachableValuesWithFewerChildrenThanCandidateEdges() {
+    Node<Integer> tree =
+        Node.create(ImmutableSet.of(1, 2), v -> ImmutableSet.of(ImmutableSet.of("edge" + v)));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(
+        ImmutableSet.of("edge1", "edge2", "edge3", "edge4", "edge5"), result::add);
+
+    assertThat(result).containsExactly(1, 2);
+  }
+
+  @Test
+  void collectReachableValuesWithNonExistentEdge() {
+    Node<Integer> tree =
+        Node.create(ImmutableSet.of(1, 2), v -> ImmutableSet.of(ImmutableSet.of("edge" + v)));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of("nonExistent", "edge1"), result::add);
+
+    assertThat(result).containsExactly(1);
+  }
+
+  @Test
+  void registerPathWithDuplicateValueAndPrefixPath() {
+    Node<Integer> tree =
+        Node.create(
+            ImmutableSet.of(42),
+            v -> ImmutableSet.of(ImmutableSet.of("a"), ImmutableSet.of("a", "b")));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of("a", "b"), result::add);
+
+    assertThat(result).containsExactly(42);
+  }
+
+  @Test
+  void registerPathWithEmptyPath() {
+    Node<Integer> tree = Node.create(ImmutableSet.of(99), v -> ImmutableSet.of(ImmutableSet.of()));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of("anyEdge"), result::add);
+
+    assertThat(result).containsExactly(99);
   }
 }
