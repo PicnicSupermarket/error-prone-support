@@ -31,7 +31,7 @@ import java.util.Optional;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid passing unchecked arguments to `valueOf`",
-    link = BUG_PATTERNS_BASE_URL + "EnumValueOfSuperSet",
+    link = BUG_PATTERNS_BASE_URL + "EnumValueOfUsage",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
@@ -103,8 +103,8 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
         .filter(
             argument ->
                 Optional.ofNullable(ASTHelpers.getType(argument))
-                    .map(type -> type.toString().equals(String.class.getCanonicalName()))
-                    .orElse(false))
+                    .filter(type -> type.toString().equals(String.class.getCanonicalName()))
+                    .isPresent())
         .findAny();
   }
 
