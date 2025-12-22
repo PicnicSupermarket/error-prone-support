@@ -22,7 +22,11 @@ import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.ParenthesizedTree;
+import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Symbol;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -76,16 +80,14 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
     if (nameArgument instanceof MethodInvocationTree anotherEnumsInvocation
         && STRING_VALUE_ENUM.matches(anotherEnumsInvocation, state)) {
 
-      // Check if it is a part of switch-case statement
-      CaseTree filteredCaseTree =
-          ASTHelpers.findEnclosingNode(
-              TreePath.getPath(state.getPath(), nameArgument), CaseTree.class);
+      // Check if it is a part of switch-case statement, and values are filtered by labels.
+      ImmutableSet<String> filteredEnumValues =
+          findFilteredEnumValues(anotherEnumsInvocation, state);
+
       ImmutableSet<String> valuesOfTarget =
-          filteredCaseTree == null
+          filteredEnumValues.isEmpty()
               ? findEnumValuesOfMethodInvocationTree(anotherEnumsInvocation)
-              : filteredCaseTree.getLabels().stream()
-                  .map(Object::toString)
-                  .collect(toImmutableSet());
+              : filteredEnumValues;
 
       return Sets.difference(valuesOfTarget, valuesOfSource).isEmpty()
           ? Description.NO_MATCH
@@ -121,5 +123,35 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
   private static ImmutableSet<String> findEnumValuesOfMethodInvocationTree(
       MethodInvocationTree tree) {
     return ImmutableSet.copyOf(ASTHelpers.enumValues(ASTHelpers.getReceiverType(tree).tsym));
+  }
+
+  private static ImmutableSet<String> findFilteredEnumValues(
+      MethodInvocationTree nameArgument, VisitorState state) {
+    SwitchExpressionTree switchExpressionTree =
+        ASTHelpers.findEnclosingNode(
+            TreePath.getPath(state.getPath(), nameArgument), SwitchExpressionTree.class);
+    if (switchExpressionTree == null) {
+      return ImmutableSet.of();
+    }
+
+    if (switchExpressionTree.getExpression() instanceof ParenthesizedTree parenthesizedTree) {
+      Symbol switchParenthesis = ASTHelpers.getSymbol(parenthesizedTree.getExpression());
+      Symbol nameCallReceiver = ASTHelpers.getSymbol(ASTHelpers.getReceiver(nameArgument));
+
+      if (switchParenthesis == null
+          || nameCallReceiver == null
+          || !Objects.equals(switchParenthesis, nameCallReceiver)) {
+        return ImmutableSet.of();
+      }
+
+      CaseTree filteredCaseTree =
+          ASTHelpers.findEnclosingNode(
+              TreePath.getPath(state.getPath(), nameArgument), CaseTree.class);
+      if (filteredCaseTree == null) {
+        return ImmutableSet.of();
+      }
+      return filteredCaseTree.getLabels().stream().map(Object::toString).collect(toImmutableSet());
+    }
+    return ImmutableSet.of();
   }
 }
