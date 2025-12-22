@@ -1,21 +1,21 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.function.Function.identity;
+import static org.openjdk.jmh.annotations.Mode.AverageTime;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.jakewharton.nopen.annotation.Open;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -27,11 +27,11 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import tech.picnic.errorprone.refaster.runner.NodeTestCase.NodeTestCaseEntry;
 
-@BenchmarkMode(Mode.AverageTime)
+@BenchmarkMode(AverageTime)
 @Fork(jvmArgs = {"-Xms1G", "-Xmx1G"})
 @Measurement(iterations = 10)
 @Open
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(MILLISECONDS)
 @State(Scope.Benchmark)
 @Warmup(iterations = 5)
 public class NodeBenchmark {

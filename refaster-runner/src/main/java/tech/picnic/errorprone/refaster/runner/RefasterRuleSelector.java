@@ -133,26 +133,28 @@ final class RefasterRuleSelector {
   private static void collectRuleIdentifiers(
       CodeTransformer codeTransformer,
       Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers) {
-    if (codeTransformer instanceof CompositeCodeTransformer compositeCodeTransformer) {
-      for (CodeTransformer transformer : compositeCodeTransformer.transformers()) {
-        collectRuleIdentifiers(transformer, identifiers);
+    switch (codeTransformer) {
+      case CompositeCodeTransformer compositeCodeTransformer -> {
+        for (CodeTransformer transformer : compositeCodeTransformer.transformers()) {
+          collectRuleIdentifiers(transformer, identifiers);
+        }
       }
-    } else if (codeTransformer instanceof AnnotatedCompositeCodeTransformer annotatedTransformer) {
-      for (Map.Entry<CodeTransformer, ImmutableSet<ImmutableSet<String>>> e :
-          indexRuleIdentifiers(annotatedTransformer.transformers()).entrySet()) {
-        identifiers.put(
-            new AnnotatedCompositeCodeTransformer(
-                annotatedTransformer.packageName(),
-                ImmutableList.of(e.getKey()),
-                annotatedTransformer.annotations()),
-            e.getValue());
+      case AnnotatedCompositeCodeTransformer annotatedTransformer -> {
+        for (Map.Entry<CodeTransformer, ImmutableSet<ImmutableSet<String>>> e :
+            indexRuleIdentifiers(annotatedTransformer.transformers()).entrySet()) {
+          identifiers.put(
+              new AnnotatedCompositeCodeTransformer(
+                  annotatedTransformer.packageName(),
+                  ImmutableList.of(e.getKey()),
+                  annotatedTransformer.annotations()),
+              e.getValue());
+        }
       }
-    } else if (codeTransformer instanceof RefasterRule) {
-      identifiers.put(
-          codeTransformer, extractRuleIdentifiers((RefasterRule<?, ?>) codeTransformer));
-    } else {
-      /* Unrecognized `CodeTransformer` types are indexed such that they always apply. */
-      identifiers.put(codeTransformer, ImmutableSet.of(ImmutableSet.of()));
+      case RefasterRule<?, ?> refasterRule ->
+          identifiers.put(codeTransformer, extractRuleIdentifiers(refasterRule));
+      default ->
+          /* Unrecognized `CodeTransformer` types are indexed such that they always apply. */
+          identifiers.put(codeTransformer, ImmutableSet.of(ImmutableSet.of()));
     }
   }
 
@@ -265,7 +267,7 @@ final class RefasterRuleSelector {
         getMethod(UCLASS_IDENT, "getTopLevelClass");
     private static final Method METHOD_UANY_OF_EXPRESSIONS = getMethod(UAnyOf.class, "expressions");
 
-    static boolean isUClassIdent(IdentifierTree tree) {
+    static boolean isUClassIdentifier(IdentifierTree tree) {
       return UCLASS_IDENT.isInstance(tree);
     }
 
@@ -281,11 +283,11 @@ final class RefasterRuleSelector {
       return invokeMethod(METHOD_BLOCK_TEMPLATE_TEMPLATE_STATEMENTS, template);
     }
 
-    static IdentifierTree getClassIdent(UStaticIdent tree) {
+    static IdentifierTree getClassIdentifier(UStaticIdent tree) {
       return invokeMethod(METHOD_USTATIC_IDENT_CLASS_IDENT, tree);
     }
 
-    // Arguments to this method must actually be of the package-private type `UClassIdent`.
+    // XXX: Arguments to this method must actually be of the package-private type `UClassIdent`.
     static String getTopLevelClass(IdentifierTree uClassIdent) {
       return invokeMethod(METHOD_UCLASS_IDENT_GET_TOP_LEVEL_CLASS, uClassIdent);
     }
@@ -334,13 +336,13 @@ final class RefasterRuleSelector {
     public @Nullable Void visitIdentifier(
         IdentifierTree node, List<Set<String>> identifierCombinations) {
       // XXX: Also include the package name if not `java.lang`; it must be present.
-      if (RefasterIntrospection.isUClassIdent(node)) {
+      if (RefasterIntrospection.isUClassIdentifier(node)) {
         for (Set<String> ids : identifierCombinations) {
           ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(node)));
           ids.add(getIdentifier(node));
         }
       } else if (node instanceof UStaticIdent uStaticIdent) {
-        IdentifierTree subNode = RefasterIntrospection.getClassIdent(uStaticIdent);
+        IdentifierTree subNode = RefasterIntrospection.getClassIdentifier(uStaticIdent);
         for (Set<String> ids : identifierCombinations) {
           ids.add(getSimpleName(RefasterIntrospection.getTopLevelClass(subNode)));
           ids.add(getIdentifier(subNode));

@@ -60,9 +60,7 @@ record NodeTestCase<V>(ImmutableSetMultimap<V, ImmutableSet<String>> input) {
 
     return Stream.concat(
             Stream.of(ImmutableSet.<String>of()), shuffle(treeInput.values(), random).stream())
-        // XXX: Use `random.nextInt(20, 100)` once we no longer target JDK 11. (And consider
-        // introducing a Refaster template for this case.)
-        .limit(20 + random.nextInt(80))
+        .limit(random.nextInt(20, 100))
         .flatMap(edges -> generateVariations(edges, allEdges, "unused", random))
         .distinct()
         .map(edges -> createTestCaseEntry(treeInput, edges));

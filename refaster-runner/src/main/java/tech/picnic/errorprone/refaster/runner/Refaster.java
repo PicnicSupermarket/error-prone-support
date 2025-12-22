@@ -93,16 +93,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     SubContext context = new SubContext(state.context);
     List<Description> matches = new ArrayList<>();
     for (CodeTransformer transformer : candidateTransformers) {
-      try {
-        transformer.apply(state.getPath(), context, matches::add);
-      } catch (LinkageError e) {
-        // XXX: This `try/catch` block handles the issue described and resolved in
-        // https://github.com/google/error-prone/pull/2456. Drop this block once that change is
-        // released.
-        // XXX: Find a way to identify that we're running Picnic's Error Prone fork and disable this
-        // fallback if so, as it might hide other bugs.
-        return Description.NO_MATCH;
-      }
+      transformer.apply(state.getPath(), context, matches::add);
     }
     /* Then apply them. */
     applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
