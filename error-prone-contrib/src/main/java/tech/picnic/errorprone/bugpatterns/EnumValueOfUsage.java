@@ -1,11 +1,11 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -18,10 +18,11 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.util.TreePath;
 import java.util.Optional;
 
 /**
@@ -59,7 +60,7 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
     ExpressionTree nameArgument = optionalNameArgument.orElseThrow();
     String constantValue = ASTHelpers.constValue(nameArgument, String.class);
 
-    ImmutableSet<String> valuesOfSource = getEnumValues(tree);
+    ImmutableSet<String> valuesOfSource = findEnumValuesOfMethodInvocationTree(tree);
 
     // Match constants
     if (constantValue != null) {
@@ -71,15 +72,24 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       return describeMatch(tree);
     }
 
-    // Match enum to enum conversions
-    if (nameArgument instanceof MethodInvocationTree anotherEnumInvocation
-        && STRING_VALUE_ENUM.matches(nameArgument, state)) {
-      ImmutableSet<String> valuesOfTarget = getEnumValues(anotherEnumInvocation);
-      ImmutableSet<String> difference =
-          Sets.difference(valuesOfTarget, valuesOfSource).immutableCopy();
+    // Match name argument where it is another enum's .name() or .toString() invocation.
+    if (nameArgument instanceof MethodInvocationTree anotherEnumsInvocation
+        && STRING_VALUE_ENUM.matches(anotherEnumsInvocation, state)) {
 
-      // TODO match if previous code parts contains switch case which filters down possible values.
-      return difference.isEmpty() ? Description.NO_MATCH : describeMatch(tree);
+      // Check if it is a part of switch-case statement
+      CaseTree filteredCaseTree =
+          ASTHelpers.findEnclosingNode(
+              TreePath.getPath(state.getPath(), nameArgument), CaseTree.class);
+      ImmutableSet<String> valuesOfTarget =
+          filteredCaseTree == null
+              ? findEnumValuesOfMethodInvocationTree(anotherEnumsInvocation)
+              : filteredCaseTree.getLabels().stream()
+                  .map(Object::toString)
+                  .collect(toImmutableSet());
+
+      return Sets.difference(valuesOfTarget, valuesOfSource).isEmpty()
+          ? Description.NO_MATCH
+          : describeMatch(tree);
     }
 
     return Description.NO_MATCH;
@@ -108,11 +118,8 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
         .findAny();
   }
 
-  private static ImmutableSet<String> getEnumValues(MethodInvocationTree tree) {
-    return ImmutableSet.copyOf(
-        ASTHelpers.enumValues(
-            requireNonNull(
-                    ASTHelpers.getType(((MemberSelectTree) tree.getMethodSelect()).getExpression()))
-                .tsym));
+  private static ImmutableSet<String> findEnumValuesOfMethodInvocationTree(
+      MethodInvocationTree tree) {
+    return ImmutableSet.copyOf(ASTHelpers.enumValues(ASTHelpers.getReceiverType(tree).tsym));
   }
 }
