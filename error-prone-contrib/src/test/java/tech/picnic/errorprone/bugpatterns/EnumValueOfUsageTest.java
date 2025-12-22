@@ -3,16 +3,22 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class EnumValueOfSuperSetTest {
+final class EnumValueOfUsageTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(EnumValueOfSuperSet.class, getClass())
+    CompilationTestHelper.newInstance(EnumValueOfUsage.class, getClass())
         .addSourceLines(
             "Test.java",
             "class Test {",
-            "  A convertUnsafe(B b) {",
-            "    // BUG: Diagnostic contains:",
-            "    return A.valueOf(b.name());",
+            "  void convertUnsafe(String raw, B b) {",
+            "    // BUG: Diagnostic contains: ",
+            "    A.valueOf(\"FOUR\");",
+            "    // BUG: Diagnostic contains: ",
+            "    A.valueOf(raw);",
+            "    // BUG: Diagnostic contains: ",
+            "    A.valueOf(b.name());",
+            "    // BUG: Diagnostic contains: ",
+            "    var a = switch(b) { case FOUR -> A.valueOf(b.name()); default -> null;};",
             "  }",
             "",
             "  enum A {",
