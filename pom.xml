@@ -208,12 +208,12 @@
         <version.error-prone-orig>2.45.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
         <version.jmh>1.37</version.jmh>
-        <version.maven>3.9.11</version.maven>
+        <version.maven>3.9.12</version.maven>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
         <version.nopen>1.0.1</version.nopen>
-        <version.pitest-git>2.3.0</version.pitest-git>
+        <version.pitest-git>2.3.2</version.pitest-git>
     </properties>
 
     <dependencyManagement>
@@ -334,7 +334,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.32.0</version>
+                <version>1.33.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -365,13 +365,15 @@
             </dependency>
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
-                <artifactId>nullaway</artifactId>
-                <version>0.12.12</version>
+                <artifactId>nullaway-bom</artifactId>
+                <version>0.12.15</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.16.0</version>
+                <version>1.16.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -430,7 +432,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.2</version>
+                <version>1.18.3</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -443,7 +445,7 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.25</version>
+                <version>1.9.25.1</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -455,7 +457,7 @@
             <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
-                <version>3.52.0</version>
+                <version>3.52.1</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -465,12 +467,12 @@
             <dependency>
                 <groupId>org.immutables</groupId>
                 <artifactId>value-annotations</artifactId>
-                <version>2.11.7</version>
+                <version>2.12.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.9</version>
+                <version>3.20.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -489,14 +491,14 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
-                <version>5.20.0</version>
+                <version>5.21.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.6.1</version>
+                <version>5.6.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -513,7 +515,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.19.0</version>
+                <version>3.21.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -527,19 +529,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>7.0.1</version>
+                <version>7.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.0.0</version>
+                <version>4.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>7.0.0</version>
+                <version>7.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -952,7 +954,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>12.2.0</version>
+                            <version>12.3.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1344,7 +1346,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.1</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationProfiles>release</preparationProfiles>
@@ -1670,7 +1672,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.3.0.6276</version>
+                    <version>5.5.0.6356</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.central</groupId>

@@ -42,7 +42,7 @@ jobs:
           - prometheus-java-client
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
+        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
         with:
           # We can't use `disable-sudo-and-containers` here, as some
           # integration test projects have unit tests that start Docker
@@ -74,7 +74,7 @@ jobs:
             21.0.8
             25
           java-distribution: temurin
-          maven-version: 3.9.11
+          maven-version: 3.9.12
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Run integration test
@@ -84,7 +84,7 @@ jobs:
           JAVA_HOME: "${{ env.JAVA_HOME_21_X64 }}"
       - name: Upload artifacts on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: "integration-test-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
