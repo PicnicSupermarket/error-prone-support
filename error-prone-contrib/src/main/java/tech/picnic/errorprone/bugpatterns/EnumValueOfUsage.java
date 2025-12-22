@@ -125,6 +125,11 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
     return ImmutableSet.copyOf(ASTHelpers.enumValues(ASTHelpers.getReceiverType(tree).tsym));
   }
 
+  /**
+   * Finds and returns all filtered enum values of {@code b.name()} where b is an enum type, and is
+   * enclosed by a switch statement where b is inside switch parenthesis, e.g. {@code switch (b)}.
+   * Otherwise, returns empty set.
+   */
   private static ImmutableSet<String> findFilteredEnumValues(
       MethodInvocationTree nameArgument, VisitorState state) {
     SwitchExpressionTree switchExpressionTree =
