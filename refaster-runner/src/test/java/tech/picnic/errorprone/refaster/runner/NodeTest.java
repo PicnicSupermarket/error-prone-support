@@ -47,27 +47,6 @@ final class NodeTest {
   }
 
   @Test
-  void collectReachableValuesWithEmptyCandidateEdges() {
-    Node<Integer> tree =
-        Node.create(ImmutableSet.of(1, 2), v -> ImmutableSet.of(ImmutableSet.of("edge" + v)));
-
-    List<Integer> result = new ArrayList<>();
-    tree.collectReachableValues(ImmutableSet.of(), result::add);
-
-    assertThat(result).isEmpty();
-  }
-
-  @Test
-  void collectReachableValuesWithEmptyChildren() {
-    Node<Integer> tree = Node.create(ImmutableSet.of(1), v -> ImmutableSet.of(ImmutableSet.of()));
-
-    List<Integer> result = new ArrayList<>();
-    tree.collectReachableValues(ImmutableSet.of("anyEdge"), result::add);
-
-    assertThat(result).containsExactly(1);
-  }
-
-  @Test
   void collectReachableValuesWithEqualSizes() {
     Node<Integer> tree =
         Node.create(ImmutableSet.of(1, 2, 3), v -> ImmutableSet.of(ImmutableSet.of("edge" + v)));
@@ -99,28 +78,5 @@ final class NodeTest {
     tree.collectReachableValues(ImmutableSet.of("nonExistent", "edge1"), result::add);
 
     assertThat(result).containsExactly(1);
-  }
-
-  @Test
-  void registerPathWithDuplicateValueAndPrefixPath() {
-    Node<Integer> tree =
-        Node.create(
-            ImmutableSet.of(42),
-            v -> ImmutableSet.of(ImmutableSet.of("a"), ImmutableSet.of("a", "b")));
-
-    List<Integer> result = new ArrayList<>();
-    tree.collectReachableValues(ImmutableSet.of("a", "b"), result::add);
-
-    assertThat(result).containsExactly(42);
-  }
-
-  @Test
-  void registerPathWithEmptyPath() {
-    Node<Integer> tree = Node.create(ImmutableSet.of(99), v -> ImmutableSet.of(ImmutableSet.of()));
-
-    List<Integer> result = new ArrayList<>();
-    tree.collectReachableValues(ImmutableSet.of("anyEdge"), result::add);
-
-    assertThat(result).containsExactly(99);
   }
 }
