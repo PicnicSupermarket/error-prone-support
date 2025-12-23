@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
+import static java.util.Collections.singletonMap;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableMap;
@@ -152,6 +153,26 @@ final class ImmutableSortedMapRules {
     ImmutableSortedMap<K, V> after(
         Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return ImmutableSortedMap.copyOf(iterable);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedMap.Builder#put(Object, Object)} over {@link
+   * ImmutableSortedMap.Builder#putAll(Map)} when adding a single key-value pair.
+   */
+  static final class ImmutableSortedMapBuilderPutOverPutAllSingleEntry<K, V> {
+    @BeforeTemplate
+    ImmutableSortedMap.Builder<K, V> before(
+        ImmutableSortedMap.Builder<K, V> builder, K key, V value) {
+      return Refaster.anyOf(
+              //TODO: ImmutableSortedMap.of()?
+          builder.putAll(singletonMap(key, value)), builder.putAll(Map.of(key, value)));
+    }
+
+    @AfterTemplate
+    ImmutableSortedMap.Builder<K, V> after(
+        ImmutableSortedMap.Builder<K, V> builder, K key, V value) {
+      return builder.put(key, value);
     }
   }
 }

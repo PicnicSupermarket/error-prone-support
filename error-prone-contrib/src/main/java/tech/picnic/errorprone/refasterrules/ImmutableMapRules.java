@@ -430,4 +430,25 @@ final class ImmutableMapRules {
   // map.entrySet().stream().filter(keyPred).forEach(mapBuilder::put)
   // ->
   // mapBuilder.putAll(Maps.filterKeys(map, pred))
+
+  /**
+   * Prefer {@link ImmutableMap.Builder#put(Object, Object)} over {@link
+   * ImmutableMap.Builder#putAll(Map)} when adding a single key-value pair.
+   */
+  static final class ImmutableMapBuilderPutOverPutAllSingleEntry<K, V> {
+    @BeforeTemplate
+    ImmutableMap.Builder<K, V> before(
+        ImmutableMap.Builder<K, V> builder, K key, V value) {
+      return Refaster.anyOf(
+          builder.putAll(ImmutableMap.of(key, value)),
+          builder.putAll(singletonMap(key, value)),
+          builder.putAll(Map.of(key, value)));
+    }
+
+    @AfterTemplate
+    ImmutableMap.Builder<K, V> after(
+        ImmutableMap.Builder<K, V> builder, K key, V value) {
+      return builder.put(key, value);
+    }
+  }
 }

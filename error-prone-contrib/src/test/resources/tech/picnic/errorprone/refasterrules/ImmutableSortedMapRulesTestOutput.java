@@ -54,4 +54,11 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
         ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1).entrySet()),
         ImmutableSortedMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
   }
+
+  ImmutableSet<ImmutableSortedMap.Builder<String, Integer>>
+      testImmutableSortedMapBuilderPutOverPutAllSingleEntry() {
+    return ImmutableSet.of(
+        ImmutableSortedMap.<String, Integer>naturalOrder().put("key", 1),
+        ImmutableSortedMap.<String, Integer>naturalOrder().put("key", 2));
+  }
 }
