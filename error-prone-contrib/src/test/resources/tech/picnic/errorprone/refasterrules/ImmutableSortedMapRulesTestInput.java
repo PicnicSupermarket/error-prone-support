@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -60,5 +61,13 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
             .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)),
         Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
             .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+  }
+
+  ImmutableSet<ImmutableSortedMap.Builder<String, Integer>>
+      testImmutableSortedMapBuilderPutOverPutAllSingleEntry() {
+    return ImmutableSet.of(
+        ImmutableSortedMap.<String, Integer>naturalOrder()
+            .putAll(Collections.singletonMap("key", 1)),
+        ImmutableSortedMap.<String, Integer>naturalOrder().putAll(Map.of("key", 2)));
   }
 }
