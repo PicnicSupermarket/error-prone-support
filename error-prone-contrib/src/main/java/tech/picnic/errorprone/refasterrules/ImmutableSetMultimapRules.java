@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutab
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
@@ -18,7 +19,9 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -214,6 +217,27 @@ final class ImmutableSetMultimapRules {
         Multimap<K, V1> multimap,
         com.google.common.base.Function<? super V1, ? extends V2> transformation) {
       return ImmutableSetMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSetMultimap.Builder#put(Object, Object)} over {@link
+   * ImmutableSetMultimap.Builder#putAll(Object, Iterable)} when adding a single value.
+   */
+  static final class ImmutableSetMultimapBuilderPutOverPutAllSingleValue<K, V> {
+    @BeforeTemplate
+    ImmutableSetMultimap.Builder<K, V> before(
+        ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
+      return Refaster.anyOf(
+          builder.putAll(key, ImmutableSet.of(value)),
+          builder.putAll(key, Collections.singleton(value)),
+          builder.putAll(key, Set.of(value)));
+    }
+
+    @AfterTemplate
+    ImmutableSetMultimap.Builder<K, V> after(
+        ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
+      return builder.put(key, value);
     }
   }
 }

@@ -14,6 +14,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeMultimap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -22,7 +24,11 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Streams.class, flatteningToImmutableListMultimap(null, null), identity());
+        Collections.class,
+        List.class,
+        Streams.class,
+        flatteningToImmutableListMultimap(null, null),
+        identity());
   }
 
   ImmutableSet<ImmutableMultimap.Builder<String, Integer>> testImmutableListMultimapBuilder() {
@@ -97,5 +103,13 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
             Multimaps.transformValues(ImmutableSetMultimap.of("qux", 4L), n -> Math.toIntExact(n))),
         ImmutableListMultimap.copyOf(
             Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
+  }
+
+  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>>
+      testImmutableListMultimapBuilderPutOverPutAllSingleValue() {
+    return ImmutableSet.of(
+        ImmutableListMultimap.<String, Integer>builder().put("key", 1),
+        ImmutableListMultimap.<String, Integer>builder().put("key", 2),
+        ImmutableListMultimap.<String, Integer>builder().put("key", 3));
   }
 }
