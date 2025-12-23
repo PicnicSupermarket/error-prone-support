@@ -17,7 +17,11 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null, null));
+        Collections.class,
+        Stream.class,
+        Streams.class,
+        naturalOrder(),
+        toImmutableSortedMap(null, null, null));
   }
 
   ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapBuilder() {

@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSortedMultiset.toImmutableSortedMultiset;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.singleton;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableSortedMultiset;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -140,6 +142,25 @@ final class ImmutableSortedMultisetRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableSortedMultiset<T> after(Stream<T> stream) {
       return stream.collect(toImmutableSortedMultiset(naturalOrder()));
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedMultiset.Builder#add(Object)} over {@link
+   * ImmutableSortedMultiset.Builder#addAll(Iterable)} when adding a single element.
+   */
+  static final class ImmutableSortedMultisetBuilderAddOverAddAllSingleElement<T> {
+    @BeforeTemplate
+    ImmutableSortedMultiset.Builder<T> before(
+        ImmutableSortedMultiset.Builder<T> builder, T element) {
+      return Refaster.anyOf(
+          builder.addAll(singleton(element)), builder.addAll(Set.of(element)));
+    }
+
+    @AfterTemplate
+    ImmutableSortedMultiset.Builder<T> after(
+        ImmutableSortedMultiset.Builder<T> builder, T element) {
+      return builder.add(element);
     }
   }
 }

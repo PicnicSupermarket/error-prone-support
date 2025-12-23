@@ -18,7 +18,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Collections.class, Streams.class, not(null));
+    return ImmutableSet.of(Arrays.class, Collections.class, Set.class, Streams.class, not(null));
   }
 
   ImmutableSet.Builder<String> testImmutableSetBuilder() {
@@ -127,5 +127,12 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Integer> testSetsUnion() {
     return Stream.concat(ImmutableSet.of(1).stream(), ImmutableSet.of(2).stream())
         .collect(toImmutableSet());
+  }
+
+  ImmutableSet<ImmutableSet.Builder<Integer>> testImmutableSetBuilderAddOverAddAllSingleElement() {
+    return ImmutableSet.of(
+        ImmutableSet.<Integer>builder().addAll(ImmutableSet.of(1)),
+        ImmutableSet.<Integer>builder().addAll(Collections.singleton(2)),
+        ImmutableSet.<Integer>builder().addAll(Set.of(3)));
   }
 }

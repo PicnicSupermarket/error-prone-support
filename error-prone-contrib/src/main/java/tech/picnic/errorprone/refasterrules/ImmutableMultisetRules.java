@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableMultiset.toImmutableMultiset;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.singleton;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Streams;
@@ -12,6 +13,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -96,6 +98,25 @@ final class ImmutableMultisetRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableMultiset<T> after(Stream<T> stream) {
       return stream.collect(toImmutableMultiset());
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableMultiset.Builder#add(Object)} over {@link
+   * ImmutableMultiset.Builder#addAll(Iterable)} when adding a single element.
+   */
+  static final class ImmutableMultisetBuilderAddOverAddAllSingleElement<T> {
+    @BeforeTemplate
+    ImmutableMultiset.Builder<T> before(ImmutableMultiset.Builder<T> builder, T element) {
+      return Refaster.anyOf(
+          builder.addAll(ImmutableMultiset.of(element)),
+          builder.addAll(singleton(element)),
+          builder.addAll(Set.of(element)));
+    }
+
+    @AfterTemplate
+    ImmutableMultiset.Builder<T> after(ImmutableMultiset.Builder<T> builder, T element) {
+      return builder.add(element);
     }
   }
 }
