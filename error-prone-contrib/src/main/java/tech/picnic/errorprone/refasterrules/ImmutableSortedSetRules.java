@@ -152,8 +152,7 @@ final class ImmutableSortedSetRules {
   static final class ImmutableSortedSetBuilderAddOverAddAllSingleElement<T> {
     @BeforeTemplate
     ImmutableSortedSet.Builder<T> before(ImmutableSortedSet.Builder<T> builder, T element) {
-      return Refaster.anyOf(
-          builder.addAll(singleton(element)), builder.addAll(Set.of(element)));
+      return Refaster.anyOf(builder.addAll(singleton(element)), builder.addAll(Set.of(element)));
     }
 
     @AfterTemplate

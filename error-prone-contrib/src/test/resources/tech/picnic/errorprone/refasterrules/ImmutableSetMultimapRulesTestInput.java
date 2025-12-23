@@ -21,10 +21,7 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Collections.class,
-        Set.class,
-        Streams.class,
-        flatteningToImmutableSetMultimap(null, null));
+        Collections.class, Set.class, Streams.class, flatteningToImmutableSetMultimap(null, null));
   }
 
   ImmutableSetMultimap.Builder<String, Integer> testImmutableSetMultimapBuilder() {
