@@ -89,7 +89,8 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
     return List.of(1, 2, 3, 4, 5);
   }
 
-  ImmutableSet<ImmutableList.Builder<Integer>> testImmutableListBuilderAddOverAddAllSingleElement() {
+  ImmutableSet<ImmutableList.Builder<Integer>>
+      testImmutableListBuilderAddOverAddAllSingleElement() {
     return ImmutableSet.of(
         ImmutableList.<Integer>builder().addAll(ImmutableList.of(1)),
         ImmutableList.<Integer>builder().addAll(Collections.singletonList(2)),

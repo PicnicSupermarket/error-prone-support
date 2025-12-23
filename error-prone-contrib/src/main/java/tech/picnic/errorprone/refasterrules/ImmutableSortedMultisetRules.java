@@ -153,8 +153,7 @@ final class ImmutableSortedMultisetRules {
     @BeforeTemplate
     ImmutableSortedMultiset.Builder<T> before(
         ImmutableSortedMultiset.Builder<T> builder, T element) {
-      return Refaster.anyOf(
-          builder.addAll(singleton(element)), builder.addAll(Set.of(element)));
+      return Refaster.anyOf(builder.addAll(singleton(element)), builder.addAll(Set.of(element)));
     }
 
     @AfterTemplate

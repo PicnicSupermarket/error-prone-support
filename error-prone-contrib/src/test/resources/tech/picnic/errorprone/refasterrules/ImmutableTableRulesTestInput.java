@@ -46,7 +46,8 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableTable.<String, String, String>builder().buildOrThrow();
   }
 
-  ImmutableTable.Builder<String, String, Integer> testImmutableTableBuilderPutOverPutAllSingleCell() {
+  ImmutableTable.Builder<String, String, Integer>
+      testImmutableTableBuilderPutOverPutAllSingleCell() {
     return ImmutableTable.<String, String, Integer>builder()
         .putAll(ImmutableTable.of("row", "col", 1));
   }
