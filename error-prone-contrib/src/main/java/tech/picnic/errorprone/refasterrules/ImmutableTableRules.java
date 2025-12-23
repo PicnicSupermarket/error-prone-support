@@ -111,4 +111,22 @@ final class ImmutableTableRules {
       return ImmutableTable.of();
     }
   }
+
+  /**
+   * Prefer {@link ImmutableTable.Builder#put(Object, Object, Object)} over {@link
+   * ImmutableTable.Builder#putAll(Table)} when adding a single cell.
+   */
+  static final class ImmutableTableBuilderPutOverPutAllSingleCell<R, C, V> {
+    @BeforeTemplate
+    ImmutableTable.Builder<R, C, V> before(
+        ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {
+      return builder.putAll(ImmutableTable.of(rowKey, columnKey, value));
+    }
+
+    @AfterTemplate
+    ImmutableTable.Builder<R, C, V> after(
+        ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {
+      return builder.put(rowKey, columnKey, value);
+    }
+  }
 }
