@@ -165,7 +165,6 @@ final class ImmutableSortedMapRules {
     ImmutableSortedMap.Builder<K, V> before(
         ImmutableSortedMap.Builder<K, V> builder, K key, V value) {
       return Refaster.anyOf(
-              //TODO: ImmutableSortedMap.of()?
           builder.putAll(singletonMap(key, value)), builder.putAll(Map.of(key, value)));
     }
 
