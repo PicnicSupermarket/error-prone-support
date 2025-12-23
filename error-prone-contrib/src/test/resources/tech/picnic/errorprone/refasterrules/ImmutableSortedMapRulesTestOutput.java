@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -16,7 +17,11 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null, null));
+        Collections.class,
+        Stream.class,
+        Streams.class,
+        naturalOrder(),
+        toImmutableSortedMap(null, null, null));
   }
 
   ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapBuilder() {
