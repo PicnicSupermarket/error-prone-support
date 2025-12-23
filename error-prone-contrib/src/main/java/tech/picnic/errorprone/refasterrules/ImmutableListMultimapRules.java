@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.ImmutableListMultimap.flatteningToImmutableListMultimap;
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.singletonList;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -21,7 +22,6 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -286,11 +286,12 @@ final class ImmutableListMultimapRules {
    */
   static final class ImmutableListMultimapBuilderPutOverPutAllSingleValue<K, V> {
     @BeforeTemplate
+    @SuppressWarnings("ImmutableListOf1")
     ImmutableListMultimap.Builder<K, V> before(
         ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
       return Refaster.anyOf(
           builder.putAll(key, ImmutableList.of(value)),
-          builder.putAll(key, Collections.singletonList(value)),
+          builder.putAll(key, singletonList(value)),
           builder.putAll(key, List.of(value)));
     }
 
