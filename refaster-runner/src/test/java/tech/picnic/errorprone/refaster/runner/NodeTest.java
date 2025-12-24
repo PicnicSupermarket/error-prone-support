@@ -79,4 +79,14 @@ final class NodeTest {
 
     assertThat(result).containsExactly(1);
   }
+
+  @Test
+  void collectReachableValuesWithEmptyChildren() {
+    Node<Integer> tree = Node.create(ImmutableSet.of(1), v -> ImmutableSet.of(ImmutableSet.of()));
+
+    List<Integer> result = new ArrayList<>();
+    tree.collectReachableValues(ImmutableSet.of("anyEdge"), result::add);
+
+    assertThat(result).containsExactly(1);
+  }
 }
