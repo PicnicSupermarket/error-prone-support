@@ -326,23 +326,4 @@ final class ImmutableSetRules {
       return Sets.union(set1, set2).immutableCopy();
     }
   }
-
-  /**
-   * Prefer {@link ImmutableSet.Builder#add(Object)} over {@link
-   * ImmutableSet.Builder#addAll(Iterable)} when adding a single element.
-   */
-  static final class ImmutableSetBuilderAddOverAddAllSingleElement<T> {
-    @BeforeTemplate
-    ImmutableSet.Builder<T> before(ImmutableSet.Builder<T> builder, T element) {
-      return Refaster.anyOf(
-          builder.addAll(ImmutableSet.of(element)),
-          builder.addAll(singleton(element)),
-          builder.addAll(Set.of(element)));
-    }
-
-    @AfterTemplate
-    ImmutableSet.Builder<T> after(ImmutableSet.Builder<T> builder, T element) {
-      return builder.add(element);
-    }
-  }
 }

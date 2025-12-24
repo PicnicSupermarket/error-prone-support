@@ -2,7 +2,6 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSortedSet.toImmutableSortedSet;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
-import static java.util.Collections.singleton;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableSortedSet;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -142,22 +140,6 @@ final class ImmutableSortedSetRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ImmutableSortedSet<T> after(Stream<T> stream) {
       return stream.collect(toImmutableSortedSet(naturalOrder()));
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableSortedSet.Builder#add(Object)} over {@link
-   * ImmutableSortedSet.Builder#addAll(Iterable)} when adding a single element.
-   */
-  static final class ImmutableSortedSetBuilderAddOverAddAllSingleElement<T> {
-    @BeforeTemplate
-    ImmutableSortedSet.Builder<T> before(ImmutableSortedSet.Builder<T> builder, T element) {
-      return Refaster.anyOf(builder.addAll(singleton(element)), builder.addAll(Set.of(element)));
-    }
-
-    @AfterTemplate
-    ImmutableSortedSet.Builder<T> after(ImmutableSortedSet.Builder<T> builder, T element) {
-      return builder.add(element);
     }
   }
 }

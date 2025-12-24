@@ -7,15 +7,13 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ImmutableMultisetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Collections.class, Set.class, Streams.class);
+    return ImmutableSet.of(Arrays.class, Streams.class);
   }
 
   ImmutableMultiset.Builder<String> testImmutableMultisetBuilder() {
@@ -41,13 +39,5 @@ final class ImmutableMultisetRulesTest implements RefasterRuleCollectionTestCase
 
   ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
     return Stream.of(1).collect(toImmutableMultiset());
-  }
-
-  ImmutableSet<ImmutableMultiset.Builder<Integer>>
-      testImmutableMultisetBuilderAddOverAddAllSingleElement() {
-    return ImmutableSet.of(
-        ImmutableMultiset.<Integer>builder().add(1),
-        ImmutableMultiset.<Integer>builder().add(2),
-        ImmutableMultiset.<Integer>builder().add(3));
   }
 }
