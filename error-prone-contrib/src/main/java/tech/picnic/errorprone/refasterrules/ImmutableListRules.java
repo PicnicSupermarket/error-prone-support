@@ -262,23 +262,4 @@ final class ImmutableListRules {
       return ImmutableList.of(e1, e2, e3, e4, e5);
     }
   }
-
-  /**
-   * Prefer {@link ImmutableList.Builder#add(Object)} over {@link
-   * ImmutableList.Builder#addAll(Iterable)} when adding a single element.
-   */
-  static final class ImmutableListBuilderAddOverAddAllSingleElement<T> {
-    @BeforeTemplate
-    ImmutableList.Builder<T> before(ImmutableList.Builder<T> builder, T element) {
-      return Refaster.anyOf(
-          builder.addAll(ImmutableList.of(element)),
-          builder.addAll(singletonList(element)),
-          builder.addAll(List.of(element)));
-    }
-
-    @AfterTemplate
-    ImmutableList.Builder<T> after(ImmutableList.Builder<T> builder, T element) {
-      return builder.add(element);
-    }
-  }
 }

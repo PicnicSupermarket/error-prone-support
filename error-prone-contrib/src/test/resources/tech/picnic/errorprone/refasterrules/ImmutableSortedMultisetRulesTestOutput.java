@@ -9,16 +9,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedMultiset;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Collections.class, Set.class, Streams.class);
+    return ImmutableSet.of(Arrays.class, Streams.class);
   }
 
   ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetBuilder() {
@@ -54,12 +52,5 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
 
   ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
     return Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder()));
-  }
-
-  ImmutableSet<ImmutableSortedMultiset.Builder<Integer>>
-      testImmutableSortedMultisetBuilderAddOverAddAllSingleElement() {
-    return ImmutableSet.of(
-        ImmutableSortedMultiset.<Integer>naturalOrder().add(1),
-        ImmutableSortedMultiset.<Integer>naturalOrder().add(2));
   }
 }

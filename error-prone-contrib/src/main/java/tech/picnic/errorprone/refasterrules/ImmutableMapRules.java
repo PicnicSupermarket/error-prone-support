@@ -438,10 +438,7 @@ final class ImmutableMapRules {
   static final class ImmutableMapBuilderPutOverPutAllSingleEntry<K, V> {
     @BeforeTemplate
     ImmutableMap.Builder<K, V> before(ImmutableMap.Builder<K, V> builder, K key, V value) {
-      return Refaster.anyOf(
-          builder.putAll(ImmutableMap.of(key, value)),
-          builder.putAll(singletonMap(key, value)),
-          builder.putAll(Map.of(key, value)));
+      return builder.putAll(ImmutableMap.of(key, value));
     }
 
     @AfterTemplate

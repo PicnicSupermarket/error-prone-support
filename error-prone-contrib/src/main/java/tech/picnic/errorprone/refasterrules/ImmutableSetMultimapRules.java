@@ -19,9 +19,7 @@ import com.google.errorprone.refaster.annotation.MayOptionallyUse;
 import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -228,10 +226,7 @@ final class ImmutableSetMultimapRules {
     @BeforeTemplate
     ImmutableSetMultimap.Builder<K, V> before(
         ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
-      return Refaster.anyOf(
-          builder.putAll(key, ImmutableSet.of(value)),
-          builder.putAll(key, Collections.singleton(value)),
-          builder.putAll(key, Set.of(value)));
+      return builder.putAll(key, ImmutableSet.of(value));
     }
 
     @AfterTemplate
