@@ -22,7 +22,6 @@ final class RefasterRuleCollectionTest {
         MisnamedTestClassRules.class,
         MissingTestAndWrongTestRules.class,
         NestedRefasterAnyOfRules.class,
-        OperatorRefasterRules.class,
         PartialTestMatchRules.class,
         RuleWithoutTestRules.class,
         SingleRefasterAnyOfRules.class,
