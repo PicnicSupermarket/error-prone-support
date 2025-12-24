@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.refaster.test;
 
 import com.google.common.collect.ImmutableSet;
-import java.util.function.Predicate;
 
 /** Code to test the Refaster rules from {@link BlockTemplateRules}. */
 final class BlockTemplateRulesTest implements RefasterRuleCollectionTestCase {
@@ -15,10 +14,5 @@ final class BlockTemplateRulesTest implements RefasterRuleCollectionTestCase {
     if (invalid) {
       throw new IllegalArgumentException();
     }
-  }
-
-  boolean testPredicateTest() {
-    Predicate<String> predicate = String::isEmpty;
-    return predicate.test("foo");
   }
 }

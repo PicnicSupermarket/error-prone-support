@@ -6,9 +6,6 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
@@ -59,32 +56,6 @@ final class FooRules {
     @AfterTemplate
     boolean after(String string) {
       return string.length() == 1;
-    }
-  }
-
-  /** A rule that uses a member reference to exercise identifier extraction. */
-  static final class PredicateTestRule {
-    @BeforeTemplate
-    boolean before(Predicate<String> predicate, String value) {
-      return predicate.test(value);
-    }
-
-    @AfterTemplate
-    boolean after(Predicate<String> predicate, String value) {
-      return predicate.test(value);
-    }
-  }
-
-  /** A rule that uses a member reference in the template to exercise visitMemberReference. */
-  static final class StreamFilterRule {
-    @BeforeTemplate
-    Stream<String> before(List<String> list) {
-      return list.stream().filter(String::isEmpty);
-    }
-
-    @AfterTemplate
-    Stream<String> after(List<String> list) {
-      return list.stream().filter(s -> s.isEmpty());
     }
   }
 

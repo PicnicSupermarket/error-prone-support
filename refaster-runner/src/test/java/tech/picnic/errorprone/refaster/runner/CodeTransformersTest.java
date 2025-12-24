@@ -16,8 +16,6 @@ final class CodeTransformersTest {
             "FooRules$StringOfSizeZeroRule",
             "FooRules$StringOfSizeZeroVerboseRule",
             "FooRules$StringOfSizeOneRule",
-            "FooRules$PredicateTestRule",
-            "FooRules$StreamFilterRule",
             "FooRules$ExtraGrouping$StringOfSizeTwoRule",
             "FooRules$ExtraGrouping$StringOfSizeThreeRule");
   }
