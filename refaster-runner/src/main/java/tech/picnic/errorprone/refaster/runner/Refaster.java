@@ -21,7 +21,6 @@ import com.google.common.collect.TreeRangeSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
-import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.ErrorProneOptions.Severity;
 import com.google.errorprone.SubContext;
@@ -39,6 +38,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -64,8 +64,9 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private static final long serialVersionUID = 1L;
 
+  // XXX: Review this suppression.
   @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
-  private final CodeTransformer codeTransformer;
+  private final RefasterRuleSelector ruleSelector;
 
   /** Instantiates a default {@link Refaster} instance. */
   public Refaster() {
@@ -80,16 +81,20 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   @Inject
   @VisibleForTesting
   public Refaster(ErrorProneFlags flags) {
-    codeTransformer = createCompositeCodeTransformer(flags);
+    ruleSelector = createRefasterRuleSelector(flags);
   }
 
   @CanIgnoreReturnValue
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    /* First, collect all matches. */
-    List<Description> matches = new ArrayList<>();
-    codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+    Set<CodeTransformer> candidateTransformers = ruleSelector.selectCandidateRules(tree);
 
+    /* First, collect all matches. */
+    SubContext context = new SubContext(state.context);
+    List<Description> matches = new ArrayList<>();
+    for (CodeTransformer transformer : candidateTransformers) {
+      transformer.apply(state.getPath(), context, matches::add);
+    }
     /* Then apply them. */
     applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
@@ -192,10 +197,12 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  private static CodeTransformer createCompositeCodeTransformer(ErrorProneFlags flags) {
+  // XXX: Add a flag to disable the optimized `RefasterRuleSelector`. That would allow us to verify
+  // that we're not prematurely pruning rules.
+  private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
     ImmutableListMultimap<String, CodeTransformer> allTransformers =
         CodeTransformers.getAllCodeTransformers();
-    return CompositeCodeTransformer.compose(
+    return RefasterRuleSelector.create(
         flags
             .get(INCLUDED_RULES_PATTERN_FLAG)
             .map(Pattern::compile)
