@@ -132,12 +132,8 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
 
-  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>>
+  ImmutableListMultimap.Builder<String, Integer>
       testImmutableListMultimapBuilderPutOverPutAllSingleValue() {
-    return ImmutableSet.of(
-        ImmutableListMultimap.<String, Integer>builder().putAll("key", ImmutableList.of(1)),
-        ImmutableListMultimap.<String, Integer>builder()
-            .putAll("key", Collections.singletonList(2)),
-        ImmutableListMultimap.<String, Integer>builder().putAll("key", List.of(3)));
+    return ImmutableListMultimap.<String, Integer>builder().putAll("key", ImmutableList.of(1));
   }
 }

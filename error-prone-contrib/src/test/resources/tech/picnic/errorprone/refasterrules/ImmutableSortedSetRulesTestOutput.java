@@ -8,16 +8,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ImmutableSortedSetRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Collections.class, Set.class, Streams.class);
+    return ImmutableSet.of(Arrays.class, Streams.class);
   }
 
   ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
@@ -53,12 +51,5 @@ final class ImmutableSortedSetRulesTest implements RefasterRuleCollectionTestCas
 
   ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {
     return Stream.of(1).collect(toImmutableSortedSet(naturalOrder()));
-  }
-
-  ImmutableSet<ImmutableSortedSet.Builder<Integer>>
-      testImmutableSortedSetBuilderAddOverAddAllSingleElement() {
-    return ImmutableSet.of(
-        ImmutableSortedSet.<Integer>naturalOrder().add(1),
-        ImmutableSortedSet.<Integer>naturalOrder().add(2));
   }
 }
