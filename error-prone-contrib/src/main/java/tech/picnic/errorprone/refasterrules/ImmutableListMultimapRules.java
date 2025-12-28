@@ -282,11 +282,13 @@ final class ImmutableListMultimapRules {
    * Prefer {@link ImmutableListMultimap.Builder#put(Object, Object)} over {@link
    * ImmutableListMultimap.Builder#putAll(Object, Iterable)} when adding a single value.
    */
-  static final class ImmutableListMultimapBuilderPutOverPutAllSingleValue<K, V> {
+  static final class ImmutableListMultimapBuilderPut<K, V> {
     @BeforeTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableListMultimap.Builder<K, V> before(
         ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
-      return builder.putAll(key, ImmutableList.of(value));
+      return Refaster.anyOf(
+          builder.putAll(key, ImmutableList.of(value)), builder.putAll(key, value));
     }
 
     @AfterTemplate
