@@ -422,20 +422,11 @@ final class ImmutableMapRules {
     }
   }
 
-  // XXX: Add a rule for this:
-  // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
-  // ->
-  // streamOfEntries.collect(groupBy(fun, toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))
-  //
-  // map.entrySet().stream().filter(keyPred).forEach(mapBuilder::put)
-  // ->
-  // mapBuilder.putAll(Maps.filterKeys(map, pred))
-
   /**
    * Prefer {@link ImmutableMap.Builder#put(Object, Object)} over {@link
    * ImmutableMap.Builder#putAll(Map)} when adding a single key-value pair.
    */
-  static final class ImmutableMapBuilderPutOverPutAllSingleEntry<K, V> {
+  static final class ImmutableMapBuilderPut<K, V> {
     @BeforeTemplate
     ImmutableMap.Builder<K, V> before(ImmutableMap.Builder<K, V> builder, K key, V value) {
       return builder.putAll(ImmutableMap.of(key, value));
@@ -446,4 +437,14 @@ final class ImmutableMapRules {
       return builder.put(key, value);
     }
   }
+
+  // XXX: Add a rule for this:
+  // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
+  // ->
+  // streamOfEntries.collect(groupBy(fun, toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))
+  //
+  // map.entrySet().stream().filter(keyPred).forEach(mapBuilder::put)
+  // ->
+  // mapBuilder.putAll(Maps.filterKeys(map, pred))
+
 }

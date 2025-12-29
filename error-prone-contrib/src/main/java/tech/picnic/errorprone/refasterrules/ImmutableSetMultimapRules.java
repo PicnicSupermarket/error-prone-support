@@ -222,7 +222,7 @@ final class ImmutableSetMultimapRules {
    * Prefer {@link ImmutableSetMultimap.Builder#put(Object, Object)} over {@link
    * ImmutableSetMultimap.Builder#putAll(Object, Iterable)} when adding a single value.
    */
-  static final class ImmutableSetMultimapBuilderPutOverPutAllSingleValue<K, V> {
+  static final class ImmutableSetMultimapBuilderPut<K, V> {
     @BeforeTemplate
     ImmutableSetMultimap.Builder<K, V> before(
         ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
