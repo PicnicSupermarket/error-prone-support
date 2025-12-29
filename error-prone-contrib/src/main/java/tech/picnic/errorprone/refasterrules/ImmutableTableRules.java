@@ -116,7 +116,7 @@ final class ImmutableTableRules {
    * Prefer {@link ImmutableTable.Builder#put(Object, Object, Object)} over {@link
    * ImmutableTable.Builder#putAll(Table)} when adding a single cell.
    */
-  static final class ImmutableTableBuilderPutOverPutAllSingleCell<R, C, V> {
+  static final class ImmutableTableBuilderPut<R, C, V> {
     @BeforeTemplate
     ImmutableTable.Builder<R, C, V> before(
         ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {

@@ -96,8 +96,7 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
 
-  ImmutableSetMultimap.Builder<String, Integer>
-      testImmutableSetMultimapBuilderPutOverPutAllSingleValue() {
+  ImmutableSetMultimap.Builder<String, Integer> testImmutableSetMultimapBuilderPut() {
     return ImmutableSetMultimap.<String, Integer>builder().putAll("key", ImmutableSet.of(1));
   }
 }

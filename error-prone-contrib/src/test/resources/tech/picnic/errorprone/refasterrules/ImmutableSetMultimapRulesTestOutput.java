@@ -77,8 +77,7 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
             Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
   }
 
-  ImmutableSetMultimap.Builder<String, Integer>
-      testImmutableSetMultimapBuilderPutOverPutAllSingleValue() {
+  ImmutableSetMultimap.Builder<String, Integer> testImmutableSetMultimapBuilderPut() {
     return ImmutableSetMultimap.<String, Integer>builder().put("key", 1);
   }
 }
