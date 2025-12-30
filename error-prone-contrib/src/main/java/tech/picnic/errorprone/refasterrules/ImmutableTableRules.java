@@ -113,14 +113,16 @@ final class ImmutableTableRules {
   }
 
   /**
-   * Prefer {@link ImmutableTable.Builder#put(Object, Object, Object)} over {@link
-   * ImmutableTable.Builder#putAll(Table)} when adding a single cell.
+   * Prefer {@link ImmutableTable.Builder#put(Object, Object, Object)} over more contrived
+   * alternatives.
    */
   static final class ImmutableTableBuilderPut<R, C, V> {
     @BeforeTemplate
     ImmutableTable.Builder<R, C, V> before(
         ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {
-      return builder.putAll(ImmutableTable.of(rowKey, columnKey, value));
+      return Refaster.anyOf(
+          builder.put(Tables.immutableCell(rowKey, columnKey, value)),
+          builder.putAll(ImmutableTable.of(rowKey, columnKey, value)));
     }
 
     @AfterTemplate

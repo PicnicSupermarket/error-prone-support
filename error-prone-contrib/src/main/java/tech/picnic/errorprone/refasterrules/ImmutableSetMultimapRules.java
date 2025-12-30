@@ -219,14 +219,21 @@ final class ImmutableSetMultimapRules {
   }
 
   /**
-   * Prefer {@link ImmutableSetMultimap.Builder#put(Object, Object)} over {@link
-   * ImmutableSetMultimap.Builder#putAll(Object, Iterable)} when adding a single value.
+   * Prefer {@link ImmutableSetMultimap.Builder#put(Object, Object)} over more contrived
+   * alternatives.
    */
   static final class ImmutableSetMultimapBuilderPut<K, V> {
     @BeforeTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSetMultimap.Builder<K, V> before(
         ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
-      return builder.putAll(key, ImmutableSet.of(value));
+      // XXX: Drop the `ImmutableSet` case in favour of generalizing the
+      // `ExplicitArgumentEnumeration` check. Otherwise, we would need to add variants for other
+      // collection types as well.
+      return Refaster.anyOf(
+          builder.put(Map.entry(key, value)),
+          builder.putAll(key, value),
+          builder.putAll(key, ImmutableSet.of(value)));
     }
 
     @AfterTemplate
