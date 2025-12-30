@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableListMultimap.flatteningToImmuta
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ListMultimap;
@@ -287,12 +286,7 @@ final class ImmutableListMultimapRules {
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableListMultimap.Builder<K, V> before(
         ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
-      // XXX: Drop the `ImmutableList` case in favour of generalizing the
-      // `ExplicitArgumentEnumeration` check, or add variants for other collection types as well.
-      return Refaster.anyOf(
-          builder.put(Map.entry(key, value)),
-          builder.putAll(key, value),
-          builder.putAll(key, ImmutableList.of(value)));
+      return Refaster.anyOf(builder.put(Map.entry(key, value)), builder.putAll(key, value));
     }
 
     @AfterTemplate
