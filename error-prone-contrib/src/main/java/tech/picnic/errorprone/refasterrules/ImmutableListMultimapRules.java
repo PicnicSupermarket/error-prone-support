@@ -279,16 +279,20 @@ final class ImmutableListMultimapRules {
   }
 
   /**
-   * Prefer {@link ImmutableListMultimap.Builder#put(Object, Object)} over {@link
-   * ImmutableListMultimap.Builder#putAll(Object, Iterable)} when adding a single value.
+   * Prefer {@link ImmutableListMultimap.Builder#put(Object, Object)} over more contrived or less
+   * efficient alternatives.
    */
   static final class ImmutableListMultimapBuilderPut<K, V> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableListMultimap.Builder<K, V> before(
         ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
+      // XXX: Drop the `ImmutableList` case in favour of generalizing the
+      // `ExplicitArgumentEnumeration` check.
       return Refaster.anyOf(
-          builder.putAll(key, ImmutableList.of(value)), builder.putAll(key, value));
+          builder.put(Map.entry(key, value)),
+          builder.putAll(key, value),
+          builder.putAll(key, ImmutableList.of(value)));
     }
 
     @AfterTemplate
