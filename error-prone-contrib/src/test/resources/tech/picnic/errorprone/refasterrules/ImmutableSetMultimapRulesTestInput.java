@@ -11,17 +11,14 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Streams;
 import com.google.common.collect.TreeMultimap;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(
-        Collections.class, Set.class, Streams.class, flatteningToImmutableSetMultimap(null, null));
+    return ImmutableSet.of(Streams.class, flatteningToImmutableSetMultimap(null, null));
   }
 
   ImmutableSetMultimap.Builder<String, Integer> testImmutableSetMultimapBuilder() {
