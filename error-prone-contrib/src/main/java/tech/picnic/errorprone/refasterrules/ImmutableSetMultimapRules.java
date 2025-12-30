@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutab
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
@@ -227,12 +226,7 @@ final class ImmutableSetMultimapRules {
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSetMultimap.Builder<K, V> before(
         ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
-      // XXX: Drop the `ImmutableSet` case in favour of generalizing the
-      // `ExplicitArgumentEnumeration` check, or add variants for other collection types as well.
-      return Refaster.anyOf(
-          builder.put(Map.entry(key, value)),
-          builder.putAll(key, value),
-          builder.putAll(key, ImmutableSet.of(value)));
+      return Refaster.anyOf(builder.put(Map.entry(key, value)), builder.putAll(key, value));
     }
 
     @AfterTemplate

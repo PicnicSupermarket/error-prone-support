@@ -35,6 +35,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.WildcardType;
 import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
@@ -128,37 +129,37 @@ public final class ExplicitArgumentEnumeration extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (tree.getArguments().size() != 1) {
-      /* Performance optimization: non-unary method invocations cannot be simplified. */
-      return Description.NO_MATCH;
-    }
-
     MethodSymbol method = ASTHelpers.getSymbol(tree);
-    if (!isUnaryIterableAcceptingMethod(method, state) || isLocalOverload(method, state)) {
+    if (!acceptsIterableAsFinalArg(method, state) || isLocalOverload(method, state)) {
       /*
        * This isn't a method invocation we can simplify, or it's an invocation of a local overload.
        * The latter type of invocation we do not suggest replacing, as this is fairly likely to
        * introduce an unbounded recursive call chain.
+       *
+       * NB: Note that strictly speaking we don't need to check whether the invoked method's final
+       * parameter is `Iterable`, as the `EXPLICIT_ITERABLE_CREATOR` matcher employed below will
+       * only match `Iterable` arguments. However, this check serves as a cheap early filter.
        */
       return Description.NO_MATCH;
     }
 
-    ExpressionTree argument = tree.getArguments().getFirst();
-    if (!EXPLICIT_ITERABLE_CREATOR.matches(argument, state)) {
+    ExpressionTree argument = tree.getArguments().getLast();
+    if (!(argument instanceof MethodInvocationTree methodInvocation)
+        || !EXPLICIT_ITERABLE_CREATOR.matches(argument, state)) {
       return Description.NO_MATCH;
     }
 
-    return trySuggestCallingVarargsOverload(method, (MethodInvocationTree) argument, state)
-        .or(() -> trySuggestCallingCustomAlternative(tree, (MethodInvocationTree) argument, state))
+    return trySuggestCallingVarargsOverload(method, methodInvocation, state)
+        .or(() -> trySuggestCallingCustomAlternative(tree, methodInvocation, state))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static boolean isUnaryIterableAcceptingMethod(MethodSymbol method, VisitorState state) {
+  private static boolean acceptsIterableAsFinalArg(MethodSymbol method, VisitorState state) {
     List<VarSymbol> params = method.params();
     return !method.isVarArgs()
-        && params.size() == 1
-        && ASTHelpers.isSubtype(params.getFirst().type, state.getSymtab().iterableType, state);
+        && !params.isEmpty()
+        && ASTHelpers.isSubtype(params.getLast().type, state.getSymtab().iterableType, state);
   }
 
   private static boolean isLocalOverload(MethodSymbol calledMethod, VisitorState state) {
@@ -192,14 +193,14 @@ public final class ExplicitArgumentEnumeration extends BugChecker
   }
 
   /**
-   * Tells whether it is likely that, if the argument to the given method is unwrapped, a suitable
-   * varargs overload will be invoked instead.
+   * Tells whether it is likely that, if the final argument to the given method is unwrapped, a
+   * suitable varargs overload will be invoked instead.
    *
-   * <p>If all overloads have a single parameter, and at least one of them is a suitably-typed
-   * varargs method, then we assume that unwrapping the iterable argument will cause a suitable
-   * overload to be invoked. (Note that there may be multiple varargs overloads due to method
-   * overriding; this check does not attempt to determine which exact method or overload will be
-   * invoked as a result of the suggested simplification.)
+   * <p>If none of the overloads has a larger number of parameters than the given method, and at
+   * least one of them is a suitably-typed varargs method, then we assume that unwrapping the
+   * iterable argument will cause a suitable overload to be invoked. (Note that there may be
+   * multiple varargs overloads due to method overriding; this check does not attempt to determine
+   * which exact method or overload will be invoked as a result of the suggested simplification.)
    *
    * <p>Note that this is a (highly!) imperfect heuristic, but it is sufficient to prevent e.g.
    * unwrapping of arguments to `org.jooq.impl.DSL#row`, which can cause the expression's return
@@ -207,10 +208,19 @@ public final class ExplicitArgumentEnumeration extends BugChecker
    */
   // XXX: There are certainly cases where it _would_ be nice to unwrap the arguments to
   // `org.jooq.impl.DSL#row(Collection<?>)`. Look into this.
-  // XXX: Ideally we validate that eligible overloads have compatible return types.
   private static boolean hasLikelySuitableVarargsOverload(
       MethodSymbol method, ImmutableList<MethodSymbol> overloads, VisitorState state) {
-    Types types = state.getTypes();
+    List<VarSymbol> parameters = method.getParameters();
+    if (overloads.stream().anyMatch(m -> m.params().size() > parameters.size())) {
+      return false;
+    }
+
+    ImmutableList<Type> initialParameterTypes =
+        parameters.stream()
+            .limit(parameters.size() - 1)
+            .map(p -> p.type)
+            .collect(toImmutableList());
+
     // XXX: This logic is fragile, as it assumes that the method parameter's type is of the form
     // `X<T>`, where `T` is the type of the explicitly enumerated values passed to the expression to
     // be unwrapped. This should generally hold, given the types returned by the
@@ -219,15 +229,43 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     // ArrayList<String>` or a `ListMap<K, V>` defined as `abstract ListMap<K, V> extends
     // AbstractMap<K, V> implements List<V>`. Raw types are handled by assuming `Object` as the
     // parameter type.
-    Type parameterType =
+    Type finalParameterType =
         Iterables.getOnlyElement(
-            Iterables.getOnlyElement(method.getParameters()).type.getTypeArguments(),
-            state.getSymtab().objectType);
-    return overloads.stream().allMatch(m -> m.params().size() == 1)
-        && overloads.stream()
-            .filter(MethodSymbol::isVarArgs)
-            .map(m -> types.elemtype(Iterables.getOnlyElement(m.getParameters()).type))
-            .anyMatch(varArgsType -> types.containsType(parameterType, varArgsType));
+            parameters.getLast().type.getTypeArguments(), state.getSymtab().objectType);
+    return overloads.stream()
+        .anyMatch(
+            m ->
+                isCompatibleVarargsOverload(
+                    m, method.getReturnType(), initialParameterTypes, finalParameterType, state));
+  }
+
+  private static boolean isCompatibleVarargsOverload(
+      MethodSymbol overload,
+      Type returnType,
+      ImmutableList<Type> initialParameterTypes,
+      Type varargsType,
+      VisitorState state) {
+    Types types = state.getTypes();
+
+    List<VarSymbol> parameters = overload.getParameters();
+    if (!overload.isVarArgs()
+        || parameters.size() != initialParameterTypes.size() + 1
+        || !types.isSubtype(overload.getReturnType(), returnType)) {
+      return false;
+    }
+
+    for (int i = 0; i < initialParameterTypes.size(); i++) {
+      if (!types.isSubtype(initialParameterTypes.get(i), parameters.get(i).type)) {
+        return false;
+      }
+    }
+
+    Type actualVarargsType = types.elemtype(parameters.getLast().type);
+    return switch (varargsType) {
+      case WildcardType wildcard when wildcard.isExtendsBound() ->
+          types.isSubtype(wildcard.getExtendsBound(), actualVarargsType);
+      default -> types.isSubtype(varargsType, actualVarargsType);
+    };
   }
 
   private static Optional<SuggestedFix> trySuggestCallingCustomAlternative(
