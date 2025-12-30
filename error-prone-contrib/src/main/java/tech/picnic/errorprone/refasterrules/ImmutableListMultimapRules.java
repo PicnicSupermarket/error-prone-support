@@ -288,7 +288,7 @@ final class ImmutableListMultimapRules {
     ImmutableListMultimap.Builder<K, V> before(
         ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
       // XXX: Drop the `ImmutableList` case in favour of generalizing the
-      // `ExplicitArgumentEnumeration` check.
+      // `ExplicitArgumentEnumeration` check, or add variants for other collection types as well.
       return Refaster.anyOf(
           builder.put(Map.entry(key, value)),
           builder.putAll(key, value),
