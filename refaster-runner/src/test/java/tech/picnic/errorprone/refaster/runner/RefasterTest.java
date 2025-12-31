@@ -15,6 +15,7 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CompilationTestHelper;
+import com.google.errorprone.ErrorProneFlags;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -253,5 +254,19 @@ final class RefasterTest {
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
+  }
+
+  @Test
+  void useOptimizedRefasterStrategyByDefault() {
+    Refaster refaster = new Refaster(ErrorProneFlags.empty());
+    assertThat(refaster.strategy.getClass().getSimpleName()).isEqualTo("OptimizedRefasterStrategy");
+  }
+
+  @Test
+  void disabledOptimizationUsesDefaultStrategy() {
+    Refaster refaster =
+        new Refaster(
+            ErrorProneFlags.builder().putFlag("Refaster:DisableOptimizedRefaster", "true").build());
+    assertThat(refaster.strategy.getClass().getSimpleName()).isEqualTo("DefaultRefasterStrategy");
   }
 }

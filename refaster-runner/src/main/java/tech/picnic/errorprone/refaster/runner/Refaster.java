@@ -21,6 +21,8 @@ import com.google.common.collect.TreeRangeSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
+import com.google.errorprone.CompositeCodeTransformer;
+import com.google.errorprone.DescriptionListener;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.ErrorProneOptions.Severity;
 import com.google.errorprone.SubContext;
@@ -62,11 +64,20 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
   public static final String INCLUDED_RULES_PATTERN_FLAG = "Refaster:NamePattern";
 
+  /**
+   * Flag to disable the optimized rule selection algorithm.
+   *
+   * <p>By default, an optimized algorithm is used to select candidate Refaster rules based on
+   * identifiers present in the source code. Set this flag to {@code true} to use the old
+   * implementation that checks all rules against all code.
+   */
+  private static final String DISABLE_OPTIMIZED_REFASTER_FLAG = "Refaster:DisableOptimizedRefaster";
+
   private static final long serialVersionUID = 1L;
 
-  // XXX: Review this suppression.
-  @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
-  private final RefasterRuleSelector ruleSelector;
+  @SuppressWarnings("java:S1948" /* Concrete instance will be `Serializable`. */)
+  @VisibleForTesting
+  final RefasterStrategy strategy;
 
   /** Instantiates a default {@link Refaster} instance. */
   public Refaster() {
@@ -81,20 +92,22 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   @Inject
   @VisibleForTesting
   public Refaster(ErrorProneFlags flags) {
-    ruleSelector = createRefasterRuleSelector(flags);
+    boolean useOptimizedRefaster = !flags.getBoolean(DISABLE_OPTIMIZED_REFASTER_FLAG).orElse(false);
+    strategy =
+        useOptimizedRefaster
+            ? new OptimizedRefasterStrategy(flags)
+            : new DefaultRefasterStrategy(flags);
   }
 
   @CanIgnoreReturnValue
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
-    Set<CodeTransformer> candidateTransformers = ruleSelector.selectCandidateRules(tree);
-
     /* First, collect all matches. */
     SubContext context = new SubContext(state.context);
     List<Description> matches = new ArrayList<>();
-    for (CodeTransformer transformer : candidateTransformers) {
-      transformer.apply(state.getPath(), context, matches::add);
-    }
+
+    strategy.applyTransformers(tree, context, matches::add, state);
+
     /* Then apply them. */
     applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
 
@@ -197,18 +210,65 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  // XXX: Add a flag to disable the optimized `RefasterRuleSelector`. That would allow us to verify
-  // that we're not prematurely pruning rules.
-  private static RefasterRuleSelector createRefasterRuleSelector(ErrorProneFlags flags) {
-    ImmutableListMultimap<String, CodeTransformer> allTransformers =
-        CodeTransformers.getAllCodeTransformers();
-    return RefasterRuleSelector.create(
-        flags
-            .get(INCLUDED_RULES_PATTERN_FLAG)
-            .map(Pattern::compile)
-            .<ImmutableCollection<CodeTransformer>>map(
-                nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
-            .orElseGet(allTransformers::values));
+  private static final class OptimizedRefasterStrategy implements RefasterStrategy {
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
+    private final RefasterRuleSelector ruleSelector;
+
+    OptimizedRefasterStrategy(ErrorProneFlags flags) {
+      ImmutableListMultimap<String, CodeTransformer> allTransformers =
+          CodeTransformers.getAllCodeTransformers();
+      this.ruleSelector =
+          RefasterRuleSelector.create(
+              flags
+                  .get(INCLUDED_RULES_PATTERN_FLAG)
+                  .map(Pattern::compile)
+                  .<ImmutableCollection<CodeTransformer>>map(
+                      nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
+                  .orElseGet(allTransformers::values));
+    }
+
+    @Override
+    public void applyTransformers(
+        CompilationUnitTree tree,
+        SubContext context,
+        DescriptionListener listener,
+        VisitorState state) {
+      Set<CodeTransformer> candidateTransformers = ruleSelector.selectCandidateRules(tree);
+      for (CodeTransformer transformer : candidateTransformers) {
+        transformer.apply(state.getPath(), context, listener);
+      }
+    }
+  }
+
+  private static final class DefaultRefasterStrategy implements RefasterStrategy {
+    private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
+    private final CodeTransformer codeTransformer;
+
+    DefaultRefasterStrategy(ErrorProneFlags flags) {
+      ImmutableListMultimap<String, CodeTransformer> allTransformers =
+          CodeTransformers.getAllCodeTransformers();
+      this.codeTransformer =
+          CompositeCodeTransformer.compose(
+              flags
+                  .get(INCLUDED_RULES_PATTERN_FLAG)
+                  .map(Pattern::compile)
+                  .<ImmutableCollection<CodeTransformer>>map(
+                      nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
+                  .orElseGet(allTransformers::values));
+    }
+
+    @Override
+    public void applyTransformers(
+        CompilationUnitTree tree,
+        SubContext context,
+        DescriptionListener listener,
+        VisitorState state) {
+      codeTransformer.apply(state.getPath(), context, listener);
+    }
   }
 
   private static ImmutableList<CodeTransformer> filterCodeTransformers(
