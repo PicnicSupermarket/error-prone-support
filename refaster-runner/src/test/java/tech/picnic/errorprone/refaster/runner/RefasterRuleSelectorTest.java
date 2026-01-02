@@ -92,9 +92,18 @@ final class RefasterRuleSelectorTest {
 
     RefasterRule<?, ?> simpleRule =
         getRefasterRule("RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule");
+    ImmutableSet<ImmutableSet<String>> simpleIdentifiers =
+        indexed.entrySet().stream()
+            .filter(
+                e ->
+                    e.getKey() instanceof AnnotatedCompositeCodeTransformer annotated
+                        && annotated.transformers().contains(simpleRule))
+            .findFirst()
+            .map(Map.Entry::getValue)
+            .orElseThrow();
 
     assertThat(indexed).hasSameSizeAs(testRuleTransformers);
-    assertThat(indexed.get(simpleRule))
+    assertThat(simpleIdentifiers)
         .containsExactly(ImmutableSet.of("&&", "==", "hashCode", "isEmpty"));
   }
 
