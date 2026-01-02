@@ -136,18 +136,18 @@ final class RefasterRuleIdentifierExtractorTestRules {
   /** A rule with multiple @BeforeTemplate methods. */
   static final class MultipleBeforeTemplatesRule {
     @BeforeTemplate
-    boolean before1(String str) {
-      return str.isEmpty() && str.length() == 0;
+    boolean before1(StringBuilder sb) {
+      return sb.isEmpty() && sb.capacity() > 0;
     }
 
     @BeforeTemplate
-    boolean before2(String str) {
-      return str.length() > 0 && str.length() != 0;
+    boolean before2(StringBuilder sb) {
+      return !sb.isEmpty() && sb.capacity() == 0;
     }
 
     @AfterTemplate
-    boolean after(String str) {
-      return str.isEmpty();
+    boolean after(StringBuilder sb) {
+      return sb.isEmpty();
     }
   }
 }

@@ -108,8 +108,8 @@ final class RefasterRuleIdentifierExtractorTest {
 
     assertThat(identifiers)
         .containsOnly(
-            ImmutableSet.of("isEmpty", "&&", "length", "=="),
-            ImmutableSet.of("length", ">", "&&", "!="));
+            ImmutableSet.of("isEmpty", "&&", "capacity", ">"),
+            ImmutableSet.of("!", "isEmpty", "&&", "capacity", "=="));
   }
 
   private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
