@@ -1,9 +1,10 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
-import static com.google.common.collect.MoreCollectors.toOptional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.CodeTransformer;
@@ -12,68 +13,49 @@ import com.google.errorprone.refaster.RefasterRule;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 final class RefasterRuleSelectorTest {
   private static final ImmutableListMultimap<String, CodeTransformer> CODE_TRANSFORMERS =
       CodeTransformers.getAllCodeTransformers();
 
-  @Test
-  void indexRuleIdentifiersWithSingleRule() {
-    RefasterRule<?, ?> rule =
-        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule");
+  private static Stream<Arguments> indexRuleIdentifiersTestCases() {
+    /* { ruleName, expectedIdentifiers } */
+    return Stream.of(
+        arguments(
+            "RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule",
+            ImmutableSet.of(ImmutableSet.of("&&", "==", "hashCode", "isEmpty"))),
+        arguments(
+            "RefasterRuleIdentifierExtractorTestRules$BinaryOperatorRule",
+            ImmutableSet.of(ImmutableSet.of("+", ">", "&&", "*", "<"))),
+        arguments(
+            "RefasterRuleIdentifierExtractorTestRules$SingleAnyOfRule",
+            ImmutableSet.of(
+                ImmutableSet.of("equals", "&&", "hashCode", "=="),
+                ImmutableSet.of("isEmpty", "==", "&&", "hashCode"))),
+        arguments(
+            "RefasterRuleIdentifierExtractorTestRules$NestedAnyOfRule",
+            ImmutableSet.of(
+                ImmutableSet.of("==", "length"),
+                ImmutableSet.of("==", "length", "+"),
+                ImmutableSet.of("==", "length", "-"))));
+  }
+
+  @MethodSource("indexRuleIdentifiersTestCases")
+  @ParameterizedTest
+  void indexRuleIdentifiers(
+      String ruleName, ImmutableSet<ImmutableSet<String>> expectedIdentifiers) {
+    RefasterRule<?, ?> rule = getRefasterRule(ruleName);
+
     Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexed =
         RefasterRuleSelector.indexRuleIdentifiers(ImmutableSet.of(rule));
 
-    assertThat(indexed).hasSize(1);
-    assertThat(indexed.get(rule))
-        .containsExactly(ImmutableSet.of("&&", "==", "hashCode", "isEmpty"));
-  }
-
-  @Test
-  void indexRuleIdentifiersWithMultipleRules() {
-    RefasterRule<?, ?> rule1 =
-        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule");
-    RefasterRule<?, ?> rule2 =
-        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$BinaryOperatorRule");
-    Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexed =
-        RefasterRuleSelector.indexRuleIdentifiers(ImmutableSet.of(rule1, rule2));
-
-    assertThat(indexed.get(rule1))
-        .containsExactly(ImmutableSet.of("&&", "==", "hashCode", "isEmpty"));
-    assertThat(indexed.get(rule2)).containsExactly(ImmutableSet.of("+", ">", "&&", "*", "<"));
-  }
-
-  @Test
-  void indexRuleIdentifiersWithSingleAnyOf() {
-    RefasterRule<?, ?> rule =
-        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$SingleAnyOfRule");
-    Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexed =
-        RefasterRuleSelector.indexRuleIdentifiers(ImmutableSet.of(rule));
-
-    assertThat(indexed).hasSize(1);
-    ImmutableSet<ImmutableSet<String>> identifiers = indexed.get(rule);
-
-    assertThat(identifiers)
-        .containsOnly(
-            ImmutableSet.of("equals", "&&", "hashCode", "=="),
-            ImmutableSet.of("isEmpty", "==", "&&", "hashCode"));
-  }
-
-  @Test
-  void indexRuleIdentifiersWithNestedAnyOf() {
-    RefasterRule<?, ?> rule =
-        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$NestedAnyOfRule");
-    Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexed =
-        RefasterRuleSelector.indexRuleIdentifiers(ImmutableSet.of(rule));
-
-    ImmutableSet<ImmutableSet<String>> identifiers = indexed.get(rule);
-
-    assertThat(identifiers)
-        .containsOnly(
-            ImmutableSet.of("==", "length"),
-            ImmutableSet.of("==", "length", "+"),
-            ImmutableSet.of("==", "length", "-"));
+    assertThat(indexed)
+        .hasEntrySatisfying(
+            rule, identifiers -> assertThat(identifiers).hasSameElementsAs(expectedIdentifiers));
   }
 
   @Test
@@ -105,26 +87,44 @@ final class RefasterRuleSelectorTest {
             .map(Map.Entry::getValue)
             .orElseThrow();
 
-    assertThat(indexed).hasSameSizeAs(testRuleTransformers);
     assertThat(simpleIdentifiers)
         .containsExactly(ImmutableSet.of("&&", "==", "hashCode", "isEmpty"));
   }
 
-  // XXX: Add AlsoNegation example, with boolean where you need negation.
-  // One complex expression. with an !
-  // Parameterized test for the RefasterRules.
-  private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
-    return CODE_TRANSFORMERS.get(ruleName).stream()
-        .flatMap(
+  @Test
+  void indexRuleIdentifiersWithAlsoNegation() {
+    String ruleName = "RefasterRuleIdentifierExtractorTestRules$AlsoNegationRule";
+
+    ImmutableList<CodeTransformer> rules = ImmutableList.copyOf(getAllRefasterRules(ruleName));
+
+    Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiersByRule =
+        RefasterRuleSelector.indexRuleIdentifiers(rules);
+
+    assertThat(identifiersByRule.get(rules.getFirst()))
+        .containsExactly(ImmutableSet.of("&&", "==", "Integer", "valueOf", "isEmpty"));
+    assertThat(identifiersByRule.get(rules.getLast()))
+        .containsExactly(ImmutableSet.of("||", "Integer", "!", "valueOf", "isEmpty", "!="));
+  }
+
+  private static ImmutableSet<RefasterRule<?, ?>> getAllRefasterRules(String ruleName) {
+    ImmutableSet.Builder<RefasterRule<?, ?>> builder = ImmutableSet.builder();
+    CODE_TRANSFORMERS.get(ruleName).stream()
+        .<CodeTransformer>flatMap(
             transformer -> {
               if (transformer instanceof AnnotatedCompositeCodeTransformer annotated) {
                 return annotated.transformers().stream();
               }
               return Stream.of(transformer);
             })
-        .collect(toOptional())
         .filter(RefasterRule.class::isInstance)
         .map(RefasterRule.class::cast)
+        .forEach(builder::add);
+    return builder.build();
+  }
+
+  private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
+    return getAllRefasterRules(ruleName).stream()
+        .findFirst()
         .orElseThrow(
             () ->
                 new IllegalStateException("Could not find RefasterRule '%s'".formatted(ruleName)));

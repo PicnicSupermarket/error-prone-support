@@ -25,6 +25,8 @@ import org.jspecify.annotations.Nullable;
  * <p>This class scans a Javac {@link Tree} and collects all identifiers that are relevant for
  * matching Refaster rules.
  */
+// XXX: Investigate: we should probably omit (local) variable names.
+// XXX: Validate that we are handling static fields / variables / constants well.
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {
   private static final SourceIdentifierExtractor INSTANCE = new SourceIdentifierExtractor();
 
@@ -42,13 +44,6 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
     return identifiers;
   }
 
-  // local variables shoulndt be there. Identifiers indentificeren die local zijn,
-  // init checken.
-  // imports.
-  // field defs ook niet includen.
-
-  // AbstractMatcherChecker --> visitVariable getInitizalizer probably alleen.
-  // imports wel doen.
   @Override
   public @Nullable Void visitPackage(PackageTree node, Set<String> identifiers) {
     /* Refaster rules never match package declarations. */

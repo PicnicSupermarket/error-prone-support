@@ -18,6 +18,7 @@ final class CodeTransformersTest {
             "FooRules$StringOfSizeOneRule",
             "FooRules$ExtraGrouping$StringOfSizeTwoRule",
             "FooRules$ExtraGrouping$StringOfSizeThreeRule",
+            "RefasterRuleIdentifierExtractorTestRules$AlsoNegationRule",
             "RefasterRuleIdentifierExtractorTestRules$BinaryOperatorRule",
             "RefasterRuleIdentifierExtractorTestRules$BlockTemplateRule",
             "RefasterRuleIdentifierExtractorTestRules$MemberReferenceRule",

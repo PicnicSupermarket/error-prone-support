@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refaster.runner;
 
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -149,6 +150,20 @@ final class RefasterRuleIdentifierExtractorTestRules {
     @AfterTemplate
     boolean after(StringBuilder sb) {
       return sb.isEmpty();
+    }
+  }
+
+  /** A rule with @AlsoNegation that creates a negated version. */
+  static final class AlsoNegationRule {
+    @BeforeTemplate
+    boolean before(String str, int value) {
+      return str.isEmpty() && Integer.valueOf(str) == value;
+    }
+
+    @AfterTemplate
+    @AlsoNegation
+    boolean after(String str, int value) {
+      return str.isEmpty();
     }
   }
 }
