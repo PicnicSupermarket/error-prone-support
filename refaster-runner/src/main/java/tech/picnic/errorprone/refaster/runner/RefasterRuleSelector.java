@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refaster.runner;
 
 import static java.util.Collections.newSetFromMap;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -92,7 +93,8 @@ final class RefasterRuleSelector {
     return candidateRules;
   }
 
-  private static Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexRuleIdentifiers(
+  @VisibleForTesting
+  static Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexRuleIdentifiers(
       ImmutableCollection<CodeTransformer> codeTransformers) {
     IdentityHashMap<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers =
         new IdentityHashMap<>();
