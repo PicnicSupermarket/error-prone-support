@@ -27,6 +27,7 @@ final class CodeTransformersTest {
             "RefasterRuleIdentifierExtractorTestRules$MultipleIdentifiersRule",
             "RefasterRuleIdentifierExtractorTestRules$NestedAnyOfRule",
             "RefasterRuleIdentifierExtractorTestRules$SingleAnyOfRule",
-            "RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule");
+            "RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule",
+            "RefasterRuleIdentifierExtractorTestRules$StaticImportAndFieldRule");
   }
 }

@@ -1,9 +1,12 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import static java.util.Collections.emptyList;
+
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -164,6 +167,19 @@ final class RefasterRuleIdentifierExtractorTestRules {
     @AlsoNegation
     boolean after(String str, int value) {
       return str.isEmpty() && value == 0;
+    }
+  }
+
+  /** A rule with static import and static field access. */
+  static final class StaticImportAndFieldRule {
+    @BeforeTemplate
+    boolean before(List<String> list) {
+      return emptyList().equals(list) && list.size() == Integer.MAX_VALUE;
+    }
+
+    @AfterTemplate
+    boolean after(List<String> list) {
+      return List.of().equals(list) && list.size() == Integer.MAX_VALUE;
     }
   }
 }

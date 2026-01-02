@@ -25,11 +25,8 @@ import org.jspecify.annotations.Nullable;
  * <p>This class scans a Javac {@link Tree} and collects all identifiers that are relevant for
  * matching Refaster rules.
  */
-// XXX: Investigate: we should probably omit (local) variable names.
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {
-  private static final SourceIdentifierExtractor INSTANCE = new SourceIdentifierExtractor();
-
-  private SourceIdentifierExtractor() {}
+  private final Set<String> variableNames = new HashSet<>();
 
   /**
    * Extracts all identifiers from the given {@link Tree}.
@@ -38,8 +35,9 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
    * @return A set of all identifiers found in the tree.
    */
   static Set<String> extractIdentifiers(Tree tree) {
+    SourceIdentifierExtractor extractor = new SourceIdentifierExtractor();
     Set<String> identifiers = new HashSet<>();
-    INSTANCE.scan(tree, identifiers);
+    extractor.scan(tree, identifiers);
     return identifiers;
   }
 
@@ -65,6 +63,13 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
     }
 
     /*
+     * Track method parameters as variable names to exclude them.
+     */
+    for (VariableTree param : node.getParameters()) {
+      variableNames.add(param.getName().toString());
+    }
+
+    /*
      * Syntactic details of a method declaration other than its body do not need to be reflected
      * in a Refaster rule for it to apply to the method's code.
      */
@@ -73,13 +78,23 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
 
   @Override
   public @Nullable Void visitVariable(VariableTree node, Set<String> identifiers) {
+    /*
+     * Track variable names (both local variables and parameters) to exclude them from
+     * identifiers.
+     */
+    variableNames.add(node.getName().toString());
+
     /* A variable's modifiers and name do not influence where a Refaster rule matches. */
     return reduce(scan(node.getInitializer(), identifiers), scan(node.getType(), identifiers));
   }
 
   @Override
   public @Nullable Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
-    identifiers.add(node.getName().toString());
+    String name = node.getName().toString();
+    // Exclude variable names (both local variables and parameters)
+    if (!variableNames.contains(name)) {
+      identifiers.add(name);
+    }
     return null;
   }
 

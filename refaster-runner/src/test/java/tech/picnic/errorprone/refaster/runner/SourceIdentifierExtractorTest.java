@@ -33,7 +33,7 @@ final class SourceIdentifierExtractorTest {
     CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: [+, a, b]",
+            "// BUG: Diagnostic contains: [+]",
             "class A {",
             "  int add(int a, int b) {",
             "    return a + b;",
@@ -47,7 +47,7 @@ final class SourceIdentifierExtractorTest {
     CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: [++x, a]",
+            "// BUG: Diagnostic contains: [++x]",
             "class A {",
             "  int increment(int a) {",
             "    return ++a;",
@@ -91,7 +91,7 @@ final class SourceIdentifierExtractorTest {
     CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: [=, x]",
+            "// BUG: Diagnostic contains: [=]",
             "class A {",
             "  void assign() {",
             "    int x;",
@@ -106,7 +106,7 @@ final class SourceIdentifierExtractorTest {
     CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: [+=, x]",
+            "// BUG: Diagnostic contains: [+=]",
             "class A {",
             "  void compound(int x) {",
             "    x += 5;",
@@ -120,7 +120,7 @@ final class SourceIdentifierExtractorTest {
     CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: [&&, <, >, a, b]",
+            "// BUG: Diagnostic contains: [&&, <, >]",
             "class A {",
             "  boolean compare(int a, int b) {",
             "    return a > 0 && b < 10;",
@@ -142,7 +142,7 @@ final class SourceIdentifierExtractorTest {
     CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: [String, obj]",
+            "// BUG: Diagnostic contains: [String]",
             "class A {",
             "  String cast(Object obj) {",
             "    return (String) obj;",
