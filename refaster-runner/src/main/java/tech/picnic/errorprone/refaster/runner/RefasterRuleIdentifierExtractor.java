@@ -30,14 +30,7 @@ import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Extracts identifiers from RefasterRule templates.
- *
- * <p>This class extracts all identifiers from a RefasterRule's {@code @BeforeTemplate} methods. It
- * returns a set of identifier sets, where each set represents one possible combination of
- * identifiers that could match the rule. Multiple sets are returned when the rule contains {@code
- * UAnyOf} expressions, as each alternative creates a separate identifier combination.
- */
+/** Extracts identifiers from RefasterRule templates. */
 final class RefasterRuleIdentifierExtractor {
   private RefasterRuleIdentifierExtractor() {}
 
@@ -51,16 +44,19 @@ final class RefasterRuleIdentifierExtractor {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
 
     for (Object template : RefasterIntrospection.getBeforeTemplates(refasterRule)) {
-      if (template instanceof ExpressionTemplate expressionTemplate) {
-        UExpression expr = RefasterIntrospection.getExpression(expressionTemplate);
-        results.addAll(extractIdentifiers(ImmutableList.of(expr)));
-      } else if (template instanceof BlockTemplate blockTemplate) {
-        ImmutableList<UStatement> statements =
-            RefasterIntrospection.getTemplateStatements(blockTemplate);
-        results.addAll(extractIdentifiers(statements));
-      } else {
-        throw new IllegalStateException(
-            "Unexpected template type '%s'".formatted(template.getClass()));
+      switch (template) {
+        case ExpressionTemplate expressionTemplate -> {
+          UExpression expr = RefasterIntrospection.getExpression(expressionTemplate);
+          results.addAll(extractIdentifiers(ImmutableList.of(expr)));
+        }
+        case BlockTemplate blockTemplate -> {
+          ImmutableList<UStatement> statements =
+              RefasterIntrospection.getTemplateStatements(blockTemplate);
+          results.addAll(extractIdentifiers(statements));
+        }
+        default ->
+            throw new IllegalStateException(
+                "Unexpected template type '%s'".formatted(template.getClass()));
       }
     }
 
@@ -139,6 +135,8 @@ final class RefasterRuleIdentifierExtractor {
       }
     }
 
+    @SuppressWarnings(
+        "java:S3011" /* The `setAccessible` is required to access private methods from Refaster. */)
     private static Method getMethod(Class<?> clazz, String methodName) {
       try {
         Method method = clazz.getDeclaredMethod(methodName);

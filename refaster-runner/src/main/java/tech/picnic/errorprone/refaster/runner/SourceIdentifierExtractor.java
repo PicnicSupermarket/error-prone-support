@@ -22,9 +22,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * Extracts all identifiers from a {@link Tree}.
  *
- * <p>This class scans a Javac tree and collects all identifiers that are relevant for matching
- * Refaster rules. It extracts identifiers from expressions, member references, member selects, and
- * operators.
+ * <p>This class scans a Javac {@link Tree} and collects all identifiers that are relevant for
+ * matching Refaster rules.
  */
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {
   private static final SourceIdentifierExtractor INSTANCE = new SourceIdentifierExtractor();

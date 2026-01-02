@@ -72,7 +72,7 @@ final class RefasterRuleIdentifierExtractorTestRules {
 
     @AfterTemplate
     Supplier<Object> after() {
-      return () -> new Object();
+      return Object::new;
     }
   }
 
