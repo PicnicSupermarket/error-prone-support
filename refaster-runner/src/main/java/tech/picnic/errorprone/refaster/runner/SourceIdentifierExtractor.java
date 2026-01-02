@@ -26,7 +26,6 @@ import org.jspecify.annotations.Nullable;
  * matching Refaster rules.
  */
 // XXX: Investigate: we should probably omit (local) variable names.
-// XXX: Validate that we are handling static fields / variables / constants well.
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {
   private static final SourceIdentifierExtractor INSTANCE = new SourceIdentifierExtractor();
 

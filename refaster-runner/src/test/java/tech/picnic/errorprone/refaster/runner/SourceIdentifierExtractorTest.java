@@ -167,6 +167,36 @@ final class SourceIdentifierExtractorTest {
         .doTest();
   }
 
+  @Test
+  void methodWithStaticImport() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [Collections, emptyList, java, util]",
+            "import static java.util.Collections.emptyList;",
+            "",
+            "class A {",
+            "  void getList() {",
+            "    emptyList();",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void methodWithStaticFieldAccess() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [Integer, MAX_VALUE]",
+            "class A {",
+            "  int getMaxInt() {",
+            "    return Integer.MAX_VALUE;",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   /**
    * A {@link BugChecker} that extracts identifiers from a {@link CompilationUnitTree} and reports
    * them as a diagnostic message.

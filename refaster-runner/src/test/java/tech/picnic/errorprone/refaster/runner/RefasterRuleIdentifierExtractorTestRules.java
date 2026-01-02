@@ -163,7 +163,7 @@ final class RefasterRuleIdentifierExtractorTestRules {
     @AfterTemplate
     @AlsoNegation
     boolean after(String str, int value) {
-      return str.isEmpty();
+      return str.isEmpty() && value == 0;
     }
   }
 }
