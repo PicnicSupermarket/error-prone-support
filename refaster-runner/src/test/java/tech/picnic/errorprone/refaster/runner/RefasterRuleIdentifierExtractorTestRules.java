@@ -12,14 +12,15 @@ import java.util.function.Supplier;
  * <p>These rules are designed to test various identifier extraction scenarios:
  *
  * <ul>
- *   <li>Simple method calls
- *   <li>Binary operators
- *   <li>Member selects
- *   <li>Member references
- *   <li>Block templates (statements)
- *   <li>UAnyOf (single and nested)
+ *   <li>Simple method calls.
+ *   <li>Binary operators.
+ *   <li>Member selects.
+ *   <li>Member references.
+ *   <li>Block templates (statements).
+ *   <li>UAnyOf (single and nested).
  * </ul>
  */
+// XXX: Consider merging this file and `FooRules` to have one generic set of test Refaster rules.
 final class RefasterRuleIdentifierExtractorTestRules {
   private RefasterRuleIdentifierExtractorTestRules() {}
 

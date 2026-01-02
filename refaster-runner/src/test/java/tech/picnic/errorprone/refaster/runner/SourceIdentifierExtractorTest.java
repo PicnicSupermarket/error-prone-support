@@ -1,9 +1,8 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
@@ -138,6 +137,36 @@ final class SourceIdentifierExtractorTest {
         .doTest();
   }
 
+  @Test
+  void methodWithTypeCast() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [String, obj]",
+            "class A {",
+            "  String cast(Object obj) {",
+            "    return (String) obj;",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void methodWithImport() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [List, java, util]",
+            "import java.util.List;",
+            "",
+            "class A {",
+            "  List<String> getList() {",
+            "    return null;",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   /**
    * A {@link BugChecker} that extracts identifiers from a {@link CompilationUnitTree} and reports
    * them as a diagnostic message.
@@ -152,8 +181,7 @@ final class SourceIdentifierExtractorTest {
     @Override
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       Set<String> identifiers = SourceIdentifierExtractor.extractIdentifiers(tree);
-      ImmutableSet<String> sortedIdentifiers =
-          identifiers.stream().sorted().collect(toImmutableSet());
+      ImmutableSortedSet<String> sortedIdentifiers = ImmutableSortedSet.copyOf(identifiers);
       return buildDescription(tree).setMessage(sortedIdentifiers.toString()).build();
     }
   }

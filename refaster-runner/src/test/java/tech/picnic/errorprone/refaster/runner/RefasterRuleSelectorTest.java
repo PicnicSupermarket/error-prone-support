@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.MoreCollectors.toOptional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 final class RefasterRuleSelectorTest {
+  private static final ImmutableListMultimap<String, CodeTransformer> CODE_TRANSFORMERS =
+      CodeTransformers.getAllCodeTransformers();
+
   @Test
   void indexRuleIdentifiersWithSingleRule() {
     RefasterRule<?, ?> rule =
@@ -107,17 +110,11 @@ final class RefasterRuleSelectorTest {
         .containsExactly(ImmutableSet.of("&&", "==", "hashCode", "isEmpty"));
   }
 
+  // XXX: Add AlsoNegation example, with boolean where you need negation.
+  // One complex expression. with an !
+  // Parameterized test for the RefasterRules.
   private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
-    ImmutableListMultimap<String, CodeTransformer> transformers =
-        CodeTransformers.getAllCodeTransformers();
-
-    checkState(
-        transformers.containsKey(ruleName),
-        "Could not find RefasterRule: %s. Available rules: %s",
-        ruleName,
-        transformers.keySet());
-
-    return transformers.get(ruleName).stream()
+    return CODE_TRANSFORMERS.get(ruleName).stream()
         .flatMap(
             transformer -> {
               if (transformer instanceof AnnotatedCompositeCodeTransformer annotated) {
@@ -125,10 +122,11 @@ final class RefasterRuleSelectorTest {
               }
               return Stream.of(transformer);
             })
-        .findFirst()
+        .collect(toOptional())
         .filter(RefasterRule.class::isInstance)
         .map(RefasterRule.class::cast)
         .orElseThrow(
-            () -> new IllegalStateException("Could not find RefasterRule '%s".formatted(ruleName)));
+            () ->
+                new IllegalStateException("Could not find RefasterRule '%s'".formatted(ruleName)));
   }
 }

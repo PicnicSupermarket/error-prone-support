@@ -1,6 +1,6 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.collect.MoreCollectors.toOptional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 final class RefasterRuleIdentifierExtractorTest {
+  private static final ImmutableListMultimap<String, CodeTransformer> CODE_TRANSFORMERS =
+      CodeTransformers.getAllCodeTransformers();
+
   @Test
   void extractIdentifiersFromSimpleMethodCallRule() {
     RefasterRule<?, ?> rule =
@@ -113,16 +116,7 @@ final class RefasterRuleIdentifierExtractorTest {
   }
 
   private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
-    ImmutableListMultimap<String, CodeTransformer> transformers =
-        CodeTransformers.getAllCodeTransformers();
-
-    checkState(
-        transformers.containsKey(ruleName),
-        "Could not find RefasterRule: %s. Available rules: %s",
-        ruleName,
-        transformers.keySet());
-
-    return transformers.get(ruleName).stream()
+    return CODE_TRANSFORMERS.get(ruleName).stream()
         .flatMap(
             transformer -> {
               if (transformer instanceof AnnotatedCompositeCodeTransformer annotated) {
@@ -130,7 +124,7 @@ final class RefasterRuleIdentifierExtractorTest {
               }
               return Stream.of(transformer);
             })
-        .findFirst()
+        .collect(toOptional())
         .filter(RefasterRule.class::isInstance)
         .map(RefasterRule.class::cast)
         .orElseThrow(
