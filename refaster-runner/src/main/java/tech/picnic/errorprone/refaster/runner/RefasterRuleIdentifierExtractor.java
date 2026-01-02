@@ -183,11 +183,6 @@ final class RefasterRuleIdentifierExtractor {
           ids.add(getIdentifier(subNode));
           ids.add(node.getName().toString());
         }
-        //      } else {
-        //        // Regular identifier (variable name, etc.)
-        //        for (Set<String> ids : identifierCombinations) {
-        //          ids.add(node.getName().toString());
-        //        }
       }
 
       return null;
@@ -244,22 +239,7 @@ final class RefasterRuleIdentifierExtractor {
     public @Nullable Void visitBinary(BinaryTree node, List<Set<String>> identifierCombinations) {
       registerOperator(node, identifierCombinations);
       return super.visitBinary(node, identifierCombinations);
-      //      scan(node.getLeftOperand(), identifierCombinations);
-      //      scan(node.getRightOperand(), identifierCombinations);
-      //      return null;
     }
-
-    //    @Override
-    //    public @Nullable Void visitLiteral(LiteralTree node, List<Set<String>>
-    // identifierCombinations) {
-    //      // Extract literal values (e.g., "0", "1", "true", "false", etc.)
-    //      Object value = node.getValue();
-    //      if (value != null) {
-    //        String literalStr = value.toString();
-    //        identifierCombinations.forEach(ids -> ids.add(literalStr));
-    //      }
-    //      return null;
-    //    }
 
     private static void registerOperator(
         ExpressionTree node, List<Set<String>> identifierCombinations) {
@@ -280,15 +260,6 @@ final class RefasterRuleIdentifierExtractor {
         }
       }
       return null;
-      //      } else if (node instanceof MethodInvocationTree methodInvocation) {
-      //        // Visit the method select (e.g., "System.out.println")
-      //        scan(methodInvocation.getMethodSelect(), identifierCombinations);
-      //        // Visit the arguments
-      //        scan(methodInvocation.getArguments(), identifierCombinations);
-      //        return null;
-      //
-      //      // For other node types, use default scanning behavior
-      //      return super.visitOther(node, identifierCombinations);
     }
 
     private static List<Set<String>> copy(List<Set<String>> identifierCombinations) {
