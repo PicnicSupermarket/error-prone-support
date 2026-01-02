@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 final class RefasterTest {
   private static final Pattern DIAGNOSTIC_STRING_OF_SIZE_ZERO =
@@ -46,6 +47,7 @@ final class RefasterTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(Refaster.class, getClass())
+        .setArgs("-XepOpt:Refaster:NamePattern=^FooRules\\$.*")
         .matchAllDiagnostics()
         .expectErrorMessage("StringOfSizeZeroRule", DIAGNOSTIC_STRING_OF_SIZE_ZERO.asPredicate())
         .expectErrorMessage("StringOfSizeOneRule", DIAGNOSTIC_STRING_OF_SIZE_ONE.asPredicate())
@@ -150,9 +152,14 @@ final class RefasterTest {
   @ParameterizedTest
   void severityAssignment(
       ImmutableList<String> arguments, ImmutableList<SeverityLevel> expectedSeverities) {
+    ImmutableList<String> filteredArgs =
+        ImmutableList.<String>builder()
+            .addAll(arguments)
+            .add("-XepOpt:Refaster:NamePattern=^FooRules\\$.*")
+            .build();
     CompilationTestHelper compilationTestHelper =
         CompilationTestHelper.newInstance(Refaster.class, getClass())
-            .setArgs(arguments)
+            .setArgs(filteredArgs)
             .addSourceLines(
                 "A.java",
                 "class A {",
@@ -202,9 +209,12 @@ final class RefasterTest {
     };
   }
 
-  @Test
-  void replacement() {
+  @ValueSource(booleans = {false, true})
+  void replacement(boolean disableOptimizedRefaster) {
     BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())
+        .setArgs(
+            "-XepOpt:Refaster:NamePattern=^FooRules\\$.*",
+            "-XepOpt:Refaster:DisableOptimizedRefaster=" + disableOptimizedRefaster)
         .addInputLines(
             "A.java",
             "class A {",

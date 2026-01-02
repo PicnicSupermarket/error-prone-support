@@ -25,6 +25,7 @@ final class CodeTransformersTest {
             "RefasterRuleIdentifierExtractorTestRules$SingleAnyOfRule",
             "RefasterRuleIdentifierExtractorTestRules$MultipleIdentifiersRule",
             "RefasterRuleIdentifierExtractorTestRules$BinaryOperatorRule",
-            "RefasterRuleIdentifierExtractorTestRules$MemberSelectRule");
+            "RefasterRuleIdentifierExtractorTestRules$MemberSelectRule",
+            "RefasterRuleIdentifierExtractorTestRules$MultipleBeforeTemplatesRule");
   }
 }
