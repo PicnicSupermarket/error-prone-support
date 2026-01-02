@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 
 import com.google.common.collect.ImmutableSet;
@@ -77,6 +78,7 @@ final class SourceIdentifierExtractorTest {
             "A.java",
             "// BUG: Diagnostic contains: [<init>, Object, Supplier, function, java, util]",
             "import java.util.function.Supplier;",
+            "",
             "class A {",
             "  Supplier<Object> getSupplier() {",
             "    return Object::new;",
@@ -151,7 +153,7 @@ final class SourceIdentifierExtractorTest {
     public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
       Set<String> identifiers = SourceIdentifierExtractor.extractIdentifiers(tree);
       ImmutableSet<String> sortedIdentifiers =
-          identifiers.stream().sorted().collect(ImmutableSet.toImmutableSet());
+          identifiers.stream().sorted().collect(toImmutableSet());
       return buildDescription(tree).setMessage(sortedIdentifiers.toString()).build();
     }
   }

@@ -17,6 +17,14 @@ final class CodeTransformersTest {
             "FooRules$StringOfSizeZeroVerboseRule",
             "FooRules$StringOfSizeOneRule",
             "FooRules$ExtraGrouping$StringOfSizeTwoRule",
-            "FooRules$ExtraGrouping$StringOfSizeThreeRule");
+            "FooRules$ExtraGrouping$StringOfSizeThreeRule",
+            "RefasterRuleIdentifierExtractorTestRules$BlockTemplateRule",
+            "RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule",
+            "RefasterRuleIdentifierExtractorTestRules$NestedAnyOfRule",
+            "RefasterRuleIdentifierExtractorTestRules$MemberReferenceRule",
+            "RefasterRuleIdentifierExtractorTestRules$SingleAnyOfRule",
+            "RefasterRuleIdentifierExtractorTestRules$MultipleIdentifiersRule",
+            "RefasterRuleIdentifierExtractorTestRules$BinaryOperatorRule",
+            "RefasterRuleIdentifierExtractorTestRules$MemberSelectRule");
   }
 }
