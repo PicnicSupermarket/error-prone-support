@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableSetMultimap.flatteningToImmutab
 import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
@@ -214,6 +215,30 @@ final class ImmutableSetMultimapRules {
         Multimap<K, V1> multimap,
         com.google.common.base.Function<? super V1, ? extends V2> transformation) {
       return ImmutableSetMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSetMultimap.Builder#put(Object, Object)} over more contrived
+   * alternatives.
+   */
+  static final class ImmutableSetMultimapBuilderPut<K, V> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ImmutableSetMultimap.Builder<K, V> before(
+        ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
+      // XXX: Drop the `ImmutableSet` case in favour of generalizing the
+      // `ExplicitArgumentEnumeration` check, or add variants for other collection types as well.
+      return Refaster.anyOf(
+          builder.put(Map.entry(key, value)),
+          builder.putAll(key, value),
+          builder.putAll(key, ImmutableSet.of(value)));
+    }
+
+    @AfterTemplate
+    ImmutableSetMultimap.Builder<K, V> after(
+        ImmutableSetMultimap.Builder<K, V> builder, K key, V value) {
+      return builder.put(key, value);
     }
   }
 }

@@ -111,4 +111,24 @@ final class ImmutableTableRules {
       return ImmutableTable.of();
     }
   }
+
+  /**
+   * Prefer {@link ImmutableTable.Builder#put(Object, Object, Object)} over more contrived
+   * alternatives.
+   */
+  static final class ImmutableTableBuilderPut<R, C, V> {
+    @BeforeTemplate
+    ImmutableTable.Builder<R, C, V> before(
+        ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {
+      return Refaster.anyOf(
+          builder.put(Tables.immutableCell(rowKey, columnKey, value)),
+          builder.putAll(ImmutableTable.of(rowKey, columnKey, value)));
+    }
+
+    @AfterTemplate
+    ImmutableTable.Builder<R, C, V> after(
+        ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {
+      return builder.put(rowKey, columnKey, value);
+    }
+  }
 }

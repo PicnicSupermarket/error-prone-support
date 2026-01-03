@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableListMultimap.flatteningToImmuta
 import static com.google.common.collect.ImmutableListMultimap.toImmutableListMultimap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ListMultimap;
@@ -274,6 +275,30 @@ final class ImmutableListMultimapRules {
         Multimap<K, V1> multimap,
         com.google.common.base.Function<? super V1, ? extends V2> transformation) {
       return ImmutableListMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableListMultimap.Builder#put(Object, Object)} over more contrived or less
+   * efficient alternatives.
+   */
+  static final class ImmutableListMultimapBuilderPut<K, V> {
+    @BeforeTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ImmutableListMultimap.Builder<K, V> before(
+        ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
+      // XXX: Drop the `ImmutableList` case in favour of generalizing the
+      // `ExplicitArgumentEnumeration` check, or add variants for other collection types as well.
+      return Refaster.anyOf(
+          builder.put(Map.entry(key, value)),
+          builder.putAll(key, value),
+          builder.putAll(key, ImmutableList.of(value)));
+    }
+
+    @AfterTemplate
+    ImmutableListMultimap.Builder<K, V> after(
+        ImmutableListMultimap.Builder<K, V> builder, K key, V value) {
+      return builder.put(key, value);
     }
   }
 }

@@ -422,6 +422,20 @@ final class ImmutableMapRules {
     }
   }
 
+  /** Prefer {@link ImmutableMap.Builder#put(Object, Object)} over more contrived alternatives. */
+  static final class ImmutableMapBuilderPut<K, V> {
+    @BeforeTemplate
+    ImmutableMap.Builder<K, V> before(ImmutableMap.Builder<K, V> builder, K key, V value) {
+      return Refaster.anyOf(
+          builder.put(Map.entry(key, value)), builder.putAll(ImmutableMap.of(key, value)));
+    }
+
+    @AfterTemplate
+    ImmutableMap.Builder<K, V> after(ImmutableMap.Builder<K, V> builder, K key, V value) {
+      return builder.put(key, value);
+    }
+  }
+
   // XXX: Add a rule for this:
   // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
   // ->
