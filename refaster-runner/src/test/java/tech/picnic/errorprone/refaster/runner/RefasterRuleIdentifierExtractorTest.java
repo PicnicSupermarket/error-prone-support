@@ -53,8 +53,8 @@ final class RefasterRuleIdentifierExtractorTest {
                     "ImmutableList", "of", "equals", "&&", "size", "==", "Integer", "MAX_VALUE"))));
   }
 
-  @ParameterizedTest
   @MethodSource("extractIdentifiersTestCases")
+  @ParameterizedTest
   void extractIdentifiers(String ruleName, ImmutableSet<ImmutableSet<String>> expectedIdentifiers) {
     RefasterRule<?, ?> rule =
         getRefasterRule("RefasterRuleIdentifierExtractorTestRules$" + ruleName);
