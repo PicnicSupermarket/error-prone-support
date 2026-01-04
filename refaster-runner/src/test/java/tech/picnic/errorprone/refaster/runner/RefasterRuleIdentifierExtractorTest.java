@@ -115,6 +115,19 @@ final class RefasterRuleIdentifierExtractorTest {
             ImmutableSet.of("!", "isEmpty", "&&", "capacity", "=="));
   }
 
+  @Test
+  void extractIdentifiersFromStaticImportAndFieldRule() {
+    RefasterRule<?, ?> rule =
+        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$StaticImportAndFieldRule");
+    ImmutableSet<ImmutableSet<String>> identifiers =
+        RefasterRuleIdentifierExtractor.extractIdentifiers(rule);
+
+    assertThat(identifiers)
+        .containsExactly(
+            ImmutableSet.of(
+                "ImmutableList", "of", "equals", "&&", "size", "==", "Integer", "MAX_VALUE"));
+  }
+
   private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
     return CODE_TRANSFORMERS.get(ruleName).stream()
         .flatMap(

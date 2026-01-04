@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static java.util.Collections.emptyList;
-
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -174,12 +173,12 @@ final class RefasterRuleIdentifierExtractorTestRules {
   static final class StaticImportAndFieldRule {
     @BeforeTemplate
     boolean before(List<String> list) {
-      return emptyList().equals(list) && list.size() == Integer.MAX_VALUE;
+      return ImmutableList.of().equals(list) && list.size() == Integer.MAX_VALUE;
     }
 
     @AfterTemplate
     boolean after(List<String> list) {
-      return List.of().equals(list) && list.size() == Integer.MAX_VALUE;
+      return ImmutableList.of().equals(list) && list.size() == Integer.MAX_VALUE;
     }
   }
 }
