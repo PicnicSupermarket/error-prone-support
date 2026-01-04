@@ -10,6 +10,8 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -25,7 +27,8 @@ import java.util.Optional;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags AssertJ usages of {@code OptionalAssert} for simplification.
+ * A {@link BugChecker} that flags AssertJ equality and identity checks on unconditionally unwrapped
+ * {@link Optional} instances for simplification.
  *
  * <p>This bug checker cannot be replaced with a simple Refaster rule, as the Refaster approach
  * would require that all overloads of the mentioned methods (such as {@link
@@ -34,7 +37,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Prefer `assertThat(optional).hasValue(value)` over more verbose alternatives",
+    summary = "Prefer `.hasValue(value)` and `.containsSame(value)` over more verbose alternatives",
     link = BUG_PATTERNS_BASE_URL + "AssertJOptionalAssertion",
     linkType = CUSTOM,
     severity = SUGGESTION,
@@ -42,66 +45,65 @@ import tech.picnic.errorprone.utils.SourceCode;
 public final class AssertJOptionalAssertion extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<MethodInvocationTree> ASSERT_METHOD =
+  private static final ImmutableMap<String, String> REPLACEMENT_METHODS =
+      ImmutableMap.of("isEqualTo", "hasValue", "isSameAs", "containsSame");
+  private static final Matcher<MethodInvocationTree> ASSERTION =
       allOf(
           instanceMethod()
               .onDescendantOf("org.assertj.core.api.Assert")
-              .namedAnyOf("isEqualTo", "isSameAs"),
+              .namedAnyOf(REPLACEMENT_METHODS.keySet()),
           argumentCount(1));
-  private static final Matcher<ExpressionTree> OPTIONAL_OR_ELSE_THROW =
+  private static final Matcher<ExpressionTree> OPTIONAL_UNWRAP =
       instanceMethod()
           .onExactClass(Optional.class.getCanonicalName())
-          .named("orElseThrow")
-          .withNoParameters();
+          .namedAnyOf("get", "orElseThrow");
 
   /** Instantiates a new {@link AssertJOptionalAssertion} instance. */
   public AssertJOptionalAssertion() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ASSERT_METHOD.matches(tree, state)) {
+    if (!ASSERTION.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
-    return extractOrElseThrowTree(tree, state)
-        .map(orElseThrow -> describeMatch(tree, suggestFix(tree, orElseThrow, state)))
+    return extractOptionalUnwrap(tree, state)
+        .map(optionalUnwrap -> describeMatch(tree, suggestFix(tree, optionalUnwrap, state)))
         .orElse(Description.NO_MATCH);
   }
 
-  private static Optional<MethodInvocationTree> extractOrElseThrowTree(
-      MethodInvocationTree isEqualToTree, VisitorState state) {
-    ExpressionTree receiver = ASTHelpers.getReceiver(isEqualToTree);
-    if (!(receiver instanceof MethodInvocationTree assertThatTree)
-        || assertThatTree.getArguments().isEmpty()) {
+  private static Optional<MethodInvocationTree> extractOptionalUnwrap(
+      MethodInvocationTree tree, VisitorState state) {
+    if (!(ASTHelpers.getReceiver(tree) instanceof MethodInvocationTree receiver)
+        || receiver.getArguments().size() != 1
+        || !ASTHelpers.getSymbol(receiver).isStatic()) {
+      /* This doesn't look like the start of an assertion statement. */
       return Optional.empty();
     }
 
-    ExpressionTree assertThatArg = assertThatTree.getArguments().getFirst();
-    if (!(assertThatArg instanceof MethodInvocationTree orElseThrow)
-        || !OPTIONAL_OR_ELSE_THROW.matches(orElseThrow, state)) {
+    if (!(Iterables.getOnlyElement(receiver.getArguments()) instanceof MethodInvocationTree subject)
+        || !OPTIONAL_UNWRAP.matches(subject, state)) {
+      /* The assertion doesn't involve the unconditional unwrapping of an `Optional`. */
       return Optional.empty();
     }
 
-    return Optional.of(orElseThrow);
+    return Optional.of(subject);
   }
 
   private static SuggestedFix suggestFix(
-      MethodInvocationTree assertionTree,
-      MethodInvocationTree orElseThrowTree,
-      VisitorState state) {
-    ExpressionTree optionalTree =
+      MethodInvocationTree assertion, MethodInvocationTree optionalUnwrap, VisitorState state) {
+    ExpressionTree optional =
         requireNonNull(
-            ASTHelpers.getReceiver(orElseThrowTree), "Method invocation must have receiver");
-    return SuggestedFixes.renameMethodInvocation(
-            assertionTree, getReplacementMethod(assertionTree), state)
+            ASTHelpers.getReceiver(optionalUnwrap), "Method invocation must have receiver");
+    return SuggestedFixes.renameMethodInvocation(assertion, getReplacementMethod(assertion), state)
         .toBuilder()
-        .replace(orElseThrowTree, SourceCode.treeToString(optionalTree, state))
+        .replace(optionalUnwrap, SourceCode.treeToString(optional, state))
         .build();
   }
 
   private static String getReplacementMethod(MethodInvocationTree tree) {
-    return ASTHelpers.getSymbol(tree).getSimpleName().contentEquals("isSameAs")
-        ? "containsSame"
-        : "hasValue";
+    return requireNonNull(
+        REPLACEMENT_METHODS.get(ASTHelpers.getSymbol(tree).getSimpleName().toString()),
+        "Unexpected method name");
   }
 }
