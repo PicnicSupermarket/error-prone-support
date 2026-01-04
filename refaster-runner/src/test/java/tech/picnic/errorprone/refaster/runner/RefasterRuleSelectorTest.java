@@ -109,7 +109,7 @@ final class RefasterRuleSelectorTest {
   private static ImmutableSet<RefasterRule<?, ?>> getAllRefasterRules(String ruleName) {
     ImmutableSet.Builder<RefasterRule<?, ?>> builder = ImmutableSet.builder();
     CODE_TRANSFORMERS.get(ruleName).stream()
-        .<CodeTransformer>flatMap(
+        .flatMap(
             transformer -> {
               if (transformer instanceof AnnotatedCompositeCodeTransformer annotated) {
                 return annotated.transformers().stream();
