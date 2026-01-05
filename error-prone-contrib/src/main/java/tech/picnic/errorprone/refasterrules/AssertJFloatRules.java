@@ -10,6 +10,7 @@ import org.assertj.core.api.AbstractFloatAssert;
 import org.assertj.core.data.Offset;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@code float}s. */
 @OnlineDocumentation
 final class AssertJFloatRules {
   private AssertJFloatRules() {}

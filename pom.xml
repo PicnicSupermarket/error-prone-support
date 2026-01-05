@@ -690,6 +690,7 @@
                             Error Prone or automatically corrected through
                             application of google-java-format (GJF). -->
                             <module name="Checker">
+                                <module name="NewlineAtEndOfFile" />
                                 <module name="RegexpMultiline">
                                     <!-- GJF drops trailing horizontal
                                     whitespace and blank lines preceding a
@@ -817,10 +818,6 @@
                                             custom helper method. -->
                                         </property>
                                         <property name="illegalPkgs" value="org.immutables.value.internal" />
-                                        <property name="illegalPkgs" value="org.jongo.marshall.jackson.oid">
-                                            <!-- Instead, please use Jackson's
-                                            `@JsonProperty` annotation. -->
-                                        </property>
                                         <property name="illegalPkgs" value="org.mutabilitydetector.internal" />
                                         <property name="illegalPkgs" value="org.testcontainers.shaded" />
                                         <property name="illegalPkgs" value="org.testng.internal" />
@@ -892,6 +889,7 @@
                                         <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
                                     </module>
                                     <module name="ParameterAssignment" />
+                                    <module name="PatternVariableAssignment" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
@@ -910,6 +908,7 @@
                                         JavaDoc-only imports. -->
                                     </module>
                                     <module name="VisibilityModifier" />
+                                    <module name="WhenShouldBeUsed" />
                                 </module>
                                 <module name="UniqueProperties" />
                                 <module name="io.spring.nohttp.checkstyle.check.NoHttpCheck" />

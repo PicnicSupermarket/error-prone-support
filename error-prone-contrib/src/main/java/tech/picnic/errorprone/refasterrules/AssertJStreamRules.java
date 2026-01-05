@@ -19,6 +19,7 @@ import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.ListAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@link Stream}s. */
 @OnlineDocumentation
 final class AssertJStreamRules {
   private AssertJStreamRules() {}

@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import org.assertj.core.api.AbstractBigIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@link BigInteger}s. */
 // XXX: If we add a rule that drops unnecessary `L` suffixes from literal longs, then the `0L`/`1L`
 // cases below can go.
 @OnlineDocumentation

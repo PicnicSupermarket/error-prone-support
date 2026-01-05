@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@link CharSequence}s. */
 @OnlineDocumentation
 final class AssertJCharSequenceRules {
   private AssertJCharSequenceRules() {}

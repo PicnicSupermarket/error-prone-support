@@ -18,6 +18,7 @@ import org.assertj.core.api.MapAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
+/** Refaster rules related to AssertJ assertions over {@link Map}s. */
 @OnlineDocumentation
 final class AssertJMapRules {
   private AssertJMapRules() {}
