@@ -10304,7 +10304,7 @@
 +  void empty() {
      MetricSnapshots snapshots = MetricSnapshots.builder().build();
 -    assertThat(snapshots.stream().findAny()).isNotPresent();
-+    assertThat(snapshots.stream().findAny()).isEmpty();
++    assertThat(snapshots.stream()).isEmpty();
    }
  
    @Test
