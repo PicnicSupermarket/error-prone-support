@@ -32,9 +32,9 @@ final class DequeRules {
   /**
    * Prefer {@link Deque#addLast(Object)} over less clear alternatives.
    *
-   * <p>Note: This rule does not match {@link java.util.List} types (including {@link
-   * java.util.LinkedList}), as {@link java.util.List#add(Object)} is the idiomatic method for those
-   * types.
+   * <p>Note: this rule does not match instances of type {@link java.util.List} (including {@link
+   * java.util.LinkedList}, which also implements {@link Deque}), as {@link
+   * java.util.List#add(Object)} is the idiomatic method for those types.
    */
   static final class DequeAddLast<S, T extends S> {
     @BeforeTemplate
