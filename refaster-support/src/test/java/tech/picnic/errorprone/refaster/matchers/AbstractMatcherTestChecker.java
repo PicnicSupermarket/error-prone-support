@@ -84,7 +84,6 @@ abstract class AbstractMatcherTestChecker extends BugChecker implements Compilat
          * variable declaration. While the latter can be `ExpressionTree`s, they will never be
          * matched by Refaster.
          */
-        scan(tree.getNameExpression(), null);
         scan(tree.getInitializer(), null);
         return null;
       }
