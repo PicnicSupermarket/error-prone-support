@@ -73,4 +73,11 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
         ImmutableSetMultimap.copyOf(
             Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
   }
+
+  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testImmutableSetMultimapBuilderPut() {
+    return ImmutableSet.of(
+        ImmutableSetMultimap.<String, Integer>builder().put("foo", 1),
+        ImmutableSetMultimap.<String, Integer>builder().put("bar", 2),
+        ImmutableSetMultimap.<String, Integer>builder().put("baz", 3));
+  }
 }

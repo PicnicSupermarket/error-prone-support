@@ -170,4 +170,10 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.ofEntries(Map.entry("foo", 1)),
         Map.ofEntries(Map.entry("bar", 2), Map.entry("baz", 3)));
   }
+
+  ImmutableSet<ImmutableMap.Builder<String, Integer>> testImmutableMapBuilderPut() {
+    return ImmutableSet.of(
+        ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)),
+        ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("bar", 2)));
+  }
 }

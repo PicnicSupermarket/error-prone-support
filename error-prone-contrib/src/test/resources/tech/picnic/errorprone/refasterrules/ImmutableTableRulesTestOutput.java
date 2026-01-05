@@ -42,4 +42,10 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableTable<String, String, String> testImmutableTableOf() {
     return ImmutableTable.of();
   }
+
+  ImmutableSet<ImmutableTable.Builder<String, String, Integer>> testImmutableTableBuilderPut() {
+    return ImmutableSet.of(
+        ImmutableTable.<String, String, Integer>builder().put("foo", "bar", 1),
+        ImmutableTable.<String, String, Integer>builder().put("baz", "qux", 2));
+  }
 }
