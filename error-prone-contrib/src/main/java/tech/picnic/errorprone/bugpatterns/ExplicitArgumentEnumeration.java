@@ -212,6 +212,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       MethodSymbol method, ImmutableList<MethodSymbol> overloads, VisitorState state) {
     List<VarSymbol> parameters = method.getParameters();
     if (overloads.stream().anyMatch(m -> m.params().size() > parameters.size())) {
+      /* Some overloads accept more parameters; back off, as this is an unusual setup. */
       return false;
     }
 
@@ -243,7 +244,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       MethodSymbol overload,
       Type returnType,
       ImmutableList<Type> initialParameterTypes,
-      Type varargsType,
+      Type iterableElementType,
       VisitorState state) {
     Types types = state.getTypes();
 
@@ -261,10 +262,10 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     }
 
     Type actualVarargsType = types.elemtype(parameters.getLast().type);
-    return switch (varargsType) {
+    return switch (iterableElementType) {
       case WildcardType wildcard when wildcard.isExtendsBound() ->
           types.isSubtype(wildcard.getExtendsBound(), actualVarargsType);
-      default -> types.isSubtype(varargsType, actualVarargsType);
+      default -> types.isSubtype(iterableElementType, actualVarargsType);
     };
   }
 
