@@ -1924,6 +1924,9 @@
                                     always contains forward-slash path
                                     separators. -->
                                     -XepExcludedPaths:(?!.*/src/[^/]+/java/.*).*
+                                    <!-- We have package-level `@NullMarked`
+                                    annotations. -->
+                                    -Xep:AddNullMarkedToClass:OFF
                                     <!-- XXX: Enable this once we open-source
                                     this library. -->
                                     -Xep:BetaApi:OFF

@@ -19,11 +19,11 @@ import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.DescriptionListener;
 import com.google.errorprone.ErrorProneOptions;
+import com.google.errorprone.fixes.ErrorPronePosition;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.util.Context;
-import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ import tech.picnic.errorprone.refaster.annotation.Severity;
 // through `RefasterTest`, but ideally it is covered by tests in this class, closer to the code that
 // implements the relevant logic.) See the comment in `#context()` below.
 final class AnnotatedCompositeCodeTransformerTest {
-  private static final DiagnosticPosition DUMMY_POSITION = mock();
+  private static final ErrorPronePosition DUMMY_POSITION = mock();
   private static final Fix DUMMY_FIX = mock();
   private static final TreePath DUMMY_PATH = mock();
   private static final String DEFAULT_PACKAGE = "";

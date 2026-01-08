@@ -11,7 +11,7 @@
              .withLogConsumer(LogConsumer.withPrefix(sampleApp))
 --- a/pom.xml
 +++ b/pom.xml
-@@ -252,9 +252,9 @@
+@@ -252,36 +252,49 @@
            <release>${java.version}</release>
            <source>${java.version}</source>
            <target>${java.version}</target>
@@ -24,7 +24,14 @@
            <showWarnings>true</showWarnings>
            <compilerArgs>
              <arg>-Xlint:all,-serial,-processing,-options</arg>
-@@ -267,21 +267,32 @@
+             <arg>${warnings}</arg>
+             <arg>--should-stop=ifError=FLOW</arg>
+             <arg>-XDcompilePolicy=simple</arg>
++            <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
++            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+             <arg>
+               -Xplugin:ErrorProne
+               -Xep:AlmostJavadoc:OFF
                -Xep:MissingSummary:OFF
                -Xep:LongDoubleConversion:OFF
                -Xep:StringSplitter:OFF
@@ -59,7 +66,7 @@
              <!-- Other annotation processors go here.
  
              If 'annotationProcessorPaths' is set, processors will no longer be
-@@ -394,7 +405,6 @@
+@@ -394,7 +407,6 @@
            <groupId>com.google.guava</groupId>
            <artifactId>guava</artifactId>
            <version>${guava.version}</version>
