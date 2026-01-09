@@ -12,11 +12,11 @@ final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   SuggestedFix testSuggestedFixDelete() {
-    return SuggestedFix.delete(null);
+    return SuggestedFix.delete((Tree) null);
   }
 
   SuggestedFix testSuggestedFixReplaceTree() {
-    return SuggestedFix.replace(null, "foo");
+    return SuggestedFix.replace((Tree) null, "foo");
   }
 
   SuggestedFix testSuggestedFixReplaceStartEnd() {
@@ -32,10 +32,10 @@ final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   SuggestedFix testSuggestedFixPrefixWith() {
-    return SuggestedFix.prefixWith(null, "foo");
+    return SuggestedFix.prefixWith((Tree) null, "foo");
   }
 
   SuggestedFix testSuggestedFixPostfixWith() {
-    return SuggestedFix.postfixWith(null, "foo");
+    return SuggestedFix.postfixWith((Tree) null, "foo");
   }
 }

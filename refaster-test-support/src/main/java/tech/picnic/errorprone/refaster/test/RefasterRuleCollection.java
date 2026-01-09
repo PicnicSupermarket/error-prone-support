@@ -27,6 +27,7 @@ import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.fixes.ErrorProneEndPosTable;
 import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
@@ -37,7 +38,6 @@ import com.sun.source.tree.LineMap;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.tree.EndPosTable;
 import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import com.sun.tools.javac.util.Position;
 import java.io.IOException;
@@ -152,7 +152,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             .withPath(state.getPath()));
 
     ImmutableRangeMap<Integer, String> indexedMatches =
-        indexRuleMatches(matches, ((JCCompilationUnit) tree).endPositions);
+        indexRuleMatches(matches, ErrorProneEndPosTable.create(tree));
 
     matches.forEach(state::reportMatch);
     reportMissingMatches(tree, indexedMatches, state);
@@ -185,7 +185,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   }
 
   private static ImmutableRangeMap<Integer, String> indexRuleMatches(
-      List<Description> matches, EndPosTable endPositions) {
+      List<Description> matches, ErrorProneEndPosTable endPositions) {
     ImmutableRangeMap.Builder<Integer, String> ruleMatches = ImmutableRangeMap.builder();
 
     for (Description description : matches) {
