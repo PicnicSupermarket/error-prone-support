@@ -115,19 +115,6 @@
             encoding is necessary because forked unit test invocations
             otherwise use the environment's file encoding. -->
             -Dfile.encoding=${project.build.sourceEncoding}
-            <!-- This argument *can* be set through Surefire's
-            'systemPropertyVariables' configuration setting, but by placing it
-            here it automatically also applies to the Failsafe plugin. To avoid
-            potential slowdown of tests relying on
-            `java.security.SecureRandom`, on Unix systems we use a
-            lower-quality source of randomness. Note that it is not fatal for
-            the file not to exist, so this setting is Windows-compatible. The
-            `/./` syntax is no accident; see
-            https://bugs.openjdk.java.net/browse/JDK-6202721 for details. -->
-            -Djava.security.egd=file:/dev/./urandom
-            <!-- On Mac OS X, running in headless mode prevents the forked JVMs
-            from showing up in the dock and capturing window focus. -->
-            -Djava.awt.headless=true
         </argLine>
         <!-- The maximum amount of heap memory available to forked Surefire
         processes. Factored out into a separate property to allow overriding. -->
@@ -690,6 +677,7 @@
                             Error Prone or automatically corrected through
                             application of google-java-format (GJF). -->
                             <module name="Checker">
+                                <module name="NewlineAtEndOfFile" />
                                 <module name="RegexpMultiline">
                                     <!-- GJF drops trailing horizontal
                                     whitespace and blank lines preceding a
@@ -817,10 +805,6 @@
                                             custom helper method. -->
                                         </property>
                                         <property name="illegalPkgs" value="org.immutables.value.internal" />
-                                        <property name="illegalPkgs" value="org.jongo.marshall.jackson.oid">
-                                            <!-- Instead, please use Jackson's
-                                            `@JsonProperty` annotation. -->
-                                        </property>
                                         <property name="illegalPkgs" value="org.mutabilitydetector.internal" />
                                         <property name="illegalPkgs" value="org.testcontainers.shaded" />
                                         <property name="illegalPkgs" value="org.testng.internal" />
@@ -892,6 +876,7 @@
                                         <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
                                     </module>
                                     <module name="ParameterAssignment" />
+                                    <module name="PatternVariableAssignment" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
@@ -910,6 +895,7 @@
                                         JavaDoc-only imports. -->
                                     </module>
                                     <module name="VisibilityModifier" />
+                                    <module name="WhenShouldBeUsed" />
                                 </module>
                                 <module name="UniqueProperties" />
                                 <module name="io.spring.nohttp.checkstyle.check.NoHttpCheck" />
@@ -1372,6 +1358,21 @@
                                 junit.platform.stacktrace.pruning.enabled=false</configurationParameters>
                         </properties>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <systemPropertyVariables>
+                            <!-- On macOS, running in headless mode prevents
+                            the forked JVMs from showing up in the dock and
+                            capturing window focus. -->
+                            <java.awt.headless>true</java.awt.headless>
+                            <!-- On Unix systems we use a lower-quality source
+                            of randomness, to avoid potential slowdown of tests
+                            relying on `java.security.SecureRandom`. Note that
+                            it is not fatal for the file to not exist, so this
+                            setting is Windows-compatible. The `/./` syntax is
+                            no accident; see
+                            https://bugs.openjdk.java.net/browse/JDK-6202721
+                            for details. -->
+                            <java.security.egd>file:/dev/./urandom</java.security.egd>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>

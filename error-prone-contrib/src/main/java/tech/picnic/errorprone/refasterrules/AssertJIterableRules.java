@@ -14,6 +14,7 @@ import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@link Iterable}s. */
 @OnlineDocumentation
 final class AssertJIterableRules {
   private AssertJIterableRules() {}

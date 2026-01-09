@@ -64,6 +64,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 // XXX: Besides explicitly enumerated iterables, consider also simplifying expressions that contain
 // explicitly enumerated `Stream`s, defined using `Stream.of(...)` or `() -> Stream.of(...)`. This
 // would allow simplifying e.g. invocations of `Flux#fromStream` to `Flux#just`.
+// XXX: Consider also rewrites in the opposite direction, where `overload(collection.toArray(..))`
+// can be simplified to `overload(collection)`, provided that a suitable overload exists.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Iterable creation can be avoided by using a varargs alternative method",

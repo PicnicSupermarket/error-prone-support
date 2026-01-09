@@ -10,6 +10,7 @@ import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.data.Offset;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@code double}s. */
 @OnlineDocumentation
 final class AssertJDoubleRules {
   private AssertJDoubleRules() {}

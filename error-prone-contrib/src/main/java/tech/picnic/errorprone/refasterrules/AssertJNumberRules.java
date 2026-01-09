@@ -22,6 +22,7 @@ import org.assertj.core.api.NumberAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 
+/** Refaster rules related to AssertJ assertions over numeric values. */
 @OnlineDocumentation
 final class AssertJNumberRules {
   private AssertJNumberRules() {}

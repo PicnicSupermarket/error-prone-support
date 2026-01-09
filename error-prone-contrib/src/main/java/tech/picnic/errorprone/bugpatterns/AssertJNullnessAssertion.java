@@ -12,6 +12,7 @@ import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -65,11 +66,12 @@ public final class AssertJNullnessAssertion extends BugChecker
     }
 
     String replacementAssertion = isPositiveAssertion(tree) ? "isNull" : "isNotNull";
-    SuggestedFix.Builder fix =
-        SuggestedFixes.renameMethodInvocation(tree, replacementAssertion, state).toBuilder();
-    tree.getArguments().forEach(arg -> fix.merge(SuggestedFix.delete(arg)));
+    SuggestedFix fix =
+        SuggestedFixes.renameMethodInvocation(tree, replacementAssertion, state).toBuilder()
+            .merge(SuggestedFix.delete(Iterables.getOnlyElement(tree.getArguments())))
+            .build();
 
-    return describeMatch(tree, fix.build());
+    return describeMatch(tree, fix);
   }
 
   private static boolean isPositiveAssertion(MethodInvocationTree tree) {
