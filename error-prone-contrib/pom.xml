@@ -14,6 +14,12 @@
     <description>Extra Error Prone plugins by Picnic.</description>
     <url>https://error-prone.picnic.tech</url>
 
+    <properties>
+        <!-- Some of the tests in this module are very heavy; by giving them
+        ample heap space we prevent slowdowns or even `OutOfMemory` errors. -->
+        <argLine.xmx>2048m</argLine.xmx>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
