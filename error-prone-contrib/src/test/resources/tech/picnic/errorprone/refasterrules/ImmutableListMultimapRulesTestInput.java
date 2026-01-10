@@ -125,4 +125,12 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
                 flatteningToImmutableListMultimap(
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
+
+  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>>
+      testImmutableListMultimapBuilderPut() {
+    return ImmutableSet.of(
+        ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)),
+        ImmutableListMultimap.<String, Integer>builder().putAll("bar", 2),
+        ImmutableListMultimap.<String, Integer>builder().putAll("baz", ImmutableList.of(3)));
+  }
 }

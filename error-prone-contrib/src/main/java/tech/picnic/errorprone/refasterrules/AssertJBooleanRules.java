@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractBooleanAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@code boolean}s. */
 @OnlineDocumentation
 final class AssertJBooleanRules {
   private AssertJBooleanRules() {}

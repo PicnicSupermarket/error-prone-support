@@ -17,6 +17,7 @@ import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over primitive values. */
 @OnlineDocumentation
 final class AssertJPrimitiveRules {
   private AssertJPrimitiveRules() {}

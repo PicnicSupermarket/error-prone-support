@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@code long}s. */
 @OnlineDocumentation
 final class AssertJLongRules {
   private AssertJLongRules() {}

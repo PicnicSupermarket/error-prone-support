@@ -13,6 +13,7 @@ import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over arbitrary objects. */
 @OnlineDocumentation
 final class AssertJObjectRules {
   private AssertJObjectRules() {}

@@ -10,6 +10,7 @@ import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@link Comparable}s. */
 @OnlineDocumentation
 final class AssertJComparableRules {
   private AssertJComparableRules() {}

@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
+/** Refaster rules related to AssertJ assertions over {@code int}s. */
 @OnlineDocumentation
 final class AssertJIntegerRules {
   private AssertJIntegerRules() {}

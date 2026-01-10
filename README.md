@@ -98,6 +98,8 @@ that your build is executed using JDK 21 or above, but supports builds that
                            </arg>
                            <arg>-XDcompilePolicy=simple</arg>
                            <arg>--should-stop=ifError=FLOW</arg>
+                           <!-- Add this flag if you build with JDK 21. -->
+                           <!-- <arg>-XDaddTypeAnnotationsToSymbol=true</arg> -->
                        </compilerArgs>
                        <!-- Enable this if you'd like to fail your build upon warnings. -->
                        <!-- <failOnWarning>true</failOnWarning> -->

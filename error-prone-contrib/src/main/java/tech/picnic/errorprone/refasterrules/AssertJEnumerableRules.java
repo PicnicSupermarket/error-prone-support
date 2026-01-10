@@ -15,6 +15,7 @@ import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
+/** Refaster rules related to AssertJ assertions over enumerable objects. */
 @OnlineDocumentation
 final class AssertJEnumerableRules {
   private AssertJEnumerableRules() {}

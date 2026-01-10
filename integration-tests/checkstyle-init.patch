@@ -13,7 +13,12 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2574,6 +2580,8 @@
+@@ -2571,9 +2577,13 @@
+                     <arg>-Xpkginfo:always</arg>
+                     <arg>-XDcompilePolicy=simple</arg>
+                     <arg>--should-stop=ifError=FLOW</arg>
++                    <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
++                    <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -22,7 +27,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2586,6 +2594,11 @@
+@@ -2586,6 +2596,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -34,12 +39,12 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2627,11 +2640,14 @@
+@@ -2627,11 +2642,14 @@
                      <arg>--should-stop=ifError=FLOW</arg>
                      <arg>-Xpkginfo:always</arg>
                      <arg>-XDcompilePolicy=simple</arg>
-+                    <!-- XXX: Drop this flag once the project uses Error Prone 2.36.0+ by default. -->
-+                    <arg>--should-stop=ifError=FLOW</arg>
++                    <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
++                    <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                      <arg>
                        -Xplugin:ErrorProne \
 -                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
@@ -50,7 +55,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2644,6 +2660,11 @@
+@@ -2644,6 +2662,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>

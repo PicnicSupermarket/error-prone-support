@@ -30,11 +30,10 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
+import com.google.errorprone.fixes.ErrorProneEndPosTable;
 import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.CompilationUnitTree;
-import com.sun.tools.javac.tree.EndPosTable;
-import com.sun.tools.javac.tree.JCTree.JCCompilationUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -109,7 +108,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     strategy.applyTransformers(tree, context, matches::add, state);
 
     /* Then apply them. */
-    applyMatches(matches, ((JCCompilationUnit) tree).endPositions, state);
+    applyMatches(matches, ErrorProneEndPosTable.create(tree), state);
 
     /* Any matches were already reported by the code above, directly to the `VisitorState`. */
     return Description.NO_MATCH;
@@ -126,7 +125,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   // XXX: This selection logic solves an issue described in
   // https://github.com/google/error-prone/issues/559. Consider contributing it back upstream.
   private void applyMatches(
-      Iterable<Description> allMatches, EndPosTable endPositions, VisitorState state) {
+      Iterable<Description> allMatches, ErrorProneEndPosTable endPositions, VisitorState state) {
     ImmutableList<Description> byReplacementSize =
         ImmutableList.sortedCopyOf(
             Comparator.<Description>comparingInt(d -> getReplacedCodeSize(d, endPositions))
@@ -188,17 +187,19 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         .build();
   }
 
-  private static int getReplacedCodeSize(Description description, EndPosTable endPositions) {
+  private static int getReplacedCodeSize(
+      Description description, ErrorProneEndPosTable endPositions) {
     return getReplacements(description, endPositions).mapToInt(Replacement::length).sum();
   }
 
   // XXX: It might be nicer to prefer the shortest replacement _post formatting_.
-  private static int getInsertedCodeSize(Description description, EndPosTable endPositions) {
+  private static int getInsertedCodeSize(
+      Description description, ErrorProneEndPosTable endPositions) {
     return getReplacements(description, endPositions).mapToInt(r -> r.replaceWith().length()).sum();
   }
 
   private static ImmutableRangeSet<Integer> getReplacementRanges(
-      Description description, EndPosTable endPositions) {
+      Description description, ErrorProneEndPosTable endPositions) {
     return getReplacements(description, endPositions)
         .map(Replacement::range)
         .filter(not(Range::isEmpty))
@@ -206,7 +207,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   }
 
   private static Stream<Replacement> getReplacements(
-      Description description, EndPosTable endPositions) {
+      Description description, ErrorProneEndPosTable endPositions) {
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
