@@ -61,18 +61,16 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       return describeMatch(tree);
     }
 
-    ImmutableSet<String> valuesOfSource = findEnumValuesOfMethodInvocationTree(tree);
+    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(tree);
 
     // Match name argument where it is an invocation of another enum's .name() or .toString()
-    if (nameArgument instanceof MethodInvocationTree anotherEnumsInvocation
-        && STRING_VALUE_ENUM.matches(anotherEnumsInvocation, state)) {
+    if (STRING_VALUE_ENUM.matches(nameArgument, state)) {
       // Check if it is a part of switch-case statement, and values are filtered by labels.
-      ImmutableSet<String> filteredEnumValues =
-          findFilteredEnumValues(anotherEnumsInvocation, state);
+      ImmutableSet<String> filteredEnumValues = findFilteredEnumValues(nameArgument, state);
 
       ImmutableSet<String> valuesOfTarget =
           filteredEnumValues.isEmpty()
-              ? findEnumValuesOfMethodInvocationTree(anotherEnumsInvocation)
+              ? findEnumValuesOfReceiver(nameArgument)
               : filteredEnumValues;
 
       return Sets.difference(valuesOfTarget, valuesOfSource).isEmpty()
@@ -95,8 +93,7 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
         .orElseThrow();
   }
 
-  private static ImmutableSet<String> findEnumValuesOfMethodInvocationTree(
-      MethodInvocationTree tree) {
+  private static ImmutableSet<String> findEnumValuesOfReceiver(ExpressionTree tree) {
     return ImmutableSet.copyOf(ASTHelpers.enumValues(ASTHelpers.getReceiverType(tree).tsym));
   }
 
@@ -119,7 +116,7 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
    * }</pre>
    */
   private static ImmutableSet<String> findFilteredEnumValues(
-      MethodInvocationTree nameArgument, VisitorState state) {
+      ExpressionTree nameArgument, VisitorState state) {
     TreePath treePath = TreePath.getPath(state.getPath(), nameArgument);
     SwitchExpressionTree switchExpressionTree =
         ASTHelpers.findEnclosingNode(treePath, SwitchExpressionTree.class);
