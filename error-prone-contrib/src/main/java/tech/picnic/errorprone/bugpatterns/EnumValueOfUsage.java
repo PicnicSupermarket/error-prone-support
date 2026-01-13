@@ -66,7 +66,6 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
     // Match name argument where it is an invocation of another enum's .name() or .toString()
     if (nameArgument instanceof MethodInvocationTree anotherEnumsInvocation
         && STRING_VALUE_ENUM.matches(anotherEnumsInvocation, state)) {
-
       // Check if it is a part of switch-case statement, and values are filtered by labels.
       ImmutableSet<String> filteredEnumValues =
           findFilteredEnumValues(anotherEnumsInvocation, state);
