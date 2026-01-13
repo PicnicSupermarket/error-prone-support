@@ -56,27 +56,16 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       return Description.NO_MATCH;
     }
 
-    Optional<? extends ExpressionTree> optionalNameArgument = findStringArgument(tree);
-    if (optionalNameArgument.isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
-    ExpressionTree nameArgument = optionalNameArgument.orElseThrow();
-    String constantValue = ASTHelpers.constValue(nameArgument, String.class);
-
-    ImmutableSet<String> valuesOfSource = findEnumValuesOfMethodInvocationTree(tree);
-
-    // Match constants
-    if (constantValue != null) {
-      return valuesOfSource.contains(constantValue) ? Description.NO_MATCH : describeMatch(tree);
-    }
+    ExpressionTree nameArgument = extractNameArgument(tree);
 
     // Match unchecked String values
     if (nameArgument instanceof IdentifierTree) {
       return describeMatch(tree);
     }
 
-    // Match name argument where it is another enum's .name() or .toString() invocation.
+    ImmutableSet<String> valuesOfSource = findEnumValuesOfMethodInvocationTree(tree);
+
+    // Match name argument where it is an invocation of another enum's .name() or .toString()
     if (nameArgument instanceof MethodInvocationTree anotherEnumsInvocation
         && STRING_VALUE_ENUM.matches(anotherEnumsInvocation, state)) {
 
@@ -94,30 +83,23 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
           : describeMatch(tree);
     }
 
-    return Description.NO_MATCH;
+    // Match constants
+    String constantValue = ASTHelpers.constValue(nameArgument, String.class);
+    return constantValue != null && valuesOfSource.contains(constantValue)
+        ? Description.NO_MATCH
+        : describeMatch(tree);
   }
 
-  /**
-   * {@link Enum#valueOf} contains two implementations, we are interested in finding the {@code
-   * name}:
-   *
-   * <pre>{@code
-   * valueOf(String name)
-   * valueOf(Class<T> enumClass, String name)
-   * }</pre>
-   *
-   * @param tree {@link MethodInvocationTree} that belongs to {@code valueOf} call.
-   * @return {@link ExpressionTree} implementation of {@code name} argument or empty if no {@link
-   *     String} argument found.
-   */
-  private static Optional<? extends ExpressionTree> findStringArgument(MethodInvocationTree tree) {
+  /** Extracts {@code name} argument from {@link Enum#valueOf} invocations. */
+  private static ExpressionTree extractNameArgument(MethodInvocationTree tree) {
     return tree.getArguments().stream()
         .filter(
             argument ->
                 Optional.ofNullable(ASTHelpers.getType(argument))
                     .filter(type -> type.toString().equals(String.class.getCanonicalName()))
                     .isPresent())
-        .findAny();
+        .findAny()
+        .orElseThrow();
   }
 
   private static ImmutableSet<String> findEnumValuesOfMethodInvocationTree(
@@ -126,15 +108,28 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
   }
 
   /**
-   * Finds and returns all filtered enum values of {@code b.name()} where b is an enum type, and is
-   * enclosed by a switch statement where b is inside switch parenthesis, e.g. {@code switch (b)}.
-   * Otherwise, returns empty set.
+   * Finds and returns all filtered enum values of {@code b.name()} (or {@code b.toString()}) where
+   * {@code b} is an enum type, and is enclosed by a switch statement where {@code b} is inside
+   * switch parenthesis, e.g. {@code switch (b)}. Otherwise, returns empty set. {@code b.name()} is
+   * provided as {@code nameArgument}.
+   *
+   * <p>Returns {@code ["B1", "B2"]} for:
+   *
+   * <pre>{@code
+   * enum B {
+   *     B1, B2, B3
+   * }
+   *
+   * switch(b) {
+   *     case B1, B2 -> A.valueOf(b.name());
+   * }
+   * }</pre>
    */
   private static ImmutableSet<String> findFilteredEnumValues(
       MethodInvocationTree nameArgument, VisitorState state) {
+    TreePath treePath = TreePath.getPath(state.getPath(), nameArgument);
     SwitchExpressionTree switchExpressionTree =
-        ASTHelpers.findEnclosingNode(
-            TreePath.getPath(state.getPath(), nameArgument), SwitchExpressionTree.class);
+        ASTHelpers.findEnclosingNode(treePath, SwitchExpressionTree.class);
     if (switchExpressionTree == null) {
       return ImmutableSet.of();
     }
@@ -149,13 +144,12 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
         return ImmutableSet.of();
       }
 
-      CaseTree filteredCaseTree =
-          ASTHelpers.findEnclosingNode(
-              TreePath.getPath(state.getPath(), nameArgument), CaseTree.class);
-      if (filteredCaseTree == null) {
-        return ImmutableSet.of();
+      CaseTree filteredCaseTree = ASTHelpers.findEnclosingNode(treePath, CaseTree.class);
+      if (filteredCaseTree != null) {
+        return filteredCaseTree.getLabels().stream()
+            .map(Object::toString)
+            .collect(toImmutableSet());
       }
-      return filteredCaseTree.getLabels().stream().map(Object::toString).collect(toImmutableSet());
     }
     return ImmutableSet.of();
   }
