@@ -148,7 +148,8 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       ImmutableSet<String> coveredLabels =
           switchExpressionTree.getCases().stream()
               .filter(caseTree -> !enclosingCaseTree.equals(caseTree))
-              .flatMap(caseTree -> caseTree.getLabels().stream().map(Object::toString))
+              .flatMap(caseTree -> caseTree.getLabels().stream())
+              .map(Object::toString)
               .collect(toImmutableSet());
       return Sets.difference(possibleLabels, coveredLabels).immutableCopy();
     }
