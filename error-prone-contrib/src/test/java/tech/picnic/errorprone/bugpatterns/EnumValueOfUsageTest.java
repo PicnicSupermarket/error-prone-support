@@ -40,7 +40,7 @@ final class EnumValueOfUsageTest {
             "        switch (b) {",
             "          case ONE, THREE -> A.valueOf(A.class, b.name());",
             "          case TWO -> A.valueOf(b.name());",
-            "          case FOUR ->   A.valueOf(A.ONE.name());",
+            "          case FOUR -> A.valueOf(A.ONE.name());",
             "          default -> null;",
             "        };",
             "  }",
