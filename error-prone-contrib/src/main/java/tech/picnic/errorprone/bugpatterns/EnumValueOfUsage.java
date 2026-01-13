@@ -56,13 +56,13 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
     }
 
     ExpressionTree nameArgument = extractNameArgument(tree, state);
+    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(tree);
 
-    // Match unchecked String values
-    if (nameArgument instanceof IdentifierTree) {
+    // Match constants
+    String constantValue = ASTHelpers.constValue(nameArgument, String.class);
+    if (constantValue != null && !valuesOfSource.contains(constantValue)) {
       return describeMatch(tree);
     }
-
-    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(tree);
 
     // Match name argument where it is an invocation of another enum's .name() or .toString()
     if (STRING_VALUE_ENUM.matches(nameArgument, state)) {
@@ -79,11 +79,8 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
           : describeMatch(tree);
     }
 
-    // Match constants
-    String constantValue = ASTHelpers.constValue(nameArgument, String.class);
-    return constantValue != null && valuesOfSource.contains(constantValue)
-        ? Description.NO_MATCH
-        : describeMatch(tree);
+    // Match unchecked identifiers
+    return nameArgument instanceof IdentifierTree ? describeMatch(tree) : Description.NO_MATCH;
   }
 
   /** Extracts {@code name} argument from {@link Enum#valueOf} invocations. */
