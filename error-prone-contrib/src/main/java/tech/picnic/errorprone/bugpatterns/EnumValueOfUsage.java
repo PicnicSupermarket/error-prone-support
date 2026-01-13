@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -126,14 +127,12 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
 
     Type paranthesisExpressionType = ASTHelpers.getType(switchExpressionTree.getExpression());
     Type nameInvocationReceiverType = ASTHelpers.getType(ASTHelpers.getReceiver(nameArgument));
-    if (ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)) {
-      CaseTree filteredCaseTree = ASTHelpers.findEnclosingNode(treePath, CaseTree.class);
-      if (filteredCaseTree != null) {
-        return filteredCaseTree.getLabels().stream()
+    return ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)
+        ? requireNonNull(ASTHelpers.findEnclosingNode(treePath, CaseTree.class))
+            .getLabels()
+            .stream()
             .map(Object::toString)
-            .collect(toImmutableSet());
-      }
-    }
-    return ImmutableSet.of();
+            .collect(toImmutableSet())
+        : ImmutableSet.of();
   }
 }
