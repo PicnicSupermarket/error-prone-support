@@ -22,11 +22,9 @@ import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.util.TreePath;
-import com.sun.tools.javac.code.Symbol;
-import java.util.Objects;
+import com.sun.tools.javac.code.Type;
 import java.util.Optional;
 
 /**
@@ -134,16 +132,9 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       return ImmutableSet.of();
     }
 
-    if (switchExpressionTree.getExpression() instanceof ParenthesizedTree parenthesizedTree) {
-      Symbol switchParenthesis = ASTHelpers.getSymbol(parenthesizedTree.getExpression());
-      Symbol nameCallReceiver = ASTHelpers.getSymbol(ASTHelpers.getReceiver(nameArgument));
-
-      if (switchParenthesis == null
-          || nameCallReceiver == null
-          || !Objects.equals(switchParenthesis, nameCallReceiver)) {
-        return ImmutableSet.of();
-      }
-
+    Type paranthesisExpressionType = ASTHelpers.getType(switchExpressionTree.getExpression());
+    Type nameInvocationReceiverType = ASTHelpers.getType(ASTHelpers.getReceiver(nameArgument));
+    if (ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)) {
       CaseTree filteredCaseTree = ASTHelpers.findEnclosingNode(treePath, CaseTree.class);
       if (filteredCaseTree != null) {
         return filteredCaseTree.getLabels().stream()
