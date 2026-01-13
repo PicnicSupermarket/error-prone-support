@@ -112,6 +112,19 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
    *     case B1, B2 -> A.valueOf(b.name());
    * }
    * }</pre>
+   *
+   * <p>Returns {@code ["B3"]} for:
+   *
+   * <pre>{@code
+   * enum B {
+   *     B1, B2, B3
+   * }
+   *
+   * switch(b) {
+   *     case B1, B2 -> null;
+   *     default -> A.valueOf(b.name());
+   * }
+   * }</pre>
    */
   private static ImmutableSet<String> findFilteredEnumValues(
       ExpressionTree nameArgument, VisitorState state) {
@@ -124,12 +137,21 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
 
     Type paranthesisExpressionType = ASTHelpers.getType(switchExpressionTree.getExpression());
     Type nameInvocationReceiverType = ASTHelpers.getType(ASTHelpers.getReceiver(nameArgument));
-    return ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)
-        ? requireNonNull(ASTHelpers.findEnclosingNode(treePath, CaseTree.class))
-            .getLabels()
-            .stream()
-            .map(Object::toString)
-            .collect(toImmutableSet())
-        : ImmutableSet.of();
+    if (!ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)) {
+      return ImmutableSet.of();
+    }
+
+    CaseTree enclosingCaseTree =
+        requireNonNull(ASTHelpers.findEnclosingNode(treePath, CaseTree.class));
+    if (ASTHelpers.isSwitchDefault(enclosingCaseTree)) {
+      ImmutableSet<String> possibleLabels = findEnumValuesOfReceiver(nameArgument);
+      ImmutableSet<String> coveredLabels =
+          switchExpressionTree.getCases().stream()
+              .filter(caseTree -> !enclosingCaseTree.equals(caseTree))
+              .flatMap(caseTree -> caseTree.getLabels().stream().map(Object::toString))
+              .collect(toImmutableSet());
+      return Sets.difference(possibleLabels, coveredLabels).immutableCopy();
+    }
+    return enclosingCaseTree.getLabels().stream().map(Object::toString).collect(toImmutableSet());
   }
 }
