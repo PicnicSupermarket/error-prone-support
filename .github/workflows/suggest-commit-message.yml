@@ -18,7 +18,10 @@ concurrency:
   group: suggest-commit-message-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
 env:
+  # XXX: Figure out how we can block access to `ab.chatgpt.com` without causing
+  # PR checks to fail.
   ALLOWED_ENDPOINTS: >
+    ab.chatgpt.com:443
     api.github.com:443
     api.openai.com:443
     github.com:443
