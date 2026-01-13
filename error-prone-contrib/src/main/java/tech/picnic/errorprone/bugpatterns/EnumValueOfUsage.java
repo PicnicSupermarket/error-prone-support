@@ -25,7 +25,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Type;
-import java.util.Optional;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags {@link Enum#valueOf} invocations that contain unchecked
@@ -54,7 +54,7 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       return Description.NO_MATCH;
     }
 
-    ExpressionTree nameArgument = extractNameArgument(tree);
+    ExpressionTree nameArgument = extractNameArgument(tree, state);
 
     // Match unchecked String values
     if (nameArgument instanceof IdentifierTree) {
@@ -89,13 +89,9 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
   }
 
   /** Extracts {@code name} argument from {@link Enum#valueOf} invocations. */
-  private static ExpressionTree extractNameArgument(MethodInvocationTree tree) {
+  private static ExpressionTree extractNameArgument(MethodInvocationTree tree, VisitorState state) {
     return tree.getArguments().stream()
-        .filter(
-            argument ->
-                Optional.ofNullable(ASTHelpers.getType(argument))
-                    .filter(type -> type.toString().equals(String.class.getCanonicalName()))
-                    .isPresent())
+        .filter(argument -> MoreASTHelpers.isStringTyped(argument, state))
         .findAny()
         .orElseThrow();
   }
