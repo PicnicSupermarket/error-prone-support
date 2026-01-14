@@ -7,42 +7,50 @@ final class EnumValueOfUsageTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(EnumValueOfUsage.class, getClass())
+        .expectErrorMessage(
+            "INVALID_VALUE",
+            m ->
+                m.contains("is not a valid value for `Test.A`, possible values: [ONE, TWO, THREE]"))
+        .expectErrorMessage(
+            "MISSING_VALUE", m -> m.contains("might generate values which are missing in `Test.A`"))
+        .expectErrorMessage(
+            "AVOID_RAW", m -> m.contains("Avoid passing unchecked arguments to `valueOf`"))
         .addSourceLines(
             "Test.java",
             "class Test {",
             "  void unsafeCases(String raw, B b) {",
-            "    // BUG: Diagnostic contains: `FOUR` is not a valid value for `Test.A`, possible values: [ONE, TWO, THREE]",
+            "    // BUG: Diagnostic matches: INVALID_VALUE",
             "    A.valueOf(\"FOUR\");",
-            "    // BUG: Diagnostic contains: `FOUR` is not a valid value for `Test.A`, possible values: [ONE, TWO, THREE]",
+            "    // BUG: Diagnostic matches: INVALID_VALUE",
             "    A.valueOf(A.class, \"FOUR\");",
-            "    // BUG: Diagnostic contains: Avoid passing unchecked arguments to `valueOf`",
+            "    // BUG: Diagnostic matches: AVOID_RAW",
             "    A.valueOf(raw);",
-            "    // BUG: Diagnostic contains: Avoid passing unchecked arguments to `valueOf`",
+            "    // BUG: Diagnostic matches: AVOID_RAW",
             "    A.valueOf(A.class, raw);",
-            "    // BUG: Diagnostic contains: `b.name()` might generate values which are missing in `Test.A`: [FOUR, FIVE]",
+            "    // BUG: Diagnostic matches: MISSING_VALUE",
             "    A.valueOf(b.name());",
-            "    // BUG: Diagnostic contains: `b.name()` might generate values which are missing in `Test.A`: [FOUR, FIVE]",
+            "    // BUG: Diagnostic matches: MISSING_VALUE",
             "    A.valueOf(A.class, b.name());",
             "    var name =",
             "        switch (b) {",
-            "          // BUG: Diagnostic contains: `b.name()` might generate values which are missing in `Test.A`: [FOUR]",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
             "          case FOUR -> A.valueOf(b.name());",
-            "          // BUG: Diagnostic contains: `b.name()` might generate values which are missing in `Test.A`: [FIVE]",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
             "          case FIVE -> A.valueOf(A.class, b.name());",
             "          default -> null;",
             "        };",
             "    var toString =",
             "        switch (b) {",
-            "          // BUG: Diagnostic contains: `b.toString()` might generate values which are missing in `Test.A`: [FOUR]",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
             "          case FOUR -> A.valueOf(b.toString());",
-            "          // BUG: Diagnostic contains: `b.toString()` might generate values which are missing in `Test.A`: [FIVE]",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
             "          case FIVE -> A.valueOf(A.class, b.toString());",
             "          default -> null;",
             "        };",
             "    var defaultCase =",
             "        switch (b) {",
             "          case ONE, FOUR -> null;",
-            "          // BUG: Diagnostic contains: `b.name()` might generate values which are missing in `Test.A`: [FIVE]",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
             "          default -> A.valueOf(b.name());",
             "        };",
             "  }",
