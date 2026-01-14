@@ -55,28 +55,36 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
       return Description.NO_MATCH;
     }
 
+    Type enumType = ASTHelpers.getReceiverType(tree);
     ExpressionTree nameArgument = extractNameArgument(tree, state);
-    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(tree);
+    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(enumType);
 
     // Match constants
     String constantValue = ASTHelpers.constValue(nameArgument, String.class);
     if (constantValue != null && !valuesOfSource.contains(constantValue)) {
-      return describeMatch(tree);
+      return buildDescription(tree)
+          .setMessage(
+              "`%s` is not a valid value for `%s`, possible values: %s"
+                  .formatted(constantValue, enumType, valuesOfSource))
+          .build();
     }
 
     // Match name argument where it is an invocation of another enum's .name() or .toString()
     if (STRING_VALUE_ENUM.matches(nameArgument, state)) {
       // Check if it is a part of switch-case statement, and values are filtered by labels.
-      ImmutableSet<String> filteredEnumValues = findFilteredEnumValues(nameArgument, state);
-
       ImmutableSet<String> valuesOfTarget =
-          filteredEnumValues.isEmpty()
-              ? findEnumValuesOfReceiver(nameArgument)
-              : filteredEnumValues;
-
-      return Sets.difference(valuesOfTarget, valuesOfSource).isEmpty()
+          findEnumValuesOfReceiver(ASTHelpers.getReceiverType(nameArgument));
+      ImmutableSet<String> filteredEnumValues =
+          findFilteredEnumValues(nameArgument, valuesOfTarget, state);
+      ImmutableSet<String> missingValues =
+          Sets.difference(filteredEnumValues, valuesOfSource).immutableCopy();
+      return missingValues.isEmpty()
           ? Description.NO_MATCH
-          : describeMatch(tree);
+          : buildDescription(tree)
+              .setMessage(
+                  "`%s` might generate values which are missing in `%s`: %s"
+                      .formatted(state.getSourceForNode(nameArgument), enumType, missingValues))
+              .build();
     }
 
     // Match unchecked identifiers
@@ -91,8 +99,10 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
         .orElseThrow();
   }
 
-  private static ImmutableSet<String> findEnumValuesOfReceiver(ExpressionTree tree) {
-    return ImmutableSet.copyOf(ASTHelpers.enumValues(ASTHelpers.getReceiverType(tree).tsym));
+  private static ImmutableSet<String> findEnumValuesOfReceiver(Type type) {
+    return type.tsym.isEnum()
+        ? ImmutableSet.copyOf(ASTHelpers.enumValues(type.tsym))
+        : ImmutableSet.of();
   }
 
   /**
@@ -127,31 +137,29 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
    * }</pre>
    */
   private static ImmutableSet<String> findFilteredEnumValues(
-      ExpressionTree nameArgument, VisitorState state) {
+      ExpressionTree nameArgument, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
     TreePath treePath = TreePath.getPath(state.getPath(), nameArgument);
     SwitchExpressionTree switchExpressionTree =
         ASTHelpers.findEnclosingNode(treePath, SwitchExpressionTree.class);
     if (switchExpressionTree == null) {
-      return ImmutableSet.of();
+      return valuesOfReceiver;
     }
 
     Type paranthesisExpressionType = ASTHelpers.getType(switchExpressionTree.getExpression());
-    Type nameInvocationReceiverType = ASTHelpers.getType(ASTHelpers.getReceiver(nameArgument));
+    Type nameInvocationReceiverType = ASTHelpers.getReceiverType(nameArgument);
     if (!ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)) {
-      return ImmutableSet.of();
+      return valuesOfReceiver;
     }
 
     CaseTree enclosingCaseTree =
         requireNonNull(ASTHelpers.findEnclosingNode(treePath, CaseTree.class));
     if (ASTHelpers.isSwitchDefault(enclosingCaseTree)) {
-      ImmutableSet<String> possibleLabels = findEnumValuesOfReceiver(nameArgument);
-      ImmutableSet<String> coveredLabels =
+      ImmutableSet<String> coveredCases =
           switchExpressionTree.getCases().stream()
-              .filter(caseTree -> !enclosingCaseTree.equals(caseTree))
               .flatMap(caseTree -> caseTree.getLabels().stream())
               .map(Object::toString)
               .collect(toImmutableSet());
-      return Sets.difference(possibleLabels, coveredLabels).immutableCopy();
+      return Sets.difference(valuesOfReceiver, coveredCases).immutableCopy();
     }
     return enclosingCaseTree.getLabels().stream().map(Object::toString).collect(toImmutableSet());
   }
