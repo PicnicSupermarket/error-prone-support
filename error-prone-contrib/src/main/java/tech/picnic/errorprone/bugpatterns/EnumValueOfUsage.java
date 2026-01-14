@@ -100,9 +100,7 @@ public final class EnumValueOfUsage extends BugChecker implements MethodInvocati
   }
 
   private static ImmutableSet<String> findEnumValuesOfReceiver(Type type) {
-    return type.tsym.isEnum()
-        ? ImmutableSet.copyOf(ASTHelpers.enumValues(type.tsym))
-        : ImmutableSet.of();
+    return ImmutableSet.copyOf(ASTHelpers.enumValues(type.tsym));
   }
 
   /**
