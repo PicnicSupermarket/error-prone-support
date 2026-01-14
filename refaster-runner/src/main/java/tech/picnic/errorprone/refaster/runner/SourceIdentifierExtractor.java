@@ -25,6 +25,7 @@ import org.jspecify.annotations.Nullable;
  * <p>This class scans a Javac {@link Tree} and collects all identifiers that are relevant for
  * matching Refaster rules.
  */
+// XXX: Extend to also extract literals, as well as syntactic constructs such as `if` and `new`.
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {
   private final Set<String> variableNames = new HashSet<>();
 
@@ -59,12 +60,11 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
   @Override
   public @Nullable Void visitMethod(MethodTree node, Set<String> identifiers) {
     if (ASTHelpers.isGeneratedConstructor(node)) {
+      /* Generated constructors are never matched by Refaster rules. */
       return null;
     }
 
-    /*
-     * Track method parameters as variable names to exclude them.
-     */
+    /* Track method parameters as variable names to exclude them. */
     for (VariableTree param : node.getParameters()) {
       variableNames.add(param.getName().toString());
     }
@@ -91,8 +91,8 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
   @Override
   public @Nullable Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
     String name = node.getName().toString();
-    // Exclude variable names (both local variables and parameters)
     if (!variableNames.contains(name)) {
+      /* Register only fixed ("non-variable") identifiers. */
       identifiers.add(name);
     }
     return null;

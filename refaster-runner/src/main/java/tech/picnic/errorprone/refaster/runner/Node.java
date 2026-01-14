@@ -103,11 +103,13 @@ record Node<T>(ImmutableMap<String, Node<T>> children, ImmutableList<T> values) 
          * prefix of the other, only the former is encoded (thus saving some space).
          */
         paths.sort(comparingInt(Set::size));
+        // XXX: Use regular `for` loop?
         paths.forEach(path -> registerPath(value, ImmutableList.sortedCopyOf(path)));
       }
     }
 
     private void registerPath(T value, ImmutableList<String> path) {
+      // XXX: Should `values()` be a `Set`?
       if (values().contains(value)) {
         /* Another (shorter) path already leads to this value. */
         return;

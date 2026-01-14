@@ -71,6 +71,10 @@ final class RefasterRuleSelector {
    */
   @SuppressWarnings("NullAway" /* XXX: Inspect this. */)
   static RefasterRuleSelector create(ImmutableCollection<CodeTransformer> refasterRules) {
+    // XXX: Instead of performing the indexing every time rules are loaded, consider collecting the
+    // identifiers after rule compilation, and storing them on the `CodeTransformer`s using a custom
+    // annotation. Review whether this approach comes with caveats around supporting multiple JDK
+    // versions.
     Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> ruleIdentifiersByTransformer =
         indexRuleIdentifiers(refasterRules);
     return new RefasterRuleSelector(

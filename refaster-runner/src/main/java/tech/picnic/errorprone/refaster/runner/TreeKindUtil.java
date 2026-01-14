@@ -9,7 +9,7 @@ final class TreeKindUtil {
   /**
    * Returns a unique string representation of the given {@link Tree.Kind}.
    *
-   * @return A string representation of the operator, if known
+   * @return A string representation of the operator, if known.
    * @throws IllegalStateException If the given input is not supported.
    */
   // XXX: Extend list to cover remaining cases; at least for any `Kind` that may appear in a

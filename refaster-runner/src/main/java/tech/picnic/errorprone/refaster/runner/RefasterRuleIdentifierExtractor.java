@@ -30,15 +30,16 @@ import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-/** Extracts identifiers from RefasterRule templates. */
+/** Extracts identifiers from {@link RefasterRule} templates. */
+// XXX: This class should either be renamed, or not be a static utility class.
 final class RefasterRuleIdentifierExtractor {
   private RefasterRuleIdentifierExtractor() {}
 
   /**
-   * Extracts identifiers from a RefasterRule's before templates.
+   * Extracts identifiers from a {@link RefasterRule}'s before templates.
    *
-   * @param refasterRule The RefasterRule to extract identifiers from
-   * @return A set of identifier sets, one for each possible identifier combination in the rule
+   * @param refasterRule The {@link RefasterRule} from which to extract identifiers.
+   * @return A set of identifier sets, one for each possible branch in the templates.F
    */
   static ImmutableSet<ImmutableSet<String>> extractIdentifiers(RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();
@@ -63,20 +64,12 @@ final class RefasterRuleIdentifierExtractor {
     return results.build();
   }
 
-  /**
-   * Extracts identifiers from a list of trees.
-   *
-   * <p>This method is package-private to allow direct testing with simple Tree instances.
-   *
-   * @param trees The trees to extract identifiers from
-   * @return A set of identifier sets
-   */
   // XXX: Consider interning the strings (once a benchmark is in place).
-  static ImmutableSet<ImmutableSet<String>> extractIdentifiers(
+  private static ImmutableSet<ImmutableSet<String>> extractIdentifiers(
       ImmutableList<? extends Tree> trees) {
     List<Set<String>> identifierCombinations = new ArrayList<>();
     identifierCombinations.add(new HashSet<>());
-    TemplateIdentifierExtractor.INSTANCE.scan(trees, identifierCombinations);
+    new TemplateIdentifierExtractor().scan(trees, identifierCombinations);
     return identifierCombinations.stream().map(ImmutableSet::copyOf).collect(toImmutableSet());
   }
 
@@ -161,10 +154,9 @@ final class RefasterRuleIdentifierExtractor {
     }
   }
 
+  // XXX: Extend to also extract literals, as well as syntactic constructs such as `if` and `new`.
   private static final class TemplateIdentifierExtractor
       extends TreeScanner<@Nullable Void, List<Set<String>>> {
-    private static final TemplateIdentifierExtractor INSTANCE = new TemplateIdentifierExtractor();
-
     @Override
     public @Nullable Void visitIdentifier(
         IdentifierTree node, List<Set<String>> identifierCombinations) {
@@ -200,6 +192,8 @@ final class RefasterRuleIdentifierExtractor {
         MemberReferenceTree node, List<Set<String>> identifierCombinations) {
       super.visitMemberReference(node, identifierCombinations);
       String id = node.getName().toString();
+      // XXX: Here and below, use a regular loop for performance?
+      // XXX: Maybe introduce a `registerIdentifier` helper method to avoid code duplication?
       identifierCombinations.forEach(ids -> ids.add(id));
       return null;
     }
@@ -251,6 +245,7 @@ final class RefasterRuleIdentifierExtractor {
         List<Set<String>> base = copy(identifierCombinations);
         identifierCombinations.clear();
 
+        // XXX: Here we're creating one more copy than strictly necessary. Improve.
         for (UExpression expr : RefasterIntrospection.getExpressions(uAnyOf)) {
           List<Set<String>> branch = copy(base);
           scan(expr, branch);

@@ -44,7 +44,6 @@ final class RefasterRuleIdentifierExtractorTestRules {
   static final class BinaryOperatorRule {
     @BeforeTemplate
     boolean before(int a, int b) {
-      // Use a very specific pattern that won't match real code
       return a + b > 0 && a * b < 1000;
     }
 

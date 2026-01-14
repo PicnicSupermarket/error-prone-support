@@ -74,6 +74,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private static final long serialVersionUID = 1L;
 
+  // XXX: Review suppression.
   @SuppressWarnings("java:S1948" /* Concrete instance will be `Serializable`. */)
   @VisibleForTesting
   final RefasterStrategy strategy;

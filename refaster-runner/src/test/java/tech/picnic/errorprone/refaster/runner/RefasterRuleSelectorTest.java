@@ -107,8 +107,7 @@ final class RefasterRuleSelectorTest {
   }
 
   private static ImmutableSet<RefasterRule<?, ?>> getAllRefasterRules(String ruleName) {
-    ImmutableSet.Builder<RefasterRule<?, ?>> builder = ImmutableSet.builder();
-    CODE_TRANSFORMERS.get(ruleName).stream()
+    return CODE_TRANSFORMERS.get(ruleName).stream()
         .flatMap(
             transformer -> {
               if (transformer instanceof AnnotatedCompositeCodeTransformer annotated) {
@@ -117,9 +116,8 @@ final class RefasterRuleSelectorTest {
               return Stream.of(transformer);
             })
         .filter(RefasterRule.class::isInstance)
-        .map(RefasterRule.class::cast)
-        .forEach(builder::add);
-    return builder.build();
+        .<RefasterRule<?, ?>>map(RefasterRule.class::cast)
+        .collect(toImmutableSet());
   }
 
   private static RefasterRule<?, ?> getRefasterRule(String ruleName) {
