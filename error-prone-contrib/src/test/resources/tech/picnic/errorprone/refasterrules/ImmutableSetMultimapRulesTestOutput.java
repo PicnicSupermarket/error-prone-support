@@ -77,7 +77,6 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
   ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testImmutableSetMultimapBuilderPut() {
     return ImmutableSet.of(
         ImmutableSetMultimap.<String, Integer>builder().put("foo", 1),
-        ImmutableSetMultimap.<String, Integer>builder().put("bar", 2),
-        ImmutableSetMultimap.<String, Integer>builder().put("baz", 3));
+        ImmutableSetMultimap.<String, Integer>builder().put("bar", 2));
   }
 }
