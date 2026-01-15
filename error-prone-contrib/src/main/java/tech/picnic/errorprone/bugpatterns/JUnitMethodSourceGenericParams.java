@@ -115,9 +115,8 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
 
     return buildDescription(tree)
         .setMessage(
-            String.format(
-                "One or more generic parameters used in the following @MethodSource provider(s) don't match accepted types: %s",
-                getMethodNames(offendingMethodSourceProviders)))
+            "One or more generic parameters used in the following @MethodSource provider(s) don't match accepted types: %s"
+                .formatted(getMethodNames(offendingMethodSourceProviders)))
         .build();
   }
 
