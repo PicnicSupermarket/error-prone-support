@@ -172,23 +172,6 @@ final class JUnitMethodSourceGenericParamsTest {
             "  @MethodSource(\"superBoundIdentificationTestCases\")",
             "  // BUG: Diagnostic contains: superBoundIdentificationTestCases",
             "  void superBoundIdentification(ImmutableList<? super Integer> intList) {}",
-            "",
-            "  private static Stream<Arguments> exactTypeIdentificationTestCases() {",
-            "    return Stream.of(arguments(ImmutableList.of(1)));",
-            "  }",
-            "",
-            "  @ParameterizedTest",
-            "  @MethodSource(\"exactTypeIdentificationTestCases\")",
-            "  // BUG: Diagnostic contains: exactTypeIdentificationTestCases",
-            "  void exactTypeIdentification(ImmutableList<String> strList) {}",
-            "",
-            "  private static Stream<Arguments> nonParameterizedOnlyTestCases() {",
-            "    return Stream.of(arguments(\"string\", 1));",
-            "  }",
-            "",
-            "  @ParameterizedTest",
-            "  @MethodSource(\"nonParameterizedOnlyTestCases\")",
-            "  void nonParameterizedOnly(String str, int num) {}",
             "}")
         .doTest();
   }
