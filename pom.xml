@@ -83,8 +83,6 @@
             Error Prone, and thus similarly make extensive use of unsupported
             `javac`-internal APIs, in some cases even reflectively inspecting
             them. -->
-            -XX:ReservedCodeCacheSize=512m
-            -XX:SoftRefLRUPolicyMSPerMB=10
             -XX:+UseParallelGC
             --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
             --add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
@@ -118,7 +116,7 @@
         </argLine>
         <!-- The maximum amount of heap memory available to forked Surefire
         processes. Factored out into a separate property to allow overriding. -->
-        <argLine.xmx>1024m</argLine.xmx>
+        <argLine.xmx>512m</argLine.xmx>
         <!-- Our build system provides a monotonically increasing build number.
         When building locally, this number is obviously absent. So we provide a
         default value. -->
@@ -360,14 +358,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.16.1</version>
+                <version>1.16.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.11</version>
+                <version>2024.0.13</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -412,11 +410,6 @@
                 <version>0.1.29</version>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-            </dependency>
-            <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
                 <version>1.18.3</version>
@@ -440,11 +433,6 @@
                 <version>3.27.6</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.checkerframework</groupId>
-                <artifactId>checker-qual</artifactId>
-                <version>3.53.0</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -1678,7 +1666,7 @@
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.9.0</version>
+                    <version>0.10.0</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
