@@ -34,20 +34,21 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Avoid passing unchecked arguments to `valueOf`",
-    link = BUG_PATTERNS_BASE_URL + "EnumValueOfUsage",
+    summary = "Avoid passing unchecked arguments to `Enum#valueOf`",
+    link = BUG_PATTERNS_BASE_URL + "UncheckedEnumValueOfInvocation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
-public final class EnumValueOfUsage extends BugChecker implements MethodInvocationTreeMatcher {
+public final class UncheckedEnumValueOfInvocation extends BugChecker
+    implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> ENUM_VALUE_OF =
       staticMethod().onDescendantOf(Enum.class.getCanonicalName()).named("valueOf");
   private static final Matcher<ExpressionTree> STRING_VALUE_ENUM =
       instanceMethod().onDescendantOf(Enum.class.getCanonicalName()).namedAnyOf("name", "toString");
 
-  /** Instantiates a new {@link EnumValueOfUsage} instance. */
-  public EnumValueOfUsage() {}
+  /** Instantiates a new {@link UncheckedEnumValueOfInvocation} instance. */
+  public UncheckedEnumValueOfInvocation() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
