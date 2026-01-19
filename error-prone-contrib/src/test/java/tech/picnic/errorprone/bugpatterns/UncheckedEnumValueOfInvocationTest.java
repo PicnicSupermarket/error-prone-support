@@ -3,10 +3,10 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class EnumValueOfUsageTest {
+final class UncheckedEnumValueOfInvocationTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(EnumValueOfUsage.class, getClass())
+    CompilationTestHelper.newInstance(UncheckedEnumValueOfInvocation.class, getClass())
         .expectErrorMessage(
             "INVALID_VALUE",
             m ->
@@ -14,7 +14,7 @@ final class EnumValueOfUsageTest {
         .expectErrorMessage(
             "MISSING_VALUE", m -> m.contains("might generate values which are missing in `Test.A`"))
         .expectErrorMessage(
-            "AVOID_RAW", m -> m.contains("Avoid passing unchecked arguments to `valueOf`"))
+            "AVOID_RAW", m -> m.contains("Avoid passing unchecked arguments to `Enum#valueOf`"))
         .addSourceLines(
             "Test.java",
             "class Test {",
@@ -56,21 +56,29 @@ final class EnumValueOfUsageTest {
             "  }",
             "",
             "  // Following cases are marked as no match",
-            "  void safeCases(B b) {",
+            "  void safeCases(B b, C c) {",
+            "    // Given constant is a valid label for A",
             "    A.valueOf(\"ONE\");",
+            "    // Given constant is a valid label for A",
             "    A.valueOf(A.class, \"TWO\");",
-            "    var a =",
+            "    var a1 =",
             "        switch (b) {",
+            "          // Invocation is protected by case labels",
             "          case ONE, THREE -> A.valueOf(A.class, b.name());",
+            "          // Invocation is protected by case label",
             "          case TWO -> A.valueOf(b.name());",
-            "          case FOUR -> A.valueOf(A.ONE.name());",
+            "          // switch and .name() are on different enums, and A > C",
+            "          case FOUR -> A.valueOf(c.name());",
             "          default -> null;",
             "        };",
             "    var defaultCase =",
             "        switch (b) {",
             "          case FOUR, FIVE -> null;",
+            "          // Invalid labels are filtered by another case leaving valid cases only",
             "          default -> A.valueOf(b.name());",
             "        };",
+            "    // A captures all labels of C",
+            "    A.valueOf(c.name());",
             "  }",
             "",
             "  // Following cases are ignored for the sake of brevity",
@@ -97,6 +105,12 @@ final class EnumValueOfUsageTest {
             "    FOUR,",
             "    FIVE",
             "  }",
+            "",
+            "  enum C {",
+            "    ONE,",
+            "    TWO",
+            "  }",
+            "",
             "}")
         .doTest();
   }
