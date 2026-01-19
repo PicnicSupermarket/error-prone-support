@@ -74,7 +74,8 @@ final class UncheckedEnumValueOfInvocationTest {
             "    var defaultCase =",
             "        switch (b) {",
             "          case FOUR, FIVE -> null;",
-            "          // Invalid labels are filtered by another case leaving valid cases only",
+            "          // Invalid labels are filtered by another case",
+            "          // leaving valid cases only",
             "          default -> A.valueOf(b.name());",
             "        };",
             "    // A captures all labels of C",
@@ -110,7 +111,6 @@ final class UncheckedEnumValueOfInvocationTest {
             "    ONE,",
             "    TWO",
             "  }",
-            "",
             "}")
         .doTest();
   }
