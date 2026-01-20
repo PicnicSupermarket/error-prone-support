@@ -20,21 +20,62 @@ on:
     branches: [ master ]
 permissions:
   contents: read
+  pull-requests: write
+  issues: write
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
-  run-integration-tests:
-    name: Integration test
+  initialize:
+    name: Initialize and Notify
     if: |
       !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Parse arguments and link build
+        id: set-matrix
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Define the full list of tests available
+            const allTests = ['checkstyle', 'metrics', 'prometheus-java-client'];
+            let testsToRun = allTests;
+
+            // Handle Pull Request Comments
+            if (context.eventName === 'issue_comment') {
+              const body = context.payload.comment.body;
+            
+              // Regex to find /integration-test followed optionally by a test name
+              const match = body.match(/\/integration-test\s+([a-zA-Z0-9_-]+)/);
+              if (match && match[1]) {
+                 if (allTests.includes(match[1])) {
+                   testsToRun = [match[1]];
+                 }
+              }
+
+              // Post the link to the build
+              const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+              const testListStr = testsToRun.map(t => `\`${t}\``).join(', ');
+            
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `Build started: [${process.env.GITHUB_WORKFLOW} #${process.env.GITHUB_RUN_NUMBER}](${runUrl})\nRunning: ${testListStr}`
+              });
+            }
+
+            // Return the matrix JSON
+            core.setOutput('matrix', JSON.stringify({ 'integration-test': testsToRun }));
+
+  run-integration-tests:
+    name: Integration test
+    needs: initialize
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix:
-        integration-test:
-          - checkstyle
-          - metrics
-          - prometheus-java-client
+      matrix: ${{ fromJson(needs.initialize.outputs.matrix) }}
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
