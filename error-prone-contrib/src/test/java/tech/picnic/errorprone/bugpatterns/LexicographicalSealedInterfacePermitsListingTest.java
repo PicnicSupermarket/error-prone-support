@@ -21,11 +21,16 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "// BUG: Diagnostic contains:",
             "public sealed interface A permits C, D, B {",
             "",
-            "  non-sealed interface B extends A {}",
+            "  non-sealed interface B extends A, E, F {}",
             "",
-            "  non-sealed interface C extends A {}",
+            "  non-sealed interface C extends A, E, F {}",
             "",
-            "  non-sealed interface D extends A {}",
+            "  non-sealed interface D extends A, E, F {}",
+            "",
+            "  sealed interface E permits B, C, D {}",
+            "",
+            "  // BUG: Diagnostic contains:",
+            "  sealed interface F permits C, B, D {}",
             "}")
         .doTest();
   }
@@ -44,11 +49,15 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "",
             "public sealed interface A permits C, D, B {",
             "",
-            "  non-sealed interface B extends A {}",
+            "  non-sealed interface B extends A, E, F {}",
             "",
-            "  non-sealed interface C extends A {}",
+            "  non-sealed interface C extends A, E, F {}",
             "",
-            "  non-sealed interface D extends A {}",
+            "  non-sealed interface D extends A, E, F {}",
+            "",
+            "  sealed interface E permits B, C, D {}",
+            "",
+            "  sealed interface F permits C, B, D {}",
             "}")
         .addOutputLines(
             "pkg/A.java",
@@ -60,11 +69,15 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "",
             "public sealed interface A permits B, C, D {",
             "",
-            "  non-sealed interface B extends A {}",
+            "  non-sealed interface B extends A, E, F {}",
             "",
-            "  non-sealed interface C extends A {}",
+            "  non-sealed interface C extends A, E, F {}",
             "",
-            "  non-sealed interface D extends A {}",
+            "  non-sealed interface D extends A, E, F {}",
+            "",
+            "  sealed interface E permits B, C, D {}",
+            "",
+            "  sealed interface F permits B, C, D {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
