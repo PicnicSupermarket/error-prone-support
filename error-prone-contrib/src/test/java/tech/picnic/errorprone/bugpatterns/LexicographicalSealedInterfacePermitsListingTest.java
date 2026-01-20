@@ -31,6 +31,8 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "",
             "  // BUG: Diagnostic contains:",
             "  sealed interface F permits C, B, D {}",
+            "",
+            "  class G {}",
             "}")
         .doTest();
   }
