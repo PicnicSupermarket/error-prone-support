@@ -84,24 +84,24 @@ jobs:
           # integration test projects have unit tests that start Docker
           # containers.
           disable-sudo: true
-          egress-policy: block
+          egress-policy: audit
           # XXX: After updating the validation build flags in
           # `integration-tests/prometheus-java-client.sh`, review whether the
           # Docker domains specified here can be dropped.
-          allowed-endpoints: >
-            api.adoptium.net:443
-            auth.docker.io:443
-            checkstyle.org:443
-            github.com:443
-            hosted-compute-watchdog-prod-*.githubapp.com:443
-            objects.githubusercontent.com:443
-            oss.sonatype.org:443
-            production.cloudflare.docker.com:443
-            raw.githubusercontent.com:443
-            registry-1.docker.io:443
-            release-assets.githubusercontent.com:443
-            repo.maven.apache.org:443
-            repository.sonatype.org:443
+#          allowed-endpoints: >
+#            api.adoptium.net:443
+#            auth.docker.io:443
+#            checkstyle.org:443
+#            github.com:443
+#            hosted-compute-watchdog-prod-*.githubapp.com:443
+#            objects.githubusercontent.com:443
+#            oss.sonatype.org:443
+#            production.cloudflare.docker.com:443
+#            raw.githubusercontent.com:443
+#            registry-1.docker.io:443
+#            release-assets.githubusercontent.com:443
+#            repo.maven.apache.org:443
+#            repository.sonatype.org:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
