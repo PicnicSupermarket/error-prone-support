@@ -22,7 +22,6 @@ import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.Tree;
 import java.util.List;
-import javax.lang.model.element.Modifier;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -48,16 +47,14 @@ public final class LexicographicalSealedInterfacePermitsListing extends BugCheck
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (!IS_INTERFACE.matches(tree, state)
-        || !tree.getModifiers().getFlags().contains(Modifier.SEALED)) {
-      return Description.NO_MATCH;
-    }
-    List<? extends Tree> originalOrderPermitClauses = tree.getPermitsClause();
-    if (originalOrderPermitClauses.size() < 2) {
+    if (!IS_INTERFACE.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
+    List<? extends Tree> originalOrderPermitClauses = tree.getPermitsClause();
+
     ImmutableList<? extends Tree> sortedPermitClauses = sort(originalOrderPermitClauses, state);
+
     if (originalOrderPermitClauses.equals(sortedPermitClauses)) {
       return Description.NO_MATCH;
     }
