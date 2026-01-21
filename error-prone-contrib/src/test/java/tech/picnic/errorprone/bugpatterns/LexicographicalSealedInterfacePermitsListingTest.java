@@ -7,6 +7,26 @@ import org.junit.jupiter.api.Test;
 
 final class LexicographicalSealedInterfacePermitsListingTest {
   @Test
+  void identificationIgnoresClasses() {
+    CompilationTestHelper.newInstance(
+            LexicographicalSealedInterfacePermitsListing.class, getClass())
+        .addSourceLines(
+            "pkg/A.java",
+            "package pkg;",
+            "",
+            "import pkg.A.B;",
+            "import pkg.A.C;",
+            "",
+            "public sealed class A permits C, B {",
+            "",
+            "  static final class B extends A {}",
+            "",
+            "  static final class C extends A {}",
+            "}")
+        .doTest();
+  }
+
+  @Test
   void identification() {
     CompilationTestHelper.newInstance(
             LexicographicalSealedInterfacePermitsListing.class, getClass())
