@@ -19,6 +19,7 @@ import static java.util.stream.Collectors.summarizingLong;
 import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
+import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
@@ -44,6 +45,7 @@ import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -863,6 +865,19 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(int n, T element) {
       return Collections.nCopies(n, element).stream();
+    }
+  }
+
+  /** Prefer {@link Set#of(Object[])} over more contrived alternatives. */
+  static final class StreamOfToUnmodifiableSet<T> {
+    @BeforeTemplate
+    Set<T> before(@Repeated T elements) {
+      return Stream.of(Refaster.asVarargs(elements)).collect(toUnmodifiableSet());
+    }
+
+    @AfterTemplate
+    Set<T> after(@Repeated T elements) {
+      return Set.of(Refaster.asVarargs(elements));
     }
   }
 }
