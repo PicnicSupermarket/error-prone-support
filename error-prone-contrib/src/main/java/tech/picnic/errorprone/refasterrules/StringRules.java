@@ -22,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -212,6 +213,22 @@ final class StringRules {
     @AfterTemplate
     String after(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
       return String.join(delimiter, elements);
+    }
+  }
+
+  /**
+   * Prefer {@link String#join(CharSequence, CharSequence...)} over
+   * {@code Stream.of(...).collect(joining(...))}.
+   */
+  static final class JoinStringsWithVarargs {
+    @BeforeTemplate
+    String before(CharSequence delimiter, @Repeated CharSequence elements) {
+      return Stream.of(Refaster.asVarargs(elements)).collect(joining(delimiter));
+    }
+
+    @AfterTemplate
+    String after(CharSequence delimiter, @Repeated CharSequence elements) {
+      return String.join(delimiter, Refaster.asVarargs(elements));
     }
   }
 
