@@ -220,7 +220,7 @@ final class StringRules {
    * Prefer {@link String#join(CharSequence, CharSequence...)} over {@code
    * Stream.of(...).collect(joining(...))}.
    */
-  static final class JoinStringsWithVarargs {
+  static final class StringJoinDelimiterVarargs {
     @BeforeTemplate
     String before(CharSequence delimiter, @Repeated CharSequence elements) {
       return Stream.of(Refaster.asVarargs(elements)).collect(joining(delimiter));

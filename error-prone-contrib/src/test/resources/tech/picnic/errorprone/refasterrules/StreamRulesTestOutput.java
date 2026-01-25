@@ -350,7 +350,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.generate(() -> UUID.randomUUID().toString()).limit(2));
   }
 
-  Set<Integer> testStreamOfToUnmodifiableSet() {
+  Set<Integer> testSetOfVarargs() {
     return Set.of(1, 2);
   }
 }
