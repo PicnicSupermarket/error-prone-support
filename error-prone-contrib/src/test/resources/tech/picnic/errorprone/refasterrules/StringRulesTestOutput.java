@@ -83,7 +83,7 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         String.join("f", ImmutableList.of("foo", "bar")));
   }
 
-  String testJoinStringsWithVarargs() {
+  String testStringJoinDelimiterVarargs() {
     return String.join(",", "foo", "bar");
   }
 

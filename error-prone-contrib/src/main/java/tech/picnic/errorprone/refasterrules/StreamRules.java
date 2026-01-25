@@ -869,7 +869,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Set#of(Object[])} over more contrived alternatives. */
-  static final class StreamOfToUnmodifiableSet<T> {
+  static final class SetOfVarargs<T> {
     @BeforeTemplate
     Set<T> before(@Repeated T elements) {
       return Stream.of(Refaster.asVarargs(elements)).collect(toUnmodifiableSet());
