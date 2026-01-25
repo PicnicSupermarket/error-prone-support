@@ -217,8 +217,8 @@ final class StringRules {
   }
 
   /**
-   * Prefer {@link String#join(CharSequence, CharSequence...)} over
-   * {@code Stream.of(...).collect(joining(...))}.
+   * Prefer {@link String#join(CharSequence, CharSequence...)} over {@code
+   * Stream.of(...).collect(joining(...))}.
    */
   static final class JoinStringsWithVarargs {
     @BeforeTemplate
