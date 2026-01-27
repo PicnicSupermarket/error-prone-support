@@ -82,7 +82,7 @@ final class RandomGeneratorRules {
   static final class RandomGeneratorNextIntWithOrigin {
     @BeforeTemplate
     int before(RandomGenerator random, int a, int b) {
-      return Refaster.anyOf(a + random.nextInt(b));
+      return a + random.nextInt(b);
     }
 
     @AfterTemplate
