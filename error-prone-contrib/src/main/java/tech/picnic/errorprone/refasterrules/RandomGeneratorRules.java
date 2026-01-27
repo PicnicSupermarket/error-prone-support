@@ -75,4 +75,19 @@ final class RandomGeneratorRules {
       return random.nextLong(bound);
     }
   }
+
+  /**
+   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over more contrived alternatives.
+   */
+  static final class RandomGeneratorNextIntWithOrigin {
+    @BeforeTemplate
+    int before(RandomGenerator random, int a, int b) {
+      return Refaster.anyOf(a + random.nextInt(b));
+    }
+
+    @AfterTemplate
+    int after(RandomGenerator random, int a, int b) {
+      return random.nextInt(a, a + b);
+    }
+  }
 }
