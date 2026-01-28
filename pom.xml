@@ -341,7 +341,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.12.15</version>
+                <version>0.13.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
