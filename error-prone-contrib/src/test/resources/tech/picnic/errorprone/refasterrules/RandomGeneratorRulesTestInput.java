@@ -28,7 +28,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         Math.round(ThreadLocalRandom.current().nextDouble(4L)));
   }
 
-  ImmutableSet<Integer> testRandomGeneratorNextIntWithOrigin() {
-    return ImmutableSet.of(20 + new Random().nextInt(80));
+  int testRandomGeneratorNextIntWithOrigin() {
+    return 20 + new Random().nextInt(80);
   }
 }
