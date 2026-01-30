@@ -269,7 +269,8 @@ final class RefasterTest {
   @Test
   void useOptimizedRefasterStrategyByDefault() {
     Refaster refaster = new Refaster(ErrorProneFlags.empty());
-    assertThat(refaster.strategy.getClass().getSimpleName()).isEqualTo("OptimizedRefasterStrategy");
+    assertThat(refaster.codeTransformer.getClass().getSimpleName())
+        .isEqualTo("OptimizedCodeTransformer");
   }
 
   @Test
@@ -277,6 +278,7 @@ final class RefasterTest {
     Refaster refaster =
         new Refaster(
             ErrorProneFlags.builder().putFlag("Refaster:DisableOptimizedRefaster", "true").build());
-    assertThat(refaster.strategy.getClass().getSimpleName()).isEqualTo("DefaultRefasterStrategy");
+    assertThat(refaster.codeTransformer.getClass().getSimpleName())
+        .isEqualTo("CompositeCodeTransformer");
   }
 }

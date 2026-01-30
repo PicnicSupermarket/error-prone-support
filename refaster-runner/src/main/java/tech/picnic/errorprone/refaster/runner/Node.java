@@ -33,6 +33,7 @@ record Node<T>(ImmutableMap<String, Node<T>> children, ImmutableList<T> values) 
   // `SortedSet`, as that would likely speed up `ImmutableSortedSet#copyOf`.
   // XXX: If this ^ proves worthwhile, then the test code and benchmark should be updated
   // accordingly.
+  // XXX: Alternatively, test with `ImmutableList.sortedCopyOf`.
   void collectReachableValues(Set<String> candidateEdges, Consumer<T> sink) {
     collectReachableValues(ImmutableSortedSet.copyOf(candidateEdges).asList(), sink);
   }
@@ -40,6 +41,7 @@ record Node<T>(ImmutableMap<String, Node<T>> children, ImmutableList<T> values) 
   private void collectReachableValues(ImmutableList<String> candidateEdges, Consumer<T> sink) {
     values().forEach(sink);
 
+    // XXX: Check benchmark: can we drop this check?
     if (candidateEdges.isEmpty() || children().isEmpty()) {
       return;
     }
