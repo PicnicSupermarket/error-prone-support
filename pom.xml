@@ -437,7 +437,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.10</version>
+                <version>3.20.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
