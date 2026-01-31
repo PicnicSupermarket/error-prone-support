@@ -1,0 +1,165 @@
+package tech.picnic.errorprone.bugpatterns;
+
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
+import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
+import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static java.util.Objects.requireNonNull;
+import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
+
+import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.errorprone.BugPattern;
+import com.google.errorprone.VisitorState;
+import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
+import com.google.errorprone.matchers.Description;
+import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.CaseTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.MethodInvocationTree;
+import com.sun.source.tree.SwitchExpressionTree;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.code.Type;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
+
+/**
+ * A {@link BugChecker} that flags {@link Enum#valueOf} invocations that contain unchecked
+ * arguments.
+ */
+@AutoService(BugChecker.class)
+@BugPattern(
+    summary = "Avoid passing unchecked arguments to `Enum#valueOf`",
+    link = BUG_PATTERNS_BASE_URL + "UncheckedEnumValueOfInvocation",
+    linkType = CUSTOM,
+    severity = WARNING,
+    tags = FRAGILE_CODE)
+public final class UncheckedEnumValueOfInvocation extends BugChecker
+    implements MethodInvocationTreeMatcher {
+  private static final long serialVersionUID = 1L;
+  private static final Matcher<ExpressionTree> ENUM_VALUE_OF =
+      staticMethod().onDescendantOf(Enum.class.getCanonicalName()).named("valueOf");
+  private static final Matcher<ExpressionTree> STRING_VALUE_ENUM =
+      instanceMethod().onDescendantOf(Enum.class.getCanonicalName()).namedAnyOf("name", "toString");
+
+  /** Instantiates a new {@link UncheckedEnumValueOfInvocation} instance. */
+  public UncheckedEnumValueOfInvocation() {}
+
+  @Override
+  public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+    if (!ENUM_VALUE_OF.matches(tree, state)) {
+      return Description.NO_MATCH;
+    }
+
+    Type enumType = ASTHelpers.getReceiverType(tree);
+    ExpressionTree nameArgument = extractNameArgument(tree, state);
+    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(enumType);
+
+    // Match constants
+    String constantValue = ASTHelpers.constValue(nameArgument, String.class);
+    if (constantValue != null && !valuesOfSource.contains(constantValue)) {
+      return buildDescription(tree)
+          .setMessage(
+              "`%s` is not a valid value for `%s`, possible values: %s"
+                  .formatted(constantValue, enumType, valuesOfSource))
+          .build();
+    }
+
+    // Match name argument where it is an invocation of another enum's .name() or .toString()
+    if (STRING_VALUE_ENUM.matches(nameArgument, state)) {
+      // Check if it is a part of switch-case statement, and values are filtered by labels.
+      ImmutableSet<String> valuesOfTarget =
+          findEnumValuesOfReceiver(ASTHelpers.getReceiverType(nameArgument));
+      ImmutableSet<String> filteredEnumValues =
+          findFilteredEnumValues(nameArgument, valuesOfTarget, state);
+      ImmutableSet<String> missingValues =
+          Sets.difference(filteredEnumValues, valuesOfSource).immutableCopy();
+      return missingValues.isEmpty()
+          ? Description.NO_MATCH
+          : buildDescription(tree)
+              .setMessage(
+                  "`%s` might generate values which are missing in `%s`: %s"
+                      .formatted(state.getSourceForNode(nameArgument), enumType, missingValues))
+              .build();
+    }
+
+    // Match unchecked identifiers
+    return nameArgument instanceof IdentifierTree ? describeMatch(tree) : Description.NO_MATCH;
+  }
+
+  /** Extracts {@code name} argument from {@link Enum#valueOf} invocations. */
+  private static ExpressionTree extractNameArgument(MethodInvocationTree tree, VisitorState state) {
+    return tree.getArguments().stream()
+        .filter(argument -> MoreASTHelpers.isStringTyped(argument, state))
+        .findAny()
+        .orElseThrow();
+  }
+
+  private static ImmutableSet<String> findEnumValuesOfReceiver(Type type) {
+    return ImmutableSet.copyOf(ASTHelpers.enumValues(type.tsym));
+  }
+
+  /**
+   * Finds and returns all filtered enum values of {@code b.name()} (or {@code b.toString()}) where
+   * {@code b} is an enum type, and is enclosed by a switch statement where {@code b} is inside
+   * switch parenthesis, e.g. {@code switch (b)}. Otherwise, returns empty set. {@code b.name()} is
+   * provided as {@code nameArgument}.
+   *
+   * <p>Returns {@code ["B1", "B2"]} for:
+   *
+   * <pre>{@code
+   * enum B {
+   *     B1, B2, B3
+   * }
+   *
+   * switch(b) {
+   *     case B1, B2 -> A.valueOf(b.name());
+   * }
+   * }</pre>
+   *
+   * <p>Returns {@code ["B3"]} for:
+   *
+   * <pre>{@code
+   * enum B {
+   *     B1, B2, B3
+   * }
+   *
+   * switch(b) {
+   *     case B1, B2 -> null;
+   *     default -> A.valueOf(b.name());
+   * }
+   * }</pre>
+   */
+  private static ImmutableSet<String> findFilteredEnumValues(
+      ExpressionTree nameArgument, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
+    TreePath treePath = TreePath.getPath(state.getPath(), nameArgument);
+    SwitchExpressionTree switchExpressionTree =
+        ASTHelpers.findEnclosingNode(treePath, SwitchExpressionTree.class);
+    if (switchExpressionTree == null) {
+      return valuesOfReceiver;
+    }
+
+    Type paranthesisExpressionType = ASTHelpers.getType(switchExpressionTree.getExpression());
+    Type nameInvocationReceiverType = ASTHelpers.getReceiverType(nameArgument);
+    if (!ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)) {
+      return valuesOfReceiver;
+    }
+
+    CaseTree enclosingCaseTree =
+        requireNonNull(ASTHelpers.findEnclosingNode(treePath, CaseTree.class));
+    if (ASTHelpers.isSwitchDefault(enclosingCaseTree)) {
+      ImmutableSet<String> coveredCases =
+          switchExpressionTree.getCases().stream()
+              .flatMap(caseTree -> caseTree.getLabels().stream())
+              .map(Object::toString)
+              .collect(toImmutableSet());
+      return Sets.difference(valuesOfReceiver, coveredCases).immutableCopy();
+    }
+    return enclosingCaseTree.getLabels().stream().map(Object::toString).collect(toImmutableSet());
+  }
+}
