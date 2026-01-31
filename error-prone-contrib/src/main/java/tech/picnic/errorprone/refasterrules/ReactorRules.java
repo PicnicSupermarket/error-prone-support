@@ -661,14 +661,10 @@ final class ReactorRules {
           mono.switchIfEmpty(Mono.empty()), mono.flux().next(), mono.flux().singleOrEmpty());
     }
 
-    // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
     @BeforeTemplate
-    @SuppressWarnings({
-      "java:S2637" /* False positive: result is never `null`. */,
-      "java:S4968" /* Result may be `Mono<Void>`. */,
-      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
-    })
-    Mono<? extends @Nullable Void> before2(Mono<@Nullable Void> mono) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before2(Mono<Void> mono) {
       return Refaster.anyOf(mono.ignoreElement(), mono.then());
     }
 
@@ -1275,25 +1271,23 @@ final class ReactorRules {
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
   static final class FluxThen<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Flux<T> flux) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before(Flux<T> flux) {
       return flux.ignoreElements().then();
     }
 
-    // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
     @BeforeTemplate
-    @SuppressWarnings({
-      "java:S2637" /* False positive: result is never `null`. */,
-      "java:S4968" /* Result may be `Mono<Void>`. */,
-      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
-    })
-    Mono<? extends @Nullable Void> before2(Flux<@Nullable Void> flux) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before2(Flux<Void> flux) {
       return flux.ignoreElements();
     }
 
     @AfterTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Flux<T> flux) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> after(Flux<T> flux) {
       return flux.then();
     }
   }
@@ -1301,14 +1295,16 @@ final class ReactorRules {
   /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
   static final class MonoThenEmpty<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before(Mono<T> mono, Publisher<Void> publisher) {
       return mono.ignoreElement().thenEmpty(publisher);
     }
 
     @AfterTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> after(Mono<T> mono, Publisher<Void> publisher) {
       return mono.thenEmpty(publisher);
     }
   }
@@ -1316,14 +1312,16 @@ final class ReactorRules {
   /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
   static final class FluxThenEmpty<T> {
     @BeforeTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before(Flux<T> flux, Publisher<Void> publisher) {
       return flux.ignoreElements().thenEmpty(publisher);
     }
 
     @AfterTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> after(Flux<T> flux, Publisher<Void> publisher) {
       return flux.thenEmpty(publisher);
     }
   }
@@ -1379,8 +1377,9 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before2(Mono<T> mono1, Mono<Void> mono2) {
       return mono1.thenEmpty(mono2);
     }
 
@@ -1398,8 +1397,9 @@ final class ReactorRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
+    @SuppressWarnings(
+        "VoidMissingNullable" /* Reactor API doesn't support `@Nullable` element types. */)
+    Mono<Void> before2(Flux<T> flux, Mono<Void> mono) {
       return flux.thenEmpty(mono);
     }
 

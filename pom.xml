@@ -355,7 +355,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.13</version>
+                <version>2025.0.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -473,6 +473,11 @@
                 <version>3.23.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
