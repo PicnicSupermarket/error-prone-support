@@ -26,4 +26,8 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         new SecureRandom().nextLong(3L),
         ThreadLocalRandom.current().nextLong(4L));
   }
+
+  int testRandomGeneratorNextIntWithOrigin() {
+    return new Random().nextInt(20, 20 + 80);
+  }
 }
