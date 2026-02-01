@@ -9,10 +9,9 @@ final class UncheckedEnumValueOfInvocationTest {
     CompilationTestHelper.newInstance(UncheckedEnumValueOfInvocation.class, getClass())
         .expectErrorMessage(
             "INVALID_VALUE",
-            m ->
-                m.contains("is not a valid value for `Test.A`, possible values: [ONE, TWO, THREE]"))
+            m -> m.contains("is not a valid value for `Foo.A`, possible values: [ONE, TWO, THREE]"))
         .expectErrorMessage(
-            "MISSING_VALUE", m -> m.contains("might generate values which are missing in `Test.A`"))
+            "MISSING_VALUE", m -> m.contains("might generate values which are missing in `Foo.A`"))
         .addSourceLines(
             "Foo.java",
             "import java.util.List;",
