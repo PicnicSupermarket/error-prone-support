@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
-import static com.google.errorprone.matchers.Matchers.IS_INTERFACE;
 import static java.util.Comparator.comparing;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -28,7 +27,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  * sorted.
  *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
- * resolution, and can even avoid it if two branches add the same annotation.
+ * resolution.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -46,9 +45,9 @@ public final class LexicographicalSealedInterfacePermitsListing extends BugCheck
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (!IS_INTERFACE.matches(tree, state)) {
-      return Description.NO_MATCH;
-    }
+    //    if (!IS_INTERFACE.matches(tree, state)) {
+    //      return Description.NO_MATCH;
+    //    }
 
     List<? extends Tree> originalOrderPermitClauses = tree.getPermitsClause();
     ImmutableList<? extends Tree> sortedPermitClauses = sort(originalOrderPermitClauses, state);
