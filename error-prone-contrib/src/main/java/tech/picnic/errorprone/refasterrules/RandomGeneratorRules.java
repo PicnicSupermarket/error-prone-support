@@ -90,4 +90,36 @@ final class RandomGeneratorRules {
       return random.nextInt(a, a + b);
     }
   }
+
+  /**
+   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over more contrived
+   * alternatives.
+   */
+  static final class RandomGeneratorNextDoubleWithOrigin {
+    @BeforeTemplate
+    double before(RandomGenerator random, double a, double b) {
+      return a + random.nextDouble(b);
+    }
+
+    @AfterTemplate
+    double after(RandomGenerator random, double a, double b) {
+      return random.nextDouble(a, a + b);
+    }
+  }
+
+  /**
+   * Prefer {@link RandomGenerator#nextLong(long origin, long bound)} over more contrived
+   * alternatives.
+   */
+  static final class RandomGeneratorNextLongWithOrigin {
+    @BeforeTemplate
+    long before(RandomGenerator random, long a, long b) {
+      return a + random.nextLong(b);
+    }
+
+    @AfterTemplate
+    long after(RandomGenerator random, long a, long b) {
+      return random.nextLong(a, a + b);
+    }
+  }
 }
