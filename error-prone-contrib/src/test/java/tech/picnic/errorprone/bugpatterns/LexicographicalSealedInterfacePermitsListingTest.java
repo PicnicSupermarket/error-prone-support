@@ -7,31 +7,11 @@ import org.junit.jupiter.api.Test;
 
 final class LexicographicalSealedInterfacePermitsListingTest {
   @Test
-  void identificationIgnoresClasses() {
-    CompilationTestHelper.newInstance(
-            LexicographicalSealedInterfacePermitsListing.class, getClass())
-        .addSourceLines(
-            "pkg/A.java",
-            "package pkg;",
-            "",
-            "import pkg.A.B;",
-            "import pkg.A.C;",
-            "",
-            "public sealed class A permits C, B {",
-            "",
-            "  static final class B extends A {}",
-            "",
-            "  static final class C extends A {}",
-            "}")
-        .doTest();
-  }
-
-  @Test
   void identification() {
     CompilationTestHelper.newInstance(
             LexicographicalSealedInterfacePermitsListing.class, getClass())
         .addSourceLines(
-            "pkg/A.java",
+            "A.java",
             "package pkg;",
             "",
             "import pkg.A.B;",
@@ -54,6 +34,23 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "",
             "  class G {}",
             "}")
+        .addSourceLines(
+            "Foo.java",
+            "package pkg;",
+            "",
+            "import pkg.Foo.Bar;",
+            "import pkg.Foo.Baz;",
+            "import pkg.Foo.Qux;",
+            "",
+            "// BUG: Diagnostic contains:",
+            "public sealed class Foo permits Qux, Bar, Baz {",
+            "",
+            "  static final class Bar extends Foo {}",
+            "",
+            "  static final class Baz extends Foo {}",
+            "",
+            "  static final class Qux extends Foo {}",
+            "}")
         .doTest();
   }
 
@@ -62,7 +59,7 @@ final class LexicographicalSealedInterfacePermitsListingTest {
     BugCheckerRefactoringTestHelper.newInstance(
             LexicographicalSealedInterfacePermitsListing.class, getClass())
         .addInputLines(
-            "pkg/A.java",
+            "A.java",
             "package pkg;",
             "",
             "import pkg.A.B;",
@@ -82,7 +79,7 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "  sealed interface F permits C, B, D {}",
             "}")
         .addOutputLines(
-            "pkg/A.java",
+            "A.java",
             "package pkg;",
             "",
             "import pkg.A.B;",
@@ -100,6 +97,38 @@ final class LexicographicalSealedInterfacePermitsListingTest {
             "  sealed interface E permits B, C, D {}",
             "",
             "  sealed interface F permits B, C, D {}",
+            "}")
+        .addInputLines(
+            "B.java",
+            "package pkg;",
+            "",
+            "import pkg.B.Foo;",
+            "import pkg.B.Bar;",
+            "import pkg.B.Baz;",
+            "",
+            "public sealed class B permits Baz, Foo, Bar {",
+            "",
+            "  static final class Foo extends B {}",
+            "",
+            "  static final class Bar extends B {}",
+            "",
+            "  static final class Baz extends B {}",
+            "}")
+        .addOutputLines(
+            "B.java",
+            "package pkg;",
+            "",
+            "import pkg.B.Foo;",
+            "import pkg.B.Bar;",
+            "import pkg.B.Baz;",
+            "",
+            "public sealed class B permits Bar, Baz, Foo {",
+            "",
+            "  static final class Foo extends B {}",
+            "",
+            "  static final class Bar extends B {}",
+            "",
+            "  static final class Baz extends B {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }
