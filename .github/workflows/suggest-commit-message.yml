@@ -29,6 +29,9 @@ env:
     registry.npmjs.org:443
 jobs:
   suggest:
+    # Skip this job for external contributors, as they don't have access to
+    # the requisite secrets (e.g., OPENAI_API_KEY).
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
       pull-requests: write
