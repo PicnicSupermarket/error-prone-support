@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
@@ -19,12 +20,12 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.CaseLabelTree;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.SwitchExpressionTree;
-import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
@@ -58,27 +59,26 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
 
     Type enumType = ASTHelpers.getReceiverType(tree);
     ExpressionTree nameArgument = extractNameArgument(tree, state);
-    ImmutableSet<String> valuesOfSource = findEnumValuesOfReceiver(enumType);
+    ImmutableSet<String> valuesSourceEnum = findEnumValuesOfReceiver(enumType);
 
-    // Match constants
-    String constantValue = ASTHelpers.constValue(nameArgument, String.class);
-    if (constantValue != null && !valuesOfSource.contains(constantValue)) {
+    String value = ASTHelpers.constValue(nameArgument, String.class);
+    if (value != null && !valuesSourceEnum.contains(value)) {
       return buildDescription(tree)
           .setMessage(
               "`%s` is not a valid value for `%s`, possible values: %s"
-                  .formatted(constantValue, enumType, valuesOfSource))
+                  .formatted(value, enumType, valuesSourceEnum))
           .build();
     }
 
-    // Match name argument where it is an invocation of another enum's .name() or .toString()
+    // Match name argument where it is an invocation of another enum's `.name()` or `.toString()`.
     if (STRING_VALUE_ENUM.matches(nameArgument, state)) {
       // Check if it is a part of switch-case statement, and values are filtered by labels.
-      ImmutableSet<String> valuesOfTarget =
+      ImmutableSet<String> valuesTargetEnum =
           findEnumValuesOfReceiver(ASTHelpers.getReceiverType(nameArgument));
-      ImmutableSet<String> filteredEnumValues =
-          findFilteredEnumValues(nameArgument, valuesOfTarget, state);
+      ImmutableSet<String> switchCoveredValues =
+          findSwitchCoveredValues(nameArgument, valuesTargetEnum, state);
       ImmutableSet<String> missingValues =
-          Sets.difference(filteredEnumValues, valuesOfSource).immutableCopy();
+          Sets.difference(switchCoveredValues, valuesSourceEnum).immutableCopy();
       return missingValues.isEmpty()
           ? Description.NO_MATCH
           : buildDescription(tree)
@@ -88,7 +88,7 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
               .build();
     }
 
-    // Match unchecked identifiers
+    /* Matches unchecked identifiers. */
     return nameArgument instanceof IdentifierTree ? describeMatch(tree) : Description.NO_MATCH;
   }
 
@@ -97,7 +97,7 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
     return tree.getArguments().stream()
         .filter(argument -> MoreASTHelpers.isStringTyped(argument, state))
         .findAny()
-        .orElseThrow();
+        .orElseThrow(() -> new VerifyException("Failed to extract argument"));
   }
 
   private static ImmutableSet<String> findEnumValuesOfReceiver(Type type) {
@@ -105,12 +105,14 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
   }
 
   /**
-   * Finds and returns all filtered enum values of {@code b.name()} (or {@code b.toString()}) where
-   * {@code b} is an enum type, and is enclosed by a switch statement where {@code b} is inside
-   * switch parenthesis, e.g. {@code switch (b)}. Otherwise, returns empty set. {@code b.name()} is
-   * provided as {@code nameArgument}.
+   * Finds the enum values covered by the switch cases containing {@code enumValueArgument}.
    *
-   * <p>Returns {@code ["B1", "B2"]} for:
+   * <p>For a non-default case, returns the labels of that case. For a default case, returns the
+   * enum values not covered by other cases. Returns all values if {@code enumValueArgument} is not
+   * part of a switch statement, or if the switch expression type doesn't match the type of {@code
+   * enumValueArgument}.
+   *
+   * <p>Example 1 - non-default case returns {@code ["B1", "B2"]}:
    *
    * <pre>{@code
    * enum B {
@@ -122,7 +124,7 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
    * }
    * }</pre>
    *
-   * <p>Returns {@code ["B3"]} for:
+   * <p>Example 2 - default case returns {@code ["B3"]}:
    *
    * <pre>{@code
    * enum B {
@@ -135,31 +137,35 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
    * }
    * }</pre>
    */
-  private static ImmutableSet<String> findFilteredEnumValues(
-      ExpressionTree nameArgument, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
-    TreePath treePath = TreePath.getPath(state.getPath(), nameArgument);
-    SwitchExpressionTree switchExpressionTree =
-        ASTHelpers.findEnclosingNode(treePath, SwitchExpressionTree.class);
-    if (switchExpressionTree == null) {
+  private static ImmutableSet<String> findSwitchCoveredValues(
+      ExpressionTree enumValueArgument, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
+    SwitchExpressionTree switchTree =
+        ASTHelpers.findEnclosingNode(state.getPath(), SwitchExpressionTree.class);
+    if (switchTree == null) {
       return valuesOfReceiver;
     }
 
-    Type paranthesisExpressionType = ASTHelpers.getType(switchExpressionTree.getExpression());
-    Type nameInvocationReceiverType = ASTHelpers.getReceiverType(nameArgument);
-    if (!ASTHelpers.isSameType(paranthesisExpressionType, nameInvocationReceiverType, state)) {
+    Type switchExpressionType = ASTHelpers.getType(switchTree.getExpression());
+    Type nameInvocationReceiverType = ASTHelpers.getReceiverType(enumValueArgument);
+    if (!ASTHelpers.isSameType(switchExpressionType, nameInvocationReceiverType, state)) {
       return valuesOfReceiver;
     }
 
     CaseTree enclosingCaseTree =
-        requireNonNull(ASTHelpers.findEnclosingNode(treePath, CaseTree.class));
+        requireNonNull(
+            ASTHelpers.findEnclosingNode(state.getPath(), CaseTree.class), "No `case` found");
     if (ASTHelpers.isSwitchDefault(enclosingCaseTree)) {
       ImmutableSet<String> coveredCases =
-          switchExpressionTree.getCases().stream()
+          switchTree.getCases().stream()
               .flatMap(caseTree -> caseTree.getLabels().stream())
-              .map(Object::toString)
+              .map(CaseLabelTree::toString)
               .collect(toImmutableSet());
+
       return Sets.difference(valuesOfReceiver, coveredCases).immutableCopy();
     }
-    return enclosingCaseTree.getLabels().stream().map(Object::toString).collect(toImmutableSet());
+
+    return enclosingCaseTree.getLabels().stream()
+        .map(CaseLabelTree::toString)
+        .collect(toImmutableSet());
   }
 }
