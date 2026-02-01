@@ -31,4 +31,12 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
   int testRandomGeneratorNextIntWithOrigin() {
     return 20 + new Random().nextInt(80);
   }
+
+  double testRandomGeneratorNextDoubleWithOrigin() {
+    return 2.0 + new Random().nextDouble(8.0);
+  }
+
+  long testRandomGeneratorNextLongWithOrigin() {
+    return 2l + new Random().nextLong(8l);
+  }
 }
