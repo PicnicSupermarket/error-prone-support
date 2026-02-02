@@ -63,7 +63,7 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
     if (optionalNameArgument.isEmpty()) {
       return buildDescription(tree)
           .setMessage(
-              "No `String` typed `name` argument was found on %s"
+              "No `String` typed `name` argument was found on `%s`"
                   .formatted(state.getSourceForNode(tree)))
           .build();
     }

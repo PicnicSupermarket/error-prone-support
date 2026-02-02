@@ -22,6 +22,8 @@ final class UncheckedEnumValueOfInvocationTest {
             "  void unsafeCases(String raw, B b) {",
             "    // BUG: Diagnostic matches: MISSING_ARGUMENT",
             "    A.valueOf(null);",
+            "    // BUG: Diagnostic matches: MISSING_ARGUMENT",
+            "    A.valueOf(A.class, null);",
             "    // BUG: Diagnostic matches: INVALID_VALUE",
             "    A.valueOf(\"FOUR\");",
             "    // BUG: Diagnostic matches: INVALID_VALUE",
