@@ -10,7 +10,6 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
@@ -27,6 +26,7 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.tools.javac.code.Type;
+import java.util.Optional;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
@@ -58,10 +58,19 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
     }
 
     Type enumType = ASTHelpers.getReceiverType(tree);
-    ExpressionTree nameArgument = extractNameArgument(tree, state);
-    ImmutableSet<String> valuesSourceEnum = findEnumValuesOfReceiver(enumType);
+    Optional<ExpressionTree> optionalNameArgument = extractNameArgument(tree, state);
 
+    if (optionalNameArgument.isEmpty()) {
+      return buildDescription(tree)
+          .setMessage(
+              "No `String` typed `name` argument was found on %s"
+                  .formatted(state.getSourceForNode(tree)))
+          .build();
+    }
+
+    ExpressionTree nameArgument = optionalNameArgument.orElseThrow();
     String value = ASTHelpers.constValue(nameArgument, String.class);
+    ImmutableSet<String> valuesSourceEnum = findEnumValuesOfReceiver(enumType);
     if (value != null && !valuesSourceEnum.contains(value)) {
       return buildDescription(tree)
           .setMessage(
@@ -93,11 +102,12 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
   }
 
   /** Extracts {@code name} argument from {@link Enum#valueOf} invocations. */
-  private static ExpressionTree extractNameArgument(MethodInvocationTree tree, VisitorState state) {
+  private static Optional<ExpressionTree> extractNameArgument(
+      MethodInvocationTree tree, VisitorState state) {
     return tree.getArguments().stream()
         .filter(argument -> MoreASTHelpers.isStringTyped(argument, state))
-        .findAny()
-        .orElseThrow(() -> new VerifyException("Failed to extract argument"));
+        .map(ExpressionTree.class::cast)
+        .findAny();
   }
 
   private static ImmutableSet<String> findEnumValuesOfReceiver(Type type) {
