@@ -16,7 +16,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   double testRandomGeneratorNextDoubleWithOrigin() {
-    return 2.0 + new Random().nextDouble(8.0);
+    return 1.0 + new Random().nextDouble(2.0);
   }
 
   ImmutableSet<Integer> testRandomGeneratorNextInt() {
@@ -25,7 +25,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   int testRandomGeneratorNextIntWithOrigin() {
-    return 20 + new Random().nextInt(80);
+    return 1 + new Random().nextInt(2);
   }
 
   ImmutableSet<Long> testRandomGeneratorNextLong() {
@@ -37,6 +37,6 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   long testRandomGeneratorNextLongWithOrigin() {
-    return 2l + new Random().nextLong(8l);
+    return 1L + new Random().nextLong(2L);
   }
 }
