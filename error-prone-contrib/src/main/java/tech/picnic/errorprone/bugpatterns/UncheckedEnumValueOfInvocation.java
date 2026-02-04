@@ -26,7 +26,6 @@ import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.tools.javac.code.Type;
-import java.util.Optional;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
@@ -58,19 +57,19 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
     }
 
     Type enumType = ASTHelpers.getReceiverType(tree);
-    Optional<ExpressionTree> optionalNameArgument = extractNameArgument(tree, state);
+    ExpressionTree nameArgument = tree.getArguments().getLast();
 
-    if (optionalNameArgument.isEmpty()) {
+    if (!MoreASTHelpers.isStringTyped(nameArgument, state)) {
       return buildDescription(tree)
           .setMessage(
-              "No `String` typed `name` argument was found on `%s`"
-                  .formatted(state.getSourceForNode(tree)))
+              "`%s` is not a valid type for `%s`, expected: `%s`"
+                  .formatted(ASTHelpers.getType(nameArgument), enumType, String.class))
           .build();
     }
 
-    ExpressionTree nameArgument = optionalNameArgument.orElseThrow();
     String value = ASTHelpers.constValue(nameArgument, String.class);
     ImmutableSet<String> valuesSourceEnum = findEnumValuesOfReceiver(enumType);
+
     if (value != null && !valuesSourceEnum.contains(value)) {
       return buildDescription(tree)
           .setMessage(
@@ -99,15 +98,6 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
 
     /* Matches unchecked identifiers. */
     return nameArgument instanceof IdentifierTree ? describeMatch(tree) : Description.NO_MATCH;
-  }
-
-  /** Extracts {@code name} argument from {@link Enum#valueOf} invocations. */
-  private static Optional<ExpressionTree> extractNameArgument(
-      MethodInvocationTree tree, VisitorState state) {
-    return tree.getArguments().stream()
-        .filter(argument -> MoreASTHelpers.isStringTyped(argument, state))
-        .map(ExpressionTree.class::cast)
-        .findAny();
   }
 
   private static ImmutableSet<String> findEnumValuesOfReceiver(Type type) {
