@@ -17,9 +17,7 @@ on:
   issue_comment:
     types: [ created ]
   push:
-    branches:
-      - master
-      - mohamedsamehsalah/integration-test-workflow-comment
+    branches: [ master ]
 permissions:
   contents: read
 env:
@@ -27,7 +25,7 @@ env:
 jobs:
   acknowledge-request:
     name: Acknowledge Request
-    # Only run this job if it is a PR comment containing the command
+    # Only run this job if it is a PR comment containing the command.
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     runs-on: ubuntu-24.04
     permissions:
@@ -116,7 +114,7 @@ jobs:
   update-status:
     name: Update Comment Status
     needs: [acknowledge-request, run-integration-tests]
-    # always() ensures this runs even if previous jobs failed or were cancelled
+    # `always()` ensures this runs even if previous jobs failed or were cancelled.
     if: always() && github.event.issue.pull_request && needs.acknowledge-request.outputs.comment_id
     runs-on: ubuntu-24.04
     permissions:
