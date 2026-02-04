@@ -31,6 +31,22 @@ final class RandomGeneratorRules {
     }
   }
 
+  /**
+   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over more contrived
+   * alternatives.
+   */
+  static final class RandomGeneratorNextDoubleWithOrigin {
+    @BeforeTemplate
+    double before(RandomGenerator random, double a, double b) {
+      return a + random.nextDouble(b);
+    }
+
+    @AfterTemplate
+    double after(RandomGenerator random, double a, double b) {
+      return random.nextDouble(a, a + b);
+    }
+  }
+
   /** Prefer {@link RandomGenerator#nextInt(int)} over more contrived alternatives. */
   static final class RandomGeneratorNextInt {
     @BeforeTemplate
@@ -43,6 +59,21 @@ final class RandomGeneratorRules {
     @AfterTemplate
     int after(RandomGenerator random, int bound) {
       return random.nextInt(bound);
+    }
+  }
+
+  /**
+   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over more contrived alternatives.
+   */
+  static final class RandomGeneratorNextIntWithOrigin {
+    @BeforeTemplate
+    int before(RandomGenerator random, int a, int b) {
+      return a + random.nextInt(b);
+    }
+
+    @AfterTemplate
+    int after(RandomGenerator random, int a, int b) {
+      return random.nextInt(a, a + b);
     }
   }
 
@@ -73,37 +104,6 @@ final class RandomGeneratorRules {
     @AfterTemplate
     long after(RandomGenerator random, long bound) {
       return random.nextLong(bound);
-    }
-  }
-
-  /**
-   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over more contrived alternatives.
-   */
-  static final class RandomGeneratorNextIntWithOrigin {
-    @BeforeTemplate
-    int before(RandomGenerator random, int a, int b) {
-      return a + random.nextInt(b);
-    }
-
-    @AfterTemplate
-    int after(RandomGenerator random, int a, int b) {
-      return random.nextInt(a, a + b);
-    }
-  }
-
-  /**
-   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over more contrived
-   * alternatives.
-   */
-  static final class RandomGeneratorNextDoubleWithOrigin {
-    @BeforeTemplate
-    double before(RandomGenerator random, double a, double b) {
-      return a + random.nextDouble(b);
-    }
-
-    @AfterTemplate
-    double after(RandomGenerator random, double a, double b) {
-      return random.nextDouble(a, a + b);
     }
   }
 
