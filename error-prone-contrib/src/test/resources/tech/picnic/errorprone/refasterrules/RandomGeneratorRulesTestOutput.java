@@ -15,8 +15,16 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         new SecureRandom().nextDouble(3.0));
   }
 
+  double testRandomGeneratorNextDoubleWithOrigin() {
+    return new Random().nextDouble(2.0, 2.0 + 8.0);
+  }
+
   ImmutableSet<Integer> testRandomGeneratorNextInt() {
     return ImmutableSet.of(new Random().nextInt(1), new SplittableRandom().nextInt(2));
+  }
+
+  int testRandomGeneratorNextIntWithOrigin() {
+    return new Random().nextInt(20, 20 + 80);
   }
 
   ImmutableSet<Long> testRandomGeneratorNextLong() {
@@ -25,14 +33,6 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         new SplittableRandom().nextLong(2L),
         new SecureRandom().nextLong(3L),
         ThreadLocalRandom.current().nextLong(4L));
-  }
-
-  int testRandomGeneratorNextIntWithOrigin() {
-    return new Random().nextInt(20, 20 + 80);
-  }
-
-  double testRandomGeneratorNextDoubleWithOrigin() {
-    return new Random().nextDouble(2.0, 2.0 + 8.0);
   }
 
   long testRandomGeneratorNextLongWithOrigin() {
