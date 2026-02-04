@@ -8,7 +8,10 @@ final class UncheckedEnumValueOfInvocationTest {
   void identification() {
     CompilationTestHelper.newInstance(UncheckedEnumValueOfInvocation.class, getClass())
         .expectErrorMessage(
-            "MISSING_ARGUMENT", m -> m.contains("No `String` typed `name` argument was found on"))
+            "INVALID_TYPE",
+            m ->
+                m.contains(
+                    "`<nulltype>` is not a valid type for `Foo.A`, expected: `class java.lang.String`"))
         .expectErrorMessage(
             "INVALID_VALUE",
             m -> m.contains("is not a valid value for `Foo.A`, possible values: [ONE, TWO, THREE]"))
@@ -20,9 +23,9 @@ final class UncheckedEnumValueOfInvocationTest {
             "",
             "class Foo {",
             "  void unsafeCases(String raw, B b) {",
-            "    // BUG: Diagnostic matches: MISSING_ARGUMENT",
+            "    // BUG: Diagnostic matches: INVALID_TYPE",
             "    A.valueOf(null);",
-            "    // BUG: Diagnostic matches: MISSING_ARGUMENT",
+            "    // BUG: Diagnostic matches: INVALID_TYPE",
             "    A.valueOf(A.class, null);",
             "    // BUG: Diagnostic matches: INVALID_VALUE",
             "    A.valueOf(\"FOUR\");",
