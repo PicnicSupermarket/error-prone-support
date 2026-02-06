@@ -1948,6 +1948,10 @@
                                     -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
+                                    -XepOpt:RefactorSwitch:EnableAssignmentSwitch=true
+                                    -XepOpt:RefactorSwitch:EnableReturnSwitch=true
+                                    -XepOpt:RefactorSwitch:EnableSimplifySwitch=true
+                                    -XepOpt:UnnamedVariable:OnlyRenameVariablesNamedUnused=false
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}
