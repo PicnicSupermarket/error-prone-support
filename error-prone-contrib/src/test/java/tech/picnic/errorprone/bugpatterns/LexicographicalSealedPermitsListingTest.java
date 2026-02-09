@@ -5,11 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class LexicographicalSealedInterfacePermitsListingTest {
+final class LexicographicalSealedPermitsListingTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(
-            LexicographicalSealedInterfacePermitsListing.class, getClass())
+    CompilationTestHelper.newInstance(LexicographicalSealedPermitsListing.class, getClass())
         .addSourceLines(
             "A.java",
             "package pkg;",
@@ -57,7 +56,7 @@ final class LexicographicalSealedInterfacePermitsListingTest {
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(
-            LexicographicalSealedInterfacePermitsListing.class, getClass())
+            LexicographicalSealedPermitsListing.class, getClass())
         .addInputLines(
             "A.java",
             "package pkg;",
