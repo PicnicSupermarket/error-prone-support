@@ -23,32 +23,29 @@ import java.util.List;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags permitted non-sealed interfaces that are not lexicographically
- * sorted.
+ * A {@link BugChecker} that flags permitted non-sealed interfaces and classes that are not
+ * lexicographically sorted.
  *
  * <p>The idea behind this checker is that maintaining a sorted sequence simplifies conflict
  * resolution.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Sort listed permitted non-sealed interfaces lexicographically where possible",
-    link = BUG_PATTERNS_BASE_URL + "LexicographicalSealedInterfacePermitsListing",
+    summary =
+        "Sort listed permitted non-sealed interfaces and classes lexicographically where possible",
+    link = BUG_PATTERNS_BASE_URL + "LexicographicalSealedPermitsListing",
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
-public final class LexicographicalSealedInterfacePermitsListing extends BugChecker
+public final class LexicographicalSealedPermitsListing extends BugChecker
     implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  /** Instantiates a new {@link LexicographicalSealedInterfacePermitsListing} instance. */
-  public LexicographicalSealedInterfacePermitsListing() {}
+  /** Instantiates a new {@link LexicographicalSealedPermitsListing} instance. */
+  public LexicographicalSealedPermitsListing() {}
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    //    if (!IS_INTERFACE.matches(tree, state)) {
-    //      return Description.NO_MATCH;
-    //    }
-
     List<? extends Tree> originalOrderPermitClauses = tree.getPermitsClause();
     ImmutableList<? extends Tree> sortedPermitClauses = sort(originalOrderPermitClauses, state);
 
