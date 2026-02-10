@@ -859,6 +859,9 @@
                                     <module name="NoCodeInFile" />
                                     <module name="NoEnumTrailingComma" />
                                     <module name="NoFinalizer" />
+                                    <!-- XXX: Enable this check or create an
+                                    analogous Error Prone check.
+                                    <module name="NumericalPrefixesInfixesSuffixesCharacterCase" /> -->
                                     <module name="PackageDeclaration" />
                                     <module name="PackageName">
                                         <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
@@ -905,7 +908,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.1.0</version>
+                            <version>13.2.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
