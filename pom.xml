@@ -341,21 +341,21 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.12.15</version>
+                <version>0.13.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.16.2</version>
+                <version>1.16.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.13</version>
+                <version>2024.0.14</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -372,7 +372,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.41</version>
+                <version>2.2.42</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -420,7 +420,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.27.6</version>
+                <version>3.27.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -437,7 +437,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.10</version>
+                <version>3.20.11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -463,14 +463,14 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.6.2</version>
+                <version>5.6.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.22.0</version>
+                <version>3.23.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -491,7 +491,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
@@ -503,12 +503,12 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.11.0</version>
+                <version>7.12.0</version>
             </dependency>
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.0.3</version>
+                <version>3.0.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -859,6 +859,9 @@
                                     <module name="NoCodeInFile" />
                                     <module name="NoEnumTrailingComma" />
                                     <module name="NoFinalizer" />
+                                    <!-- XXX: Enable this check or create an
+                                    analogous Error Prone check.
+                                    <module name="NumericalPrefixesInfixesSuffixesCharacterCase" /> -->
                                     <module name="PackageDeclaration" />
                                     <module name="PackageName">
                                         <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
@@ -905,7 +908,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.0.0</version>
+                            <version>13.2.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -943,6 +946,7 @@
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
@@ -1252,6 +1256,7 @@
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</additionalJOption>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</additionalJOption>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</additionalJOption>
                             <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</additionalJOption>
@@ -1576,7 +1581,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.22.0</version>
+                    <version>1.22.1</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->
