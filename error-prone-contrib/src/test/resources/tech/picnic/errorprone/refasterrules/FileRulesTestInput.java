@@ -31,6 +31,14 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return Path.of("foo").toFile().toPath();
   }
 
+  Path testPathResolveSiblingPath() {
+    return Path.of("foo").getParent().resolve(Path.of("bar"));
+  }
+
+  Path testPathResolveSiblingString() {
+    return Path.of("foo").getParent().resolve("bar");
+  }
+
   String testFilesReadStringWithCharset() throws IOException {
     return new String(Files.readAllBytes(Paths.get("foo")), StandardCharsets.ISO_8859_1);
   }
