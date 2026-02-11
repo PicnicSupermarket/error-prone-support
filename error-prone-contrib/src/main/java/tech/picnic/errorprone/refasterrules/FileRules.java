@@ -76,7 +76,8 @@ final class FileRules {
    */
   static final class PathResolveSiblingPath {
     @BeforeTemplate
-    @SuppressWarnings("NullAway" /* Matched expressions are in practice embedded in a larger context. */)
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
     Path before(Path path, Path other) {
       return path.getParent().resolve(other);
     }
@@ -93,7 +94,8 @@ final class FileRules {
    */
   static final class PathResolveSiblingString {
     @BeforeTemplate
-    @SuppressWarnings("NullAway" /* Matched expressions are in practice embedded in a larger context. */)
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
     Path before(Path path, String other) {
       return path.getParent().resolve(other);
     }
