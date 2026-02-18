@@ -216,8 +216,13 @@
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
+            <artifactId>bson</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-core</artifactId>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openrewrite</groupId>
