@@ -225,7 +225,7 @@ jobs:
           sandbox: danger-full-access
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           prompt-file: /tmp/codex-prompt-suggest-commit-message.md
-          model: gpt-5.1-codex-mini
+          model: gpt-5.1-codex
           output-schema: |
             {
               "type": "object",
