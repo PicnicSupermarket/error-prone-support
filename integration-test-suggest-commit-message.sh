@@ -12,11 +12,9 @@ else
   prs="$(yq -r '.tests[].pr' "${spec_file}")"
 fi
 
-# Use lock files to (a) synchronize part of `suggest-commit-message.sh`'s
-# execution and (b) synchronize test result output.
-execution_lock="$(mktemp)"
+# Use a lock file to synchronize test result output.
 result_lock="$(mktemp)"
-trap 'rm -f -- "${execution_lock}" "${result_lock}"' INT TERM HUP EXIT
+trap 'rm -f -- "${result_lock}"' INT TERM HUP EXIT
 
 test_pr() {
   local pr="${1}"
@@ -27,7 +25,7 @@ test_pr() {
 
   # Run the suggested commit message workflow and capture its output.
   local output
-  output="$(./suggest-commit-message.sh "${branch}" "${pr}" true "${execution_lock}")"
+  output="$(./suggest-commit-message.sh "${branch}" "${pr}" true)"
 
   # Extract the newly suggested commit message.
   local actual
