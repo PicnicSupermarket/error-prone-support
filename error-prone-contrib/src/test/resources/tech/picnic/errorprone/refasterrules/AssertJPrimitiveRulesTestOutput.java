@@ -21,8 +21,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isEqualTo(2),
         assertThat(1L).isEqualTo(2L),
         assertThat(1L).isEqualTo(2L),
-        assertThat(1F).isEqualTo(2F),
-        assertThat(1F).isEqualTo(2F),
+        assertThat(1f).isEqualTo(2f),
+        assertThat(1f).isEqualTo(2f),
         assertThat(1.0).isEqualTo(2.0),
         assertThat(1.0).isEqualTo(2.0));
   }
@@ -41,8 +41,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isNotEqualTo(2),
         assertThat(1L).isNotEqualTo(2L),
         assertThat(1L).isNotEqualTo(2L),
-        assertThat(1F).isNotEqualTo(2F),
-        assertThat(1F).isNotEqualTo(2F),
+        assertThat(1f).isNotEqualTo(2f),
+        assertThat(1f).isNotEqualTo(2f),
         assertThat(1.0).isNotEqualTo(2.0),
         assertThat(1.0).isNotEqualTo(2.0));
   }
@@ -59,8 +59,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isLessThan(2),
         assertThat(1L).isLessThan(2L),
         assertThat(1L).isLessThan(2L),
-        assertThat(1F).isLessThan(2F),
-        assertThat(1F).isLessThan(2F),
+        assertThat(1f).isLessThan(2f),
+        assertThat(1f).isLessThan(2f),
         assertThat(1.0).isLessThan(2.0),
         assertThat(1.0).isLessThan(2.0));
   }
@@ -77,8 +77,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isLessThanOrEqualTo(2),
         assertThat(1L).isLessThanOrEqualTo(2L),
         assertThat(1L).isLessThanOrEqualTo(2L),
-        assertThat(1F).isLessThanOrEqualTo(2F),
-        assertThat(1F).isLessThanOrEqualTo(2F),
+        assertThat(1f).isLessThanOrEqualTo(2f),
+        assertThat(1f).isLessThanOrEqualTo(2f),
         assertThat(1.0).isLessThanOrEqualTo(2.0),
         assertThat(1.0).isLessThanOrEqualTo(2.0));
   }
@@ -95,8 +95,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isGreaterThan(2),
         assertThat(1L).isGreaterThan(2L),
         assertThat(1L).isGreaterThan(2L),
-        assertThat(1F).isGreaterThan(2F),
-        assertThat(1F).isGreaterThan(2F),
+        assertThat(1f).isGreaterThan(2f),
+        assertThat(1f).isGreaterThan(2f),
         assertThat(1.0).isGreaterThan(2.0),
         assertThat(1.0).isGreaterThan(2.0));
   }
@@ -113,8 +113,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isGreaterThanOrEqualTo(2),
         assertThat(1L).isGreaterThanOrEqualTo(2L),
         assertThat(1L).isGreaterThanOrEqualTo(2L),
-        assertThat(1F).isGreaterThanOrEqualTo(2F),
-        assertThat(1F).isGreaterThanOrEqualTo(2F),
+        assertThat(1f).isGreaterThanOrEqualTo(2f),
+        assertThat(1f).isGreaterThanOrEqualTo(2f),
         assertThat(1.0).isGreaterThanOrEqualTo(2.0),
         assertThat(1.0).isGreaterThanOrEqualTo(2.0));
   }
