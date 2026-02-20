@@ -22,6 +22,9 @@ tests:
     See:
     - https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-7.0-Release-Notes
     - https://github.com/spring-projects/spring-framework/releases/tag/v6.2.13
+    - https://github.com/spring-projects/spring-framework/releases/tag/v6.2.14
+    - https://github.com/spring-projects/spring-framework/releases/tag/v6.2.15
+    - https://github.com/spring-projects/spring-framework/releases/tag/v6.2.16
     - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M1
     - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M2
     - https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M3
@@ -43,3 +46,19 @@ tests:
     See:
     - https://github.com/apache/maven-jar-plugin/releases/tag/maven-jar-plugin-3.5.0
     - https://github.com/apache/maven-jar-plugin/compare/maven-jar-plugin-3.4.2...maven-jar-plugin-3.5.0
+- pr: 2096
+  expected: |
+    Upgrade MongoDB driver 5.6.2 -> 5.6.3 (#2096)
+
+    See:
+    - https://jira.mongodb.org/issues/?jql=project%20%3D%20JAVA%20AND%20fixVersion%20%3E%205.6.2%20AND%20fixVersion%20%3C%3D%205.6.3
+    - https://github.com/mongodb/mongo-java-driver/releases/tag/r5.6.3
+    - https://github.com/mongodb/mongo-java-driver/compare/r5.6.2...r5.6.3
+- pr: 2100
+  expected: |
+    Upgrade Checkstyle 13.1.0 -> 13.2.0 (#2100)
+
+    See:
+    - https://checkstyle.sourceforge.io/releasenotes.html
+    - https://github.com/checkstyle/checkstyle/releases/tag/checkstyle-13.2.0
+    - https://github.com/checkstyle/checkstyle/compare/checkstyle-13.1.0...checkstyle-13.2.0
