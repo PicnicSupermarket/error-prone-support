@@ -84,6 +84,7 @@ final class PrimitiveRules {
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
     // change.
     @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
     int before(int value, int min, int max) {
       return Refaster.anyOf(
           Math.min(max, Math.max(value, min)),
@@ -105,6 +106,7 @@ final class PrimitiveRules {
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
     // change.
     @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
     long before(long value, long min, long max) {
       return Refaster.anyOf(
           Math.min(max, Math.max(value, min)),
@@ -126,6 +128,7 @@ final class PrimitiveRules {
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
     // change.
     @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
     float before(float value, float min, float max) {
       return Refaster.anyOf(
           Math.min(max, Math.max(value, min)),
@@ -147,6 +150,7 @@ final class PrimitiveRules {
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
     // change.
     @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
     double before(double value, double min, double max) {
       return Refaster.anyOf(
           Math.min(max, Math.max(value, min)),
