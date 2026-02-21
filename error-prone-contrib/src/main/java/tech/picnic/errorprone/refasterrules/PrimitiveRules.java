@@ -80,6 +80,9 @@ final class PrimitiveRules {
 
   /** Prefer {@link Math#clamp(long, int, int)} over more verbose alternatives. */
   static final class MathClampInt {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
     @BeforeTemplate
     int before(int value, int min, int max) {
       return Refaster.anyOf(
@@ -98,6 +101,9 @@ final class PrimitiveRules {
 
   /** Prefer {@link Math#clamp(long, long, long)} over more verbose alternatives. */
   static final class MathClampLong {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
     @BeforeTemplate
     long before(long value, long min, long max) {
       return Refaster.anyOf(
@@ -116,6 +122,9 @@ final class PrimitiveRules {
 
   /** Prefer {@link Math#clamp(float, float, float)} over more verbose alternatives. */
   static final class MathClampFloat {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
     @BeforeTemplate
     float before(float value, float min, float max) {
       return Refaster.anyOf(
@@ -134,6 +143,9 @@ final class PrimitiveRules {
 
   /** Prefer {@link Math#clamp(double, double, double)} over more verbose alternatives. */
   static final class MathClampDouble {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
     @BeforeTemplate
     double before(double value, double min, double max) {
       return Refaster.anyOf(
