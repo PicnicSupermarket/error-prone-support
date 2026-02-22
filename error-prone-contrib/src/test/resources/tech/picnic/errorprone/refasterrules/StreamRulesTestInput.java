@@ -22,7 +22,6 @@ import static java.util.stream.Collectors.summarizingLong;
 import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
-import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,7 +36,6 @@ import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -73,8 +71,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         summingInt(null),
         summingLong(null),
         toImmutableList(),
-        toImmutableMap(null, null),
-        toUnmodifiableSet());
+        toImmutableMap(null, null));
   }
 
   String testJoining() {
@@ -350,9 +347,5 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Stream.generate(() -> "foo").limit(1),
         Stream.generate(() -> UUID.randomUUID().toString()).limit(2));
-  }
-
-  Set<Integer> testSetOfVarargs() {
-    return Stream.of(1, 2).collect(toUnmodifiableSet());
   }
 }

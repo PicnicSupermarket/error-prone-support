@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.stream.Collectors.toUnmodifiableSet;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
@@ -13,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -20,7 +23,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Iterables.class, Lists.class, Streams.class);
+    return ImmutableSet.of(Iterables.class, Lists.class, Streams.class, toUnmodifiableSet());
   }
 
   ImmutableSet<Boolean> testCollectionIsEmpty() {
@@ -75,6 +78,10 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testSetStream() {
     return ImmutableSet.of(1).stream().distinct();
+  }
+
+  Set<Integer> testSetOfVarargs() {
+    return Stream.of(1, 2).collect(toUnmodifiableSet());
   }
 
   ArrayList<String> testNewArrayListFromCollection() {
