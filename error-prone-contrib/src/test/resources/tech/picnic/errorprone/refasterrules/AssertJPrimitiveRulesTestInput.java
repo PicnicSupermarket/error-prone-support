@@ -21,8 +21,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isSameAs(2),
         assertThat(1L).isSameAs(2L),
         assertThat(1L).isSameAs(2L),
-        assertThat(1F).isSameAs(2F),
-        assertThat(1F).isSameAs(2F),
+        assertThat(1f).isSameAs(2f),
+        assertThat(1f).isSameAs(2f),
         assertThat(1.0).isSameAs(2.0),
         assertThat(1.0).isSameAs(2.0));
   }
@@ -41,8 +41,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1).isNotSameAs(2),
         assertThat(1L).isNotSameAs(2L),
         assertThat(1L).isNotSameAs(2L),
-        assertThat(1F).isNotSameAs(2F),
-        assertThat(1F).isNotSameAs(2F),
+        assertThat(1f).isNotSameAs(2f),
+        assertThat(1f).isNotSameAs(2f),
         assertThat(1.0).isNotSameAs(2.0),
         assertThat(1.0).isNotSameAs(2.0));
   }
@@ -59,8 +59,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1 >= 2).isFalse(),
         assertThat(1L < 2L).isTrue(),
         assertThat(1L >= 2L).isFalse(),
-        assertThat(1F < 2F).isTrue(),
-        assertThat(1F >= 2F).isFalse(),
+        assertThat(1f < 2f).isTrue(),
+        assertThat(1f >= 2f).isFalse(),
         assertThat(1.0 < 2.0).isTrue(),
         assertThat(1.0 >= 2.0).isFalse());
   }
@@ -77,8 +77,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1 > 2).isFalse(),
         assertThat(1L <= 2L).isTrue(),
         assertThat(1L > 2L).isFalse(),
-        assertThat(1F <= 2F).isTrue(),
-        assertThat(1F > 2F).isFalse(),
+        assertThat(1f <= 2f).isTrue(),
+        assertThat(1f > 2f).isFalse(),
         assertThat(1.0 <= 2.0).isTrue(),
         assertThat(1.0 > 2.0).isFalse());
   }
@@ -95,8 +95,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1 <= 2).isFalse(),
         assertThat(1L > 2L).isTrue(),
         assertThat(1L <= 2L).isFalse(),
-        assertThat(1F > 2F).isTrue(),
-        assertThat(1F <= 2F).isFalse(),
+        assertThat(1f > 2f).isTrue(),
+        assertThat(1f <= 2f).isFalse(),
         assertThat(1.0 > 2.0).isTrue(),
         assertThat(1.0 <= 2.0).isFalse());
   }
@@ -113,8 +113,8 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
         assertThat(1 < 2).isFalse(),
         assertThat(1L >= 2L).isTrue(),
         assertThat(1L < 2L).isFalse(),
-        assertThat(1F >= 2F).isTrue(),
-        assertThat(1F < 2F).isFalse(),
+        assertThat(1f >= 2f).isTrue(),
+        assertThat(1f < 2f).isFalse(),
         assertThat(1.0 >= 2.0).isTrue(),
         assertThat(1.0 < 2.0).isFalse());
   }

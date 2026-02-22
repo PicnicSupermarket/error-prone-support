@@ -123,10 +123,10 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(0L).isEqualTo(Long.valueOf(1));
     assertThat(Long.valueOf(0)).isEqualTo(1L);
     assertThat(Long.valueOf(0)).isEqualTo(Long.valueOf(1));
-    assertThat(0.0F).isEqualTo(1.0F);
-    assertThat(0.0F).isEqualTo(Float.valueOf(1.0F));
-    assertThat(Float.valueOf(0.0F)).isEqualTo(1.0F);
-    assertThat(Float.valueOf(0.0F)).isEqualTo(Float.valueOf(1.0F));
+    assertThat(0.0f).isEqualTo(1.0f);
+    assertThat(0.0f).isEqualTo(Float.valueOf(1.0f));
+    assertThat(Float.valueOf(0.0f)).isEqualTo(1.0f);
+    assertThat(Float.valueOf(0.0f)).isEqualTo(Float.valueOf(1.0f));
     assertThat(0.0).isEqualTo(1.0);
     assertThat(0.0).isEqualTo(Double.valueOf(1.0));
     assertThat(Double.valueOf(0.0)).isEqualTo(1.0);
@@ -161,10 +161,10 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(0L).withFailMessage("waldo").isEqualTo(Long.valueOf(1));
     assertThat(Long.valueOf(0)).withFailMessage("fred").isEqualTo(1L);
     assertThat(Long.valueOf(0)).withFailMessage("plugh").isEqualTo(Long.valueOf(1));
-    assertThat(0.0F).withFailMessage("xyzzy").isEqualTo(1.0F);
-    assertThat(0.0F).withFailMessage("thud").isEqualTo(Float.valueOf(1.0F));
-    assertThat(Float.valueOf(0.0F)).withFailMessage("foo").isEqualTo(1.0F);
-    assertThat(Float.valueOf(0.0F)).withFailMessage("bar").isEqualTo(Float.valueOf(1.0F));
+    assertThat(0.0f).withFailMessage("xyzzy").isEqualTo(1.0f);
+    assertThat(0.0f).withFailMessage("thud").isEqualTo(Float.valueOf(1.0f));
+    assertThat(Float.valueOf(0.0f)).withFailMessage("foo").isEqualTo(1.0f);
+    assertThat(Float.valueOf(0.0f)).withFailMessage("bar").isEqualTo(Float.valueOf(1.0f));
     assertThat(0.0).withFailMessage("baz").isEqualTo(1.0);
     assertThat(0.0).withFailMessage("qux").isEqualTo(Double.valueOf(1.0));
     assertThat(Double.valueOf(0.0)).withFailMessage("quux").isEqualTo(1.0);
@@ -175,11 +175,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqualFloatsWithDelta() {
-    assertThat(0.0F).isCloseTo(0.0F, offset(0.0F));
+    assertThat(0.0f).isCloseTo(0.0f, offset(0.0f));
   }
 
   void testAssertEqualFloatsWithDeltaWithMessage() {
-    assertThat(0.0F).withFailMessage("foo").isCloseTo(0.0F, offset(0.0F));
+    assertThat(0.0f).withFailMessage("foo").isCloseTo(0.0f, offset(0.0f));
   }
 
   void testAssertEqualDoublesWithDelta() {
@@ -215,11 +215,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqualFloatArraysWithDelta() {
-    assertThat(new float[0]).containsExactly(new float[0], offset(0.0F));
+    assertThat(new float[0]).containsExactly(new float[0], offset(0.0f));
   }
 
   void testAssertEqualFloatArraysWithDeltaWithMessage() {
-    assertThat(new float[0]).withFailMessage("foo").containsExactly(new float[0], offset(0.0F));
+    assertThat(new float[0]).withFailMessage("foo").containsExactly(new float[0], offset(0.0f));
   }
 
   void testAssertEqualDoubleArraysWithDelta() {
@@ -296,7 +296,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat((short) 0).isNotEqualTo((short) 0);
     assertThat(0).isNotEqualTo(0);
     assertThat(0L).isNotEqualTo(0L);
-    assertThat(0.0F).isNotEqualTo(0.0F);
+    assertThat(0.0f).isNotEqualTo(0.0f);
     assertThat(0.0).isNotEqualTo(0.0);
     assertThat(new Object()).isNotEqualTo(new Object());
     assertThat("actual").isNotEqualTo("expected");
@@ -311,7 +311,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat((short) 0).withFailMessage("qux").isNotEqualTo((short) 0);
     assertThat(0).withFailMessage("quux").isNotEqualTo(0);
     assertThat(0L).withFailMessage("quuz").isNotEqualTo(0L);
-    assertThat(0.0F).withFailMessage("corge").isNotEqualTo(0.0F);
+    assertThat(0.0f).withFailMessage("corge").isNotEqualTo(0.0f);
     assertThat(0.0).withFailMessage("grault").isNotEqualTo(0.0);
     assertThat(new Object()).withFailMessage("garply").isNotEqualTo(new Object());
     assertThat("actual").withFailMessage("waldo").isNotEqualTo("expected");
@@ -320,11 +320,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertUnequalFloatsWithDelta() {
-    assertThat(0.0F).isNotCloseTo(0.0F, offset(0.0F));
+    assertThat(0.0f).isNotCloseTo(0.0f, offset(0.0f));
   }
 
   void testAssertUnequalFloatsWithDeltaWithMessage() {
-    assertThat(0.0F).withFailMessage("foo").isNotCloseTo(0.0F, offset(0.0F));
+    assertThat(0.0f).withFailMessage("foo").isNotCloseTo(0.0f, offset(0.0f));
   }
 
   void testAssertUnequalDoublesWithDelta() {

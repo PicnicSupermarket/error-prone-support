@@ -109,27 +109,27 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatFloatArrayContainsExactly() {
-    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F});
+    assertArrayEquals(new float[] {1.0f}, new float[] {2.0f});
   }
 
   void testAssertThatFloatArrayWithFailMessageContainsExactly() {
-    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, "foo");
+    assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, "foo");
   }
 
   void testAssertThatFloatArrayWithFailMessageSupplierContainsExactly() {
-    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, () -> "foo");
+    assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, () -> "foo");
   }
 
   void testAssertThatFloatArrayContainsExactlyWithOffset() {
-    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, 0.1f);
+    assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f);
   }
 
   void testAssertThatFloatArrayWithFailMessageContainsExactlyWithOffset() {
-    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, 0.1f, "foo");
+    assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f, "foo");
   }
 
   void testAssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset() {
-    assertArrayEquals(new float[] {1.0F}, new float[] {2.0F}, 0.1f, () -> "foo");
+    assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f, () -> "foo");
   }
 
   void testAssertThatDoubleArrayContainsExactly() {

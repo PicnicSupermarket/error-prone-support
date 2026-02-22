@@ -118,10 +118,10 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(0L, Long.valueOf(1));
     assertEquals(Long.valueOf(0), 1L);
     assertEquals(Long.valueOf(0), Long.valueOf(1));
-    assertEquals(0.0F, 1.0F);
-    assertEquals(0.0F, Float.valueOf(1.0F));
-    assertEquals(Float.valueOf(0.0F), 1.0F);
-    assertEquals(Float.valueOf(0.0F), Float.valueOf(1.0F));
+    assertEquals(0.0f, 1.0f);
+    assertEquals(0.0f, Float.valueOf(1.0f));
+    assertEquals(Float.valueOf(0.0f), 1.0f);
+    assertEquals(Float.valueOf(0.0f), Float.valueOf(1.0f));
     assertEquals(0.0, 1.0);
     assertEquals(0.0, Double.valueOf(1.0));
     assertEquals(Double.valueOf(0.0), 1.0);
@@ -156,10 +156,10 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(0L, Long.valueOf(1), "waldo");
     assertEquals(Long.valueOf(0), 1L, "fred");
     assertEquals(Long.valueOf(0), Long.valueOf(1), "plugh");
-    assertEquals(0.0F, 1.0F, "xyzzy");
-    assertEquals(0.0F, Float.valueOf(1.0F), "thud");
-    assertEquals(Float.valueOf(0.0F), 1.0F, "foo");
-    assertEquals(Float.valueOf(0.0F), Float.valueOf(1.0F), "bar");
+    assertEquals(0.0f, 1.0f, "xyzzy");
+    assertEquals(0.0f, Float.valueOf(1.0f), "thud");
+    assertEquals(Float.valueOf(0.0f), 1.0f, "foo");
+    assertEquals(Float.valueOf(0.0f), Float.valueOf(1.0f), "bar");
     assertEquals(0.0, 1.0, "baz");
     assertEquals(0.0, Double.valueOf(1.0), "qux");
     assertEquals(Double.valueOf(0.0), 1.0, "quux");
@@ -170,11 +170,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqualFloatsWithDelta() {
-    assertEquals(0.0F, 0.0F, 0.0F);
+    assertEquals(0.0f, 0.0f, 0.0f);
   }
 
   void testAssertEqualFloatsWithDeltaWithMessage() {
-    assertEquals(0.0F, 0.0F, 0.0F, "foo");
+    assertEquals(0.0f, 0.0f, 0.0f, "foo");
   }
 
   void testAssertEqualDoublesWithDelta() {
@@ -210,11 +210,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertEqualFloatArraysWithDelta() {
-    assertEquals(new float[0], new float[0], 0.0F);
+    assertEquals(new float[0], new float[0], 0.0f);
   }
 
   void testAssertEqualFloatArraysWithDeltaWithMessage() {
-    assertEquals(new float[0], new float[0], 0.0F, "foo");
+    assertEquals(new float[0], new float[0], 0.0f, "foo");
   }
 
   void testAssertEqualDoubleArraysWithDelta() {
@@ -284,7 +284,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertNotEquals((short) 0, (short) 0);
     assertNotEquals(0, 0);
     assertNotEquals(0L, 0L);
-    assertNotEquals(0.0F, 0.0F);
+    assertNotEquals(0.0f, 0.0f);
     assertNotEquals(0.0, 0.0);
     assertNotEquals(new Object(), new Object());
     assertNotEquals("actual", "expected");
@@ -299,7 +299,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertNotEquals((short) 0, (short) 0, "qux");
     assertNotEquals(0, 0, "quux");
     assertNotEquals(0L, 0L, "quuz");
-    assertNotEquals(0.0F, 0.0F, "corge");
+    assertNotEquals(0.0f, 0.0f, "corge");
     assertNotEquals(0.0, 0.0, "grault");
     assertNotEquals(new Object(), new Object(), "garply");
     assertNotEquals("actual", "expected", "waldo");
@@ -308,11 +308,11 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertUnequalFloatsWithDelta() {
-    assertNotEquals(0.0F, 0.0F, 0.0F);
+    assertNotEquals(0.0f, 0.0f, 0.0f);
   }
 
   void testAssertUnequalFloatsWithDeltaWithMessage() {
-    assertNotEquals(0.0F, 0.0F, 0.0F, "foo");
+    assertNotEquals(0.0f, 0.0f, 0.0f, "foo");
   }
 
   void testAssertUnequalDoublesWithDelta() {
