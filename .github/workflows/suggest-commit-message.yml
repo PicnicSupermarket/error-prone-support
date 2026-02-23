@@ -29,6 +29,10 @@ env:
     registry.npmjs.org:443
 jobs:
   suggest:
+    # No commit message is suggested for code originating from forked
+    # repositories, as such workflow runs do not have access to the requisite
+    # secrets.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
       pull-requests: write
