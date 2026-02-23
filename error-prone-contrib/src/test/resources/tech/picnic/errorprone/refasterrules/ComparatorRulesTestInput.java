@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.greatest;
+import static com.google.common.collect.Comparators.least;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
@@ -13,6 +15,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collector;
@@ -193,6 +196,22 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.max(Arrays.asList("a", "b"), (a, b) -> -1),
         Collections.max(ImmutableList.of("a", "b"), (a, b) -> 0),
         Collections.max(ImmutableSet.of("a", "b"), (a, b) -> 1));
+  }
+
+  Collector<String, ?, List<String>> testLeast() {
+    return greatest(1, Comparator.comparingInt(String::length).reversed());
+  }
+
+  Collector<String, ?, List<String>> testGreatest() {
+    return least(1, Comparator.comparingInt(String::length).reversed());
+  }
+
+  Collector<String, ?, List<String>> testLeastNaturalOrder() {
+    return greatest(1, reverseOrder());
+  }
+
+  Collector<String, ?, List<String>> testGreatedNaturalOrder() {
+    return least(1, reverseOrder());
   }
 
   BinaryOperator<String> testComparatorsMin() {

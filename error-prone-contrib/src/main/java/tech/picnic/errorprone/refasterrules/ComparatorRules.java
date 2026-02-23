@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.greatest;
+import static com.google.common.collect.Comparators.least;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingDouble;
@@ -481,6 +483,68 @@ final class ComparatorRules {
     @AfterTemplate
     T after(T value1, T value2, Comparator<? super T> cmp) {
       return Comparators.max(value1, value2, cmp);
+    }
+  }
+
+  /** Prefer {@link Comparators#least(int, Comparator)} over more contrived alternatives. */
+  static final class Least<S, T extends S> {
+    @BeforeTemplate
+    Collector<T, ?, List<T>> before(int n, Comparator<S> cmp) {
+      return greatest(n, cmp.reversed());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T, ?, List<T>> after(int n, Comparator<S> cmp) {
+      return least(n, cmp);
+    }
+  }
+
+  /** Prefer {@link Comparators#greatest(int, Comparator)} over more contrived alternatives. */
+  static final class Greatest<S, T extends S> {
+    @BeforeTemplate
+    Collector<T, ?, List<T>> before(int n, Comparator<S> cmp) {
+      return least(n, cmp.reversed());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T, ?, List<T>> after(int n, Comparator<S> cmp) {
+      return greatest(n, cmp);
+    }
+  }
+
+  /**
+   * Prefer {@link Comparators#least(int, Comparator)} with {@link Comparator#naturalOrder()} over
+   * more contrived alternatives.
+   */
+  static final class LeastNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Collector<T, ?, List<T>> before(int n) {
+      return greatest(n, reverseOrder());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T, ?, List<T>> after(int n) {
+      return least(n, naturalOrder());
+    }
+  }
+
+  /**
+   * Prefer {@link Comparators#greatest(int, Comparator)} with {@link Comparator#naturalOrder()}
+   * over more contrived alternatives.
+   */
+  static final class GreatedNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Collector<T, ?, List<T>> before(int n) {
+      return least(n, reverseOrder());
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T, ?, List<T>> after(int n) {
+      return greatest(n, naturalOrder());
     }
   }
 
