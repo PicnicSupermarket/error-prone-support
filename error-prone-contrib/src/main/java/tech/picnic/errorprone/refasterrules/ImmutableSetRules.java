@@ -104,6 +104,24 @@ final class ImmutableSetRules {
     }
   }
 
+  /** Avoid unnecessary calls to {@link SetView#immutableCopy()}. */
+  // XXX: Consider introducing similar rules for other `SetView` methods that derive a stateless
+  // object from a `SetView`: `isEmpty()`, `size()`, `contains()`, `containsAll()`, `equals()`, and
+  // `hashCode()`, as well as the `toArray` overloads.
+  // XXX: Consider introducing similar rules for other methods that create an immutable copy of a
+  // collection, such as `ImmutableList.copyOf`, `ImmutableSet.copyOf` and `ImmutableMap.copyOf`.
+  static final class SetViewIsEmpty<T> {
+    @BeforeTemplate
+    boolean before(SetView<T> set) {
+      return set.immutableCopy().isEmpty();
+    }
+
+    @AfterTemplate
+    boolean after(SetView<T> set) {
+      return set.isEmpty();
+    }
+  }
+
   /**
    * Prefer {@link ImmutableSet#of()} over more contrived alternatives or alternatives that don't
    * communicate the immutability of the resulting set at the type level.

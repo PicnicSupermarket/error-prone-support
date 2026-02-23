@@ -47,6 +47,10 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.copyOf(Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)));
   }
 
+  boolean testSetViewIsEmpty() {
+    return Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy().isEmpty();
+  }
+
   ImmutableSet<Set<Integer>> testImmutableSetOf() {
     return ImmutableSet.of(
         ImmutableSet.<Integer>builder().build(),
