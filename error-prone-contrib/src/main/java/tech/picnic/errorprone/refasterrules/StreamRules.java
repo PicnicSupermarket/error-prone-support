@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.least;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
@@ -20,6 +21,7 @@ import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
+import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -279,6 +281,24 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(Stream<T> stream, Comparator<S> comparator) {
       return stream.distinct().sorted(comparator);
+    }
+  }
+
+  /**
+   * Prefer {@link Comparators#least(int, Comparator)} over alternatives that require space
+   * proportional to the size of the input stream, rather than space proportional to the result
+   * stream.
+   */
+  static final class StreamCollectLeastStream<S, T extends S> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, int n, Comparator<S> comparator) {
+      return stream.sorted(comparator).limit(n);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Stream<T> after(Stream<T> stream, int n, Comparator<S> comparator) {
+      return stream.collect(least(n, comparator)).stream();
     }
   }
 

@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.least;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -61,6 +62,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         filtering(null, null),
         flatMapping(null, null),
         identity(),
+        least(1, null),
         mapping(null, null),
         maxBy(null),
         minBy(null),
@@ -136,6 +138,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamDistinctSortedWithComparator() {
     return Stream.of(1).distinct().sorted(reverseOrder());
+  }
+
+  Stream<Integer> testStreamCollectLeastStream() {
+    return Stream.of(1).collect(least(2, reverseOrder())).stream();
   }
 
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {
