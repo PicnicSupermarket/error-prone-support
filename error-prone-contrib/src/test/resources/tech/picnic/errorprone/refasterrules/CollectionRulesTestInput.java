@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         Iterables.isEmpty(ImmutableSet.of(7)),
         ImmutableSet.of(8).stream().findAny().isEmpty(),
         ImmutableSet.of(9).stream().findFirst().isEmpty(),
-        ImmutableSet.of(10).asList().isEmpty());
+        ImmutableSet.of(10).asList().isEmpty(),
+        Sets.intersection(ImmutableSet.of(11), ImmutableSet.of(12)).immutableCopy().isEmpty());
   }
 
   ImmutableSet<Integer> testCollectionSize() {
