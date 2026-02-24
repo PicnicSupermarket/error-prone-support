@@ -367,6 +367,19 @@ final class StreamRules {
     }
   }
 
+  /** Prefer {@link Stream#findFirst()} over more contrived alternatives. */
+  static final class StreamFindFirst<T> {
+    @BeforeTemplate
+    Optional<T> before(Stream<T> stream, long limit) {
+      return Refaster.anyOf(stream.limit(limit).findFirst(), stream.limit(limit).findAny());
+    }
+
+    @AfterTemplate
+    Optional<T> after(Stream<T> stream) {
+      return stream.findFirst();
+    }
+  }
+
   /**
    * Prefer an unconditional {@link Map#get(Object)} call followed by a {@code null} check over a
    * call to {@link Map#containsKey(Object)}, as the former avoids a second lookup operation.
