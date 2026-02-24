@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
@@ -123,6 +124,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length()).flatMap(Stream::of));
   }
 
+  Stream<Integer> testStreamSorted() {
+    return Stream.of(1).sorted(naturalOrder());
+  }
+
   Stream<Integer> testStreamFilterSorted() {
     return Stream.of(1).sorted().filter(i -> i % 2 == 0);
   }
@@ -141,6 +146,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamCollectLeastStream() {
     return Stream.of(1).sorted(reverseOrder()).limit(2);
+  }
+
+  Stream<Integer> testStreamCollectLeastNaturalOrderStream() {
+    return Stream.of(1).sorted().limit(2);
   }
 
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {

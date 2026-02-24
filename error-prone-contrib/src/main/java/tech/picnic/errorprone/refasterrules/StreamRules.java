@@ -218,6 +218,19 @@ final class StreamRules {
     }
   }
 
+  /** Prefer {@link Stream#sorted()} over more contrived alternatives. */
+  static final class StreamSorted<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream) {
+      return stream.sorted(naturalOrder());
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream) {
+      return stream.sorted();
+    }
+  }
+
   /**
    * Apply {@link Stream#filter(Predicate)} before {@link Stream#sorted()} to reduce the number of
    * elements to sort.
@@ -299,6 +312,24 @@ final class StreamRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Stream<T> after(Stream<T> stream, int n, Comparator<S> comparator) {
       return stream.collect(least(n, comparator)).stream();
+    }
+  }
+
+  /**
+   * Prefer {@link Comparators#least(int, Comparator)} over alternatives that require space
+   * proportional to the size of the input stream, rather than space proportional to the result
+   * stream.
+   */
+  static final class StreamCollectLeastNaturalOrderStream<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, int n) {
+      return stream.sorted().limit(n);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Stream<T> after(Stream<T> stream, int n) {
+      return stream.collect(least(n, naturalOrder())).stream();
     }
   }
 
