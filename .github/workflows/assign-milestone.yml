@@ -31,15 +31,24 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              sort: 'due_on',
-              direction: 'asc',
-              per_page: 1,
+              per_page: 100,
             });
 
             if (milestones.data.length === 0) {
               core.warning('No open milestones found.');
               return;
             }
+
+            const parts = (t) => t.split('.').map(Number);
+            milestones.data.sort((a, b) => {
+              const pa = parts(a.title);
+              const pb = parts(b.title);
+              for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+                const diff = (pa[i] || 0) - (pb[i] || 0);
+                if (diff !== 0) return diff;
+              }
+              return 0;
+            });
 
             const milestone = milestones.data[0];
             core.info(`Assigning milestone "${milestone.title}" to PR #${context.issue.number}.`);
