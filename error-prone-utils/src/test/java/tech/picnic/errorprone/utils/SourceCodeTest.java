@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.utils;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -23,6 +24,8 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.lang.model.element.Name;
@@ -292,6 +295,40 @@ final class SourceCodeTest {
         .doTest(TestMode.TEXT_MATCH);
   }
 
+  @Test
+  void sortTrees() {
+    BugCheckerRefactoringTestHelper.newInstance(SortTreesTestChecker.class, getClass())
+        .addInputLines(
+            "A.java",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Stream.of();",
+            "    Stream.of(\"a\");",
+            "    Stream.of(\"a\", \"b\");",
+            "    Stream.of(\"b\", \"a\");",
+            "    Stream.of(\"a\", \"b\", \"c\");",
+            "    Stream.of(\"c\", \"a\", \"b\");",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Stream.of();",
+            "    Stream.of(\"a\");",
+            "    Stream.of(\"a\", \"b\");",
+            "    Stream.of(\"a\", \"b\");",
+            "    Stream.of(\"a\", \"b\", \"c\");",
+            "    Stream.of(\"a\", \"b\", \"c\");",
+            "  }",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+
   /**
    * A {@link BugChecker} that applies {@link SourceCode#toStringConstantExpression(Object,
    * VisitorState)} to string literals.
@@ -381,6 +418,25 @@ final class SourceCodeTest {
     public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
       return describeMatch(
           tree, SourceCode.unwrapMethodInvocationDroppingWhitespaceAndComments(tree, state));
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that applies {@link SourceCode#sortTrees(Collection, Comparator,
+   * VisitorState)} to all method invocation arguments with the aim of sorting them
+   * lexicographically.
+   */
+  @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
+  public static final class SortTreesTestChecker extends BugChecker
+      implements MethodInvocationTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+      SuggestedFix fix =
+          SourceCode.sortTrees(
+              tree.getArguments(), comparing(arg -> SourceCode.treeToString(arg, state)), state);
+      return fix.isEmpty() ? Description.NO_MATCH : describeMatch(tree, fix);
     }
   }
 }

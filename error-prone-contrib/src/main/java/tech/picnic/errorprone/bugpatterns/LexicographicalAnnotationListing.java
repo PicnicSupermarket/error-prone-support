@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
@@ -11,14 +10,10 @@ import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.VerifyException;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ModifiersTreeMatcher;
-import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
@@ -73,8 +68,9 @@ public final class LexicographicalAnnotationListing extends BugChecker
 
   @Override
   public Description matchModifiers(ModifiersTree tree, VisitorState state) {
-    List<? extends AnnotationTree> originalOrdering = tree.getAnnotations();
-    if (originalOrdering.size() < 2) {
+    List<? extends AnnotationTree> annotations = tree.getAnnotations();
+    if (annotations.size() < 2) {
+      /* Fast path: there's at most one annotation. */
       return Description.NO_MATCH;
     }
 
@@ -82,41 +78,14 @@ public final class LexicographicalAnnotationListing extends BugChecker
         requireNonNull(
             ASTHelpers.getSymbol(ASTHelpers.findEnclosingNode(state.getPath(), Tree.class)),
             "Cannot find enclosing symbol");
+    Comparator<AnnotationTree> comparator =
+        comparing(
+                (AnnotationTree annotation) ->
+                    ASTHelpers.getAnnotationType(annotation, symbol, state),
+                BY_ANNOTATION_TYPE)
+            .thenComparing(annotation -> SourceCode.treeToString(annotation, state));
 
-    ImmutableList<? extends AnnotationTree> sortedAnnotations =
-        sort(originalOrdering, symbol, state);
-    if (originalOrdering.equals(sortedAnnotations)) {
-      return Description.NO_MATCH;
-    }
-
-    return describeMatch(
-        originalOrdering.getFirst(), fixOrdering(originalOrdering, sortedAnnotations, state));
-  }
-
-  private static ImmutableList<? extends AnnotationTree> sort(
-      List<? extends AnnotationTree> annotations, Symbol symbol, VisitorState state) {
-    return annotations.stream()
-        .sorted(
-            comparing(
-                    (AnnotationTree annotation) ->
-                        ASTHelpers.getAnnotationType(annotation, symbol, state),
-                    BY_ANNOTATION_TYPE)
-                .thenComparing(annotation -> SourceCode.treeToString(annotation, state)))
-        .collect(toImmutableList());
-  }
-
-  private static Fix fixOrdering(
-      List<? extends AnnotationTree> originalAnnotations,
-      ImmutableList<? extends AnnotationTree> sortedAnnotations,
-      VisitorState state) {
-    return Streams.zip(
-            originalAnnotations.stream(),
-            sortedAnnotations.stream(),
-            (original, replacement) ->
-                SuggestedFix.builder()
-                    .replace(original, SourceCode.treeToString(replacement, state)))
-        .reduce(SuggestedFix.Builder::merge)
-        .map(SuggestedFix.Builder::build)
-        .orElseThrow(() -> new VerifyException("No annotations were provided"));
+    SuggestedFix fix = SourceCode.sortTrees(annotations, comparator, state);
+    return fix.isEmpty() ? Description.NO_MATCH : describeMatch(annotations.getFirst(), fix);
   }
 }
