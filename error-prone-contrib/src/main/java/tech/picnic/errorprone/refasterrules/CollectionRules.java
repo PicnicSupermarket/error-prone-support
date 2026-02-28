@@ -214,6 +214,8 @@ final class CollectionRules {
   // XXX: Ideally we rewrite both of these expressions directly to `ImmutableSet.of(..)` (and
   // locate this rule in `ImmutableSetRules`), but for now this rule is included as-is for use with
   // OpenRewrite.
+  // XXX: The replacement code throws `IllegalArgumentException` on duplicate elements, while the
+  // original code deduplicates them.
   static final class SetOfVarargs<T> {
     @BeforeTemplate
     Set<T> before(@Repeated T elements) {
