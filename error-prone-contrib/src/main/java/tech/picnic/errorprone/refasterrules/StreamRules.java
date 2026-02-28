@@ -55,6 +55,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -116,6 +117,16 @@ final class StreamRules {
     Stream<T> before(T object) {
       return Refaster.anyOf(
           Stream.of(object).filter(Objects::nonNull), Optional.ofNullable(object).stream());
+    }
+
+    @BeforeTemplate
+    Stream<T> before2(@Nullable T object) {
+      return object != null ? Stream.of(object) : Stream.empty();
+    }
+
+    @BeforeTemplate
+    Stream<T> before3(@Nullable T object) {
+      return object == null ? Stream.empty() : Stream.of(object);
     }
 
     @AfterTemplate

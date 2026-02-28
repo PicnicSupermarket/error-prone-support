@@ -95,7 +95,11 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Stream<String>> testStreamOfNullable() {
-    return ImmutableSet.of(Stream.ofNullable("a"), Stream.ofNullable("b"));
+    return ImmutableSet.of(
+        Stream.ofNullable("a"),
+        Stream.ofNullable("b"),
+        Stream.ofNullable("c"),
+        Stream.ofNullable("d"));
   }
 
   Stream<String> testStreamOfArray() {
