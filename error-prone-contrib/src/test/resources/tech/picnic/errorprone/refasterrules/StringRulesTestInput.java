@@ -86,6 +86,10 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableList.of("foo", "bar").stream().collect(joining("f")));
   }
 
+  String testStringJoinDelimiterVarargs() {
+    return Stream.of("foo", "bar").collect(joining(","));
+  }
+
   String testStringValueOf() {
     return Objects.toString("foo");
   }

@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.stream.Collectors.toUnmodifiableSet;
+
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -10,6 +12,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.NotMatches;
+import com.google.errorprone.refaster.annotation.Repeated;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -204,6 +207,24 @@ final class CollectionRules {
     @AfterTemplate
     Stream<?> after(Set<T> set) {
       return set.stream();
+    }
+  }
+
+  /** Prefer {@link Set#of(Object[])} over more contrived alternatives. */
+  // XXX: Ideally we rewrite both of these expressions directly to `ImmutableSet.of(..)` (and
+  // locate this rule in `ImmutableSetRules`), but for now this rule is included as-is for use with
+  // OpenRewrite.
+  // XXX: The replacement code throws `IllegalArgumentException` on duplicate elements, while the
+  // original code deduplicates them.
+  static final class SetOfVarargs<T> {
+    @BeforeTemplate
+    Set<T> before(@Repeated T elements) {
+      return Stream.of(Refaster.asVarargs(elements)).collect(toUnmodifiableSet());
+    }
+
+    @AfterTemplate
+    Set<T> after(@Repeated T elements) {
+      return Set.of(Refaster.asVarargs(elements));
     }
   }
 
