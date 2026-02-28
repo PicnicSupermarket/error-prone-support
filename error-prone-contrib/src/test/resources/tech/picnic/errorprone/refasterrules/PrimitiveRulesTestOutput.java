@@ -77,6 +77,42 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         3.0 >= 4.0);
   }
 
+  ImmutableSet<Integer> testMathClampInt() {
+    return ImmutableSet.of(
+        Math.clamp(2, 3, 1),
+        Math.clamp(1, 2, 3),
+        Math.clamp(2, 1, 3),
+        Math.clamp(1, 3, 2),
+        Math.clamp(1, 2, 3));
+  }
+
+  ImmutableSet<Long> testMathClampLong() {
+    return ImmutableSet.of(
+        Math.clamp(2L, 3L, 1L),
+        Math.clamp(1L, 2L, 3L),
+        Math.clamp(2L, 1L, 3L),
+        Math.clamp(1L, 3L, 2L),
+        Math.clamp(1L, 2L, 3L));
+  }
+
+  ImmutableSet<Float> testMathClampFloat() {
+    return ImmutableSet.of(
+        Math.clamp(2f, 3f, 1f),
+        Math.clamp(1f, 2f, 3f),
+        Math.clamp(2f, 1f, 3f),
+        Math.clamp(1f, 3f, 2f),
+        Math.clamp(1f, 2f, 3f));
+  }
+
+  ImmutableSet<Double> testMathClampDouble() {
+    return ImmutableSet.of(
+        Math.clamp(2.0, 3.0, 1.0),
+        Math.clamp(1.0, 2.0, 3.0),
+        Math.clamp(2.0, 1.0, 3.0),
+        Math.clamp(1.0, 3.0, 2.0),
+        Math.clamp(1.0, 2.0, 3.0));
+  }
+
   int testLongToIntExact() {
     return Math.toIntExact(Long.MAX_VALUE);
   }
