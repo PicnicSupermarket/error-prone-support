@@ -10,6 +10,7 @@ import static tech.picnic.errorprone.utils.MoreMatchers.hasMetaAnnotation;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.AnnotationMatcherUtils;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.MultiMatcher;
@@ -18,6 +19,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -106,6 +108,21 @@ public final class MoreJUnitMatchers {
     return newArray.getInitializers().stream()
         .map(name -> toMethodSourceFactoryDescriptor(name, methodName))
         .collect(toImmutableList());
+  }
+
+  /**
+   * Finds the {@link org.junit.jupiter.params.provider.MethodSource} annotation on the given
+   * method, if any.
+   *
+   * @param methodTree The method tree on which to find the annotation from.
+   * @param state The {@link VisitorState} from which to derive the AST location of interest.
+   * @return The {@link org.junit.jupiter.params.provider.MethodSource} annotation on the given
+   *     method, if any.
+   */
+  public static Optional<AnnotationTree> findMethodSourceAnnotation(
+      MethodTree methodTree, VisitorState state) {
+    return HAS_METHOD_SOURCE.multiMatchResult(methodTree, state).matchingNodes().stream()
+        .findFirst();
   }
 
   // XXX: Drop this suppression once SonarCloud is able to infer that this method will not return
