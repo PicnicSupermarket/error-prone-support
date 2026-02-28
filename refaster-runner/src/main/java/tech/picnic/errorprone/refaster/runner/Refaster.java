@@ -11,6 +11,7 @@ import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -22,6 +23,7 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
+import com.google.errorprone.DescriptionListener;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.ErrorProneOptions.Severity;
 import com.google.errorprone.SubContext;
@@ -33,11 +35,15 @@ import com.google.errorprone.fixes.ErrorProneEndPosTable;
 import com.google.errorprone.fixes.Replacement;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.util.Context;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -61,10 +67,24 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   /** Flag to pass a pattern that restricts which Refaster rules are loaded. */
   public static final String INCLUDED_RULES_PATTERN_FLAG = "Refaster:NamePattern";
 
+  /**
+   * Flag to disable the optimized rule selection algorithm.
+   *
+   * <p>By default, the checker avoids applying all Refaster rules to all compilation units.
+   * Instead, it skips rules that provably cannot have an effect, based on identifiers and code
+   * constructs required by a rule, yet absent in the source code under consideration.
+   *
+   * <p>Set this flag to {@code true} to disable this conservative heuristic logic.
+   */
+  // XXX: Review flag name.
+  private static final String DISABLE_OPTIMIZED_REFASTER_FLAG = "Refaster:DisableOptimizedRefaster";
+
   private static final long serialVersionUID = 1L;
 
-  @SuppressWarnings({"java:S1948", "serial"} /* Concrete instance will be `Serializable`. */)
-  private final CodeTransformer codeTransformer;
+  // XXX: Should we expose a `getter` for this field instead?
+  @SuppressWarnings({"java:S1948", "serial"} /* Serialization compatibility is unsupported. */)
+  @VisibleForTesting
+  final CodeTransformer codeTransformer;
 
   /** Instantiates a default {@link Refaster} instance. */
   public Refaster() {
@@ -79,7 +99,12 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   @Inject
   @VisibleForTesting
   public Refaster(ErrorProneFlags flags) {
-    codeTransformer = createCompositeCodeTransformer(flags);
+    boolean useOptimizedRefaster = !flags.getBoolean(DISABLE_OPTIMIZED_REFASTER_FLAG).orElse(false);
+    ImmutableCollection<CodeTransformer> refasterRules = loadRefasterRules(flags);
+    codeTransformer =
+        useOptimizedRefaster
+            ? new OptimizedCodeTransformer(refasterRules)
+            : CompositeCodeTransformer.compose(refasterRules);
   }
 
   @CanIgnoreReturnValue
@@ -193,16 +218,15 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
     return description.fixes.stream().flatMap(fix -> fix.getReplacements(endPositions).stream());
   }
 
-  private static CodeTransformer createCompositeCodeTransformer(ErrorProneFlags flags) {
+  private static ImmutableCollection<CodeTransformer> loadRefasterRules(ErrorProneFlags flags) {
     ImmutableListMultimap<String, CodeTransformer> allTransformers =
         CodeTransformers.getAllCodeTransformers();
-    return CompositeCodeTransformer.compose(
-        flags
-            .get(INCLUDED_RULES_PATTERN_FLAG)
-            .map(Pattern::compile)
-            .<ImmutableCollection<CodeTransformer>>map(
-                nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
-            .orElseGet(allTransformers::values));
+    return flags
+        .get(INCLUDED_RULES_PATTERN_FLAG)
+        .map(Pattern::compile)
+        .<ImmutableCollection<CodeTransformer>>map(
+            nameFilter -> filterCodeTransformers(allTransformers, nameFilter))
+        .orElseGet(allTransformers::values);
   }
 
   private static ImmutableList<CodeTransformer> filterCodeTransformers(
@@ -211,5 +235,27 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         .filter(e -> nameFilter.matcher(e.getKey()).matches())
         .map(Map.Entry::getValue)
         .collect(toImmutableList());
+  }
+
+  private static final class OptimizedCodeTransformer implements CodeTransformer {
+    private final RefasterRuleSelector ruleSelector;
+
+    OptimizedCodeTransformer(ImmutableCollection<CodeTransformer> refasterRules) {
+      this.ruleSelector = RefasterRuleSelector.create(refasterRules);
+    }
+
+    @Override
+    public void apply(TreePath path, Context context, DescriptionListener listener) {
+      Set<CodeTransformer> candidateTransformers =
+          ruleSelector.selectCandidateRules(path.getCompilationUnit());
+      for (CodeTransformer transformer : candidateTransformers) {
+        transformer.apply(path, context, listener);
+      }
+    }
+
+    @Override
+    public ImmutableClassToInstanceMap<Annotation> annotations() {
+      return ImmutableClassToInstanceMap.of();
+    }
   }
 }

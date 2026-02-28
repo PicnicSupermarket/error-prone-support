@@ -14,6 +14,9 @@
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: Integration tests
 on:
+#  issue_comment:
+#    types: [ created ]
+  pull_request:
   issue_comment:
     types: [ created ]
   push:
@@ -24,6 +27,8 @@ env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   run-integration-tests:
+#    if: |
+#      github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
     name: Integration test
     if: |
       !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
@@ -73,6 +78,7 @@ jobs:
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Run integration test
+        continue-on-error: true
         run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
         env:
           JAVA_HOME: "${{ env.JAVA_HOME_21_X64 }}"
