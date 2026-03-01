@@ -1,4 +1,4 @@
-name: Assign milestone to dependency PRs
+name: Assign milestone to dependency upgrade PR
 on:
   pull_request:
     types:
@@ -7,16 +7,14 @@ permissions:
   contents: read
 jobs:
   assign-milestone:
-    if: >-
-      github.event.label.name == 'dependencies'
-      && github.event.pull_request.milestone == null
+    if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null }}
     permissions:
       contents: read
       issues: write
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e # v2.14.2
+        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
         with:
           disable-sudo-and-containers: true
           egress-policy: block
@@ -27,30 +25,31 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const milestones = await github.rest.issues.listMilestones({
+            const milestones = (await github.rest.issues.listMilestones({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
               per_page: 100,
-            });
+            })).data;
 
-            if (milestones.data.length === 0) {
+            if (milestones.length === 0) {
               core.warning('No open milestones found.');
               return;
             }
 
-            const parts = (t) => t.split('.').map(Number);
-            milestones.data.sort((a, b) => {
-              const pa = parts(a.title);
-              const pb = parts(b.title);
-              for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-                const diff = (pa[i] || 0) - (pb[i] || 0);
-                if (diff !== 0) return diff;
+            const parseVersion = (title) => title.split('.').map(Number);
+            const compareVersions = (a, b) => {
+              const va = parseVersion(a);
+              const vb = parseVersion(b);
+              for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+                const diff = (va[i] ?? 0) - (vb[i] ?? 0);
+                if (diff !== 0) {
+                  return diff;
+                }
               }
               return 0;
-            });
-
-            const milestone = milestones.data[0];
+            };
+            const milestone = milestones.reduce((a, b) => compareVersions(a.title, b.title) <= 0 ? a : b);
             core.info(`Assigning milestone "${milestone.title}" to PR #${context.issue.number}.`);
 
             await github.rest.issues.update({
