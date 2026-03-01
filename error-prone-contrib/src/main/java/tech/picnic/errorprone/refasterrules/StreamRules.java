@@ -112,21 +112,14 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#ofNullable(Object)} over more contrived alternatives. */
-  static final class StreamOfNullable<T> {
+  static final class StreamOfNullable<T extends @Nullable Object> {
     @BeforeTemplate
     Stream<T> before(T object) {
       return Refaster.anyOf(
-          Stream.of(object).filter(Objects::nonNull), Optional.ofNullable(object).stream());
-    }
-
-    @BeforeTemplate
-    Stream<T> before2(@Nullable T object) {
-      return object != null ? Stream.of(object) : Stream.empty();
-    }
-
-    @BeforeTemplate
-    Stream<T> before3(@Nullable T object) {
-      return object == null ? Stream.empty() : Stream.of(object);
+          Stream.of(object).filter(Objects::nonNull),
+          Optional.ofNullable(object).stream(),
+          object != null ? Stream.of(object) : Stream.empty(),
+          object == null ? Stream.empty() : Stream.of(object));
     }
 
     @AfterTemplate
