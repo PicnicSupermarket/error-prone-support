@@ -738,6 +738,7 @@
                                     </module>
                                     <module name="EmptyStatement" />
                                     <module name="FinalClass" />
+                                    <module name="GoogleNonConstantFieldName" />
                                     <module name="HiddenField">
                                         <property name="ignoreConstructorParameter" value="true" />
                                         <property name="ignoreSetter" value="true" />
@@ -883,6 +884,7 @@
                                         but (currently) doesn't warn about
                                         JavaDoc-only imports. -->
                                     </module>
+                                    <module name="UseEnhancedSwitch" />
                                     <module name="VisibilityModifier" />
                                     <module name="WhenShouldBeUsed" />
                                 </module>
