@@ -23,10 +23,36 @@ permissions:
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
+  acknowledge-request:
+    name: Acknowledge request
+    # Only run this job if it is a PR comment containing the command.
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    outputs:
+      comment_id: ${{ steps.post-comment.outputs.result }}
+    steps:
+      - name: Post comment with workflow link
+        id: post-comment
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const response = await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Integration tests started. :rocket:\n\n[View Workflow Run](${runUrl})`
+            })
+            return response.data.id
+
   run-integration-tests:
     name: Integration test
+    needs: [acknowledge-request]
     if: |
-      !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
+      always() && 
+      (!github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test'))
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -84,3 +110,40 @@ jobs:
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+
+  update-status:
+    name: Update comment status
+    needs: [acknowledge-request, run-integration-tests]
+    # `always()` ensures this runs even if previous jobs failed or were cancelled.
+    if: always() && github.event.issue.pull_request && needs.acknowledge-request.outputs.comment_id
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Update comment with results
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const conclusion = "${{ needs.run-integration-tests.result }}";
+            
+            let statusEmoji = '';
+            let message = "";
+            
+            if (conclusion === 'success') {
+              statusEmoji = ':white_check_mark:';
+              message = "Integration tests passed successfully!";
+            } else if (conclusion === 'cancelled') {
+              statusEmoji = ':stop_sign:';
+              message = "The workflow was manually cancelled.";
+            } else {
+              statusEmoji = ':x:';
+              message = "Integration tests failed. Please check the logs and artifacts.";
+            }
+            
+            github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ needs.acknowledge-request.outputs.comment_id }},
+              body: `Integration tests status: ${statusEmoji} ${conclusion.toUpperCase()}\n\n${message}\n\n[View Workflow Run](${runUrl})`
+            });
