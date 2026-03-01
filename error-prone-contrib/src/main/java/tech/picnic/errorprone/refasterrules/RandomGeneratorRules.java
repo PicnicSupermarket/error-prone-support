@@ -32,9 +32,12 @@ final class RandomGeneratorRules {
   }
 
   /**
-   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over more contrived
-   * alternatives.
+   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over alternatives that
+   * may silently yield an ununiform domain of values.
    */
+  // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
+  // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
+  // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextDoubleWithOrigin {
     @BeforeTemplate
     double before(RandomGenerator random, double a, double b) {
@@ -63,8 +66,12 @@ final class RandomGeneratorRules {
   }
 
   /**
-   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over more contrived alternatives.
+   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over alternatives that may
+   * silently yield values outside the intended domain.
    */
+  // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
+  // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
+  // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextIntWithOrigin {
     @BeforeTemplate
     int before(RandomGenerator random, int a, int b) {
@@ -111,6 +118,9 @@ final class RandomGeneratorRules {
    * Prefer {@link RandomGenerator#nextLong(long origin, long bound)} over more contrived
    * alternatives.
    */
+  // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
+  // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
+  // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextLongWithOrigin {
     @BeforeTemplate
     long before(RandomGenerator random, long a, long b) {
