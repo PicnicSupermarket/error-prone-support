@@ -310,8 +310,8 @@ final class StreamRules {
    * proportional to the size of the input stream, rather than space proportional to the result
    * stream.
    */
-  // XXX: This for ordered streams this the replacement code is not equivalent to the original code,
-  // as the latter uses a stable sort operation, while the former breaks ties arbitrarily.
+  // XXX: For ordered streams the replacement code is not equivalent to the original code, as the
+  // latter uses a stable sort operation, while the former breaks ties arbitrarily.
   static final class StreamCollectLeastStream<S, T extends S> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream, int n, Comparator<S> comparator) {
@@ -330,6 +330,8 @@ final class StreamRules {
    * proportional to the size of the input stream, rather than space proportional to the result
    * stream.
    */
+  // XXX: For ordered streams the replacement code is not equivalent to the original code, as the
+  // latter uses a stable sort operation, while the former breaks ties arbitrarily.
   static final class StreamCollectLeastNaturalOrderStream<T extends Comparable<? super T>> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream, int n) {
@@ -409,6 +411,8 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#findFirst()} over more contrived alternatives. */
+  // XXX: By dropping `.limit(n)` for any `n`, this rule assumes that consuming the stream does not
+  // have side-effects.
   static final class StreamFindFirst<T> {
     @BeforeTemplate
     Optional<T> before(Stream<T> stream, long limit) {
