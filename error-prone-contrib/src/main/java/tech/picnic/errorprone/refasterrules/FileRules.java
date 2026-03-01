@@ -70,10 +70,9 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer {@link Path#resolveSibling(Path)} over the more verbose alternative using {@link
-   * Path#getParent()}.
-   */
+  /** Prefer {@link Path#resolveSibling(Path)} over more verbose alternatives. */
+  // XXX: Contrary to the original code, the alternative code gracefully handles the case where
+  // `path` has no parent.
   static final class PathResolveSiblingPath {
     @BeforeTemplate
     @SuppressWarnings(
@@ -88,10 +87,9 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer {@link Path#resolveSibling(String)} over the more verbose alternative using {@link
-   * Path#getParent()}.
-   */
+  /** Prefer {@link Path#resolveSibling(String)} over the more verbose alternatives. */
+  // XXX: Contrary to the original code, the alternative code gracefully handles the case where
+  // `path` has no parent.
   static final class PathResolveSiblingString {
     @BeforeTemplate
     @SuppressWarnings(
