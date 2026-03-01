@@ -1,0 +1,118 @@
+package tech.picnic.errorprone.bugpatterns;
+
+import com.google.errorprone.CompilationTestHelper;
+import org.junit.jupiter.api.Test;
+
+final class UncheckedEnumValueOfInvocationTest {
+  @Test
+  void identification() {
+    CompilationTestHelper.newInstance(UncheckedEnumValueOfInvocation.class, getClass())
+        .expectErrorMessage(
+            "INVALID_TYPE",
+            m ->
+                m.contains(
+                    "`<nulltype>` is not a valid type for `Foo.A`, expected: `class java.lang.String`"))
+        .expectErrorMessage(
+            "INVALID_VALUE",
+            m -> m.contains("is not a valid value for `Foo.A`, possible values: [ONE, TWO, THREE]"))
+        .expectErrorMessage(
+            "MISSING_VALUE", m -> m.contains("might generate values which are missing in `Foo.A`"))
+        .addSourceLines(
+            "Foo.java",
+            "import java.util.List;",
+            "",
+            "class Foo {",
+            "  void unsafeCases(String raw, B b) {",
+            "    // BUG: Diagnostic matches: INVALID_TYPE",
+            "    A.valueOf(null);",
+            "    // BUG: Diagnostic matches: INVALID_TYPE",
+            "    A.valueOf(A.class, null);",
+            "    // BUG: Diagnostic matches: INVALID_VALUE",
+            "    A.valueOf(\"FOUR\");",
+            "    // BUG: Diagnostic matches: INVALID_VALUE",
+            "    A.valueOf(A.class, \"FOUR\");",
+            "    // BUG: Diagnostic contains:",
+            "    A.valueOf(raw);",
+            "    // BUG: Diagnostic contains:",
+            "    A.valueOf(A.class, raw);",
+            "    // BUG: Diagnostic matches: MISSING_VALUE",
+            "    A.valueOf(b.name());",
+            "    // BUG: Diagnostic matches: MISSING_VALUE",
+            "    A.valueOf(A.class, b.name());",
+            "",
+            "    A name =",
+            "        switch (b) {",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
+            "          case FOUR -> A.valueOf(b.name());",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
+            "          case FIVE -> A.valueOf(A.class, b.name());",
+            "          default -> null;",
+            "        };",
+            "    A toString =",
+            "        switch (b) {",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
+            "          case FOUR -> A.valueOf(b.toString());",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
+            "          case FIVE -> A.valueOf(A.class, b.toString());",
+            "          default -> null;",
+            "        };",
+            "    A defaultCase =",
+            "        switch (b) {",
+            "          case ONE, FOUR -> null;",
+            "          // BUG: Diagnostic matches: MISSING_VALUE",
+            "          default -> A.valueOf(b.name());",
+            "        };",
+            "  }",
+            "",
+            "  void safeCases(B b, C c) {",
+            "    A validLabel1 = A.valueOf(\"ONE\");",
+            "    A validLabel2 = A.valueOf(A.class, \"TWO\");",
+            "    A hasAllLabels = A.valueOf(c.name());",
+            "",
+            "    A a =",
+            "        switch (b) {",
+            "          // Invocation is protected by case labels.",
+            "          case ONE, THREE -> A.valueOf(A.class, b.name());",
+            "          // Invocation is protected by case label.",
+            "          case TWO -> A.valueOf(b.name());",
+            "          // `switch` and `.name()` are on different enums, and A > C.",
+            "          case FOUR -> A.valueOf(c.name());",
+            "          default -> null;",
+            "        };",
+            "    A defaultCase =",
+            "        switch (b) {",
+            "          case FOUR, FIVE -> null;",
+            "          // Invalid labels are filtered by another case",
+            "          // leaving valid cases only.",
+            "          default -> A.valueOf(b.name());",
+            "        };",
+            "  }",
+            "",
+            "  void ignoredCases() {",
+            "    A.valueOf(getClass().getSimpleName());",
+            "    A.valueOf(A.class, getClass().getSimpleName());",
+            "    List.of(\"\").stream().map(A::valueOf);",
+            "  }",
+            "",
+            "  enum A {",
+            "    ONE,",
+            "    TWO,",
+            "    THREE",
+            "  }",
+            "",
+            "  enum B {",
+            "    ONE,",
+            "    TWO,",
+            "    THREE,",
+            "    FOUR,",
+            "    FIVE",
+            "  }",
+            "",
+            "  enum C {",
+            "    ONE,",
+            "    TWO",
+            "  }",
+            "}")
+        .doTest();
+  }
+}
