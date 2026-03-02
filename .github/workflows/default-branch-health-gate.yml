@@ -1,3 +1,10 @@
+# XXX: Instead of this workflow, look into workflow that runs any time a `push`
+# event workflow against the default branch completes, and then updates the
+# merge guard on all open PRs that target the default branch, based on whether
+# all workflows against the head SHA (a) completed and (b) were successful.
+# If that workflow would also run on a `push` to the default branch (thus
+# blocking any further merges until all workflow succeed), that would make for
+# a more robust guard less susceptible to race conditions.
 name: Require that all checks on the default branch pass
 on:
   pull_request:
@@ -71,6 +78,8 @@ jobs:
             }
             core.info(`Found ${checkRuns.length} push event check runs; ${latestByName.size} unique names.`);
 
+            // XXX: The check for completed rules leaves the door open for slow
+            // checks to be missed; see the comment at the top of this file.
             const successConclusions = new Set(['neutral', 'skipped', 'stale', 'success']);
             const failures = [...latestByName.values()].filter(
               (cr) => cr.status === 'completed' && !successConclusions.has(cr.conclusion),
