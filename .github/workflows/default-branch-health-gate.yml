@@ -1,12 +1,6 @@
-name: Require green default branch
+name: Require that all checks on the default branch pass
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
-      - unlabeled
 permissions:
   contents: read
 jobs:
@@ -27,8 +21,8 @@ jobs:
         with:
           script: |
             const prLabels = context.payload.pull_request?.labels ?? [];
-            if (prLabels.some((l) => l.name === 'merge-when-default-branch-red')) {
-              core.info('Bypass label "merge-when-default-branch-red" found; skipping default branch health check.');
+            if (prLabels.some((l) => l.name === 'allow-merge-when-master-red')) {
+              core.info('Bypass label "allow-merge-when-master-red" found; skipping default branch health check.');
               return;
             }
 
@@ -38,24 +32,24 @@ jobs:
               repo: context.repo.repo,
               ref: `heads/${defaultBranch}`,
             });
-            const branchSha = branchRef.object.sha;
-            core.info(`Checking ${defaultBranch} at ${branchSha}`);
+            const defaultBranchSha = branchRef.object.sha;
+            core.info(`Checking ${defaultBranch} at ${defaultBranchSha}`);
 
-            // Only consider workflow runs triggered by a push event; other
-            // events (e.g. `issue_comment`) can also produce check runs on
-            // default branch SHA and should not be evaluated here.
+            // Only consider workflow runs triggered by a push event, so as to
+            // ignore other events such as `issue_comment` that also trigger
+            // workflow runs against the default branch.
             const [workflowRuns, allCheckRuns] = await Promise.all([
               github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                head_sha: branchSha,
+                head_sha: defaultBranchSha,
                 event: 'push',
                 per_page: 100,
               }),
               github.paginate(github.rest.checks.listForRef, {
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: branchSha,
+                ref: defaultBranchSha,
                 per_page: 100,
               }),
             ]);
@@ -63,10 +57,11 @@ jobs:
             const checkRuns = allCheckRuns.filter((cr) => pushSuiteIds.has(cr.check_suite?.id));
 
             // When a workflow is re-run, GitHub creates a new check suite per
-            // attempt. This means the same check name can appear multiple times
-            // for a given SHA, once per attempt. To correctly handle re-runs,
-            // we deduplicate by name and keep only the most recently created
-            // check run (highest ID, since IDs are monotonically increasing).
+            // attempt. This means that the same check name can appear multiple
+            // times for a given SHA, once per attempt. To correctly handle
+            // re-runs, we deduplicate by name and keep only the most recently
+            // created check run (the one with the highest ID, as IDs are
+            // monotonically increasing).
             const latestByName = new Map();
             for (const cr of checkRuns) {
               const existing = latestByName.get(cr.name);
@@ -74,7 +69,7 @@ jobs:
                 latestByName.set(cr.name, cr);
               }
             }
-            core.info(`Found ${checkRuns.length} push-event check run(s); ${latestByName.size} unique name(s).`);
+            core.info(`Found ${checkRuns.length} push event check runs; ${latestByName.size} unique names.`);
 
             const failureConclusions = new Set(['failure', 'timed_out', 'action_required', 'cancelled']);
             const failures = [...latestByName.values()].filter(
