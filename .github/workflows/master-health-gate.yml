@@ -11,6 +11,7 @@ permissions:
   contents: read
 jobs:
   check:
+    if: ${{ github.base_ref == github.event.repository.default_branch }}
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -31,13 +32,14 @@ jobs:
               return;
             }
 
+            const defaultBranch = context.payload.repository.default_branch;
             const { data: masterRef } = await github.rest.git.getRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'heads/master',
+              ref: `heads/${defaultBranch}`,
             });
             const masterSha = masterRef.object.sha;
-            core.info(`Checking master at ${masterSha}`);
+            core.info(`Checking ${defaultBranch} at ${masterSha}`);
 
             // Only consider workflow runs triggered by a push event; other
             // events (e.g. `issue_comment`) can also produce check runs on
