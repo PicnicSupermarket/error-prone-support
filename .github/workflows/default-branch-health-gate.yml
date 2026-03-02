@@ -3,8 +3,9 @@
 # merge guard on all open PRs that target the default branch, based on whether
 # all workflows against the head SHA (a) completed and (b) were successful.
 # If that workflow would also run on a `push` to the default branch (thus
-# blocking any further merges until all workflow succeed), that would make for
-# a more robust guard less susceptible to race conditions.
+# blocking any further merges until all workflow succeed) and on `pull_request`
+# events for new PRs (to assign an initial check state), that would make for a
+# more robust guard less susceptible to race conditions.
 name: Require that all checks on the default branch pass
 on:
   pull_request:
