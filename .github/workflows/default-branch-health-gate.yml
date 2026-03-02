@@ -1,25 +1,39 @@
-# XXX: Instead of this workflow, look into workflow that runs any time a `push`
-# event workflow against the default branch completes, and then updates the
-# merge guard on all open PRs that target the default branch, based on whether
-# all workflows against the head SHA (a) completed and (b) were successful.
-# If that workflow would also run on a `push` to the default branch (thus
-# blocking any further merges until all workflow succeed) and on `pull_request`
-# events for new PRs (to assign an initial check state), that would make for a
-# more robust guard less susceptible to race conditions.
-name: Require that all checks on the default branch pass
+# Maintains a "Default branch health" check run on each open PR targeting the
+# default branch. The check run is set to `in_progress` when a new commit is
+# pushed to the default branch (immediately blocking merges while CI runs), and
+# updated to `success` or `failure` once all push-triggered CI on the default
+# branch HEAD SHA completes. PRs can opt out via the
+# `allow-merge-when-master-red` label.
+#
+# To use this gate, add "Default branch health" as a required status check in
+# the branch protection rule for the default branch. Note that this refers to
+# the check run created by this workflow's script, not the workflow's own
+# automatic check run ("Default branch health gate / gate").
+name: Default branch health gate
 on:
+  check_suite:
+    types: [completed]
+  push:
+    branches: [master]
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
-      - unlabeled
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 permissions:
   contents: read
 jobs:
-  check:
-    if: ${{ github.base_ref == github.event.repository.default_branch }}
+  gate:
+    # For `check_suite` events, pre-filter at the job level to avoid launching
+    # a runner for suites from other apps (e.g. Dependabot) or other branches.
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+       github.base_ref == github.event.repository.default_branch) ||
+      (github.event_name == 'check_suite' &&
+       github.event.check_suite.app.slug == 'github-actions' &&
+       github.event.check_suite.head_branch == github.event.repository.default_branch)
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -30,71 +44,244 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
-      - name: Check default branch health
+      - name: Run default branch health gate
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
-            const prLabels = context.payload.pull_request?.labels ?? [];
-            if (prLabels.some((l) => l.name === 'allow-merge-when-master-red')) {
-              core.info('Bypass label "allow-merge-when-master-red" found; skipping default branch health check.');
+            const CHECK_NAME = 'Default branch health';
+            const BYPASS_LABEL = 'allow-merge-when-master-red';
+            const SUCCESS_CONCLUSIONS = new Set(['neutral', 'skipped', 'stale', 'success']);
+
+            // Returns the current HEAD SHA of the given branch.
+            async function getDefaultBranchSha(defaultBranch) {
+              const { data: ref } = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${defaultBranch}`,
+              });
+              return ref.object.sha;
+            }
+
+            // Evaluates all push-triggered check runs on the given default
+            // branch SHA. Returns 'success', 'failure', or 'pending' (if some
+            // checks are still running, or none have started yet).
+            async function evaluateDefaultBranchHealth(defaultBranchSha) {
+              const [workflowRuns, allCheckRuns] = await Promise.all([
+                github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  head_sha: defaultBranchSha,
+                  event: 'push',
+                  per_page: 100,
+                }),
+                github.paginate(github.rest.checks.listForRef, {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: defaultBranchSha,
+                  per_page: 100,
+                }),
+              ]);
+
+              const pushSuiteIds = new Set(workflowRuns.map((run) => run.check_suite_id));
+              const checkRuns = allCheckRuns.filter((cr) => pushSuiteIds.has(cr.check_suite?.id));
+
+              // When a workflow is re-run, GitHub creates a new check suite per
+              // attempt. This means that the same check name can appear multiple
+              // times for a given SHA, once per attempt. To correctly handle
+              // re-runs, we deduplicate by name and keep only the most recently
+              // created check run (the one with the highest ID, as IDs are
+              // monotonically increasing).
+              const latestByName = new Map();
+              for (const cr of checkRuns) {
+                const existing = latestByName.get(cr.name);
+                if (!existing || cr.id > existing.id) {
+                  latestByName.set(cr.name, cr);
+                }
+              }
+              core.info(`Found ${checkRuns.length} push-event check run(s); ${latestByName.size} unique name(s).`);
+
+              const entries = [...latestByName.values()];
+
+              // If no check runs have started yet, or some are still running,
+              // the default branch health is pending.
+              const stillRunning = entries.filter((cr) => cr.status !== 'completed');
+              if (entries.length === 0 || stillRunning.length > 0) {
+                core.info(`${stillRunning.length} check run(s) still running; ${entries.length} total.`);
+                return 'pending';
+              }
+
+              const failures = entries.filter((cr) => !SUCCESS_CONCLUSIONS.has(cr.conclusion));
+              if (failures.length > 0) {
+                const details = failures
+                  .map((cr) => `  - ${cr.name}: ${cr.conclusion} (${cr.html_url})`)
+                  .join('\n');
+                core.info(`Default branch has ${failures.length} failing check(s):\n${details}`);
+                return 'failure';
+              }
+
+              core.info('All checks on the default branch are green.');
+              return 'success';
+            }
+
+            // Creates or updates the gate check run on a PR head SHA. Looks up
+            // any existing check run with our name and updates it; creates a
+            // new one if none exists.
+            async function upsertCheckRun(prHeadSha, status, conclusion, summary) {
+              const { data: existing } = await github.rest.checks.listForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: prHeadSha,
+                check_name: CHECK_NAME,
+                per_page: 100,
+              });
+
+              // Pick the most recently created check run (highest ID).
+              const latest = existing.check_runs.reduce(
+                (best, cr) => (!best || cr.id > best.id ? cr : best),
+                null,
+              );
+
+              const outputTitle =
+                conclusion === 'success' ? 'Default branch is healthy' :
+                conclusion === 'failure' ? 'Default branch has failing checks' :
+                'Waiting for default branch CI to complete';
+
+              const payload = {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: CHECK_NAME,
+                status,
+                ...(conclusion !== null ? { conclusion } : {}),
+                output: { title: outputTitle, summary },
+              };
+
+              if (latest) {
+                await github.rest.checks.update({ check_run_id: latest.id, ...payload });
+                core.info(`Updated check run ${latest.id} on ${prHeadSha}: ${status}/${conclusion ?? '-'}`);
+              } else {
+                await github.rest.checks.create({ head_sha: prHeadSha, ...payload });
+                core.info(`Created check run on ${prHeadSha}: ${status}/${conclusion ?? '-'}`);
+              }
+            }
+
+            // Lists all open PRs targeting the given base branch.
+            async function listOpenPRs(baseBranch) {
+              return github.paginate(github.rest.pulls.list, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                base: baseBranch,
+                per_page: 100,
+              });
+            }
+
+            // =================================================================
+            // PUSH handler: a new commit landed on the default branch.
+            // Immediately set all open PR gate check runs to `in_progress` to
+            // block merges while CI runs.
+            // =================================================================
+            if (context.eventName === 'push') {
+              const defaultBranch = context.payload.repository.default_branch;
+              core.info(`Push to '${defaultBranch}'; marking open PRs as pending.`);
+
+              const openPRs = await listOpenPRs(defaultBranch);
+              core.info(`Found ${openPRs.length} open PR(s) targeting '${defaultBranch}'.`);
+
+              await Promise.all(
+                openPRs.map((pr) =>
+                  upsertCheckRun(
+                    pr.head.sha,
+                    'in_progress',
+                    null,
+                    'A new commit was pushed to the default branch. Waiting for CI to complete.',
+                  ),
+                ),
+              );
               return;
             }
 
-            const defaultBranch = context.payload.repository.default_branch;
-            const { data: branchRef } = await github.rest.git.getRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `heads/${defaultBranch}`,
-            });
-            const defaultBranchSha = branchRef.object.sha;
-            core.info(`Checking ${defaultBranch} at ${defaultBranchSha}`);
+            // =================================================================
+            // CHECK_SUITE handler: a check suite on the default branch
+            // completed. Re-evaluate health and update all open PRs if all
+            // checks are now done.
+            // =================================================================
+            if (context.eventName === 'check_suite') {
+              const suite = context.payload.check_suite;
+              const defaultBranch = context.payload.repository.default_branch;
 
-            // Only consider workflow runs triggered by a push event, so as to
-            // ignore other events such as `issue_comment` that also trigger
-            // workflow runs against the default branch.
-            const [workflowRuns, allCheckRuns] = await Promise.all([
-              github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                head_sha: defaultBranchSha,
-                event: 'push',
-                per_page: 100,
-              }),
-              github.paginate(github.rest.checks.listForRef, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: defaultBranchSha,
-                per_page: 100,
-              }),
-            ]);
-            const pushSuiteIds = new Set(workflowRuns.map((run) => run.check_suite_id));
-            const checkRuns = allCheckRuns.filter((cr) => pushSuiteIds.has(cr.check_suite?.id));
-
-            // When a workflow is re-run, GitHub creates a new check suite per
-            // attempt. This means that the same check name can appear multiple
-            // times for a given SHA, once per attempt. To correctly handle
-            // re-runs, we deduplicate by name and keep only the most recently
-            // created check run (the one with the highest ID, as IDs are
-            // monotonically increasing).
-            const latestByName = new Map();
-            for (const cr of checkRuns) {
-              const existing = latestByName.get(cr.name);
-              if (!existing || cr.id > existing.id) {
-                latestByName.set(cr.name, cr);
+              // These checks mirror the job-level `if:` and are kept here for
+              // defensive correctness.
+              if (suite.app?.slug !== 'github-actions') {
+                core.info(`Ignoring check_suite for app '${suite.app?.slug}'.`);
+                return;
               }
+              if (suite.head_branch !== defaultBranch) {
+                core.info(`Ignoring check_suite for branch '${suite.head_branch}'.`);
+                return;
+              }
+
+              // Only act on the *current* default branch HEAD, not on stale
+              // suites from a previous push.
+              const currentHeadSha = await getDefaultBranchSha(defaultBranch);
+              if (suite.head_sha !== currentHeadSha) {
+                core.info(`Ignoring stale check_suite for ${suite.head_sha}; current HEAD is ${currentHeadSha}.`);
+                return;
+              }
+
+              const health = await evaluateDefaultBranchHealth(currentHeadSha);
+              if (health === 'pending') {
+                core.info('Some checks are still running; leaving PR gate check runs in in_progress state.');
+                return;
+              }
+
+              const conclusion = health === 'success' ? 'success' : 'failure';
+              const summary = health === 'success'
+                ? 'All checks on the default branch passed.'
+                : 'One or more checks on the default branch failed. See the default branch for details.';
+
+              const openPRs = await listOpenPRs(defaultBranch);
+              core.info(`Updating ${openPRs.length} open PR(s) with health '${health}'.`);
+
+              await Promise.all(
+                openPRs.map((pr) =>
+                  upsertCheckRun(pr.head.sha, 'completed', conclusion, summary),
+                ),
+              );
+              return;
             }
-            core.info(`Found ${checkRuns.length} push event check runs; ${latestByName.size} unique names.`);
 
-            // XXX: The check for completed rules leaves the door open for slow
-            // checks to be missed; see the comment at the top of this file.
-            const successConclusions = new Set(['neutral', 'skipped', 'stale', 'success']);
-            const failures = [...latestByName.values()].filter(
-              (cr) => cr.status === 'completed' && !successConclusions.has(cr.conclusion),
-            );
+            // =================================================================
+            // PULL_REQUEST handler: a PR was opened, updated, or relabeled.
+            // Set the gate check run on this PR based on current default branch
+            // health.
+            // =================================================================
+            if (context.eventName === 'pull_request') {
+              const pr = context.payload.pull_request;
+              const defaultBranch = context.payload.repository.default_branch;
 
-            if (failures.length > 0) {
-              const details = failures.map((cr) => `  - ${cr.name}: ${cr.conclusion} (${cr.html_url})`).join('\n');
-              core.setFailed(`Default branch has ${failures.length} failing check(s):\n${details}`);
-            } else {
-              core.info('All completed checks on the default branch are green.');
+              const hasBypassLabel = pr.labels.some((l) => l.name === BYPASS_LABEL);
+              if (hasBypassLabel) {
+                core.info(`Bypass label '${BYPASS_LABEL}' found on PR #${pr.number}; marking as success.`);
+                await upsertCheckRun(
+                  pr.head.sha,
+                  'completed',
+                  'success',
+                  `Bypass label "${BYPASS_LABEL}" is set; default branch health check is skipped.`,
+                );
+                return;
+              }
+
+              const defaultBranchSha = await getDefaultBranchSha(defaultBranch);
+              core.info(`PR #${pr.number}: evaluating default branch '${defaultBranch}' at ${defaultBranchSha}.`);
+
+              const health = await evaluateDefaultBranchHealth(defaultBranchSha);
+
+              const [status, conclusion, summary] =
+                health === 'pending'
+                  ? ['in_progress', null, 'Default branch CI is still running. Merging is blocked until all checks complete.']
+                  : health === 'success'
+                  ? ['completed', 'success', 'All checks on the default branch passed.']
+                  : ['completed', 'failure', 'One or more checks on the default branch failed. See the default branch for details.'];
+
+              await upsertCheckRun(pr.head.sha, status, conclusion, summary);
             }
