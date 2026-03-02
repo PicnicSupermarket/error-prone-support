@@ -46,8 +46,23 @@ jobs:
               per_page: 100,
             });
 
+            // When a workflow is re-run, GitHub creates a new check suite per
+            // attempt. This means the same check name can appear multiple times
+            // for a given SHA, once per attempt. To correctly handle re-runs,
+            // we deduplicate by name and keep only the most recently created
+            // check run (highest ID, since IDs are monotonically increasing).
+            const latestByName = new Map();
+            for (const cr of checkRuns) {
+              const existing = latestByName.get(cr.name);
+              if (!existing || cr.id > existing.id) {
+                latestByName.set(cr.name, cr);
+              }
+            }
+            core.info(`Found ${checkRuns.length} check run(s); ${latestByName.size} unique name(s).`);
+
             const failureConclusions = new Set(['failure', 'timed_out', 'action_required', 'cancelled']);
-            const failures = checkRuns.filter(
+            // Note: the `startsWith` check below relies on this workflow's `name:` field.
+            const failures = [...latestByName.values()].filter(
               (cr) =>
                 cr.status === 'completed' &&
                 failureConclusions.has(cr.conclusion) &&
