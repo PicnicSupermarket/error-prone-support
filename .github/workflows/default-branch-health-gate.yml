@@ -71,9 +71,9 @@ jobs:
             }
             core.info(`Found ${checkRuns.length} push event check runs; ${latestByName.size} unique names.`);
 
-            const failureConclusions = new Set(['failure', 'timed_out', 'action_required', 'cancelled']);
+            const successConclusions = new Set(['neutral', 'skipped', 'stale', 'success']);
             const failures = [...latestByName.values()].filter(
-              (cr) => cr.status === 'completed' && failureConclusions.has(cr.conclusion),
+              (cr) => cr.status === 'completed' && !successConclusions.has(cr.conclusion),
             );
 
             if (failures.length > 0) {
