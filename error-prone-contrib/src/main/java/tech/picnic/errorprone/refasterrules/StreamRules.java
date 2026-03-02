@@ -55,6 +55,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -111,11 +112,14 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#ofNullable(Object)} over more contrived alternatives. */
-  static final class StreamOfNullable<T> {
+  static final class StreamOfNullable<T extends @Nullable Object> {
     @BeforeTemplate
     Stream<T> before(T object) {
       return Refaster.anyOf(
-          Stream.of(object).filter(Objects::nonNull), Optional.ofNullable(object).stream());
+          Stream.of(object).filter(Objects::nonNull),
+          Optional.ofNullable(object).stream(),
+          object != null ? Stream.of(object) : Stream.empty(),
+          object == null ? Stream.empty() : Stream.of(object));
     }
 
     @AfterTemplate
