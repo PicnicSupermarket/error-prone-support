@@ -42,21 +42,22 @@ jobs:
             // Only consider workflow runs triggered by a push event; other
             // events (e.g. `issue_comment`) can also produce check runs on
             // master SHA and should not be evaluated here.
-            const workflowRuns = await github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              head_sha: masterSha,
-              event: 'push',
-              per_page: 100,
-            });
+            const [workflowRuns, allCheckRuns] = await Promise.all([
+              github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head_sha: masterSha,
+                event: 'push',
+                per_page: 100,
+              }),
+              github.paginate(github.rest.checks.listForRef, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: masterSha,
+                per_page: 100,
+              }),
+            ]);
             const pushSuiteIds = new Set(workflowRuns.map((run) => run.check_suite_id));
-
-            const allCheckRuns = await github.paginate(github.rest.checks.listForRef, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: masterSha,
-              per_page: 100,
-            });
             const checkRuns = allCheckRuns.filter((cr) => pushSuiteIds.has(cr.check_suite?.id));
 
             // When a workflow is re-run, GitHub creates a new check suite per
@@ -74,12 +75,8 @@ jobs:
             core.info(`Found ${checkRuns.length} push-event check run(s); ${latestByName.size} unique name(s).`);
 
             const failureConclusions = new Set(['failure', 'timed_out', 'action_required', 'cancelled']);
-            // Note: the `startsWith` check below relies on this workflow's `name:` field.
             const failures = [...latestByName.values()].filter(
-              (cr) =>
-                cr.status === 'completed' &&
-                failureConclusions.has(cr.conclusion) &&
-                !cr.name.startsWith('Require green master'),
+              (cr) => cr.status === 'completed' && failureConclusions.has(cr.conclusion),
             );
 
             if (failures.length > 0) {
