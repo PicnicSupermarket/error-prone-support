@@ -4,13 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.suppliers.Supplier;
-import com.sun.tools.javac.code.ClassFinder;
-import com.sun.tools.javac.code.Source;
-import com.sun.tools.javac.code.Symbol.CompletionFailure;
-import com.sun.tools.javac.code.Symbol.ModuleSymbol;
-import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.util.Name;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.model.JavacElements;
 
 /**
  * Utility class that helps decide whether it is appropriate to introduce references to (well-known)
@@ -86,30 +81,8 @@ public enum ThirdPartyLibrary {
    * loaded, then an attempt is made to do so.
    */
   private static boolean isKnownClass(String typeName, VisitorState state) {
-    return isPublicClassInSymbolTable(typeName, state) || canLoadPublicClass(typeName, state);
-  }
-
-  private static boolean isPublicClassInSymbolTable(String typeName, VisitorState state) {
-    Type type = state.getTypeFromString(typeName);
-    return type != null && type.tsym.isPublic();
-  }
-
-  private static boolean canLoadPublicClass(String typeName, VisitorState state) {
-    ClassFinder classFinder = ClassFinder.instance(state.context);
-    Symtab symtab = state.getSymtab();
-    // XXX: Drop support for targeting Java 8 once the oldest supported JDK drops such support.
-    ModuleSymbol module =
-        Source.instance(state.context).compareTo(Source.JDK9) < 0
-            ? symtab.noModule
-            : symtab.unnamedModule;
-    Name binaryName = state.binaryNameFromClassname(typeName);
-    try {
-      return classFinder.loadClass(module, binaryName).isPublic();
-    } catch (
-        @SuppressWarnings("java:S1166" /* Not exceptional. */)
-        CompletionFailure e) {
-      return false;
-    }
+    Symbol type = JavacElements.instance(state.context).getTypeElement(typeName);
+    return type != null && type.isPublic();
   }
 
   private static boolean shouldIgnoreClasspath(VisitorState state) {

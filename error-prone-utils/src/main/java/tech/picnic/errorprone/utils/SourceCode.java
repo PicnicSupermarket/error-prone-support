@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.joining;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
+import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.VisitorState;
@@ -16,6 +17,8 @@ import com.google.errorprone.util.ErrorProneTokens;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.Position;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
 import javax.lang.model.SourceVersion;
 
@@ -154,5 +157,35 @@ public final class SourceCode {
     return SuggestedFix.replace(
         tree,
         tree.getArguments().stream().map(arg -> treeToString(arg, state)).collect(joining(", ")));
+  }
+
+  /**
+   * Creates a {@link SuggestedFix} for the replacement of the given collection of {@link Tree}s
+   * with the same collection, sorted according to the given {@link Comparator}.
+   *
+   * @param <T> The type of the given {@link Tree}s.
+   * @param trees The AST nodes to be sorted.
+   * @param comparator The {@link Comparator} according to which the given {@link Tree}s should be
+   *     sorted.
+   * @param state A {@link VisitorState} describing the context in which the given {@link Tree}s are
+   *     found.
+   * @return A non-{@code null} {@link SuggestedFix} that replaces the given collection of {@link
+   *     Tree}s with the same collection, sorted according to the given {@link Comparator}; {@link
+   *     SuggestedFix#emptyFix() empty} if the trees are already sorted.
+   */
+  public static <T extends Tree> SuggestedFix sortTrees(
+      Collection<? extends T> trees, Comparator<? super T> comparator, VisitorState state) {
+    if (Comparators.isInOrder(trees, comparator)) {
+      /* Fast path: the trees are already sorted. */
+      return SuggestedFix.emptyFix();
+    }
+
+    return Streams.zip(
+            trees.stream(),
+            trees.stream().sorted(comparator),
+            (original, replacement) ->
+                SuggestedFix.replace(original, treeToString(replacement, state)))
+        .reduce(SuggestedFix.builder(), SuggestedFix.Builder::merge, SuggestedFix.Builder::merge)
+        .build();
   }
 }

@@ -114,31 +114,31 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatFloatArrayContainsExactly() {
-    assertThat(new float[] {2.0F}).containsExactly(new float[] {1.0F});
+    assertThat(new float[] {2.0f}).containsExactly(new float[] {1.0f});
   }
 
   void testAssertThatFloatArrayWithFailMessageContainsExactly() {
-    assertThat(new float[] {2.0F}).withFailMessage("foo").containsExactly(new float[] {1.0F});
+    assertThat(new float[] {2.0f}).withFailMessage("foo").containsExactly(new float[] {1.0f});
   }
 
   void testAssertThatFloatArrayWithFailMessageSupplierContainsExactly() {
-    assertThat(new float[] {2.0F}).withFailMessage(() -> "foo").containsExactly(new float[] {1.0F});
+    assertThat(new float[] {2.0f}).withFailMessage(() -> "foo").containsExactly(new float[] {1.0f});
   }
 
   void testAssertThatFloatArrayContainsExactlyWithOffset() {
-    assertThat(new float[] {2.0F}).containsExactly(new float[] {1.0F}, offset(0.1f));
+    assertThat(new float[] {2.0f}).containsExactly(new float[] {1.0f}, offset(0.1f));
   }
 
   void testAssertThatFloatArrayWithFailMessageContainsExactlyWithOffset() {
-    assertThat(new float[] {2.0F})
+    assertThat(new float[] {2.0f})
         .withFailMessage("foo")
-        .containsExactly(new float[] {1.0F}, offset(0.1f));
+        .containsExactly(new float[] {1.0f}, offset(0.1f));
   }
 
   void testAssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset() {
-    assertThat(new float[] {2.0F})
+    assertThat(new float[] {2.0f})
         .withFailMessage(() -> "foo")
-        .containsExactly(new float[] {1.0F}, offset(0.1f));
+        .containsExactly(new float[] {1.0f}, offset(0.1f));
   }
 
   void testAssertThatDoubleArrayContainsExactly() {

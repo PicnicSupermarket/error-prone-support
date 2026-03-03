@@ -39,7 +39,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         !((short) 3 >= (short) 4),
         !(3 >= 4),
         !(3L >= 4L),
-        !(3F >= 4F),
+        !(3f >= 4f),
         !(3.0 >= 4.0));
   }
 
@@ -50,7 +50,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         !((short) 3 > (short) 4),
         !(3 > 4),
         !(3L > 4L),
-        !(3F > 4F),
+        !(3f > 4f),
         !(3.0 > 4.0));
   }
 
@@ -61,7 +61,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         !((short) 3 <= (short) 4),
         !(3 <= 4),
         !(3L <= 4L),
-        !(3F <= 4F),
+        !(3f <= 4f),
         !(3.0 <= 4.0));
   }
 
@@ -72,7 +72,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         !((short) 3 < (short) 4),
         !(3 < 4),
         !(3L < 4L),
-        !(3F < 4F),
+        !(3f < 4f),
         !(3.0 < 4.0));
   }
 
