@@ -114,6 +114,10 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
    * Comparator#thenComparing{Double,Long,Int}}. Conversion in the opposite direction does not
    * require the introduction of a generic type parameter.
    */
+  // XXX: Drop the `javabugs:S6976` violation suppression once SonarCloud no longer flags this false
+  // positive.
+  @SuppressWarnings(
+      "javabugs:S6976" /* SonarCloud incorrectly believes that a `Stream` is consumed twice. */)
   private static String prefixTypeArgumentsIfRelevant(
       String preferredMethodName, MethodInvocationTree tree, Type cmpType, VisitorState state) {
     if (tree.getTypeArguments().isEmpty() || preferredMethodName.startsWith("then")) {

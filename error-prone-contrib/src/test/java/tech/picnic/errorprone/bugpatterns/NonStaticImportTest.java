@@ -29,6 +29,8 @@ final class NonStaticImportTest {
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
   }
 
+  @SuppressWarnings(
+      "java:S3415" /* Comparing a constant against a non-constant value is intentional here. */)
   @Test
   void candidateIdentifiersDoNotClash() {
     assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)

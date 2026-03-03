@@ -113,7 +113,11 @@ final class StreamRules {
 
   /** Prefer {@link Stream#ofNullable(Object)} over more contrived alternatives. */
   static final class StreamOfNullable<T extends @Nullable Object> {
+    // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
+    // annotations.
     @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */)
     Stream<T> before(T object) {
       return Refaster.anyOf(
           Stream.of(object).filter(Objects::nonNull),
