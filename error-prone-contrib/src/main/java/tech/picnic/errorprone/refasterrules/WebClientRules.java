@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient.RequestBodyUri
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to expressions dealing with {@link
@@ -29,6 +30,7 @@ final class WebClientRules {
   private WebClientRules() {}
 
   /** Prefer {@link RequestBodySpec#bodyValue(Object)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class BodyValue<T> {
     @BeforeTemplate
     RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T value) {
@@ -48,60 +50,64 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#get()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientGet {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(GET);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(GET);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.get();
     }
   }
 
   /** Prefer {@link WebClient#head()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientHead {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(HEAD);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(HEAD);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.head();
     }
   }
 
   /** Prefer {@link WebClient#options()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientOptions {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.options();
     }
   }
 
   /** Prefer {@link WebClient#patch()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPatch {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -120,6 +126,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#post()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPost {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -138,6 +145,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#put()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPut {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -158,6 +166,7 @@ final class WebClientRules {
   /**
    * Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class RequestHeadersUriSpecUri<
       S extends RequestHeadersSpec<S>, T extends WebTestClient.RequestHeadersSpec<T>> {
     @BeforeTemplate

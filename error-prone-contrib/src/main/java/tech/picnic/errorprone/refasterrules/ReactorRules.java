@@ -60,6 +60,7 @@ import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
@@ -537,6 +538,7 @@ final class ReactorRules {
   /** Prefer {@link Flux#empty()} over more contrived alternatives. */
   // XXX: Using `@Matches(IsEmpty.class)`, the non-varargs overloads of most methods referenced here
   // can be rewritten as well. That would require adding a bunch more suitably-typed parameters.
+  @PossibleSourceIncompatibility
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
     // XXX: The methods enumerated here are not ordered entirely lexicographically, to accommodate a
     // conflict between the `InconsistentOverloads` and `RefasterMethodParameterOrder` checks.
@@ -611,6 +613,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#just(Object)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class FluxJust<T> {
     @BeforeTemplate
     Flux<Integer> before(int value) {
@@ -660,6 +663,7 @@ final class ReactorRules {
   /**
    * Prefer using {@link Mono}s as-is over less efficient transformations to equivalent instances.
    */
+  @PossibleSourceIncompatibility
   static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
@@ -1135,7 +1139,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
-    Publisher<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
+    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
       return Refaster.anyOf(
           flux.concatMap(
               x ->
@@ -1390,6 +1394,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#then(Mono)} over applying vacuous operations first. */
+  @PossibleSourceIncompatibility
   static final class MonoThenMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono1, Mono<S> mono2) {
@@ -1409,6 +1414,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#then(Mono)} over vacuously invoking {@link Flux#ignoreElements()}. */
+  @PossibleSourceIncompatibility
   static final class FluxThenMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Flux<T> flux, Mono<S> mono) {
@@ -2029,6 +2035,7 @@ final class ReactorRules {
    * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList()} over
    * alternatives that do not explicitly return an immutable collection.
    */
+  @PossibleSourceIncompatibility
   static final class FluxCollectToImmutableList<T> {
     @BeforeTemplate
     Mono<List<T>> before(Flux<T> flux) {
@@ -2339,12 +2346,12 @@ final class ReactorRules {
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
-    FirstStep<? extends T> before(Mono<T> mono) {
+    FirstStep<T> before(Mono<T> mono) {
       return Refaster.anyOf(StepVerifier.create(mono), mono.flux().as(StepVerifier::create));
     }
 
     @AfterTemplate
-    FirstStep<? extends T> after(Mono<T> mono) {
+    FirstStep<T> after(Mono<T> mono) {
       return mono.as(StepVerifier::create);
     }
   }
@@ -2352,12 +2359,12 @@ final class ReactorRules {
   /** Prefer {@link Flux#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromFlux<T> {
     @BeforeTemplate
-    FirstStep<? extends T> before(Flux<T> flux) {
+    FirstStep<T> before(Flux<T> flux) {
       return StepVerifier.create(flux);
     }
 
     @AfterTemplate
-    FirstStep<? extends T> after(Flux<T> flux) {
+    FirstStep<T> after(Flux<T> flux) {
       return flux.as(StepVerifier::create);
     }
   }
@@ -2375,6 +2382,7 @@ final class ReactorRules {
   // code, at the risk of compilation failures. With this rule, for example, we want to explicitly
   // nudge users towards `StepVerifier.Step#assertNext(Consumer)` or
   // `StepVerifier.Step#expectNext(Object)`, together with `Step#verifyComplete()`.
+  @PossibleSourceIncompatibility
   static final class StepVerifierVerify {
     @BeforeTemplate
     StepVerifier.Assertions before(StepVerifier stepVerifier) {
@@ -2391,6 +2399,7 @@ final class ReactorRules {
    * Prefer {@link StepVerifier#verify(Duration)} over a dangling {@link
    * StepVerifier#verifyThenAssertThat(Duration)}.
    */
+  @PossibleSourceIncompatibility
   static final class StepVerifierVerifyDuration {
     @BeforeTemplate
     StepVerifier.Assertions before(StepVerifier stepVerifier, Duration duration) {
@@ -2453,6 +2462,7 @@ final class ReactorRules {
    */
   // XXX: This rule assumes that the matched collector does not drop elements. Consider introducing
   // a `@Matches(DoesNotDropElements.class)` or `@NotMatches(MayDropElements.class)` guard.
+  @PossibleSourceIncompatibility
   static final class FluxAsStepVerifierExpectNext<T, L extends List<T>> {
     @BeforeTemplate
     StepVerifier.Step<L> before(Flux<T> flux, T object, Collector<? super T, ?, L> listCollector) {
@@ -2513,6 +2523,7 @@ final class ReactorRules {
    * Prefer {@link StepVerifier.LastStep#verifyErrorMatches(Predicate)} over more verbose
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class StepVerifierLastStepVerifyErrorMatches {
     @BeforeTemplate
     Duration before(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
@@ -2551,6 +2562,7 @@ final class ReactorRules {
    * Prefer {@link StepVerifier.LastStep#verifyErrorSatisfies(Consumer)} with AssertJ over more
    * contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class StepVerifierLastStepVerifyErrorSatisfiesAssertJ<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings("StepVerifierVerify" /* This is a more specific template. */)

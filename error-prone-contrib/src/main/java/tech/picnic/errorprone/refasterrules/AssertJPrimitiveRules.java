@@ -16,6 +16,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over primitive values. */
 @OnlineDocumentation
@@ -23,6 +24,7 @@ final class AssertJPrimitiveRules {
   private AssertJPrimitiveRules() {}
 
   /** Prefer {@code isEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
@@ -72,6 +74,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@code isNotEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
@@ -121,6 +124,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@code isLessThan} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsLessThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
@@ -136,6 +140,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@code isLessThanOrEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
@@ -151,6 +156,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@code isGreaterThan} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
@@ -166,6 +172,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@code isGreaterThanOrEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {

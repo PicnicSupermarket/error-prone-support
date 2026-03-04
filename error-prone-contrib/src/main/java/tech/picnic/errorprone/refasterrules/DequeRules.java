@@ -51,12 +51,12 @@ final class DequeRules {
   /** Prefer {@link Deque#removeFirst()} over less explicit alternatives. */
   static final class DequeRemoveFirst<S, T extends S> {
     @BeforeTemplate
-    S before(Deque<T> deque) {
+    T before(Deque<T> deque) {
       return Refaster.anyOf(deque.pop(), deque.remove());
     }
 
     @AfterTemplate
-    S after(Deque<T> deque) {
+    T after(Deque<T> deque) {
       return deque.removeFirst();
     }
   }
@@ -77,12 +77,12 @@ final class DequeRules {
   /** Prefer {@link Deque#pollFirst()} over less explicit alternatives. */
   static final class DequePollFirst<S, T extends S> {
     @BeforeTemplate
-    @Nullable S before(Deque<T> deque) {
+    @Nullable T before(Deque<T> deque) {
       return deque.poll();
     }
 
     @AfterTemplate
-    @Nullable S after(Deque<T> deque) {
+    @Nullable T after(Deque<T> deque) {
       return deque.pollFirst();
     }
   }
@@ -90,12 +90,12 @@ final class DequeRules {
   /** Prefer {@link Deque#getFirst()} over less explicit alternatives. */
   static final class DequeGetFirst<S, T extends S> {
     @BeforeTemplate
-    S before(Deque<T> deque) {
+    T before(Deque<T> deque) {
       return deque.element();
     }
 
     @AfterTemplate
-    S after(Deque<T> deque) {
+    T after(Deque<T> deque) {
       return deque.getFirst();
     }
   }
@@ -103,12 +103,12 @@ final class DequeRules {
   /** Prefer {@link Deque#peekFirst()} over less explicit alternatives. */
   static final class DequePeekFirst<S, T extends S> {
     @BeforeTemplate
-    @Nullable S before(Deque<T> deque) {
+    @Nullable T before(Deque<T> deque) {
       return deque.peek();
     }
 
     @AfterTemplate
-    @Nullable S after(Deque<T> deque) {
+    @Nullable T after(Deque<T> deque) {
       return deque.peekFirst();
     }
   }

@@ -24,6 +24,9 @@ import tech.picnic.errorprone.utils.SourceCode;
  *
  * <p>Note that this logic can't be implemented as a Refaster rule, as the {@link Refaster} class is
  * treated specially.
+ *
+ * @apiNote This check doesn't flag unnecessarily nested calls to {@link Refaster#anyOf(Object[])};
+ *     those cases are already handled by {@link AssociativeMethodInvocation}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
