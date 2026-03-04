@@ -10,6 +10,7 @@ import static com.google.errorprone.matchers.Matchers.isType;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -28,7 +29,6 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
 import javax.lang.model.type.TypeKind;
-import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -68,7 +68,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       return Description.NO_MATCH;
     }
 
-    boolean isIncompatible = isSourceIncompatible(tree, state);
+    boolean isIncompatible = isReturnTypeIncompatible(tree, state);
     MultiMatchResult<AnnotationTree> annotationMatch =
         HAS_POSSIBLE_SOURCE_INCOMPATIBILITY.multiMatchResult(tree, state);
     boolean hasAnnotation = annotationMatch.matches();
@@ -90,19 +90,22 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     return Description.NO_MATCH;
   }
 
-  private static boolean isSourceIncompatible(ClassTree tree, VisitorState state) {
-    Type afterReturnType = getAfterTemplateReturnType(tree, state);
-    if (afterReturnType == null || afterReturnType.getKind() == TypeKind.VOID) {
-      return false;
-    }
+  private static boolean isReturnTypeIncompatible(ClassTree tree, VisitorState state) {
+    ImmutableList<Type> afterReturnTypes = getAfterTemplateReturnTypes(tree, state);
 
-    for (Tree member : tree.getMembers()) {
-      if (BEFORE_TEMPLATE_METHOD.matches(member, state)
-          && member instanceof MethodTree methodTree) {
-        Type beforeReturnType = ASTHelpers.getSymbol(methodTree).getReturnType();
-        if (beforeReturnType.getKind() != TypeKind.VOID
-            && !state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
-          return true;
+    for (Type afterReturnType : afterReturnTypes) {
+      if (afterReturnType.getKind() == TypeKind.VOID) {
+        continue;
+      }
+
+      for (Tree member : tree.getMembers()) {
+        if (BEFORE_TEMPLATE_METHOD.matches(member, state)
+            && member instanceof MethodTree methodTree) {
+          Type beforeReturnType = ASTHelpers.getSymbol(methodTree).getReturnType();
+          if (beforeReturnType.getKind() != TypeKind.VOID
+              && !state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
+            return true;
+          }
         }
       }
     }
@@ -110,13 +113,15 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     return false;
   }
 
-  private static @Nullable Type getAfterTemplateReturnType(ClassTree tree, VisitorState state) {
+  private static ImmutableList<Type> getAfterTemplateReturnTypes(
+      ClassTree tree, VisitorState state) {
+    ImmutableList.Builder<Type> types = ImmutableList.builder();
     for (Tree member : tree.getMembers()) {
       if (AFTER_TEMPLATE_METHOD.matches(member, state) && member instanceof MethodTree methodTree) {
-        return ASTHelpers.getSymbol(methodTree).getReturnType();
+        types.add(ASTHelpers.getSymbol(methodTree).getReturnType());
       }
     }
-    return null;
+    return types.build();
   }
 
   private static boolean hasMatchingMember(
