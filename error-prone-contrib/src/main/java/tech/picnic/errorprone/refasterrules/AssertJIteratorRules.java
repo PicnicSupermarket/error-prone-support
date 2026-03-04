@@ -10,6 +10,7 @@ import java.util.Iterator;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.IteratorAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Iterator}s. */
 @OnlineDocumentation
@@ -17,6 +18,7 @@ final class AssertJIteratorRules {
   private AssertJIteratorRules() {}
 
   /** Prefer {@link IteratorAssert#hasNext()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasNext<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Iterator<T> iterator) {
@@ -31,6 +33,7 @@ final class AssertJIteratorRules {
   }
 
   /** Prefer {@link IteratorAssert#isExhausted()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsExhausted<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Iterator<T> iterator) {

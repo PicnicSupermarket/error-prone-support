@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link String}s. */
 @OnlineDocumentation
@@ -47,6 +48,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#startsWith(String)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatStringStartsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String prefix) {
@@ -63,6 +65,7 @@ final class AssertJStringRules {
   /**
    * Prefer {@link AbstractStringAssert#doesNotStartWith(String)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatStringDoesNotStartWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String prefix) {
@@ -77,6 +80,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#endsWith(String)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatStringEndsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String suffix) {
@@ -93,6 +97,7 @@ final class AssertJStringRules {
   /**
    * Prefer {@link AbstractStringAssert#doesNotEndWith(String)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatStringDoesNotEndWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String suffix) {
@@ -109,6 +114,7 @@ final class AssertJStringRules {
   /**
    * Prefer {@link AbstractStringAssert#contains(CharSequence...)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatStringContains {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {
@@ -126,6 +132,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#doesNotContain(CharSequence...)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatStringDoesNotContain {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {

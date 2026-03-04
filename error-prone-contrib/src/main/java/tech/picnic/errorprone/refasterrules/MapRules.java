@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link Map} instances. */
 @OnlineDocumentation
@@ -20,14 +21,16 @@ final class MapRules {
   /** Prefer {@link EnumMap} over less efficient alternatives. */
   // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
   // not allow an empty non-EnumMap to be provided.
+  @PossibleSourceIncompatibility
+  @SuppressWarnings("NonApiType" /* Refaster templates declare the most specific return type. */)
   static final class CreateEnumMap<K extends Enum<K>, V> {
     @BeforeTemplate
-    Map<K, V> before() {
+    HashMap<K, V> before() {
       return new HashMap<>();
     }
 
     @AfterTemplate
-    Map<K, V> after() {
+    EnumMap<K, V> after() {
       return new EnumMap<>(Refaster.<K>clazz());
     }
   }
