@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 
 /** Refaster rules related to expressions dealing with {@link Optional}s. */
@@ -184,9 +185,10 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#filter(Predicate)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class MapOptionalToBoolean<S, T extends S> {
     @BeforeTemplate
-    boolean before(Optional<T> optional, Function<S, Boolean> predicate) {
+    Boolean before(Optional<T> optional, Function<S, Boolean> predicate) {
       return optional.map(predicate).orElse(false);
     }
 

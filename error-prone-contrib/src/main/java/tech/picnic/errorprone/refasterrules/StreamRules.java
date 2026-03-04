@@ -58,6 +58,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
@@ -584,15 +585,16 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToInt(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamMapToIntSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    long before(Stream<T> stream, ToIntFunction<T> mapper) {
+    Integer before(Stream<T> stream, ToIntFunction<T> mapper) {
       return stream.collect(summingInt(mapper));
     }
 
     @BeforeTemplate
-    int before2(
+    Integer before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Integer> mapper) {
       return stream.map(mapper).reduce(0, Integer::sum);
@@ -605,15 +607,16 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToDouble(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamMapToDoubleSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
+    Double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
       return stream.collect(summingDouble(mapper));
     }
 
     @BeforeTemplate
-    double before2(
+    Double before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Double> mapper) {
       return stream.map(mapper).reduce(0.0, Double::sum);
@@ -626,15 +629,16 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToLong(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamMapToLongSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    long before(Stream<T> stream, ToLongFunction<T> mapper) {
+    Long before(Stream<T> stream, ToLongFunction<T> mapper) {
       return stream.collect(summingLong(mapper));
     }
 
     @BeforeTemplate
-    long before2(
+    Long before2(
         Stream<T> stream,
         @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Long> mapper) {
       return stream.map(mapper).reduce(0L, Long::sum);
@@ -692,10 +696,11 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#count()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamCount<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    long before(Stream<T> stream) {
+    Long before(Stream<T> stream) {
       return stream.collect(counting());
     }
 

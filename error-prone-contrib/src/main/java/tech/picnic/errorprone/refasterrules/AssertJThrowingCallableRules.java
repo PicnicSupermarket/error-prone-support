@@ -21,6 +21,7 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.assertj.core.api.ThrowableAssertAlternative;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over expressions that may throw a {@link Throwable}
@@ -58,9 +59,10 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentException {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
+    ThrowableAssertAlternative<IllegalArgumentException> before(ThrowingCallable throwingCallable) {
       return assertThatIllegalArgumentException().isThrownBy(throwingCallable);
     }
 
@@ -75,11 +77,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException().isThrownBy(throwingCallable).withMessage(message);
     }
 
@@ -96,11 +100,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentExceptionRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
           .havingRootCause()
@@ -121,11 +126,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<IllegalArgumentException> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
@@ -146,11 +152,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
           .withMessageStartingWith(message);
@@ -169,11 +177,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
           .withMessageContaining(message);
@@ -192,11 +202,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalArgumentExceptionHasMessageNotContainingAny {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<IllegalArgumentException> before(
         ThrowingCallable throwingCallable, @Repeated CharSequence values) {
       return assertThatIllegalArgumentException()
           .isThrownBy(throwingCallable)
@@ -217,9 +228,10 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateException {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
+    ThrowableAssertAlternative<IllegalStateException> before(ThrowingCallable throwingCallable) {
       return assertThatIllegalStateException().isThrownBy(throwingCallable);
     }
 
@@ -234,11 +246,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException().isThrownBy(throwingCallable).withMessage(message);
     }
 
@@ -255,11 +269,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateExceptionRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
           .havingRootCause()
@@ -280,11 +295,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<IllegalStateException> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
@@ -305,11 +321,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
           .withMessageStartingWith(message);
@@ -328,11 +346,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
           .withMessageContaining(message);
@@ -351,11 +371,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIllegalStateExceptionHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIllegalStateException()
           .isThrownBy(throwingCallable)
           .withMessageNotContaining(message);
@@ -374,9 +396,10 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerException {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
+    ThrowableAssertAlternative<NullPointerException> before(ThrowingCallable throwingCallable) {
       return assertThatNullPointerException().isThrownBy(throwingCallable);
     }
 
@@ -391,11 +414,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException().isThrownBy(throwingCallable).withMessage(message);
     }
 
@@ -412,11 +437,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerExceptionRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
           .havingRootCause()
@@ -437,11 +463,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<NullPointerException> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
@@ -462,11 +489,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
           .withMessageStartingWith(message);
@@ -485,11 +514,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
           .withMessageContaining(message);
@@ -508,11 +539,13 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByNullPointerExceptionHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatNullPointerException()
           .isThrownBy(throwingCallable)
           .withMessageNotContaining(message);
@@ -531,9 +564,10 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOException {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
+    ThrowableAssertAlternative<IOException> before(ThrowingCallable throwingCallable) {
       return assertThatIOException().isThrownBy(throwingCallable);
     }
 
@@ -548,10 +582,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOExceptionHasMessage {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessage(message);
     }
 
@@ -568,10 +604,11 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOExceptionRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<?> before(ThrowingCallable throwingCallable, String message) {
       return assertThatIOException()
           .isThrownBy(throwingCallable)
           .havingRootCause()
@@ -592,10 +629,11 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOExceptionHasMessageParameters {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<IOException> before(
         ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessage(message, parameters);
     }
@@ -614,10 +652,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOExceptionHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessageStartingWith(message);
     }
 
@@ -634,10 +674,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOExceptionHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessageContaining(message);
     }
 
@@ -654,10 +696,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIOExceptionHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable throwingCallable, String message) {
       return assertThatIOException().isThrownBy(throwingCallable).withMessageNotContaining(message);
     }
 
@@ -674,6 +718,7 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByAsInstanceOfThrowable<T extends Throwable> {
     @BeforeTemplate
     ThrowableAssertAlternative<T> before(
@@ -692,11 +737,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByHasMessage<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<? extends Throwable> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -715,11 +761,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByRootCauseHasMessage<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<?> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -742,11 +789,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByHasMessageParameters<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<? extends Throwable> before(
         ThrowingCallable throwingCallable,
         Class<T> exceptionType,
         String message,
@@ -773,11 +821,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByHasMessageStartingWith<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<? extends Throwable> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -798,11 +847,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByHasMessageContaining<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<? extends Throwable> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -823,11 +873,12 @@ final class AssertJThrowingCallableRules {
    * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByHasMessageNotContaining<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
+    ThrowableAssertAlternative<? extends Throwable> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
