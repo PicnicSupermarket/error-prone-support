@@ -37,21 +37,20 @@ import tech.picnic.errorprone.utils.SourceCode;
  * actual source compatibility of a Refaster rule.
  *
  * <p>A Refaster rule is source-incompatible if its {@link AfterTemplate} return type is not a
- * subtype of every {@link BeforeTemplate} return type, meaning the replacement may break compilation
- * at call sites that depend on the narrower type. Such rules should be annotated with {@link
- * tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility}.
+ * subtype of every {@link BeforeTemplate} return type, meaning the replacement may break
+ * compilation at call sites that depend on the narrower type. Such rules should be annotated with
+ * {@link tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility}.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
         "Refaster rules with source-incompatible type changes should be annotated with "
             + "`@PossibleSourceIncompatibility` and vice versa",
-    link = BUG_PATTERNS_BASE_URL + "RefasterSourceCompatibilityCheck",
+    link = BUG_PATTERNS_BASE_URL + "RefasterSourceCompatibility",
     linkType = CUSTOM,
     severity = WARNING,
     tags = LIKELY_ERROR)
-public final class RefasterSourceCompatibilityCheck extends BugChecker
-    implements ClassTreeMatcher {
+public final class RefasterSourceCompatibility extends BugChecker implements ClassTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION =
       "tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility";
@@ -60,8 +59,8 @@ public final class RefasterSourceCompatibilityCheck extends BugChecker
   private static final MultiMatcher<Tree, AnnotationTree> HAS_POSSIBLE_SOURCE_INCOMPATIBILITY =
       annotations(AT_LEAST_ONE, isType(POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION));
 
-  /** Instantiates a new {@link RefasterSourceCompatibilityCheck} instance. */
-  public RefasterSourceCompatibilityCheck() {}
+  /** Instantiates a new {@link RefasterSourceCompatibility} instance. */
+  public RefasterSourceCompatibility() {}
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
@@ -85,8 +84,7 @@ public final class RefasterSourceCompatibilityCheck extends BugChecker
 
     if (!isIncompatible && hasAnnotation) {
       return describeMatch(
-          tree,
-          SourceCode.deleteWithTrailingWhitespace(annotationMatch.onlyMatchingNode(), state));
+          tree, SourceCode.deleteWithTrailingWhitespace(annotationMatch.onlyMatchingNode(), state));
     }
 
     return Description.NO_MATCH;
@@ -114,8 +112,7 @@ public final class RefasterSourceCompatibilityCheck extends BugChecker
 
   private static @Nullable Type getAfterTemplateReturnType(ClassTree tree, VisitorState state) {
     for (Tree member : tree.getMembers()) {
-      if (AFTER_TEMPLATE_METHOD.matches(member, state)
-          && member instanceof MethodTree methodTree) {
+      if (AFTER_TEMPLATE_METHOD.matches(member, state) && member instanceof MethodTree methodTree) {
         return ASTHelpers.getSymbol(methodTree).getReturnType();
       }
     }
