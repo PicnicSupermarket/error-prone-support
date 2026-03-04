@@ -77,7 +77,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       return describeMatch(
           tree,
           SuggestedFix.builder()
-              .prefixWith(tree, "@PossibleSourceIncompatibility\n")
+              .prefixWith(tree, "@PossibleSourceIncompatibility ")
               .addImport(POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION)
               .build());
     }
