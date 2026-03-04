@@ -16,6 +16,7 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.MultiMatcher;
@@ -74,12 +75,10 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     boolean hasAnnotation = annotationMatch.matches();
 
     if (isIncompatible && !hasAnnotation) {
-      return describeMatch(
-          tree,
-          SuggestedFix.builder()
-              .prefixWith(tree, "@PossibleSourceIncompatibility ")
-              .addImport(POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION)
-              .build());
+      SuggestedFix.Builder fix = SuggestedFix.builder();
+      String annotation =
+          SuggestedFixes.qualifyType(state, fix, POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION);
+      return describeMatch(tree, fix.prefixWith(tree, '@' + annotation + ' ').build());
     }
 
     if (!isIncompatible && hasAnnotation) {
