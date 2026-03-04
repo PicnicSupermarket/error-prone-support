@@ -5,10 +5,10 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class RefasterSourceCompatibilityCheckTest {
+final class RefasterSourceCompatibilityTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(RefasterSourceCompatibilityCheck.class, getClass())
+    CompilationTestHelper.newInstance(RefasterSourceCompatibility.class, getClass())
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",
@@ -145,7 +145,7 @@ final class RefasterSourceCompatibilityCheckTest {
 
   @Test
   void replacement() {
-    BugCheckerRefactoringTestHelper.newInstance(RefasterSourceCompatibilityCheck.class, getClass())
+    BugCheckerRefactoringTestHelper.newInstance(RefasterSourceCompatibility.class, getClass())
         .addInputLines(
             "A.java",
             "import com.google.errorprone.refaster.annotation.AfterTemplate;",
