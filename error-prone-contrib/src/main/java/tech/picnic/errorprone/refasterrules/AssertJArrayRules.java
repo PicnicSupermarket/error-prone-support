@@ -8,8 +8,9 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractIntegerAssert;
-import org.assertj.core.api.AbstractObjectArrayAssert;
+import org.assertj.core.api.ObjectArrayAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsMultidimensionalArray;
 
 /** Refaster rules related to AssertJ assertions over arrays. */
@@ -19,6 +20,7 @@ import tech.picnic.errorprone.refaster.matchers.IsMultidimensionalArray;
 final class AssertJArrayRules {
   private AssertJArrayRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSize<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -28,11 +30,12 @@ final class AssertJArrayRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array, int size) {
+    ObjectArrayAssert<T> after(T[] array, int size) {
       return assertThat(array).hasSize(size);
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeLessThan<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -42,11 +45,12 @@ final class AssertJArrayRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array, int size) {
+    ObjectArrayAssert<T> after(T[] array, int size) {
       return assertThat(array).hasSizeLessThan(size);
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeLessThanOrEqualTo<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -56,11 +60,12 @@ final class AssertJArrayRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array, int size) {
+    ObjectArrayAssert<T> after(T[] array, int size) {
       return assertThat(array).hasSizeLessThanOrEqualTo(size);
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeGreaterThan<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -70,11 +75,12 @@ final class AssertJArrayRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array, int size) {
+    ObjectArrayAssert<T> after(T[] array, int size) {
       return assertThat(array).hasSizeGreaterThan(size);
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeGreaterThanOrEqualTo<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -84,11 +90,12 @@ final class AssertJArrayRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array, int size) {
+    ObjectArrayAssert<T> after(T[] array, int size) {
       return assertThat(array).hasSizeGreaterThanOrEqualTo(size);
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeBetween<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -98,7 +105,7 @@ final class AssertJArrayRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectArrayAssert<?, T> after(T[] array, int lowerBound, int upperBound) {
+    ObjectArrayAssert<T> after(T[] array, int lowerBound, int upperBound) {
       return assertThat(array).hasSizeBetween(lowerBound, upperBound);
     }
   }

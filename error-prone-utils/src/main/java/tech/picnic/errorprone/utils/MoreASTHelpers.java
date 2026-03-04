@@ -9,8 +9,11 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.util.TreeScanner;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A collection of helper methods for working with the AST.
@@ -64,6 +67,37 @@ public final class MoreASTHelpers {
     return Optional.ofNullable(state.findEnclosing(LambdaExpressionTree.class, MethodTree.class))
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast);
+  }
+
+  /**
+   * Collects all direct {@link ReturnTree}s in the given method, excluding return statements nested
+   * inside anonymous and local classes or lambda expressions.
+   *
+   * @param method The method from which to extract return statements.
+   * @return The {@link ReturnTree}s that directly belong to the given method.
+   */
+  // XXX: This pattern also occurs a few times inside Error Prone; contribute upstream.
+  public static ImmutableList<ReturnTree> findDirectReturnStatements(MethodTree method) {
+    ImmutableList.Builder<ReturnTree> returnStatements = ImmutableList.builder();
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitClass(ClassTree node, @Nullable Void unused) {
+        return null;
+      }
+
+      @Override
+      public @Nullable Void visitReturn(ReturnTree node, @Nullable Void unused) {
+        returnStatements.add(node);
+        return null;
+      }
+
+      @Override
+      public @Nullable Void visitLambdaExpression(
+          LambdaExpressionTree node, @Nullable Void unused) {
+        return null;
+      }
+    }.scan(method, null);
+    return returnStatements.build();
   }
 
   /**

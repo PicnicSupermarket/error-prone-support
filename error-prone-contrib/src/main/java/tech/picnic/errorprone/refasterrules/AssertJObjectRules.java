@@ -12,12 +12,14 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over arbitrary objects. */
 @OnlineDocumentation
 final class AssertJObjectRules {
   private AssertJObjectRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsInstanceOf<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object) {
@@ -31,6 +33,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsInstanceOf2<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T object, Class<S> clazz) {
@@ -44,6 +47,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotInstanceOf<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object) {
@@ -57,6 +61,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsIsEqualTo<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object1, T object2) {
@@ -70,6 +75,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsIsNotEqualTo<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object1, T object2) {
@@ -83,6 +89,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasToString<T> {
     @BeforeTemplate
     AbstractStringAssert<?> before(T object, String str) {
@@ -96,6 +103,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsSameAs<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T object1, T object2) {
@@ -110,6 +118,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotSameAs<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T object1, T object2) {
@@ -148,6 +157,7 @@ final class AssertJObjectRules {
 
   // XXX This rule is redundant when the `AssertThatIsNotSameAs` rule is used in combination with
   // the `AssertJNullnessAssertion` check. It's retained for use with OpenRewrite.
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotNull<T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsNotSameAs" /* This is a more specific template. */)
@@ -163,6 +173,7 @@ final class AssertJObjectRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSameHashCodeAs<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T object1, T object2) {

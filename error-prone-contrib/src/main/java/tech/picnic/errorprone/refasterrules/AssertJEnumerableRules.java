@@ -6,13 +6,14 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import java.util.Collection;
-import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractIterableAssert;
 import org.assertj.core.api.AbstractIterableSizeAssert;
 import org.assertj.core.api.Assert;
 import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ assertions over enumerable objects. */
@@ -73,6 +74,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertIsNotEmpty<E> {
     @BeforeTemplate
     EnumerableAssert<?, E> before(EnumerableAssert<?, E> enumAssert) {
@@ -87,10 +89,18 @@ final class AssertJEnumerableRules {
           enumAssert.size().isPositive().returnToIterable());
     }
 
-    // XXX: If this template matches, then the expression's return type changes incompatibly.
-    // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
-    AbstractIntegerAssert<?> before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
+    AbstractIterableSizeAssert<
+            ? extends
+                AbstractIterableAssert<
+                    ? extends AbstractIterableAssert<?, ?, E, ?>,
+                    ? extends Iterable<? extends E>,
+                    E,
+                    ? extends AbstractAssert<? extends AbstractAssert<?, E>, E>>,
+            ? extends Iterable<? extends E>,
+            E,
+            ? extends AbstractAssert<? extends AbstractAssert<?, E>, E>>
+        before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
       return Refaster.anyOf(enumAssert.size().isNotEqualTo(0), enumAssert.size().isPositive());
     }
 
@@ -100,6 +110,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSize<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -121,6 +132,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeLessThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -142,6 +154,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeLessThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -163,6 +176,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeGreaterThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -184,6 +198,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeGreaterThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -205,6 +220,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeBetween<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(

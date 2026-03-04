@@ -9,6 +9,7 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractDurationAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over {@link Duration}s.
@@ -20,6 +21,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJDurationRules {
   private AssertJDurationRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasNanos {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long nanos) {
@@ -32,6 +34,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasMillis {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long millis) {
@@ -44,6 +47,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSeconds {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long seconds) {
@@ -56,6 +60,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasMinutes {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long minutes) {
@@ -68,6 +73,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasHours {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long hours) {
@@ -80,6 +86,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasDays {
     @BeforeTemplate
     AbstractLongAssert<?> before(Duration duration, long days) {
@@ -92,6 +99,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsZero {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Duration duration) {
@@ -112,6 +120,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsPositive {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Duration duration) {
@@ -129,6 +138,7 @@ final class AssertJDurationRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNegative {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Duration duration) {

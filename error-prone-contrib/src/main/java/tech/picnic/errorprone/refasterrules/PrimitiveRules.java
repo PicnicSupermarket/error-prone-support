@@ -331,12 +331,12 @@ final class PrimitiveRules {
   /** Prefer JDK's {@link Long#compareUnsigned(long, long)} over third-party alternatives. */
   static final class LongCompareUnsigned {
     @BeforeTemplate
-    long before(long x, long y) {
+    int before(long x, long y) {
       return UnsignedLongs.compare(x, y);
     }
 
     @AfterTemplate
-    long after(long x, long y) {
+    int after(long x, long y) {
       return Long.compareUnsigned(x, y);
     }
   }

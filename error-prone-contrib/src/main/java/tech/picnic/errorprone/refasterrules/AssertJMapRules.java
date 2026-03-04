@@ -16,6 +16,7 @@ import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ assertions over {@link Map}s. */
@@ -183,6 +184,7 @@ final class AssertJMapRules {
   // XXX: Strictly speaking this rule could be merged into `AssertThatMapContainsOnlyKeys` below,
   // but that rule targets another `containsOnlyKeys` overload. Review how cases like this should
   // impact the preferred naming scheme.
+  @PossibleSourceIncompatibility
   static final class AssertThatMapContainsOnlyKey<K, V> {
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(Map<K, V> map, K key) {
@@ -196,6 +198,7 @@ final class AssertJMapRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatMapContainsOnlyKeys<K, V> {
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(
