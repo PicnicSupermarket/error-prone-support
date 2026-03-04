@@ -13,6 +13,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Iterable}s. */
 @OnlineDocumentation
@@ -76,6 +77,7 @@ final class AssertJIterableRules {
   // XXX: In practice this rule isn't very useful, as it only matches invocations of
   // `assertThat(E)`. In most cases a more specific overload of `assertThat` is invoked, in which
   // case this rule won't match. Look into a more robust approach.
+  @PossibleSourceIncompatibility
   static final class AssertThatIterableHasOneElementEqualTo<S, E extends S> {
     @BeforeTemplate
     ObjectAssert<S> before(Iterable<S> iterable, E element) {

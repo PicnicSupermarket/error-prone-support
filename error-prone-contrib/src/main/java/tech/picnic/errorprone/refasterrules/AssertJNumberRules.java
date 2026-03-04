@@ -20,6 +20,7 @@ import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import org.assertj.core.api.NumberAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 
 /** Refaster rules related to AssertJ assertions over numeric values. */
@@ -27,6 +28,7 @@ import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 final class AssertJNumberRules {
   private AssertJNumberRules() {}
 
+  @PossibleSourceIncompatibility
   static final class NumberAssertIsPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -78,6 +80,7 @@ final class AssertJNumberRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class NumberAssertIsNotPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -129,6 +132,7 @@ final class AssertJNumberRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class NumberAssertIsNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -180,6 +184,7 @@ final class AssertJNumberRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class NumberAssertIsNotNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -238,6 +243,7 @@ final class AssertJNumberRules {
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isOdd} test.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsOdd {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
@@ -263,6 +269,7 @@ final class AssertJNumberRules {
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isEven} test.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEven {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {

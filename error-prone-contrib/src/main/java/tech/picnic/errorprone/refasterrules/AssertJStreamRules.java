@@ -18,6 +18,7 @@ import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.ListAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Stream}s. */
 @OnlineDocumentation
@@ -131,6 +132,7 @@ final class AssertJStreamRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSize<T> {
     @BeforeTemplate
     AbstractLongAssert<?> before(Stream<T> stream, int size) {
@@ -177,6 +179,7 @@ final class AssertJStreamRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatAnyMatch<T> {
     @BeforeTemplate
     ListAssert<T> before(Stream<T> stream, Predicate<? super T> predicate) {
@@ -198,6 +201,7 @@ final class AssertJStreamRules {
   }
 
   // XXX: Consider moving this rule to a new `AssertJCollectionRules` class.
+  @PossibleSourceIncompatibility
   static final class AssertThatCollection<T> {
     @BeforeTemplate
     ListAssert<T> before(Collection<T> collection) {

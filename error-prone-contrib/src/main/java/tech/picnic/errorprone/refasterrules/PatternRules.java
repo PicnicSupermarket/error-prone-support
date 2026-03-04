@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to code dealing with regular expressions. */
 @OnlineDocumentation
@@ -19,6 +20,7 @@ final class PatternRules {
   // expression may match functional interfaces other than `Predicate`. If we do add such a rule, we
   // should also add a rule that replaces `s -> pattern.matcher(s).matches()` with
   // `pattern.asMatchPredicate()`.
+  @PossibleSourceIncompatibility
   static final class PatternAsPredicate {
     @BeforeTemplate
     Predicate<CharSequence> before(Pattern pattern) {
@@ -32,6 +34,7 @@ final class PatternRules {
   }
 
   /** Prefer {@link Pattern#asPredicate()} over non-JDK alternatives. */
+  @PossibleSourceIncompatibility
   static final class PatternCompileAsPredicate {
     @BeforeTemplate
     Predicate<CharSequence> before(String pattern) {

@@ -15,12 +15,14 @@ import org.assertj.core.api.AbstractOptionalAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Optional}s. */
 @OnlineDocumentation
 final class AssertJOptionalRules {
   private AssertJOptionalRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatOptional<T> {
     @BeforeTemplate
     ObjectAssert<T> before(Optional<T> optional) {
@@ -117,6 +119,7 @@ final class AssertJOptionalRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatOptionalHasValueMatching<T> {
     @BeforeTemplate
     AbstractOptionalAssert<?, T> before(Optional<T> optional, Predicate<? super T> predicate) {

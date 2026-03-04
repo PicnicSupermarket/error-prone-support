@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractObjectArrayAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsMultidimensionalArray;
 
 /** Refaster rules related to AssertJ assertions over arrays. */
@@ -19,6 +20,7 @@ import tech.picnic.errorprone.refaster.matchers.IsMultidimensionalArray;
 final class AssertJArrayRules {
   private AssertJArrayRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSize<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -33,6 +35,7 @@ final class AssertJArrayRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeLessThan<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -47,6 +50,7 @@ final class AssertJArrayRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeLessThanOrEqualTo<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -61,6 +65,7 @@ final class AssertJArrayRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeGreaterThan<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -75,6 +80,7 @@ final class AssertJArrayRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeGreaterThanOrEqualTo<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -89,6 +95,7 @@ final class AssertJArrayRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSizeBetween<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(

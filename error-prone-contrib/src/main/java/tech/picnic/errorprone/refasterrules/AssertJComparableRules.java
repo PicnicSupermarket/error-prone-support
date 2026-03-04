@@ -9,12 +9,14 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractComparableAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Comparable}s. */
 @OnlineDocumentation
 final class AssertJComparableRules {
   private AssertJComparableRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -28,6 +30,7 @@ final class AssertJComparableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -41,6 +44,7 @@ final class AssertJComparableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsLessThan<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -54,6 +58,7 @@ final class AssertJComparableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsLessThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -67,6 +72,7 @@ final class AssertJComparableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThan<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -80,6 +86,7 @@ final class AssertJComparableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {

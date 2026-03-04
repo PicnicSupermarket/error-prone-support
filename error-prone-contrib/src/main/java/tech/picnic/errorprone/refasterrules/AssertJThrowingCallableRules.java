@@ -21,6 +21,7 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.assertj.core.api.ThrowableAssertAlternative;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over expressions that may throw a {@link Throwable}
@@ -554,6 +555,7 @@ final class AssertJThrowingCallableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByAsInstanceOfThrowable<T extends Throwable> {
     @BeforeTemplate
     ThrowableAssertAlternative<T> before(

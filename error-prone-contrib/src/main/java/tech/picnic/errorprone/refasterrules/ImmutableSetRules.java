@@ -244,7 +244,7 @@ final class ImmutableSetRules {
     }
 
     @AfterTemplate
-    ImmutableSet<K> after(Set<K> set, Map<K, V> map) {
+    ImmutableSet<T> after(Set<T> set, Map<K, V> map) {
       return Sets.difference(set, map.keySet()).immutableCopy();
     }
   }
