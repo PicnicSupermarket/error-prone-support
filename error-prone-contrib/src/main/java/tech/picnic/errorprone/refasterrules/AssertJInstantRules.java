@@ -9,6 +9,7 @@ import java.time.Instant;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractInstantAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over {@link Instant}s.
@@ -20,6 +21,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJInstantRules {
   private AssertJInstantRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAfter {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -32,6 +34,7 @@ final class AssertJInstantRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsBeforeOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -44,6 +47,7 @@ final class AssertJInstantRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsBefore {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -56,6 +60,7 @@ final class AssertJInstantRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAfterOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {

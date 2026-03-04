@@ -11,6 +11,7 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractPathAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over {@link Path}s.
@@ -22,6 +23,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJPathRules {
   private AssertJPathRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatExists {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -34,6 +36,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotExist {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -46,6 +49,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsRegularFile {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -58,6 +62,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsDirectory {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -70,6 +75,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsSymbolicLink {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -82,6 +88,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAbsolute {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -94,6 +101,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsRelative {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -106,6 +114,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsReadable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -118,6 +127,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsWritable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -130,6 +140,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsExecutable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -180,6 +191,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatStartsWithRaw {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual, Path other) {
@@ -192,6 +204,7 @@ final class AssertJPathRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatEndsWithRaw {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual, Path other) {
@@ -208,6 +221,7 @@ final class AssertJPathRules {
    * Prefer using {@link AbstractPathAssert#hasExtension(String)} over more verbose and less
    * accurate alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasExtension {
     @BeforeTemplate
     AbstractStringAssert<?> before(Path actual, String expectedExtension) {

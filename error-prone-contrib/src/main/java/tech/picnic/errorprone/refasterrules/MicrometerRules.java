@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with Micrometer. */
 // XXX: Consider replacing the `TagsOf[N]` rules with a bug checker, so that various other
@@ -19,6 +20,7 @@ final class MicrometerRules {
   private MicrometerRules() {}
 
   /** Prefer using {@link Tags} over other immutable collections. */
+  @PossibleSourceIncompatibility
   static final class TagsOf1 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag) {
@@ -32,6 +34,7 @@ final class MicrometerRules {
   }
 
   /** Prefer using {@link Tags} over other immutable collections. */
+  @PossibleSourceIncompatibility
   static final class TagsOf2 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2) {
@@ -45,6 +48,7 @@ final class MicrometerRules {
   }
 
   /** Prefer using {@link Tags} over other immutable collections. */
+  @PossibleSourceIncompatibility
   static final class TagsOf3 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3) {
@@ -58,6 +62,7 @@ final class MicrometerRules {
   }
 
   /** Prefer using {@link Tags} over other immutable collections. */
+  @PossibleSourceIncompatibility
   static final class TagsOf4 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
@@ -72,6 +77,7 @@ final class MicrometerRules {
   }
 
   /** Prefer using {@link Tags} over other immutable collections. */
+  @PossibleSourceIncompatibility
   static final class TagsOf5 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {

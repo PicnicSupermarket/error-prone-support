@@ -10,6 +10,7 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over {@link File}s.
@@ -21,6 +22,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJFileRules {
   private AssertJFileRules() {}
 
+  @PossibleSourceIncompatibility
   static final class AssertThatExists {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -33,6 +35,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotExist {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -45,6 +48,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsFile {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -57,6 +61,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsDirectory {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -69,6 +74,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAbsolute {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -81,6 +87,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsRelative {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -93,6 +100,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsReadable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -105,6 +113,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsWritable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -117,6 +126,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIsExecutable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -129,6 +139,7 @@ final class AssertJFileRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatHasFileName {
     @BeforeTemplate
     AbstractStringAssert<?> before(File actual, String fileName) {
@@ -183,6 +194,7 @@ final class AssertJFileRules {
    * Prefer using {@link AbstractFileAssert#hasExtension(String)} over more verbose and less
    * accurate alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasExtension {
     @BeforeTemplate
     AbstractStringAssert<?> before(File actual, String expectedExtension) {

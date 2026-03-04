@@ -13,6 +13,7 @@ import org.assertj.core.api.Assert;
 import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ assertions over enumerable objects. */
@@ -73,6 +74,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertIsNotEmpty<E> {
     @BeforeTemplate
     EnumerableAssert<?, E> before(EnumerableAssert<?, E> enumAssert) {
@@ -100,6 +102,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSize<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -121,6 +124,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeLessThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -142,6 +146,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeLessThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -163,6 +168,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeGreaterThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -184,6 +190,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeGreaterThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -205,6 +212,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeBetween<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
