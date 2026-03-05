@@ -42,6 +42,8 @@ import tech.picnic.errorprone.utils.SourceCode;
  * compilation at call sites that depend on the narrower type. Such rules should be annotated with
  * {@link tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility}.
  */
+// XXX: Relies on declared (and denotable) return types. Works in tandem with the
+// `RefasterReturnType` check.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
