@@ -153,11 +153,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
         newArgs.add(new Type.WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass));
         changed = true;
       } else {
-        Type mapped = mapVoidTypeArgsToWildcard(arg, state);
-        newArgs.add(mapped);
-        if (!state.getTypes().isSameType(mapped, arg)) {
-          changed = true;
-        }
+        newArgs.add(arg);
       }
     }
 
