@@ -123,6 +123,17 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     if (type.isCompound()) {
       return false;
     }
-    return type.tsym == null || !type.tsym.isAnonymous();
+    if (type instanceof Type.CapturedType) {
+      return false;
+    }
+    if (type.tsym != null && type.tsym.isAnonymous()) {
+      return false;
+    }
+    for (Type typeArg : type.getTypeArguments()) {
+      if (!isDenotable(typeArg)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
