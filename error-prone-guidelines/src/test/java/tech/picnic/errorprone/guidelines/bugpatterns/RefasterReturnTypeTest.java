@@ -128,6 +128,22 @@ final class RefasterReturnTypeTest {
             "      return s;",
             "    }",
             "  }",
+            "",
+            "  class BroaderReturnTypeForVoid {",
+            "    @BeforeTemplate",
+            "    // BUG: Diagnostic contains:",
+            "    Object before(Void v) {",
+            "      return v;",
+            "    }",
+            "  }",
+            "",
+            "  class BroaderParameterizedReturnTypeForVoid {",
+            "    @BeforeTemplate",
+            "    // BUG: Diagnostic contains:",
+            "    List<?> before(List<Void> list) {",
+            "      return list;",
+            "    }",
+            "  }",
             "}")
         .doTest();
   }
@@ -173,6 +189,50 @@ final class RefasterReturnTypeTest {
             "  @AfterTemplate",
             "  String after(String str) {",
             "    return str.strip();",
+            "  }",
+            "}")
+        .addInputLines(
+            "C.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "",
+            "class C {",
+            "  @BeforeTemplate",
+            "  Object before(Void v) {",
+            "    return v;",
+            "  }",
+            "}")
+        .addOutputLines(
+            "C.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import org.jspecify.annotations.Nullable;",
+            "",
+            "class C {",
+            "  @BeforeTemplate",
+            "  @Nullable Void before(Void v) {",
+            "    return v;",
+            "  }",
+            "}")
+        .addInputLines(
+            "D.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import java.util.List;",
+            "",
+            "class D {",
+            "  @BeforeTemplate",
+            "  List<?> before(List<Void> list) {",
+            "    return list;",
+            "  }",
+            "}")
+        .addOutputLines(
+            "D.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import java.util.List;",
+            "import org.jspecify.annotations.Nullable;",
+            "",
+            "class D {",
+            "  @BeforeTemplate",
+            "  List<? extends @Nullable Void> before(List<Void> list) {",
+            "    return list;",
             "  }",
             "}")
         .doTest(TestMode.TEXT_MATCH);
