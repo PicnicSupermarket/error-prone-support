@@ -8,6 +8,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets.SetView;
 import com.google.common.collect.Streams;
+import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
@@ -29,6 +30,7 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
 /** Refaster rules related to expressions dealing with (arbitrary) collections. */
@@ -217,12 +219,12 @@ final class CollectionRules {
   // check.
   static final class SetStream<T> {
     @BeforeTemplate
-    Stream<?> before(Set<T> set) {
+    Stream<T> before(Set<T> set) {
       return set.stream().distinct();
     }
 
     @AfterTemplate
-    Stream<?> after(Set<T> set) {
+    Stream<T> after(Set<T> set) {
       return set.stream();
     }
   }
@@ -379,12 +381,12 @@ final class CollectionRules {
    */
   static final class ImmutableCollectionToArrayWithArray<T, S> {
     @BeforeTemplate
-    Object[] before(ImmutableCollection<T> collection, S[] array) {
+    S[] before(ImmutableCollection<T> collection, S[] array) {
       return collection.asList().toArray(array);
     }
 
     @AfterTemplate
-    Object[] after(ImmutableCollection<T> collection, S[] array) {
+    S[] after(ImmutableCollection<T> collection, S[] array) {
       return collection.toArray(array);
     }
   }
@@ -406,6 +408,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Collection#iterator()} over more contrived or less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class CollectionIterator<T> {
     @BeforeTemplate
     Iterator<T> before(Collection<T> collection) {
@@ -413,7 +416,7 @@ final class CollectionRules {
     }
 
     @BeforeTemplate
-    Iterator<T> before(ImmutableCollection<T> collection) {
+    UnmodifiableIterator<T> before(ImmutableCollection<T> collection) {
       return collection.asList().iterator();
     }
 
@@ -527,12 +530,12 @@ final class CollectionRules {
   /** Prefer {@code collection.iterator().next()} over more contrived alternatives. */
   static final class CollectionIteratorNext<S, T extends S> {
     @BeforeTemplate
-    S before(Collection<T> collection) {
+    T before(Collection<T> collection) {
       return collection.stream().findFirst().orElseThrow();
     }
 
     @AfterTemplate
-    S after(Collection<T> collection) {
+    T after(Collection<T> collection) {
       return collection.iterator().next();
     }
   }
@@ -540,17 +543,17 @@ final class CollectionRules {
   /** Prefer {@link SequencedCollection#getFirst()} over less idiomatic alternatives. */
   static final class SequencedCollectionGetFirst<S, T extends S> {
     @BeforeTemplate
-    S before(SequencedCollection<T> collection) {
+    T before(SequencedCollection<T> collection) {
       return collection.iterator().next();
     }
 
     @BeforeTemplate
-    S before(List<T> collection) {
+    T before(List<T> collection) {
       return collection.get(0);
     }
 
     @AfterTemplate
-    S after(SequencedCollection<T> collection) {
+    T after(SequencedCollection<T> collection) {
       return collection.getFirst();
     }
   }
@@ -558,18 +561,18 @@ final class CollectionRules {
   /** Prefer {@link SequencedCollection#getLast()} over less idiomatic alternatives. */
   static final class SequencedCollectionGetLast<S, T extends S> {
     @BeforeTemplate
-    S before(SequencedCollection<T> collection) {
+    T before(SequencedCollection<T> collection) {
       return Refaster.anyOf(
           collection.reversed().getFirst(), Streams.findLast(collection.stream()).orElseThrow());
     }
 
     @BeforeTemplate
-    S before(List<T> collection) {
+    T before(List<T> collection) {
       return collection.get(collection.size() - 1);
     }
 
     @AfterTemplate
-    S after(SequencedCollection<T> collection) {
+    T after(SequencedCollection<T> collection) {
       return collection.getLast();
     }
   }
@@ -610,12 +613,12 @@ final class CollectionRules {
   // `NoSuchElementException`.
   static final class ListRemoveFirst<S, T extends S> {
     @BeforeTemplate
-    S before(List<T> list) {
+    T before(List<T> list) {
       return list.remove(0);
     }
 
     @AfterTemplate
-    S after(List<T> list) {
+    T after(List<T> list) {
       return list.removeFirst();
     }
   }
@@ -625,12 +628,12 @@ final class CollectionRules {
   // `NoSuchElementException`.
   static final class ListRemoveLast<S, T extends S> {
     @BeforeTemplate
-    S before(List<T> list) {
+    T before(List<T> list) {
       return list.remove(list.size() - 1);
     }
 
     @AfterTemplate
-    S after(List<T> list) {
+    T after(List<T> list) {
       return list.removeLast();
     }
   }
@@ -638,12 +641,12 @@ final class CollectionRules {
   /** Prefer {@link SortedSet#first()} over more verbose alternatives. */
   static final class SortedSetFirst<S, T extends S> {
     @BeforeTemplate
-    S before(SortedSet<T> set) {
+    T before(SortedSet<T> set) {
       return set.getFirst();
     }
 
     @AfterTemplate
-    S after(SortedSet<T> set) {
+    T after(SortedSet<T> set) {
       return set.first();
     }
   }
@@ -651,12 +654,12 @@ final class CollectionRules {
   /** Prefer {@link SortedSet#last()} over more verbose alternatives. */
   static final class SortedSetLast<S, T extends S> {
     @BeforeTemplate
-    S before(SortedSet<T> set) {
+    T before(SortedSet<T> set) {
       return set.getLast();
     }
 
     @AfterTemplate
-    S after(SortedSet<T> set) {
+    T after(SortedSet<T> set) {
       return set.last();
     }
   }

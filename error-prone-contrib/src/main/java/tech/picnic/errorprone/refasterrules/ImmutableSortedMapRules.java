@@ -3,7 +3,6 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static java.util.Comparator.naturalOrder;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -122,7 +121,7 @@ final class ImmutableSortedMapRules {
   // `reverseOrder`.) Worth the hassle?
   static final class IterableToImmutableSortedMap<K extends Comparable<? super K>, V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Map<? extends K, ? extends V> iterable) {
+    ImmutableSortedMap<K, V> before(Map<? extends K, ? extends V> iterable) {
       return Refaster.anyOf(
           ImmutableSortedMap.copyOf(iterable, naturalOrder()),
           ImmutableSortedMap.copyOf(iterable.entrySet()),

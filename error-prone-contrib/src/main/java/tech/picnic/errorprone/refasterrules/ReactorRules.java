@@ -672,7 +672,7 @@ final class ReactorRules {
       "java:S4968" /* Result may be `Mono<Void>`. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    Mono<? extends @Nullable Void> before2(Mono<@Nullable Void> mono) {
+    Mono<@Nullable Void> before2(Mono<@Nullable Void> mono) {
       return Refaster.anyOf(mono.ignoreElement(), mono.then());
     }
 
@@ -1127,7 +1127,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
-    Publisher<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
+    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
       return Refaster.anyOf(
           flux.concatMap(
               x ->
@@ -1261,7 +1261,7 @@ final class ReactorRules {
   static final class MonoThen<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Mono<T> mono) {
+    Mono<@Nullable Void> before(Mono<T> mono) {
       return Refaster.anyOf(
           mono.ignoreElement().then(),
           mono.flux().then(),
@@ -1271,7 +1271,7 @@ final class ReactorRules {
 
     @AfterTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Mono<T> mono) {
+    Mono<@Nullable Void> after(Mono<T> mono) {
       return mono.then();
     }
   }
@@ -1280,7 +1280,7 @@ final class ReactorRules {
   static final class FluxThen<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Flux<T> flux) {
+    Mono<@Nullable Void> before(Flux<T> flux) {
       return flux.ignoreElements().then();
     }
 
@@ -1291,13 +1291,13 @@ final class ReactorRules {
       "java:S4968" /* Result may be `Mono<Void>`. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    Mono<? extends @Nullable Void> before2(Flux<@Nullable Void> flux) {
+    Mono<@Nullable Void> before2(Flux<@Nullable Void> flux) {
       return flux.ignoreElements();
     }
 
     @AfterTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Flux<T> flux) {
+    Mono<@Nullable Void> after(Flux<T> flux) {
       return flux.then();
     }
   }
@@ -1306,13 +1306,13 @@ final class ReactorRules {
   static final class MonoThenEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    Mono<@Nullable Void> before(Mono<T> mono, Publisher<@Nullable Void> publisher) {
       return mono.ignoreElement().thenEmpty(publisher);
     }
 
     @AfterTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
+    Mono<@Nullable Void> after(Mono<T> mono, Publisher<@Nullable Void> publisher) {
       return mono.thenEmpty(publisher);
     }
   }
@@ -1321,13 +1321,13 @@ final class ReactorRules {
   static final class FluxThenEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    Mono<@Nullable Void> before(Flux<T> flux, Publisher<@Nullable Void> publisher) {
       return flux.ignoreElements().thenEmpty(publisher);
     }
 
     @AfterTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
+    Mono<@Nullable Void> after(Flux<T> flux, Publisher<@Nullable Void> publisher) {
       return flux.thenEmpty(publisher);
     }
   }
@@ -1385,7 +1385,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
+    Mono<@Nullable Void> before2(Mono<T> mono1, Mono<@Nullable Void> mono2) {
       return mono1.thenEmpty(mono2);
     }
 
@@ -1405,7 +1405,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
+    Mono<@Nullable Void> before2(Flux<T> flux, Mono<@Nullable Void> mono) {
       return flux.thenEmpty(mono);
     }
 
@@ -2328,12 +2328,12 @@ final class ReactorRules {
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
-    StepVerifier.FirstStep<? extends T> before(Mono<T> mono) {
+    StepVerifier.FirstStep<T> before(Mono<T> mono) {
       return Refaster.anyOf(StepVerifier.create(mono), mono.flux().as(StepVerifier::create));
     }
 
     @AfterTemplate
-    StepVerifier.FirstStep<? extends T> after(Mono<T> mono) {
+    StepVerifier.FirstStep<T> after(Mono<T> mono) {
       return mono.as(StepVerifier::create);
     }
   }
@@ -2341,12 +2341,12 @@ final class ReactorRules {
   /** Prefer {@link Flux#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromFlux<T> {
     @BeforeTemplate
-    StepVerifier.FirstStep<? extends T> before(Flux<T> flux) {
+    StepVerifier.FirstStep<T> before(Flux<T> flux) {
       return StepVerifier.create(flux);
     }
 
     @AfterTemplate
-    StepVerifier.FirstStep<? extends T> after(Flux<T> flux) {
+    StepVerifier.FirstStep<T> after(Flux<T> flux) {
       return flux.as(StepVerifier::create);
     }
   }
