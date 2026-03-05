@@ -11,6 +11,7 @@ import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
@@ -86,11 +87,10 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     }
 
     SuggestedFix.Builder fix = SuggestedFix.builder();
-    String prettyType = SuggestedFixes.prettyType(state, fix, typeForSuggestion);
+    @Var String prettyType = SuggestedFixes.prettyType(state, fix, typeForSuggestion);
 
     if (containsVoidType(inferredType, state)) {
-      String nullable =
-          SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable");
+      String nullable = SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable");
       prettyType = prettyType.replace("Void", "@" + nullable + " Void");
     }
 
@@ -146,17 +146,16 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     }
 
     Type voidType = state.getTypeFromString(Void.class.getCanonicalName());
-    boolean changed = false;
+    @Var boolean changed = false;
     ListBuffer<Type> newArgs = new ListBuffer<>();
     for (Type arg : typeArgs) {
       if (ASTHelpers.isSameType(arg, voidType, state)) {
-        newArgs.add(
-            new Type.WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass));
+        newArgs.add(new Type.WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass));
         changed = true;
       } else {
         Type mapped = mapVoidTypeArgsToWildcard(arg, state);
         newArgs.add(mapped);
-        if (mapped != arg) {
+        if (!state.getTypes().isSameType(mapped, arg)) {
           changed = true;
         }
       }
