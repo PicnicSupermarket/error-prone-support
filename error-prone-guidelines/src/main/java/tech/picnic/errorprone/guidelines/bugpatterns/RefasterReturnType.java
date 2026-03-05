@@ -26,8 +26,10 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.BoundKind;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.ListBuffer;
 import javax.lang.model.type.TypeKind;
 import org.jspecify.annotations.Nullable;
 
@@ -76,13 +78,22 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return Description.NO_MATCH;
     }
 
+    Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
+
     if (!state.getTypes().isSubtype(inferredType, declaredReturnType)
-        || state.getTypes().isSameType(inferredType, declaredReturnType)) {
+        || state.getTypes().isSameType(typeForSuggestion, declaredReturnType)) {
       return Description.NO_MATCH;
     }
 
     SuggestedFix.Builder fix = SuggestedFix.builder();
-    String prettyType = SuggestedFixes.prettyType(state, fix, inferredType);
+    String prettyType = SuggestedFixes.prettyType(state, fix, typeForSuggestion);
+
+    if (containsVoidType(inferredType, state)) {
+      String nullable =
+          SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable");
+      prettyType = prettyType.replace("Void", "@" + nullable + " Void");
+    }
+
     fix.replace(tree.getReturnType(), prettyType);
     return describeMatch(tree, fix.build());
   }
@@ -113,6 +124,50 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       }
     }.scan(tree.getBody(), null);
     return types.build();
+  }
+
+  private static boolean containsVoidType(Type type, VisitorState state) {
+    if (ASTHelpers.isSameType(
+        type, state.getTypeFromString(Void.class.getCanonicalName()), state)) {
+      return true;
+    }
+    for (Type typeArg : type.getTypeArguments()) {
+      if (containsVoidType(typeArg, state)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static Type mapVoidTypeArgsToWildcard(Type type, VisitorState state) {
+    List<Type> typeArgs = type.getTypeArguments();
+    if (typeArgs.isEmpty()) {
+      return type;
+    }
+
+    Type voidType = state.getTypeFromString(Void.class.getCanonicalName());
+    boolean changed = false;
+    ListBuffer<Type> newArgs = new ListBuffer<>();
+    for (Type arg : typeArgs) {
+      if (ASTHelpers.isSameType(arg, voidType, state)) {
+        newArgs.add(
+            new Type.WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass));
+        changed = true;
+      } else {
+        Type mapped = mapVoidTypeArgsToWildcard(arg, state);
+        newArgs.add(mapped);
+        if (mapped != arg) {
+          changed = true;
+        }
+      }
+    }
+
+    if (!changed) {
+      return type;
+    }
+
+    Type.ClassType classType = (Type.ClassType) type;
+    return new Type.ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
   }
 
   private static boolean isDenotable(Type type) {
