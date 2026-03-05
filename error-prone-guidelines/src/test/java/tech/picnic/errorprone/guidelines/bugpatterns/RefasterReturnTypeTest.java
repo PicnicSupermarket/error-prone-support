@@ -144,6 +144,14 @@ final class RefasterReturnTypeTest {
             "      return list;",
             "    }",
             "  }",
+            "",
+            "  class BroaderParameterizedReturnTypeForNestedVoid {",
+            "    @BeforeTemplate",
+            "    // BUG: Diagnostic contains:",
+            "    List<?> before(List<List<Void>> list) {",
+            "      return list;",
+            "    }",
+            "  }",
             "}")
         .doTest();
   }
@@ -232,6 +240,53 @@ final class RefasterReturnTypeTest {
             "class D {",
             "  @BeforeTemplate",
             "  List<? extends @Nullable Void> before(List<Void> list) {",
+            "    return list;",
+            "  }",
+            "}")
+        .addInputLines(
+            "E.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import java.util.ArrayList;",
+            "import java.util.List;",
+            "",
+            "class E {",
+            "  @BeforeTemplate",
+            "  List<String> before() {",
+            "    return new ArrayList<String>();",
+            "  }",
+            "}")
+        .addOutputLines(
+            "E.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import java.util.ArrayList;",
+            "import java.util.List;",
+            "",
+            "class E {",
+            "  @BeforeTemplate",
+            "  ArrayList<String> before() {",
+            "    return new ArrayList<String>();",
+            "  }",
+            "}")
+        .addInputLines(
+            "F.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import java.util.List;",
+            "",
+            "class F {",
+            "  @BeforeTemplate",
+            "  List<?> before(List<List<Void>> list) {",
+            "    return list;",
+            "  }",
+            "}")
+        .addOutputLines(
+            "F.java",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import java.util.List;",
+            "import org.jspecify.annotations.Nullable;",
+            "",
+            "class F {",
+            "  @BeforeTemplate",
+            "  List<List<@Nullable Void>> before(List<List<Void>> list) {",
             "    return list;",
             "  }",
             "}")
