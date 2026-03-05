@@ -10,7 +10,9 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.AbstractIterableSizeAssert;
 import org.assertj.core.api.IterableAssert;
+import org.assertj.core.api.IteratorAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
@@ -38,9 +40,10 @@ final class AssertJIterableRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatIterableIsNotEmpty<E> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Iterable<E> iterable) {
+    IteratorAssert<E> before(Iterable<E> iterable) {
       return assertThat(iterable.iterator()).hasNext();
     }
 
@@ -69,7 +72,8 @@ final class AssertJIterableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractIntegerAssert<?> after(Iterable<E> iterable) {
+    AbstractIterableSizeAssert<IterableAssert<E>, Iterable<? extends E>, E, ObjectAssert<E>> after(
+        Iterable<E> iterable) {
       return assertThat(iterable).size();
     }
   }

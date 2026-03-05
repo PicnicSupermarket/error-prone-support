@@ -58,12 +58,12 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientGet {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(GET);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(GET);
     }
 
@@ -80,12 +80,12 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientHead {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(HEAD);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(HEAD);
     }
 
@@ -102,12 +102,12 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientOptions {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(OPTIONS);
     }
 

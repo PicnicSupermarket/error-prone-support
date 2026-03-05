@@ -28,7 +28,7 @@ final class MicrometerRules {
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag) {
+    Tags after(Tag tag) {
       return Tags.of(tag);
     }
   }
@@ -42,7 +42,7 @@ final class MicrometerRules {
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2) {
+    Tags after(Tag tag1, Tag tag2) {
       return Tags.of(tag1, tag2);
     }
   }
@@ -56,7 +56,7 @@ final class MicrometerRules {
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2, Tag tag3) {
+    Tags after(Tag tag1, Tag tag2, Tag tag3) {
       return Tags.of(tag1, tag2, tag3);
     }
   }
@@ -71,7 +71,7 @@ final class MicrometerRules {
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
+    Tags after(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
       return Tags.of(tag1, tag2, tag3, tag4);
     }
   }
@@ -87,7 +87,7 @@ final class MicrometerRules {
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {
+    Tags after(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {
       return Tags.of(tag1, tag2, tag3, tag4, tag5);
     }
   }

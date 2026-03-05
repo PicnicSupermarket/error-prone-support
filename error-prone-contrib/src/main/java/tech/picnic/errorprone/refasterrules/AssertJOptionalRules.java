@@ -122,7 +122,7 @@ final class AssertJOptionalRules {
   @PossibleSourceIncompatibility
   static final class AssertThatOptionalHasValueMatching<T> {
     @BeforeTemplate
-    AbstractOptionalAssert<?, T> before(Optional<T> optional, Predicate<? super T> predicate) {
+    OptionalAssert<T> before(Optional<T> optional, Predicate<? super T> predicate) {
       return assertThat(optional.filter(predicate)).isPresent();
     }
 

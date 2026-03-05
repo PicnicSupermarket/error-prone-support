@@ -23,7 +23,7 @@ final class PatternRules {
   @PossibleSourceIncompatibility
   static final class PatternAsPredicate {
     @BeforeTemplate
-    Predicate<CharSequence> before(Pattern pattern) {
+    com.google.common.base.Predicate<CharSequence> before(Pattern pattern) {
       return Predicates.contains(pattern);
     }
 
@@ -37,7 +37,7 @@ final class PatternRules {
   @PossibleSourceIncompatibility
   static final class PatternCompileAsPredicate {
     @BeforeTemplate
-    Predicate<CharSequence> before(String pattern) {
+    com.google.common.base.Predicate<CharSequence> before(String pattern) {
       return containsPattern(pattern);
     }
 

@@ -24,7 +24,7 @@ final class RxJava2AdapterRules {
   static final class CompletableToMono {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Completable completable) {
+    Mono<@Nullable Void> before(Completable completable) {
       return Refaster.anyOf(
           RxJava2Adapter.completableToMono(completable),
           completable.to(RxJava2Adapter::completableToMono));
@@ -32,7 +32,7 @@ final class RxJava2AdapterRules {
 
     @AfterTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Completable completable) {
+    Mono<@Nullable Void> after(Completable completable) {
       return completable.as(RxJava2Adapter::completableToMono);
     }
   }
