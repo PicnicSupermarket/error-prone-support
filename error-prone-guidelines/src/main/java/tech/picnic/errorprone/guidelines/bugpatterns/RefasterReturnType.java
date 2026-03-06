@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -21,18 +22,16 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.util.ASTHelpers;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.BoundKind;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
+import java.util.Objects;
 import javax.lang.model.type.TypeKind;
-import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags Refaster template methods whose declared return type is not the
@@ -99,31 +98,12 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
   }
 
   private static ImmutableList<Type> collectReturnExpressionTypes(MethodTree tree) {
-    ImmutableList.Builder<Type> types = ImmutableList.builder();
-    new TreeScanner<@Nullable Void, @Nullable Void>() {
-      @Override
-      public @Nullable Void visitReturn(ReturnTree node, @Nullable Void unused) {
-        if (node.getExpression() != null) {
-          Type type = ASTHelpers.getType(node.getExpression());
-          if (type != null) {
-            types.add(type);
-          }
-        }
-        return super.visitReturn(node, null);
-      }
-
-      @Override
-      public @Nullable Void visitClass(ClassTree node, @Nullable Void unused) {
-        return null;
-      }
-
-      @Override
-      public @Nullable Void visitLambdaExpression(
-          LambdaExpressionTree node, @Nullable Void unused) {
-        return null;
-      }
-    }.scan(tree.getBody(), null);
-    return types.build();
+    return MoreASTHelpers.findDirectReturnStatements(tree).stream()
+        .map(ReturnTree::getExpression)
+        .filter(Objects::nonNull)
+        .map(ASTHelpers::getType)
+        .filter(Objects::nonNull)
+        .collect(toImmutableList());
   }
 
   private static boolean containsVoidType(Type type, VisitorState state) {
