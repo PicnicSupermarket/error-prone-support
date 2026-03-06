@@ -3,11 +3,17 @@ on:
   pull_request_target:
     types:
       - labeled
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to assign a milestone to
+        type: number
+        required: true
 permissions:
   contents: read
 jobs:
   assign-milestone:
-    if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null) }}
     permissions:
       contents: read
       issues: write
@@ -51,11 +57,12 @@ jobs:
               return 0;
             };
             const milestone = milestones.reduce((a, b) => compareVersions(a.title, b.title) <= 0 ? a : b);
-            core.info(`Assigning milestone "${milestone.title}" to PR #${context.issue.number}.`);
+            const issueNumber = context.payload.inputs?.pr_number ?? context.issue.number;
+            core.info(`Assigning milestone "${milestone.title}" to PR #${issueNumber}.`);
 
             await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: issueNumber,
               milestone: milestone.number,
             });
