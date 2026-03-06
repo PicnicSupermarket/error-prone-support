@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.least;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
@@ -61,6 +62,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         filtering(null, null),
         flatMapping(null, null),
         identity(),
+        least(1, null),
         mapping(null, null),
         maxBy(null),
         minBy(null),
@@ -126,6 +128,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length())).flatMap(Stream::of);
   }
 
+  Stream<Integer> testStreamSorted() {
+    return Stream.of(1).sorted();
+  }
+
   Stream<Integer> testStreamFilterSorted() {
     return Stream.of(1).filter(i -> i % 2 == 0).sorted();
   }
@@ -140,6 +146,14 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamDistinctSortedWithComparator() {
     return Stream.of(1).distinct().sorted(reverseOrder());
+  }
+
+  Stream<Integer> testStreamCollectLeastStream() {
+    return Stream.of(1).collect(least(2, reverseOrder())).stream();
+  }
+
+  Stream<Integer> testStreamCollectLeastNaturalOrderStream() {
+    return Stream.of(1).collect(least(2, naturalOrder())).stream();
   }
 
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {
@@ -166,6 +180,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testStreamFindAnyIsPresent() {
     return Stream.of(1).findAny().isPresent();
+  }
+
+  ImmutableSet<Optional<Integer>> testStreamFindFirst() {
+    return ImmutableSet.of(Stream.of(1).findFirst(), Stream.of(3).findFirst());
   }
 
   Stream<Integer> testStreamMapFilter() {
