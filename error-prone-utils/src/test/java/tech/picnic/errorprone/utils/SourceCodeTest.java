@@ -334,7 +334,7 @@ final class SourceCodeTest {
    * VisitorState)} to string literals.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class ToStringConstantExpressionTestChecker extends BugChecker
+  private static final class ToStringConstantExpressionTestChecker extends BugChecker
       implements LiteralTreeMatcher, VariableTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -363,7 +363,7 @@ final class SourceCodeTest {
    * {@value DELETION_MARKER}.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class DeleteWithTrailingWhitespaceTestChecker extends BugChecker
+  private static final class DeleteWithTrailingWhitespaceTestChecker extends BugChecker
       implements AnnotationTreeMatcher, MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final String DELETION_MARKER = "ToBeDeleted";
@@ -394,7 +394,7 @@ final class SourceCodeTest {
    * invocations.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class UnwrapMethodInvocationTestChecker extends BugChecker
+  private static final class UnwrapMethodInvocationTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -410,7 +410,7 @@ final class SourceCodeTest {
    * VisitorState)} to all method invocations.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker
+  private static final class UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker
       extends BugChecker implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -427,7 +427,7 @@ final class SourceCodeTest {
    * lexicographically.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class SortTreesTestChecker extends BugChecker
+  private static final class SortTreesTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
