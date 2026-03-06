@@ -1,6 +1,6 @@
 name: Assign milestone to dependency upgrade PR
 on:
-  pull_request:
+  pull_request_target:
     types:
       - labeled
 permissions:
