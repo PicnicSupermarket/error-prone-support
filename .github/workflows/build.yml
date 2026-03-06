@@ -61,7 +61,7 @@ jobs:
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   deploy:
-    if: github.ref == 'refs/heads/master'
+    if: ${{ github.ref == github.event.repository.default_branch }}
     needs: build
     runs-on: ubuntu-24.04
     environment: maven-deploy
