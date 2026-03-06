@@ -1590,6 +1590,11 @@
                             <mutator>EXTENDED</mutator>
                             <mutator>STRONGER</mutator>
                         </mutators>
+                        <!-- XXX: Look into using Reviewdog to post comments
+                        for surviving mutants; this may replace the
+                        `pitest-{analyze,update}-pr.yml` GitHub actions
+                        workflows. -->
+                        <outputFormats>CSV,HTML</outputFormats>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
