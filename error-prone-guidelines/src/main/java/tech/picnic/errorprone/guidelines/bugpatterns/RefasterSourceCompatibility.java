@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -33,22 +34,26 @@ import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that validates the consistency between the presence of a {@link
- * tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility} annotation and the
- * actual source compatibility of a Refaster rule.
+ * A {@link BugChecker} that suggests that Refaster rules have the {@link
+ * tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility} annotation if and only
+ * if it identifies at least one scenario in which application of the rule could yield uncompilable
+ * code.
  *
- * <p>A Refaster rule is source-incompatible if its {@link AfterTemplate} return type is not a
- * subtype of every {@link BeforeTemplate} return type, meaning the replacement may break
- * compilation at call sites that depend on the narrower type. Such rules should be annotated with
- * {@link tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility}.
+ * <p>Currently, a Refaster rule is possibly source-incompatible if an {@link AfterTemplate} return
+ * type is not a subtype of every {@link BeforeTemplate} return type, meaning that the replacement
+ * may break compilation at call sites that depend on the narrower type.
  */
-// XXX: Relies on declared (and denotable) return types. Works in tandem with the
-// `RefasterReturnType` check.
+// XXX: Extend this check to also consider parameter types, which can similarly be a source of
+// incompatibility.
+// XXX: As-is, this rule relies on the return types declared by template methods. The
+// `RefasterReturnType` check ensures that such return types are as specific as possible, but we
+// could further reduce false-negatives by instead analyzing the return expressions of template
+// methods to infer more specific non-denotable return types.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Refaster rules with source-incompatible type changes should be annotated with "
-            + "`@PossibleSourceIncompatibility` and vice versa",
+        "Refaster rules should be annotated with `@PossibleSourceIncompatibility` if and only if "
+            + " they are possibly source-incompatible",
     link = BUG_PATTERNS_BASE_URL + "RefasterSourceCompatibility",
     linkType = CUSTOM,
     severity = WARNING,
@@ -57,8 +62,8 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   private static final long serialVersionUID = 1L;
   private static final String POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION =
       "tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility";
-  private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);
-  private static final Matcher<Tree> AFTER_TEMPLATE_METHOD = hasAnnotation(AfterTemplate.class);
+  private static final Matcher<Tree> IS_BEFORE_TEMPLATE = hasAnnotation(BeforeTemplate.class);
+  private static final Matcher<Tree> IS_AFTER_TEMPLATE = hasAnnotation(AfterTemplate.class);
   private static final MultiMatcher<Tree, AnnotationTree> HAS_POSSIBLE_SOURCE_INCOMPATIBILITY =
       annotations(AT_LEAST_ONE, isType(POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION));
 
@@ -67,66 +72,67 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (!hasMatchingMember(tree, BEFORE_TEMPLATE_METHOD, state)) {
+    ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
+    if (beforeMethods.isEmpty()) {
+      /* This is not a Refaster rule. */
       return Description.NO_MATCH;
     }
 
-    boolean isIncompatible = isReturnTypeIncompatible(tree, state);
+    ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
+
+    boolean isCompatible = hasCompatibleReturnTypes(beforeMethods, afterMethods, state);
     MultiMatchResult<AnnotationTree> annotationMatch =
         HAS_POSSIBLE_SOURCE_INCOMPATIBILITY.multiMatchResult(tree, state);
     boolean hasAnnotation = annotationMatch.matches();
 
-    if (isIncompatible && !hasAnnotation) {
-      SuggestedFix.Builder fix = SuggestedFix.builder();
-      String annotation =
-          SuggestedFixes.qualifyType(state, fix, POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION);
-      return describeMatch(tree, fix.prefixWith(tree, '@' + annotation + ' ').build());
+    if (isCompatible) {
+      if (!hasAnnotation) {
+        return Description.NO_MATCH;
+      }
+
+      AnnotationTree annotation = annotationMatch.onlyMatchingNode();
+      return describeMatch(annotation, SourceCode.deleteWithTrailingWhitespace(annotation, state));
     }
 
-    if (!isIncompatible && hasAnnotation) {
-      return describeMatch(
-          tree, SourceCode.deleteWithTrailingWhitespace(annotationMatch.onlyMatchingNode(), state));
+    if (hasAnnotation) {
+      return Description.NO_MATCH;
     }
 
-    return Description.NO_MATCH;
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String annotation =
+        SuggestedFixes.qualifyType(state, fix, POSSIBLE_SOURCE_INCOMPATIBILITY_ANNOTATION);
+    return describeMatch(tree, fix.prefixWith(tree, '@' + annotation + ' ').build());
   }
 
-  private static boolean isReturnTypeIncompatible(ClassTree tree, VisitorState state) {
-    ImmutableList<Type> afterReturnTypes = getAfterTemplateReturnTypes(tree, state);
-
-    for (Type afterReturnType : afterReturnTypes) {
+  private static boolean hasCompatibleReturnTypes(
+      ImmutableList<MethodTree> beforeMethods,
+      ImmutableList<MethodTree> afterMethods,
+      VisitorState state) {
+    for (MethodTree afterMethod : afterMethods) {
+      Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
+      // XXX: Drop special `void` handling?
       if (afterReturnType.getKind() == TypeKind.VOID) {
         continue;
       }
 
-      for (Tree member : tree.getMembers()) {
-        if (BEFORE_TEMPLATE_METHOD.matches(member, state)
-            && member instanceof MethodTree methodTree) {
-          Type beforeReturnType = ASTHelpers.getSymbol(methodTree).getReturnType();
-          if (beforeReturnType.getKind() != TypeKind.VOID
-              && !state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
-            return true;
-          }
+      for (MethodTree beforeMethod : beforeMethods) {
+        Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
+        // XXX: Drop special `void` handling?
+        if (beforeReturnType.getKind() != TypeKind.VOID
+            && !state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
+          return false;
         }
       }
     }
 
-    return false;
+    return true;
   }
 
-  private static ImmutableList<Type> getAfterTemplateReturnTypes(
-      ClassTree tree, VisitorState state) {
-    ImmutableList.Builder<Type> types = ImmutableList.builder();
-    for (Tree member : tree.getMembers()) {
-      if (AFTER_TEMPLATE_METHOD.matches(member, state) && member instanceof MethodTree methodTree) {
-        types.add(ASTHelpers.getSymbol(methodTree).getReturnType());
-      }
-    }
-    return types.build();
-  }
-
-  private static boolean hasMatchingMember(
+  private static ImmutableList<MethodTree> getMatchingMethods(
       ClassTree tree, Matcher<Tree> matcher, VisitorState state) {
-    return tree.getMembers().stream().anyMatch(member -> matcher.matches(member, state));
+    return tree.getMembers().stream()
+        .filter(member -> member instanceof MethodTree && matcher.matches(member, state))
+        .map(MethodTree.class::cast)
+        .collect(toImmutableList());
   }
 }
