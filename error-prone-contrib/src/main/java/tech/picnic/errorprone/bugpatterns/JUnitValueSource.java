@@ -40,14 +40,11 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.ReturnTree;
-import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +55,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
-import org.jspecify.annotations.Nullable;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -227,31 +224,9 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             });
   }
 
-  // XXX: This pattern also occurs a few times inside Error Prone; contribute upstream.
   private static Optional<ExpressionTree> getSingleReturnExpression(MethodTree methodTree) {
-    List<ExpressionTree> returnExpressions = new ArrayList<>();
-    new TreeScanner<@Nullable Void, @Nullable Void>() {
-      @Override
-      public @Nullable Void visitClass(ClassTree node, @Nullable Void unused) {
-        /* Ignore `return` statements inside anonymous/local classes. */
-        return null;
-      }
-
-      @Override
-      public @Nullable Void visitReturn(ReturnTree node, @Nullable Void unused) {
-        returnExpressions.add(node.getExpression());
-        return super.visitReturn(node, null);
-      }
-
-      @Override
-      public @Nullable Void visitLambdaExpression(
-          LambdaExpressionTree node, @Nullable Void unused) {
-        /* Ignore `return` statements inside lambda expressions. */
-        return null;
-      }
-    }.scan(methodTree, null);
-
-    return getElementIfSingleton(returnExpressions);
+    return getElementIfSingleton(MoreASTHelpers.findDirectReturnStatements(methodTree))
+        .map(ReturnTree::getExpression);
   }
 
   private static Optional<String> tryExtractValueSourceAttributeValue(
