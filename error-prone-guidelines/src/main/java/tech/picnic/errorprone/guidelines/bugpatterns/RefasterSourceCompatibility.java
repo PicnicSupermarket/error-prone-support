@@ -30,7 +30,6 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
-import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -75,26 +74,63 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
     if (beforeMethods.isEmpty()) {
       /* This is not a Refaster rule. */
-      return Description.NO_MATCH;
+      return dropAnnotationIfPresent(tree, state);
     }
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
+    return hasCompatibleReturnTypes(beforeMethods, afterMethods, state)
+        ? dropAnnotationIfPresent(tree, state)
+        : addAnnotationIfAbsent(tree, state);
+  }
 
-    boolean isCompatible = hasCompatibleReturnTypes(beforeMethods, afterMethods, state);
-    MultiMatchResult<AnnotationTree> annotationMatch =
-        HAS_POSSIBLE_SOURCE_INCOMPATIBILITY.multiMatchResult(tree, state);
-    boolean hasAnnotation = annotationMatch.matches();
+  private static ImmutableList<MethodTree> getMatchingMethods(
+      ClassTree tree, Matcher<Tree> matcher, VisitorState state) {
+    return tree.getMembers().stream()
+        .filter(member -> member instanceof MethodTree && matcher.matches(member, state))
+        .map(MethodTree.class::cast)
+        .collect(toImmutableList());
+  }
 
-    if (isCompatible) {
-      if (!hasAnnotation) {
-        return Description.NO_MATCH;
+  /**
+   * Tells whether the all given {@code @AfterTemplate} methods have a return type that is a subtype
+   * of each of the given {@code @BeforeTemplate} methods.
+   *
+   * @implNote Note that this method does not need to implement custom logic to handle {@code void}
+   *     return types (associated with "block templates"): Refaster rules cannot combine {@code
+   *     void} after-templates with non-{@code void} before-templates, and while the reverse is
+   *     supported, it is not in general safe to replace a sequence of statements with a {@code
+   *     return} statement.
+   */
+  private static boolean hasCompatibleReturnTypes(
+      ImmutableList<MethodTree> beforeMethods,
+      ImmutableList<MethodTree> afterMethods,
+      VisitorState state) {
+    for (MethodTree afterMethod : afterMethods) {
+      Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
+      for (MethodTree beforeMethod : beforeMethods) {
+        Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
+        if (!state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
+          return false;
+        }
       }
-
-      AnnotationTree annotation = annotationMatch.onlyMatchingNode();
-      return describeMatch(annotation, SourceCode.deleteWithTrailingWhitespace(annotation, state));
     }
 
-    if (hasAnnotation) {
+    return true;
+  }
+
+  private Description dropAnnotationIfPresent(ClassTree tree, VisitorState state) {
+    MultiMatchResult<AnnotationTree> annotationMatch = getIncompatibilityAnnotation(tree, state);
+    if (!annotationMatch.matches()) {
+      return Description.NO_MATCH;
+    }
+
+    AnnotationTree annotation = annotationMatch.onlyMatchingNode();
+    return describeMatch(annotation, SourceCode.deleteWithTrailingWhitespace(annotation, state));
+  }
+
+  private Description addAnnotationIfAbsent(ClassTree tree, VisitorState state) {
+    MultiMatchResult<AnnotationTree> annotationMatch = getIncompatibilityAnnotation(tree, state);
+    if (annotationMatch.matches()) {
       return Description.NO_MATCH;
     }
 
@@ -104,35 +140,8 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     return describeMatch(tree, fix.prefixWith(tree, '@' + annotation + ' ').build());
   }
 
-  private static boolean hasCompatibleReturnTypes(
-      ImmutableList<MethodTree> beforeMethods,
-      ImmutableList<MethodTree> afterMethods,
-      VisitorState state) {
-    for (MethodTree afterMethod : afterMethods) {
-      Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
-      // XXX: Drop special `void` handling?
-      if (afterReturnType.getKind() == TypeKind.VOID) {
-        continue;
-      }
-
-      for (MethodTree beforeMethod : beforeMethods) {
-        Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
-        // XXX: Drop special `void` handling?
-        if (beforeReturnType.getKind() != TypeKind.VOID
-            && !state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  private static ImmutableList<MethodTree> getMatchingMethods(
-      ClassTree tree, Matcher<Tree> matcher, VisitorState state) {
-    return tree.getMembers().stream()
-        .filter(member -> member instanceof MethodTree && matcher.matches(member, state))
-        .map(MethodTree.class::cast)
-        .collect(toImmutableList());
+  private static MultiMatchResult<AnnotationTree> getIncompatibilityAnnotation(
+      ClassTree tree, VisitorState state) {
+    return HAS_POSSIBLE_SOURCE_INCOMPATIBILITY.multiMatchResult(tree, state);
   }
 }
