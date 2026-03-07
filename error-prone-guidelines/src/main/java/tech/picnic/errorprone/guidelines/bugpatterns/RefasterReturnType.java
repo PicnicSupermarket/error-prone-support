@@ -75,14 +75,12 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     }
 
     Type inferredType = lub.orElseThrow();
-    if (!isDenotable(inferredType, /* isTypeArg= */ false)) {
-      // XXX: In this case, can we do better than just giving up? For example, if the inferred type
-      // is an anonymous class, we could suggest using the nearest non-anonymous superclass or
-      // interface that is a supertype of all return expression types.
+    Optional<Type> denotableType = toDenotable(inferredType, /* isTypeArg= */ false, state);
+    if (denotableType.isEmpty()) {
       return Description.NO_MATCH;
     }
 
-    @Var Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
+    @Var Type typeForSuggestion = mapVoidTypeArgsToWildcard(denotableType.orElseThrow(), state);
 
     // @AlsoNegation semantically requires a primitive boolean return type. When the
     // LUB auto-boxes boolean to Boolean, unbox it back to the primitive.
@@ -103,7 +101,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     SuggestedFix.Builder fix = SuggestedFix.builder();
     @Var String prettyType = SuggestedFixes.prettyType(state, fix, typeForSuggestion);
 
-    if (containsVoidType(inferredType, state)) {
+    if (containsVoidType(denotableType.orElseThrow(), state)) {
       String nullable = SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable");
       prettyType = prettyType.replace("Void", '@' + nullable + " Void");
     }
@@ -167,22 +165,84 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     return new Type.ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
   }
 
-  // XXX: Instead of giving up on suggesting a fix when the inferred type is not denotable, we could
-  // try to
-  // find the most specific denotable supertype of the inferred type and suggest that instead, as
-  // long as it is
-  // still more specific than the declared return type. Any non-denotable type paramter could at
-  // least be replaced with `?.
+  /**
+   * Attempts to convert a possibly non-denotable type into its most specific denotable
+   * approximation. Returns {@link Optional#empty()} if no denotable type can be constructed.
+   */
+  private static Optional<Type> toDenotable(Type type, boolean isTypeArg, VisitorState state) {
+    if (isDenotable(type, isTypeArg)) {
+      return Optional.of(type);
+    }
+
+    TypeKind kind = type.getKind();
+    if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
+      return Optional.empty();
+    }
+
+    if (!isTypeArg && type.isCompound()) {
+      Type supertype = state.getTypes().supertype(type);
+      return toDenotable(supertype, isTypeArg, state);
+    }
+
+    if (type instanceof Type.CapturedType capturedType) {
+      if (!isTypeArg) {
+        return Optional.empty();
+      }
+      Type.WildcardType wildcard = capturedType.wildcard;
+      if (wildcard.kind == BoundKind.UNBOUND) {
+        return Optional.of(
+            new Type.WildcardType(
+                state.getSymtab().objectType, BoundKind.UNBOUND, state.getSymtab().boundClass));
+      }
+      return toDenotable(wildcard.type, /* isTypeArg= */ true, state)
+          .map(bound -> new Type.WildcardType(bound, wildcard.kind, state.getSymtab().boundClass));
+    }
+
+    if (type.tsym != null && type.tsym.isAnonymous()) {
+      Type supertype = state.getTypes().supertype(type);
+      return toDenotable(supertype, isTypeArg, state);
+    }
+
+    List<Type> typeArgs = type.getTypeArguments();
+    if (!typeArgs.isEmpty()) {
+      @Var boolean changed = false;
+      ListBuffer<Type> newArgs = new ListBuffer<>();
+      for (Type arg : typeArgs) {
+        Optional<Type> denotableArg = toDenotable(arg, /* isTypeArg= */ true, state);
+        if (denotableArg.isEmpty()) {
+          return Optional.empty();
+        }
+        Type resolved = denotableArg.orElseThrow();
+        if (resolved != arg) {
+          changed = true;
+        }
+        newArgs.add(resolved);
+      }
+      if (changed) {
+        Type.ClassType ct = (Type.ClassType) type;
+        return Optional.of(new Type.ClassType(ct.getEnclosingType(), newArgs.toList(), ct.tsym));
+      }
+    }
+
+    if (type instanceof Type.WildcardType wildcardType && wildcardType.type != null) {
+      return toDenotable(wildcardType.type, isTypeArg, state)
+          .map(
+              bound ->
+                  bound == wildcardType.type
+                      ? type
+                      : new Type.WildcardType(
+                          bound, wildcardType.kind, state.getSymtab().boundClass));
+    }
+
+    return Optional.empty();
+  }
+
   private static boolean isDenotable(Type type, boolean isTypeArg) {
     TypeKind kind = type.getKind();
     if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
       return false;
     }
     if (!isTypeArg && type.isCompound()) {
-      // XXX: Compound types are denotable as type parameters, but `SuggestedFixes.prettyType` does
-      // not seems to be able to pretty-print them in all cases. Review whether we can do better.
-      // XXX: Drop this comment or the `isTypeArg` parameter if we can eventually support compound
-      // types in all contexts.
       return false;
     }
     if (type instanceof Type.CapturedType) {
@@ -193,8 +253,6 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     }
     for (Type typeArg : type.getTypeArguments()) {
       if (!isDenotable(typeArg, /* isTypeArg= */ true)) {
-        // XXX: We might want to allow certain non-denotable type arguments, such as captured
-        // wildcard type arguments, if they are part of an otherwise denotable return type.
         return false;
       }
     }
