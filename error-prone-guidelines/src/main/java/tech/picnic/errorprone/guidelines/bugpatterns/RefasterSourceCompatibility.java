@@ -73,7 +73,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
     if (beforeMethods.isEmpty()) {
-      /* This is not a Refaster rule. */
+      /* Fast path: this is not a Refaster rule. */
       return dropAnnotationIfPresent(tree, state);
     }
 
@@ -86,7 +86,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   private static ImmutableList<MethodTree> getMatchingMethods(
       ClassTree tree, Matcher<Tree> matcher, VisitorState state) {
     return tree.getMembers().stream()
-        .filter(member -> member instanceof MethodTree && matcher.matches(member, state))
+        .filter(member -> matcher.matches(member, state))
         .map(MethodTree.class::cast)
         .collect(toImmutableList());
   }
