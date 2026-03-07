@@ -6,7 +6,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import java.util.Collection;
-import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractIterableAssert;
 import org.assertj.core.api.AbstractIterableSizeAssert;
 import org.assertj.core.api.Assert;
@@ -89,10 +89,18 @@ final class AssertJEnumerableRules {
           enumAssert.size().isPositive().returnToIterable());
     }
 
-    // XXX: If this template matches, then the expression's return type changes incompatibly.
-    // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
-    AbstractIntegerAssert<?> before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
+    AbstractIterableSizeAssert<
+            ? extends
+                AbstractIterableAssert<
+                    ? extends AbstractIterableAssert<?, ?, E, ?>,
+                    ? extends Iterable<? extends E>,
+                    E,
+                    ? extends AbstractAssert<? extends AbstractAssert<?, E>, E>>,
+            ? extends Iterable<? extends E>,
+            E,
+            ? extends AbstractAssert<? extends AbstractAssert<?, E>, E>>
+        before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
       return Refaster.anyOf(enumAssert.size().isNotEqualTo(0), enumAssert.size().isPositive());
     }
 

@@ -10,6 +10,7 @@ import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractOptionalAssert;
 import org.assertj.core.api.ObjectAssert;
@@ -38,7 +39,8 @@ final class AssertJOptionalRules {
 
   static final class AbstractOptionalAssertIsPresent<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
+    AbstractOptionalAssert<? extends AbstractOptionalAssert<?, T>, T> before(
+        AbstractOptionalAssert<?, T> optionalAssert) {
       return Refaster.anyOf(
           optionalAssert.isNotEmpty(), optionalAssert.isNotEqualTo(Optional.empty()));
     }
@@ -49,9 +51,10 @@ final class AssertJOptionalRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatOptionalIsPresent<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Optional<T> optional) {
+    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> optional) {
       return Refaster.anyOf(
           assertThat(optional.isPresent()).isTrue(), assertThat(optional.isEmpty()).isFalse());
     }
@@ -65,7 +68,8 @@ final class AssertJOptionalRules {
 
   static final class AbstractOptionalAssertIsEmpty<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
+    AbstractOptionalAssert<? extends AbstractOptionalAssert<?, T>, T> before(
+        AbstractOptionalAssert<?, T> optionalAssert) {
       return Refaster.anyOf(
           optionalAssert.isNotPresent(), optionalAssert.isEqualTo(Optional.empty()));
     }
@@ -76,9 +80,10 @@ final class AssertJOptionalRules {
     }
   }
 
+  @PossibleSourceIncompatibility
   static final class AssertThatOptionalIsEmpty<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Optional<T> optional) {
+    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> optional) {
       return Refaster.anyOf(
           assertThat(optional.isEmpty()).isTrue(), assertThat(optional.isPresent()).isFalse());
     }

@@ -252,9 +252,15 @@ final class AssertJRules {
   // Set
   //
 
+  @PossibleSourceIncompatibility
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Iterable<T> set2) {
+    AbstractCollectionAssert<
+            ? extends AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>>,
+            Collection<? extends S>,
+            S,
+            ObjectAssert<S>>
+        before(Set<S> set1, Iterable<T> set2) {
       return Refaster.anyOf(
           assertThat(set1).isEqualTo(set2),
           assertThat(set1).containsExactlyInAnyOrderElementsOf(set2));
