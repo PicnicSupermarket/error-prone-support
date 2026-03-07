@@ -37,6 +37,15 @@
      assertThat(targetDir.getFileName().toString())
          .as("failed to locate target/ directory")
          .isEqualTo("target");
+@@ -34,7 +35,7 @@ public class Volume {
+    * @param src is relative to {@code ./target/}
+    */
+   public Volume copy(String src) throws IOException {
+-    Path srcPath = tmpDir.getParent().resolve(src);
++    Path srcPath = tmpDir.resolveSibling(src);
+     if (Files.isRegularFile(srcPath)) {
+       Files.copy(srcPath, tmpDir.resolve(srcPath.getFileName()), REPLACE_EXISTING);
+     } else if (Files.isDirectory(srcPath)) {
 @@ -61,7 +62,7 @@ public class Volume {
              }
            });
