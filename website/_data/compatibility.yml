@@ -3,6 +3,8 @@
 releases:
   - version: 0.28.0
     compatible:
+      - "2.48.0"
+      - "2.47.0"
       - "2.46.0"
   - version: 0.27.0
     compatible:
