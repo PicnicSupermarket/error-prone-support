@@ -152,6 +152,10 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return false;
     }
     if (!isTypeArg && type.isCompound()) {
+      // XXX: Compound types are denotable as type parameters, but `SuggestedFixes.prettyType` does
+      // not seems to be able to pretty-print them in all cases. Review whether we can do better.
+      // XXX: Drop this comment or the `isTypeArg` parameter if we can eventually support compound
+      // types in all contexts.
       return false;
     }
     if (type instanceof Type.CapturedType) {
@@ -167,6 +171,11 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
         return false;
       }
     }
+    if (type instanceof Type.WildcardType wildcardType) {
+      Type bound = wildcardType.type;
+      return bound == null || isDenotable(bound, isTypeArg);
+    }
+
     return true;
   }
 }
