@@ -20,9 +20,11 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
+import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
@@ -54,6 +56,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> REFASTER_TEMPLATE_METHOD =
       anyOf(hasAnnotation(BeforeTemplate.class), hasAnnotation(AfterTemplate.class));
+  private static final Matcher<Tree> HAS_ALSO_NEGATION = hasAnnotation(AlsoNegation.class);
   private static final Supplier<Type> VOID_TYPE_SUPPLIER =
       VisitorState.memoize(state -> state.getTypeFromString(Void.class.getCanonicalName()));
 
@@ -81,6 +84,17 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
 
     Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
 
+    // @AlsoNegation semantically requires a primitive boolean return type. When the
+    // LUB auto-boxes boolean to Boolean, unbox it back to the primitive.
+    // XXX: More generally, `Types#lub` auto-boxes primitive types. Consider unboxing the
+    // inferred type whenever all return expression types are the same primitive type.
+    if (enclosingClassHasAlsoNegation(state)) {
+      Type unboxed = state.getTypes().unboxedType(typeForSuggestion);
+      if (unboxed.getKind() != TypeKind.NONE) {
+        typeForSuggestion = unboxed;
+      }
+    }
+
     Type declaredReturnType = ASTHelpers.getSymbol(tree).getReturnType();
     if (state.getTypes().isSameType(typeForSuggestion, declaredReturnType)) {
       return Description.NO_MATCH;
@@ -96,6 +110,13 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
 
     fix.replace(tree.getReturnType(), prettyType);
     return describeMatch(tree, fix.build());
+  }
+
+  private static boolean enclosingClassHasAlsoNegation(VisitorState state) {
+    ClassTree enclosingClass = state.findEnclosing(ClassTree.class);
+    return enclosingClass != null
+        && enclosingClass.getMembers().stream()
+            .anyMatch(member -> HAS_ALSO_NEGATION.matches(member, state));
   }
 
   private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
@@ -146,6 +167,12 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     return new Type.ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
   }
 
+  // XXX: Instead of giving up on suggesting a fix when the inferred type is not denotable, we could
+  // try to
+  // find the most specific denotable supertype of the inferred type and suggest that instead, as
+  // long as it is
+  // still more specific than the declared return type. Any non-denotable type paramter could at
+  // least be replaced with `?.
   private static boolean isDenotable(Type type, boolean isTypeArg) {
     TypeKind kind = type.getKind();
     if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
