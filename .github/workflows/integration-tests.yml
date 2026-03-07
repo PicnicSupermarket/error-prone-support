@@ -1,6 +1,6 @@
 # Runs integration tests against the project.
 #
-# The tests run in the following scenrios:
+# The tests run in the following scenarios:
 # - Any time code is pushed to the default branch.
 # - When a user leaves a pull request comment containing the string
 #   `/integration-test`.
