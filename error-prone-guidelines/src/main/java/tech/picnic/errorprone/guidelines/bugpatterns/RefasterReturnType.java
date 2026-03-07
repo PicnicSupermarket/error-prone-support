@@ -71,18 +71,19 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return Description.NO_MATCH;
     }
 
-    Optional<Type> lub = getLubOfReturnExpressionTypes(tree, state);
-    if (lub.isEmpty()) {
+    Optional<Type> inferredType = inferReturnType(tree, state);
+    if (inferredType.isEmpty()) {
       return Description.NO_MATCH;
     }
 
-    Type inferredType = lub.orElseThrow();
-    Optional<Type> denotableType = toDenotable(inferredType, /* isTypeArg= */ false, state);
+    Optional<Type> denotableType =
+        toDenotable(inferredType.orElseThrow(), /* isTypeArg= */ false, state);
     if (denotableType.isEmpty()) {
       return Description.NO_MATCH;
     }
 
-    @Var Type typeForSuggestion = mapVoidTypeArgsToWildcard(denotableType.orElseThrow(), state);
+    Type denotable = denotableType.orElseThrow();
+    @Var Type typeForSuggestion = mapVoidTypeArgsToWildcard(denotable, state);
 
     // @AlsoNegation semantically requires a primitive boolean return type. When the
     // LUB auto-boxes boolean to Boolean, unbox it back to the primitive.
@@ -103,7 +104,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     SuggestedFix.Builder fix = SuggestedFix.builder();
     @Var String prettyType = SuggestedFixes.prettyType(state, fix, typeForSuggestion);
 
-    if (containsVoidType(denotableType.orElseThrow(), state)) {
+    if (containsVoidType(denotable, state)) {
       String nullable = SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable");
       prettyType = prettyType.replace("Void", '@' + nullable + " Void");
     }
@@ -119,8 +120,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
             .anyMatch(member -> HAS_ALSO_NEGATION.matches(member, state));
   }
 
-  // XXX: Rename.
-  private static Optional<Type> getLubOfReturnExpressionTypes(MethodTree tree, VisitorState state) {
+  private static Optional<Type> inferReturnType(MethodTree tree, VisitorState state) {
     return MoreASTHelpers.findDirectReturnStatements(tree).stream()
         .map(ReturnTree::getExpression)
         .flatMap(
@@ -169,10 +169,6 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
    * approximation. Returns {@link Optional#empty()} if no denotable type can be constructed.
    */
   private static Optional<Type> toDenotable(Type type, boolean isTypeArg, VisitorState state) {
-    if (isDenotable(type, isTypeArg)) {
-      return Optional.of(type);
-    }
-
     TypeKind kind = type.getKind();
     if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
       return Optional.empty();
@@ -233,33 +229,6 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
                           bound, wildcardType.kind, state.getSymtab().boundClass));
     }
 
-    return Optional.empty();
-  }
-
-  private static boolean isDenotable(Type type, boolean isTypeArg) {
-    TypeKind kind = type.getKind();
-    if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
-      return false;
-    }
-    if (!isTypeArg && type.isCompound()) {
-      return false;
-    }
-    if (type instanceof Type.CapturedType) {
-      return false;
-    }
-    if (type.tsym != null && type.tsym.isAnonymous()) {
-      return false;
-    }
-    for (Type typeArg : type.getTypeArguments()) {
-      if (!isDenotable(typeArg, /* isTypeArg= */ true)) {
-        return false;
-      }
-    }
-    if (type instanceof Type.WildcardType wildcardType) {
-      Type bound = wildcardType.type;
-      return bound == null || isDenotable(bound, isTypeArg);
-    }
-
-    return true;
+    return Optional.of(type);
   }
 }
