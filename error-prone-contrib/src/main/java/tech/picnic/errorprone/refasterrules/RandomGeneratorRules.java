@@ -31,6 +31,25 @@ final class RandomGeneratorRules {
     }
   }
 
+  /**
+   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over alternatives that
+   * may silently yield an ununiform domain of values.
+   */
+  // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
+  // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
+  // code, but only in situations that are likely unintended.
+  static final class RandomGeneratorNextDoubleWithOrigin {
+    @BeforeTemplate
+    double before(RandomGenerator random, double a, double b) {
+      return a + random.nextDouble(b);
+    }
+
+    @AfterTemplate
+    double after(RandomGenerator random, double a, double b) {
+      return random.nextDouble(a, a + b);
+    }
+  }
+
   /** Prefer {@link RandomGenerator#nextInt(int)} over more contrived alternatives. */
   static final class RandomGeneratorNextInt {
     @BeforeTemplate
@@ -43,6 +62,25 @@ final class RandomGeneratorRules {
     @AfterTemplate
     int after(RandomGenerator random, int bound) {
       return random.nextInt(bound);
+    }
+  }
+
+  /**
+   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over alternatives that may
+   * silently yield values outside the intended domain.
+   */
+  // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
+  // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
+  // code, but only in situations that are likely unintended.
+  static final class RandomGeneratorNextIntWithOrigin {
+    @BeforeTemplate
+    int before(RandomGenerator random, int a, int b) {
+      return a + random.nextInt(b);
+    }
+
+    @AfterTemplate
+    int after(RandomGenerator random, int a, int b) {
+      return random.nextInt(a, a + b);
     }
   }
 
@@ -73,6 +111,25 @@ final class RandomGeneratorRules {
     @AfterTemplate
     long after(RandomGenerator random, long bound) {
       return random.nextLong(bound);
+    }
+  }
+
+  /**
+   * Prefer {@link RandomGenerator#nextLong(long origin, long bound)} over more contrived
+   * alternatives.
+   */
+  // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
+  // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
+  // code, but only in situations that are likely unintended.
+  static final class RandomGeneratorNextLongWithOrigin {
+    @BeforeTemplate
+    long before(RandomGenerator random, long a, long b) {
+      return a + random.nextLong(b);
+    }
+
+    @AfterTemplate
+    long after(RandomGenerator random, long a, long b) {
+      return random.nextLong(a, a + b);
     }
   }
 }
