@@ -82,7 +82,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return Description.NO_MATCH;
     }
 
-    Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
+    @Var Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
 
     // @AlsoNegation semantically requires a primitive boolean return type. When the
     // LUB auto-boxes boolean to Boolean, unbox it back to the primitive.
