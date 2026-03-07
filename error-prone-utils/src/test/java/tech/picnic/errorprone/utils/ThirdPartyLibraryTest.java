@@ -102,7 +102,7 @@ final class ThirdPartyLibraryTest {
    * element, whether they can be used.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `ThirdPartyLibrary` for testing purposes")
-  public static final class IsIntroductionAllowedTestChecker extends BugChecker
+  private static final class IsIntroductionAllowedTestChecker extends BugChecker
       implements ClassTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -122,7 +122,7 @@ final class ThirdPartyLibraryTest {
    * {@link ThirdPartyLibrary#canIntroduceUsage(String, VisitorState)}.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `ThirdPartyLibrary` for testing purposes")
-  public static final class CanIntroduceUsageTestChecker extends BugChecker
+  private static final class CanIntroduceUsageTestChecker extends BugChecker
       implements ClassTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final ImmutableMap<String, String> TYPES =

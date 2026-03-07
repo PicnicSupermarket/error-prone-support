@@ -85,7 +85,7 @@ final class ConflictDetectionTest {
    * String, VisitorState)} to flag methods of which the name cannot be suffixed with a {@code t}.
    */
   @BugPattern(summary = "Interacts with `ConflictDetection` for testing purposes", severity = ERROR)
-  public static final class RenameBlockerFlagger extends BugChecker implements MethodTreeMatcher {
+  private static final class RenameBlockerFlagger extends BugChecker implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override

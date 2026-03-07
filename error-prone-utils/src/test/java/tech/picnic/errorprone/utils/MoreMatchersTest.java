@@ -106,7 +106,7 @@ final class MoreMatchersTest {
 
   /** A {@link BugChecker} that delegates to {@link MoreMatchers#hasMetaAnnotation(String)}. */
   @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
-  public static final class HasMetaAnnotationTestChecker extends BugChecker
+  private static final class HasMetaAnnotationTestChecker extends BugChecker
       implements AnnotationTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final Matcher<AnnotationTree> DELEGATE =
@@ -120,7 +120,7 @@ final class MoreMatchersTest {
 
   /** A {@link BugChecker} that delegates to {@link MoreMatchers#isSubTypeOf(Supplier)}. */
   @BugPattern(summary = "Interacts with `MoreMatchers` for testing purposes", severity = ERROR)
-  public static final class IsSubTypeOfTestChecker extends BugChecker
+  private static final class IsSubTypeOfTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final Matcher<Tree> DELEGATE =
