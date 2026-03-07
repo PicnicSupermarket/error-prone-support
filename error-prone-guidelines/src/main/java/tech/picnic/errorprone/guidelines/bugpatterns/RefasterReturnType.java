@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -9,7 +8,6 @@ import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
@@ -30,6 +28,7 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 import java.util.Objects;
+import java.util.Optional;
 import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
@@ -59,27 +58,22 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return Description.NO_MATCH;
     }
 
-    Type declaredReturnType = ASTHelpers.getSymbol(tree).getReturnType();
-    if (declaredReturnType.getKind() == TypeKind.VOID) {
+    Optional<Type> lub = getLubOfReturnExpressionTypes(tree, state);
+    if (lub.isEmpty()) {
       return Description.NO_MATCH;
     }
 
-    ImmutableList<Type> returnTypes = collectReturnExpressionTypes(tree);
-    if (returnTypes.isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
-    Type inferredType =
-        returnTypes.size() == 1
-            ? returnTypes.getFirst()
-            : state.getTypes().lub(List.from(returnTypes));
-
-    if (!isDenotable(inferredType)) {
+    Type inferredType = lub.orElseThrow();
+    if (!isDenotable(inferredType, /* isTypeArg= */ false)) {
+      // XXX: In this case, can we do better than just giving up? For example, if the inferred type
+      // is an anonymous class, we could suggest using the nearest non-anonymous superclass or
+      // interface that is a supertype of all return expression types.
       return Description.NO_MATCH;
     }
 
     Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
 
+    Type declaredReturnType = ASTHelpers.getSymbol(tree).getReturnType();
     if (!state.getTypes().isSubtype(inferredType, declaredReturnType)
         || state.getTypes().isSameType(typeForSuggestion, declaredReturnType)) {
       return Description.NO_MATCH;
@@ -90,20 +84,20 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
 
     if (containsVoidType(inferredType, state)) {
       String nullable = SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable");
-      prettyType = prettyType.replace("Void", "@" + nullable + " Void");
+      prettyType = prettyType.replace("Void", '@' + nullable + " Void");
     }
 
     fix.replace(tree.getReturnType(), prettyType);
     return describeMatch(tree, fix.build());
   }
 
-  private static ImmutableList<Type> collectReturnExpressionTypes(MethodTree tree) {
+  // XXX: Rename.
+  private static Optional<Type> getLubOfReturnExpressionTypes(MethodTree tree, VisitorState state) {
     return MoreASTHelpers.findDirectReturnStatements(tree).stream()
         .map(ReturnTree::getExpression)
-        .filter(Objects::nonNull)
         .map(ASTHelpers::getType)
         .filter(Objects::nonNull)
-        .collect(toImmutableList());
+        .reduce(state.getTypes()::lub);
   }
 
   private static boolean containsVoidType(Type type, VisitorState state) {
@@ -145,12 +139,12 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     return new Type.ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
   }
 
-  private static boolean isDenotable(Type type) {
+  private static boolean isDenotable(Type type, boolean isTypeArg) {
     TypeKind kind = type.getKind();
     if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
       return false;
     }
-    if (type.isCompound()) {
+    if (!isTypeArg && type.isCompound()) {
       return false;
     }
     if (type instanceof Type.CapturedType) {
@@ -160,7 +154,9 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return false;
     }
     for (Type typeArg : type.getTypeArguments()) {
-      if (!isDenotable(typeArg)) {
+      if (!isDenotable(typeArg, /* isTypeArg= */ true)) {
+        // XXX: We might want to allow certain non-denotable type arguments, such as captured
+        // wildcard type arguments, if they are part of an otherwise denotable return type.
         return false;
       }
     }
