@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -17,9 +18,13 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
@@ -29,6 +34,7 @@ import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
@@ -48,6 +54,8 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> REFASTER_TEMPLATE_METHOD =
       anyOf(hasAnnotation(BeforeTemplate.class), hasAnnotation(AfterTemplate.class));
+  private static final Supplier<Type> VOID_TYPE_SUPPLIER =
+      VisitorState.memoize(state -> state.getTypeFromString(Void.class.getCanonicalName()));
 
   /** Instantiates a new {@link RefasterReturnType} instance. */
   public RefasterReturnType() {}
@@ -74,8 +82,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     Type typeForSuggestion = mapVoidTypeArgsToWildcard(inferredType, state);
 
     Type declaredReturnType = ASTHelpers.getSymbol(tree).getReturnType();
-    if (!state.getTypes().isSubtype(inferredType, declaredReturnType)
-        || state.getTypes().isSameType(typeForSuggestion, declaredReturnType)) {
+    if (state.getTypes().isSameType(typeForSuggestion, declaredReturnType)) {
       return Description.NO_MATCH;
     }
 
@@ -91,26 +98,26 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     return describeMatch(tree, fix.build());
   }
 
+  private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
+      staticMethod().onClass(Refaster.class.getCanonicalName()).named("anyOf");
+
   // XXX: Rename.
   private static Optional<Type> getLubOfReturnExpressionTypes(MethodTree tree, VisitorState state) {
     return MoreASTHelpers.findDirectReturnStatements(tree).stream()
         .map(ReturnTree::getExpression)
+        .flatMap(
+            t ->
+                REFASTER_ANY_OF.matches(t, state)
+                    ? ((MethodInvocationTree) t).getArguments().stream()
+                    : Stream.of(t))
         .map(ASTHelpers::getType)
         .filter(Objects::nonNull)
         .reduce(state.getTypes()::lub);
   }
 
   private static boolean containsVoidType(Type type, VisitorState state) {
-    if (ASTHelpers.isSameType(
-        type, state.getTypeFromString(Void.class.getCanonicalName()), state)) {
-      return true;
-    }
-    for (Type typeArg : type.getTypeArguments()) {
-      if (containsVoidType(typeArg, state)) {
-        return true;
-      }
-    }
-    return false;
+    return state.getTypes().isSameType(type, VOID_TYPE_SUPPLIER.get(state))
+        || type.getTypeArguments().stream().anyMatch(arg -> containsVoidType(arg, state));
   }
 
   private static Type mapVoidTypeArgsToWildcard(Type type, VisitorState state) {
@@ -119,7 +126,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return type;
     }
 
-    Type voidType = state.getTypeFromString(Void.class.getCanonicalName());
+    Type voidType = VOID_TYPE_SUPPLIER.get(state);
     @Var boolean changed = false;
     ListBuffer<Type> newArgs = new ListBuffer<>();
     for (Type arg : typeArgs) {
