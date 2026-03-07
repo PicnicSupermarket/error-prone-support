@@ -70,6 +70,40 @@ final class FileRules {
     }
   }
 
+  /** Prefer {@link Path#resolveSibling(Path)} over more verbose alternatives. */
+  // XXX: Contrary to the original code, the alternative code gracefully handles the case where
+  // `path` has no parent.
+  static final class PathResolveSiblingPath {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
+    Path before(Path path, Path other) {
+      return path.getParent().resolve(other);
+    }
+
+    @AfterTemplate
+    Path after(Path path, Path other) {
+      return path.resolveSibling(other);
+    }
+  }
+
+  /** Prefer {@link Path#resolveSibling(String)} over the more verbose alternatives. */
+  // XXX: Contrary to the original code, the alternative code gracefully handles the case where
+  // `path` has no parent.
+  static final class PathResolveSiblingString {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
+    Path before(Path path, String other) {
+      return path.getParent().resolve(other);
+    }
+
+    @AfterTemplate
+    Path after(Path path, String other) {
+      return path.resolveSibling(other);
+    }
+  }
+
   /** Prefer {@link Files#readString(Path, Charset)} over more contrived alternatives. */
   static final class FilesReadStringWithCharset {
     @BeforeTemplate
