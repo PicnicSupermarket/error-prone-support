@@ -554,20 +554,6 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  static final class AssertThatThrownByAsInstanceOfThrowable<T extends Throwable> {
-    @BeforeTemplate
-    ThrowableAssertAlternative<T> before(
-        ThrowingCallable throwingCallable, Class<T> exceptionType) {
-      return assertThatExceptionOfType(exceptionType).isThrownBy(throwingCallable);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractThrowableAssert<?, T> after(ThrowingCallable throwingCallable, Class<T> exceptionType) {
-      return assertThatThrownBy(throwingCallable).asInstanceOf(throwable(exceptionType));
-    }
-  }
-
   static final class AssertThatThrownByHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
@@ -717,6 +703,24 @@ final class AssertJThrowingCallableRules {
       return assertThatThrownBy(throwingCallable)
           .isInstanceOf(exceptionType)
           .hasMessageNotContaining(message);
+    }
+  }
+
+  // NB: This rule must be defined after the more specific `AssertThatThrownByHasMessage*` rules
+  // above, so that those match first when the `isThrownBy()` call is followed by `.withMessage()` or
+  // similar. If this rule matches first, the chained message assertion is left calling a method
+  // (`withMessage`) that does not exist on the resulting `AbstractThrowableAssert` type.
+  static final class AssertThatThrownByAsInstanceOfThrowable<T extends Throwable> {
+    @BeforeTemplate
+    ThrowableAssertAlternative<T> before(
+        ThrowingCallable throwingCallable, Class<T> exceptionType) {
+      return assertThatExceptionOfType(exceptionType).isThrownBy(throwingCallable);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractThrowableAssert<?, T> after(ThrowingCallable throwingCallable, Class<T> exceptionType) {
+      return assertThatThrownBy(throwingCallable).asInstanceOf(throwable(exceptionType));
     }
   }
 
