@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets.SetView;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -63,6 +64,22 @@ final class CollectionRules {
     @BeforeTemplate
     boolean before(ImmutableCollection<T> collection) {
       return collection.asList().isEmpty();
+    }
+
+    // XXX: Consider introducing similar templates for other `SetView` methods that derive a
+    // stateless object from a `SetView`: `isEmpty()`, `size()`, `contains()`, `containsAll()`,
+    // `equals()` and `hashCode()`, as well as the `toArray` overloads.
+    // XXX: Consider introducing similar templates for other methods that create an immutable copy
+    // of a collection, such as `ImmutableList.copyOf`, `ImmutableSet.copyOf` and
+    // `ImmutableMap.copyOf`.
+    // XXX: Instead of introducing many Refaster rules to cover the Cartesian product of the above
+    // suggestions, consider writing an `UnnecessaryCollectionCopy` Error Prone check that
+    // simplifies all such expressions. Some logic for such a rule may be extracted from the
+    // `IsEmpty` matcher implementation. (Note that `equals()` and `hashCode()` may need special
+    // handling, as they depend on the collection type produced.)
+    @BeforeTemplate
+    boolean before(SetView<T> collection) {
+      return collection.immutableCopy().isEmpty();
     }
 
     @AfterTemplate
