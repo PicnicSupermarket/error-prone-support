@@ -56,6 +56,8 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
   private static final long serialVersionUID = 1L;
   private static final Matcher<Tree> REFASTER_TEMPLATE_METHOD =
       anyOf(hasAnnotation(BeforeTemplate.class), hasAnnotation(AfterTemplate.class));
+  private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
+      staticMethod().onClass(Refaster.class.getCanonicalName()).named("anyOf");
   private static final Matcher<Tree> HAS_ALSO_NEGATION = hasAnnotation(AlsoNegation.class);
   private static final Supplier<Type> VOID_TYPE_SUPPLIER =
       VisitorState.memoize(state -> state.getTypeFromString(Void.class.getCanonicalName()));
@@ -116,9 +118,6 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
         && enclosingClass.getMembers().stream()
             .anyMatch(member -> HAS_ALSO_NEGATION.matches(member, state));
   }
-
-  private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
-      staticMethod().onClass(Refaster.class.getCanonicalName()).named("anyOf");
 
   // XXX: Rename.
   private static Optional<Type> getLubOfReturnExpressionTypes(MethodTree tree, VisitorState state) {
@@ -213,7 +212,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
           return Optional.empty();
         }
         Type resolved = denotableArg.orElseThrow();
-        if (!Objects.equals(resolved, arg)) {
+        if (!state.getTypes().isSameType(resolved, arg)) {
           changed = true;
         }
         newArgs.add(resolved);
@@ -228,7 +227,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return toDenotable(wildcardType.type, isTypeArg, state)
           .map(
               bound ->
-                  Objects.equals(bound, wildcardType.type)
+                  state.getTypes().isSameType(bound, wildcardType.type)
                       ? type
                       : new Type.WildcardType(
                           bound, wildcardType.kind, state.getSymtab().boundClass));
