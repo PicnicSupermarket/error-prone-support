@@ -68,7 +68,7 @@ final class WebClientRules {
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.get();
     }
   }
@@ -90,7 +90,7 @@ final class WebClientRules {
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.head();
     }
   }
@@ -112,7 +112,7 @@ final class WebClientRules {
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.options();
     }
   }

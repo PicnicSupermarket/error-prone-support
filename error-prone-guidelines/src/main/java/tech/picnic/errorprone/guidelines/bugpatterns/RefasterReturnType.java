@@ -213,7 +213,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
           return Optional.empty();
         }
         Type resolved = denotableArg.orElseThrow();
-        if (resolved != arg) {
+        if (!Objects.equals(resolved, arg)) {
           changed = true;
         }
         newArgs.add(resolved);
@@ -228,7 +228,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return toDenotable(wildcardType.type, isTypeArg, state)
           .map(
               bound ->
-                  bound == wildcardType.type
+                  Objects.equals(bound, wildcardType.type)
                       ? type
                       : new Type.WildcardType(
                           bound, wildcardType.kind, state.getSymtab().boundClass));

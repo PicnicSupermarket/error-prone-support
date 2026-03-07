@@ -17,6 +17,7 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
@@ -210,7 +211,8 @@ final class AssertJStreamRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, T, ?> after(Collection<T> collection) {
+    AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> after(
+        Collection<T> collection) {
       return assertThat(collection);
     }
   }
