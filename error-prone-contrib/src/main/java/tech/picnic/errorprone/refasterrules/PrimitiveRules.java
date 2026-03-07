@@ -78,6 +78,94 @@ final class PrimitiveRules {
     }
   }
 
+  /** Prefer {@link Math#clamp(long, int, int)} over more verbose alternatives. */
+  static final class MathClampInt {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
+    @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
+    int before(int value, int min, int max) {
+      return Refaster.anyOf(
+          Math.min(max, Math.max(value, min)),
+          Math.min(Math.max(value, min), max),
+          Math.max(min, Math.min(value, max)),
+          Math.max(Math.min(value, max), min),
+          Ints.constrainToRange(value, min, max));
+    }
+
+    @AfterTemplate
+    int after(int value, int min, int max) {
+      return Math.clamp(value, min, max);
+    }
+  }
+
+  /** Prefer {@link Math#clamp(long, long, long)} over more verbose alternatives. */
+  static final class MathClampLong {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
+    @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
+    long before(long value, long min, long max) {
+      return Refaster.anyOf(
+          Math.min(max, Math.max(value, min)),
+          Math.min(Math.max(value, min), max),
+          Math.max(min, Math.min(value, max)),
+          Math.max(Math.min(value, max), min),
+          Longs.constrainToRange(value, min, max));
+    }
+
+    @AfterTemplate
+    long after(long value, long min, long max) {
+      return Math.clamp(value, min, max);
+    }
+  }
+
+  /** Prefer {@link Math#clamp(float, float, float)} over more verbose alternatives. */
+  static final class MathClampFloat {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
+    @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
+    float before(float value, float min, float max) {
+      return Refaster.anyOf(
+          Math.min(max, Math.max(value, min)),
+          Math.min(Math.max(value, min), max),
+          Math.max(min, Math.min(value, max)),
+          Math.max(Math.min(value, max), min),
+          Floats.constrainToRange(value, min, max));
+    }
+
+    @AfterTemplate
+    float after(float value, float min, float max) {
+      return Math.clamp(value, min, max);
+    }
+  }
+
+  /** Prefer {@link Math#clamp(double, double, double)} over more verbose alternatives. */
+  static final class MathClampDouble {
+    // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
+    // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
+    // change.
+    @BeforeTemplate
+    @SuppressWarnings("java:S6885" /* This violation will be rewritten. */)
+    double before(double value, double min, double max) {
+      return Refaster.anyOf(
+          Math.min(max, Math.max(value, min)),
+          Math.min(Math.max(value, min), max),
+          Math.max(min, Math.min(value, max)),
+          Math.max(Math.min(value, max), min),
+          Doubles.constrainToRange(value, min, max));
+    }
+
+    @AfterTemplate
+    double after(double value, double min, double max) {
+      return Math.clamp(value, min, max);
+    }
+  }
+
   /** Prefer {@link Math#toIntExact(long)} over the Guava alternative. */
   // XXX: This rule changes the exception possibly thrown from `IllegalArgumentException` to
   // `ArithmeticException`.
