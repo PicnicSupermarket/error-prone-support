@@ -20,8 +20,6 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 // XXX: Redefine as a record?
-// XXX: Document design decision that the project stays as close as possible to Error Prone.
-//      ^ ... and *therefore* uses Google Auto Value rather than Immutables.org.
 // XXX: Make this class implement the `MultiMatcher` interface.
 /**
  * A matcher of (annotation, attribute) pairs.
