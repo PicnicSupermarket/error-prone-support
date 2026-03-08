@@ -32,7 +32,7 @@ layout: default
 > {{ page.summary }}
 
 {% comment %}
-  # XXX: Here, include a more elaborate explantion, if available.
+  # XXX: Here, include a more elaborate explanation, if available.
 {% endcomment %}
 
 {: .note-title }
@@ -76,7 +76,7 @@ applied.
 ### Identification
 
 Shows code lines which will (not) be flagged by this bug pattern. \
-A `//BUG: Diagnostic contains:` comment is placed above any violating line.
+A `// BUG: Diagnostic contains:` comment is placed above any violating line.
 
 {% for source in page.identification %}
 {% highlight java %}

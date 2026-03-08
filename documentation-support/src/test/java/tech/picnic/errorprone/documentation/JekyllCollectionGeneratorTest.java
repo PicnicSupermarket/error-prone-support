@@ -33,6 +33,7 @@ import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugP
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Identification;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Replacement;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
 
@@ -47,6 +48,10 @@ final class JekyllCollectionGeneratorTest {
   void mainWithInvalidArgs(ImmutableList<String> args) {
     assertThatThrownBy(() -> JekyllCollectionGenerator.main(args.toArray(String[]::new)))
         .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  private static Stream<Arguments> mainTestCases() {
+    return Stream.of(bugpatternAndRefaster(), onlyBugpattern());
   }
 
   @MethodSource("mainTestCases")
@@ -64,7 +69,6 @@ final class JekyllCollectionGeneratorTest {
      */
     Files.createDirectories(projectRoot.resolve(WEBSITE_ROOT));
 
-    // XXX: Validate!
     Files.writeString(
         projectRoot.resolve("README.md"),
         "# Test Readme\n\nSome content with link src=\"website/img.png\".\n",
@@ -74,12 +78,14 @@ final class JekyllCollectionGeneratorTest {
 
     testCase.verify();
 
-    // XXX: Validate `website/index.md` contents!
-  }
-
-  // XXX: Move up!
-  private static Stream<Arguments> mainTestCases() {
-    return Stream.of(bugpatternAndRefaster(), onlyBugpattern());
+    assertThat(projectRoot.resolve(WEBSITE_ROOT).resolve("index.md"))
+        .content(UTF_8)
+        .contains("layout: default")
+        .contains("title: Home")
+        .contains("nav_order: 1")
+        .contains("# Test Readme")
+        .contains("src=\"img.png\"")
+        .doesNotContain("src=\"website/img.png\"");
   }
 
   // XXX: Use `argumentSet`? Rename test cases then.
@@ -96,6 +102,10 @@ final class JekyllCollectionGeneratorTest {
                           root,
                           "module-a",
                           JekyllCollectionGeneratorTest::bugPatternTestCasesAlpha),
+                      TestInput.create(
+                          root,
+                          "module-b",
+                          JekyllCollectionGeneratorTest::refasterRuleCollectionBeta),
                       TestInput.create(
                           root,
                           "module-b",
@@ -137,7 +147,7 @@ final class JekyllCollectionGeneratorTest {
                           severity: SUGGESTION
                           tags:
                           - Simplification
-                          source: error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/Beta.java
+                          source: module-b/src/main/java/beta/Beta.java
                           rules:
                           - name: Rule1
                             severity: SUGGESTION
@@ -163,32 +173,12 @@ final class JekyllCollectionGeneratorTest {
             root -> {
               ImmutableList<TestInput> inputs =
                   ImmutableList.of(
-                      new TestInput(
-                          resolvePath(root, "module-d", "target", "docs", "bugpattern-Gamma.json"),
-                          new BugPatternInfo(
-                              root.resolve("module-d/src/main/java/pkg/Gamma.java").toUri(),
-                              "pkg.Gamma",
-                              "Gamma",
-                              ImmutableList.of(),
-                              "",
-                              ImmutableList.of(),
-                              "Gamma summary",
-                              "",
-                              SUGGESTION,
-                              /* canDisable= */ true,
-                              ImmutableList.of())),
-                      new TestInput(
-                          resolvePath(root, "module-d", "target", "docs", "tests-Gamma.json"),
-                          new BugPatternTestCases(
-                              root.resolve("module-d/src/test/java/pkg/GammaTest.java").toUri(),
-                              "pkg.GammaTest",
-                              ImmutableList.of(
-                                  new BugPatternTestCase(
-                                      "pkg.Gamma",
-                                      ImmutableList.of(
-                                          new Identification(
-                                              "G.java",
-                                              "// BUG: Diagnostic contains:\nclass G {}\n")))))));
+                      TestInput.create(
+                          root, "module-d", JekyllCollectionGeneratorTest::bugPatternGamma),
+                      TestInput.create(
+                          root,
+                          "module-d",
+                          JekyllCollectionGeneratorTest::bugPatternTestCasesGamma));
 
               ImmutableList<TestOutput> outputs =
                   ImmutableList.of(
@@ -215,11 +205,26 @@ final class JekyllCollectionGeneratorTest {
             });
   }
 
-  // XXX: Logically reorder the methods below.
+  /* Bug pattern helpers. */
 
   // XXX: Introduce another with a different severity level.
   private static BugPatternInfo bugPatternAlpha(Path projectRoot, String module) {
     return bugPattern(projectRoot, module, "Alpha", WARNING);
+  }
+
+  private static BugPatternInfo bugPatternGamma(Path projectRoot, String module) {
+    return new BugPatternInfo(
+        resolvePath(projectRoot, module, "src", "main", "java", "pkg", "Gamma.java").toUri(),
+        "pkg.Gamma",
+        "Gamma",
+        ImmutableList.of(),
+        "",
+        ImmutableList.of(),
+        "Gamma summary",
+        "",
+        SUGGESTION,
+        /* canDisable= */ true,
+        ImmutableList.of());
   }
 
   private static BugPatternInfo bugPattern(
@@ -243,6 +248,17 @@ final class JekyllCollectionGeneratorTest {
   private static BugPatternTestCases bugPatternTestCasesAlpha(Path projectRoot, String module) {
     return bugPatternTestCases(
         projectRoot, module, "Alpha", identificationTestA(), replacementTestB());
+  }
+
+  private static BugPatternTestCases bugPatternTestCasesGamma(Path projectRoot, String module) {
+    return new BugPatternTestCases(
+        resolvePath(projectRoot, module, "src", "test", "java", "pkg", "GammaTest.java").toUri(),
+        "pkg.GammaTest",
+        ImmutableList.of(
+            new BugPatternTestCase(
+                "pkg.Gamma",
+                ImmutableList.of(
+                    new Identification("G.java", "// BUG: Diagnostic contains:\nclass G {}\n")))));
   }
 
   // XXX: Say something about odd variants not being tested. Can we instead disallow those? Drop the
@@ -279,8 +295,30 @@ final class JekyllCollectionGeneratorTest {
 		""");
   }
 
+  /* Refaster helpers. */
+
+  private static RefasterRuleCollection refasterRuleCollectionBeta(
+      Path projectRoot, String module) {
+    return new RefasterRuleCollection(
+        resolvePath(projectRoot, module, "src", "main", "java", "beta", "Beta.java").toUri(),
+        "Beta",
+        "",
+        "https://error-prone.picnic.tech/refasterrules/Beta#",
+        ImmutableList.of(
+            new RefasterRuleCollection.Rule(
+                "Rule1",
+                "",
+                "https://error-prone.picnic.tech/refasterrules/Beta#Rule1",
+                SUGGESTION),
+            new RefasterRuleCollection.Rule(
+                "Rule2",
+                "",
+                "https://error-prone.picnic.tech/refasterrules/Beta#Rule2",
+                SUGGESTION)));
+  }
+
   private static RefasterTestCases refasterTestCasesBetaInput(Path projectRoot, String module) {
-    return refasterTestCasesInput(
+    return createRefasterTestCases(
         projectRoot,
         module,
         "Beta",
@@ -290,7 +328,7 @@ final class JekyllCollectionGeneratorTest {
   }
 
   private static RefasterTestCases refasterTestCasesBetaOutput(Path projectRoot, String module) {
-    return refasterTestCasesInput(
+    return createRefasterTestCases(
         projectRoot,
         module,
         "Beta",
@@ -299,7 +337,7 @@ final class JekyllCollectionGeneratorTest {
         refasterTestCaseOutputRule2());
   }
 
-  private static RefasterTestCases refasterTestCasesInput(
+  private static RefasterTestCases createRefasterTestCases(
       Path projectRoot,
       String module,
       String name,
@@ -331,6 +369,8 @@ final class JekyllCollectionGeneratorTest {
     return new RefasterTestCase("Rule2", "void testRule2() { /* changed */ }\n");
   }
 
+  /* Utility methods. */
+
   private static Path resolvePath(Path root, String... paths) {
     @Var Path result = root;
     for (String p : paths) {
@@ -338,6 +378,8 @@ final class JekyllCollectionGeneratorTest {
     }
     return result;
   }
+
+  /* Inner record types. */
 
   private record TestCase(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {
     void setUp() throws IOException {
@@ -351,7 +393,6 @@ final class JekyllCollectionGeneratorTest {
     }
   }
 
-  // XXX: Replace remaining `new TestInput` calls.
   private record TestInput(Path path, ProjectInfo info) {
     static TestInput create(
         Path projectRoot, String module, BiFunction<Path, String, ProjectInfo> projectInfoFactory) {

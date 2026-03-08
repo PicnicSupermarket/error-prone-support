@@ -2,7 +2,7 @@ ruby File.read(".ruby-version").strip
 
 source "https://rubygems.org"
 
-# XXX: This dependency group is declared to suppress Ruby depreciation
+# XXX: This dependency group is declared to suppress Ruby deprecation
 # warnings. Drop once redundant.
 group :standard_library_replacements do
   gem "logger", "1.6.1"
