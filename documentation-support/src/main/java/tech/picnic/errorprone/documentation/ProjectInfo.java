@@ -66,9 +66,9 @@ sealed interface ProjectInfo {
     }
   }
 
-  // XXX: For this type there is no extractor yet; implement it.
   record RefasterRuleCollection(
-      URI source, String name, String description, String link, ImmutableList<Rule> rules) {
+      URI source, String name, String description, String link, ImmutableList<Rule> rules)
+      implements ProjectInfo {
     record Rule(String name, String description, String link, SeverityLevel severityLevel) {}
   }
 

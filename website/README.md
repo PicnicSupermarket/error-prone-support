@@ -10,8 +10,8 @@ To view the website on `localhost`, first follow the [Jekyll installation
 instructions][jekyll-docs-installation]. Once done, run the following Maven
 commands in the root of the repository to extract the (test) data from the bug
 patterns and Refaster rule collections and to transform this data into a
-Jekyll-digestible format. Unless and relevant Java code has been changed, these
-commands needs to be executed once.
+Jekyll-digestible format. Unless relevant Java code has been changed, these
+commands need to be executed once.
 
 ```sh
 mvn -T1C clean install -DskipTests -Dverification.skip

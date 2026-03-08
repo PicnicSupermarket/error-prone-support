@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import java.io.BufferedWriter;
@@ -40,6 +41,7 @@ import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugP
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Identification;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.TestEntry.Replacement;
+import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterTestCases.RefasterTestCase;
 import tools.jackson.core.StreamWriteFeature;
@@ -57,7 +59,7 @@ import tools.jackson.dataformat.yaml.YAMLWriteFeature;
 // likely document the source of each check on the website, perhaps even
 // grouping them by module.
 public record JekyllCollectionGenerator() {
-  // XXX: Find a bette name. Also, externalize this.
+  // XXX: Find a better name. Also, externalize this.
   private static final PathMatcher PATH_MATCHER =
       FileSystems.getDefault().getPathMatcher("glob:**/target/docs/*.json");
   private static final YAMLMapper YAML_MAPPER =
@@ -112,6 +114,7 @@ public record JekyllCollectionGenerator() {
 
     private final List<BugPatternInfo> bugPatterns = new ArrayList<>();
     private final List<BugPatternTestCases> bugPatternTests = new ArrayList<>();
+    private final List<RefasterRuleCollection> refasterRuleCollections = new ArrayList<>();
     private final List<RefasterTestCases> refasterRuleCollectionTests = new ArrayList<>();
 
     static void apply(Path projectRoot) throws IOException {
@@ -132,6 +135,8 @@ public record JekyllCollectionGenerator() {
         bugPatterns.add(data);
       } else if (entry instanceof BugPatternTestCases data) {
         bugPatternTests.add(data);
+      } else if (entry instanceof RefasterRuleCollection data) {
+        refasterRuleCollections.add(data);
       } else if (entry instanceof RefasterTestCases data) {
         refasterRuleCollectionTests.add(data);
       }
@@ -146,7 +151,7 @@ public record JekyllCollectionGenerator() {
           BugPatternDescription::name);
       writePages(
           projectRoot.resolve(REFASTER_RULES_ROOT),
-          createRefasterRuleCollection(),
+          createRefasterRuleCollection(projectRoot),
           RefasterRuleCollectionDescription::name);
     }
 
@@ -208,7 +213,11 @@ public record JekyllCollectionGenerator() {
           replacement.build());
     }
 
-    private ImmutableList<RefasterRuleCollectionDescription> createRefasterRuleCollection() {
+    private ImmutableList<RefasterRuleCollectionDescription> createRefasterRuleCollection(
+        Path projectRoot) {
+      ImmutableMap<String, RefasterRuleCollection> collectionsByName =
+          Maps.uniqueIndex(refasterRuleCollections, RefasterRuleCollection::name);
+
       ImmutableTable<String, Boolean, ImmutableList<RefasterTestCase>> refasterTests =
           refasterRuleCollectionTests.stream()
               .collect(
@@ -219,33 +228,55 @@ public record JekyllCollectionGenerator() {
 
       return refasterTests.rowMap().entrySet().stream()
           .map(
-              e ->
-                  createRefasterRuleCollection(
-                      e.getKey(),
-                      requireNonNullElseGet(e.getValue().get(true), ImmutableList::of),
-                      requireNonNullElseGet(e.getValue().get(false), ImmutableList::of)))
+              e -> {
+                String name = e.getKey();
+                RefasterRuleCollection collection = collectionsByName.get(name);
+                // XXX: Derive source location from input.
+                String source =
+                    collection != null
+                        ? projectRoot.relativize(Path.of(collection.source())).toString()
+                        : "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java"
+                            .formatted(name);
+                ImmutableMap<String, SeverityLevel> ruleSeverities =
+                    collection != null
+                        ? collection.rules().stream()
+                            .collect(
+                                toImmutableMap(
+                                    RefasterRuleCollection.Rule::name,
+                                    RefasterRuleCollection.Rule::severityLevel))
+                        : ImmutableMap.of();
+
+                return createRefasterRuleCollection(
+                    name,
+                    source,
+                    ruleSeverities,
+                    requireNonNullElseGet(e.getValue().get(true), ImmutableList::of),
+                    requireNonNullElseGet(e.getValue().get(false), ImmutableList::of));
+              })
           .collect(toImmutableList());
     }
 
     private static RefasterRuleCollectionDescription createRefasterRuleCollection(
         String name,
+        String source,
+        ImmutableMap<String, SeverityLevel> ruleSeverities,
         ImmutableList<RefasterTestCase> inputTests,
         ImmutableList<RefasterTestCase> outputTests) {
       return new RefasterRuleCollectionDescription(
           name,
           name,
-          // XXX: Derive severity from input.
+          // XXX: Derive severity from input (or drop this feature).
           SUGGESTION,
           // XXX: Derive tags from input (or drop this feature).
           ImmutableList.of("Simplification"),
-          // XXX: Derive source location from input.
-          "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java"
-              .formatted(name),
-          createRefasterRule(inputTests, outputTests));
+          source,
+          createRefasterRule(ruleSeverities, inputTests, outputTests));
     }
 
     private static ImmutableList<RefasterRuleCollectionDescription.Rule> createRefasterRule(
-        ImmutableList<RefasterTestCase> inputTests, ImmutableList<RefasterTestCase> outputTests) {
+        ImmutableMap<String, SeverityLevel> ruleSeverities,
+        ImmutableList<RefasterTestCase> inputTests,
+        ImmutableList<RefasterTestCase> outputTests) {
       ImmutableMap<String, String> inputs = indexRefasterTestCases(inputTests);
       ImmutableMap<String, String> outputs = indexRefasterTestCases(outputTests);
 
@@ -255,8 +286,7 @@ public record JekyllCollectionGenerator() {
               name ->
                   new RefasterRuleCollectionDescription.Rule(
                       name,
-                      // XXX: Derive severity from input.
-                      SUGGESTION,
+                      ruleSeverities.getOrDefault(name, SUGGESTION),
                       // XXX: Derive tags from input (or drop this feature).
                       ImmutableList.of("Simplification"),
                       generateDiff(
