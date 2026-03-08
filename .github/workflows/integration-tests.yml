@@ -135,7 +135,7 @@ jobs:
                 case 'cancelled':
                   return [':stop_sign:', 'The workflow was cancelled.'];
                 default:
-                  return [':x:', 'Integration tests failed. Please check the logs and artifacts.'];
+                  return [':x:', 'Integration tests failed. Please check the logs.'];
               }
             })();
 
