@@ -21,10 +21,41 @@ final class RefasterRuleCollectionExtractorTest {
   }
 
   @Test
+  void customOnlineDocumentationUrl(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "CustomUrlRules.java",
+        "import com.google.errorprone.refaster.annotation.AfterTemplate;",
+        "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+        "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
+        "",
+        "@OnlineDocumentation(\"https://example.com\")",
+        "final class CustomUrlRules {",
+        "  private CustomUrlRules() {}",
+        "",
+        "  static final class MyRule {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 0;",
+        "    }",
+        "",
+        "    @AfterTemplate",
+        "    int after() {",
+        "      return 1;",
+        "    }",
+        "  }",
+        "}");
+
+    assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
+  }
+
+  @Test
   void simpleRefasterRuleCollection(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "SimpleRules.java",
+        "import com.google.errorprone.refaster.annotation.AfterTemplate;",
+        "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
         "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
         "",
         "/** Rules for simplification. */",
@@ -44,11 +75,7 @@ final class RefasterRuleCollectionExtractorTest {
         "      return 1;",
         "    }",
         "  }",
-        "}",
-        "",
-        "@interface BeforeTemplate {}",
-        "",
-        "@interface AfterTemplate {}");
+        "}");
 
     verifyGeneratedFileContent(
         outputDirectory,
@@ -57,25 +84,21 @@ final class RefasterRuleCollectionExtractorTest {
             URI.create("file:///SimpleRules.java"),
             "SimpleRules",
             "Rules for simplification.",
-            "https://error-prone.picnic.tech/refasterrules/SimpleRules#",
-            ImmutableList.of(
-                new Rule(
-                    "MyRule",
-                    "Prefer simpler alternative.",
-                    "https://error-prone.picnic.tech/refasterrules/SimpleRules#MyRule",
-                    SUGGESTION))));
+            ImmutableList.of(new Rule("MyRule", "Prefer simpler alternative.", SUGGESTION))));
   }
 
   @Test
-  void multipleRulesWithCustomUrl(@TempDir Path outputDirectory) {
+  void multipleRules(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "pkg/MultiRules.java",
         "package pkg;",
         "",
+        "import com.google.errorprone.refaster.annotation.AfterTemplate;",
+        "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
         "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
         "",
-        "@OnlineDocumentation(\"https://example.com/${topLevelClassName}#${nestedClassName}\")",
+        "@OnlineDocumentation",
         "final class MultiRules {",
         "  private MultiRules() {}",
         "",
@@ -101,11 +124,7 @@ final class RefasterRuleCollectionExtractorTest {
         "  static final class NotARule {",
         "    void helper() {}",
         "  }",
-        "}",
-        "",
-        "@interface BeforeTemplate {}",
-        "",
-        "@interface AfterTemplate {}");
+        "}");
 
     verifyGeneratedFileContent(
         outputDirectory,
@@ -114,10 +133,8 @@ final class RefasterRuleCollectionExtractorTest {
             URI.create("file:///pkg/MultiRules.java"),
             "MultiRules",
             "",
-            "https://example.com/MultiRules#",
             ImmutableList.of(
-                new Rule("RuleA", "", "https://example.com/MultiRules#RuleA", SUGGESTION),
-                new Rule("RuleB", "", "https://example.com/MultiRules#RuleB", SUGGESTION))));
+                new Rule("RuleA", "", SUGGESTION), new Rule("RuleB", "", SUGGESTION))));
   }
 
   private static void verifyGeneratedFileContent(
