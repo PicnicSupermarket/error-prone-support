@@ -21,7 +21,7 @@ final class RefasterRuleCollectionExtractorTest {
   }
 
   @Test
-  void customOnlineDocumentationUrl(@TempDir Path outputDirectory) {
+  void customOnlineDocumentation(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CustomUrlRules.java",
@@ -31,17 +31,10 @@ final class RefasterRuleCollectionExtractorTest {
         "",
         "@OnlineDocumentation(\"https://example.com\")",
         "final class CustomUrlRules {",
-        "  private CustomUrlRules() {}",
-        "",
         "  static final class MyRule {",
         "    @BeforeTemplate",
         "    int before() {",
         "      return 0;",
-        "    }",
-        "",
-        "    @AfterTemplate",
-        "    int after() {",
-        "      return 1;",
         "    }",
         "  }",
         "}");
@@ -115,8 +108,8 @@ final class RefasterRuleCollectionExtractorTest {
         "  }",
         "",
         "  static final class RuleB {",
-        "    @AfterTemplate",
-        "    int after() {",
+        "    @BeforeTemplate",
+        "    int before() {",
         "      return 42;",
         "    }",
         "  }",
