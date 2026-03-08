@@ -2,18 +2,21 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
+import static com.google.errorprone.matchers.Matchers.annotations;
+import static com.google.errorprone.matchers.Matchers.isType;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Var;
+import com.google.errorprone.matchers.MultiMatcher;
+import com.google.errorprone.matchers.MultiMatcher.MultiMatchResult;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
-import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
-import java.util.List;
+import com.sun.source.tree.Tree;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import java.util.Optional;
 import javax.lang.model.element.Element;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
@@ -27,14 +30,13 @@ import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.R
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRuleCollection> {
-  private static final String ONLINE_DOCUMENTATION_SIMPLE_NAME = "OnlineDocumentation";
-  private static final String BEFORE_TEMPLATE_SIMPLE_NAME = "BeforeTemplate";
-  private static final String AFTER_TEMPLATE_SIMPLE_NAME = "AfterTemplate";
-  // XXX: Avoid duplication with `OnlineDocumentation`.
-  private static final String DEFAULT_URL_PATTERN =
-      "https://error-prone.picnic.tech/refasterrules/${topLevelClassName}#${nestedClassName}";
-  private static final String TOP_LEVEL_CLASS_PLACEHOLDER = "${topLevelClassName}";
-  private static final String NESTED_CLASS_PLACEHOLDER = "${nestedClassName}";
+  private static final MultiMatcher<Tree, AnnotationTree> ONLINE_DOCUMENTATION =
+      annotations(
+          AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.OnlineDocumentation"));
+  private static final String BEFORE_TEMPLATE =
+      "com.google.errorprone.refaster.annotation.BeforeTemplate";
+  private static final String AFTER_TEMPLATE =
+      "com.google.errorprone.refaster.annotation.AfterTemplate";
 
   @Override
   public String identifier() {
@@ -43,38 +45,23 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
 
   @Override
   public Optional<RefasterRuleCollection> tryExtract(ClassTree tree, VisitorState state) {
-    AnnotationTree annotation =
-        ASTHelpers.getAnnotationWithSimpleName(
-            ASTHelpers.getAnnotations(tree), ONLINE_DOCUMENTATION_SIMPLE_NAME);
-    if (annotation == null) {
+    ClassSymbol symbol = ASTHelpers.getSymbol(tree);
+    MultiMatchResult<AnnotationTree> hasOnlineDocumentation =
+        ONLINE_DOCUMENTATION.multiMatchResult(tree, state);
+    if (!hasOnlineDocumentation.matches()) {
       return Optional.empty();
     }
 
-    String name = tree.getSimpleName().toString();
-    String urlPattern = getUrlPattern(annotation);
-    ImmutableList<Rule> rules = extractRules(tree, name, urlPattern, state);
+    if (!hasOnlineDocumentation.onlyMatchingNode().getArguments().isEmpty()) {
+      return Optional.empty();
+    }
 
     return Optional.of(
         new RefasterRuleCollection(
             state.getPath().getCompilationUnit().getSourceFile().toUri(),
-            name,
-            getDocComment(ASTHelpers.getSymbol(tree), state),
-            resolveLink(urlPattern, name, ""),
-            rules));
-  }
-
-  private static String getUrlPattern(AnnotationTree annotation) {
-    List<? extends ExpressionTree> args = annotation.getArguments();
-    if (args.isEmpty()) {
-      return DEFAULT_URL_PATTERN;
-    }
-
-    @Var ExpressionTree arg = args.getFirst();
-    if (arg instanceof AssignmentTree assignment) {
-      arg = assignment.getExpression();
-    }
-    String value = ASTHelpers.constValue(arg, String.class);
-    return value != null ? value : DEFAULT_URL_PATTERN;
+            tree.getSimpleName().toString(),
+            getDocComment(symbol, state),
+            getRules(tree, state)));
   }
 
   private static String getDocComment(Element element, VisitorState state) {
@@ -82,43 +69,29 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
     return docComment != null ? docComment.strip() : "";
   }
 
-  private static ImmutableList<Rule> extractRules(
-      ClassTree tree, String topLevelName, String urlPattern, VisitorState state) {
+  private static ImmutableList<Rule> getRules(ClassTree tree, VisitorState state) {
     return tree.getMembers().stream()
         .filter(ClassTree.class::isInstance)
         .map(ClassTree.class::cast)
-        .filter(RefasterRuleCollectionExtractor::isRefasterRule)
+        .filter(innerClass -> isRefasterRule(innerClass, state))
         .map(
-            innerClass -> {
-              String ruleName = innerClass.getSimpleName().toString();
-              return new Rule(
-                  ruleName,
-                  getDocComment(ASTHelpers.getSymbol(innerClass), state),
-                  resolveLink(urlPattern, topLevelName, ruleName),
-                  SUGGESTION);
-            })
+            innerClass ->
+                new Rule(
+                    innerClass.getSimpleName().toString(),
+                    getDocComment(ASTHelpers.getSymbol(innerClass), state),
+                    SUGGESTION))
         .collect(toImmutableList());
   }
 
-  private static boolean isRefasterRule(ClassTree classTree) {
+  private static boolean isRefasterRule(ClassTree classTree, VisitorState state) {
     return classTree.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .anyMatch(RefasterRuleCollectionExtractor::hasRefasterAnnotation);
+        .anyMatch(method -> hasRefasterAnnotation(method, state));
   }
 
-  private static boolean hasRefasterAnnotation(MethodTree method) {
-    return ASTHelpers.getAnnotationWithSimpleName(
-                method.getModifiers().getAnnotations(), BEFORE_TEMPLATE_SIMPLE_NAME)
-            != null
-        || ASTHelpers.getAnnotationWithSimpleName(
-                method.getModifiers().getAnnotations(), AFTER_TEMPLATE_SIMPLE_NAME)
-            != null;
-  }
-
-  private static String resolveLink(String urlPattern, String topLevelName, String nestedName) {
-    return urlPattern
-        .replace(TOP_LEVEL_CLASS_PLACEHOLDER, topLevelName)
-        .replace(NESTED_CLASS_PLACEHOLDER, nestedName);
+  private static boolean hasRefasterAnnotation(MethodTree method, VisitorState state) {
+    return ASTHelpers.hasAnnotation(method, BEFORE_TEMPLATE, state)
+        || ASTHelpers.hasAnnotation(method, AFTER_TEMPLATE, state);
   }
 }
