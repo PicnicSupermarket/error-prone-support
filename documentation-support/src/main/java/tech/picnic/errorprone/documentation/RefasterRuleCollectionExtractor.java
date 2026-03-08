@@ -16,16 +16,17 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import java.util.Optional;
-import javax.lang.model.element.Element;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.Rule;
 
 /**
- * An {@link Extractor} that describes how to extract data from classes annotated with
- * {@code @OnlineDocumentation} that contain Refaster rules.
+ * An {@link Extractor} that describes how to extract data from Refaster rule collection classes
+ * annotated with {@code @OnlineDocumentation}.
  */
+// XXX: This class doesn't support `@OnlineDocumentation` with a custom documentation URL or
+// Refaster rules that are directly annotated with `@OnlineDocumentation`. Generalize this logic
+// if/when either of those use cases arises.
 // XXX: Also extract information from the `@TypeMigration` annotation.
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
@@ -35,8 +36,6 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
           AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.OnlineDocumentation"));
   private static final String BEFORE_TEMPLATE =
       "com.google.errorprone.refaster.annotation.BeforeTemplate";
-  private static final String AFTER_TEMPLATE =
-      "com.google.errorprone.refaster.annotation.AfterTemplate";
 
   @Override
   public String identifier() {
@@ -45,7 +44,6 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
 
   @Override
   public Optional<RefasterRuleCollection> tryExtract(ClassTree tree, VisitorState state) {
-    ClassSymbol symbol = ASTHelpers.getSymbol(tree);
     MultiMatchResult<AnnotationTree> hasOnlineDocumentation =
         ONLINE_DOCUMENTATION.multiMatchResult(tree, state);
     if (!hasOnlineDocumentation.matches()) {
@@ -53,6 +51,7 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
     }
 
     if (!hasOnlineDocumentation.onlyMatchingNode().getArguments().isEmpty()) {
+      /* This is a rule that is meant to be hosted at a custom location: skip it. */
       return Optional.empty();
     }
 
@@ -60,26 +59,19 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
         new RefasterRuleCollection(
             state.getPath().getCompilationUnit().getSourceFile().toUri(),
             tree.getSimpleName().toString(),
-            getDocComment(symbol, state),
+            getDescription(tree, state),
             getRules(tree, state)));
   }
 
-  private static String getDocComment(Element element, VisitorState state) {
-    String docComment = state.getElements().getDocComment(element);
-    return docComment != null ? docComment.strip() : "";
-  }
-
+  // XXX: Infer the severity of each rule from the `@Severity` annotation if present.
   private static ImmutableList<Rule> getRules(ClassTree tree, VisitorState state) {
     return tree.getMembers().stream()
         .filter(ClassTree.class::isInstance)
         .map(ClassTree.class::cast)
         .filter(innerClass -> isRefasterRule(innerClass, state))
         .map(
-            innerClass ->
-                new Rule(
-                    innerClass.getSimpleName().toString(),
-                    getDocComment(ASTHelpers.getSymbol(innerClass), state),
-                    SUGGESTION))
+            rule ->
+                new Rule(rule.getSimpleName().toString(), getDescription(rule, state), SUGGESTION))
         .collect(toImmutableList());
   }
 
@@ -87,11 +79,12 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
     return classTree.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .anyMatch(method -> hasRefasterAnnotation(method, state));
+        .anyMatch(method -> ASTHelpers.hasAnnotation(method, BEFORE_TEMPLATE, state));
   }
 
-  private static boolean hasRefasterAnnotation(MethodTree method, VisitorState state) {
-    return ASTHelpers.hasAnnotation(method, BEFORE_TEMPLATE, state)
-        || ASTHelpers.hasAnnotation(method, AFTER_TEMPLATE, state);
+  // XXX: Derive the description from the `@Description` annotation if present.
+  private static String getDescription(ClassTree element, VisitorState state) {
+    String docComment = state.getElements().getDocComment(ASTHelpers.getSymbol(element));
+    return docComment != null ? docComment.strip() : "";
   }
 }
