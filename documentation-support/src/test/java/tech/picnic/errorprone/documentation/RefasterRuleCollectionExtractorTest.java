@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.documentation;
 
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
+import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -25,7 +26,6 @@ final class RefasterRuleCollectionExtractorTest {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
         "CustomUrlRules.java",
-        "import com.google.errorprone.refaster.annotation.AfterTemplate;",
         "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
         "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
         "",
@@ -128,6 +128,51 @@ final class RefasterRuleCollectionExtractorTest {
             "",
             ImmutableList.of(
                 new Rule("RuleA", "", SUGGESTION), new Rule("RuleB", "", SUGGESTION))));
+  }
+
+  @Test
+  void annotatedRules(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "AnnotatedRules.java",
+        "import com.google.errorprone.BugPattern.SeverityLevel;",
+        "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+        "import tech.picnic.errorprone.refaster.annotation.Description;",
+        "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
+        "import tech.picnic.errorprone.refaster.annotation.Severity;",
+        "",
+        "@OnlineDocumentation",
+        "@Description(\"Collection description.\")",
+        "final class AnnotatedRules {",
+        "  /** Javadoc on rule. */",
+        "  @Severity(SeverityLevel.WARNING)",
+        "  @Description(\"Rule description.\")",
+        "  static final class RuleWithAnnotations {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 0;",
+        "    }",
+        "  }",
+        "",
+        "  /** Only Javadoc. */",
+        "  static final class RuleWithJavadocOnly {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 1;",
+        "    }",
+        "  }",
+        "}");
+
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "AnnotatedRules",
+        new RefasterRuleCollection(
+            URI.create("file:///AnnotatedRules.java"),
+            "AnnotatedRules",
+            "Collection description.",
+            ImmutableList.of(
+                new Rule("RuleWithAnnotations", "Rule description.", WARNING),
+                new Rule("RuleWithJavadocOnly", "Only Javadoc.", SUGGESTION))));
   }
 
   private static void verifyGeneratedFileContent(
