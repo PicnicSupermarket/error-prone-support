@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.documentation;
 
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -142,10 +143,11 @@ final class RefasterRuleCollectionExtractorTest {
         "import tech.picnic.errorprone.refaster.annotation.Severity;",
         "",
         "@OnlineDocumentation",
+        "@Severity(SeverityLevel.WARNING)",
         "@Description(\"Collection description.\")",
         "final class AnnotatedRules {",
         "  /** Javadoc on rule. */",
-        "  @Severity(SeverityLevel.WARNING)",
+        "  @Severity(SeverityLevel.ERROR)",
         "  @Description(\"Rule description.\")",
         "  static final class RuleWithAnnotations {",
         "    @BeforeTemplate",
@@ -161,6 +163,13 @@ final class RefasterRuleCollectionExtractorTest {
         "      return 1;",
         "    }",
         "  }",
+        "",
+        "  static final class RuleWithoutAnnotationsOrJavadoc {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 2;",
+        "    }",
+        "  }",
         "}");
 
     verifyGeneratedFileContent(
@@ -171,8 +180,10 @@ final class RefasterRuleCollectionExtractorTest {
             "AnnotatedRules",
             "Collection description.",
             ImmutableList.of(
-                new Rule("RuleWithAnnotations", "Rule description.", WARNING),
-                new Rule("RuleWithJavadocOnly", "Only Javadoc.", SUGGESTION))));
+                new Rule("RuleWithAnnotations", "Rule description.", ERROR),
+                new Rule("RuleWithJavadocOnly", "Collection description.", WARNING),
+                new Rule(
+                    "RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING))));
   }
 
   private static void verifyGeneratedFileContent(
