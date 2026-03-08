@@ -303,18 +303,9 @@ final class JekyllCollectionGeneratorTest {
         resolvePath(projectRoot, module, "src", "main", "java", "beta", "Beta.java").toUri(),
         "Beta",
         "",
-        "https://error-prone.picnic.tech/refasterrules/Beta#",
         ImmutableList.of(
-            new RefasterRuleCollection.Rule(
-                "Rule1",
-                "",
-                "https://error-prone.picnic.tech/refasterrules/Beta#Rule1",
-                SUGGESTION),
-            new RefasterRuleCollection.Rule(
-                "Rule2",
-                "",
-                "https://error-prone.picnic.tech/refasterrules/Beta#Rule2",
-                SUGGESTION)));
+            new RefasterRuleCollection.Rule("Rule1", "", SUGGESTION),
+            new RefasterRuleCollection.Rule("Rule2", "", SUGGESTION)));
   }
 
   private static RefasterTestCases refasterTestCasesBetaInput(Path projectRoot, String module) {
