@@ -6,13 +6,13 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElse;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.matchers.AnnotationMatcherUtils;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.MultiMatcher;
@@ -20,10 +20,9 @@ import com.google.errorprone.matchers.MultiMatcher.MultiMatchResult;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import com.sun.tools.javac.code.Symbol;
+import com.sun.source.util.TreePath;
 import java.util.Optional;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.Rule;
@@ -57,6 +56,11 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
 
   @Override
   public Optional<RefasterRuleCollection> tryExtract(ClassTree tree, VisitorState state) {
+    if (ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class) != null) {
+      /* Only top-level rule collection classes are supported. */
+      return Optional.empty();
+    }
+
     MultiMatchResult<AnnotationTree> hasOnlineDocumentation =
         ONLINE_DOCUMENTATION.multiMatchResult(tree, state);
     if (!hasOnlineDocumentation.matches()) {
@@ -82,11 +86,13 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
         .map(ClassTree.class::cast)
         .filter(innerClass -> isRefasterRule(innerClass, state))
         .map(
-            rule ->
-                new Rule(
-                    rule.getSimpleName().toString(),
-                    getDescription(rule, state),
-                    getSeverity(rule, state)))
+            rule -> {
+              VisitorState ruleState = state.withPath(new TreePath(state.getPath(), rule));
+              return new Rule(
+                  rule.getSimpleName().toString(),
+                  getDescription(rule, ruleState),
+                  getSeverity(rule, ruleState));
+            })
         .collect(toImmutableList());
   }
 
@@ -97,34 +103,41 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
         .anyMatch(method -> BEFORE_TEMPLATE.matches(method, state));
   }
 
+  // XXX: If we extract the rule description from the Javadoc, do we need the `@Description`
+  // annotation at all? (Only the latter currently supports "inheritance" of a collection-level
+  // description, but if desired we could implement similar logic for Javadoc as well.)
+  // XXX: Consider whether/how to further post-process the Javadoc.
   private static String getDescription(ClassTree tree, VisitorState state) {
-    MultiMatchResult<AnnotationTree> descriptionMatch = DESCRIPTION.multiMatchResult(tree, state);
-    if (descriptionMatch.matches()) {
-      return requireNonNull(
-          ASTHelpers.constValue(
-              AnnotationMatcherUtils.getArgument(descriptionMatch.onlyMatchingNode(), "value"),
-              String.class),
-          "@Description annotation without `value` argument");
-    }
-
-    // XXX: If we extract the rule description from the Javadoc, do we need the `@Description`
-    // annotation at all?
-    // XXX: Consider whether/how to further post-process the Javadoc.
-    return requireNonNullElse(state.getElements().getDocComment(ASTHelpers.getSymbol(tree)), "")
-        .strip();
+    return getNearestAnnotation(DESCRIPTION, state)
+        .map(annotation -> AnnotationMatcherUtils.getArgument(annotation, "value"))
+        .map(value -> ASTHelpers.constValue(value, String.class))
+        .orElseGet(
+            () ->
+                requireNonNullElse(
+                        state.getElements().getDocComment(ASTHelpers.getSymbol(tree)), "")
+                    .strip());
   }
 
   private static SeverityLevel getSeverity(ClassTree tree, VisitorState state) {
-    MultiMatchResult<AnnotationTree> severityMatch = SEVERITY.multiMatchResult(tree, state);
-    if (severityMatch.matches()) {
-      ExpressionTree value =
-          AnnotationMatcherUtils.getArgument(severityMatch.onlyMatchingNode(), "value");
-      Symbol symbol = ASTHelpers.getSymbol(value);
-      if (symbol != null) {
-        return SeverityLevel.valueOf(symbol.getSimpleName().toString());
-      }
-    }
+    return getNearestAnnotation(SEVERITY, state)
+        .map(annotation -> AnnotationMatcherUtils.getArgument(annotation, "value"))
+        .map(ASTHelpers::getSymbol)
+        .map(symbol -> SeverityLevel.valueOf(symbol.getSimpleName().toString()))
+        .orElse(SUGGESTION);
+  }
 
-    return SUGGESTION;
+  private static Optional<AnnotationTree> getNearestAnnotation(
+      MultiMatcher<Tree, AnnotationTree> matcher, VisitorState state) {
+    @Var TreePath path = state.getPath();
+    do {
+      MultiMatchResult<AnnotationTree> matchResult =
+          matcher.multiMatchResult(path.getLeaf(), state);
+      if (matchResult.matches()) {
+        return Optional.of(matchResult.onlyMatchingNode());
+      }
+      path = ASTHelpers.findPathFromEnclosingNodeToTopLevel(path, ClassTree.class);
+    } while (path != null);
+
+    return Optional.empty();
   }
 }
