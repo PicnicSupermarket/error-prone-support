@@ -6,7 +6,6 @@ import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-import static com.sun.tools.javac.code.Type.ClassType;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -32,13 +31,15 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.BoundKind;
+import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.CapturedType;
+import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.WildcardType;
 import com.sun.tools.javac.util.List;
-import com.sun.tools.javac.util.ListBuffer;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
@@ -142,87 +143,77 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
   }
 
   private static Type mapVoidTypeArgsToWildcard(Type type, VisitorState state) {
-    List<Type> typeArgs = type.getTypeArguments();
-    if (typeArgs.isEmpty()) {
-      return type;
-    }
-
     Type voidType = VOID_TYPE_SUPPLIER.get(state);
-    @Var boolean changed = false;
-    ListBuffer<Type> newArgs = new ListBuffer<>();
-    for (Type arg : typeArgs) {
-      if (ASTHelpers.isSameType(arg, voidType, state)) {
-        newArgs.add(new Type.WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass));
-        changed = true;
-      } else {
-        newArgs.add(arg);
-      }
-    }
-
-    if (!changed) {
-      return type;
-    }
-
-    ClassType classType = (ClassType) type;
-    return new ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
+    return type instanceof ClassType classType
+        ? mapTypeArguments(
+            classType,
+            arg ->
+                ASTHelpers.isSameType(arg, voidType, state)
+                    ? new WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass)
+                    : arg)
+        : type;
   }
 
   /**
    * Attempts to convert a possibly non-denotable type into its most specific denotable
    * approximation. Returns {@link Optional#empty()} if no denotable type can be constructed.
    */
+  // XXX: Also handle arrays.
   private static Optional<Type> toDenotable(Type type, boolean isTypeArg, VisitorState state) {
     TypeKind kind = type.getKind();
     if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
       return Optional.empty();
     }
 
+    // XXX: Add tests for union types (e.g. from multi-catch) and intersection types (e.g. from type
+    // inference with multiple bounds).
+    // XXX: Add test with local classes and anonymous classes that implement multiple interfaces.
     if ((!isTypeArg && type.isCompound()) || (type.tsym != null && type.tsym.isAnonymous())) {
+      // XXX: Instead of only checking the first direct supertype, consider all direct supertypes.
+      // Any matches the declared return type, prefer that one.
       return toDenotable(state.getTypes().supertype(type), isTypeArg, state);
     }
 
-    if (type instanceof CapturedType capturedType) {
-      if (!isTypeArg) {
-        return Optional.empty();
-      }
-
-      Type.WildcardType wildcard = capturedType.wildcard;
-      return (wildcard.kind == BoundKind.UNBOUND
-              ? Optional.of(state.getSymtab().objectType)
-              : toDenotable(wildcard.type, isTypeArg, state))
-          .map(bound -> new WildcardType(bound, wildcard.kind, state.getSymtab().boundClass));
-    }
-
-    List<Type> typeArgs = type.getTypeArguments();
-    if (!typeArgs.isEmpty()) {
-      @Var boolean changed = false;
-      ListBuffer<Type> newArgs = new ListBuffer<>();
-      for (Type arg : typeArgs) {
-        Optional<Type> denotableArg = toDenotable(arg, /* isTypeArg= */ true, state);
-        if (denotableArg.isEmpty()) {
-          return Optional.empty();
+    Symtab symtab = state.getSymtab();
+    return switch (type) {
+      case CapturedType capturedType -> {
+        if (!isTypeArg) {
+          yield Optional.empty();
         }
-        Type resolved = denotableArg.orElseThrow();
-        if (!state.getTypes().isSameType(resolved, arg)) {
-          changed = true;
-        }
-        newArgs.add(resolved);
-      }
-      if (changed) {
-        ClassType ct = (ClassType) type;
-        return Optional.of(new ClassType(ct.getEnclosingType(), newArgs.toList(), ct.tsym));
-      }
-    }
 
-    if (type instanceof WildcardType wildcardType && wildcardType.type != null) {
-      return toDenotable(wildcardType.type, isTypeArg, state)
-          .map(
-              bound ->
-                  state.getTypes().isSameType(bound, wildcardType.type)
-                      ? type
-                      : new WildcardType(bound, wildcardType.kind, state.getSymtab().boundClass));
-    }
+        WildcardType wildcard = capturedType.wildcard;
+        yield (wildcard.kind == BoundKind.UNBOUND
+                ? Optional.of(symtab.objectType)
+                : toDenotable(wildcard.type, isTypeArg, state))
+            .map(bound -> new WildcardType(bound, wildcard.kind, symtab.boundClass));
+      }
+      case ClassType classType ->
+          Optional.of(
+              mapTypeArguments(
+                  classType,
+                  arg ->
+                      toDenotable(arg, /* isTypeArg= */ true, state)
+                          .orElseGet(
+                              () ->
+                                  new WildcardType(
+                                      symtab.objectType, BoundKind.UNBOUND, symtab.boundClass))));
 
-    return Optional.of(type);
+      case WildcardType wildcard when wildcard.type != null ->
+          toDenotable(wildcard.type, isTypeArg, state)
+              .map(
+                  bound ->
+                      state.getTypes().isSameType(bound, wildcard.type)
+                          ? wildcard
+                          : new WildcardType(bound, wildcard.kind, wildcard.tsym));
+      default -> Optional.of(type);
+    };
+  }
+
+  private static ClassType mapTypeArguments(ClassType classType, Function<Type, Type> typeMapper) {
+    return new ClassType(
+        classType.getEnclosingType(),
+        classType.getTypeArguments().stream().map(typeMapper).collect(List.collector()),
+        classType.tsym,
+        classType.getMetadata());
   }
 }
