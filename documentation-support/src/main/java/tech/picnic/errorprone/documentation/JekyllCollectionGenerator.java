@@ -108,7 +108,6 @@ public record JekyllCollectionGenerator() {
 
   // XXX: Review whether this class should be split in two: one for bug patterns and one for
   // Refaster rules.
-  // XXX: Reorder methods.
   private static final class PageGenerator extends SimpleFileVisitor<Path> {
     private static final Splitter LINE_SPLITTER = Splitter.on(System.lineSeparator());
 
@@ -125,20 +124,13 @@ public record JekyllCollectionGenerator() {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-      if (!PATH_MATCHER.matches(file)) {
-        return FileVisitResult.CONTINUE;
-      }
-
-      // XXX: Replace with type switch once we target JDK 21+.
-      ProjectInfo entry = Json.read(file, ProjectInfo.class);
-      if (entry instanceof BugPatternInfo data) {
-        bugPatterns.add(data);
-      } else if (entry instanceof BugPatternTestCases data) {
-        bugPatternTests.add(data);
-      } else if (entry instanceof RefasterRuleCollection data) {
-        refasterRuleCollections.add(data);
-      } else if (entry instanceof RefasterTestCases data) {
-        refasterRuleCollectionTests.add(data);
+      if (PATH_MATCHER.matches(file)) {
+        switch (Json.read(file, ProjectInfo.class)) {
+          case BugPatternInfo data -> bugPatterns.add(data);
+          case BugPatternTestCases data -> bugPatternTests.add(data);
+          case RefasterRuleCollection data -> refasterRuleCollections.add(data);
+          case RefasterTestCases data -> refasterRuleCollectionTests.add(data);
+        }
       }
 
       return FileVisitResult.CONTINUE;
@@ -226,32 +218,24 @@ public record JekyllCollectionGenerator() {
                       RefasterTestCases::isInput,
                       RefasterTestCases::testCases));
 
-      return refasterTests.rowMap().entrySet().stream()
+      return collectionsByName.entrySet().stream()
           .map(
               e -> {
                 String name = e.getKey();
-                RefasterRuleCollection collection = collectionsByName.get(name);
-                // XXX: Derive source location from input.
-                String source =
-                    collection != null
-                        ? projectRoot.relativize(Path.of(collection.source())).toString()
-                        : "error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/%s.java"
-                            .formatted(name);
-                ImmutableMap<String, SeverityLevel> ruleSeverities =
-                    collection != null
-                        ? collection.rules().stream()
-                            .collect(
-                                toImmutableMap(
-                                    RefasterRuleCollection.Rule::name,
-                                    RefasterRuleCollection.Rule::severityLevel))
-                        : ImmutableMap.of();
+                RefasterRuleCollection collection = e.getValue();
+                ImmutableMap<Boolean, ImmutableList<RefasterTestCase>> tests =
+                    refasterTests.row(name);
 
                 return createRefasterRuleCollection(
                     name,
-                    source,
-                    ruleSeverities,
-                    requireNonNullElseGet(e.getValue().get(true), ImmutableList::of),
-                    requireNonNullElseGet(e.getValue().get(false), ImmutableList::of));
+                    projectRoot.relativize(Path.of(collection.source())).toString(),
+                    collection.rules().stream()
+                        .collect(
+                            toImmutableMap(
+                                RefasterRuleCollection.Rule::name,
+                                RefasterRuleCollection.Rule::severityLevel)),
+                    requireNonNullElseGet(tests.get(true), ImmutableList::of),
+                    requireNonNullElseGet(tests.get(false), ImmutableList::of));
               })
           .collect(toImmutableList());
     }
@@ -339,7 +323,7 @@ public record JekyllCollectionGenerator() {
       // XXX: The documentation could link to the original test code. Perhaps even with the correct
       // line numbers. If we do this, we should do the same for individual rules.
       String source,
-      ImmutableList<Rule> rules) {
+      ImmutableList<RefasterRuleCollectionDescription.Rule> rules) {
     private record Rule(
         String name, SeverityLevel severity, ImmutableList<String> tags, String diff) {}
   }

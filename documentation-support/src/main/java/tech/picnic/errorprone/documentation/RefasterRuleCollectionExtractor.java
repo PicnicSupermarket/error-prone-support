@@ -23,6 +23,7 @@ import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.R
  * An {@link Extractor} that describes how to extract data from classes annotated with
  * {@code @OnlineDocumentation} that contain Refaster rules.
  */
+// XXX: Also extract information from the `@TypeMigration` annotation.
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRuleCollection> {
