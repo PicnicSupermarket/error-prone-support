@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static com.sun.tools.javac.code.Type.ClassType;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -32,6 +33,8 @@ import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.BoundKind;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.CapturedType;
+import com.sun.tools.javac.code.Type.WildcardType;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.ListBuffer;
 import java.util.Objects;
@@ -160,8 +163,8 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return type;
     }
 
-    Type.ClassType classType = (Type.ClassType) type;
-    return new Type.ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
+    ClassType classType = (ClassType) type;
+    return new ClassType(classType.getEnclosingType(), newArgs.toList(), classType.tsym);
   }
 
   /**
@@ -174,28 +177,20 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return Optional.empty();
     }
 
-    if (!isTypeArg && type.isCompound()) {
-      Type supertype = state.getTypes().supertype(type);
-      return toDenotable(supertype, isTypeArg, state);
+    if ((!isTypeArg && type.isCompound()) || (type.tsym != null && type.tsym.isAnonymous())) {
+      return toDenotable(state.getTypes().supertype(type), isTypeArg, state);
     }
 
-    if (type instanceof Type.CapturedType capturedType) {
+    if (type instanceof CapturedType capturedType) {
       if (!isTypeArg) {
         return Optional.empty();
       }
-      Type.WildcardType wildcard = capturedType.wildcard;
-      if (wildcard.kind == BoundKind.UNBOUND) {
-        return Optional.of(
-            new Type.WildcardType(
-                state.getSymtab().objectType, BoundKind.UNBOUND, state.getSymtab().boundClass));
-      }
-      return toDenotable(wildcard.type, /* isTypeArg= */ true, state)
-          .map(bound -> new Type.WildcardType(bound, wildcard.kind, state.getSymtab().boundClass));
-    }
 
-    if (type.tsym != null && type.tsym.isAnonymous()) {
-      Type supertype = state.getTypes().supertype(type);
-      return toDenotable(supertype, isTypeArg, state);
+      Type.WildcardType wildcard = capturedType.wildcard;
+      return (wildcard.kind == BoundKind.UNBOUND
+              ? Optional.of(state.getSymtab().objectType)
+              : toDenotable(wildcard.type, isTypeArg, state))
+          .map(bound -> new WildcardType(bound, wildcard.kind, state.getSymtab().boundClass));
     }
 
     List<Type> typeArgs = type.getTypeArguments();
@@ -214,19 +209,18 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
         newArgs.add(resolved);
       }
       if (changed) {
-        Type.ClassType ct = (Type.ClassType) type;
-        return Optional.of(new Type.ClassType(ct.getEnclosingType(), newArgs.toList(), ct.tsym));
+        ClassType ct = (ClassType) type;
+        return Optional.of(new ClassType(ct.getEnclosingType(), newArgs.toList(), ct.tsym));
       }
     }
 
-    if (type instanceof Type.WildcardType wildcardType && wildcardType.type != null) {
+    if (type instanceof WildcardType wildcardType && wildcardType.type != null) {
       return toDenotable(wildcardType.type, isTypeArg, state)
           .map(
               bound ->
                   state.getTypes().isSameType(bound, wildcardType.type)
                       ? type
-                      : new Type.WildcardType(
-                          bound, wildcardType.kind, state.getSymtab().boundClass));
+                      : new WildcardType(bound, wildcardType.kind, state.getSymtab().boundClass));
     }
 
     return Optional.of(type);
