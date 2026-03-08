@@ -51,7 +51,7 @@ jobs:
     name: Integration test
     needs: [acknowledge-request]
     if: |
-      always() && 
+      always() &&
       (!github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test'))
     runs-on: ubuntu-24.04
     strategy:
@@ -126,10 +126,10 @@ jobs:
           script: |
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             const conclusion = "${{ needs.run-integration-tests.result }}";
-            
+
             let statusEmoji = '';
             let message = "";
-            
+
             if (conclusion === 'success') {
               statusEmoji = ':white_check_mark:';
               message = "Integration tests passed successfully!";
@@ -140,7 +140,7 @@ jobs:
               statusEmoji = ':x:';
               message = "Integration tests failed. Please check the logs and artifacts.";
             }
-            
+
             github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
