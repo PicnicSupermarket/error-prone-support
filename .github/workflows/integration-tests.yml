@@ -1,6 +1,6 @@
 # Runs integration tests against the project.
 #
-# The tests run in the following scenrios:
+# The tests run in the following scenarios:
 # - Any time code is pushed to the default branch.
 # - When a user leaves a pull request comment containing the string
 #   `/integration-test`.
@@ -23,10 +23,37 @@ permissions:
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
+  acknowledge-request:
+    name: Acknowledge request
+    # Only run this job if it is a PR comment containing the command.
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test') }}
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    outputs:
+      comment_id: ${{ steps.post-comment.outputs.commentId }}
+    steps:
+      - name: Post comment with workflow link
+        id: post-comment
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+
+            const response = await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `[Integration tests](${runUrl}) started. :rocket:`
+            });
+
+            core.setOutput('commentId', response.data.id);
   run-integration-tests:
     name: Integration test
-    if: |
-      !github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')
+    # On push events `acknowledge-request` is skipped; `always()` ensures this
+    # job still runs in that case.
+    needs: [ acknowledge-request ]
+    if: ${{ always() && (!github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')) }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -84,3 +111,37 @@ jobs:
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+  report-outcome:
+    name: Report integration test result
+    needs: [ acknowledge-request, run-integration-tests ]
+    # Using `always()` ensures that this job runs even if previous jobs failed
+    # or were cancelled.
+    if: ${{ always() && github.event.issue.pull_request && needs.acknowledge-request.outputs.comment_id }}
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Update comment with results
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const conclusion = '${{ needs.run-integration-tests.result }}';
+
+            let [statusEmoji, message] = (() => {
+              switch (conclusion) {
+                case 'success':
+                  return [':white_check_mark:', 'Integration tests passed successfully!'];
+                case 'cancelled':
+                  return [':stop_sign:', 'The workflow was cancelled.'];
+                default:
+                  return [':x:', 'Integration tests failed. Please check the logs.'];
+              }
+            })();
+
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: ${{ needs.acknowledge-request.outputs.comment_id }},
+              body: `[Integration tests](${runUrl}) completed. ${statusEmoji} ${conclusion.toUpperCase()}: ${message}`
+            });
