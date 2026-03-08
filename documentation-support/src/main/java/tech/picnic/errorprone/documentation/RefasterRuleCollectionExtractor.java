@@ -4,13 +4,17 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
+import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static java.util.Objects.requireNonNull;
+import static java.util.Objects.requireNonNullElse;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.AnnotationMatcherUtils;
+import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.MultiMatcher;
 import com.google.errorprone.matchers.MultiMatcher.MultiMatchResult;
 import com.google.errorprone.util.ASTHelpers;
@@ -28,22 +32,23 @@ import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.R
  * An {@link Extractor} that describes how to extract data from Refaster rule collection classes
  * annotated with {@code @OnlineDocumentation}.
  */
-// XXX: This class doesn't support `@OnlineDocumentation` with a custom documentation URL or
-// Refaster rules that are directly annotated with `@OnlineDocumentation`. Generalize this logic
-// if/when either of those use cases arises.
+// XXX: This class doesn't support `@OnlineDocumentation` with a custom documentation URL. Consider
+// extracting it and including it in the generated `RefasterRuleCollection`s. (But if we'd be
+// accurate about this, then this extractor should also support the default URL construction logic
+// in `AnnotatedCompositeCodeTransformer`.)
 // XXX: Also extract information from the `@TypeMigration` annotation.
 @AutoService(Extractor.class)
 @SuppressWarnings("rawtypes" /* See https://github.com/google/auto/issues/870. */)
 public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRuleCollection> {
-  private static final MultiMatcher<Tree, AnnotationTree> DESCRIPTION =
-      annotations(AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.Description"));
+  private static final Matcher<Tree> BEFORE_TEMPLATE =
+      hasAnnotation("com.google.errorprone.refaster.annotation.BeforeTemplate");
   private static final MultiMatcher<Tree, AnnotationTree> ONLINE_DOCUMENTATION =
       annotations(
           AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.OnlineDocumentation"));
+  private static final MultiMatcher<Tree, AnnotationTree> DESCRIPTION =
+      annotations(AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.Description"));
   private static final MultiMatcher<Tree, AnnotationTree> SEVERITY =
       annotations(AT_LEAST_ONE, isType("tech.picnic.errorprone.refaster.annotation.Severity"));
-  private static final String BEFORE_TEMPLATE =
-      "com.google.errorprone.refaster.annotation.BeforeTemplate";
 
   @Override
   public String identifier() {
@@ -89,23 +94,24 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
     return classTree.getMembers().stream()
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .anyMatch(method -> ASTHelpers.hasAnnotation(method, BEFORE_TEMPLATE, state));
+        .anyMatch(method -> BEFORE_TEMPLATE.matches(method, state));
   }
 
   private static String getDescription(ClassTree tree, VisitorState state) {
     MultiMatchResult<AnnotationTree> descriptionMatch = DESCRIPTION.multiMatchResult(tree, state);
     if (descriptionMatch.matches()) {
-      String value =
+      return requireNonNull(
           ASTHelpers.constValue(
               AnnotationMatcherUtils.getArgument(descriptionMatch.onlyMatchingNode(), "value"),
-              String.class);
-      if (value != null) {
-        return value;
-      }
+              String.class),
+          "@Description annotation without `value` argument");
     }
 
-    String docComment = state.getElements().getDocComment(ASTHelpers.getSymbol(tree));
-    return docComment != null ? docComment.strip() : "";
+    // XXX: If we extract the rule description from the Javadoc, do we need the `@Description`
+    // annotation at all?
+    // XXX: Consider whether/how to further post-process the Javadoc.
+    return requireNonNullElse(state.getElements().getDocComment(ASTHelpers.getSymbol(tree)), "")
+        .strip();
   }
 
   private static SeverityLevel getSeverity(ClassTree tree, VisitorState state) {
