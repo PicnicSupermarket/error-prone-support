@@ -36,7 +36,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
         with:
-          java-version: 25
+          java-version: 25.0.2
           java-distribution: temurin
           maven-version: 3.9.13
       - name: Download Pitest analysis artifact

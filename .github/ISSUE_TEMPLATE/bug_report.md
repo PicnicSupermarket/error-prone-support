@@ -42,9 +42,9 @@ Please replace this sentence with log output, if applicable.
 <!-- Please complete the following information: -->
 
 - Operating system (e.g. MacOS Tahoe).
-- Java version (i.e. `java --version`, e.g. `21.0.8`).
-- Error Prone version (e.g. `2.43.0`).
-- Error Prone Support version (e.g. `0.26.0`).
+- Java version (i.e. `java --version`, e.g. `21.0.10`).
+- Error Prone version (e.g. `2.48.0`).
+- Error Prone Support version (e.g. `0.28.0`).
 
 ### Additional context
 
