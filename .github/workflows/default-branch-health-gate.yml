@@ -35,8 +35,8 @@ jobs:
         with:
           script: |
             const prLabels = context.payload.pull_request?.labels ?? [];
-            if (prLabels.some((l) => l.name === 'allow-merge-when-master-red')) {
-              core.info('Bypass label "allow-merge-when-master-red" found; skipping default branch health check.');
+            if (prLabels.some((l) => l.name === 'disable-default-branch-health-gate')) {
+              core.info('Label "disable-default-branch-health-gate" present; skipping default branch health check.');
               return;
             }
 
