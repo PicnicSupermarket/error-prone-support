@@ -71,6 +71,7 @@ final class ComparatorRules {
     Comparator<T> before() {
       return Refaster.anyOf(
           Collections.reverseOrder(),
+          Collections.reverseOrder(T::compareTo),
           Collections.<T>reverseOrder(naturalOrder()),
           Comparator.<T>naturalOrder().reversed());
     }
