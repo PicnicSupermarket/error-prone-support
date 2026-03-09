@@ -126,7 +126,7 @@ final class MoreTypesTest {
    * {@link #getTestTypes()}.
    */
   @BugPattern(summary = "Flags invocations of methods with select return types", severity = ERROR)
-  public static final class SubtypeFlagger extends BugChecker
+  private static final class SubtypeFlagger extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
