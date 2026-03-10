@@ -113,6 +113,7 @@ final class AssertJRules {
 
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsDouble`.
+  /** Prefer {@link OptionalDoubleAssert#hasValue(double)} over more fragile alternatives. */
   static final class AssertThatOptionalDouble {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(OptionalDouble optional, double expected) {
@@ -132,6 +133,7 @@ final class AssertJRules {
 
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsInt`.
+  /** Prefer {@link OptionalIntAssert#hasValue(int)} over more fragile alternatives. */
   static final class AssertThatOptionalInt {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(OptionalInt optional, int expected) {
@@ -151,6 +153,7 @@ final class AssertJRules {
 
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsLong`.
+  /** Prefer {@link OptionalLongAssert#hasValue(long)} over more fragile alternatives. */
   static final class AssertThatOptionalLong {
     @BeforeTemplate
     AbstractLongAssert<?> before(OptionalLong optional, long expected) {
@@ -168,6 +171,7 @@ final class AssertJRules {
   // ObjectEnumerable
   //
 
+  /** Prefer {@link ObjectEnumerableAssert#contains(Object[])} over more contrived alternatives. */
   static final class ObjectEnumerableContainsOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
@@ -185,6 +189,10 @@ final class AssertJRules {
     }
   }
 
+  /**
+   * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over more contrived
+   * alternatives.
+   */
   static final class ObjectEnumerableDoesNotContainOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
@@ -199,6 +207,10 @@ final class AssertJRules {
     }
   }
 
+  /**
+   * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over more contrived
+   * alternatives.
+   */
   static final class ObjectEnumerableContainsExactlyOneElement<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
@@ -214,6 +226,7 @@ final class AssertJRules {
     }
   }
 
+  /** Prefer {@code assertThat(set).containsExactly(element)} over less explicit alternatives. */
   static final class AssertThatSetContainsExactlyOneElement<S, T extends S> {
     @BeforeTemplate
     ObjectEnumerableAssert<?, S> before(Set<S> set, T element) {
@@ -231,6 +244,9 @@ final class AssertJRules {
   // List
   //
 
+  /**
+   * Prefer {@link ListAssert#containsExactlyElementsOf(Iterable)} over less explicit alternatives.
+   */
   static final class AssertThatListsAreEqual<S, T extends S> {
     @BeforeTemplate
     ListAssert<S> before(List<S> list1, Iterable<T> list2) {
@@ -248,6 +264,10 @@ final class AssertJRules {
   // Set
   //
 
+  /**
+   * Prefer {@link AbstractCollectionAssert#hasSameElementsAs(Iterable)} over less explicit or more
+   * contrived alternatives.
+   */
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<?, ?, S, ?> before(Set<S> set1, Iterable<T> set2) {
@@ -267,6 +287,10 @@ final class AssertJRules {
   // Multiset
   //
 
+  /**
+   * Prefer {@link AbstractCollectionAssert#containsExactlyInAnyOrderElementsOf(Iterable)} over less
+   * explicit alternatives.
+   */
   static final class AssertThatMultisetsAreEqual<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Iterable<T> multiset2) {
@@ -286,6 +310,7 @@ final class AssertJRules {
 
   // XXX: To match in all cases there'll need to be a `@BeforeTemplate` variant for each
   // `assertThat` overload. Consider defining a `BugChecker` instead.
+  /** Prefer {@link MapAssert#containsEntry(Object, Object)} over more contrived alternatives. */
   static final class AssertThatMapContainsEntry<K, V> {
     @BeforeTemplate
     ObjectAssert<V> before(Map<K, V> map, K key, V value) {
@@ -304,6 +329,7 @@ final class AssertJRules {
   //
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsAnyElementsOf(Iterable)} over less efficient alternatives. */
   static final class AssertThatStreamContainsAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -333,6 +359,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsAnyOf(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsAnyOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -360,6 +387,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsAnyOf(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsAnyOfVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsAnyOf" /* Varargs converted to array. */)
@@ -393,6 +421,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsAll(Iterable)} over less efficient alternatives. */
   static final class AssertThatStreamContainsAll<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -422,6 +451,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#contains(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContains<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -449,6 +479,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#contains(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContains" /* Varargs converted to array. */)
@@ -481,6 +512,9 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#containsExactlyElementsOf(Iterable)} over less efficient alternatives.
+   */
   static final class AssertThatStreamContainsExactlyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -496,6 +530,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsExactly(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsExactly<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -511,6 +546,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsExactly(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsExactlyVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactly" /* Varargs converted to array. */)
@@ -527,6 +563,10 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#containsExactlyInAnyOrderElementsOf(Iterable)} over less efficient
+   * alternatives.
+   */
   static final class AssertThatStreamContainsExactlyInAnyOrderElementsOf<
       S, T extends S, U extends T> {
     @BeforeTemplate
@@ -549,6 +589,9 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#containsExactlyInAnyOrder(Object[])} over less efficient alternatives.
+   */
   static final class AssertThatStreamContainsExactlyInAnyOrder<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -570,6 +613,9 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#containsExactlyInAnyOrder(Object[])} over less efficient alternatives.
+   */
   static final class AssertThatStreamContainsExactlyInAnyOrderVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
@@ -596,6 +642,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsSequence(Iterable)} over less efficient alternatives. */
   static final class AssertThatStreamContainsSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -617,6 +664,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsSequence(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsSequenceVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsSequence" /* Varargs converted to array. */)
@@ -634,6 +682,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsSubsequence(Iterable)} over less efficient alternatives. */
   static final class AssertThatStreamContainsSubsequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -655,6 +704,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsSubsequence(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsSubsequenceVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsSubsequence" /* Varargs converted to array. */)
@@ -673,6 +723,10 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#doesNotContainAnyElementsOf(Iterable)} over less efficient
+   * alternatives.
+   */
   static final class AssertThatStreamDoesNotContainAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -702,6 +756,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#doesNotContain(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamDoesNotContain<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -729,6 +784,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#doesNotContain(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamDoesNotContainVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamDoesNotContain" /* Varargs converted to array. */)
@@ -761,6 +817,9 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#doesNotContainSequence(Iterable)} over less efficient alternatives.
+   */
   static final class AssertThatStreamDoesNotContainSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -782,6 +841,9 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /**
+   * Prefer {@link ListAssert#doesNotContainSequence(Object[])} over less efficient alternatives.
+   */
   static final class AssertThatStreamDoesNotContainSequenceVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamDoesNotContainSequence" /* Varargs converted to array. */)
@@ -800,6 +862,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#hasSameElementsAs(Iterable)} over less efficient alternatives. */
   static final class AssertThatStreamHasSameElementsAs<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -829,6 +892,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsOnly(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsOnly<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -856,6 +920,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#containsOnly(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamContainsOnlyVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsOnly" /* Varargs converted to array. */)
@@ -888,6 +953,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#isSubsetOf(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamIsSubsetOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -935,6 +1001,7 @@ final class AssertJRules {
   }
 
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  /** Prefer {@link ListAssert#isSubsetOf(Object[])} over less efficient alternatives. */
   static final class AssertThatStreamIsSubsetOfVarArgs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamIsSubsetOf" /* Varargs converted to array. */)
@@ -970,6 +1037,7 @@ final class AssertJRules {
   // Predicate
   //
 
+  /** Prefer {@code assertThat(predicate).accepts(object)} over less explicit alternatives. */
   static final class AssertThatPredicateAccepts<T> {
     @BeforeTemplate
     void before(Predicate<T> predicate, T object) {
@@ -983,6 +1051,7 @@ final class AssertJRules {
     }
   }
 
+  /** Prefer {@code assertThat(predicate).rejects(object)} over less explicit alternatives. */
   static final class AssertThatPredicateRejects<T> {
     @BeforeTemplate
     void before(Predicate<T> predicate, T object) {

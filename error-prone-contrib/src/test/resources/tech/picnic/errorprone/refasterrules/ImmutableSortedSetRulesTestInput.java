@@ -18,41 +18,41 @@ final class ImmutableSortedSetRulesTest implements RefasterRuleCollectionTestCas
     return ImmutableSet.of(Arrays.class, Streams.class);
   }
 
-  ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
+  ImmutableSortedSet.Builder<String> testImmutableSortedSetOrderedBy() {
     return new ImmutableSortedSet.Builder<>(Comparator.comparingInt(String::length));
   }
 
-  ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrderBuilder() {
+  ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrder() {
     return ImmutableSortedSet.orderedBy(Comparator.<String>naturalOrder());
   }
 
-  ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrderBuilder() {
+  ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrder() {
     return ImmutableSortedSet.orderedBy(Comparator.<String>reverseOrder());
   }
 
-  ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableSortedSet() {
+  ImmutableSet<ImmutableSortedSet<Integer>> testImmutableSortedSetOf() {
     return ImmutableSet.of(
         ImmutableSortedSet.<Integer>naturalOrder().build(),
         Stream.<Integer>empty().collect(toImmutableSortedSet(naturalOrder())));
   }
 
-  ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {
+  ImmutableSet<ImmutableSortedSet<Integer>> testImmutableSortedSetCopyOf() {
     // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
     return ImmutableSet.of(
-        ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(1)),
-        ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(2).iterator()),
-        ImmutableList.of(3).stream().collect(toImmutableSortedSet(naturalOrder())),
-        Streams.stream(ImmutableList.of(4)::iterator).collect(toImmutableSortedSet(naturalOrder())),
+        ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {1}).build(),
+        Arrays.stream(new Integer[] {2}).collect(toImmutableSortedSet(naturalOrder())),
+        ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(3).iterator()),
+        ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(4).iterator()).build(),
         Streams.stream(ImmutableList.of(5).iterator())
             .collect(toImmutableSortedSet(naturalOrder())),
-        ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(6)).build(),
-        ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(7)::iterator).build(),
-        ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(8).iterator()).build(),
-        ImmutableSortedSet.<Integer>naturalOrder().add(new Integer[] {9}).build(),
-        Arrays.stream(new Integer[] {10}).collect(toImmutableSortedSet(naturalOrder())));
+        ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(6)),
+        ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(7)).build(),
+        ImmutableSortedSet.<Integer>naturalOrder().addAll(ImmutableSet.of(8)::iterator).build(),
+        Streams.stream(ImmutableList.of(9)::iterator).collect(toImmutableSortedSet(naturalOrder())),
+        ImmutableList.of(10).stream().collect(toImmutableSortedSet(naturalOrder())));
   }
 
-  ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {
+  ImmutableSortedSet<Integer> testStreamCollectToImmutableSortedSet() {
     return ImmutableSortedSet.copyOf(Stream.of(1).iterator());
   }
 }

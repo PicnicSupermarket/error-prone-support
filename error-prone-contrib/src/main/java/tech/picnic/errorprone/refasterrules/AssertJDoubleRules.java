@@ -15,6 +15,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJDoubleRules {
   private AssertJDoubleRules() {}
 
+  /**
+   * Prefer {@link AbstractDoubleAssert#isCloseTo(double, Offset)} over less explicit alternatives.
+   */
   static final class AbstractDoubleAssertIsCloseToWithOffset {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(
@@ -35,6 +38,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over more contrived alternatives. */
   static final class AbstractDoubleAssertIsEqualTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
@@ -48,6 +52,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isNotEqualTo(double)} over more contrived alternatives. */
   static final class AbstractDoubleAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
@@ -62,6 +67,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over less explicit alternatives. */
   static final class AbstractDoubleAssertIsZero {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
@@ -74,6 +80,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isNotEqualTo(double)} over less explicit alternatives. */
   static final class AbstractDoubleAssertIsNotZero {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
@@ -86,6 +93,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over less explicit alternatives. */
   static final class AbstractDoubleAssertIsOne {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {

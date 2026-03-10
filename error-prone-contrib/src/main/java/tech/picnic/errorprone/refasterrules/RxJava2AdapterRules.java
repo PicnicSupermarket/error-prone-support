@@ -20,7 +20,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class RxJava2AdapterRules {
   private RxJava2AdapterRules() {}
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#completableToMono}. */
+  /** Prefer {@link RxJava2Adapter#completableToMono} over less idiomatic alternatives. */
   static final class CompletableToMono {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -37,10 +37,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#flowableToFlux} to convert a {@link Flowable} to a {@link Flux}, and
-   * do so using the fluent API style.
-   */
+  /** Prefer {@link RxJava2Adapter#flowableToFlux} over less idiomatic alternatives. */
   static final class FlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flowable<T> flowable) {
@@ -58,10 +55,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#fluxToFlowable} to convert a {@link Flux} to a {@link Flowable}, and
-   * do so using the fluent API style.
-   */
+  /** Prefer {@link RxJava2Adapter#fluxToFlowable} over less idiomatic alternatives. */
   static final class FluxToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Flux<T> flux) {
@@ -77,10 +71,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#fluxToObservable} to convert a {@link Flux} to a {@link Observable},
-   * and do so using the fluent API style.
-   */
+  /** Prefer {@link RxJava2Adapter#fluxToObservable} over less idiomatic alternatives. */
   static final class FluxToObservable<T> {
     @BeforeTemplate
     Observable<T> before(Flux<T> flux) {
@@ -96,7 +87,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#maybeToMono}. */
+  /** Prefer {@link RxJava2Adapter#maybeToMono} over less idiomatic alternatives. */
   static final class MaybeToMono<T> {
     @BeforeTemplate
     Mono<T> before(Maybe<T> maybe) {
@@ -110,10 +101,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#monoToCompletable} to convert a {@link Mono} to a {@link
-   * Completable}, and do so using the fluent API style.
-   */
+  /** Prefer {@link RxJava2Adapter#monoToCompletable} over less idiomatic alternatives. */
   static final class MonoToCompletable<T> {
     @BeforeTemplate
     Completable before(Mono<T> mono) {
@@ -129,10 +117,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#monoToFlowable} to convert a {@link Mono} to a {@link Flowable}, and
-   * do so using the fluent API style.
-   */
+  /** Prefer {@link RxJava2Adapter#monoToFlowable} over less idiomatic alternatives. */
   static final class MonoToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Mono<T> mono) {
@@ -148,7 +133,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#monoToMaybe}. */
+  /** Prefer {@link RxJava2Adapter#monoToMaybe} over less idiomatic alternatives. */
   static final class MonoToMaybe<T> {
     @BeforeTemplate
     Maybe<T> before(Mono<T> mono) {
@@ -161,10 +146,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#monoToSingle} to convert a {@link Mono} to a {@link Single}, and do
-   * so using the fluent API style.
-   */
+  /** Prefer {@link RxJava2Adapter#monoToSingle} over less idiomatic alternatives. */
   static final class MonoToSingle<T> {
     @BeforeTemplate
     Single<T> before(Mono<T> mono) {
@@ -180,7 +162,10 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#observableToFlux}. */
+  /**
+   * Prefer chaining {@link Observable#toFlowable(BackpressureStrategy)} with {@link
+   * RxJava2Adapter#flowableToFlux} over less idiomatic alternatives.
+   */
   static final class ObservableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Observable<T> observable, BackpressureStrategy strategy) {
@@ -196,7 +181,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#singleToMono}. */
+  /** Prefer {@link RxJava2Adapter#singleToMono} over less idiomatic alternatives. */
   static final class SingleToMono<T> {
     @BeforeTemplate
     Mono<T> before(Single<T> single) {

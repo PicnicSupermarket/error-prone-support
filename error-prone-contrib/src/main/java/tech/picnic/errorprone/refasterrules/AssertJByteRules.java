@@ -14,6 +14,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJByteRules {
   private AssertJByteRules() {}
 
+  /** Prefer {@link AbstractByteAssert#isEqualTo(byte)} over more contrived alternatives. */
   static final class AbstractByteAssertIsEqualTo {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte n) {
@@ -27,6 +28,7 @@ final class AssertJByteRules {
     }
   }
 
+  /** Prefer {@link AbstractByteAssert#isNotEqualTo(byte)} over more contrived alternatives. */
   static final class AbstractByteAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte n) {
@@ -41,6 +43,7 @@ final class AssertJByteRules {
     }
   }
 
+  /** Prefer {@link AbstractByteAssert#isEqualTo(byte)} over less explicit alternatives. */
   static final class AbstractByteAssertIsZero {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert) {
@@ -53,6 +56,7 @@ final class AssertJByteRules {
     }
   }
 
+  /** Prefer {@link AbstractByteAssert#isNotEqualTo(byte)} over less explicit alternatives. */
   static final class AbstractByteAssertIsNotZero {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert) {
@@ -65,6 +69,7 @@ final class AssertJByteRules {
     }
   }
 
+  /** Prefer {@link AbstractByteAssert#isEqualTo(byte)} over less explicit alternatives. */
   static final class AbstractByteAssertIsOne {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert) {

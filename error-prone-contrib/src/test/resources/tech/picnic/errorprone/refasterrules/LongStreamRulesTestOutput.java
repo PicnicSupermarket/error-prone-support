@@ -14,15 +14,15 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
-  LongStream testLongStreamClosedOpenRange() {
+  LongStream testLongStreamRange() {
     return LongStream.range(0, 42);
   }
 
-  LongStream testConcatOneLongStream() {
+  LongStream testLongStreamIdentity() {
     return LongStream.of(1);
   }
 
-  LongStream testConcatTwoLongStreams() {
+  LongStream testLongStreamConcat() {
     return LongStream.concat(LongStream.of(1), LongStream.of(2));
   }
 
@@ -54,7 +54,7 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
     return LongStream.of(1, 4, 3, 2).filter(l -> l % 2 == 0).sorted();
   }
 
-  ImmutableSet<Boolean> testLongStreamIsEmpty() {
+  ImmutableSet<Boolean> testLongStreamFindAnyIsEmpty() {
     return ImmutableSet.of(
         LongStream.of(1).findAny().isEmpty(),
         LongStream.of(2).findAny().isEmpty(),
@@ -62,7 +62,7 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
         LongStream.of(4).findAny().isEmpty());
   }
 
-  ImmutableSet<Boolean> testLongStreamIsNotEmpty() {
+  ImmutableSet<Boolean> testLongStreamFindAnyIsPresent() {
     return ImmutableSet.of(
         LongStream.of(1).findAny().isPresent(),
         LongStream.of(2).findAny().isPresent(),

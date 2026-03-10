@@ -40,7 +40,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new boolean[] {true}, new boolean[] {false});
   }
 
-  void testAssertThatBooleanArrayWithFailMessageContainsExactly() {
+  void testAssertThatBooleanArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new boolean[] {true}, new boolean[] {false}, "foo");
   }
 
@@ -52,7 +52,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new byte[] {1}, new byte[] {2});
   }
 
-  void testAssertThatByteArrayWithFailMessageContainsExactly() {
+  void testAssertThatByteArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new byte[] {1}, new byte[] {2}, "foo");
   }
 
@@ -64,7 +64,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new char[] {'a'}, new char[] {'b'});
   }
 
-  void testAssertThatCharArrayWithFailMessageContainsExactly() {
+  void testAssertThatCharArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new char[] {'a'}, new char[] {'b'}, "foo");
   }
 
@@ -76,7 +76,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new short[] {1}, new short[] {2});
   }
 
-  void testAssertThatShortArrayWithFailMessageContainsExactly() {
+  void testAssertThatShortArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new short[] {1}, new short[] {2}, "foo");
   }
 
@@ -88,7 +88,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new int[] {1}, new int[] {2});
   }
 
-  void testAssertThatIntArrayWithFailMessageContainsExactly() {
+  void testAssertThatIntArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new int[] {1}, new int[] {2}, "foo");
   }
 
@@ -100,7 +100,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new long[] {1L}, new long[] {2L});
   }
 
-  void testAssertThatLongArrayWithFailMessageContainsExactly() {
+  void testAssertThatLongArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new long[] {1L}, new long[] {2L}, "foo");
   }
 
@@ -112,7 +112,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f});
   }
 
-  void testAssertThatFloatArrayWithFailMessageContainsExactly() {
+  void testAssertThatFloatArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, "foo");
   }
 
@@ -124,7 +124,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f);
   }
 
-  void testAssertThatFloatArrayWithFailMessageContainsExactlyWithOffset() {
+  void testAssertThatFloatArrayWithFailMessageStringContainsExactlyWithOffset() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f, "foo");
   }
 
@@ -136,7 +136,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0});
   }
 
-  void testAssertThatDoubleArrayWithFailMessageContainsExactly() {
+  void testAssertThatDoubleArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, "foo");
   }
 
@@ -148,7 +148,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1);
   }
 
-  void testAssertThatDoubleArrayWithFailMessageContainsExactlyWithOffset() {
+  void testAssertThatDoubleArrayWithFailMessageStringContainsExactlyWithOffset() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1, "foo");
   }
 
@@ -160,7 +160,7 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"});
   }
 
-  void testAssertThatObjectArrayWithFailMessageContainsExactly() {
+  void testAssertThatObjectArrayWithFailMessageStringContainsExactly() {
     assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"}, "foo");
   }
 
@@ -172,11 +172,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     return Assertions.fail();
   }
 
-  Object testFailWithMessage() {
+  Object testFailWithString() {
     return Assertions.fail("foo");
   }
 
-  Object testFailWithMessageAndThrowable() {
+  Object testFailWithStringAndThrowable() {
     return Assertions.fail("foo", new IllegalStateException());
   }
 

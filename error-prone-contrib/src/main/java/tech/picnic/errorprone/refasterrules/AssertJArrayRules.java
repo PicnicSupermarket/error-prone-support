@@ -19,6 +19,7 @@ import tech.picnic.errorprone.refaster.matchers.IsMultidimensionalArray;
 final class AssertJArrayRules {
   private AssertJArrayRules() {}
 
+  /** Prefer {@link AbstractObjectArrayAssert#hasSize(int)} over less explicit alternatives. */
   static final class AssertThatHasSize<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -33,6 +34,9 @@ final class AssertJArrayRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractObjectArrayAssert#hasSizeLessThan(int)} over less explicit alternatives.
+   */
   static final class AssertThatHasSizeLessThan<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -47,6 +51,10 @@ final class AssertJArrayRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractObjectArrayAssert#hasSizeLessThanOrEqualTo(int)} over less explicit
+   * alternatives.
+   */
   static final class AssertThatHasSizeLessThanOrEqualTo<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -61,6 +69,10 @@ final class AssertJArrayRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractObjectArrayAssert#hasSizeGreaterThan(int)} over less explicit
+   * alternatives.
+   */
   static final class AssertThatHasSizeGreaterThan<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -75,6 +87,10 @@ final class AssertJArrayRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractObjectArrayAssert#hasSizeGreaterThanOrEqualTo(int)} over less explicit
+   * alternatives.
+   */
   static final class AssertThatHasSizeGreaterThanOrEqualTo<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(
@@ -89,6 +105,10 @@ final class AssertJArrayRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractObjectArrayAssert#hasSizeBetween(int, int)} over less explicit
+   * alternatives.
+   */
   static final class AssertThatHasSizeBetween<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(

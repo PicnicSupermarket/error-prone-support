@@ -22,53 +22,46 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJPrimitiveRules {
   private AssertJPrimitiveRules() {}
 
+  /** Prefer {@code isEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractByteAssert<?> before(byte actual, byte expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractCharacterAssert<?> before(char actual, char expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractShortAssert<?> before(short actual, short expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractIntegerAssert<?> before(int actual, int expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractLongAssert<?> before(long actual, long expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractFloatAssert<?> before(float actual, float expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractDoubleAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @AfterTemplate
@@ -78,53 +71,46 @@ final class AssertJPrimitiveRules {
     }
   }
 
+  /** Prefer {@code isNotEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractByteAssert<?> before(byte actual, byte expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractCharacterAssert<?> before(char actual, char expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractShortAssert<?> before(short actual, short expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractIntegerAssert<?> before(int actual, int expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractLongAssert<?> before(long actual, long expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractFloatAssert<?> before(float actual, float expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @BeforeTemplate
-    AbstractDoubleAssert<? extends AbstractDoubleAssert<?>> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractDoubleAssert<?> before(double actual, double expected) {
+      return assertThat(actual).isNotSameAs(expected);
     }
 
     @AfterTemplate
@@ -134,6 +120,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
+  /** Prefer {@code isLessThan} over less idiomatic alternatives. */
   static final class AssertThatIsLessThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
@@ -148,6 +135,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
+  /** Prefer {@code isLessThanOrEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
@@ -162,6 +150,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
+  /** Prefer {@code isGreaterThan} over less idiomatic alternatives. */
   static final class AssertThatIsGreaterThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {
@@ -176,6 +165,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
+  /** Prefer {@code isGreaterThanOrEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double expected) {

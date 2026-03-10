@@ -19,10 +19,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class MockitoRules {
   private MockitoRules() {}
 
-  /**
-   * Prefer {@link Mockito#never()}} over explicitly specifying that the associated invocation must
-   * happen precisely zero times.
-   */
+  /** Prefer {@link Mockito#never()} over less explicit alternatives. */
   static final class Never {
     @BeforeTemplate
     VerificationMode before() {
@@ -36,10 +33,7 @@ final class MockitoRules {
     }
   }
 
-  /**
-   * Prefer {@link Mockito#verify(Object)} over explicitly specifying that the associated invocation
-   * must happen precisely once; this is the default behavior.
-   */
+  /** Prefer {@link Mockito#verify(Object)} over more verbose alternatives. */
   static final class VerifyOnce<T> {
     @BeforeTemplate
     T before(T mock) {
@@ -53,7 +47,8 @@ final class MockitoRules {
     }
   }
 
-  static final class InvocationOnMockGetArguments {
+  /** Prefer {@link InvocationOnMock#getArgument(int)} over more verbose alternatives. */
+  static final class InvocationOnMockGetArgument {
     @BeforeTemplate
     Object before(InvocationOnMock invocation, int i) {
       return invocation.getArguments()[i];
@@ -65,7 +60,8 @@ final class MockitoRules {
     }
   }
 
-  static final class InvocationOnMockGetArgumentsWithTypeParameter<T> {
+  /** Prefer {@code invocation.<T>getArgument(int)} over less explicit alternatives. */
+  static final class InvocationOnMockGetArgumentWithTypeArgument<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Cast is presumed safe in matched context. */)
     T before(InvocationOnMock invocation, int i) {

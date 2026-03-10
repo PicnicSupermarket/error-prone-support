@@ -8,7 +8,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -44,6 +47,20 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<String> testUnboundedSingleElementStream() {
     return Stream.generate(() -> "foo");
+  }
+
+  ImmutableSet<Boolean> testDisjointSets() {
+    return ImmutableSet.of(
+        Collections.disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
+        Collections.disjoint(ImmutableSet.of(3), ImmutableSet.of(4)));
+  }
+
+  ImmutableSet<Boolean> testDisjointCollections() {
+    return ImmutableSet.of(
+        Collections.disjoint(ImmutableList.of(1), ImmutableList.of(2)),
+        Collections.disjoint(ImmutableList.of(3), ImmutableList.of(4)),
+        Collections.disjoint(ImmutableList.of(5), ImmutableList.of(6)),
+        Collections.disjoint(ImmutableList.of(7), ImmutableList.of(8)));
   }
 
   boolean testIterableIsEmpty() {

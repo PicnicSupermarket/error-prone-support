@@ -24,7 +24,7 @@ final class MapEntryRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(comparingByKey(), comparingByKey());
   }
 
-  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByKeyWithCustomComparator() {
+  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByKeyWithComparator() {
     return comparingByKey(Comparator.comparingInt(i -> i * 2));
   }
 
@@ -32,7 +32,7 @@ final class MapEntryRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(comparingByValue(), comparingByValue());
   }
 
-  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByValueWithCustomComparator() {
+  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByValueWithComparator() {
     return comparingByValue(Comparator.comparingInt(String::length));
   }
 }

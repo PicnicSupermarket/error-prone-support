@@ -35,28 +35,29 @@ final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Number> testObjectMapperConvertValueWithClass() {
     return ImmutableSet.of(
-        new ObjectMapper().readValue(new ObjectMapper().writeValueAsBytes("1"), Integer.class),
-        JsonMapper.shared().readValue(JsonMapper.shared().writeValueAsString("2.0"), Double.class));
+        new ObjectMapper().readValue(new ObjectMapper().writeValueAsBytes("foo"), Integer.class),
+        JsonMapper.shared().readValue(JsonMapper.shared().writeValueAsString("bar"), Double.class));
   }
 
   ImmutableSet<Number> testObjectMapperConvertValueWithJavaType() {
     return ImmutableSet.of(
         new ObjectMapper()
             .readValue(
-                new ObjectMapper().writeValueAsBytes("1"),
+                new ObjectMapper().writeValueAsBytes("foo"),
                 SimpleType.constructUnsafe(Integer.class)),
         JsonMapper.shared()
             .readValue(
-                JsonMapper.shared().writeValueAsString("2.0"),
+                JsonMapper.shared().writeValueAsString("bar"),
                 SimpleType.constructUnsafe(Double.class)));
   }
 
   ImmutableSet<Number> testObjectMapperConvertValueWithTypeReference() {
     return ImmutableSet.of(
         new ObjectMapper()
-            .readValue(new ObjectMapper().writeValueAsBytes("1"), new TypeReference<Integer>() {}),
+            .readValue(
+                new ObjectMapper().writeValueAsBytes("foo"), new TypeReference<Integer>() {}),
         JsonMapper.shared()
             .readValue(
-                JsonMapper.shared().writeValueAsString("2.0"), new TypeReference<Double>() {}));
+                JsonMapper.shared().writeValueAsString("bar"), new TypeReference<Double>() {}));
   }
 }

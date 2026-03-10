@@ -21,7 +21,7 @@ final class WebClientRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<?> testBodyValue() {
     return ImmutableSet.of(
-        WebClient.create().post().bodyValue("bar"),
+        WebClient.create().post().bodyValue("foo"),
         WebTestClient.bindToServer().build().post().bodyValue("bar"));
   }
 

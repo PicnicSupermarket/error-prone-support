@@ -18,16 +18,16 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     assertThat(ImmutableSet.of(1)).hasSize(0);
     assertThat(ImmutableSet.of(2)).hasSizeLessThanOrEqualTo(0);
     assertThat(ImmutableSet.of(3)).hasSizeLessThan(1);
-    assertThat(ImmutableSet.of(4)).hasSameSizeAs(ImmutableSet.of());
-    assertThat(ImmutableSet.of(5)).hasSameSizeAs(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(6)).containsExactlyElementsOf(ImmutableSet.of());
-    assertThat(ImmutableSet.of(7)).containsExactlyElementsOf(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(8)).containsExactlyInAnyOrderElementsOf(ImmutableSet.of());
-    assertThat(ImmutableSet.of(9)).containsExactlyInAnyOrderElementsOf(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(10)).hasSameElementsAs(ImmutableSet.of());
-    assertThat(ImmutableSet.of(11)).hasSameElementsAs(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(12)).isSubsetOf(ImmutableSet.of());
-    assertThat(ImmutableSet.of(13)).isSubsetOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(4)).hasSameSizeAs(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(5)).hasSameSizeAs(ImmutableSet.of());
+    assertThat(ImmutableSet.of(6)).containsExactlyElementsOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(7)).containsExactlyElementsOf(ImmutableSet.of());
+    assertThat(ImmutableSet.of(8)).containsExactlyInAnyOrderElementsOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(9)).containsExactlyInAnyOrderElementsOf(ImmutableSet.of());
+    assertThat(ImmutableSet.of(10)).hasSameElementsAs(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(11)).hasSameElementsAs(ImmutableSet.of());
+    assertThat(ImmutableSet.of(12)).isSubsetOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(13)).isSubsetOf(ImmutableSet.of());
     assertThat(ImmutableSet.of(14)).containsExactly();
     assertThat(ImmutableSet.of(15)).containsExactlyInAnyOrder();
     assertThat(ImmutableSet.of(16)).containsOnly();
@@ -36,8 +36,8 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
   }
 
   void testAssertAndEnumerableAssertIsEmpty() {
-    assertThat(ImmutableSet.of(1)).isEqualTo(ImmutableSet.of());
-    assertThat(ImmutableSet.of(2)).isEqualTo(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(1)).isEqualTo(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(2)).isEqualTo(ImmutableSet.of());
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertIsNotEmpty() {

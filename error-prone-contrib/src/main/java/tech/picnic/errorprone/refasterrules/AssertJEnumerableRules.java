@@ -20,6 +20,7 @@ import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 final class AssertJEnumerableRules {
   private AssertJEnumerableRules() {}
 
+  /** Prefer {@link EnumerableAssert#isEmpty()} over more contrived alternatives. */
   static final class EnumerableAssertIsEmpty<E> {
     @BeforeTemplate
     void before(
@@ -60,6 +61,7 @@ final class AssertJEnumerableRules {
 
   // XXX: This rule assumes that the rewritten assertion aims to compare the contents of two
   // iterables, rather than other semantics (such as `Set` vs. `List`).
+  /** Prefer {@link EnumerableAssert#isEmpty()} over more contrived alternatives. */
   static final class AssertAndEnumerableAssertIsEmpty<
       E, A extends Assert<?, ? extends Iterable<? extends E>> & EnumerableAssert<?, E>> {
     @BeforeTemplate
@@ -73,6 +75,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /** Prefer {@link EnumerableAssert#isNotEmpty()} over more contrived alternatives. */
   static final class EnumerableAssertIsNotEmpty<E> {
     @BeforeTemplate
     EnumerableAssert<?, E> before(EnumerableAssert<?, E> enumAssert) {
@@ -100,6 +103,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /** Prefer {@link EnumerableAssert#hasSize(int)} over more verbose alternatives. */
   static final class EnumerableAssertHasSize<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -121,6 +125,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /** Prefer {@link EnumerableAssert#hasSizeLessThan(int)} over more verbose alternatives. */
   static final class EnumerableAssertHasSizeLessThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -142,6 +147,9 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /**
+   * Prefer {@link EnumerableAssert#hasSizeLessThanOrEqualTo(int)} over more verbose alternatives.
+   */
   static final class EnumerableAssertHasSizeLessThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -163,6 +171,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /** Prefer {@link EnumerableAssert#hasSizeGreaterThan(int)} over more verbose alternatives. */
   static final class EnumerableAssertHasSizeGreaterThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -184,6 +193,10 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /**
+   * Prefer {@link EnumerableAssert#hasSizeGreaterThanOrEqualTo(int)} over more verbose
+   * alternatives.
+   */
   static final class EnumerableAssertHasSizeGreaterThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -205,6 +218,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /** Prefer {@link EnumerableAssert#hasSizeBetween(int, int)} over more verbose alternatives. */
   static final class EnumerableAssertHasSizeBetween<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -226,6 +240,7 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /** Prefer {@link EnumerableAssert#hasSameSizeAs(Iterable)} over more verbose alternatives. */
   static final class EnumerableAssertHasSameSizeAs<S, E> {
     @BeforeTemplate
     EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Iterable<E> iterable) {

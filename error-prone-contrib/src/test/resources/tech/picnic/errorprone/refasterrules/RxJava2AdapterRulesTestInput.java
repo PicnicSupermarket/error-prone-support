@@ -16,7 +16,7 @@ final class RxJava2AdapterRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Void>> testCompletableToMono() {
     return ImmutableSet.of(
         RxJava2Adapter.completableToMono(Completable.complete()),
-        Completable.complete().to(RxJava2Adapter::completableToMono));
+        Completable.never().to(RxJava2Adapter::completableToMono));
   }
 
   ImmutableSet<Flux<Integer>> testFlowableToFlux() {
@@ -51,8 +51,8 @@ final class RxJava2AdapterRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Completable> testMonoToCompletable() {
     return ImmutableSet.of(
         Completable.fromPublisher(Mono.empty()),
-        Mono.empty().as(Completable::fromPublisher),
-        RxJava2Adapter.monoToCompletable(Mono.empty()));
+        Mono.just(1).as(Completable::fromPublisher),
+        RxJava2Adapter.monoToCompletable(Mono.just(2)));
   }
 
   ImmutableSet<Flowable<Integer>> testMonoToFlowable() {

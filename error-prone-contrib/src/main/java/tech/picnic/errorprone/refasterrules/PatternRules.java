@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster rules related to code dealing with regular expressions. */
+/** Refaster rules related to expressions dealing with {@link Pattern}s. */
 @OnlineDocumentation
 final class PatternRules {
   private PatternRules() {}

@@ -25,25 +25,24 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return new ImmutableSet.Builder<>();
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
+  ImmutableSet<ImmutableSet<Integer>> testImmutableSetCopyOf() {
     return ImmutableSet.of(
-        ImmutableList.of(1).stream().collect(toImmutableSet()),
-        Streams.stream(ImmutableList.of(2)::iterator).collect(toImmutableSet()),
-        Streams.stream(ImmutableList.of(3).iterator()).collect(toImmutableSet()),
-        ImmutableSet.<Integer>builder().addAll(ImmutableSet.of(4)).build(),
-        ImmutableSet.<Integer>builder().addAll(ImmutableSet.of(5)::iterator).build(),
-        ImmutableSet.<Integer>builder().addAll(ImmutableSet.of(6).iterator()).build(),
-        ImmutableSet.<Integer>builder().add(new Integer[] {7}).build(),
-        Arrays.stream(new Integer[] {8}).collect(toImmutableSet()));
+        ImmutableSet.<Integer>builder().add(new Integer[] {1}).build(),
+        Arrays.stream(new Integer[] {2}).collect(toImmutableSet()),
+        ImmutableSet.<Integer>builder().addAll(ImmutableSet.of(3).iterator()).build(),
+        Streams.stream(ImmutableList.of(4).iterator()).collect(toImmutableSet()),
+        ImmutableSet.<Integer>builder().addAll(ImmutableSet.of(5)).build(),
+        Streams.stream(ImmutableList.of(6)::iterator).collect(toImmutableSet()),
+        ImmutableList.of(7).stream().collect(toImmutableSet()));
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
+  ImmutableSet<ImmutableSet<Integer>> testStreamCollectToImmutableSet() {
     return ImmutableSet.of(
         ImmutableSet.copyOf(Stream.of(1).iterator()),
         Stream.of(2).distinct().collect(toImmutableSet()));
   }
 
-  ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
+  ImmutableSet<Integer> testSetViewImmutableCopy() {
     return ImmutableSet.copyOf(Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)));
   }
 
@@ -57,7 +56,7 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Set<Integer>> testImmutableSetOf1() {
     return ImmutableSet.of(
-        ImmutableSet.<Integer>builder().add(1).build(), Collections.singleton(1), Set.of(1));
+        ImmutableSet.<Integer>builder().add(1).build(), Collections.singleton(2), Set.of(3));
   }
 
   Set<Integer> testImmutableSetOf2() {
@@ -76,7 +75,7 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return Set.of(1, 2, 3, 4, 5);
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifference() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceImmutableCopy() {
     return ImmutableSet.of(
         ImmutableSet.of(1).stream()
             .filter(not(ImmutableSet.of(2)::contains))
@@ -86,7 +85,7 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
             .collect(toImmutableSet()));
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMap() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceKeySetImmutableCopy() {
     return ImmutableSet.of(
         ImmutableSet.of(1).stream()
             .filter(not(ImmutableMap.of(2, 3)::containsKey))
@@ -96,7 +95,7 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
             .collect(toImmutableSet()));
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMultimap() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMultimapKeySetImmutableCopy() {
     return ImmutableSet.of(
         ImmutableSet.of(1).stream()
             .filter(not(ImmutableSetMultimap.of(2, 3)::containsKey))
@@ -106,25 +105,25 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
             .collect(toImmutableSet()));
   }
 
-  ImmutableSet<Integer> testSetsIntersection() {
+  ImmutableSet<Integer> testSetsIntersectionImmutableCopy() {
     return ImmutableSet.of(1).stream()
         .filter(ImmutableSet.of(2)::contains)
         .collect(toImmutableSet());
   }
 
-  ImmutableSet<Integer> testSetsIntersectionMap() {
+  ImmutableSet<Integer> testSetsIntersectionMapKeySetImmutableCopy() {
     return ImmutableSet.of(1).stream()
         .filter(ImmutableMap.of(2, 3)::containsKey)
         .collect(toImmutableSet());
   }
 
-  ImmutableSet<Integer> testSetsIntersectionMultimap() {
+  ImmutableSet<Integer> testSetsIntersectionMultimapKeySetImmutableCopy() {
     return ImmutableSet.of(1).stream()
         .filter(ImmutableSetMultimap.of(2, 3)::containsKey)
         .collect(toImmutableSet());
   }
 
-  ImmutableSet<Integer> testSetsUnion() {
+  ImmutableSet<Integer> testSetsUnionImmutableCopy() {
     return Stream.concat(ImmutableSet.of(1).stream(), ImmutableSet.of(2).stream())
         .collect(toImmutableSet());
   }

@@ -18,38 +18,38 @@ final class ImmutableSortedSetRulesTest implements RefasterRuleCollectionTestCas
     return ImmutableSet.of(Arrays.class, Streams.class);
   }
 
-  ImmutableSortedSet.Builder<String> testImmutableSortedSetBuilder() {
+  ImmutableSortedSet.Builder<String> testImmutableSortedSetOrderedBy() {
     return ImmutableSortedSet.orderedBy(Comparator.comparingInt(String::length));
   }
 
-  ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrderBuilder() {
+  ImmutableSortedSet.Builder<String> testImmutableSortedSetNaturalOrder() {
     return ImmutableSortedSet.naturalOrder();
   }
 
-  ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrderBuilder() {
+  ImmutableSortedSet.Builder<String> testImmutableSortedSetReverseOrder() {
     return ImmutableSortedSet.reverseOrder();
   }
 
-  ImmutableSet<ImmutableSortedSet<Integer>> testEmptyImmutableSortedSet() {
+  ImmutableSet<ImmutableSortedSet<Integer>> testImmutableSortedSetOf() {
     return ImmutableSet.of(ImmutableSortedSet.of(), ImmutableSortedSet.of());
   }
 
-  ImmutableSet<ImmutableSortedSet<Integer>> testIterableToImmutableSortedSet() {
+  ImmutableSet<ImmutableSortedSet<Integer>> testImmutableSortedSetCopyOf() {
     // XXX: The first subexpression is not rewritten (`naturalOrder()` isn't dropped). WHY!?
     return ImmutableSet.of(
-        ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(1)),
-        ImmutableSortedSet.copyOf(ImmutableList.of(2).iterator()),
-        ImmutableSortedSet.copyOf(ImmutableList.of(3)),
-        ImmutableSortedSet.copyOf(ImmutableList.of(4)::iterator),
+        ImmutableSortedSet.copyOf(new Integer[] {1}),
+        ImmutableSortedSet.copyOf(new Integer[] {2}),
+        ImmutableSortedSet.copyOf(ImmutableList.of(3).iterator()),
+        ImmutableSortedSet.copyOf(ImmutableSet.of(4).iterator()),
         ImmutableSortedSet.copyOf(ImmutableList.of(5).iterator()),
-        ImmutableSortedSet.copyOf(ImmutableSet.of(6)),
-        ImmutableSortedSet.copyOf(ImmutableSet.of(7)::iterator),
-        ImmutableSortedSet.copyOf(ImmutableSet.of(8).iterator()),
-        ImmutableSortedSet.copyOf(new Integer[] {9}),
-        ImmutableSortedSet.copyOf(new Integer[] {10}));
+        ImmutableSortedSet.copyOf(naturalOrder(), ImmutableList.of(6)),
+        ImmutableSortedSet.copyOf(ImmutableSet.of(7)),
+        ImmutableSortedSet.copyOf(ImmutableSet.of(8)::iterator),
+        ImmutableSortedSet.copyOf(ImmutableList.of(9)::iterator),
+        ImmutableSortedSet.copyOf(ImmutableList.of(10)));
   }
 
-  ImmutableSortedSet<Integer> testStreamToImmutableSortedSet() {
+  ImmutableSortedSet<Integer> testStreamCollectToImmutableSortedSet() {
     return Stream.of(1).collect(toImmutableSortedSet(naturalOrder()));
   }
 }

@@ -34,10 +34,7 @@ final class ImmutableTableRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableTable.Builder#buildOrThrow()} over the less explicit {@link
-   * ImmutableTable.Builder#build()}.
-   */
+  /** Prefer {@link ImmutableTable.Builder#buildOrThrow()} over less explicit alternatives. */
   static final class ImmutableTableBuilderBuildOrThrow<R, C, V> {
     @BeforeTemplate
     ImmutableTable<R, C, V> before(ImmutableTable.Builder<R, C, V> builder) {
@@ -50,10 +47,14 @@ final class ImmutableTableRules {
     }
   }
 
-  /** Prefer {@link ImmutableTable#of(Object, Object, Object)} over more contrived alternatives. */
-  static final class CellToImmutableTable<R, C, V> {
+  /**
+   * Prefer {@link ImmutableTable#of(Object, Object, Object)} over less efficient or more contrived
+   * alternatives.
+   */
+  static final class ImmutableTableOfCellGetRowKeyCellGetColumnKeyCellGetValue<
+      R, C, V, R2 extends R, C2 extends C, V2 extends V> {
     @BeforeTemplate
-    ImmutableTable<R, C, V> before(Table.Cell<? extends R, ? extends C, ? extends V> cell) {
+    ImmutableTable<R, C, V> before(Table.Cell<R2, C2, V2> cell) {
       return Refaster.anyOf(
           ImmutableTable.<R, C, V>builder().put(cell).buildOrThrow(),
           Stream.of(cell)
@@ -63,16 +64,13 @@ final class ImmutableTableRules {
     }
 
     @AfterTemplate
-    ImmutableTable<R, C, V> after(Table.Cell<? extends R, ? extends C, ? extends V> cell) {
+    ImmutableTable<R, C, V> after(Table.Cell<R2, C2, V2> cell) {
       return ImmutableTable.of(cell.getRowKey(), cell.getColumnKey(), cell.getValue());
     }
   }
 
-  /**
-   * Don't map a stream's elements to table cells, only to subsequently collect them into an {@link
-   * ImmutableTable}. The collection can be performed directly.
-   */
-  abstract static class StreamOfCellsToImmutableTable<E, R, C, V> {
+  /** Prefer {@code stream.collect(toImmutableTable(...))} over more contrived alternatives. */
+  abstract static class StreamCollectToImmutableTable<E, R, C, V> {
     @Placeholder(allowsIdentity = true)
     abstract R rowFunction(@MayOptionallyUse E element);
 
@@ -99,7 +97,7 @@ final class ImmutableTableRules {
     }
   }
 
-  /** Prefer {@link ImmutableTable#of()} over more contrived alternatives . */
+  /** Prefer {@link ImmutableTable#of()} over less efficient alternatives. */
   static final class ImmutableTableOf<R, C, V> {
     @BeforeTemplate
     ImmutableTable<R, C, V> before() {

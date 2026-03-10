@@ -38,15 +38,15 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").anyMatch(s -> "bar".equals(s));
   }
 
-  boolean testDoubleNegation() {
+  boolean testBooleanIdentity() {
     return !!Boolean.TRUE;
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
   ImmutableSet<Boolean> testNegation() {
     return ImmutableSet.of(
-        true ? !false : false,
         !(true == false),
+        true ? !false : false,
         !((byte) 3 == (byte) 4),
         !((char) 3 == (char) 4),
         !((short) 3 == (short) 4),
@@ -57,11 +57,11 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         !(BoundType.OPEN == BoundType.CLOSED));
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
   ImmutableSet<Boolean> testIndirectDoubleNegation() {
     return ImmutableSet.of(
-        true ? false : !false,
         !(true != false),
+        true ? false : !false,
         !((byte) 3 != (byte) 4),
         !((char) 3 != (char) 4),
         !((short) 3 != (short) 4),
@@ -80,7 +80,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").equals(Optional.of("bar")),
         Optional.of("baz").equals(Optional.ofNullable("qux")),
-        Optional.ofNullable("quux").equals(Optional.of("quuz")));
+        Optional.ofNullable("quux").equals(Optional.of("corge")));
   }
 
   boolean testObjectsEquals() {

@@ -33,11 +33,11 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return requireNonNullElseGet("foo", () -> "bar");
   }
 
-  ImmutableSet<Predicate<String>> testIsNullFunction() {
+  ImmutableSet<Predicate<String>> testObjectsIsNull() {
     return ImmutableSet.of(Objects::isNull, Objects::isNull);
   }
 
-  ImmutableSet<Predicate<String>> testNonNullFunction() {
+  ImmutableSet<Predicate<String>> testObjectsNonNull() {
     return ImmutableSet.of(Objects::nonNull, Objects::nonNull);
   }
 }

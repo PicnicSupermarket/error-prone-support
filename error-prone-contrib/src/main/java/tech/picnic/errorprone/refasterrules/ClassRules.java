@@ -7,12 +7,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster rules related to expressions dealing with classes. */
+/** Refaster rules related to expressions dealing with {@link Class}es. */
 @OnlineDocumentation
 final class ClassRules {
   private ClassRules() {}
 
-  /** Prefer {@link Class#isInstance(Object)} over more contrived alternatives. */
+  /** Prefer {@link Class#isInstance(Object)} over more contrived or more fragile alternatives. */
   static final class ClassIsInstance<T, S> {
     @BeforeTemplate
     boolean before(Class<T> clazz, S object) {
@@ -38,10 +38,7 @@ final class ClassRules {
     }
   }
 
-  /**
-   * Prefer {@link Class#isInstance(Object)} method references over lambda expressions that require
-   * naming a variable.
-   */
+  /** Prefer {@link Class#isInstance(Object)} method references over more verbose alternatives. */
   // XXX: Once the `ClassReferenceIsInstancePredicate` rule is dropped, rename this rule to just
   // `ClassIsInstancePredicate`.
   static final class ClassLiteralIsInstancePredicate<T, S> {
@@ -56,10 +53,7 @@ final class ClassRules {
     }
   }
 
-  /**
-   * Prefer {@link Class#isInstance(Object)} method references over lambda expressions that require
-   * naming a variable.
-   */
+  /** Prefer {@link Class#isInstance(Object)} method references over more verbose alternatives. */
   // XXX: Drop this rule once the `MethodReferenceUsage` rule is enabled by default.
   static final class ClassReferenceIsInstancePredicate<T, S> {
     @BeforeTemplate
@@ -73,19 +67,16 @@ final class ClassRules {
     }
   }
 
-  /**
-   * Prefer {@link Class#cast(Object)} method references over lambda expressions that require naming
-   * a variable.
-   */
+  /** Prefer {@link Class#cast(Object)} method references over more verbose alternatives. */
   // XXX: Drop this rule once the `MethodReferenceUsage` rule is enabled by default.
-  static final class ClassReferenceCast<T, S> {
+  static final class ClassReferenceCast<T, S, U extends S> {
     @BeforeTemplate
-    Function<T, S> before(Class<? extends S> clazz) {
+    Function<T, S> before(Class<U> clazz) {
       return o -> clazz.cast(o);
     }
 
     @AfterTemplate
-    Function<T, S> after(Class<? extends S> clazz) {
+    Function<T, S> after(Class<U> clazz) {
       return clazz::cast;
     }
   }

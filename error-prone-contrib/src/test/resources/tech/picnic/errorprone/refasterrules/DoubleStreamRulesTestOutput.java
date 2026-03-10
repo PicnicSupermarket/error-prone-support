@@ -14,11 +14,11 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
-  DoubleStream testConcatOneDoubleStream() {
+  DoubleStream testDoubleStreamIdentity() {
     return DoubleStream.of(1);
   }
 
-  DoubleStream testConcatTwoDoubleStreams() {
+  DoubleStream testDoubleStreamConcat() {
     return DoubleStream.concat(DoubleStream.of(1), DoubleStream.of(2));
   }
 
@@ -47,7 +47,7 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   DoubleStream testDoubleStreamFilterSorted() {
-    return DoubleStream.of(1, 4, 3, 2).filter(d -> d % 2 == 0).sorted();
+    return DoubleStream.of(1).filter(d -> d > 0).sorted();
   }
 
   ImmutableSet<Boolean> testDoubleStreamIsEmpty() {

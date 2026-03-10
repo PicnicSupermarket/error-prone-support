@@ -80,7 +80,7 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
         RoundingMode.HALF_EVEN);
   }
 
-  ImmutableSet<RoundingMode> testSetsImmutableEnumSetVarArgs() {
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSetWithVarargs() {
     return Sets.immutableEnumSet(
         RoundingMode.UP,
         RoundingMode.DOWN,
@@ -90,7 +90,7 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
         RoundingMode.HALF_EVEN);
   }
 
-  ImmutableSet<BoundType> testStreamToImmutableEnumSet() {
+  ImmutableSet<BoundType> testStreamCollectToImmutableEnumSet() {
     return Stream.of(BoundType.OPEN).collect(toImmutableEnumSet());
   }
 }

@@ -12,16 +12,12 @@ import org.assertj.core.api.AbstractPathAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/**
- * Refaster rules related to AssertJ assertions over {@link Path}s.
- *
- * <p>These rules simplify and improve the readability of tests by using {@link Path}-specific
- * AssertJ assertion methods instead of generic assertions.
- */
+/** Refaster rules related to AssertJ assertions over {@link Path}s. */
 @OnlineDocumentation
 final class AssertJPathRules {
   private AssertJPathRules() {}
 
+  /** Prefer {@link AbstractPathAssert#exists()} over more contrived alternatives. */
   static final class AssertThatExists {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -34,6 +30,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#doesNotExist()} over more contrived alternatives. */
   static final class AssertThatDoesNotExist {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -46,6 +43,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isRegularFile()} over more contrived alternatives. */
   static final class AssertThatIsRegularFile {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -58,6 +56,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isDirectory()} over more contrived alternatives. */
   static final class AssertThatIsDirectory {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -70,6 +69,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isSymbolicLink()} over more contrived alternatives. */
   static final class AssertThatIsSymbolicLink {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -82,6 +82,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isAbsolute()} over more contrived alternatives. */
   static final class AssertThatIsAbsolute {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -94,6 +95,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isRelative()} over more contrived alternatives. */
   static final class AssertThatIsRelative {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -106,6 +108,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isReadable()} over more contrived alternatives. */
   static final class AssertThatIsReadable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -118,6 +121,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isWritable()} over more contrived alternatives. */
   static final class AssertThatIsWritable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -130,6 +134,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#isExecutable()} over more contrived alternatives. */
   static final class AssertThatIsExecutable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual) {
@@ -142,7 +147,12 @@ final class AssertJPathRules {
     }
   }
 
-  // XXX: This rule changes the `Path` against which subsequent assertions are made.
+  /**
+   * Prefer {@link AbstractPathAssert#hasFileName(String)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the {@link Path} against which subsequent
+   * assertions are made.
+   */
   static final class AssertThatHasFileName {
     @BeforeTemplate
     AbstractPathAssert<?> before(Path actual, String fileName) {
@@ -155,7 +165,12 @@ final class AssertJPathRules {
     }
   }
 
-  // XXX: This rule changes the `Path` against which subsequent assertions are made.
+  /**
+   * Prefer {@link AbstractPathAssert#hasParentRaw(Path)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the {@link Path} against which subsequent
+   * assertions are made.
+   */
   static final class AssertThatHasParentRaw {
     @BeforeTemplate
     AbstractPathAssert<?> before(Path actual, Path expected) {
@@ -168,6 +183,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#hasNoParent()} over more contrived alternatives. */
   static final class AssertThatHasNoParent {
     @BeforeTemplate
     void before(Path actual) {
@@ -180,6 +196,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#startsWithRaw(Path)} over more contrived alternatives. */
   static final class AssertThatStartsWithRaw {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual, Path other) {
@@ -192,6 +209,7 @@ final class AssertJPathRules {
     }
   }
 
+  /** Prefer {@link AbstractPathAssert#endsWithRaw(Path)} over more contrived alternatives. */
   static final class AssertThatEndsWithRaw {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Path actual, Path other) {
@@ -204,10 +222,7 @@ final class AssertJPathRules {
     }
   }
 
-  /**
-   * Prefer using {@link AbstractPathAssert#hasExtension(String)} over more verbose and less
-   * accurate alternatives.
-   */
+  /** Prefer {@link AbstractPathAssert#hasExtension(String)} over more contrived alternatives. */
   static final class AssertThatHasExtension {
     @BeforeTemplate
     AbstractStringAssert<?> before(Path actual, String expectedExtension) {

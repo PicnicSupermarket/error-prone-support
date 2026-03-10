@@ -22,15 +22,15 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(FileInputStream.class, FileOutputStream.class, InputStreamReader.class);
   }
 
-  Path testPathOfUri() {
+  Path testPathOf() {
     return Path.of(URI.create("foo"));
   }
 
-  ImmutableSet<Path> testPathOfString() {
+  ImmutableSet<Path> testPathOfWithVarargs() {
     return ImmutableSet.of(Path.of("foo"), Path.of("bar", "baz", "qux"));
   }
 
-  Path testPathInstance() {
+  Path testPathIdentity() {
     return Path.of("foo");
   }
 

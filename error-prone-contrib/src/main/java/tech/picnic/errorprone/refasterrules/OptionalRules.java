@@ -27,7 +27,7 @@ import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 final class OptionalRules {
   private OptionalRules() {}
 
-  /** Prefer {@link Optional#empty()} over the more contrived alternative. */
+  /** Prefer {@link Optional#empty()} over more contrived alternatives. */
   static final class OptionalEmpty<T> {
     @BeforeTemplate
     Optional<T> before() {
@@ -40,11 +40,12 @@ final class OptionalRules {
     }
   }
 
+  /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
   static final class OptionalOfNullable<T> {
     // XXX: Refaster should be smart enough to also rewrite occurrences in which there are
     // parentheses around the null check, but that's currently not the case. Try to fix that.
     @BeforeTemplate
-    @SuppressWarnings("TernaryOperatorOptionalNegativeFiltering" /* Special case. */)
+    @SuppressWarnings("OptionalOfFilterNegated" /* Special case. */)
     Optional<T> before(@Nullable T object) {
       return object == null ? Optional.empty() : Optional.of(object);
     }
@@ -55,7 +56,7 @@ final class OptionalRules {
     }
   }
 
-  /** Prefer {@link Optional#isEmpty()} over the more verbose alternative. */
+  /** Prefer {@link Optional#isEmpty()} over more verbose alternatives. */
   static final class OptionalIsEmpty<T> {
     @BeforeTemplate
     boolean before(Optional<T> optional) {
@@ -68,7 +69,7 @@ final class OptionalRules {
     }
   }
 
-  /** Prefer {@link Optional#isPresent()} over the inverted alternative. */
+  /** Prefer {@link Optional#isPresent()} over more verbose alternatives. */
   static final class OptionalIsPresent<T> {
     @BeforeTemplate
     boolean before(Optional<T> optional) {
@@ -128,10 +129,7 @@ final class OptionalRules {
     }
   }
 
-  /**
-   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
-   * Iterator} as an {@link Optional}.
-   */
+  /** Prefer {@code Streams.stream(iterator).findFirst()} over more contrived alternatives. */
   static final class OptionalFirstIteratorElement<T> {
     @BeforeTemplate
     Optional<T> before(Iterator<T> it) {
@@ -149,7 +147,7 @@ final class OptionalRules {
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Review whether a `@Matcher` can be used to avoid this.
-  abstract static class TernaryOperatorOptionalPositiveFiltering<T> {
+  abstract static class OptionalOfFilter<T> {
     @Placeholder
     abstract boolean test(T value);
 
@@ -169,7 +167,7 @@ final class OptionalRules {
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Review whether a `@Matcher` can be used to avoid this.
-  abstract static class TernaryOperatorOptionalNegativeFiltering<T> {
+  abstract static class OptionalOfFilterNegated<T> {
     @Placeholder
     abstract boolean test(T value);
 
@@ -185,27 +183,20 @@ final class OptionalRules {
     }
   }
 
-  /**
-   * Prefer {@link Optional#filter(Predicate)} over {@link Optional#map(Function)} when converting
-   * an {@link Optional} to a boolean.
-   */
-  static final class MapOptionalToBoolean<T> {
+  /** Prefer {@link Optional#filter(Predicate)} over more contrived alternatives. */
+  static final class MapOptionalToBoolean<S, T extends S> {
     @BeforeTemplate
-    boolean before(Optional<T> optional, Function<? super T, Boolean> predicate) {
+    boolean before(Optional<T> optional, Function<S, Boolean> predicate) {
       return optional.map(predicate).orElse(false);
     }
 
     @AfterTemplate
-    boolean after(Optional<T> optional, Predicate<? super T> predicate) {
+    boolean after(Optional<T> optional, Predicate<S> predicate) {
       return optional.filter(predicate).isPresent();
     }
   }
 
-  /**
-   * Prefer {@link Optional#map} over a {@link Optional#flatMap} that wraps the result of a
-   * transformation in an {@link Optional}; the former operation transforms {@code null} to {@link
-   * Optional#empty()}.
-   */
+  /** Prefer {@link Optional#map(Function)} over more contrived alternatives. */
   abstract static class MapToNullable<T, S> {
     @Placeholder
     abstract S toNullableFunction(@MayOptionallyUse T element);
@@ -224,6 +215,7 @@ final class OptionalRules {
     }
   }
 
+  /** Prefer {@link Optional#flatMap(Function)} over more contrived alternatives. */
   abstract static class FlatMapToOptional<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
@@ -239,22 +231,23 @@ final class OptionalRules {
     }
   }
 
+  /**
+   * Prefer {@link Optional#or(Supplier)} combined with {@link Optional#orElseThrow()} over more
+   * contrived alternatives.
+   */
   static final class OrOrElseThrow<T> {
     @BeforeTemplate
-    T before(Optional<T> o1, Optional<T> o2) {
-      return o1.orElseGet(() -> o2.orElseThrow());
+    T before(Optional<T> optional1, Optional<T> optional2) {
+      return optional1.orElseGet(() -> optional2.orElseThrow());
     }
 
     @AfterTemplate
-    T after(Optional<T> o1, Optional<T> o2) {
-      return o1.or(() -> o2).orElseThrow();
+    T after(Optional<T> optional1, Optional<T> optional2) {
+      return optional1.or(() -> optional2).orElseThrow();
     }
   }
 
-  /**
-   * Prefer {@link Optional#orElse(Object)} over {@link Optional#orElseGet(Supplier)} if the
-   * fallback value does not require non-trivial computation.
-   */
+  /** Prefer {@link Optional#orElse(Object)} over more contrived alternatives. */
   // XXX: This rule is the counterpart to the `OptionalOrElseGet` bug checker. Once the
   // `MethodReferenceUsage` bug checker is "production ready", that bug checker may similarly be
   // replaced with a Refaster rule.
@@ -270,10 +263,7 @@ final class OptionalRules {
     }
   }
 
-  /**
-   * Flatten a stream of {@link Optional}s using {@link Optional#stream()}, rather than using one of
-   * the more verbose alternatives.
-   */
+  /** Prefer {@link Optional#stream()} over more verbose or non-JDK alternatives. */
   // XXX: Do we need the `.filter(Optional::isPresent)`? If it's absent the caller probably assumed
   // that the values are present. (If we drop it, we should rewrite vacuous filter steps.)
   // XXX: The rewritten `filter`/`map` expression may be more performant than its replacement. See
@@ -296,8 +286,8 @@ final class OptionalRules {
   }
 
   /**
-   * Within a stream's map operation unconditional {@link Optional#orElseThrow()} calls can be
-   * avoided.
+   * Prefer {@link Optional#stream()} within {@link Stream#flatMap(Function)} over more contrived
+   * alternatives.
    *
    * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving. The
    * original code throws an exception if the mapping operation does not produce a value, while the
@@ -320,40 +310,46 @@ final class OptionalRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link Optional#filter(Predicate)} operations. */
-  abstract static class FilterOuterOptionalAfterFlatMap<T, S> {
+  /**
+   * Prefer {@link Optional#filter(Predicate)} outside of {@link Optional#flatMap(Function)} over
+   * more contrived alternatives.
+   */
+  abstract static class OptionalFlatMapFilter<T, W, S extends W> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Optional<S> before(Optional<T> optional, Predicate<? super S> predicate) {
+    Optional<S> before(Optional<T> optional, Predicate<W> predicate) {
       return optional.flatMap(v -> toOptionalFunction(v).filter(predicate));
     }
 
     @AfterTemplate
-    Optional<S> after(Optional<T> optional, Predicate<? super S> predicate) {
+    Optional<S> after(Optional<T> optional, Predicate<W> predicate) {
       return optional.flatMap(v -> toOptionalFunction(v)).filter(predicate);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link Optional#map(Function)} operations. */
-  abstract static class MapOuterOptionalAfterFlatMap<T, S, R> {
+  /**
+   * Prefer {@link Optional#map(Function)} outside of {@link Optional#flatMap(Function)} over more
+   * contrived alternatives.
+   */
+  abstract static class OptionalFlatMapMap<T, U, S extends U, R, V extends R> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Optional<R> before(Optional<T> optional, Function<? super S, ? extends R> function) {
+    Optional<V> before(Optional<T> optional, Function<U, V> function) {
       return optional.flatMap(v -> toOptionalFunction(v).map(function));
     }
 
     @AfterTemplate
-    Optional<R> after(Optional<T> optional, Function<? super S, ? extends R> function) {
+    Optional<V> after(Optional<T> optional, Function<U, V> function) {
       return optional.flatMap(v -> toOptionalFunction(v)).map(function);
     }
   }
 
   /** Avoid unnecessary nesting of {@link Optional#flatMap(Function)} operations. */
-  abstract static class FlatMapOuterOptionalAfterFlatMap<T, S, R> {
+  abstract static class OptionalFlatMapFlatMap<T, S, R> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
@@ -396,11 +392,11 @@ final class OptionalRules {
     }
   }
 
-  /** Don't unnecessarily transform an {@link Optional} to an equivalent instance. */
-  static final class OptionalIdentity<T> {
+  /** Prefer using {@link Optional}s as-is over more contrived alternatives. */
+  static final class OptionalIdentity<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("NestedOptionals")
-    Optional<T> before(Optional<T> optional, Comparator<? super T> comparator) {
+    Optional<T> before(Optional<T> optional, Comparator<S> comparator) {
       return Refaster.anyOf(
           optional.or(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
           optional
@@ -419,38 +415,32 @@ final class OptionalRules {
     }
   }
 
-  /**
-   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when filtering a value of the
-   * former type.
-   */
-  static final class OptionalFilter<T> {
+  /** Prefer {@link Optional#filter(Predicate)} over more contrived alternatives. */
+  static final class OptionalFilter<S, T extends S> {
     @BeforeTemplate
-    Optional<T> before(Optional<T> optional, Predicate<? super T> predicate) {
+    Optional<T> before(Optional<T> optional, Predicate<S> predicate) {
       return Refaster.anyOf(
           optional.stream().filter(predicate).findFirst(),
           optional.stream().filter(predicate).findAny());
     }
 
     @AfterTemplate
-    Optional<T> after(Optional<T> optional, Predicate<? super T> predicate) {
+    Optional<T> after(Optional<T> optional, Predicate<S> predicate) {
       return optional.filter(predicate);
     }
   }
 
-  /**
-   * Avoid unnecessary {@link Optional} to {@link Stream} conversion when mapping a value of the
-   * former type.
-   */
+  /** Prefer {@link Optional#map(Function)} over more contrived alternatives. */
   // XXX: If `StreamMapFirst` also simplifies `.findAny()` expressions, then this rule can be
   // dropped in favour of `StreamMapFirst` and `OptionalIdentity`.
-  static final class OptionalMap<S, T> {
+  static final class OptionalMap<W, S extends W, T, V extends T> {
     @BeforeTemplate
-    Optional<? extends T> before(Optional<S> optional, Function<? super S, ? extends T> function) {
+    Optional<V> before(Optional<S> optional, Function<W, V> function) {
       return optional.stream().map(function).findAny();
     }
 
     @AfterTemplate
-    Optional<? extends T> after(Optional<S> optional, Function<? super S, ? extends T> function) {
+    Optional<V> after(Optional<S> optional, Function<W, V> function) {
       return optional.map(function);
     }
   }

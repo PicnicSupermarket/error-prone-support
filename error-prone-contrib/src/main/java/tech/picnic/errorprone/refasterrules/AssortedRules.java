@@ -2,18 +2,25 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.disjoint;
 import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;

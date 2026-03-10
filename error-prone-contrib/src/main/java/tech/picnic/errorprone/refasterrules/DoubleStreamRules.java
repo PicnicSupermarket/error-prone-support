@@ -20,8 +20,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class DoubleStreamRules {
   private DoubleStreamRules() {}
 
-  /** Don't unnecessarily call {@link Streams#concat(DoubleStream...)}. */
-  static final class ConcatOneDoubleStream {
+  /** Prefer using {@link DoubleStream}s as-is over more contrived alternatives. */
+  static final class DoubleStreamIdentity {
     @BeforeTemplate
     DoubleStream before(DoubleStream stream) {
       return Streams.concat(stream);
@@ -34,20 +34,20 @@ final class DoubleStreamRules {
     }
   }
 
-  /** Prefer {@link DoubleStream#concat(DoubleStream, DoubleStream)} over the Guava alternative. */
-  static final class ConcatTwoDoubleStreams {
+  /** Prefer {@link DoubleStream#concat(DoubleStream, DoubleStream)} over non-JDK alternatives. */
+  static final class DoubleStreamConcat {
     @BeforeTemplate
-    DoubleStream before(DoubleStream s1, DoubleStream s2) {
-      return Streams.concat(s1, s2);
+    DoubleStream before(DoubleStream stream1, DoubleStream stream2) {
+      return Streams.concat(stream1, stream2);
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream s1, DoubleStream s2) {
-      return DoubleStream.concat(s1, s2);
+    DoubleStream after(DoubleStream stream1, DoubleStream stream2) {
+      return DoubleStream.concat(stream1, stream2);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link DoubleStream#filter(DoublePredicate)} operations. */
+  /** Prefer {@link DoubleStream#filter(DoublePredicate)} over more contrived alternatives. */
   abstract static class FilterOuterDoubleStreamAfterFlatMap {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
@@ -63,7 +63,7 @@ final class DoubleStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link DoubleStream#filter(DoublePredicate)} operations. */
+  /** Prefer {@link DoubleStream#filter(DoublePredicate)} over more contrived alternatives. */
   abstract static class FilterOuterStreamAfterFlatMapToDouble<T> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
@@ -79,7 +79,7 @@ final class DoubleStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link DoubleStream#map(DoubleUnaryOperator)} operations. */
+  /** Prefer {@link DoubleStream#map(DoubleUnaryOperator)} over more contrived alternatives. */
   abstract static class MapOuterDoubleStreamAfterFlatMap {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
@@ -95,7 +95,7 @@ final class DoubleStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link DoubleStream#map(DoubleUnaryOperator)} operations. */
+  /** Prefer {@link DoubleStream#map(DoubleUnaryOperator)} over more contrived alternatives. */
   abstract static class MapOuterStreamAfterFlatMapToDouble<T> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
@@ -111,41 +111,41 @@ final class DoubleStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link DoubleStream#flatMap(DoubleFunction)} operations. */
-  abstract static class FlatMapOuterDoubleStreamAfterFlatMap {
+  /** Prefer {@link DoubleStream#flatMap(DoubleFunction)} over more contrived alternatives. */
+  abstract static class FlatMapOuterDoubleStreamAfterFlatMap<S extends DoubleStream> {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoubleFunction<? extends DoubleStream> function) {
+    DoubleStream before(DoubleStream stream, DoubleFunction<S> function) {
       return stream.flatMap(v -> toDoubleStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoubleFunction<? extends DoubleStream> function) {
+    DoubleStream after(DoubleStream stream, DoubleFunction<S> function) {
       return stream.flatMap(v -> toDoubleStreamFunction(v)).flatMap(function);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link DoubleStream#flatMap(DoubleFunction)} operations. */
-  abstract static class FlatMapOuterStreamAfterFlatMapToDouble<T> {
+  /** Prefer {@link DoubleStream#flatMap(DoubleFunction)} over more contrived alternatives. */
+  abstract static class FlatMapOuterStreamAfterFlatMapToDouble<T, S extends DoubleStream> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    DoubleStream before(Stream<T> stream, DoubleFunction<? extends DoubleStream> function) {
+    DoubleStream before(Stream<T> stream, DoubleFunction<S> function) {
       return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    DoubleStream after(Stream<T> stream, DoubleFunction<? extends DoubleStream> function) {
+    DoubleStream after(Stream<T> stream, DoubleFunction<S> function) {
       return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).flatMap(function);
     }
   }
 
   /**
-   * Apply {@link DoubleStream#filter(DoublePredicate)} before {@link DoubleStream#sorted()} to
-   * reduce the number of elements to sort.
+   * Prefer {@link DoubleStream#filter(DoublePredicate)} before {@link DoubleStream#sorted()} over
+   * less efficient alternatives.
    */
   static final class DoubleStreamFilterSorted {
     @BeforeTemplate
@@ -159,7 +159,7 @@ final class DoubleStreamRules {
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
+  /** Prefer {@link DoubleStream#findAny()} over less efficient alternatives. */
   static final class DoubleStreamIsEmpty {
     @BeforeTemplate
     boolean before(DoubleStream stream) {
@@ -176,7 +176,7 @@ final class DoubleStreamRules {
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
+  /** Prefer {@link DoubleStream#findAny()} over less efficient alternatives. */
   static final class DoubleStreamIsNotEmpty {
     @BeforeTemplate
     boolean before(DoubleStream stream) {
@@ -193,6 +193,7 @@ final class DoubleStreamRules {
     }
   }
 
+  /** Prefer {@link DoubleStream#min()} over less efficient alternatives. */
   static final class DoubleStreamMin {
     @BeforeTemplate
     OptionalDouble before(DoubleStream stream) {
@@ -221,6 +222,7 @@ final class DoubleStreamRules {
     }
   }
 
+  /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over less explicit alternatives. */
   abstract static class DoubleStreamNoneMatch2 {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
@@ -251,6 +253,7 @@ final class DoubleStreamRules {
     }
   }
 
+  /** Prefer {@link DoubleStream#allMatch(DoublePredicate)} over more contrived alternatives. */
   static final class DoubleStreamAllMatch {
     @BeforeTemplate
     boolean before(DoubleStream stream, DoublePredicate predicate) {
@@ -263,6 +266,7 @@ final class DoubleStreamRules {
     }
   }
 
+  /** Prefer {@link DoubleStream#allMatch(DoublePredicate)} over less explicit alternatives. */
   abstract static class DoubleStreamAllMatch2 {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
@@ -278,6 +282,7 @@ final class DoubleStreamRules {
     }
   }
 
+  /** Prefer {@link DoubleStream#takeWhile(DoublePredicate)} over more verbose alternatives. */
   static final class DoubleStreamTakeWhile {
     @BeforeTemplate
     DoubleStream before(DoubleStream stream, DoublePredicate predicate) {
