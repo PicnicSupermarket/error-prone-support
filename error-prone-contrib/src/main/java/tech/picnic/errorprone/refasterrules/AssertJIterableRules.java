@@ -8,21 +8,24 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractIterableAssert;
+import org.assertj.core.api.AbstractIterableSizeAssert;
 import org.assertj.core.api.IterableAssert;
+import org.assertj.core.api.IteratorAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Iterable}s. */
 @OnlineDocumentation
 final class AssertJIterableRules {
   private AssertJIterableRules() {}
 
-  static final class AssertThatIterableIsEmpty<E> {
+  /** Prefer {@code assertThat(iterable).isEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsEmpty<E> {
     @BeforeTemplate
     void before(Iterable<E> iterable) {
       assertThat(iterable.iterator()).isExhausted();
@@ -40,14 +43,16 @@ final class AssertJIterableRules {
     }
   }
 
-  static final class AssertThatIterableIsNotEmpty<E> {
+  /** Prefer {@code assertThat(iterable).isNotEmpty()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
+  static final class AssertThatIsNotEmpty<E> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Iterable<E> iterable) {
+    IteratorAssert<E> before(Iterable<E> iterable) {
       return assertThat(iterable.iterator()).hasNext();
     }
 
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Collection<E> iterable) {
+    AbstractBooleanAssert<?> before(Collection<E> iterable) {
       return assertThat(iterable.isEmpty()).isFalse();
     }
 
@@ -58,7 +63,8 @@ final class AssertJIterableRules {
     }
   }
 
-  static final class AssertThatIterableSize<E> {
+  /** Prefer {@code assertThat(iterable).size()} over non-JDK or more contrived alternatives. */
+  static final class AssertThatSize<E> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(Iterable<E> iterable) {
       return assertThat(Iterables.size(iterable));
@@ -71,12 +77,14 @@ final class AssertJIterableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractIntegerAssert<?> after(Iterable<E> iterable) {
+    AbstractIterableSizeAssert<IterableAssert<E>, Iterable<? extends E>, E, ObjectAssert<E>> after(
+        Iterable<E> iterable) {
       return assertThat(iterable).size();
     }
   }
 
   /** Prefer {@link ObjectEnumerableAssert#contains(Object[])} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatContains<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
@@ -93,6 +101,7 @@ final class AssertJIterableRules {
   /**
    * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over less explicit alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContain<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
@@ -109,6 +118,7 @@ final class AssertJIterableRules {
   /**
    * Prefer {@link AbstractIterableAssert#containsAll(Iterable)} over less explicit alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsAll<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> iterable, Collection<? extends E> elements) {
@@ -122,10 +132,14 @@ final class AssertJIterableRules {
     }
   }
 
+  /**
+   * Prefer {@code assertThat(iterable).containsExactly(element)} over more contrived alternatives.
+   */
   // XXX: In practice this rule isn't very useful, as it only matches invocations of
   // `assertThat(E)`. In most cases a more specific overload of `assertThat` is invoked, in which
   // case this rule won't match. Look into a more robust approach.
-  static final class AssertThatIterableHasOneElementEqualTo<S, E extends S> {
+  @PossibleSourceIncompatibility
+  static final class AssertThatContainsExactly<S, E extends S> {
     @BeforeTemplate
     ObjectAssert<S> before(Iterable<S> iterable, E element) {
       return assertThat(Iterables.getOnlyElement(iterable)).isEqualTo(element);

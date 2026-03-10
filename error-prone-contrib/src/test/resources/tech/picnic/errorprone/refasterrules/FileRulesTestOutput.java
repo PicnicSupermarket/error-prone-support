@@ -22,15 +22,15 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(FileInputStream.class, FileOutputStream.class, InputStreamReader.class);
   }
 
-  Path testPathOfUri() {
+  Path testPathOf() {
     return Path.of(URI.create("foo"));
   }
 
-  ImmutableSet<Path> testPathOfString() {
+  ImmutableSet<Path> testPathOfVarargs() {
     return ImmutableSet.of(Path.of("foo"), Path.of("bar", "baz", "qux"));
   }
 
-  Path testPathInstance() {
+  Path testPathIdentity() {
     return Path.of("foo");
   }
 
@@ -55,17 +55,17 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
         Files.createTempFile("foo", "bar").toFile(), Files.createTempFile("baz", "qux").toFile());
   }
 
-  File testFilesCreateTempFileInCustomDirectoryToFile() throws IOException {
+  File testFilesCreateTempFileFileToPathToFile() throws IOException {
     return Files.createTempFile(new File("baz").toPath(), "foo", "bar").toFile();
   }
 
-  ImmutableSet<Boolean> testPathToFileMkDirsFilesExists() {
+  ImmutableSet<Boolean> testPathToFileMkdirsOrFilesExists() {
     return ImmutableSet.of(
         Path.of("foo").toFile().mkdirs() || Files.exists(Path.of("foo")),
         !Path.of("bar").toFile().mkdirs() && !Files.exists(Path.of("bar")));
   }
 
-  ImmutableSet<Boolean> testFileMkDirsFileExists() {
+  ImmutableSet<Boolean> testFileMkdirsOrFileExists() {
     return ImmutableSet.of(
         new File("foo").mkdirs() || new File("foo").exists(),
         !new File("bar").mkdirs() && !new File("bar").exists());
@@ -75,7 +75,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return Files.newInputStream(Path.of("foo"));
   }
 
-  InputStream testFilesNewInputStreamToPath() throws IOException {
+  InputStream testFilesNewInputStreamFileToPath() throws IOException {
     return Files.newInputStream(new File("foo").toPath());
   }
 
@@ -83,7 +83,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return Files.newOutputStream(Path.of("foo"));
   }
 
-  OutputStream testFilesNewOutputStreamToPath() throws IOException {
+  OutputStream testFilesNewOutputStreamFileToPath() throws IOException {
     return Files.newOutputStream(new File("foo").toPath());
   }
 

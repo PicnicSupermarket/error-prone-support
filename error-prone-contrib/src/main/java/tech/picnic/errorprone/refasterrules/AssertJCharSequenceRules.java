@@ -8,14 +8,18 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractCharSequenceAssert;
+import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link CharSequence}s. */
 @OnlineDocumentation
 final class AssertJCharSequenceRules {
   private AssertJCharSequenceRules() {}
 
-  static final class AssertThatCharSequenceIsEmpty {
+  /** Prefer {@link AbstractCharSequenceAssert#isEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsEmpty {
     @BeforeTemplate
     void before(CharSequence charSequence) {
       Refaster.anyOf(
@@ -31,7 +35,8 @@ final class AssertJCharSequenceRules {
     }
   }
 
-  static final class AssertThatCharSequenceIsNotEmpty {
+  /** Prefer {@link AbstractCharSequenceAssert#isNotEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsNotEmpty {
     @BeforeTemplate
     AbstractAssert<?, ?> before(CharSequence charSequence) {
       return Refaster.anyOf(
@@ -42,20 +47,23 @@ final class AssertJCharSequenceRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(CharSequence charSequence) {
+    AbstractCharSequenceAssert<?, ? extends CharSequence> after(CharSequence charSequence) {
       return assertThat(charSequence).isNotEmpty();
     }
   }
 
-  static final class AssertThatCharSequenceHasSize {
+  /** Prefer {@link AbstractCharSequenceAssert#hasSize(int)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
+  static final class AssertThatHasSize {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(CharSequence charSequence, int length) {
+    AbstractIntegerAssert<?> before(CharSequence charSequence, int length) {
       return assertThat(charSequence.length()).isEqualTo(length);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(CharSequence charSequence, int length) {
+    AbstractCharSequenceAssert<?, ? extends CharSequence> after(
+        CharSequence charSequence, int length) {
       return assertThat(charSequence).hasSize(length);
     }
   }

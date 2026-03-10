@@ -12,8 +12,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
-import java.util.function.Function;
-import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
@@ -21,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient.RequestBodyUri
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to expressions dealing with {@link
@@ -31,7 +30,8 @@ final class WebClientRules {
   private WebClientRules() {}
 
   /** Prefer {@link RequestBodySpec#bodyValue(Object)} over more contrived alternatives. */
-  static final class BodyValue<T> {
+  @PossibleSourceIncompatibility
+  static final class RequestBodySpecBodyValue<T> {
     @BeforeTemplate
     RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T value) {
       return requestBodySpec.body(fromValue(value));
@@ -49,73 +49,65 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#get()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#GET}.
-   */
+  /** Prefer {@link WebClient#get()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientGet {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(GET);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(GET);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.get();
     }
   }
 
-  /**
-   * Prefer {@link WebClient#head()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#HEAD}.
-   */
+  /** Prefer {@link WebClient#head()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientHead {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(HEAD);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(HEAD);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.head();
     }
   }
 
-  /**
-   * Prefer {@link WebClient#options()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#OPTIONS}.
-   */
+  /** Prefer {@link WebClient#options()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientOptions {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.options();
     }
   }
 
-  /**
-   * Prefer {@link WebClient#patch()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PATCH}.
-   */
+  /** Prefer {@link WebClient#patch()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPatch {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -133,10 +125,8 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#post()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#POST}.
-   */
+  /** Prefer {@link WebClient#post()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPost {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -154,10 +144,8 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#put()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PUT}.
-   */
+  /** Prefer {@link WebClient#put()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPut {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -175,11 +163,17 @@ final class WebClientRules {
     }
   }
 
-  /** Don't unnecessarily use {@link RequestHeadersUriSpec#uri(Function)}. */
-  static final class RequestHeadersUriSpecUri {
+  /**
+   * Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over more contrived alternatives.
+   */
+  // XXX: Resolve the `RefasterReturnType` warning suppressions by splitting this rule.
+  @PossibleSourceIncompatibility
+  static final class RequestHeadersUriSpecUri<
+      S extends RequestHeadersSpec<S>, T extends WebTestClient.RequestHeadersSpec<T>> {
     @BeforeTemplate
+    @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     RequestHeadersSpec<?> before(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        RequestHeadersUriSpec<S> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
@@ -187,8 +181,9 @@ final class WebClientRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        WebTestClient.RequestHeadersUriSpec<T> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
@@ -196,8 +191,8 @@ final class WebClientRules {
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec,
+    S after(
+        RequestHeadersUriSpec<S> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(path, Refaster.asVarargs(uriVariables));

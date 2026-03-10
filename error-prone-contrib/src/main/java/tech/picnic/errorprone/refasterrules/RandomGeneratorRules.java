@@ -16,8 +16,11 @@ final class RandomGeneratorRules {
   private RandomGeneratorRules() {}
 
   /**
-   * Prefer {@link RandomGenerator#nextDouble(double)} over alternatives that yield a smaller domain
-   * of values and may result in {@link Double#isInfinite() inifinity}.
+   * Prefer {@link RandomGenerator#nextDouble(double)} over more fragile alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite may change the domain of generated values; in
+   * particular, the before-template can yield values outside {@code [0, bound)} or even {@link
+   * Double#isInfinite() infinity}.
    */
   static final class RandomGeneratorNextDouble {
     @BeforeTemplate
@@ -32,13 +35,16 @@ final class RandomGeneratorRules {
   }
 
   /**
-   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over alternatives that
-   * may silently yield an ununiform domain of values.
+   * Prefer {@link RandomGenerator#nextDouble(double origin, double bound)} over more fragile
+   * alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite may change the distribution of generated values; the
+   * before-template can silently yield a non-uniform domain.
    */
   // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
   // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
   // code, but only in situations that are likely unintended.
-  static final class RandomGeneratorNextDoubleWithOrigin {
+  static final class RandomGeneratorNextDoublePlus {
     @BeforeTemplate
     double before(RandomGenerator random, double a, double b) {
       return a + random.nextDouble(b);
@@ -66,13 +72,15 @@ final class RandomGeneratorRules {
   }
 
   /**
-   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over alternatives that may
-   * silently yield values outside the intended domain.
+   * Prefer {@link RandomGenerator#nextInt(int origin, int bound)} over more fragile alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite may change the set of generated values; the
+   * before-template can silently yield values outside the intended domain.
    */
   // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
   // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
   // code, but only in situations that are likely unintended.
-  static final class RandomGeneratorNextIntWithOrigin {
+  static final class RandomGeneratorNextIntPlus {
     @BeforeTemplate
     int before(RandomGenerator random, int a, int b) {
       return a + random.nextInt(b);
@@ -87,8 +95,8 @@ final class RandomGeneratorRules {
   /**
    * Prefer {@link RandomGenerator#nextLong(long)} over more contrived alternatives.
    *
-   * <p>Additionally, for large bounds, the unnecessary floating point arithmetic prevents some
-   * {@code long} values from being generated.
+   * <p><strong>Warning:</strong> for large bounds, the before-template's floating point arithmetic
+   * prevents some {@code long} values from being generated.
    */
   static final class RandomGeneratorNextLong {
     // XXX: By including expressions with and without a cast from `long` to `double`, we cater both
@@ -115,13 +123,16 @@ final class RandomGeneratorRules {
   }
 
   /**
-   * Prefer {@link RandomGenerator#nextLong(long origin, long bound)} over more contrived
+   * Prefer {@link RandomGenerator#nextLong(long origin, long bound)} over more fragile
    * alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite may change the set of generated values; the
+   * before-template can silently yield values outside the intended domain.
    */
   // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
   // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
   // code, but only in situations that are likely unintended.
-  static final class RandomGeneratorNextLongWithOrigin {
+  static final class RandomGeneratorNextLongPlus {
     @BeforeTemplate
     long before(RandomGenerator random, long a, long b) {
       return a + random.nextLong(b);

@@ -42,8 +42,11 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over more contrived alternatives. */
-  static final class IterableToImmutableSet<T> {
+  /**
+   * Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over less efficient or more contrived
+   * alternatives.
+   */
+  static final class ImmutableSetCopyOf<T> {
     @BeforeTemplate
     ImmutableSet<T> before(T[] iterable) {
       return Refaster.anyOf(
@@ -76,8 +79,11 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link ImmutableSet#toImmutableSet()} over less idiomatic alternatives. */
-  static final class StreamToImmutableSet<T> {
+  /**
+   * Prefer {@link ImmutableSet#toImmutableSet()} over less efficient or less idiomatic
+   * alternatives.
+   */
+  static final class StreamCollectToImmutableSet<T> {
     @BeforeTemplate
     ImmutableSet<T> before(Stream<T> stream) {
       return Refaster.anyOf(
@@ -91,8 +97,8 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link SetView#immutableCopy()} over the more verbose alternative. */
-  static final class ImmutableSetCopyOfSetView<T> {
+  /** Prefer {@link SetView#immutableCopy()} over more verbose alternatives. */
+  static final class SetViewImmutableCopy<T> {
     @BeforeTemplate
     ImmutableSet<T> before(SetView<T> set) {
       return ImmutableSet.copyOf(set);
@@ -105,12 +111,12 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of()} over more contrived alternatives or alternatives that don't
-   * communicate the immutability of the resulting set at the type level.
+   * Prefer {@link ImmutableSet#of()} over imprecisely typed, less efficient, or more contrived
+   * alternatives.
    */
   // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
   // this and similar Refaster rules are replaced with an Error Prone check.
-  static final class ImmutableSetOf<T> {
+  static final class ImmutableSetOf0<T> {
     @BeforeTemplate
     Set<T> before() {
       return Refaster.anyOf(
@@ -127,8 +133,7 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of(Object)} over more contrived alternatives or alternatives that
-   * don't communicate the immutability of the resulting set at the type level.
+   * Prefer {@link ImmutableSet#of(Object)} over imprecisely typed or more contrived alternatives.
    */
   // XXX: Note that the replacement of `Collections#singleton` is incorrect for nullable elements.
   static final class ImmutableSetOf1<T> {
@@ -143,10 +148,7 @@ final class ImmutableSetRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSet#of(Object, Object)} over alternatives that don't communicate the
-   * immutability of the resulting set at the type level.
-   */
+  /** Prefer {@link ImmutableSet#of(Object, Object)} over imprecisely typed alternatives. */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf2<T> {
@@ -161,10 +163,7 @@ final class ImmutableSetRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSet#of(Object, Object, Object)} over alternatives that don't communicate
-   * the immutability of the resulting set at the type level.
-   */
+  /** Prefer {@link ImmutableSet#of(Object, Object, Object)} over imprecisely typed alternatives. */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf3<T> {
@@ -180,8 +179,8 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over alternatives that don't
-   * communicate the immutability of the resulting set at the type level.
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over imprecisely typed
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
@@ -198,8 +197,8 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over alternatives that
-   * don't communicate the immutability of the resulting set at the type level.
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over imprecisely typed
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
@@ -216,9 +215,9 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer an immutable copy of {@link Sets#difference(Set, Set)} over more contrived alternatives.
+   * Prefer {@code Sets.difference(set1, set2).immutableCopy()} over less efficient alternatives.
    */
-  static final class SetsDifference<S, T> {
+  static final class SetsDifferenceImmutableCopy<S, T> {
     @BeforeTemplate
     ImmutableSet<S> before(Set<S> set1, Set<T> set2) {
       return set1.stream()
@@ -233,9 +232,10 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer an immutable copy of {@link Sets#difference(Set, Set)} over more contrived alternatives.
+   * Prefer {@code Sets.difference(set, map.keySet()).immutableCopy()} over less efficient
+   * alternatives.
    */
-  static final class SetsDifferenceMap<T, K, V> {
+  static final class SetsDifferenceMapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
     ImmutableSet<T> before(Set<T> set, Map<K, V> map) {
       return set.stream()
@@ -244,15 +244,16 @@ final class ImmutableSetRules {
     }
 
     @AfterTemplate
-    ImmutableSet<K> after(Set<K> set, Map<K, V> map) {
+    ImmutableSet<T> after(Set<T> set, Map<K, V> map) {
       return Sets.difference(set, map.keySet()).immutableCopy();
     }
   }
 
   /**
-   * Prefer an immutable copy of {@link Sets#difference(Set, Set)} over more contrived alternatives.
+   * Prefer {@code Sets.difference(set, multimap.keySet()).immutableCopy()} over less efficient
+   * alternatives.
    */
-  static final class SetsDifferenceMultimap<T, K, V> {
+  static final class SetsDifferenceMultimapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
     ImmutableSet<T> before(Set<T> set, Multimap<K, V> multimap) {
       return set.stream()
@@ -267,10 +268,9 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer an immutable copy of {@link Sets#intersection(Set, Set)} over more contrived
-   * alternatives.
+   * Prefer {@code Sets.intersection(set1, set2).immutableCopy()} over less efficient alternatives.
    */
-  static final class SetsIntersection<S, T> {
+  static final class SetsIntersectionImmutableCopy<S, T> {
     @BeforeTemplate
     ImmutableSet<S> before(Set<S> set1, Set<T> set2) {
       return set1.stream().filter(set2::contains).collect(toImmutableSet());
@@ -283,10 +283,10 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer an immutable copy of {@link Sets#intersection(Set, Set)} over more contrived
+   * Prefer {@code Sets.intersection(set, map.keySet()).immutableCopy()} over less efficient
    * alternatives.
    */
-  static final class SetsIntersectionMap<T, K, V> {
+  static final class SetsIntersectionMapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
     ImmutableSet<T> before(Set<T> set, Map<K, V> map) {
       return set.stream().filter(map::containsKey).collect(toImmutableSet());
@@ -299,10 +299,10 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer an immutable copy of {@link Sets#intersection(Set, Set)} over more contrived
+   * Prefer {@code Sets.intersection(set, multimap.keySet()).immutableCopy()} over less efficient
    * alternatives.
    */
-  static final class SetsIntersectionMultimap<T, K, V> {
+  static final class SetsIntersectionMultimapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
     ImmutableSet<T> before(Set<T> set, Multimap<K, V> multimap) {
       return set.stream().filter(multimap::containsKey).collect(toImmutableSet());
@@ -314,8 +314,8 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer an immutable copy of {@link Sets#union(Set, Set)} over more contrived alternatives. */
-  static final class SetsUnion<S, T extends S, U extends S> {
+  /** Prefer {@code Sets.union(set1, set2).immutableCopy()} over less efficient alternatives. */
+  static final class SetsUnionImmutableCopy<S, T extends S, U extends S> {
     @BeforeTemplate
     ImmutableSet<S> before(Set<T> set1, Set<U> set2) {
       return Stream.concat(set1.stream(), set2.stream()).collect(toImmutableSet());

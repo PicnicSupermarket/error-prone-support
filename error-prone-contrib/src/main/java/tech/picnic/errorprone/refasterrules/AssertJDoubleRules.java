@@ -15,7 +15,10 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJDoubleRules {
   private AssertJDoubleRules() {}
 
-  static final class AbstractDoubleAssertIsCloseToWithOffset {
+  /**
+   * Prefer {@link AbstractDoubleAssert#isCloseTo(double, Offset)} over less explicit alternatives.
+   */
+  static final class AbstractDoubleAssertIsCloseTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(
         AbstractDoubleAssert<?> doubleAssert, double n, Offset<Double> offset) {
@@ -35,6 +38,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over more contrived alternatives. */
   static final class AbstractDoubleAssertIsEqualTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
@@ -48,6 +52,7 @@ final class AssertJDoubleRules {
     }
   }
 
+  /** Prefer {@link AbstractDoubleAssert#isNotEqualTo(double)} over more contrived alternatives. */
   static final class AbstractDoubleAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert, double n) {
@@ -62,7 +67,8 @@ final class AssertJDoubleRules {
     }
   }
 
-  static final class AbstractDoubleAssertIsZero {
+  /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over less explicit alternatives. */
+  static final class AbstractDoubleAssertIsEqualToZero {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
       return doubleAssert.isZero();
@@ -74,7 +80,8 @@ final class AssertJDoubleRules {
     }
   }
 
-  static final class AbstractDoubleAssertIsNotZero {
+  /** Prefer {@link AbstractDoubleAssert#isNotEqualTo(double)} over less explicit alternatives. */
+  static final class AbstractDoubleAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
       return doubleAssert.isNotZero();
@@ -86,7 +93,8 @@ final class AssertJDoubleRules {
     }
   }
 
-  static final class AbstractDoubleAssertIsOne {
+  /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over less explicit alternatives. */
+  static final class AbstractDoubleAssertIsEqualToOne {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
       return doubleAssert.isOne();
