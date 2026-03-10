@@ -18,13 +18,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(
-        HashSet.class,
-        Iterables.class,
-        Preconditions.class,
-        Sets.class,
-        Splitter.class,
-        Streams.class);
+    return ImmutableSet.of(HashSet.class, Preconditions.class, Sets.class, Streams.class);
   }
 
   int testCheckIndex() {

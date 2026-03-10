@@ -33,7 +33,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssortedRules {
   private AssortedRules() {}
 
-  /** Prefer {@link Objects#checkIndex(int, int)} over the Guava alternative. */
+  /** Prefer {@link Objects#checkIndex(int, int)} over non-JDK alternatives. */
   static final class CheckIndex {
     @BeforeTemplate
     int before(int index, int size) {
@@ -48,7 +48,7 @@ final class AssortedRules {
   }
 
   /**
-   * Prefer {@link Objects#checkIndex(int, int)} over less descriptive or more verbose alternatives.
+   * Prefer {@link Objects#checkIndex(int, int)} over less explicit alternatives.
    *
    * <p>If a custom error message is desired, consider using Guava's {@link
    * com.google.common.base.Preconditions#checkElementIndex(int, int, String)}.
@@ -84,7 +84,7 @@ final class AssortedRules {
     }
   }
 
-  /** Don't unnecessarily repeat boolean expressions. */
+  /** Prefer {@code firstTest || secondTest} over more contrived alternatives. */
   // XXX: This rule captures only the simplest case. `@AlsoNegation` doesn't help. Consider
   // contributing a Refaster patch, which handles the negation in the `@BeforeTemplate` more
   // intelligently.
@@ -137,8 +137,7 @@ final class AssortedRules {
   }
 
   /**
-   * Don't unnecessarily copy collections before passing them to {@link
-   * Collections#disjoint(Collection, Collection)}.
+   * Prefer {@link Collections#disjoint(Collection, Collection)} over less efficient alternatives.
    */
   // XXX: Other copy operations could be elided too, but these are most common after application of
   // the `DisjointSets` rule defined above. If we ever introduce a generic "makes a copy" stand-in,

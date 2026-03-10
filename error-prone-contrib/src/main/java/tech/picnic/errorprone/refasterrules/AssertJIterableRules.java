@@ -19,6 +19,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJIterableRules {
   private AssertJIterableRules() {}
 
+  /** Prefer {@code assertThat(iterable).isEmpty()} over more contrived alternatives. */
   static final class AssertThatIterableIsEmpty<E> {
     @BeforeTemplate
     void before(Iterable<E> iterable) {
@@ -37,6 +38,7 @@ final class AssertJIterableRules {
     }
   }
 
+  /** Prefer {@code assertThat(iterable).isNotEmpty()} over more contrived alternatives. */
   static final class AssertThatIterableIsNotEmpty<E> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Iterable<E> iterable) {
@@ -55,6 +57,7 @@ final class AssertJIterableRules {
     }
   }
 
+  /** Prefer {@code assertThat(iterable).size()} over non-JDK or more contrived alternatives. */
   static final class AssertThatIterableSize<E> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(Iterable<E> iterable) {
@@ -73,6 +76,9 @@ final class AssertJIterableRules {
     }
   }
 
+  /**
+   * Prefer {@code assertThat(iterable).containsExactly(element)} over more contrived alternatives.
+   */
   // XXX: In practice this rule isn't very useful, as it only matches invocations of
   // `assertThat(E)`. In most cases a more specific overload of `assertThat` is invoked, in which
   // case this rule won't match. Look into a more robust approach.

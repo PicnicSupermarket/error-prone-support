@@ -31,34 +31,33 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
     return ImmutableSortedMultiset.orderedBy(Comparator.<String>reverseOrder());
   }
 
-  ImmutableMultiset<ImmutableSortedMultiset<Integer>> testEmptyImmutableSortedMultiset() {
-    return ImmutableMultiset.of(
+  ImmutableSet<ImmutableSortedMultiset<Integer>> testImmutableSortedMultisetOf() {
+    return ImmutableSet.of(
         ImmutableSortedMultiset.<Integer>naturalOrder().build(),
         Stream.<Integer>empty().collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
-  @SuppressWarnings("unchecked")
-  ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
-    return ImmutableMultiset.of(
-        ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(1)),
-        ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(2).iterator()),
-        ImmutableList.of(3).stream().collect(toImmutableSortedMultiset(naturalOrder())),
-        Streams.stream(ImmutableList.of(4)::iterator)
-            .collect(toImmutableSortedMultiset(naturalOrder())),
+  ImmutableSet<ImmutableSortedMultiset<Integer>> testImmutableSortedMultisetCopyOf() {
+    return ImmutableSet.of(
+        ImmutableSortedMultiset.<Integer>naturalOrder().add(new Integer[] {1}).build(),
+        Arrays.stream(new Integer[] {2}).collect(toImmutableSortedMultiset(naturalOrder())),
+        ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(3).iterator()),
+        ImmutableSortedMultiset.<Integer>naturalOrder()
+            .addAll(ImmutableMultiset.of(4).iterator())
+            .build(),
         Streams.stream(ImmutableList.of(5).iterator())
             .collect(toImmutableSortedMultiset(naturalOrder())),
-        ImmutableSortedMultiset.<Integer>naturalOrder().addAll(ImmutableMultiset.of(6)).build(),
+        ImmutableSortedMultiset.copyOf(naturalOrder(), ImmutableList.of(6)),
+        ImmutableSortedMultiset.<Integer>naturalOrder().addAll(ImmutableMultiset.of(7)).build(),
         ImmutableSortedMultiset.<Integer>naturalOrder()
-            .addAll(ImmutableMultiset.of(7)::iterator)
+            .addAll(ImmutableMultiset.of(8)::iterator)
             .build(),
-        ImmutableSortedMultiset.<Integer>naturalOrder()
-            .addAll(ImmutableMultiset.of(8).iterator())
-            .build(),
-        ImmutableSortedMultiset.<Integer>naturalOrder().add(new Integer[] {9}).build(),
-        Arrays.stream(new Integer[] {10}).collect(toImmutableSortedMultiset(naturalOrder())));
+        Streams.stream(ImmutableList.of(9)::iterator)
+            .collect(toImmutableSortedMultiset(naturalOrder())),
+        ImmutableList.of(10).stream().collect(toImmutableSortedMultiset(naturalOrder())));
   }
 
-  ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
+  ImmutableSortedMultiset<Integer> testStreamCollectToImmutableSortedMultiset() {
     return ImmutableSortedMultiset.copyOf(Stream.of(1).iterator());
   }
 }

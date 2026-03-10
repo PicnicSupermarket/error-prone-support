@@ -60,8 +60,8 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         getClass().getName() != null && !getClass().getName().isEmpty());
   }
 
-  boolean testStringIsBlank() {
-    return "foo".trim().isEmpty();
+  ImmutableSet<Boolean> testStringIsBlank() {
+    return ImmutableSet.of("foo".trim().isEmpty(), !"foo".trim().isEmpty());
   }
 
   ImmutableSet<Optional<String>> testOptionalNonEmptyString() {

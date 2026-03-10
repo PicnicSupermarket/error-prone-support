@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -20,8 +18,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Booleans.class,
-        Bytes.class,
         Chars.class,
         Doubles.class,
         Floats.class,
@@ -141,7 +137,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Double.BYTES;
   }
 
-  ImmutableSet<Boolean> testIntegerSignumIsPositive() {
+  ImmutableSet<Boolean> testIntegerSignumIsOne() {
     return ImmutableSet.of(
         Integer.signum(1) == 1,
         Integer.signum(2) == 1,
@@ -149,7 +145,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Integer.signum(4) != 1);
   }
 
-  ImmutableSet<Boolean> testIntegerSignumIsNegative() {
+  ImmutableSet<Boolean> testIntegerSignumIsNegativeOne() {
     return ImmutableSet.of(
         Integer.signum(1) == -1,
         Integer.signum(2) == -1,
@@ -157,12 +153,12 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Integer.signum(4) != -1);
   }
 
-  ImmutableSet<Boolean> testLongSignumIsPositive() {
+  ImmutableSet<Boolean> testLongSignumIsOne() {
     return ImmutableSet.of(
         Long.signum(1L) == 1, Long.signum(2L) == 1, Long.signum(3L) != 1, Long.signum(4L) != 1);
   }
 
-  ImmutableSet<Boolean> testLongSignumIsNegative() {
+  ImmutableSet<Boolean> testLongSignumIsNegativeOne() {
     return ImmutableSet.of(
         Long.signum(1L) == -1, Long.signum(2L) == -1, Long.signum(3L) != -1, Long.signum(4L) != -1);
   }
@@ -171,7 +167,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Integer.compareUnsigned(1, 2);
   }
 
-  long testLongCompareUnsigned() {
+  int testLongCompareUnsigned() {
     return Long.compareUnsigned(1, 2);
   }
 

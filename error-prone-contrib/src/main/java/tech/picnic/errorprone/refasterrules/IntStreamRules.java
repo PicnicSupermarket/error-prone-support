@@ -20,8 +20,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class IntStreamRules {
   private IntStreamRules() {}
 
-  /** Prefer {@link IntStream#range(int, int)} over the more contrived alternative. */
-  static final class IntStreamClosedOpenRange {
+  /** Prefer {@link IntStream#range(int, int)} over more verbose alternatives. */
+  static final class IntStreamRange {
     @BeforeTemplate
     IntStream before(int from, int to) {
       return IntStream.rangeClosed(from, to - 1);
@@ -33,8 +33,8 @@ final class IntStreamRules {
     }
   }
 
-  /** Don't unnecessarily call {@link Streams#concat(IntStream...)}. */
-  static final class ConcatOneIntStream {
+  /** Prefer using {@link IntStream}s as-is over more contrived alternatives. */
+  static final class IntStreamIdentity {
     @BeforeTemplate
     IntStream before(IntStream stream) {
       return Streams.concat(stream);
@@ -47,20 +47,20 @@ final class IntStreamRules {
     }
   }
 
-  /** Prefer {@link IntStream#concat(IntStream, IntStream)} over the Guava alternative. */
-  static final class ConcatTwoIntStreams {
+  /** Prefer {@link IntStream#concat(IntStream, IntStream)} over non-JDK alternatives. */
+  static final class IntStreamConcat {
     @BeforeTemplate
-    IntStream before(IntStream s1, IntStream s2) {
-      return Streams.concat(s1, s2);
+    IntStream before(IntStream stream1, IntStream stream2) {
+      return Streams.concat(stream1, stream2);
     }
 
     @AfterTemplate
-    IntStream after(IntStream s1, IntStream s2) {
-      return IntStream.concat(s1, s2);
+    IntStream after(IntStream stream1, IntStream stream2) {
+      return IntStream.concat(stream1, stream2);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link IntStream#filter(IntPredicate)} operations. */
+  /** Prefer {@link IntStream#filter(IntPredicate)} over more contrived alternatives. */
   abstract static class FilterOuterIntStreamAfterFlatMap {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
@@ -76,7 +76,7 @@ final class IntStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link IntStream#filter(IntPredicate)} operations. */
+  /** Prefer {@link IntStream#filter(IntPredicate)} over more contrived alternatives. */
   abstract static class FilterOuterStreamAfterFlatMapToInt<T> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
@@ -92,7 +92,7 @@ final class IntStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link IntStream#map(IntUnaryOperator)} operations. */
+  /** Prefer {@link IntStream#map(IntUnaryOperator)} over more contrived alternatives. */
   abstract static class MapOuterIntStreamAfterFlatMap {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
@@ -108,7 +108,7 @@ final class IntStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link IntStream#map(IntUnaryOperator)} operations. */
+  /** Prefer {@link IntStream#map(IntUnaryOperator)} over more contrived alternatives. */
   abstract static class MapOuterStreamAfterFlatMapToInt<T> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
@@ -124,41 +124,41 @@ final class IntStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link IntStream#flatMap(IntFunction)} operations. */
-  abstract static class FlatMapOuterIntStreamAfterFlatMap {
+  /** Prefer {@link IntStream#flatMap(IntFunction)} over more contrived alternatives. */
+  abstract static class FlatMapOuterIntStreamAfterFlatMap<S extends IntStream> {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
 
     @BeforeTemplate
-    IntStream before(IntStream stream, IntFunction<? extends IntStream> function) {
+    IntStream before(IntStream stream, IntFunction<S> function) {
       return stream.flatMap(v -> toIntStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    IntStream after(IntStream stream, IntFunction<? extends IntStream> function) {
+    IntStream after(IntStream stream, IntFunction<S> function) {
       return stream.flatMap(v -> toIntStreamFunction(v)).flatMap(function);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link IntStream#flatMap(IntFunction)} operations. */
-  abstract static class FlatMapOuterStreamAfterFlatMapToInt<T> {
+  /** Prefer {@link IntStream#flatMap(IntFunction)} over more contrived alternatives. */
+  abstract static class FlatMapOuterStreamAfterFlatMapToInt<T, S extends IntStream> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    IntStream before(Stream<T> stream, IntFunction<? extends IntStream> function) {
+    IntStream before(Stream<T> stream, IntFunction<S> function) {
       return stream.flatMapToInt(v -> toIntStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    IntStream after(Stream<T> stream, IntFunction<? extends IntStream> function) {
+    IntStream after(Stream<T> stream, IntFunction<S> function) {
       return stream.flatMapToInt(v -> toIntStreamFunction(v)).flatMap(function);
     }
   }
 
   /**
-   * Apply {@link IntStream#filter(IntPredicate)} before {@link IntStream#sorted()} to reduce the
-   * number of elements to sort.
+   * Prefer {@link IntStream#filter(IntPredicate)} before {@link IntStream#sorted()} over less
+   * efficient alternatives.
    */
   static final class IntStreamFilterSorted {
     @BeforeTemplate
@@ -172,7 +172,7 @@ final class IntStreamRules {
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
+  /** Prefer {@link IntStream#findAny()} over less efficient alternatives. */
   static final class IntStreamIsEmpty {
     @BeforeTemplate
     boolean before(IntStream stream) {
@@ -189,7 +189,7 @@ final class IntStreamRules {
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
+  /** Prefer {@link IntStream#findAny()} over less efficient alternatives. */
   static final class IntStreamIsNotEmpty {
     @BeforeTemplate
     boolean before(IntStream stream) {
@@ -206,6 +206,7 @@ final class IntStreamRules {
     }
   }
 
+  /** Prefer {@link IntStream#min()} over less efficient alternatives. */
   static final class IntStreamMin {
     @BeforeTemplate
     OptionalInt before(IntStream stream) {
@@ -234,6 +235,7 @@ final class IntStreamRules {
     }
   }
 
+  /** Prefer {@link IntStream#noneMatch(IntPredicate)} over less explicit alternatives. */
   abstract static class IntStreamNoneMatch2 {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
@@ -264,6 +266,7 @@ final class IntStreamRules {
     }
   }
 
+  /** Prefer {@link IntStream#allMatch(IntPredicate)} over more contrived alternatives. */
   static final class IntStreamAllMatch {
     @BeforeTemplate
     boolean before(IntStream stream, IntPredicate predicate) {
@@ -276,6 +279,7 @@ final class IntStreamRules {
     }
   }
 
+  /** Prefer {@link IntStream#allMatch(IntPredicate)} over less explicit alternatives. */
   abstract static class IntStreamAllMatch2 {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
@@ -291,6 +295,7 @@ final class IntStreamRules {
     }
   }
 
+  /** Prefer {@link IntStream#takeWhile(IntPredicate)} over more verbose alternatives. */
   static final class IntStreamTakeWhile {
     @BeforeTemplate
     IntStream before(IntStream stream, IntPredicate predicate) {

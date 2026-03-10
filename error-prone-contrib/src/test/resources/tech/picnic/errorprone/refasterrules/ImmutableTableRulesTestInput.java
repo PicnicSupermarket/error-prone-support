@@ -23,7 +23,8 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableTable.builder().build();
   }
 
-  ImmutableSet<ImmutableTable<String, Integer, String>> testCellToImmutableTable() {
+  ImmutableSet<ImmutableTable<String, Integer, String>>
+      testImmutableTableOfCellGetRowKeyCellGetColumnKeyCellGetValue() {
     return ImmutableSet.of(
         ImmutableTable.<String, Integer, String>builder()
             .put(Tables.immutableCell("foo", 1, "bar"))
@@ -34,7 +35,7 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
                     Table.Cell::getRowKey, Table.Cell::getColumnKey, Table.Cell::getValue)));
   }
 
-  ImmutableTable<Integer, String, Integer> testStreamOfCellsToImmutableTable() {
+  ImmutableTable<Integer, String, Integer> testStreamCollectToImmutableTable() {
     return Stream.of(1, 2, 3)
         .map(n -> Tables.immutableCell(n, n.toString(), n * 2))
         .collect(

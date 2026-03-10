@@ -21,6 +21,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJOptionalRules {
   private AssertJOptionalRules() {}
 
+  /** Prefer {@code assertThat(optional).get()} over more contrived alternatives. */
   static final class AssertThatOptional<T> {
     @BeforeTemplate
     ObjectAssert<T> before(Optional<T> optional) {
@@ -34,6 +35,7 @@ final class AssertJOptionalRules {
     }
   }
 
+  /** Prefer {@link AbstractOptionalAssert#isPresent()} over more contrived alternatives. */
   static final class AbstractOptionalAssertIsPresent<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
@@ -47,6 +49,7 @@ final class AssertJOptionalRules {
     }
   }
 
+  /** Prefer {@code assertThat(optional).isPresent()} over more contrived alternatives. */
   static final class AssertThatOptionalIsPresent<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Optional<T> optional) {
@@ -61,6 +64,7 @@ final class AssertJOptionalRules {
     }
   }
 
+  /** Prefer {@link AbstractOptionalAssert#isEmpty()} over more contrived alternatives. */
   static final class AbstractOptionalAssertIsEmpty<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert) {
@@ -74,6 +78,7 @@ final class AssertJOptionalRules {
     }
   }
 
+  /** Prefer {@code assertThat(optional).isEmpty()} over more contrived alternatives. */
   static final class AssertThatOptionalIsEmpty<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Optional<T> optional) {
@@ -88,6 +93,7 @@ final class AssertJOptionalRules {
     }
   }
 
+  /** Prefer {@link AbstractOptionalAssert#hasValue(Object)} over more contrived alternatives. */
   static final class AbstractOptionalAssertHasValue<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
@@ -104,6 +110,9 @@ final class AssertJOptionalRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractOptionalAssert#containsSame(Object)} over more contrived alternatives.
+   */
   static final class AbstractOptionalAssertContainsSame<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
@@ -117,15 +126,18 @@ final class AssertJOptionalRules {
     }
   }
 
-  static final class AssertThatOptionalHasValueMatching<T> {
+  /**
+   * Prefer {@code assertThat(optional).get().matches(predicate)} over more contrived alternatives.
+   */
+  static final class AssertThatOptionalHasValueMatching<S, T extends S> {
     @BeforeTemplate
-    AbstractOptionalAssert<?, T> before(Optional<T> optional, Predicate<? super T> predicate) {
+    AbstractOptionalAssert<?, T> before(Optional<T> optional, Predicate<S> predicate) {
       return assertThat(optional.filter(predicate)).isPresent();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, T> after(Optional<T> optional, Predicate<? super T> predicate) {
+    AbstractObjectAssert<?, T> after(Optional<T> optional, Predicate<S> predicate) {
       return assertThat(optional).get().matches(predicate);
     }
   }

@@ -23,12 +23,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Optional.ofNullable(toString()), Optional.ofNullable(toString()));
   }
 
-  ImmutableSet<Boolean> testOptionalIsEmpty() {
-    return ImmutableSet.of(Optional.empty().isEmpty(), Optional.of("foo").isEmpty());
+  boolean testOptionalIsEmpty() {
+    return Optional.of("foo").isEmpty();
   }
 
-  ImmutableSet<Boolean> testOptionalIsPresent() {
-    return ImmutableSet.of(Optional.empty().isPresent(), Optional.of("foo").isPresent());
+  boolean testOptionalIsPresent() {
+    return Optional.of("foo").isPresent();
   }
 
   String testOptionalOrElseThrow() {
@@ -51,14 +51,20 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         stream(ImmutableSet.of("foo").iterator()).findFirst());
   }
 
-  Optional<String> testTernaryOperatorOptionalPositiveFiltering() {
-    return /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")
-        .filter(v -> v.length() > 5);
+  ImmutableSet<Optional<String>> testOptionalOfFilter() {
+    return ImmutableSet.of(
+        /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")
+            .filter(v -> v.length() > 5),
+        /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("bar")
+            .filter(v -> v.length() > 5));
   }
 
-  Optional<String> testTernaryOperatorOptionalNegativeFiltering() {
-    return /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")
-        .filter(v -> v.length() <= 5);
+  ImmutableSet<Optional<String>> testOptionalOfFilterNegated() {
+    return ImmutableSet.of(
+        /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")
+            .filter(v -> v.length() <= 5),
+        /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("bar")
+            .filter(v -> v.length() <= 5));
   }
 
   boolean testMapOptionalToBoolean() {
@@ -80,7 +86,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<String> testOptionalOrElse() {
     return ImmutableSet.of(
-        Optional.of("foo").orElse("bar"), Optional.of("baz").orElseGet(() -> toString()));
+        Optional.of("foo").orElseGet(() -> toString()), Optional.of("bar").orElse("baz"));
   }
 
   ImmutableSet<Object> testStreamFlatMapOptional() {
@@ -93,15 +99,15 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).flatMap(n -> Optional.of(String.valueOf(n)).stream());
   }
 
-  Optional<Integer> testFilterOuterOptionalAfterFlatMap() {
+  Optional<Integer> testOptionalFlatMapFilter() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length())).filter(len -> len > 0);
   }
 
-  Optional<Integer> testMapOuterOptionalAfterFlatMap() {
+  Optional<Integer> testOptionalFlatMapMap() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length())).map(len -> len * 0);
   }
 
-  Optional<Integer> testFlatMapOuterOptionalAfterFlatMap() {
+  Optional<Integer> testOptionalFlatMapFlatMap() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length())).flatMap(Optional::of);
   }
 
@@ -109,8 +115,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").or(() -> Optional.of("bar")),
         Optional.of("baz").or(() -> Optional.of("qux")),
-        Optional.of("quux").or(() -> Optional.of("quuz")),
-        Optional.of("corge").or(() -> Optional.of("grault")));
+        Optional.of("quux").or(() -> Optional.of("corge")),
+        Optional.of("grault").or(() -> Optional.of("garply")));
   }
 
   ImmutableSet<Optional<String>> testOptionalIdentity() {
@@ -120,9 +126,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("baz"),
         Optional.of("qux"),
         Optional.of("quux"),
-        Optional.of("quuz"),
         Optional.of("corge"),
-        Optional.of("grault"));
+        Optional.of("grault"),
+        Optional.of("garply"));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {

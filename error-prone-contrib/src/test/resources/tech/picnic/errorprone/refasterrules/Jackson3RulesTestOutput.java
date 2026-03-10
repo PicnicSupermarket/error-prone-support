@@ -34,19 +34,19 @@ final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Number> testObjectMapperConvertValueWithClass() {
     return ImmutableSet.of(
-        new ObjectMapper().convertValue("1", Integer.class),
-        JsonMapper.shared().convertValue("2.0", Double.class));
+        new ObjectMapper().convertValue("foo", Integer.class),
+        JsonMapper.shared().convertValue("bar", Double.class));
   }
 
   ImmutableSet<Number> testObjectMapperConvertValueWithJavaType() {
     return ImmutableSet.of(
-        new ObjectMapper().convertValue("1", SimpleType.constructUnsafe(Integer.class)),
-        JsonMapper.shared().convertValue("2.0", SimpleType.constructUnsafe(Double.class)));
+        new ObjectMapper().convertValue("foo", SimpleType.constructUnsafe(Integer.class)),
+        JsonMapper.shared().convertValue("bar", SimpleType.constructUnsafe(Double.class)));
   }
 
   ImmutableSet<Number> testObjectMapperConvertValueWithTypeReference() {
     return ImmutableSet.of(
-        new ObjectMapper().convertValue("1", new TypeReference<Integer>() {}),
-        JsonMapper.shared().convertValue("2.0", new TypeReference<Double>() {}));
+        new ObjectMapper().convertValue("foo", new TypeReference<Integer>() {}),
+        JsonMapper.shared().convertValue("bar", new TypeReference<Double>() {}));
   }
 }

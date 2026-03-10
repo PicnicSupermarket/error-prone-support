@@ -38,11 +38,11 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").anyMatch("bar"::equals);
   }
 
-  boolean testDoubleNegation() {
+  boolean testBooleanIdentity() {
     return Boolean.TRUE;
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
   ImmutableSet<Boolean> testNegation() {
     return ImmutableSet.of(
         true != false,
@@ -57,7 +57,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         BoundType.OPEN != BoundType.CLOSED);
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
   ImmutableSet<Boolean> testIndirectDoubleNegation() {
     return ImmutableSet.of(
         true == false,
@@ -77,7 +77,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Boolean> testEquals() {
-    return ImmutableSet.of("foo".equals("bar"), "baz".equals("qux"), "quuz".equals("quux"));
+    return ImmutableSet.of("foo".equals("bar"), "baz".equals("qux"), "corge".equals("quux"));
   }
 
   boolean testObjectsEquals() {

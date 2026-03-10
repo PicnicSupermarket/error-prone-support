@@ -20,7 +20,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class EqualityRules {
   private EqualityRules() {}
 
-  /** Prefer reference-based equality for enums. */
+  /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
   // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
   static final class EnumReferenceEquality<T extends Enum<T>> {
     /**
@@ -44,7 +44,7 @@ final class EqualityRules {
     }
   }
 
-  /** Prefer reference-based equality for enums. */
+  /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
   static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
     @BeforeTemplate
     Predicate<T> before(T e) {
@@ -58,7 +58,7 @@ final class EqualityRules {
     }
   }
 
-  /** Prefer {@link Object#equals(Object)} over the equivalent lambda function. */
+  /** Prefer {@link Object#equals(Object)} method references over more verbose alternatives. */
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
   // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
   // XXX: Alternatively, the rule should be replaced with a plugin that also identifies cases where
@@ -76,8 +76,8 @@ final class EqualityRules {
     }
   }
 
-  /** Avoid double negations; this is not Javascript. */
-  static final class DoubleNegation {
+  /** Prefer using the boolean expression as-is over more contrived alternatives. */
+  static final class BooleanIdentity {
     @BeforeTemplate
     @SuppressWarnings("java:S2761" /* This violation will be rewritten. */)
     boolean before(boolean b) {
@@ -91,10 +91,7 @@ final class EqualityRules {
     }
   }
 
-  /**
-   * Don't negate an equality test or use the ternary operator to compare two booleans; directly
-   * test for inequality instead.
-   */
+  /** Prefer {@code !=} over more contrived alternatives. */
   // XXX: Replacing `a ? !b : b` with `a != b` changes semantics if both `a` and `b` are boxed
   // booleans.
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
@@ -122,10 +119,7 @@ final class EqualityRules {
     }
   }
 
-  /**
-   * Don't negate an inequality test or use the ternary operator to compare two booleans; directly
-   * test for equality instead.
-   */
+  /** Prefer {@code ==} over more contrived alternatives. */
   // XXX: Replacing `a ? b : !b` with `a == b` changes semantics if both `a` and `b` are boxed
   // booleans.
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
@@ -153,10 +147,7 @@ final class EqualityRules {
     }
   }
 
-  /**
-   * Don't pass a lambda expression to {@link Predicate#not(Predicate)}; instead push the negation
-   * into the lambda expression.
-   */
+  /** Prefer negated lambda expressions over more contrived alternatives. */
   abstract static class PredicateLambda<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean predicate(@MayOptionallyUse T value);
@@ -172,7 +163,7 @@ final class EqualityRules {
     }
   }
 
-  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  /** Prefer {@link Object#equals(Object)} over more contrived alternatives. */
   static final class Equals<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {
@@ -188,7 +179,7 @@ final class EqualityRules {
     }
   }
 
-  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  /** Prefer {@link Objects#equals(Object, Object)} over more contrived alternatives. */
   static final class ObjectsEquals<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {

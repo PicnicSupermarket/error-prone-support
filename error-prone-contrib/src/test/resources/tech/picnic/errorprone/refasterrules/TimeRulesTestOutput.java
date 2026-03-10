@@ -164,16 +164,16 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         !ZonedDateTime.now().isAfter(ZonedDateTime.now()));
   }
 
-  ImmutableSet<Boolean> testOffsetDateTimeIsAfter() {
-    return ImmutableSet.of(
-        OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX),
-        !OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX));
-  }
-
   ImmutableSet<Boolean> testOffsetDateTimeIsBefore() {
     return ImmutableSet.of(
         OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX),
         !OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX));
+  }
+
+  ImmutableSet<Boolean> testOffsetDateTimeIsAfter() {
+    return ImmutableSet.of(
+        OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX),
+        !OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX));
   }
 
   ImmutableSet<Duration> testZeroDuration() {

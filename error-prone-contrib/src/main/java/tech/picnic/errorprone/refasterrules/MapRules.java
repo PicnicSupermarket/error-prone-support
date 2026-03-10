@@ -17,6 +17,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class MapRules {
   private MapRules() {}
 
+  /** Prefer {@link EnumMap} over less efficient alternatives. */
   // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
   // not allow an empty non-EnumMap to be provided.
   static final class CreateEnumMap<K extends Enum<K>, V> {
@@ -31,6 +32,7 @@ final class MapRules {
     }
   }
 
+  /** Prefer {@link Map#get(Object)} over more verbose alternatives. */
   static final class MapGetOrNull<K, V, T> {
     @BeforeTemplate
     @Nullable V before(Map<K, V> map, T key) {
@@ -43,9 +45,13 @@ final class MapRules {
     }
   }
 
-  /** Prefer {@link Map#getOrDefault(Object, Object)} over more contrived alternatives. */
-  // XXX: Note that `requireNonNullElse` throws an NPE if the second argument is `null`, while the
-  // alternative does not.
+  /**
+   * Prefer {@link Map#getOrDefault(Object, Object)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if {@code defaultValue} is {@code
+   * null}: {@link java.util.Objects#requireNonNullElse} throws a {@link NullPointerException} in
+   * that case, while {@link Map#getOrDefault(Object, Object)} does not.
+   */
   static final class MapGetOrDefault<K, V, T> {
     @BeforeTemplate
     V before(Map<K, V> map, T key, V defaultValue) {
@@ -110,7 +116,7 @@ final class MapRules {
     }
   }
 
-  /** Don't unnecessarily use {@link Map#entrySet()}. */
+  /** Prefer {@link Map#keySet()} over more contrived alternatives. */
   static final class MapKeyStream<K, V> {
     @BeforeTemplate
     Stream<K> before(Map<K, V> map) {
@@ -123,7 +129,7 @@ final class MapRules {
     }
   }
 
-  /** Don't unnecessarily use {@link Map#entrySet()}. */
+  /** Prefer {@link Map#values()} over more contrived alternatives. */
   static final class MapValueStream<K, V> {
     @BeforeTemplate
     Stream<V> before(Map<K, V> map) {

@@ -18,33 +18,33 @@ final class AssertJBigIntegerRulesTest implements RefasterRuleCollectionTestCase
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsEqualTo() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isEqualTo(BigInteger.ONE),
-        assertThat(BigInteger.ZERO).isEqualTo(BigInteger.ONE));
+        assertThat(BigInteger.ONE).isEqualTo(BigInteger.TWO));
   }
 
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isNotEqualTo(BigInteger.ONE),
-        assertThat(BigInteger.ZERO).isNotEqualTo(BigInteger.ONE));
+        assertThat(BigInteger.ONE).isNotEqualTo(BigInteger.TWO));
   }
 
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsZero() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isEqualTo(0),
-        assertThat(BigInteger.ZERO).isEqualTo(0),
-        assertThat(BigInteger.ZERO).isEqualTo(0));
+        assertThat(BigInteger.ONE).isEqualTo(0),
+        assertThat(BigInteger.TWO).isEqualTo(0));
   }
 
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotZero() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isNotEqualTo(0),
-        assertThat(BigInteger.ZERO).isNotEqualTo(0),
-        assertThat(BigInteger.ZERO).isNotEqualTo(0));
+        assertThat(BigInteger.ONE).isNotEqualTo(0),
+        assertThat(BigInteger.TWO).isNotEqualTo(0));
   }
 
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsOne() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isEqualTo(1),
-        assertThat(BigInteger.ZERO).isEqualTo(1),
-        assertThat(BigInteger.ZERO).isEqualTo(1));
+        assertThat(BigInteger.ONE).isEqualTo(1),
+        assertThat(BigInteger.TWO).isEqualTo(1));
   }
 }

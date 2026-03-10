@@ -16,7 +16,7 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster templates related to statements dealing with {@link Preconditions}. */
+/** Refaster rules related to expressions dealing with {@link Preconditions}. */
 @OnlineDocumentation
 final class PreconditionsRules {
   private PreconditionsRules() {}
@@ -54,7 +54,7 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less descriptive or more
+   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    *
    * <p>Note that the two-argument {@link Preconditions#checkElementIndex(int, int)} is better
@@ -150,7 +150,7 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less descriptive or more verbose
+   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less explicit or more verbose
    * alternatives.
    */
   static final class CheckPositionIndex {
@@ -169,7 +169,7 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less descriptive or more
+   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    */
   static final class CheckPositionIndexWithMessage {

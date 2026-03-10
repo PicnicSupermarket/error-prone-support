@@ -22,7 +22,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<BigDecimal> testBigDecimalValueOf() {
-    return ImmutableSet.of(BigDecimal.valueOf(2), BigDecimal.valueOf(2L), BigDecimal.valueOf(2.0));
+    return ImmutableSet.of(BigDecimal.valueOf(1), BigDecimal.valueOf(2L), BigDecimal.valueOf(3.0));
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsZero() {
@@ -33,7 +33,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.valueOf(4).signum() != 0);
   }
 
-  ImmutableSet<Boolean> testBigDecimalSignumIsPositive() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsOne() {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).signum() == 1,
         BigDecimal.valueOf(2).signum() == 1,
@@ -45,7 +45,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.valueOf(8).signum() != 1);
   }
 
-  ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsNegativeOne() {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).signum() == -1,
         BigDecimal.valueOf(2).signum() == -1,

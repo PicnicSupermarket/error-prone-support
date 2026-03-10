@@ -25,6 +25,10 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJBigDecimalRules {
   private AssertJBigDecimalRules() {}
 
+  /**
+   * Prefer {@link AbstractBigDecimalAssert#isEqualByComparingTo(BigDecimal)} over more contrived
+   * alternatives.
+   */
   static final class AbstractBigDecimalAssertIsEqualByComparingTo {
     @BeforeTemplate
     AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
@@ -39,6 +43,10 @@ final class AssertJBigDecimalRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractBigDecimalAssert#isNotEqualByComparingTo(BigDecimal)} over more contrived
+   * alternatives.
+   */
   static final class AbstractBigDecimalAssertIsNotEqualByComparingTo {
     @BeforeTemplate
     AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {

@@ -23,12 +23,12 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         toString() != null ? Optional.of(toString()) : Optional.empty());
   }
 
-  ImmutableSet<Boolean> testOptionalIsEmpty() {
-    return ImmutableSet.of(!Optional.empty().isPresent(), !Optional.of("foo").isPresent());
+  boolean testOptionalIsEmpty() {
+    return !Optional.of("foo").isPresent();
   }
 
-  ImmutableSet<Boolean> testOptionalIsPresent() {
-    return ImmutableSet.of(!Optional.empty().isEmpty(), !Optional.of("foo").isEmpty());
+  boolean testOptionalIsPresent() {
+    return !Optional.of("foo").isEmpty();
   }
 
   String testOptionalOrElseThrow() {
@@ -55,12 +55,16 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.of(ImmutableSet.of("foo").iterator().next()));
   }
 
-  Optional<String> testTernaryOperatorOptionalPositiveFiltering() {
-    return "foo".length() > 5 ? Optional.of("foo") : Optional.empty();
+  ImmutableSet<Optional<String>> testOptionalOfFilter() {
+    return ImmutableSet.of(
+        "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
+        !("bar".length() > 5) ? Optional.empty() : Optional.of("bar"));
   }
 
-  Optional<String> testTernaryOperatorOptionalNegativeFiltering() {
-    return "foo".length() > 5 ? Optional.empty() : Optional.of("foo");
+  ImmutableSet<Optional<String>> testOptionalOfFilterNegated() {
+    return ImmutableSet.of(
+        "foo".length() > 5 ? Optional.empty() : Optional.of("foo"),
+        !("bar".length() > 5) ? Optional.of("bar") : Optional.empty());
   }
 
   boolean testMapOptionalToBoolean() {
@@ -83,7 +87,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<String> testOptionalOrElse() {
     return ImmutableSet.of(
-        Optional.of("foo").orElseGet(() -> "bar"), Optional.of("baz").orElseGet(() -> toString()));
+        Optional.of("foo").orElseGet(() -> toString()), Optional.of("bar").orElseGet(() -> "baz"));
   }
 
   ImmutableSet<Object> testStreamFlatMapOptional() {
@@ -96,15 +100,15 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).map(n -> Optional.of(String.valueOf(n)).orElseThrow());
   }
 
-  Optional<Integer> testFilterOuterOptionalAfterFlatMap() {
+  Optional<Integer> testOptionalFlatMapFilter() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length()).filter(len -> len > 0));
   }
 
-  Optional<Integer> testMapOuterOptionalAfterFlatMap() {
+  Optional<Integer> testOptionalFlatMapMap() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length()).map(len -> len * 0));
   }
 
-  Optional<Integer> testFlatMapOuterOptionalAfterFlatMap() {
+  Optional<Integer> testOptionalFlatMapFlatMap() {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length()).flatMap(Optional::of));
   }
 
@@ -112,8 +116,8 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Optional.of("foo").map(Optional::of).orElse(Optional.of("bar")),
         Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.of("qux")),
-        Stream.of(Optional.of("quux"), Optional.of("quuz")).flatMap(Optional::stream).findFirst(),
-        Optional.of("corge").isPresent() ? Optional.of("corge") : Optional.of("grault"));
+        Stream.of(Optional.of("quux"), Optional.of("corge")).flatMap(Optional::stream).findFirst(),
+        Optional.of("grault").isPresent() ? Optional.of("grault") : Optional.of("garply"));
   }
 
   ImmutableSet<Optional<String>> testOptionalIdentity() {
@@ -123,9 +127,9 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.empty()),
         Optional.of("qux").map(Optional::of).orElseGet(Optional::empty),
         Optional.of("quux").stream().findFirst(),
-        Optional.of("quuz").stream().findAny(),
-        Optional.of("corge").stream().min(String::compareTo),
-        Optional.of("grault").stream().max(String::compareTo));
+        Optional.of("corge").stream().findAny(),
+        Optional.of("grault").stream().min(String::compareTo),
+        Optional.of("garply").stream().max(String::compareTo));
   }
 
   ImmutableSet<Optional<String>> testOptionalFilter() {

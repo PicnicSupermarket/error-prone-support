@@ -24,7 +24,7 @@ final class MapEntryRulesTest implements RefasterRuleCollectionTestCase {
         Map.Entry.comparingByKey(Comparator.naturalOrder()));
   }
 
-  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByKeyWithCustomComparator() {
+  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByKeyWithComparator() {
     return Comparator.comparing(Map.Entry::getKey, Comparator.comparingInt(i -> i * 2));
   }
 
@@ -34,7 +34,7 @@ final class MapEntryRulesTest implements RefasterRuleCollectionTestCase {
         Map.Entry.comparingByValue(Comparator.naturalOrder()));
   }
 
-  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByValueWithCustomComparator() {
+  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByValueWithComparator() {
     return Comparator.comparing(Map.Entry::getValue, Comparator.comparingInt(String::length));
   }
 }

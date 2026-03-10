@@ -31,26 +31,25 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
     return ImmutableSortedMultiset.reverseOrder();
   }
 
-  ImmutableMultiset<ImmutableSortedMultiset<Integer>> testEmptyImmutableSortedMultiset() {
-    return ImmutableMultiset.of(ImmutableSortedMultiset.of(), ImmutableSortedMultiset.of());
+  ImmutableSet<ImmutableSortedMultiset<Integer>> testImmutableSortedMultisetOf() {
+    return ImmutableSet.of(ImmutableSortedMultiset.of(), ImmutableSortedMultiset.of());
   }
 
-  @SuppressWarnings("unchecked")
-  ImmutableMultiset<ImmutableSortedMultiset<Integer>> testIterableToImmutableSortedMultiset() {
-    return ImmutableMultiset.of(
-        ImmutableSortedMultiset.copyOf(ImmutableList.of(1)),
-        ImmutableSortedMultiset.copyOf(ImmutableList.of(2).iterator()),
-        ImmutableSortedMultiset.copyOf(ImmutableList.of(3)),
-        ImmutableSortedMultiset.copyOf(ImmutableList.of(4)::iterator),
+  ImmutableSet<ImmutableSortedMultiset<Integer>> testImmutableSortedMultisetCopyOf() {
+    return ImmutableSet.of(
+        ImmutableSortedMultiset.copyOf(new Integer[] {1}),
+        ImmutableSortedMultiset.copyOf(new Integer[] {2}),
+        ImmutableSortedMultiset.copyOf(ImmutableList.of(3).iterator()),
+        ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(4).iterator()),
         ImmutableSortedMultiset.copyOf(ImmutableList.of(5).iterator()),
-        ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(6)),
-        ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(7)::iterator),
-        ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(8).iterator()),
-        ImmutableSortedMultiset.copyOf(new Integer[] {9}),
-        ImmutableSortedMultiset.copyOf(new Integer[] {10}));
+        ImmutableSortedMultiset.copyOf(ImmutableList.of(6)),
+        ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(7)),
+        ImmutableSortedMultiset.copyOf(ImmutableMultiset.of(8)::iterator),
+        ImmutableSortedMultiset.copyOf(ImmutableList.of(9)::iterator),
+        ImmutableSortedMultiset.copyOf(ImmutableList.of(10)));
   }
 
-  ImmutableSortedMultiset<Integer> testStreamToImmutableSortedMultiset() {
+  ImmutableSortedMultiset<Integer> testStreamCollectToImmutableSortedMultiset() {
     return Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder()));
   }
 }
