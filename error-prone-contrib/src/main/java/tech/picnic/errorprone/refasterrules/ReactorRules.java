@@ -60,6 +60,7 @@ import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
@@ -556,6 +557,7 @@ final class ReactorRules {
   /** Prefer {@link Flux#empty()} over more contrived alternatives. */
   // XXX: Using `@Matches(IsEmpty.class)`, the non-varargs overloads of most methods referenced here
   // can be rewritten as well. That would require adding a bunch more suitably-typed parameters.
+  @PossibleSourceIncompatibility
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
     // XXX: The methods enumerated here are not ordered entirely lexicographically, to accommodate a
     // conflict between the `InconsistentOverloads` and `RefasterMethodParameterOrder` checks.
@@ -630,6 +632,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#just(Object)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class FluxJust<T> {
     @BeforeTemplate
     Flux<Integer> before(int data) {
@@ -679,6 +682,7 @@ final class ReactorRules {
   /**
    * Prefer using {@link Mono}s as-is over less efficient transformations to equivalent instances.
    */
+  @PossibleSourceIncompatibility
   static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
@@ -1406,6 +1410,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#then(Mono)} over applying vacuous operations first. */
+  @PossibleSourceIncompatibility
   static final class MonoThenWithMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono, Mono<S> other) {
@@ -1425,6 +1430,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#then(Mono)} over vacuously invoking {@link Flux#ignoreElements()}. */
+  @PossibleSourceIncompatibility
   static final class FluxThenWithMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Flux<T> flux, Mono<S> other) {
@@ -2052,6 +2058,7 @@ final class ReactorRules {
    * Prefer {@link Flux#collect(Collector)} with {@link ImmutableList#toImmutableList()} over
    * alternatives that do not explicitly return an immutable collection.
    */
+  @PossibleSourceIncompatibility
   static final class FluxCollectToImmutableList<T> {
     @BeforeTemplate
     Mono<List<T>> before(Flux<T> flux) {
@@ -2399,6 +2406,7 @@ final class ReactorRules {
   // code, at the risk of compilation failures. With this rule, for example, we want to explicitly
   // nudge users towards `StepVerifier.Step#assertNext(Consumer)` or
   // `StepVerifier.Step#expectNext(Object)`, together with `Step#verifyComplete()`.
+  @PossibleSourceIncompatibility
   static final class StepVerifierVerify {
     @BeforeTemplate
     StepVerifier.Assertions before(StepVerifier stepVerifier) {
@@ -2415,6 +2423,7 @@ final class ReactorRules {
    * Prefer {@link StepVerifier#verify(Duration)} over a dangling {@link
    * StepVerifier#verifyThenAssertThat(Duration)}.
    */
+  @PossibleSourceIncompatibility
   static final class StepVerifierVerifyWithDuration {
     @BeforeTemplate
     StepVerifier.Assertions before(StepVerifier stepVerifier, Duration duration) {
@@ -2477,6 +2486,7 @@ final class ReactorRules {
    */
   // XXX: This rule assumes that the matched collector does not drop elements. Consider introducing
   // a `@Matches(DoesNotDropElements.class)` or `@NotMatches(MayDropElements.class)` guard.
+  @PossibleSourceIncompatibility
   static final class FluxAsStepVerifierCreateExpectNext<T, L extends List<T>> {
     @BeforeTemplate
     StepVerifier.Step<L> before(Flux<T> flux, T object, Collector<? super T, ?, L> collector) {
@@ -2537,6 +2547,7 @@ final class ReactorRules {
    * Prefer {@link StepVerifier.LastStep#verifyErrorMatches(Predicate)} over more verbose
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class LastStepVerifyErrorMatches {
     @BeforeTemplate
     Duration before(StepVerifier.LastStep lastStep, Predicate<Throwable> predicate) {
@@ -2576,6 +2587,7 @@ final class ReactorRules {
    * Prefer {@link StepVerifier.LastStep#verifyErrorSatisfies(Consumer)} with AssertJ over more
    * contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class LastStepVerifyErrorSatisfiesAssertThatIsInstanceOfHasMessage<
       T extends Throwable> {
     @BeforeTemplate

@@ -11,6 +11,7 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link CharSequence}s. */
 @OnlineDocumentation
@@ -52,6 +53,7 @@ final class AssertJCharSequenceRules {
   }
 
   /** Prefer {@link AbstractCharSequenceAssert#hasSize(int)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSize {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(CharSequence actual, int expected) {

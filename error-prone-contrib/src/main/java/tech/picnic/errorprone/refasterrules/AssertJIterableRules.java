@@ -17,6 +17,7 @@ import org.assertj.core.api.IteratorAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Iterable}s. */
 @OnlineDocumentation
@@ -43,6 +44,7 @@ final class AssertJIterableRules {
   }
 
   /** Prefer {@code assertThat(iterable).isNotEmpty()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEmpty<E> {
     @BeforeTemplate
     IteratorAssert<E> before(Iterable<E> actual) {
@@ -82,6 +84,7 @@ final class AssertJIterableRules {
   }
 
   /** Prefer {@link ObjectEnumerableAssert#contains(Object[])} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatContains<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> actual, E element) {
@@ -98,6 +101,7 @@ final class AssertJIterableRules {
   /**
    * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over less explicit alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContain<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> actual, E element) {
@@ -114,6 +118,7 @@ final class AssertJIterableRules {
   /**
    * Prefer {@link AbstractIterableAssert#containsAll(Iterable)} over less explicit alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsAll<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> actual, Collection<? extends E> iterable) {
@@ -133,6 +138,7 @@ final class AssertJIterableRules {
   // XXX: In practice this rule isn't very useful, as it only matches invocations of
   // `assertThat(E)`. In most cases a more specific overload of `assertThat` is invoked, in which
   // case this rule won't match. Look into a more robust approach.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactly<S, E extends S> {
     @BeforeTemplate
     ObjectAssert<S> before(Iterable<S> actual, E expected) {

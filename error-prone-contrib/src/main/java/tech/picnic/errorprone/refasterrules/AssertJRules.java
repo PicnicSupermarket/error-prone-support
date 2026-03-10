@@ -33,6 +33,7 @@ import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
 
 /** Refaster rules related to AssertJ expressions and statements. */
@@ -104,6 +105,7 @@ final class AssertJRules {
   /** Prefer {@link OptionalDoubleAssert#hasValue(double)} over more fragile alternatives. */
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsDouble`.
+  @PossibleSourceIncompatibility
   static final class AssertThatHasValueOptionalDouble {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(OptionalDouble actual, double expectedValue) {
@@ -124,6 +126,7 @@ final class AssertJRules {
   /** Prefer {@link OptionalIntAssert#hasValue(int)} over more fragile alternatives. */
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsInt`.
+  @PossibleSourceIncompatibility
   static final class AssertThatHasValueOptionalInt {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(OptionalInt actual, int expectedValue) {
@@ -144,6 +147,7 @@ final class AssertJRules {
   /** Prefer {@link OptionalLongAssert#hasValue(long)} over more fragile alternatives. */
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsLong`.
+  @PossibleSourceIncompatibility
   static final class AssertThatHasValueOptionalLong {
     @BeforeTemplate
     AbstractLongAssert<?> before(OptionalLong actual, long expectedValue) {
@@ -337,6 +341,7 @@ final class AssertJRules {
    */
   // XXX: To match in all cases there'll need to be a `@BeforeTemplate` variant for each
   // `assertThat` overload. Consider defining a `BugChecker` instead.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsEntry<K, V> {
     @BeforeTemplate
     ObjectAssert<V> before(Map<K, V> actual, K key, V value) {
@@ -356,6 +361,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsAnyElementsOf(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -386,6 +392,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsAnyOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsAnyOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -414,6 +421,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsAnyOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsAnyOfVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
@@ -445,6 +453,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsAll(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsAll<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -475,6 +484,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#contains(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContains<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -503,6 +513,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#contains(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
@@ -536,6 +547,7 @@ final class AssertJRules {
    * Prefer {@link ListAssert#containsExactlyElementsOf(Iterable)} over less efficient alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactlyElementsOfStream<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -552,6 +564,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsExactly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactlyStream<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -568,6 +581,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsExactly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactlyVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsExactlyStream" /* Varargs converted to array. */)
@@ -588,6 +602,7 @@ final class AssertJRules {
    * alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactlyInAnyOrderElementsOfStream<
       S, T extends S, U extends T> {
     @BeforeTemplate
@@ -613,6 +628,7 @@ final class AssertJRules {
    * Prefer {@link ListAssert#containsExactlyInAnyOrder(Object[])} over less efficient alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactlyInAnyOrder<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -637,6 +653,7 @@ final class AssertJRules {
    * Prefer {@link ListAssert#containsExactlyInAnyOrder(Object[])} over less efficient alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactlyInAnyOrderVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsExactlyInAnyOrder" /* Varargs converted to array. */)
@@ -663,6 +680,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsSequence(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -685,6 +703,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsSequence(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsSequenceVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsSequence" /* Varargs converted to array. */)
@@ -702,6 +721,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsSubsequence(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsSubsequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -724,6 +744,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsSubsequence(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsSubsequenceVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsSubsequence" /* Varargs converted to array. */)
@@ -745,6 +766,7 @@ final class AssertJRules {
    * alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContainAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -775,6 +797,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#doesNotContain(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContain<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -803,6 +826,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#doesNotContain(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContainVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
@@ -836,6 +860,7 @@ final class AssertJRules {
    * Prefer {@link ListAssert#doesNotContainSequence(Iterable)} over less efficient alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContainSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -860,6 +885,7 @@ final class AssertJRules {
    * Prefer {@link ListAssert#doesNotContainSequence(Object[])} over less efficient alternatives.
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContainSequenceVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatDoesNotContainSequence" /* Varargs converted to array. */)
@@ -878,6 +904,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#hasSameElementsAs(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSameElementsAsStream<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -908,6 +935,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsOnly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsOnly<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -936,6 +964,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#containsOnly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsOnlyVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
@@ -967,6 +996,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#isSubsetOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatIsSubsetOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
@@ -1013,6 +1043,7 @@ final class AssertJRules {
 
   /** Prefer {@link ListAssert#isSubsetOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
+  @PossibleSourceIncompatibility
   static final class AssertThatIsSubsetOfVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)

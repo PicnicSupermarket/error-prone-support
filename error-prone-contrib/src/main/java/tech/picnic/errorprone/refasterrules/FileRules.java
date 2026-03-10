@@ -28,6 +28,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.util.List;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with files. */
 @OnlineDocumentation
@@ -291,6 +292,7 @@ final class FileRules {
 
   /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  @PossibleSourceIncompatibility
   static final class FilesNewInputStreamPathOf {
     @BeforeTemplate
     @SuppressWarnings(
@@ -307,6 +309,7 @@ final class FileRules {
 
   /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  @PossibleSourceIncompatibility
   static final class FilesNewInputStreamFileToPath {
     @BeforeTemplate
     @SuppressWarnings(
@@ -323,6 +326,7 @@ final class FileRules {
 
   /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  @PossibleSourceIncompatibility
   static final class FilesNewOutputStreamPathOf {
     @BeforeTemplate
     @SuppressWarnings(
@@ -339,6 +343,7 @@ final class FileRules {
 
   /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  @PossibleSourceIncompatibility
   static final class FilesNewOutputStreamFileToPath {
     @BeforeTemplate
     @SuppressWarnings(

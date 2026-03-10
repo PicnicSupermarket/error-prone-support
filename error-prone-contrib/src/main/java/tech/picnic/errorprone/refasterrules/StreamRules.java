@@ -58,6 +58,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
@@ -349,6 +350,7 @@ final class StreamRules {
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
+  @PossibleSourceIncompatibility
   static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     // XXX: Drop the `TypeParameterQualifier` suppression if
     // https://github.com/google/error-prone/pull/5884 is merged and released.
@@ -592,6 +594,7 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToInt(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamMapToIntSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
@@ -613,6 +616,7 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToDouble(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamMapToDoubleSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
@@ -634,6 +638,7 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToLong(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamMapToLongSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
@@ -700,6 +705,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#count()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamCount<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)

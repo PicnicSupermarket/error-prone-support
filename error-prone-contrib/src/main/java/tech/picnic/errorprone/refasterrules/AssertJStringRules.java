@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link String}s. */
 @OnlineDocumentation
@@ -49,6 +50,7 @@ final class AssertJStringRules {
   /**
    * Prefer {@link AbstractStringAssert#startsWith(CharSequence)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatStartsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String prefix) {
@@ -66,6 +68,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#doesNotStartWith(CharSequence)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotStartWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String prefix) {
@@ -82,6 +85,7 @@ final class AssertJStringRules {
   /**
    * Prefer {@link AbstractStringAssert#endsWith(CharSequence)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatEndsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String suffix) {
@@ -99,6 +103,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#doesNotEndWith(CharSequence)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotEndWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String suffix) {
@@ -115,6 +120,7 @@ final class AssertJStringRules {
   /**
    * Prefer {@link AbstractStringAssert#contains(CharSequence...)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatContains {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, CharSequence s) {
@@ -132,6 +138,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#doesNotContain(CharSequence...)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContain {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, CharSequence s) {
@@ -149,6 +156,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualToIgnoringCase {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String expected) {
@@ -166,6 +174,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualToIgnoringCase {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String expected) {
@@ -194,6 +203,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#isNotBlank()} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotBlank {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual) {
@@ -208,6 +218,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#matches(CharSequence)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatMatches {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String regex) {
@@ -225,6 +236,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#doesNotMatch(CharSequence)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotMatch {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String actual, String regex) {

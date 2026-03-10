@@ -102,22 +102,6 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#monoToCompletable(Mono)} over less idiomatic alternatives. */
-  static final class MonoAsRxJava2AdapterMonoToCompletable<T> {
-    @BeforeTemplate
-    Completable before(Mono<T> publisher) {
-      return Refaster.anyOf(
-          Completable.fromPublisher(publisher),
-          publisher.as(Completable::fromPublisher),
-          RxJava2Adapter.monoToCompletable(publisher));
-    }
-
-    @AfterTemplate
-    Completable after(Mono<T> publisher) {
-      return publisher.as(RxJava2Adapter::monoToCompletable);
-    }
-  }
-
   /** Prefer {@link RxJava2Adapter#monoToFlowable(Mono)} over less idiomatic alternatives. */
   static final class MonoAsRxJava2AdapterMonoToFlowable<T> {
     @BeforeTemplate
@@ -163,6 +147,36 @@ final class RxJava2AdapterRules {
     }
   }
 
+  /** Prefer {@link RxJava2Adapter#singleToMono(Single)} over less idiomatic alternatives. */
+  static final class SingleAsRxJava2AdapterSingleToMono<T> {
+    @BeforeTemplate
+    Mono<T> before(Single<T> source) {
+      return Refaster.anyOf(
+          RxJava2Adapter.singleToMono(source), source.to(RxJava2Adapter::singleToMono));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Single<T> source) {
+      return source.as(RxJava2Adapter::singleToMono);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#monoToCompletable(Mono)} over less idiomatic alternatives. */
+  static final class MonoAsRxJava2AdapterMonoToCompletable<T> {
+    @BeforeTemplate
+    Completable before(Mono<T> publisher) {
+      return Refaster.anyOf(
+          Completable.fromPublisher(publisher),
+          publisher.as(Completable::fromPublisher),
+          RxJava2Adapter.monoToCompletable(publisher));
+    }
+
+    @AfterTemplate
+    Completable after(Mono<T> publisher) {
+      return publisher.as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
   /**
    * Prefer chaining {@link Observable#toFlowable(BackpressureStrategy)} with {@link
    * RxJava2Adapter#flowableToFlux(Flowable)} over less idiomatic alternatives.
@@ -179,20 +193,6 @@ final class RxJava2AdapterRules {
     @AfterTemplate
     Flux<T> after(Observable<T> source, BackpressureStrategy strategy) {
       return source.toFlowable(strategy).as(RxJava2Adapter::flowableToFlux);
-    }
-  }
-
-  /** Prefer {@link RxJava2Adapter#singleToMono(Single)} over less idiomatic alternatives. */
-  static final class SingleAsRxJava2AdapterSingleToMono<T> {
-    @BeforeTemplate
-    Mono<T> before(Single<T> source) {
-      return Refaster.anyOf(
-          RxJava2Adapter.singleToMono(source), source.to(RxJava2Adapter::singleToMono));
-    }
-
-    @AfterTemplate
-    Mono<T> after(Single<T> source) {
-      return source.as(RxJava2Adapter::singleToMono);
     }
   }
 }

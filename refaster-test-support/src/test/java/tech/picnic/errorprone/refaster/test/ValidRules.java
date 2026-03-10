@@ -11,6 +11,7 @@ import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
 /** Refaster rule collection to validate that having no violations works as expected. */
+@SuppressWarnings("RefasterRuleName" /* Rule names are part of the test fixture API. */)
 final class ValidRules {
   private ValidRules() {}
 

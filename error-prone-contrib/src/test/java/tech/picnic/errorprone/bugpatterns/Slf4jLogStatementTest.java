@@ -86,7 +86,6 @@ final class Slf4jLogStatementTest {
         .doTest();
   }
 
-  // XXX: Drop what's unused.
   @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(Slf4jLogStatement.class, getClass())
@@ -103,14 +102,14 @@ final class Slf4jLogStatementTest {
             "",
             "  private final Marker marker = MarkerFactory.getMarker(A.class.getName());",
             "  private final Object o = new Object();",
-            "  private final String s = o.toString();",
             "  private final Throwable t = new Throwable();",
             "",
             "  void m() {",
             "    LOG.error(FMT_ERR, o);",
             "    LOG.error(\"format-string-with-'%s'-placeholder\", o);",
-            "    LOG.error(\"format-string-with-\\\"%s\\\"-placeholder\", o);",
-            "    LOG.error(\"format-string-with-%s\" + \"-placeholder\", o);",
+            "    LOG.error(marker, \"format-string-with-\\\"%s\\\"-placeholder\", o);",
+            "    LOG.error(\"format-string-with-%s\" + \"-placeholder\", o, t);",
+            "    LOG.error(marker, \"format-string-with-'%s'-placeholder\", o, t);",
             "  }",
             "}")
         .addOutputLines(
@@ -126,14 +125,14 @@ final class Slf4jLogStatementTest {
             "",
             "  private final Marker marker = MarkerFactory.getMarker(A.class.getName());",
             "  private final Object o = new Object();",
-            "  private final String s = o.toString();",
             "  private final Throwable t = new Throwable();",
             "",
             "  void m() {",
             "    LOG.error(FMT_ERR, o);",
             "    LOG.error(\"format-string-with-'{}'-placeholder\", o);",
-            "    LOG.error(\"format-string-with-\\\"{}\\\"-placeholder\", o);",
-            "    LOG.error(\"format-string-with-{}\" + \"-placeholder\", o);",
+            "    LOG.error(marker, \"format-string-with-\\\"{}\\\"-placeholder\", o);",
+            "    LOG.error(\"format-string-with-{}\" + \"-placeholder\", o, t);",
+            "    LOG.error(marker, \"format-string-with-'{}'-placeholder\", o, t);",
             "  }",
             "}")
         .doTest();

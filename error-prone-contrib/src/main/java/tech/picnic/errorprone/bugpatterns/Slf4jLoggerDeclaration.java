@@ -176,9 +176,8 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
 
   private static ClassTree getEnclosingClass(VisitorState state) {
     ClassTree clazz = state.findEnclosing(ClassTree.class);
-    // XXX: Review whether we should relax this constraint in the face of so-called anonymous
-    // classes. See
-    // https://docs.oracle.com/en/java/javase/23/language/implicitly-declared-classes-and-instance-main-methods.html
+    // XXX: Gracefully handle implicitly declared classes / unnamed classes. See
+    // https://docs.oracle.com/en/java/javase/23/language/implicitly-declared-classes-and-instance-main-methods.html.
     verify(clazz != null, "Variable not defined inside class");
     return clazz;
   }

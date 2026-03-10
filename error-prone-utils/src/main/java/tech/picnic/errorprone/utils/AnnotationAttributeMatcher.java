@@ -19,16 +19,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-// XXX: Redefine as a record?
-// XXX: Document design decision that the project stays as close as possible to Error Prone.
-//      ^ ... and *therefore* uses Google Auto Value rather than Immutables.org.
-// XXX: Make this class implement the `MultiMatcher` interface.
 /**
  * A matcher of (annotation, attribute) pairs.
  *
  * <p>This class allows one to define a whitelist or blacklist of annotations or their attributes.
  * Annotations are identified by their fully qualified name.
  */
+// XXX: Redefine as a record?
+// XXX: Document design decision that the project stays as close as possible to Error Prone.
+//      ^ ... and *therefore* uses Google Auto Value rather than Immutables.org.
+// XXX: Make this class implement the `MultiMatcher` interface.
 public final class AnnotationAttributeMatcher implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -19,6 +19,7 @@ import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
 import org.assertj.core.api.ThrowingConsumer;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to AssertJ assertions over {@link Optional}s. */
@@ -27,6 +28,7 @@ final class AssertJOptionalRules {
   private AssertJOptionalRules() {}
 
   /** Prefer {@code assertThat(optional).get()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatGet<T> {
     @BeforeTemplate
     ObjectAssert<T> before(Optional<T> actual) {
@@ -56,6 +58,7 @@ final class AssertJOptionalRules {
   }
 
   /** Prefer {@code assertThat(optional).isPresent()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsPresent<T> {
     @BeforeTemplate
     AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> actual) {
@@ -86,6 +89,7 @@ final class AssertJOptionalRules {
   }
 
   /** Prefer {@code assertThat(optional).isEmpty()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEmpty<T> {
     @BeforeTemplate
     AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> actual) {
@@ -140,6 +144,7 @@ final class AssertJOptionalRules {
    * Prefer {@link AbstractOptionalAssert#hasValueSatisfying(Consumer)} over less idiomatic
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AbstractOptionalAssertHasValueSatisfying<T> {
     @BeforeTemplate
     AbstractObjectAssert<?, T> before(
@@ -164,6 +169,7 @@ final class AssertJOptionalRules {
   /**
    * Prefer {@code assertThat(optional).get().matches(predicate)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatGetMatches<S, T extends S> {
     @BeforeTemplate
     OptionalAssert<T> before(Optional<T> actual, Predicate<S> predicate) {

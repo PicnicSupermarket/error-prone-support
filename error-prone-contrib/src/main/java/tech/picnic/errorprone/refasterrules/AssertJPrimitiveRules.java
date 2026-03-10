@@ -16,6 +16,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over primitive values. */
 @OnlineDocumentation
@@ -23,6 +24,7 @@ final class AssertJPrimitiveRules {
   private AssertJPrimitiveRules() {}
 
   /** Prefer {@link AbstractBooleanAssert#isEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
@@ -72,6 +74,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@link AbstractBooleanAssert#isNotEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean other) {
@@ -121,6 +124,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@link AbstractDoubleAssert#isLessThan} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsLessThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
@@ -136,6 +140,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@link AbstractDoubleAssert#isLessThanOrEqualTo} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
@@ -151,6 +156,7 @@ final class AssertJPrimitiveRules {
   }
 
   /** Prefer {@link AbstractDoubleAssert#isGreaterThan} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
@@ -168,6 +174,7 @@ final class AssertJPrimitiveRules {
   /**
    * Prefer {@link AbstractDoubleAssert#isGreaterThanOrEqualTo} over less idiomatic alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {

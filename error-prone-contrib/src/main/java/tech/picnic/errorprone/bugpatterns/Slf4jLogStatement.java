@@ -28,8 +28,6 @@ import tech.picnic.errorprone.utils.SourceCode;
 /** A {@link BugChecker} that flags SLF4J usages that are likely to be in error. */
 // XXX: The special-casing of Throwable applies only to SLF4J 1.6.0+; see
 // https://www.slf4j.org/faq.html#paramException. That should be documented.
-// XXX: Write a similar checker for Spring RestTemplates, String.format and friends, Guava
-// preconditions, ...
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Make sure SLF4J log statements contain proper placeholders with matching arguments",

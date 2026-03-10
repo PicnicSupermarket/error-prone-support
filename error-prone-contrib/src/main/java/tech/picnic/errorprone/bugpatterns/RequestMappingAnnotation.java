@@ -99,8 +99,6 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) {
     // XXX: Auto-add `@RequestParam` where applicable.
-    // XXX: What about the `PurchasingProposerRequestParams` in POM? Implies `@RequestBody`?
-    // (Documentation doesn't mention this, IIUC.)
     return HAS_MAPPING_ANNOTATION.matches(tree, state)
             && LACKS_PARAMETER_ANNOTATION.matches(tree, state)
         ? buildDescription(tree)

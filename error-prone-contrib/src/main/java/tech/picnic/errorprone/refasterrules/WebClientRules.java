@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient.RequestBodyUri
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import org.springframework.web.reactive.function.client.WebClient.RequestHeadersUriSpec;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to expressions dealing with {@link
@@ -29,6 +30,7 @@ final class WebClientRules {
   private WebClientRules() {}
 
   /** Prefer {@link RequestBodySpec#bodyValue(Object)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class RequestBodySpecBodyValue<T> {
     @BeforeTemplate
     RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T body) {
@@ -48,6 +50,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#get()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientGet {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -66,6 +69,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#head()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientHead {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -84,6 +88,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#options()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientOptions {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -102,6 +107,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#patch()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPatch {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -120,6 +126,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#post()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPost {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -138,6 +145,7 @@ final class WebClientRules {
   }
 
   /** Prefer {@link WebClient#put()} over less idiomatic alternatives. */
+  @PossibleSourceIncompatibility
   static final class WebClientPut {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -159,6 +167,7 @@ final class WebClientRules {
    * Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over more contrived alternatives.
    */
   // XXX: Resolve the `RefasterReturnType` warning suppressions by splitting this rule.
+  @PossibleSourceIncompatibility
   static final class RequestHeadersUriSpecUri<
       S extends RequestHeadersSpec<S>, T extends WebTestClient.RequestHeadersSpec<T>> {
     @BeforeTemplate

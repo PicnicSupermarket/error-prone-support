@@ -13,6 +13,7 @@ import org.assertj.core.api.Assert;
 import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ assertions over enumerable objects. */
@@ -76,6 +77,7 @@ final class AssertJEnumerableRules {
   }
 
   /** Prefer {@link EnumerableAssert#isNotEmpty()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertIsNotEmpty<E> {
     @BeforeTemplate
     EnumerableAssert<?, E> before(EnumerableAssert<?, E> enumerableAssert) {
@@ -113,6 +115,7 @@ final class AssertJEnumerableRules {
   }
 
   /** Prefer {@link EnumerableAssert#hasSize(int)} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSize<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -135,6 +138,7 @@ final class AssertJEnumerableRules {
   }
 
   /** Prefer {@link EnumerableAssert#hasSizeLessThan(int)} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeLessThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -159,6 +163,7 @@ final class AssertJEnumerableRules {
   /**
    * Prefer {@link EnumerableAssert#hasSizeLessThanOrEqualTo(int)} over more verbose alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeLessThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -181,6 +186,7 @@ final class AssertJEnumerableRules {
   }
 
   /** Prefer {@link EnumerableAssert#hasSizeGreaterThan(int)} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeGreaterThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -206,6 +212,7 @@ final class AssertJEnumerableRules {
    * Prefer {@link EnumerableAssert#hasSizeGreaterThanOrEqualTo(int)} over more verbose
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeGreaterThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
@@ -228,6 +235,7 @@ final class AssertJEnumerableRules {
   }
 
   /** Prefer {@link EnumerableAssert#hasSizeBetween(int, int)} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSizeBetween<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(

@@ -13,6 +13,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsNullLiteral;
 
 /** Refaster rules related to AssertJ assertions over arbitrary objects. */
@@ -21,6 +22,7 @@ final class AssertJObjectRules {
   private AssertJObjectRules() {}
 
   /** Prefer {@link ObjectAssert#isInstanceOf(Class)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsInstanceOfClass<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S actual) {
@@ -35,6 +37,7 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#isInstanceOf(Class)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsInstanceOf<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T actual, Class<S> type) {
@@ -49,6 +52,7 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#isNotInstanceOf(Class)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotInstanceOfClass<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S actual) {
@@ -69,6 +73,7 @@ final class AssertJObjectRules {
    * the original code throws a {@link NullPointerException}, while the replacement handles the
    * comparison gracefully.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualTo<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S actual, T expected) {
@@ -89,6 +94,7 @@ final class AssertJObjectRules {
    * the original code throws a {@link NullPointerException}, while the replacement handles the
    * comparison gracefully.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualTo<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S actual, T other) {
@@ -103,6 +109,7 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#hasToString(String)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasToString<T> {
     @BeforeTemplate
     AbstractStringAssert<?> before(T actual, String expectedToString) {
@@ -117,6 +124,8 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#isSameAs(Object)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
+  @PossibleSourceIncompatibility
   static final class AssertThatIsSameAs<T> {
     @BeforeTemplate
     @SuppressWarnings("ReferenceEquality" /* This violation will be rewritten. */)
@@ -133,6 +142,8 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#isNotSameAs(Object)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotSameAs<T> {
     @BeforeTemplate
     @SuppressWarnings("ReferenceEquality" /* This violation will be rewritten. */)
@@ -149,6 +160,7 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#hasSameHashCodeAs(Object)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSameHashCodeAs<T> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T other) {
