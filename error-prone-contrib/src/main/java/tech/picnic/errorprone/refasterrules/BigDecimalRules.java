@@ -12,7 +12,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class BigDecimalRules {
   private BigDecimalRules() {}
 
-  /** Prefer using the constant {@link BigDecimal#ZERO} when possible. */
+  /** Prefer {@link BigDecimal#ZERO} over less efficient alternatives. */
   static final class BigDecimalZero {
     @BeforeTemplate
     BigDecimal before() {
@@ -25,7 +25,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#ONE} when possible. */
+  /** Prefer {@link BigDecimal#ONE} over less efficient alternatives. */
   static final class BigDecimalOne {
     @BeforeTemplate
     BigDecimal before() {
@@ -38,7 +38,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#TWO} when possible. */
+  /** Prefer {@link BigDecimal#TWO} over less efficient alternatives. */
   static final class BigDecimalTwo {
     @BeforeTemplate
     BigDecimal before() {
@@ -51,7 +51,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#TEN} when possible. */
+  /** Prefer {@link BigDecimal#TEN} over less efficient alternatives. */
   static final class BigDecimalTen {
     @BeforeTemplate
     BigDecimal before() {
@@ -64,7 +64,13 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer {@link BigDecimal#valueOf(double)} over the associated constructor. */
+  /**
+   * Prefer {@link BigDecimal#valueOf(double)} over the associated constructor.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the {@link BigDecimal} value created, as
+   * {@link BigDecimal#valueOf(double)} uses the double's canonical string representation, while
+   * {@link BigDecimal#BigDecimal(double)} uses the exact binary floating-point value.
+   */
   // XXX: Ideally we also rewrite `new BigDecimal("<some-integer-value>")` in cases where the
   // specified number can be represented as an `int` or `long`, but that requires a custom
   // `BugChecker`.
@@ -81,8 +87,8 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over more contrived alternatives. */
-  static final class BigDecimalSignumIsZero {
+  /** Prefer a {@link BigDecimal#signum()} comparison to 0 over less explicit alternatives. */
+  static final class BigDecimalSignumEqualToZero {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
@@ -97,10 +103,10 @@ final class BigDecimalRules {
   }
 
   /**
-   * Prefer a {@link BigDecimal#signum()} comparison to 0 over more contrived or less idiomatic
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less clear
    * alternatives.
    */
-  static final class BigDecimalSignumIsPositive {
+  static final class BigDecimalSignumGreaterThanZero {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
@@ -118,10 +124,10 @@ final class BigDecimalRules {
   }
 
   /**
-   * Prefer a {@link BigDecimal#signum()} comparison to -1 over more contrived or less idiomatic
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less clear
    * alternatives.
    */
-  static final class BigDecimalSignumIsNegative {
+  static final class BigDecimalSignumLessThanZero {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(

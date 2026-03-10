@@ -9,17 +9,15 @@ import java.time.Instant;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractInstantAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
-/**
- * Refaster rules related to AssertJ assertions over {@link Instant}s.
- *
- * <p>These rules simplify and improve the readability of tests by using {@link Instant}-specific
- * AssertJ assertion methods instead of generic assertions.
- */
+/** Refaster rules related to AssertJ assertions over {@link Instant}s. */
 @OnlineDocumentation
 final class AssertJInstantRules {
   private AssertJInstantRules() {}
 
+  /** Prefer {@link AbstractInstantAssert#isAfter(Instant)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAfter {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -32,6 +30,11 @@ final class AssertJInstantRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractInstantAssert#isBeforeOrEqualTo(Instant)} over less explicit
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsBeforeOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -44,6 +47,8 @@ final class AssertJInstantRules {
     }
   }
 
+  /** Prefer {@link AbstractInstantAssert#isBefore(Instant)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsBefore {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -56,6 +61,10 @@ final class AssertJInstantRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractInstantAssert#isAfterOrEqualTo(Instant)} over less explicit alternatives.
+   */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAfterOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Instant actual, Instant other) {
@@ -68,6 +77,10 @@ final class AssertJInstantRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractInstantAssert#isBetween(Instant, Instant)} over more verbose
+   * alternatives.
+   */
   static final class AssertThatIsBetween {
     @BeforeTemplate
     AbstractInstantAssert<?> before(Instant actual, Instant start, Instant end) {
@@ -82,6 +95,10 @@ final class AssertJInstantRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractInstantAssert#isStrictlyBetween(Instant, Instant)} over more verbose
+   * alternatives.
+   */
   static final class AssertThatIsStrictlyBetween {
     @BeforeTemplate
     AbstractInstantAssert<?> before(Instant actual, Instant start, Instant end) {

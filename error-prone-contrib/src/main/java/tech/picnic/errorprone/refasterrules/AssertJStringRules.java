@@ -11,17 +11,18 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link String}s. */
 @OnlineDocumentation
 final class AssertJStringRules {
   private AssertJStringRules() {}
 
-  static final class AbstractStringAssertStringIsEmpty {
+  /** Prefer {@link AbstractStringAssert#isEmpty()} over less explicit alternatives. */
+  static final class AbstractStringAssertIsEmpty {
     @BeforeTemplate
     void before(AbstractStringAssert<?> stringAssert) {
       stringAssert.isEqualTo("");
@@ -33,7 +34,8 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AbstractStringAssertStringIsNotEmpty {
+  /** Prefer {@link AbstractStringAssert#isNotEmpty()} over less explicit alternatives. */
+  static final class AbstractStringAssertIsNotEmpty {
     @BeforeTemplate
     AbstractStringAssert<?> before(AbstractStringAssert<?> stringAssert) {
       return stringAssert.isNotEqualTo("");
@@ -45,7 +47,11 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringStartsWith {
+  /**
+   * Prefer {@link AbstractStringAssert#startsWith(CharSequence)} over more contrived alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatStartsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String prefix) {
       return assertThat(string.startsWith(prefix)).isTrue();
@@ -58,7 +64,12 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringDoesNotStartWith {
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotStartWith(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatDoesNotStartWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String prefix) {
       return assertThat(string.startsWith(prefix)).isFalse();
@@ -71,33 +82,46 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringEndsWith {
+  /**
+   * Prefer {@link AbstractStringAssert#endsWith(CharSequence)} over more contrived alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatEndsWith {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String prefix) {
-      return assertThat(string.endsWith(prefix)).isTrue();
+    AbstractBooleanAssert<?> before(String string, String suffix) {
+      return assertThat(string.endsWith(suffix)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String prefix) {
-      return assertThat(string).endsWith(prefix);
+    AbstractStringAssert<?> after(String string, String suffix) {
+      return assertThat(string).endsWith(suffix);
     }
   }
 
-  static final class AssertThatStringDoesNotEndWith {
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotEndWith(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatDoesNotEndWith {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String prefix) {
-      return assertThat(string.endsWith(prefix)).isFalse();
+    AbstractBooleanAssert<?> before(String string, String suffix) {
+      return assertThat(string.endsWith(suffix)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String prefix) {
-      return assertThat(string).doesNotEndWith(prefix);
+    AbstractStringAssert<?> after(String string, String suffix) {
+      return assertThat(string).doesNotEndWith(suffix);
     }
   }
 
-  static final class AssertThatStringContains {
+  /**
+   * Prefer {@link AbstractStringAssert#contains(CharSequence...)} over more contrived alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatContains {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {
       return assertThat(string.contains(substring)).isTrue();
@@ -110,7 +134,12 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringDoesNotContain {
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotContain(CharSequence...)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatDoesNotContain {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {
       return assertThat(string.contains(substring)).isFalse();
@@ -127,6 +156,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualToIgnoringCase {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String other) {
@@ -144,6 +174,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualToIgnoringCase {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String other) {
@@ -172,6 +203,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#isNotBlank()} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotBlank {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string) {
@@ -185,33 +217,41 @@ final class AssertJStringRules {
     }
   }
 
+  /** Prefer {@link AbstractStringAssert#matches(CharSequence)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatMatches {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(String string, String regex) {
+    AbstractBooleanAssert<?> before(String string, String regex) {
       return assertThat(string.matches(regex)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string, String regex) {
+    AbstractStringAssert<?> after(String string, String regex) {
       return assertThat(string).matches(regex);
     }
   }
 
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotMatch(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotMatch {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(String string, String regex) {
+    AbstractBooleanAssert<?> before(String string, String regex) {
       return assertThat(string.matches(regex)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string, String regex) {
+    AbstractStringAssert<?> after(String string, String regex) {
       return assertThat(string).doesNotMatch(regex);
     }
   }
 
-  static final class AssertThatPathContent {
+  /** Prefer {@code assertThat(path).content(charset)} over more contrived alternatives. */
+  static final class AssertThatContent {
     @BeforeTemplate
     AbstractStringAssert<?> before(Path path, Charset charset) throws IOException {
       return assertThat(Files.readString(path, charset));
@@ -224,7 +264,8 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatPathContentUtf8 {
+  /** Prefer {@code assertThat(path).content(UTF_8)} over more contrived alternatives. */
+  static final class AssertThatContentUtf8 {
     @BeforeTemplate
     AbstractStringAssert<?> before(Path path) throws IOException {
       return assertThat(Files.readString(path));

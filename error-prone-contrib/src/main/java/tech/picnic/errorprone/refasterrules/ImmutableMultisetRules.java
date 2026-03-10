@@ -34,8 +34,8 @@ final class ImmutableMultisetRules {
     }
   }
 
-  /** Prefer {@link ImmutableMultiset#of()} over more contrived alternatives. */
-  static final class EmptyImmutableMultiset<T> {
+  /** Prefer {@link ImmutableMultiset#of()} over less efficient alternatives. */
+  static final class ImmutableMultisetOf<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before() {
       return Refaster.anyOf(
@@ -49,10 +49,10 @@ final class ImmutableMultisetRules {
   }
 
   /**
-   * Prefer {@link ImmutableMultiset#copyOf(Iterable)} and variants over more contrived
-   * alternatives.
+   * Prefer {@link ImmutableMultiset#copyOf(Iterable)} and variants over less efficient or more
+   * contrived alternatives.
    */
-  static final class IterableToImmutableMultiset<T> {
+  static final class ImmutableMultisetCopyOf<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before(T[] iterable) {
       return Refaster.anyOf(
@@ -86,7 +86,7 @@ final class ImmutableMultisetRules {
   }
 
   /** Prefer {@link ImmutableMultiset#toImmutableMultiset()} over less idiomatic alternatives. */
-  static final class StreamToImmutableMultiset<T> {
+  static final class StreamCollectToImmutableMultiset<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before(Stream<T> stream) {
       return ImmutableMultiset.copyOf(stream.iterator());

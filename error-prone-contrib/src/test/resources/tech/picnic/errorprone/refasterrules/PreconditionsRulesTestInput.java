@@ -7,44 +7,44 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  @SuppressWarnings("RequireNonNull")
+  @SuppressWarnings("RequireNonNullExpression")
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(checkNotNull(null));
   }
 
-  void testCheckArgument() {
+  void testCheckArgumentNot() {
     if ("foo".isEmpty()) {
       throw new IllegalArgumentException();
     }
   }
 
-  void testCheckArgumentWithMessage() {
+  void testCheckArgumentNotWithString() {
     if ("foo".isEmpty()) {
       throw new IllegalArgumentException("The string is empty");
     }
   }
 
-  void testCheckElementIndexWithMessage() {
+  void testCheckElementIndex() {
     if (1 < 0 || 1 >= 2) {
       throw new IndexOutOfBoundsException("My index");
     }
   }
 
-  String testRequireNonNull() {
+  String testRequireNonNullExpression() {
     return checkNotNull("foo");
   }
 
-  void testRequireNonNullStatement() {
+  void testRequireNonNullBlock() {
     if ("foo" == null) {
       throw new NullPointerException();
     }
   }
 
-  String testRequireNonNullWithMessage() {
+  String testRequireNonNullWithStringExpression() {
     return checkNotNull("foo", "The string is null");
   }
 
-  void testRequireNonNullWithMessageStatement() {
+  void testRequireNonNullWithStringBlock() {
     if ("foo" == null) {
       throw new NullPointerException("The string is null");
     }
@@ -56,19 +56,19 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  void testCheckPositionIndexWithMessage() {
+  void testCheckPositionIndexWithString() {
     if (1 < 0 || 1 > 2) {
       throw new IndexOutOfBoundsException("My position");
     }
   }
 
-  void testCheckState() {
+  void testCheckStateNot() {
     if ("foo".isEmpty()) {
       throw new IllegalStateException();
     }
   }
 
-  void testCheckStateWithMessage() {
+  void testCheckStateNotWithString() {
     if ("foo".isEmpty()) {
       throw new IllegalStateException("The string is empty");
     }

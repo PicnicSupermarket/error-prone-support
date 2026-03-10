@@ -22,11 +22,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class NullRules {
   private NullRules() {}
 
-  /**
-   * Prefer the {@code ==} operator (with {@code null} as the second operand) over {@link
-   * Objects#isNull(Object)}.
-   */
-  static final class IsNull {
+  /** Prefer {@code == null} over less idiomatic alternatives. */
+  static final class EqualToNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
       return Refaster.anyOf(null == object, Objects.isNull(object));
@@ -38,11 +35,8 @@ final class NullRules {
     }
   }
 
-  /**
-   * Prefer the {@code !=} operator (with {@code null} as the second operand) over {@link
-   * Objects#nonNull(Object)}.
-   */
-  static final class IsNotNull {
+  /** Prefer {@code != null} over less idiomatic alternatives. */
+  static final class NotEqualToNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
       return Refaster.anyOf(null != object, Objects.nonNull(object));
@@ -95,11 +89,8 @@ final class NullRules {
     }
   }
 
-  /**
-   * Prefer {@link Objects#isNull(Object)} over the equivalent lambda function or more contrived
-   * alternatives.
-   */
-  static final class IsNullFunction<T> {
+  /** Prefer {@link Objects#isNull(Object)} over less idiomatic or more contrived alternatives. */
+  static final class ObjectsIsNull<T> {
     @BeforeTemplate
     Predicate<T> before() {
       return Refaster.anyOf(o -> o == null, not(Objects::nonNull));
@@ -111,11 +102,8 @@ final class NullRules {
     }
   }
 
-  /**
-   * Prefer {@link Objects#nonNull(Object)} over the equivalent lambda function or more contrived
-   * alternatives.
-   */
-  static final class NonNullFunction<T> {
+  /** Prefer {@link Objects#nonNull(Object)} over less idiomatic or more contrived alternatives. */
+  static final class ObjectsNonNull<T> {
     @BeforeTemplate
     Predicate<T> before() {
       return Refaster.anyOf(o -> o != null, not(Objects::isNull));

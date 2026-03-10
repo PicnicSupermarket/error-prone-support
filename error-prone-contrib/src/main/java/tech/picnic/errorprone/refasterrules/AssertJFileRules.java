@@ -10,17 +10,15 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
-/**
- * Refaster rules related to AssertJ assertions over {@link File}s.
- *
- * <p>These rules simplify and improve the readability of tests by using {@link File}-specific
- * AssertJ assertion methods instead of generic assertions.
- */
+/** Refaster rules related to AssertJ assertions over {@link File}s. */
 @OnlineDocumentation
 final class AssertJFileRules {
   private AssertJFileRules() {}
 
+  /** Prefer {@link AbstractFileAssert#exists()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatExists {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -33,6 +31,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#doesNotExist()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotExist {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -45,6 +45,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isFile()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsFile {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -57,6 +59,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isDirectory()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsDirectory {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -69,6 +73,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isAbsolute()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsAbsolute {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -81,6 +87,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isRelative()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsRelative {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -93,6 +101,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isReadable()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsReadable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -105,6 +115,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isWritable()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsWritable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -117,6 +129,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#isExecutable()} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsExecutable {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(File actual) {
@@ -129,6 +143,8 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#hasFileName(String)} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasFileName {
     @BeforeTemplate
     AbstractStringAssert<?> before(File actual, String fileName) {
@@ -141,6 +157,7 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#hasParent(File)} over more verbose alternatives. */
   // XXX: This rule changes the `File` against which subsequent assertions are made.
   static final class AssertThatHasParentFile {
     @BeforeTemplate
@@ -154,6 +171,7 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#hasParent(String)} over more verbose alternatives. */
   // XXX: This rule changes the `File` against which subsequent assertions are made.
   static final class AssertThatHasParentString {
     @BeforeTemplate
@@ -167,6 +185,7 @@ final class AssertJFileRules {
     }
   }
 
+  /** Prefer {@link AbstractFileAssert#hasNoParent()} over more verbose alternatives. */
   static final class AssertThatHasNoParent {
     @BeforeTemplate
     void before(File actual) {
@@ -180,9 +199,10 @@ final class AssertJFileRules {
   }
 
   /**
-   * Prefer using {@link AbstractFileAssert#hasExtension(String)} over more verbose and less
-   * accurate alternatives.
+   * Prefer {@link AbstractFileAssert#hasExtension(String)} over more verbose or less explicit
+   * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasExtension {
     @BeforeTemplate
     AbstractStringAssert<?> before(File actual, String expectedExtension) {

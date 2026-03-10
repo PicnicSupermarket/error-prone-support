@@ -13,6 +13,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class InputStreamRules {
   private InputStreamRules() {}
 
+  /** Prefer {@link InputStream#transferTo(OutputStream)} over non-JDK alternatives. */
   static final class InputStreamTransferTo {
     @BeforeTemplate
     long before(InputStream in, OutputStream out) throws IOException {
@@ -25,6 +26,7 @@ final class InputStreamRules {
     }
   }
 
+  /** Prefer {@link InputStream#readAllBytes()} over non-JDK alternatives. */
   static final class InputStreamReadAllBytes {
     @BeforeTemplate
     byte[] before(InputStream in) throws IOException {
@@ -37,6 +39,7 @@ final class InputStreamRules {
     }
   }
 
+  /** Prefer {@link InputStream#readNBytes(int)} over non-JDK alternatives. */
   static final class InputStreamReadNBytes {
     @BeforeTemplate
     byte[] before(InputStream in, int n) throws IOException {
@@ -49,6 +52,7 @@ final class InputStreamRules {
     }
   }
 
+  /** Prefer {@link InputStream#skipNBytes(long)} over non-JDK alternatives. */
   static final class InputStreamSkipNBytes {
     @BeforeTemplate
     void before(InputStream in, long n) throws IOException {

@@ -16,13 +16,13 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster templates related to statements dealing with {@link Preconditions}. */
+/** Refaster rules related to expressions dealing with {@link Preconditions}. */
 @OnlineDocumentation
 final class PreconditionsRules {
   private PreconditionsRules() {}
 
   /** Prefer {@link Preconditions#checkArgument(boolean)} over more verbose alternatives. */
-  static final class CheckArgument {
+  static final class CheckArgumentNot {
     @BeforeTemplate
     void before(boolean condition) {
       if (condition) {
@@ -38,7 +38,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Preconditions#checkArgument(boolean, Object)} over more verbose alternatives. */
-  static final class CheckArgumentWithMessage {
+  static final class CheckArgumentNotWithString {
     @BeforeTemplate
     void before(boolean condition, String message) {
       if (condition) {
@@ -54,13 +54,13 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less descriptive or more
+   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    *
    * <p>Note that the two-argument {@link Preconditions#checkElementIndex(int, int)} is better
    * replaced with {@link java.util.Objects#checkIndex(int, int)}.
    */
-  static final class CheckElementIndexWithMessage {
+  static final class CheckElementIndex {
     @BeforeTemplate
     void before(int index, int size, String message) {
       if (index < 0 || index >= size) {
@@ -76,7 +76,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over non-JDK alternatives. */
-  static final class RequireNonNull<T> {
+  static final class RequireNonNullExpression<T> {
     @BeforeTemplate
     T before(T object) {
       return checkNotNull(object);
@@ -90,7 +90,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
-  static final class RequireNonNullStatement<T extends @Nullable Object> {
+  static final class RequireNonNullBlock<T extends @Nullable Object> {
     // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
     // annotations.
     @BeforeTemplate
@@ -113,7 +113,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over non-JDK alternatives. */
-  static final class RequireNonNullWithMessage<T> {
+  static final class RequireNonNullWithStringExpression<T> {
     @BeforeTemplate
     T before(T object, String message) {
       return checkNotNull(object, message);
@@ -127,7 +127,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
-  static final class RequireNonNullWithMessageStatement<T extends @Nullable Object> {
+  static final class RequireNonNullWithStringBlock<T extends @Nullable Object> {
     // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
     // annotations.
     @BeforeTemplate
@@ -150,7 +150,7 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less descriptive or more verbose
+   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less explicit or more verbose
    * alternatives.
    */
   static final class CheckPositionIndex {
@@ -169,10 +169,10 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less descriptive or more
+   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    */
-  static final class CheckPositionIndexWithMessage {
+  static final class CheckPositionIndexWithString {
     @BeforeTemplate
     void before(int index, int size, String message) {
       if (index < 0 || index > size) {
@@ -188,7 +188,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
-  static final class CheckState {
+  static final class CheckStateNot {
     @BeforeTemplate
     void before(boolean condition) {
       if (condition) {
@@ -204,7 +204,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Preconditions#checkState(boolean, Object)} over more verbose alternatives. */
-  static final class CheckStateWithMessage {
+  static final class CheckStateNotWithString {
     @BeforeTemplate
     void before(boolean condition, String message) {
       if (condition) {

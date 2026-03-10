@@ -12,7 +12,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class SuggestedFixRules {
   private SuggestedFixRules() {}
 
-  /** Prefer {@link SuggestedFix#toBuilder()}} over more contrived alternatives. */
+  /** Prefer {@link SuggestedFix#toBuilder()} over more contrived alternatives. */
   static final class SuggestedFixToBuilder {
     @BeforeTemplate
     SuggestedFix.Builder before(SuggestedFix fix) {
@@ -38,8 +38,8 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#replace(Tree, String)}} over more contrived alternatives. */
-  static final class SuggestedFixReplaceTree {
+  /** Prefer {@link SuggestedFix#replace(Tree, String)} over more contrived alternatives. */
+  static final class SuggestedFixReplace2 {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String replaceWith) {
       return SuggestedFix.builder().replace(tree, replaceWith).build();
@@ -51,8 +51,8 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#replace(int, int, String)}} over more contrived alternatives. */
-  static final class SuggestedFixReplaceStartEnd {
+  /** Prefer {@link SuggestedFix#replace(int, int, String)} over more contrived alternatives. */
+  static final class SuggestedFixReplace3 {
     @BeforeTemplate
     SuggestedFix before(int start, int end, String replaceWith) {
       return SuggestedFix.builder().replace(start, end, replaceWith).build();
@@ -65,9 +65,9 @@ final class SuggestedFixRules {
   }
 
   /**
-   * Prefer {@link SuggestedFix#replace(Tree, String, int, int)}} over more contrived alternatives.
+   * Prefer {@link SuggestedFix#replace(Tree, String, int, int)} over more contrived alternatives.
    */
-  static final class SuggestedFixReplaceTreeStartEnd {
+  static final class SuggestedFixReplace4 {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String replaceWith, int start, int end) {
       return SuggestedFix.builder().replace(tree, replaceWith, start, end).build();
@@ -107,7 +107,7 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#postfixWith(Tree, String)}} over more contrived alternatives. */
+  /** Prefer {@link SuggestedFix#postfixWith(Tree, String)} over more contrived alternatives. */
   static final class SuggestedFixPostfixWith {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String postfix) {

@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 
 /** A method invocation expression {@link Matcher} factory. */
 // XXX: Document better. The expressions accepted here could also be defined using `MethodMatchers`.
-// So explain why this class is still useful.
+// So explain why this class is still useful. (Namely that it can be used to parse signatures that
+// are supplied via Error Prone flags.)
 public final class MethodMatcherFactory {
   private static final Splitter ARGUMENT_TYPE_SPLITTER =
       Splitter.on(',').trimResults().omitEmptyStrings();
@@ -42,7 +43,6 @@ public final class MethodMatcherFactory {
             .collect(toImmutableSet()));
   }
 
-  // XXX: It seems parse errors are silently swallowed. Double-check; if true, file a ticket.
   // XXX: This (probably) doesn't work for methods with array type arguments; if true, implement a
   // fix.
   private static Matcher<ExpressionTree> createMethodMatcher(CharSequence signature) {

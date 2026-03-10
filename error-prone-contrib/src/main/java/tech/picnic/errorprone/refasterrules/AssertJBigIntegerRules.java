@@ -17,6 +17,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJBigIntegerRules {
   private AssertJBigIntegerRules() {}
 
+  /** Prefer {@code isEqualTo(n)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsEqualTo {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger n) {
@@ -31,6 +32,7 @@ final class AssertJBigIntegerRules {
     }
   }
 
+  /** Prefer {@code isNotEqualTo(n)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger n) {
@@ -45,7 +47,8 @@ final class AssertJBigIntegerRules {
     }
   }
 
-  static final class AbstractBigIntegerAssertIsZero {
+  /** Prefer {@code isEqualTo(0)} over more contrived alternatives. */
+  static final class AbstractBigIntegerAssertIsEqualToZero {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
       return Refaster.anyOf(
@@ -60,7 +63,8 @@ final class AssertJBigIntegerRules {
     }
   }
 
-  static final class AbstractBigIntegerAssertIsNotZero {
+  /** Prefer {@code isNotEqualTo(0)} over more contrived alternatives. */
+  static final class AbstractBigIntegerAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
       return Refaster.anyOf(
@@ -75,7 +79,8 @@ final class AssertJBigIntegerRules {
     }
   }
 
-  static final class AbstractBigIntegerAssertIsOne {
+  /** Prefer {@code isEqualTo(1)} over more contrived alternatives. */
+  static final class AbstractBigIntegerAssertIsEqualToOne {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
       return Refaster.anyOf(

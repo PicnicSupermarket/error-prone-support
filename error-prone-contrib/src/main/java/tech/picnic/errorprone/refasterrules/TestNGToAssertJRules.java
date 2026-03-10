@@ -4,7 +4,7 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.data.Offset.offset;
+import static org.assertj.core.api.Assertions.offset;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertEqualsNoOrder;
 import static org.testng.Assert.assertFalse;
@@ -25,14 +25,21 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractBooleanAssert;
+import org.assertj.core.api.AbstractDoubleAssert;
+import org.assertj.core.api.AbstractFloatAssert;
+import org.assertj.core.api.AbstractIterableAssert;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.assertj.core.data.Offset;
 import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 
 /**
- * Refaster rules that replace TestNG assertions with equivalent AssertJ assertions.
+ * Refaster rules that replace TestNG APIs with AssertJ equivalents.
  *
  * <p>Some of the classes below have TestNG {@code @BeforeTemplate}s that reference wildcard type
  * bounds ({@code <?>}), while the associated AssertJ {@code @AfterTemplate}s reference stricter
@@ -49,13 +56,13 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
  * List<Map<String, Object>> myMaps = new ArrayList<>();
  * assertEquals(myMaps, ImmutableList.of(ImmutableMap.of()));
  * }</pre>
+ *
+ * <p><strong>Warning:</strong> while both libraries throw an {@link AssertionError} in case of an
+ * assertion failure, the exact subtype used generally differs.
  */
 // XXX: As-is these rules do not result in a complete migration:
 // - Expressions containing comments are skipped due to a limitation of Refaster.
 // - Assertions inside lambda expressions are also skipped. Unclear why.
-// XXX: Many of the test expressions for these rules use the same expression for `expected` and
-// `actual`, which makes the validation weaker than necessary; fix this. (And investigate whether we
-// can introduce validation for this.)
 @OnlineDocumentation
 @TypeMigration(
     of = Assert.class,
@@ -102,6 +109,7 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 final class TestNGToAssertJRules {
   private TestNGToAssertJRules() {}
 
+  /** Prefer {@link Assertions#fail()} over non-AssertJ alternatives. */
   static final class Fail {
     @BeforeTemplate
     void before() {
@@ -116,8 +124,9 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /** Prefer {@link Assertions#fail(String)} over non-AssertJ alternatives. */
   // XXX: This may cause the TestNG import not to be cleaned up, yielding a compilation failure.
-  static final class FailWithMessage {
+  static final class FailWithString {
     @BeforeTemplate
     void before(String message) {
       Assert.fail(message);
@@ -130,8 +139,9 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /** Prefer {@link Assertions#fail(String, Throwable)} over non-AssertJ alternatives. */
   // XXX: This may cause the TestNG import not to be cleaned up, yielding a compilation failure.
-  static final class FailWithMessageAndThrowable {
+  static final class FailWithStringAndThrowable {
     @BeforeTemplate
     void before(String message, Throwable throwable) {
       Assert.fail(message, throwable);
@@ -144,111 +154,120 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertTrue {
+  /** Prefer {@link AbstractBooleanAssert#isTrue()} over non-AssertJ alternatives. */
+  static final class AssertThatIsTrue {
     @BeforeTemplate
-    void before(boolean condition) {
-      assertTrue(condition);
+    void before(boolean actual) {
+      assertTrue(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition) {
-      assertThat(condition).isTrue();
+    void after(boolean actual) {
+      assertThat(actual).isTrue();
     }
   }
 
-  static final class AssertTrueWithMessage {
+  /** Prefer {@link AbstractBooleanAssert#isTrue()} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsTrue {
     @BeforeTemplate
-    void before(boolean condition, String message) {
-      assertTrue(condition, message);
+    void before(boolean actual, String message) {
+      assertTrue(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isTrue();
+    void after(boolean actual, String message) {
+      assertThat(actual).withFailMessage(message).isTrue();
     }
   }
 
-  static final class AssertFalse {
+  /** Prefer {@link AbstractBooleanAssert#isFalse()} over non-AssertJ alternatives. */
+  static final class AssertThatIsFalse {
     @BeforeTemplate
-    void before(boolean condition) {
-      assertFalse(condition);
+    void before(boolean actual) {
+      assertFalse(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition) {
-      assertThat(condition).isFalse();
+    void after(boolean actual) {
+      assertThat(actual).isFalse();
     }
   }
 
-  static final class AssertFalseWithMessage {
+  /** Prefer {@link AbstractBooleanAssert#isFalse()} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsFalse {
     @BeforeTemplate
-    void before(boolean condition, String message) {
-      assertFalse(condition, message);
+    void before(boolean actual, String message) {
+      assertFalse(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      assertThat(condition).withFailMessage(message).isFalse();
+    void after(boolean actual, String message) {
+      assertThat(actual).withFailMessage(message).isFalse();
     }
   }
 
-  static final class AssertNull {
+  /** Prefer {@link AbstractAssert#isNull()} over non-AssertJ alternatives. */
+  static final class AssertThatIsNull {
     @BeforeTemplate
-    void before(Object object) {
-      assertNull(object);
+    void before(Object actual) {
+      assertNull(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object) {
-      assertThat(object).isNull();
+    void after(Object actual) {
+      assertThat(actual).isNull();
     }
   }
 
-  static final class AssertNullWithMessage {
+  /** Prefer {@link AbstractAssert#isNull()} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsNull {
     @BeforeTemplate
-    void before(Object object, String message) {
-      assertNull(object, message);
+    void before(Object actual, String message) {
+      assertNull(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, String message) {
-      assertThat(object).withFailMessage(message).isNull();
+    void after(Object actual, String message) {
+      assertThat(actual).withFailMessage(message).isNull();
     }
   }
 
-  static final class AssertNotNull {
+  /** Prefer {@link AbstractAssert#isNotNull()} over non-AssertJ alternatives. */
+  static final class AssertThatIsNotNull {
     @BeforeTemplate
-    void before(Object object) {
-      assertNotNull(object);
+    void before(Object actual) {
+      assertNotNull(actual);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object) {
-      assertThat(object).isNotNull();
+    void after(Object actual) {
+      assertThat(actual).isNotNull();
     }
   }
 
-  static final class AssertNotNullWithMessage {
+  /** Prefer {@link AbstractAssert#isNotNull()} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsNotNull {
     @BeforeTemplate
-    void before(Object object, String message) {
-      assertNotNull(object, message);
+    void before(Object actual, String message) {
+      assertNotNull(actual, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Object object, String message) {
-      assertThat(object).withFailMessage(message).isNotNull();
+    void after(Object actual, String message) {
+      assertThat(actual).withFailMessage(message).isNotNull();
     }
   }
 
-  static final class AssertSame {
+  /** Prefer {@link AbstractAssert#isSameAs(Object)} over non-AssertJ alternatives. */
+  static final class AssertThatIsSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected) {
       assertSame(actual, expected);
@@ -261,7 +280,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertSameWithMessage {
+  /** Prefer {@link AbstractAssert#isSameAs(Object)} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsSameAs {
     @BeforeTemplate
     void before(Object actual, String message, Object expected) {
       assertSame(actual, expected, message);
@@ -274,7 +294,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertNotSame {
+  /** Prefer {@link AbstractAssert#isNotSameAs(Object)} over non-AssertJ alternatives. */
+  static final class AssertThatIsNotSameAs {
     @BeforeTemplate
     void before(Object actual, Object expected) {
       assertNotSame(actual, expected);
@@ -287,7 +308,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertNotSameWithMessage {
+  /** Prefer {@link AbstractAssert#isNotSameAs(Object)} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsNotSameAs {
     @BeforeTemplate
     void before(Object actual, String message, Object expected) {
       assertNotSame(actual, expected, message);
@@ -300,8 +322,9 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /** Prefer {@link AbstractAssert#isEqualTo(Object)} over non-AssertJ alternatives. */
   @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
-  static final class AssertEqual {
+  static final class AssertThatIsEqualTo {
     @BeforeTemplate
     void before(boolean actual, boolean expected) {
       assertEquals(actual, expected);
@@ -484,8 +507,9 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /** Prefer {@link AbstractAssert#isEqualTo(Object)} over non-AssertJ alternatives. */
   @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
-  static final class AssertEqualWithMessage {
+  static final class AssertThatWithFailMessageIsEqualTo {
     @BeforeTemplate
     void before(boolean actual, String message, boolean expected) {
       assertEquals(actual, expected, message);
@@ -668,7 +692,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualFloatsWithDelta {
+  /** Prefer {@link AbstractFloatAssert#isCloseTo(float, Offset)} over non-AssertJ alternatives. */
+  static final class AssertThatIsCloseToOffsetFloat {
     @BeforeTemplate
     void before(float actual, float expected, float delta) {
       assertEquals(actual, expected, delta);
@@ -676,12 +701,13 @@ final class TestNGToAssertJRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Float actual, float expected, float delta) {
+    void after(float actual, float expected, float delta) {
       assertThat(actual).isCloseTo(expected, offset(delta));
     }
   }
 
-  static final class AssertEqualFloatsWithDeltaWithMessage {
+  /** Prefer {@link AbstractFloatAssert#isCloseTo(float, Offset)} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsCloseToOffsetFloat {
     @BeforeTemplate
     void before(float actual, String message, float expected, float delta) {
       assertEquals(actual, expected, delta, message);
@@ -694,7 +720,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualDoublesWithDelta {
+  /**
+   * Prefer {@link AbstractDoubleAssert#isCloseTo(double, Offset)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatIsCloseToOffsetDouble {
     @BeforeTemplate
     void before(double actual, double expected, double delta) {
       assertEquals(actual, expected, delta);
@@ -707,7 +736,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualDoublesWithDeltaWithMessage {
+  /**
+   * Prefer {@link AbstractDoubleAssert#isCloseTo(double, Offset)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatWithFailMessageIsCloseToOffsetDouble {
     @BeforeTemplate
     void before(double actual, String message, double expected, double delta) {
       assertEquals(actual, expected, delta, message);
@@ -720,7 +752,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualArrayIterationOrder {
+  /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
+  static final class AssertThatContainsExactly {
     @BeforeTemplate
     void before(boolean[] actual, boolean[] expected) {
       assertEquals(actual, expected);
@@ -773,7 +806,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualArrayIterationOrderWithMessage {
+  /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageContainsExactly {
     @BeforeTemplate
     void before(boolean[] actual, String message, boolean[] expected) {
       assertEquals(actual, expected, message);
@@ -826,7 +860,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualFloatArraysWithDelta {
+  /**
+   * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
+   */
+  static final class AssertThatContainsExactlyOffsetFloat {
     @BeforeTemplate
     void before(float[] actual, float[] expected, float delta) {
       assertEquals(actual, expected, delta);
@@ -839,7 +876,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualFloatArraysWithDeltaWithMessage {
+  /**
+   * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
+   */
+  static final class AssertThatWithFailMessageContainsExactlyOffsetFloat {
     @BeforeTemplate
     void before(float[] actual, String message, float[] expected, float delta) {
       assertEquals(actual, expected, delta, message);
@@ -852,7 +892,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualDoubleArraysWithDelta {
+  /**
+   * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
+   */
+  static final class AssertThatContainsExactlyOffsetDouble {
     @BeforeTemplate
     void before(double[] actual, double[] expected, double delta) {
       assertEquals(actual, expected, delta);
@@ -865,7 +908,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualDoubleArraysWithDeltaWithMessage {
+  /**
+   * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
+   */
+  static final class AssertThatWithFailMessageContainsExactlyOffsetDouble {
     @BeforeTemplate
     void before(double[] actual, String message, double[] expected, double delta) {
       assertEquals(actual, expected, delta, message);
@@ -878,7 +924,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualArraysIrrespectiveOfOrder {
+  /**
+   * Prefer {@code assertThat(...).containsExactlyInAnyOrder(...)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatContainsExactlyInAnyOrder {
     @BeforeTemplate
     void before(Object[] actual, Object[] expected) {
       assertEqualsNoOrder(actual, expected);
@@ -891,7 +940,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertEqualArraysIrrespectiveOfOrderWithMessage {
+  /**
+   * Prefer {@code assertThat(...).containsExactlyInAnyOrder(...)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatWithFailMessageContainsExactlyInAnyOrder {
     @BeforeTemplate
     void before(Object[] actual, String message, Object[] expected) {
       assertEqualsNoOrder(actual, expected, message);
@@ -904,9 +956,14 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /**
+   * Prefer {@code assertThat(...).toIterable().containsExactlyElementsOf(...)} over non-AssertJ
+   * alternatives.
+   */
   // XXX: TestNG's `assertEquals` accepts arbitrary `Iterator<?>` arguments. As such some
   // expressions will not be rewritten.
-  static final class AssertEqualIteratorIterationOrder<S, T extends S> {
+  static final class AssertThatToIterableContainsExactlyElementsOfImmutableListCopyOf<
+      S, T extends S> {
     @BeforeTemplate
     void before(Iterator<S> actual, Iterator<T> expected) {
       assertEquals(actual, expected);
@@ -921,9 +978,15 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /**
+   * Prefer {@code assertThat(...).toIterable().containsExactlyElementsOf(...)} over non-AssertJ
+   * alternatives.
+   */
   // XXX: TestNG's `assertEquals` accepts arbitrary `Iterator<?>` arguments. As such some
   // expressions will not be rewritten.
-  static final class AssertEqualIteratorIterationOrderWithMessage<S, T extends S> {
+  static final
+  class AssertThatToIterableWithFailMessageContainsExactlyElementsOfImmutableListCopyOf<
+      S, T extends S> {
     @BeforeTemplate
     void before(Iterator<S> actual, String message, Iterator<T> expected) {
       assertEquals(actual, expected, message);
@@ -941,11 +1004,15 @@ final class TestNGToAssertJRules {
     }
   }
 
-  // XXX This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
+  /**
+   * Prefer {@link AbstractIterableAssert#containsExactlyElementsOf(Iterable)} over non-AssertJ
+   * alternatives.
+   */
+  // XXX: This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
   // `assertThat(Path)` does not support `.containsExactlyElementsOf`.
   // XXX: TestNG's `assertEquals` accepts arbitrary `Iterable<?>` and `Collection<?>` arguments. As
   // such some expressions will not be rewritten.
-  static final class AssertEqualIterableIterationOrder<S, T extends S> {
+  static final class AssertThatContainsExactlyElementsOf<S, T extends S> {
     @BeforeTemplate
     void before(Iterable<S> actual, Iterable<T> expected) {
       assertEquals(actual, expected);
@@ -963,11 +1030,15 @@ final class TestNGToAssertJRules {
     }
   }
 
-  // XXX This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
+  /**
+   * Prefer {@link AbstractIterableAssert#containsExactlyElementsOf(Iterable)} over non-AssertJ
+   * alternatives.
+   */
+  // XXX: This rule fails for `java.nio.file.Path` as it is `Iterable`, but AssertJ's
   // `assertThat(Path)` does not support `.containsExactlyElementsOf`.
   // XXX: TestNG's `assertEquals` accepts arbitrary `Iterable<?>` and `Collection<?>` arguments. As
   // such some expressions will not be rewritten.
-  static final class AssertEqualIterableIterationOrderWithMessage<S, T extends S> {
+  static final class AssertThatWithFailMessageContainsExactlyElementsOf<S, T extends S> {
     @BeforeTemplate
     void before(Iterable<S> actual, String message, Iterable<T> expected) {
       assertEquals(actual, expected, message);
@@ -985,9 +1056,13 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractIterableAssert#hasSameElementsAs(Iterable)} over non-AssertJ
+   * alternatives.
+   */
   // XXX: TestNG's `assertEquals` accepts arbitrary `Set<?>` arguments. As such some expressions
   // will not be rewritten.
-  static final class AssertEqualSets<S, T extends S> {
+  static final class AssertThatHasSameElementsAs<S, T extends S> {
     @BeforeTemplate
     void before(Set<S> actual, Set<T> expected) {
       assertEquals(actual, expected);
@@ -1000,9 +1075,13 @@ final class TestNGToAssertJRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractIterableAssert#hasSameElementsAs(Iterable)} over non-AssertJ
+   * alternatives.
+   */
   // XXX: TestNG's `assertEquals` accepts arbitrary `Set<?>` arguments. As such some expressions
   // will not be rewritten.
-  static final class AssertEqualSetsWithMessage<S, T extends S> {
+  static final class AssertThatWithFailMessageHasSameElementsAs<S, T extends S> {
     @BeforeTemplate
     void before(Set<S> actual, String message, Set<T> expected) {
       assertEquals(actual, expected, message);
@@ -1015,7 +1094,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertUnequal {
+  /** Prefer {@link AbstractAssert#isNotEqualTo(Object)} over non-AssertJ alternatives. */
+  static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     void before(boolean actual, boolean expected) {
       assertNotEquals(actual, expected);
@@ -1083,7 +1163,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertUnequalWithMessage {
+  /** Prefer {@link AbstractAssert#isNotEqualTo(Object)} over non-AssertJ alternatives. */
+  static final class AssertThatWithFailMessageIsNotEqualTo {
     @BeforeTemplate
     void before(boolean actual, String message, boolean expected) {
       assertNotEquals(actual, expected, message);
@@ -1151,7 +1232,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertUnequalFloatsWithDelta {
+  /**
+   * Prefer {@link AbstractFloatAssert#isNotCloseTo(float, Offset)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatIsNotCloseToOffsetFloat {
     @BeforeTemplate
     void before(float actual, float expected, float delta) {
       assertNotEquals(actual, expected, delta);
@@ -1164,7 +1248,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertUnequalFloatsWithDeltaWithMessage {
+  /**
+   * Prefer {@link AbstractFloatAssert#isNotCloseTo(float, Offset)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatWithFailMessageIsNotCloseToOffsetFloat {
     @BeforeTemplate
     void before(float actual, String message, float expected, float delta) {
       assertNotEquals(actual, expected, delta, message);
@@ -1177,7 +1264,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertUnequalDoublesWithDelta {
+  /**
+   * Prefer {@link AbstractDoubleAssert#isNotCloseTo(double, Offset)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatIsNotCloseToOffsetDouble {
     @BeforeTemplate
     void before(double actual, double expected, double delta) {
       assertNotEquals(actual, expected, delta);
@@ -1190,7 +1280,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertUnequalDoublesWithDeltaWithMessage {
+  /**
+   * Prefer {@link AbstractDoubleAssert#isNotCloseTo(double, Offset)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatWithFailMessageIsNotCloseToOffsetDouble {
     @BeforeTemplate
     void before(double actual, String message, double expected, double delta) {
       assertNotEquals(actual, expected, delta, message);
@@ -1203,7 +1296,10 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertThrows {
+  /**
+   * Prefer {@link Assertions#assertThatThrownBy(ThrowingCallable)} over non-AssertJ alternatives.
+   */
+  static final class AssertThatThrownBy {
     @BeforeTemplate
     void before(ThrowingRunnable runnable) {
       assertThrows(runnable);
@@ -1216,7 +1312,8 @@ final class TestNGToAssertJRules {
     }
   }
 
-  static final class AssertThrowsWithType<T extends Throwable> {
+  /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
+  static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(ThrowingRunnable runnable, Class<T> clazz) {
       assertThrows(clazz, runnable);

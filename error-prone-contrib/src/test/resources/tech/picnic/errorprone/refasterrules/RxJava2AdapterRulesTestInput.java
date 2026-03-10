@@ -13,13 +13,13 @@ import reactor.core.publisher.Mono;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class RxJava2AdapterRulesTest implements RefasterRuleCollectionTestCase {
-  ImmutableSet<Mono<Void>> testCompletableToMono() {
+  ImmutableSet<Mono<Void>> testCompletableAsRxJava2AdapterCompletableToMono() {
     return ImmutableSet.of(
         RxJava2Adapter.completableToMono(Completable.complete()),
-        Completable.complete().to(RxJava2Adapter::completableToMono));
+        Completable.never().to(RxJava2Adapter::completableToMono));
   }
 
-  ImmutableSet<Flux<Integer>> testFlowableToFlux() {
+  ImmutableSet<Flux<Integer>> testFlowableAsRxJava2AdapterFlowableToFlux() {
     return ImmutableSet.of(
         Flux.from(Flowable.just(1)),
         Flowable.just(2).to(Flux::from),
@@ -28,52 +28,52 @@ final class RxJava2AdapterRulesTest implements RefasterRuleCollectionTestCase {
         Flowable.just(5).to(RxJava2Adapter::flowableToFlux));
   }
 
-  ImmutableSet<Flowable<String>> testFluxToFlowable() {
+  ImmutableSet<Flowable<String>> testFluxAsRxJava2AdapterFluxToFlowable() {
     return ImmutableSet.of(
         Flowable.fromPublisher(Flux.just("foo")),
         Flux.just("bar").as(Flowable::fromPublisher),
         RxJava2Adapter.fluxToFlowable(Flux.just("baz")));
   }
 
-  ImmutableSet<Observable<Integer>> testFluxToObservable() {
+  ImmutableSet<Observable<Integer>> testFluxAsRxJava2AdapterFluxToObservable() {
     return ImmutableSet.of(
         Observable.fromPublisher(Flux.just(1)),
         Flux.just(2).as(Observable::fromPublisher),
         RxJava2Adapter.fluxToObservable(Flux.just(3)));
   }
 
-  ImmutableSet<Mono<String>> testMaybeToMono() {
+  ImmutableSet<Mono<String>> testMaybeAsRxJava2AdapterMaybeToMono() {
     return ImmutableSet.of(
         RxJava2Adapter.maybeToMono(Maybe.just("foo")),
         Maybe.just("bar").to(RxJava2Adapter::maybeToMono));
   }
 
-  ImmutableSet<Completable> testMonoToCompletable() {
+  ImmutableSet<Completable> testMonoAsRxJava2AdapterMonoToCompletable() {
     return ImmutableSet.of(
         Completable.fromPublisher(Mono.empty()),
-        Mono.empty().as(Completable::fromPublisher),
-        RxJava2Adapter.monoToCompletable(Mono.empty()));
+        Mono.just(1).as(Completable::fromPublisher),
+        RxJava2Adapter.monoToCompletable(Mono.just(2)));
   }
 
-  ImmutableSet<Flowable<Integer>> testMonoToFlowable() {
+  ImmutableSet<Flowable<Integer>> testMonoAsRxJava2AdapterMonoToFlowable() {
     return ImmutableSet.of(
         Flowable.fromPublisher(Mono.just(1)),
         Mono.just(2).as(Flowable::fromPublisher),
         RxJava2Adapter.monoToFlowable(Mono.just(3)));
   }
 
-  Maybe<String> testMonoToMaybe() {
+  Maybe<String> testMonoAsRxJava2AdapterMonoToMaybe() {
     return RxJava2Adapter.monoToMaybe(Mono.just("foo"));
   }
 
-  ImmutableSet<Single<Integer>> testMonoToSingle() {
+  ImmutableSet<Single<Integer>> testMonoAsRxJava2AdapterMonoToSingle() {
     return ImmutableSet.of(
         Single.fromPublisher(Mono.just(1)),
         Mono.just(2).as(Single::fromPublisher),
         RxJava2Adapter.monoToSingle(Mono.just(3)));
   }
 
-  ImmutableSet<Flux<String>> testObservableToFlux() {
+  ImmutableSet<Flux<String>> testObservableToFlowableAsRxJava2AdapterFlowableToFlux() {
     return ImmutableSet.of(
         RxJava2Adapter.observableToFlux(Observable.just("foo"), BackpressureStrategy.BUFFER),
         Observable.just("bar")
@@ -82,7 +82,7 @@ final class RxJava2AdapterRulesTest implements RefasterRuleCollectionTestCase {
             .to(obs -> RxJava2Adapter.observableToFlux(obs, BackpressureStrategy.ERROR)));
   }
 
-  ImmutableSet<Mono<Integer>> testSingleToMono() {
+  ImmutableSet<Mono<Integer>> testSingleAsRxJava2AdapterSingleToMono() {
     return ImmutableSet.of(
         RxJava2Adapter.singleToMono(Single.just(1)),
         Single.just(2).to(RxJava2Adapter::singleToMono));

@@ -15,7 +15,9 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
+import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
 /** Refaster rules related to AssertJ assertions over {@link Map}s. */
@@ -23,13 +25,14 @@ import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 final class AssertJMapRules {
   private AssertJMapRules() {}
 
-  static final class AbstractMapAssertIsEmpty<K, V> {
+  /** Prefer {@link AbstractMapAssert#isEmpty()} over more contrived alternatives. */
+  static final class AbstractMapAssertIsEmpty<K, V, M extends K, N extends V, T extends K> {
     @BeforeTemplate
     void before(
         AbstractMapAssert<?, ?, K, V> mapAssert,
-        @Matches(IsEmpty.class) Map<? extends K, ? extends V> wellTypedMap,
+        @Matches(IsEmpty.class) Map<M, N> wellTypedMap,
         @Matches(IsEmpty.class) Map<?, ?> arbitrarilyTypedMap,
-        @Matches(IsEmpty.class) Iterable<? extends K> keys) {
+        @Matches(IsEmpty.class) Iterable<T> keys) {
       Refaster.anyOf(
           mapAssert.containsExactlyEntriesOf(wellTypedMap),
           mapAssert.containsExactlyInAnyOrderEntriesOf(wellTypedMap),
@@ -47,7 +50,8 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapIsEmpty<K, V> {
+  /** Prefer {@code assertThat(map).isEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsEmpty<K, V> {
     @BeforeTemplate
     void before(Map<K, V> map) {
       Refaster.anyOf(
@@ -69,6 +73,7 @@ final class AssertJMapRules {
     }
   }
 
+  /** Prefer {@link AbstractMapAssert#isNotEmpty()} over more contrived alternatives. */
   static final class AbstractMapAssertIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(
@@ -82,7 +87,8 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapIsNotEmpty<K, V> {
+  /** Prefer {@code assertThat(map).isNotEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map) {
       return Refaster.anyOf(
@@ -99,21 +105,27 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AbstractMapAssertContainsExactlyInAnyOrderEntriesOf<K, V> {
+  /**
+   * Prefer {@link AbstractMapAssert#containsExactlyInAnyOrderEntriesOf(Map)} over less explicit
+   * alternatives.
+   */
+  static final class AbstractMapAssertContainsExactlyInAnyOrderEntriesOf<
+      K, V, M extends K, N extends V> {
     @BeforeTemplate
-    AbstractMapAssert<?, ?, K, V> before(
-        AbstractMapAssert<?, ?, K, V> mapAssert, Map<? extends K, ? extends V> map) {
+    AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, Map<M, N> map) {
       return mapAssert.isEqualTo(map);
     }
 
     @AfterTemplate
-    AbstractMapAssert<?, ?, K, V> after(
-        AbstractMapAssert<?, ?, K, V> mapAssert, Map<? extends K, ? extends V> map) {
+    AbstractMapAssert<?, ?, K, V> after(AbstractMapAssert<?, ?, K, V> mapAssert, Map<M, N> map) {
       return mapAssert.containsExactlyInAnyOrderEntriesOf(map);
     }
   }
 
-  static final class AbstractMapAssertContainsExactlyEntriesOf<K, V> {
+  /**
+   * Prefer {@link AbstractMapAssert#containsExactlyEntriesOf(Map)} over less explicit alternatives.
+   */
+  static final class AbstractMapAssertContainsExactlyEntriesOfImmutableMapOf<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, K key, V value) {
       return mapAssert.containsExactlyInAnyOrderEntriesOf(ImmutableMap.of(key, value));
@@ -125,7 +137,8 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapHasSize<K, V> {
+  /** Prefer {@code assertThat(map).hasSize(int)} over more contrived alternatives. */
+  static final class AssertThatHasSize<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map, int length) {
       return Refaster.anyOf(
@@ -140,6 +153,7 @@ final class AssertJMapRules {
     }
   }
 
+  /** Prefer {@link AbstractMapAssert#hasSameSizeAs(Map)} over more contrived alternatives. */
   static final class AbstractMapAssertHasSameSizeAs<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(AbstractMapAssert<?, ?, K, V> mapAssert, Map<?, ?> map) {
@@ -152,7 +166,8 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapContainsKey<K, V> {
+  /** Prefer {@code assertThat(map).containsKey(Object)} over more contrived alternatives. */
+  static final class AssertThatContainsKey<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map, K key) {
       return Refaster.anyOf(
@@ -166,7 +181,8 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapDoesNotContainKey<K, V> {
+  /** Prefer {@code assertThat(map).doesNotContainKey(Object)} over more contrived alternatives. */
+  static final class AssertThatDoesNotContainKey<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map, K key) {
       return Refaster.anyOf(
@@ -180,12 +196,12 @@ final class AssertJMapRules {
     }
   }
 
-  // XXX: Strictly speaking this rule could be merged into `AssertThatMapContainsOnlyKeys` below,
-  // but that rule targets another `containsOnlyKeys` overload. Review how cases like this should
-  // impact the preferred naming scheme.
-  static final class AssertThatMapContainsOnlyKey<K, V> {
+  /** Prefer {@code assertThat(map).containsOnlyKeys(Object)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
+  static final class AssertThatContainsOnlyKeysObject<K, V> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(Map<K, V> map, K key) {
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ObjectAssert<K>> before(
+        Map<K, V> map, K key) {
       return assertThat(map.keySet()).containsExactly(key);
     }
 
@@ -196,21 +212,24 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapContainsOnlyKeys<K, V> {
+  /** Prefer {@code assertThat(map).containsOnlyKeys(Iterable)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
+  static final class AssertThatContainsOnlyKeysIterable<K, V, T extends K> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(
-        Map<K, V> map, Iterable<? extends K> keys) {
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ObjectAssert<K>> before(
+        Map<K, V> map, Iterable<T> keys) {
       return assertThat(map.keySet()).hasSameElementsAs(keys);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map, Iterable<? extends K> keys) {
+    MapAssert<K, V> after(Map<K, V> map, Iterable<T> keys) {
       return assertThat(map).containsOnlyKeys(keys);
     }
   }
 
-  static final class AssertThatMapContainsValue<K, V> {
+  /** Prefer {@code assertThat(map).containsValue(Object)} over more contrived alternatives. */
+  static final class AssertThatContainsValue<K, V> {
     @BeforeTemplate
     AbstractAssert<? extends AbstractAssert<?, ?>, ? extends Object> before(
         Map<K, V> map, V value) {
@@ -225,7 +244,10 @@ final class AssertJMapRules {
     }
   }
 
-  static final class AssertThatMapDoesNotContainValue<K, V> {
+  /**
+   * Prefer {@code assertThat(map).doesNotContainValue(Object)} over more contrived alternatives.
+   */
+  static final class AssertThatDoesNotContainValue<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> map, V value) {
       return Refaster.anyOf(

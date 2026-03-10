@@ -37,63 +37,63 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     org.testng.Assert.fail();
   }
 
-  void testFailWithMessage() {
+  void testFailWithString() {
     org.testng.Assert.fail("foo");
   }
 
-  void testFailWithMessageAndThrowable() {
+  void testFailWithStringAndThrowable() {
     org.testng.Assert.fail("foo", new IllegalStateException());
   }
 
-  void testAssertTrue() {
+  void testAssertThatIsTrue() {
     assertTrue(true);
   }
 
-  void testAssertTrueWithMessage() {
+  void testAssertThatWithFailMessageIsTrue() {
     assertTrue(true, "foo");
   }
 
-  void testAssertFalse() {
+  void testAssertThatIsFalse() {
     assertFalse(true);
   }
 
-  void testAssertFalseWithMessage() {
-    assertFalse(true, "message");
+  void testAssertThatWithFailMessageIsFalse() {
+    assertFalse(true, "foo");
   }
 
-  void testAssertNull() {
+  void testAssertThatIsNull() {
     assertNull(new Object());
   }
 
-  void testAssertNullWithMessage() {
+  void testAssertThatWithFailMessageIsNull() {
     assertNull(new Object(), "foo");
   }
 
-  void testAssertNotNull() {
+  void testAssertThatIsNotNull() {
     assertNotNull(new Object());
   }
 
-  void testAssertNotNullWithMessage() {
+  void testAssertThatWithFailMessageIsNotNull() {
     assertNotNull(new Object(), "foo");
   }
 
-  void testAssertSame() {
-    assertSame(new Object(), new Object());
+  void testAssertThatIsSameAs() {
+    assertSame(new Object(), new StringBuilder());
   }
 
-  void testAssertSameWithMessage() {
-    assertSame(new Object(), new Object(), "foo");
+  void testAssertThatWithFailMessageIsSameAs() {
+    assertSame(new Object(), new StringBuilder(), "foo");
   }
 
-  void testAssertNotSame() {
-    assertNotSame(new Object(), new Object());
+  void testAssertThatIsNotSameAs() {
+    assertNotSame(new Object(), new StringBuilder());
   }
 
-  void testAssertNotSameWithMessage() {
-    assertNotSame(new Object(), new Object(), "foo");
+  void testAssertThatWithFailMessageIsNotSameAs() {
+    assertNotSame(new Object(), new StringBuilder(), "foo");
   }
 
-  void testAssertEqual() {
+  void testAssertThatIsEqualTo() {
     assertEquals(true, false);
     assertEquals(true, Boolean.FALSE);
     assertEquals(Boolean.TRUE, false);
@@ -131,7 +131,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(ImmutableMap.of(), ImmutableMap.of(1, 2));
   }
 
-  void testAssertEqualWithMessage() {
+  void testAssertThatWithFailMessageIsEqualTo() {
     assertEquals(true, false, "foo");
     assertEquals(true, Boolean.FALSE, "bar");
     assertEquals(Boolean.TRUE, false, "baz");
@@ -169,81 +169,81 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(ImmutableMap.of(), ImmutableMap.of(1, 2), "waldo");
   }
 
-  void testAssertEqualFloatsWithDelta() {
-    assertEquals(0.0f, 0.0f, 0.0f);
+  void testAssertThatIsCloseToOffsetFloat() {
+    assertEquals(1.0f, 2.0f, 0.0f);
   }
 
-  void testAssertEqualFloatsWithDeltaWithMessage() {
-    assertEquals(0.0f, 0.0f, 0.0f, "foo");
+  void testAssertThatWithFailMessageIsCloseToOffsetFloat() {
+    assertEquals(1.0f, 2.0f, 0.0f, "foo");
   }
 
-  void testAssertEqualDoublesWithDelta() {
-    assertEquals(0.0, 0.0, 0.0);
+  void testAssertThatIsCloseToOffsetDouble() {
+    assertEquals(1.0, 2.0, 0.0);
   }
 
-  void testAssertEqualDoublesWithDeltaWithMessage() {
-    assertEquals(0.0, 0.0, 0.0, "foo");
+  void testAssertThatWithFailMessageIsCloseToOffsetDouble() {
+    assertEquals(1.0, 2.0, 0.0, "foo");
   }
 
-  void testAssertEqualArrayIterationOrder() {
-    assertEquals(new boolean[0], new boolean[0]);
-    assertEquals(new byte[0], new byte[0]);
-    assertEquals(new char[0], new char[0]);
-    assertEquals(new short[0], new short[0]);
-    assertEquals(new int[0], new int[0]);
-    assertEquals(new long[0], new long[0]);
-    assertEquals(new float[0], new float[0]);
-    assertEquals(new double[0], new double[0]);
-    assertEquals(new Object[0], new Object[0]);
+  void testAssertThatContainsExactly() {
+    assertEquals(new boolean[] {false}, new boolean[] {true});
+    assertEquals(new byte[] {2}, new byte[] {1});
+    assertEquals(new char[] {'b'}, new char[] {'a'});
+    assertEquals(new short[] {2}, new short[] {1});
+    assertEquals(new int[] {2}, new int[] {1});
+    assertEquals(new long[] {2L}, new long[] {1L});
+    assertEquals(new float[] {2.0f}, new float[] {1.0f});
+    assertEquals(new double[] {2.0}, new double[] {1.0});
+    assertEquals(new Object[] {"bar"}, new Object[] {"foo"});
   }
 
-  void testAssertEqualArrayIterationOrderWithMessage() {
-    assertEquals(new boolean[0], new boolean[0], "foo");
-    assertEquals(new byte[0], new byte[0], "bar");
-    assertEquals(new char[0], new char[0], "baz");
-    assertEquals(new short[0], new short[0], "qux");
-    assertEquals(new int[0], new int[0], "quux");
-    assertEquals(new long[0], new long[0], "quuz");
-    assertEquals(new float[0], new float[0], "corge");
-    assertEquals(new double[0], new double[0], "grault");
-    assertEquals(new Object[0], new Object[0], "garply");
+  void testAssertThatWithFailMessageContainsExactly() {
+    assertEquals(new boolean[] {false}, new boolean[] {true}, "foo");
+    assertEquals(new byte[] {2}, new byte[] {1}, "bar");
+    assertEquals(new char[] {'b'}, new char[] {'a'}, "baz");
+    assertEquals(new short[] {2}, new short[] {1}, "qux");
+    assertEquals(new int[] {2}, new int[] {1}, "quux");
+    assertEquals(new long[] {2L}, new long[] {1L}, "corge");
+    assertEquals(new float[] {2.0f}, new float[] {1.0f}, "grault");
+    assertEquals(new double[] {2.0}, new double[] {1.0}, "garply");
+    assertEquals(new Object[] {"bar"}, new Object[] {"foo"}, "waldo");
   }
 
-  void testAssertEqualFloatArraysWithDelta() {
-    assertEquals(new float[0], new float[0], 0.0f);
+  void testAssertThatContainsExactlyOffsetFloat() {
+    assertEquals(new float[] {2.0f}, new float[] {1.0f}, 0.0f);
   }
 
-  void testAssertEqualFloatArraysWithDeltaWithMessage() {
-    assertEquals(new float[0], new float[0], 0.0f, "foo");
+  void testAssertThatWithFailMessageContainsExactlyOffsetFloat() {
+    assertEquals(new float[] {2.0f}, new float[] {1.0f}, 0.0f, "foo");
   }
 
-  void testAssertEqualDoubleArraysWithDelta() {
-    assertEquals(new double[0], new double[0], 0.0);
+  void testAssertThatContainsExactlyOffsetDouble() {
+    assertEquals(new double[] {2.0}, new double[] {1.0}, 0.0);
   }
 
-  void testAssertEqualDoubleArraysWithDeltaWithMessage() {
-    assertEquals(new double[0], new double[0], 0.0, "foo");
+  void testAssertThatWithFailMessageContainsExactlyOffsetDouble() {
+    assertEquals(new double[] {2.0}, new double[] {1.0}, 0.0, "foo");
   }
 
-  void testAssertEqualArraysIrrespectiveOfOrder() {
-    assertEqualsNoOrder(new Object[0], new Object[0]);
+  void testAssertThatContainsExactlyInAnyOrder() {
+    assertEqualsNoOrder(new Object[] {"bar"}, new Object[] {"foo"});
   }
 
-  void testAssertEqualArraysIrrespectiveOfOrderWithMessage() {
-    assertEqualsNoOrder(new Object[0], new Object[0], "foo");
+  void testAssertThatWithFailMessageContainsExactlyInAnyOrder() {
+    assertEqualsNoOrder(new Object[] {"bar"}, new Object[] {"foo"}, "foo");
   }
 
-  void testAssertEqualIteratorIterationOrder() {
+  void testAssertThatToIterableContainsExactlyElementsOfImmutableListCopyOf() {
     assertEquals(new ArrayList<Number>().iterator(), new ArrayList<Integer>().iterator());
     assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator());
   }
 
-  void testAssertEqualIteratorIterationOrderWithMessage() {
+  void testAssertThatToIterableWithFailMessageContainsExactlyElementsOfImmutableListCopyOf() {
     assertEquals(new ArrayList<Number>().iterator(), new ArrayList<Integer>().iterator(), "foo");
     assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator(), "bar");
   }
 
-  void testAssertEqualIterableIterationOrder() {
+  void testAssertThatContainsExactlyElementsOf() {
     assertEquals(
         Iterables.unmodifiableIterable(new ArrayList<Number>()),
         Iterables.unmodifiableIterable(new ArrayList<Integer>()));
@@ -254,7 +254,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(new ArrayList<Number>(), new ArrayList<String>());
   }
 
-  void testAssertEqualIterableIterationOrderWithMessage() {
+  void testAssertThatWithFailMessageContainsExactlyElementsOf() {
     assertEquals(
         Iterables.unmodifiableIterable(new ArrayList<Number>()),
         Iterables.unmodifiableIterable(new ArrayList<Integer>()),
@@ -267,67 +267,67 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(new ArrayList<Number>(), new ArrayList<String>(), "qux");
   }
 
-  void testAssertEqualSets() {
+  void testAssertThatHasSameElementsAs() {
     assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<Integer>of());
     assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of());
   }
 
-  void testAssertEqualSetsWithMessage() {
+  void testAssertThatWithFailMessageHasSameElementsAs() {
     assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<Integer>of(), "foo");
     assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of(), "bar");
   }
 
-  void testAssertUnequal() {
-    assertNotEquals(true, true);
-    assertNotEquals((byte) 0, (byte) 0);
-    assertNotEquals((char) 0, (char) 0);
-    assertNotEquals((short) 0, (short) 0);
-    assertNotEquals(0, 0);
-    assertNotEquals(0L, 0L);
-    assertNotEquals(0.0f, 0.0f);
-    assertNotEquals(0.0, 0.0);
-    assertNotEquals(new Object(), new Object());
-    assertNotEquals("actual", "expected");
-    assertNotEquals(ImmutableSet.of(), ImmutableSet.of());
-    assertNotEquals(ImmutableMap.of(), ImmutableMap.of());
+  void testAssertThatIsNotEqualTo() {
+    assertNotEquals(true, false);
+    assertNotEquals((byte) 0, (byte) 1);
+    assertNotEquals('a', 'b');
+    assertNotEquals((short) 0, (short) 1);
+    assertNotEquals(0, 1);
+    assertNotEquals(0L, 1L);
+    assertNotEquals(0.0f, 1.0f);
+    assertNotEquals(0.0, 1.0);
+    assertNotEquals(new Object(), new StringBuilder());
+    assertNotEquals("foo", "bar");
+    assertNotEquals(ImmutableSet.of(), ImmutableSet.of(1));
+    assertNotEquals(ImmutableMap.of(), ImmutableMap.of(1, 2));
   }
 
-  void testAssertUnequalWithMessage() {
-    assertNotEquals(true, true, "foo");
-    assertNotEquals((byte) 0, (byte) 0, "bar");
-    assertNotEquals((char) 0, (char) 0, "baz");
-    assertNotEquals((short) 0, (short) 0, "qux");
-    assertNotEquals(0, 0, "quux");
-    assertNotEquals(0L, 0L, "quuz");
-    assertNotEquals(0.0f, 0.0f, "corge");
-    assertNotEquals(0.0, 0.0, "grault");
-    assertNotEquals(new Object(), new Object(), "garply");
-    assertNotEquals("actual", "expected", "waldo");
-    assertNotEquals(ImmutableSet.of(), ImmutableSet.of(), "fred");
-    assertNotEquals(ImmutableMap.of(), ImmutableMap.of(), "plugh");
+  void testAssertThatWithFailMessageIsNotEqualTo() {
+    assertNotEquals(true, false, "foo");
+    assertNotEquals((byte) 0, (byte) 1, "bar");
+    assertNotEquals('a', 'b', "baz");
+    assertNotEquals((short) 0, (short) 1, "qux");
+    assertNotEquals(0, 1, "quux");
+    assertNotEquals(0L, 1L, "corge");
+    assertNotEquals(0.0f, 1.0f, "grault");
+    assertNotEquals(0.0, 1.0, "garply");
+    assertNotEquals(new Object(), new StringBuilder(), "waldo");
+    assertNotEquals("foo", "bar", "fred");
+    assertNotEquals(ImmutableSet.of(), ImmutableSet.of(1), "plugh");
+    assertNotEquals(ImmutableMap.of(), ImmutableMap.of(1, 2), "xyzzy");
   }
 
-  void testAssertUnequalFloatsWithDelta() {
-    assertNotEquals(0.0f, 0.0f, 0.0f);
+  void testAssertThatIsNotCloseToOffsetFloat() {
+    assertNotEquals(1.0f, 2.0f, 0.0f);
   }
 
-  void testAssertUnequalFloatsWithDeltaWithMessage() {
-    assertNotEquals(0.0f, 0.0f, 0.0f, "foo");
+  void testAssertThatWithFailMessageIsNotCloseToOffsetFloat() {
+    assertNotEquals(1.0f, 2.0f, 0.0f, "foo");
   }
 
-  void testAssertUnequalDoublesWithDelta() {
-    assertNotEquals(0.0, 0.0, 0.0);
+  void testAssertThatIsNotCloseToOffsetDouble() {
+    assertNotEquals(1.0, 2.0, 0.0);
   }
 
-  void testAssertUnequalDoublesWithDeltaWithMessage() {
-    assertNotEquals(0.0, 0.0, 0.0, "foo");
+  void testAssertThatWithFailMessageIsNotCloseToOffsetDouble() {
+    assertNotEquals(1.0, 2.0, 0.0, "foo");
   }
 
-  void testAssertThrows() {
+  void testAssertThatThrownBy() {
     assertThrows(() -> {});
   }
 
-  void testAssertThrowsWithType() {
+  void testAssertThatThrownByIsInstanceOf() {
     assertThrows(IllegalStateException.class, () -> {});
   }
 }

@@ -32,75 +32,71 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
         ImmutableMultimap.builder());
   }
 
-  ImmutableSet<ImmutableMultimap<String, Integer>> testEmptyImmutableListMultimap() {
+  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf0() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().build(), ImmutableMultimap.of());
   }
 
-  ImmutableSet<ImmutableMultimap<String, Integer>> testPairToImmutableListMultimap() {
+  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf2() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put("foo", 1).build(),
         ImmutableMultimap.of("bar", 2));
   }
 
-  ImmutableList<ImmutableMultimap<String, Integer>> testEntryToImmutableListMultimap() {
-    return ImmutableList.of(
+  ImmutableSet<ImmutableMultimap<String, Integer>>
+      testImmutableListMultimapOfEntryGetKeyEntryGetValue() {
+    return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
-        Stream.of(Map.entry("foo", 1))
+        Stream.of(Map.entry("bar", 2))
             .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableList<ImmutableMultimap<String, Integer>> testIterableToImmutableListMultimap() {
-    return ImmutableList.of(
+  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapCopyOf() {
+    return ImmutableSet.of(
         ImmutableListMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
         ImmutableListMultimap.<String, Integer>builder()
-            .putAll(ImmutableListMultimap.of("foo", 1))
+            .putAll(ImmutableListMultimap.of("bar", 2))
             .build(),
+        ImmutableMultimap.copyOf(ImmutableListMultimap.of("baz", 3)),
+        ImmutableMultimap.copyOf(ImmutableListMultimap.of("qux", 4).entries()),
         ImmutableListMultimap.<String, Integer>builder()
-            .putAll(ImmutableListMultimap.of("foo", 1).entries())
+            .putAll(Iterables.cycle(Map.entry("quux", 5)))
             .build(),
-        ImmutableListMultimap.of("foo", 1).entries().stream()
+        Streams.stream(Iterables.cycle(Map.entry("corge", 6)))
             .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-        Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
-            .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-        ImmutableMultimap.copyOf(ImmutableListMultimap.of("foo", 1)),
-        ImmutableMultimap.copyOf(ImmutableListMultimap.of("foo", 1).entries()),
-        ImmutableMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+        ImmutableMultimap.copyOf(Iterables.cycle(Map.entry("grault", 7))),
+        ImmutableListMultimap.of("garply", 8).entries().stream()
+            .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableListMultimap<Integer, String> testStreamOfMapEntriesToImmutableListMultimap() {
+  ImmutableListMultimap<Integer, String> testStreamCollectToImmutableListMultimap() {
     return Stream.of(1, 2, 3)
         .map(n -> Map.entry(n, n.toString()))
         .collect(toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  ImmutableSet<ImmutableListMultimap<Integer, Integer>> testIndexIterableToImmutableListMultimap() {
+  ImmutableSet<ImmutableListMultimap<Integer, Integer>> testMultimapsIndex() {
     return ImmutableSet.of(
-        Streams.stream(ImmutableList.of(1).iterator())
-            .collect(toImmutableListMultimap(n -> n * 2, identity())),
-        Streams.stream(ImmutableList.of(2).iterator())
-            .collect(toImmutableListMultimap(n -> n * 2, v -> v)),
-        Streams.stream(ImmutableList.of(3).iterator())
-            .collect(toImmutableListMultimap(n -> n * 2, v -> 0)),
-        Streams.stream(ImmutableList.of(4)::iterator)
-            .collect(toImmutableListMultimap(Integer::valueOf, identity())),
-        Streams.stream(ImmutableList.of(5)::iterator)
-            .collect(toImmutableListMultimap(Integer::valueOf, v -> v)),
-        Streams.stream(ImmutableList.of(6)::iterator)
+        Streams.stream(ImmutableList.of(1)::iterator)
             .collect(toImmutableListMultimap(Integer::valueOf, v -> 0)),
-        ImmutableList.of(7).stream()
+        Streams.stream(ImmutableList.of(2)::iterator)
+            .collect(toImmutableListMultimap(Integer::valueOf, identity())),
+        ImmutableList.of(3).stream().collect(toImmutableListMultimap(n -> n.intValue(), v -> 0)),
+        ImmutableList.of(4).stream()
             .collect(toImmutableListMultimap(n -> n.intValue(), identity())),
-        ImmutableList.of(8).stream().collect(toImmutableListMultimap(n -> n.intValue(), v -> v)),
-        ImmutableList.of(9).stream().collect(toImmutableListMultimap(n -> n.intValue(), v -> 0)));
+        Streams.stream(ImmutableList.of(5).iterator())
+            .collect(toImmutableListMultimap(n -> n * 2, v -> 0)),
+        Streams.stream(ImmutableList.of(6).iterator())
+            .collect(toImmutableListMultimap(n -> n * 2, identity())));
   }
 
-  ImmutableListMultimap<String, Integer> testTransformMultimapValuesToImmutableListMultimap() {
+  ImmutableListMultimap<String, Integer> testImmutableListMultimapCopyOfMultimapsTransformValues() {
     return ImmutableListMultimap.of("foo", 1L).entries().stream()
         .collect(toImmutableListMultimap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
   }
 
   ImmutableSet<ImmutableListMultimap<String, Integer>>
-      testTransformMultimapValuesToImmutableListMultimap2() {
+      testImmutableListMultimapCopyOfMultimapsTransformValuesWithFunction() {
     return ImmutableSet.of(
         ImmutableSetMultimap.of("foo", 1L).asMap().entrySet().stream()
             .collect(
@@ -126,8 +122,7 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
 
-  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>>
-      testImmutableListMultimapBuilderPut() {
+  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)),
         ImmutableListMultimap.<String, Integer>builder().putAll("bar", 2));

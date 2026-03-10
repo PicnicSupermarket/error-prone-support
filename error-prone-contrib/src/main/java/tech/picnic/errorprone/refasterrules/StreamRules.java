@@ -27,7 +27,6 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
-import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.MayOptionallyUse;
@@ -59,6 +58,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
@@ -70,10 +70,7 @@ import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 final class StreamRules {
   private StreamRules() {}
 
-  /**
-   * Prefer {@link Collectors#joining()} over {@link Collectors#joining(CharSequence)} with an empty
-   * delimiter string.
-   */
+  /** Prefer {@link Collectors#joining()} over more verbose alternatives. */
   static final class Joining {
     @BeforeTemplate
     Collector<CharSequence, ?, String> before() {
@@ -87,11 +84,11 @@ final class StreamRules {
     }
   }
 
-  /** Prefer {@link Stream#empty()} over less clear alternatives. */
+  /** Prefer {@link Stream#empty()} over less explicit alternatives. */
   // XXX: We can additionally introduce a rule that maps `OptionalInt.empty().stream()` to
   // `IntStream.empty()`, and likewise for `OptionalLong` and `OptionalDouble`, but those
   // expressions are highly unlikely to be seen in the wild.
-  static final class EmptyStream<T> {
+  static final class StreamEmpty<T> {
     @BeforeTemplate
     Stream<T> before(
         @Matches(IsEmpty.class) Collection<T> collection,
@@ -134,11 +131,8 @@ final class StreamRules {
     }
   }
 
-  /**
-   * Prefer {@link Arrays#stream(Object[])} over {@link Stream#of(Object[])}, as the former is
-   * clearer.
-   */
-  static final class StreamOfArray<T> {
+  /** Prefer {@link Arrays#stream(Object[])} over less explicit alternatives. */
+  static final class ArraysStream<T> {
     @BeforeTemplate
     Stream<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
       return Stream.of(array);
@@ -150,8 +144,8 @@ final class StreamRules {
     }
   }
 
-  /** Don't unnecessarily call {@link Streams#concat(Stream...)}. */
-  static final class ConcatOneStream<T> {
+  /** Prefer the {@link Stream} as-is over more contrived alternatives. */
+  static final class StreamIdentity<T> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream) {
       return Streams.concat(stream);
@@ -164,69 +158,68 @@ final class StreamRules {
     }
   }
 
-  /** Prefer {@link Stream#concat(Stream, Stream)} over the Guava alternative. */
-  static final class ConcatTwoStreams<T> {
+  /** Prefer {@link Stream#concat(Stream, Stream)} over non-JDK alternatives. */
+  static final class StreamConcat<T> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> s1, Stream<T> s2) {
-      return Streams.concat(s1, s2);
+    Stream<T> before(Stream<T> stream1, Stream<T> stream2) {
+      return Streams.concat(stream1, stream2);
     }
 
     @AfterTemplate
-    Stream<T> after(Stream<T> s1, Stream<T> s2) {
-      return Stream.concat(s1, s2);
+    Stream<T> after(Stream<T> stream1, Stream<T> stream2) {
+      return Stream.concat(stream1, stream2);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link Stream#filter(Predicate)} operations. */
-  abstract static class FilterOuterStreamAfterFlatMap<T, S> {
+  /** Prefer {@link Stream#filter(Predicate)} over more contrived alternatives. */
+  abstract static class StreamFlatMapFilter<T, S2, S extends S2> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Stream<S> before(Stream<T> stream, Predicate<? super S> predicate) {
+    Stream<S> before(Stream<T> stream, Predicate<S2> predicate) {
       return stream.flatMap(v -> toStreamFunction(v).filter(predicate));
     }
 
     @AfterTemplate
-    Stream<S> after(Stream<T> stream, Predicate<? super S> predicate) {
+    Stream<S> after(Stream<T> stream, Predicate<S2> predicate) {
       return stream.flatMap(v -> toStreamFunction(v)).filter(predicate);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link Stream#map(Function)} operations. */
-  abstract static class MapOuterStreamAfterFlatMap<T, S, R> {
+  /** Prefer {@link Stream#map(Function)} over more contrived alternatives. */
+  abstract static class StreamFlatMapMap<T, S2, S extends S2, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Stream<R> before(Stream<T> stream, Function<? super S, ? extends R> function) {
+    Stream<R> before(Stream<T> stream, Function<S2, R> function) {
       return stream.flatMap(v -> toStreamFunction(v).map(function));
     }
 
     @AfterTemplate
-    Stream<R> after(Stream<T> stream, Function<? super S, ? extends R> function) {
+    Stream<R> after(Stream<T> stream, Function<S2, R> function) {
       return stream.flatMap(v -> toStreamFunction(v)).map(function);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link Stream#flatMap(Function)} operations. */
-  abstract static class FlatMapOuterStreamAfterFlatMap<T, S, R> {
+  /** Prefer {@link Stream#flatMap(Function)} over more contrived alternatives. */
+  abstract static class StreamFlatMapFlatMap<T, S2, S extends S2, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Stream<R> before(
-        Stream<T> stream, Function<? super S, ? extends Stream<? extends R>> function) {
+    Stream<R> before(Stream<T> stream, Function<S2, ? extends Stream<? extends R>> function) {
       return stream.flatMap(v -> toStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    Stream<R> after(Stream<T> stream, Function<? super S, ? extends Stream<? extends R>> function) {
+    Stream<R> after(Stream<T> stream, Function<S2, ? extends Stream<? extends R>> function) {
       return stream.flatMap(v -> toStreamFunction(v)).flatMap(function);
     }
   }
 
-  /** Prefer {@link Stream#sorted()} over more contrived alternatives. */
+  /** Prefer {@link Stream#sorted()} over more verbose alternatives. */
   static final class StreamSorted<T extends Comparable<? super T>> {
     @BeforeTemplate
     Stream<T> before(Stream<T> stream) {
@@ -240,42 +233,40 @@ final class StreamRules {
   }
 
   /**
-   * Apply {@link Stream#filter(Predicate)} before {@link Stream#sorted()} to reduce the number of
-   * elements to sort.
+   * Prefer {@link Stream#filter(Predicate)} before {@link Stream#sorted()} over less efficient
+   * alternatives.
    */
-  static final class StreamFilterSorted<T> {
+  static final class StreamFilterSorted<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
+    Stream<T> before(Stream<T> stream, Predicate<S> predicate) {
       return stream.sorted().filter(predicate);
     }
 
     @AfterTemplate
-    Stream<T> after(Stream<T> stream, Predicate<? super T> predicate) {
+    Stream<T> after(Stream<T> stream, Predicate<S> predicate) {
       return stream.filter(predicate).sorted();
     }
   }
 
   /**
-   * Apply {@link Stream#filter(Predicate)} before {@link Stream#sorted(Comparator)} to reduce the
-   * number of elements to sort.
+   * Prefer {@link Stream#filter(Predicate)} before {@link Stream#sorted(Comparator)} over less
+   * efficient alternatives.
    */
-  static final class StreamFilterSortedWithComparator<T> {
+  static final class StreamFilterSortedWithComparator<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(
-        Stream<T> stream, Predicate<? super T> predicate, Comparator<? super T> comparator) {
-      return stream.sorted(comparator).filter(predicate);
+    Stream<T> before(Stream<T> stream, Predicate<S> predicate, Comparator<S> cmp) {
+      return stream.sorted(cmp).filter(predicate);
     }
 
     @AfterTemplate
-    Stream<T> after(
-        Stream<T> stream, Predicate<? super T> predicate, Comparator<? super T> comparator) {
-      return stream.filter(predicate).sorted(comparator);
+    Stream<T> after(Stream<T> stream, Predicate<S> predicate, Comparator<S> cmp) {
+      return stream.filter(predicate).sorted(cmp);
     }
   }
 
   /**
-   * Apply {@link Stream#distinct()} before {@link Stream#sorted()} to reduce the number of elements
-   * to sort.
+   * Prefer {@link Stream#distinct()} before {@link Stream#sorted()} over less efficient
+   * alternatives.
    */
   static final class StreamDistinctSorted<T> {
     @BeforeTemplate
@@ -290,46 +281,38 @@ final class StreamRules {
   }
 
   /**
-   * Apply {@link Stream#distinct()} before {@link Stream#sorted(Comparator)} to reduce the number
-   * of elements to sort.
+   * Prefer {@link Stream#distinct()} before {@link Stream#sorted(Comparator)} over less efficient
+   * alternatives.
    */
   static final class StreamDistinctSortedWithComparator<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, Comparator<S> comparator) {
-      return stream.sorted(comparator).distinct();
+    Stream<T> before(Stream<T> stream, Comparator<S> cmp) {
+      return stream.sorted(cmp).distinct();
     }
 
     @AfterTemplate
-    Stream<T> after(Stream<T> stream, Comparator<S> comparator) {
-      return stream.distinct().sorted(comparator);
+    Stream<T> after(Stream<T> stream, Comparator<S> cmp) {
+      return stream.distinct().sorted(cmp);
     }
   }
 
-  /**
-   * Prefer {@link Comparators#least(int, Comparator)} over alternatives that require space
-   * proportional to the size of the input stream, rather than space proportional to the result
-   * stream.
-   */
+  /** Prefer {@link Comparators#least(int, Comparator)} over less efficient alternatives. */
   // XXX: For ordered streams the replacement code is not equivalent to the original code, as the
   // latter uses a stable sort operation, while the former breaks ties arbitrarily.
   static final class StreamCollectLeastStream<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, int n, Comparator<S> comparator) {
-      return stream.sorted(comparator).limit(n);
+    Stream<T> before(Stream<T> stream, int n, Comparator<S> cmp) {
+      return stream.sorted(cmp).limit(n);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Stream<T> after(Stream<T> stream, int n, Comparator<S> comparator) {
-      return stream.collect(least(n, comparator)).stream();
+    Stream<T> after(Stream<T> stream, int n, Comparator<S> cmp) {
+      return stream.collect(least(n, cmp)).stream();
     }
   }
 
-  /**
-   * Prefer {@link Comparators#least(int, Comparator)} over alternatives that require space
-   * proportional to the size of the input stream, rather than space proportional to the result
-   * stream.
-   */
+  /** Prefer {@link Comparators#least(int, Comparator)} over less efficient alternatives. */
   // XXX: For ordered streams the replacement code is not equivalent to the original code, as the
   // latter uses a stable sort operation, while the former breaks ties arbitrarily.
   static final class StreamCollectLeastNaturalOrderStream<T extends Comparable<? super T>> {
@@ -345,34 +328,32 @@ final class StreamRules {
     }
   }
 
-  /**
-   * Where possible, clarify that a mapping operation will be applied only to a single stream
-   * element.
-   */
+  /** Prefer {@code stream.findFirst().map(function)} over less efficient alternatives. */
   // XXX: Implement a similar rule for `.findAny()`. For parallel streams this wouldn't be quite the
   // same, so such a rule requires a `Matcher` that heuristically identifies `Stream` expressions
   // with deterministic order.
   // XXX: This change is not equivalent for `null`-returning functions, as the original code throws
   // an NPE if the first element is `null`, while the latter yields an empty `Optional`.
-  static final class StreamMapFirst<T, S> {
+  static final class StreamFindFirstMap<T2, T extends T2, S> {
     @BeforeTemplate
-    Optional<S> before(Stream<T> stream, Function<? super T, S> function) {
+    Optional<S> before(Stream<T> stream, Function<T2, S> function) {
       return stream.map(function).findFirst();
     }
 
     @AfterTemplate
-    Optional<S> after(Stream<T> stream, Function<? super T, S> function) {
+    Optional<S> after(Stream<T> stream, Function<T2, S> function) {
       return stream.findFirst().map(function);
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
+  /** Prefer {@link Stream#findAny()} over less efficient alternatives. */
   // XXX: This rule assumes that any matched `Collector` does not perform any filtering.
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
+  @PossibleSourceIncompatibility
   static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
+    Boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
       return Refaster.anyOf(
           stream.count() == 0,
           stream.count() <= 0,
@@ -383,25 +364,25 @@ final class StreamRules {
     }
 
     @BeforeTemplate
-    boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> collector) {
+    Boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> collector) {
       return stream.collect(collectingAndThen(collector, M::isEmpty));
     }
 
     @AfterTemplate
-    @AlsoNegation
     boolean after(Stream<T> stream) {
       return stream.findAny().isEmpty();
     }
   }
 
-  /**
-   * Prefer {@link Stream#findAny()} over {@link Stream#findFirst()} if one only cares whether the
-   * stream is nonempty.
-   */
+  /** Prefer {@link Stream#findAny()} over less efficient alternatives. */
   static final class StreamFindAnyIsPresent<T> {
     @BeforeTemplate
     boolean before(Stream<T> stream) {
-      return stream.findFirst().isPresent();
+      return Refaster.anyOf(
+          stream.count() != 0,
+          stream.count() > 0,
+          stream.count() >= 1,
+          stream.findFirst().isPresent());
     }
 
     @AfterTemplate
@@ -426,10 +407,9 @@ final class StreamRules {
   }
 
   /**
-   * Prefer an unconditional {@link Map#get(Object)} call followed by a {@code null} check over a
-   * call to {@link Map#containsKey(Object)}, as the former avoids a second lookup operation.
+   * Prefer {@code stream.map(map::get).filter(Objects::nonNull)} over less efficient alternatives.
    */
-  static final class StreamMapFilter<T, K, V> {
+  static final class StreamMapMapGetFilterObjectsNonNull<T, K, V> {
     @BeforeTemplate
     Stream<V> before(Stream<T> stream, Map<K, V> map) {
       return stream.filter(map::containsKey).map(map::get);
@@ -441,22 +421,22 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMin<T> {
+  /** Prefer {@link Stream#min(Comparator)} over less efficient alternatives. */
+  static final class StreamMin<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
+    Optional<T> before(Stream<T> stream, Comparator<S> cmp) {
       return Refaster.anyOf(
-          stream.max(comparator.reversed()),
-          stream.sorted(comparator).findFirst(),
-          stream.collect(minBy(comparator)));
+          stream.max(cmp.reversed()), stream.sorted(cmp).findFirst(), stream.collect(minBy(cmp)));
     }
 
     @AfterTemplate
-    Optional<T> after(Stream<T> stream, Comparator<? super T> comparator) {
-      return stream.min(comparator);
+    Optional<T> after(Stream<T> stream, Comparator<S> cmp) {
+      return stream.min(cmp);
     }
   }
 
+  /** Prefer {@link Stream#min(Comparator)} over less efficient alternatives. */
   static final class StreamMinNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     Optional<T> before(Stream<T> stream) {
@@ -470,22 +450,24 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMax<T> {
+  /** Prefer {@link Stream#max(Comparator)} over less efficient alternatives. */
+  static final class StreamMax<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    Optional<T> before(Stream<T> stream, Comparator<? super T> comparator) {
+    Optional<T> before(Stream<T> stream, Comparator<S> cmp) {
       return Refaster.anyOf(
-          stream.min(comparator.reversed()),
-          Streams.findLast(stream.sorted(comparator)),
-          stream.collect(maxBy(comparator)));
+          stream.min(cmp.reversed()),
+          Streams.findLast(stream.sorted(cmp)),
+          stream.collect(maxBy(cmp)));
     }
 
     @AfterTemplate
-    Optional<T> after(Stream<T> stream, Comparator<? super T> comparator) {
-      return stream.max(comparator);
+    Optional<T> after(Stream<T> stream, Comparator<S> cmp) {
+      return stream.max(cmp);
     }
   }
 
+  /** Prefer {@link Stream#max(Comparator)} over less efficient alternatives. */
   static final class StreamMaxNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     Optional<T> before(Stream<T> stream) {
@@ -500,10 +482,10 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
-  static final class StreamNoneMatch<T> {
+  static final class StreamNoneMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
-    boolean before(Stream<T> stream, Predicate<? super T> predicate) {
+    boolean before(Stream<T> stream, Predicate<S> predicate) {
       return Refaster.anyOf(
           !stream.anyMatch(predicate),
           stream.allMatch(Refaster.anyOf(not(predicate), predicate.negate())),
@@ -515,18 +497,18 @@ final class StreamRules {
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class)
-            Function<? super T, Boolean> predicate) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> predicate) {
       return stream.map(predicate).noneMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<? super T> predicate) {
+    boolean after(Stream<T> stream, Predicate<S> predicate) {
       return stream.noneMatch(predicate);
     }
   }
 
-  abstract static class StreamNoneMatch2<T> {
+  /** Prefer {@link Stream#noneMatch(Predicate)} over less explicit alternatives. */
+  abstract static class StreamNoneMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
@@ -542,10 +524,10 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#anyMatch(Predicate)} over more contrived alternatives. */
-  static final class StreamAnyMatch<T> {
+  static final class StreamAnyMatch<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
-    boolean before(Stream<T> stream, Predicate<? super T> predicate) {
+    boolean before(Stream<T> stream, Predicate<S> predicate) {
       return Refaster.anyOf(
           !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
     }
@@ -555,20 +537,20 @@ final class StreamRules {
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class)
-            Function<? super T, Boolean> predicate) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> predicate) {
       return stream.map(predicate).anyMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<? super T> predicate) {
+    boolean after(Stream<T> stream, Predicate<S> predicate) {
       return stream.anyMatch(predicate);
     }
   }
 
-  static final class StreamAllMatch<T> {
+  /** Prefer {@link Stream#allMatch(Predicate)} over more contrived alternatives. */
+  static final class StreamAllMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Predicate<? super T> predicate) {
+    boolean before(Stream<T> stream, Predicate<S> predicate) {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
     }
 
@@ -577,18 +559,18 @@ final class StreamRules {
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class)
-            Function<? super T, Boolean> predicate) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> predicate) {
       return stream.map(predicate).allMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<? super T> predicate) {
+    boolean after(Stream<T> stream, Predicate<S> predicate) {
       return stream.allMatch(predicate);
     }
   }
 
-  abstract static class StreamAllMatch2<T> {
+  /** Prefer {@link Stream#allMatch(Predicate)} over less explicit alternatives. */
+  abstract static class StreamAllMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
@@ -603,17 +585,19 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMapToIntSum<T> {
+  /** Prefer {@code stream.mapToInt(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
+  static final class StreamMapToIntSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    long before(Stream<T> stream, ToIntFunction<T> mapper) {
+    Integer before(Stream<T> stream, ToIntFunction<T> mapper) {
       return stream.collect(summingInt(mapper));
     }
 
     @BeforeTemplate
-    int before2(
+    Integer before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Integer> mapper) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Integer> mapper) {
       return stream.map(mapper).reduce(0, Integer::sum);
     }
 
@@ -623,17 +607,19 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMapToDoubleSum<T> {
+  /** Prefer {@code stream.mapToDouble(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
+  static final class StreamMapToDoubleSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
+    Double before(Stream<T> stream, ToDoubleFunction<T> mapper) {
       return stream.collect(summingDouble(mapper));
     }
 
     @BeforeTemplate
-    double before2(
+    Double before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Double> mapper) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Double> mapper) {
       return stream.map(mapper).reduce(0.0, Double::sum);
     }
 
@@ -643,17 +629,19 @@ final class StreamRules {
     }
   }
 
-  static final class StreamMapToLongSum<T> {
+  /** Prefer {@code stream.mapToLong(mapper).sum()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
+  static final class StreamMapToLongSum<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    long before(Stream<T> stream, ToLongFunction<T> mapper) {
+    Long before(Stream<T> stream, ToLongFunction<T> mapper) {
       return stream.collect(summingLong(mapper));
     }
 
     @BeforeTemplate
-    long before2(
+    Long before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) Function<? super T, Long> mapper) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Long> mapper) {
       return stream.map(mapper).reduce(0L, Long::sum);
     }
 
@@ -663,6 +651,9 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer {@code stream.mapToInt(mapper).summaryStatistics()} over less efficient alternatives.
+   */
   static final class StreamMapToIntSummaryStatistics<T> {
     @BeforeTemplate
     IntSummaryStatistics before(Stream<T> stream, ToIntFunction<T> mapper) {
@@ -675,6 +666,9 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer {@code stream.mapToDouble(mapper).summaryStatistics()} over less efficient alternatives.
+   */
   static final class StreamMapToDoubleSummaryStatistics<T> {
     @BeforeTemplate
     DoubleSummaryStatistics before(Stream<T> stream, ToDoubleFunction<T> mapper) {
@@ -687,6 +681,9 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer {@code stream.mapToLong(mapper).summaryStatistics()} over less efficient alternatives.
+   */
   static final class StreamMapToLongSummaryStatistics<T> {
     @BeforeTemplate
     LongSummaryStatistics before(Stream<T> stream, ToLongFunction<T> mapper) {
@@ -699,10 +696,12 @@ final class StreamRules {
     }
   }
 
+  /** Prefer {@link Stream#count()} over less efficient alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamCount<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    long before(Stream<T> stream) {
+    Long before(Stream<T> stream) {
       return stream.collect(counting());
     }
 
@@ -712,6 +711,7 @@ final class StreamRules {
     }
   }
 
+  /** Prefer {@link Stream#reduce(BinaryOperator)} over less efficient alternatives. */
   static final class StreamReduce<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
@@ -725,7 +725,8 @@ final class StreamRules {
     }
   }
 
-  static final class StreamReduceWithIdentity<T> {
+  /** Prefer {@link Stream#reduce(Object, BinaryOperator)} over less efficient alternatives. */
+  static final class StreamReduceWithObject<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
     T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
@@ -738,57 +739,53 @@ final class StreamRules {
     }
   }
 
-  static final class StreamFilterCollect<T, R> {
+  /** Prefer {@link Stream#filter(Predicate)} over more contrived alternatives. */
+  static final class StreamFilterCollect<S, T extends S, R> {
     @BeforeTemplate
-    R before(
-        Stream<T> stream, Predicate<? super T> predicate, Collector<? super T, ?, R> collector) {
+    R before(Stream<T> stream, Predicate<S> predicate, Collector<S, ?, R> collector) {
       return stream.collect(filtering(predicate, collector));
     }
 
     @AfterTemplate
-    R after(
-        Stream<T> stream, Predicate<? super T> predicate, Collector<? super T, ?, R> collector) {
+    R after(Stream<T> stream, Predicate<S> predicate, Collector<S, ?, R> collector) {
       return stream.filter(predicate).collect(collector);
     }
   }
 
-  static final class StreamMapCollect<T, U, R> {
+  /** Prefer {@link Stream#map(Function)} over more contrived alternatives. */
+  static final class StreamMapCollect<S, T extends S, U, R> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    R before(
-        Stream<T> stream,
-        Function<? super T, ? extends U> mapper,
-        Collector<? super U, ?, R> collector) {
+    R before(Stream<T> stream, Function<S, U> mapper, Collector<U, ?, R> collector) {
       return stream.collect(mapping(mapper, collector));
     }
 
     @AfterTemplate
-    R after(
-        Stream<T> stream,
-        Function<? super T, ? extends U> mapper,
-        Collector<? super U, ?, R> collector) {
+    R after(Stream<T> stream, Function<S, U> mapper, Collector<U, ?, R> collector) {
       return stream.map(mapper).collect(collector);
     }
   }
 
-  static final class StreamFlatMapCollect<T, U, R> {
+  /** Prefer {@link Stream#flatMap(Function)} over more contrived alternatives. */
+  static final class StreamFlatMapCollect<S, T extends S, U, R> {
     @BeforeTemplate
     R before(
         Stream<T> stream,
-        Function<? super T, ? extends Stream<? extends U>> mapper,
-        Collector<? super U, ?, R> collector) {
+        Function<S, ? extends Stream<? extends U>> mapper,
+        Collector<U, ?, R> collector) {
       return stream.collect(flatMapping(mapper, collector));
     }
 
     @AfterTemplate
     R after(
         Stream<T> stream,
-        Function<? super T, ? extends Stream<? extends U>> mapper,
-        Collector<? super U, ?, R> collector) {
+        Function<S, ? extends Stream<? extends U>> mapper,
+        Collector<U, ?, R> collector) {
       return stream.flatMap(mapper).collect(collector);
     }
   }
 
+  /** Prefer {@link Streams#concat(Stream...)} over more contrived alternatives. */
   static final class StreamsConcat<T> {
     @BeforeTemplate
     Stream<T> before(
@@ -804,14 +801,15 @@ final class StreamRules {
     }
   }
 
-  static final class StreamTakeWhile<T> {
+  /** Prefer {@link Stream#takeWhile(Predicate)} over more verbose alternatives. */
+  static final class StreamTakeWhile<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, Predicate<? super T> predicate) {
+    Stream<T> before(Stream<T> stream, Predicate<S> predicate) {
       return stream.takeWhile(predicate).filter(predicate);
     }
 
     @AfterTemplate
-    Stream<T> after(Stream<T> stream, Predicate<? super T> predicate) {
+    Stream<T> after(Stream<T> stream, Predicate<S> predicate) {
       return stream.takeWhile(predicate);
     }
   }
@@ -820,14 +818,14 @@ final class StreamRules {
    * Prefer {@link Stream#iterate(Object, Predicate, UnaryOperator)} over more contrived
    * alternatives.
    */
-  static final class StreamIterate<T> {
+  static final class StreamIterate<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+    Stream<T> before(T seed, Predicate<S> hasNext, UnaryOperator<T> next) {
       return Stream.iterate(seed, next).takeWhile(hasNext);
     }
 
     @AfterTemplate
-    Stream<T> after(T seed, Predicate<? super T> hasNext, UnaryOperator<T> next) {
+    Stream<T> after(T seed, Predicate<S> hasNext, UnaryOperator<T> next) {
       return Stream.iterate(seed, hasNext, next);
     }
   }
@@ -928,10 +926,7 @@ final class StreamRules {
     }
   }
 
-  /**
-   * Prefer streaming the result of {@link Collections#nCopies(int, Object)} if a stream of
-   * identical elements is required.
-   */
+  /** Prefer {@link Collections#nCopies(int, Object)} over more contrived alternatives. */
   static final class CollectionsNCopiesStream<T> {
     @BeforeTemplate
     Stream<T> before(int n, @NotMatches(RequiresComputation.class) T element) {
