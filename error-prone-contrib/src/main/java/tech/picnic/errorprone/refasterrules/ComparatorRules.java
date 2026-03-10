@@ -37,6 +37,7 @@ import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -46,11 +47,15 @@ import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 final class ComparatorRules {
   private ComparatorRules() {}
 
-  /** Prefer {@link Comparator#naturalOrder()} over more complicated constructs. */
-  static final class NaturalOrder<T extends Comparable<? super T>> {
+  /**
+   * Prefer {@link Comparator#naturalOrder()} over less explicit, more verbose, or more contrived
+   * alternatives.
+   */
+  static final class NaturalOrder<T extends Comparable<? super T>, U extends T> {
+    // XXX: Ideally `? super T` would also be replaced by a class-level type parameter, but Java
+    // does not allow a type variable to be followed by other bounds.
     @BeforeTemplate
-    Comparator<T> before(
-        @Matches(IsIdentityOperation.class) Function<? super T, ? extends T> keyExtractor) {
+    Comparator<T> before(@Matches(IsIdentityOperation.class) Function<? super T, U> keyExtractor) {
       return Refaster.anyOf(
           T::compareTo,
           comparing(keyExtractor),
@@ -65,7 +70,10 @@ final class ComparatorRules {
     }
   }
 
-  /** Prefer {@link Comparator#reverseOrder()} over more complicated constructs. */
+  /**
+   * Prefer {@link Comparator#reverseOrder()} over less explicit, more verbose, or more contrived
+   * alternatives.
+   */
   static final class ReverseOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     Comparator<T> before() {
@@ -83,11 +91,11 @@ final class ComparatorRules {
     }
   }
 
-  static final class CustomComparator<T> {
+  /** Prefer using the {@link Comparator} as-is over more contrived alternatives. */
+  static final class ComparatorIdentity<S, T extends S, U extends T> {
     @BeforeTemplate
     Comparator<T> before(
-        Comparator<T> cmp,
-        @Matches(IsIdentityOperation.class) Function<? super T, ? extends T> keyExtractor) {
+        Comparator<T> cmp, @Matches(IsIdentityOperation.class) Function<S, U> keyExtractor) {
       return comparing(keyExtractor, cmp);
     }
 
@@ -99,7 +107,7 @@ final class ComparatorRules {
     }
   }
 
-  /** Don't explicitly compare enums by their ordinal. */
+  /** Prefer {@link Comparator#comparing(Function)} over less explicit alternatives. */
   abstract static class ComparingEnum<E extends Enum<E>, T> {
     @Placeholder(allowsIdentity = true)
     abstract E toEnumFunction(@MayOptionallyUse T value);
@@ -117,111 +125,117 @@ final class ComparatorRules {
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparing<S, T extends Comparable<? super T>> {
+  /** Prefer {@link Comparator#thenComparing(Function)} over more verbose alternatives. */
+  static final class ComparatorThenComparing<
+      R, S extends R, T extends Comparable<? super T>, U extends T> {
     @BeforeTemplate
-    Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
       return cmp.thenComparing(comparing(function));
     }
 
     @AfterTemplate
-    Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
       return cmp.thenComparing(function);
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparingReversed<S, T extends Comparable<? super T>> {
+  /**
+   * Prefer {@link Comparator#thenComparing(Function, Comparator)} over more verbose alternatives.
+   */
+  static final class ComparatorThenComparingReverseOrder<
+      R, S extends R, T extends Comparable<? super T>, U extends T> {
     @BeforeTemplate
-    Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
       return cmp.thenComparing(comparing(function).reversed());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
       return cmp.thenComparing(function, reverseOrder());
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparingCustom<S, T> {
+  /**
+   * Prefer {@link Comparator#thenComparing(Function, Comparator)} over more verbose alternatives.
+   */
+  static final class ComparatorThenComparingWithComparator<R, S extends R, V, U extends V> {
     @BeforeTemplate
-    Comparator<S> before(
-        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+    Comparator<S> before(Comparator<S> cmp, Function<R, U> function, Comparator<V> cmp2) {
       return cmp.thenComparing(comparing(function, cmp2));
     }
 
     @AfterTemplate
-    Comparator<S> after(
-        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+    Comparator<S> after(Comparator<S> cmp, Function<R, U> function, Comparator<V> cmp2) {
       return cmp.thenComparing(function, cmp2);
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparingCustomReversed<S, T> {
+  /**
+   * Prefer {@link Comparator#thenComparing(Function, Comparator)} over more contrived alternatives.
+   */
+  static final class ComparatorThenComparingComparatorReversed<R, S extends R, V, U extends V> {
     @BeforeTemplate
-    Comparator<S> before(
-        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+    Comparator<S> before(Comparator<S> cmp, Function<R, U> function, Comparator<V> cmp2) {
       return cmp.thenComparing(comparing(function, cmp2).reversed());
     }
 
     @AfterTemplate
-    Comparator<S> after(
-        Comparator<S> cmp, Function<? super S, ? extends T> function, Comparator<? super T> cmp2) {
+    Comparator<S> after(Comparator<S> cmp, Function<R, U> function, Comparator<V> cmp2) {
       return cmp.thenComparing(function, cmp2.reversed());
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparingDouble<T> {
+  /**
+   * Prefer {@link Comparator#thenComparingDouble(ToDoubleFunction)} over more verbose alternatives.
+   */
+  static final class ComparatorThenComparingDouble<S, T extends S> {
     @BeforeTemplate
-    Comparator<T> before(Comparator<T> cmp, ToDoubleFunction<? super T> function) {
+    Comparator<T> before(Comparator<T> cmp, ToDoubleFunction<S> function) {
       return cmp.thenComparing(comparingDouble(function));
     }
 
     @AfterTemplate
-    Comparator<T> after(Comparator<T> cmp, ToDoubleFunction<? super T> function) {
+    Comparator<T> after(Comparator<T> cmp, ToDoubleFunction<S> function) {
       return cmp.thenComparingDouble(function);
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparingInt<T> {
+  /** Prefer {@link Comparator#thenComparingInt(ToIntFunction)} over more verbose alternatives. */
+  static final class ComparatorThenComparingInt<S, T extends S> {
     @BeforeTemplate
-    Comparator<T> before(Comparator<T> cmp, ToIntFunction<? super T> function) {
+    Comparator<T> before(Comparator<T> cmp, ToIntFunction<S> function) {
       return cmp.thenComparing(comparingInt(function));
     }
 
     @AfterTemplate
-    Comparator<T> after(Comparator<T> cmp, ToIntFunction<? super T> function) {
+    Comparator<T> after(Comparator<T> cmp, ToIntFunction<S> function) {
       return cmp.thenComparingInt(function);
     }
   }
 
-  /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparingLong<T> {
+  /** Prefer {@link Comparator#thenComparingLong(ToLongFunction)} over more verbose alternatives. */
+  static final class ComparatorThenComparingLong<S, T extends S> {
     @BeforeTemplate
-    Comparator<T> before(Comparator<T> cmp, ToLongFunction<? super T> function) {
+    Comparator<T> before(Comparator<T> cmp, ToLongFunction<S> function) {
       return cmp.thenComparing(comparingLong(function));
     }
 
     @AfterTemplate
-    Comparator<T> after(Comparator<T> cmp, ToLongFunction<? super T> function) {
+    Comparator<T> after(Comparator<T> cmp, ToLongFunction<S> function) {
       return cmp.thenComparingLong(function);
     }
   }
 
-  /**
-   * Where applicable, prefer {@link Comparator#naturalOrder()} over identity function-based
-   * comparisons, as the former more clearly states intent.
-   */
-  static final class ThenComparingNaturalOrder<T extends Comparable<? super T>> {
+  /** Prefer {@link Comparator#thenComparing(Comparator)} over less explicit alternatives. */
+  static final class ComparatorThenComparingNaturalOrder<
+      T extends Comparable<? super T>, U extends T> {
+    // XXX: Ideally `? super T` would also be replaced by a class-level type parameter, but Java
+    // does not allow a type variable to be followed by other bounds.
     @BeforeTemplate
     Comparator<T> before(
         Comparator<T> cmp,
-        @Matches(IsIdentityOperation.class) Function<? super T, ? extends T> keyExtractor) {
+        @Matches(IsIdentityOperation.class) Function<? super T, U> keyExtractor) {
       return cmp.thenComparing(keyExtractor);
     }
 
@@ -232,8 +246,8 @@ final class ComparatorRules {
     }
   }
 
-  /** Prefer {@link Comparable#compareTo(Object)}} over more verbose alternatives. */
-  static final class CompareTo<T extends Comparable<? super T>> {
+  /** Prefer {@link Comparable#compareTo(Object)} over more verbose alternatives. */
+  static final class ComparableCompareTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     int before(T value1, T value2) {
       return Refaster.anyOf(
@@ -260,7 +274,9 @@ final class ComparatorRules {
     }
   }
 
-  /** Prefer {@link Collections#min(Collection)} over more verbose alternatives. */
+  /**
+   * Prefer {@link Collections#min(Collection)} over more verbose or more contrived alternatives.
+   */
   static final class CollectionsMin<T extends Comparable<? super T>> {
     @BeforeTemplate
     T before(Collection<T> collection) {
@@ -274,11 +290,8 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
-   * of values.
-   */
-  static final class MinOfArray<S, T extends S> {
+  /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMinArraysAsListOfArray<S, T extends S> {
     @BeforeTemplate
     T before(T[] array, Comparator<S> cmp) {
       return Arrays.stream(array).min(cmp).orElseThrow();
@@ -290,10 +303,7 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
-   * of values.
-   */
+  /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
   static final class CollectionsMinWithComparator<S, T extends S> {
     @BeforeTemplate
     T before(Collection<T> collection, Comparator<S> cmp) {
@@ -306,11 +316,8 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
-   * of values.
-   */
-  static final class MinOfVarargs<S, T extends S> {
+  /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMinArraysAsList<S, T extends S> {
     @BeforeTemplate
     T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
@@ -318,12 +325,15 @@ final class ComparatorRules {
 
     @AfterTemplate
     T after(@Repeated T value, Comparator<S> cmp) {
-      return Collections.min(Arrays.asList(value), cmp);
+      return Collections.min(Arrays.asList(Refaster.asVarargs(value)), cmp);
     }
   }
 
-  /** Prefer {@link Comparators#min(Comparable, Comparable)}} over more verbose alternatives. */
-  static final class MinOfPairNaturalOrder<T extends Comparable<? super T>> {
+  /**
+   * Prefer {@link Comparators#min(Comparable, Comparable)} over less efficient, more verbose, or
+   * more contrived alternatives.
+   */
+  static final class ComparatorsMinOfPair<T extends Comparable<? super T>> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2) {
@@ -348,12 +358,13 @@ final class ComparatorRules {
   }
 
   /**
-   * Prefer {@link Comparators#min(Object, Object, Comparator)}}} over more verbose alternatives.
+   * Prefer {@link Comparators#min(Object, Object, Comparator)} over less efficient or more verbose
+   * alternatives.
    */
-  static final class MinOfPairCustomOrder<T> {
+  static final class ComparatorsMinOfPairWithComparator<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<? super T> cmp) {
+    T before(T value1, T value2, Comparator<S> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) <= 0 ? value1 : value2,
           cmp.compare(value1, value2) > 0 ? value2 : value1,
@@ -368,12 +379,14 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<? super T> cmp) {
+    T after(T value1, T value2, Comparator<S> cmp) {
       return Comparators.min(value1, value2, cmp);
     }
   }
 
-  /** Prefer {@link Collections#max(Collection)} over more verbose alternatives. */
+  /**
+   * Prefer {@link Collections#max(Collection)} over more verbose or more contrived alternatives.
+   */
   static final class CollectionsMax<T extends Comparable<? super T>> {
     @BeforeTemplate
     T before(Collection<T> collection) {
@@ -387,11 +400,8 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
-   * of values.
-   */
-  static final class MaxOfArray<S, T extends S> {
+  /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMaxArraysAsListOfArray<S, T extends S> {
     @BeforeTemplate
     T before(T[] array, Comparator<S> cmp) {
       return Arrays.stream(array).max(cmp).orElseThrow();
@@ -403,10 +413,7 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
-   * of values.
-   */
+  /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
   static final class CollectionsMaxWithComparator<S, T extends S> {
     @BeforeTemplate
     T before(Collection<T> collection, Comparator<S> cmp) {
@@ -419,11 +426,8 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Avoid unnecessary creation of a {@link Stream} to determine the maximum of a known collection
-   * of values.
-   */
-  static final class MaxOfVarargs<S, T extends S> {
+  /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMaxArraysAsList<S, T extends S> {
     @BeforeTemplate
     T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).max(cmp).orElseThrow();
@@ -431,12 +435,15 @@ final class ComparatorRules {
 
     @AfterTemplate
     T after(@Repeated T value, Comparator<S> cmp) {
-      return Collections.max(Arrays.asList(value), cmp);
+      return Collections.max(Arrays.asList(Refaster.asVarargs(value)), cmp);
     }
   }
 
-  /** Prefer {@link Comparators#max(Comparable, Comparable)}} over more verbose alternatives. */
-  static final class MaxOfPairNaturalOrder<T extends Comparable<? super T>> {
+  /**
+   * Prefer {@link Comparators#max(Comparable, Comparable)} over less efficient, more verbose, or
+   * more contrived alternatives.
+   */
+  static final class ComparatorsMaxOfPair<T extends Comparable<? super T>> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2) {
@@ -461,12 +468,13 @@ final class ComparatorRules {
   }
 
   /**
-   * Prefer {@link Comparators#max(Object, Object, Comparator)}}} over more verbose alternatives.
+   * Prefer {@link Comparators#max(Object, Object, Comparator)} over less efficient or more verbose
+   * alternatives.
    */
-  static final class MaxOfPairCustomOrder<T> {
+  static final class ComparatorsMaxOfPairWithComparator<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<? super T> cmp) {
+    T before(T value1, T value2, Comparator<S> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) >= 0 ? value1 : value2,
           cmp.compare(value1, value2) < 0 ? value2 : value1,
@@ -481,7 +489,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<? super T> cmp) {
+    T after(T value1, T value2, Comparator<S> cmp) {
       return Comparators.max(value1, value2, cmp);
     }
   }
@@ -548,10 +556,7 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Prefer a method reference to {@link Comparators#min(Comparable, Comparable)} over calling
-   * {@link BinaryOperator#minBy(Comparator)} with {@link Comparator#naturalOrder()}.
-   */
+  /** Prefer {@link Comparators#min(Comparable, Comparable)} over more verbose alternatives. */
   static final class ComparatorsMin<T extends Comparable<? super T>> {
     @BeforeTemplate
     BinaryOperator<T> before() {
@@ -564,10 +569,7 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Prefer a method reference to {@link Comparators#max(Comparable, Comparable)} over calling
-   * {@link BinaryOperator#minBy(Comparator)} with {@link Comparator#naturalOrder()}.
-   */
+  /** Prefer {@link Comparators#max(Comparable, Comparable)} over more verbose alternatives. */
   static final class ComparatorsMax<T extends Comparable<? super T>> {
     @BeforeTemplate
     BinaryOperator<T> before() {
@@ -581,7 +583,8 @@ final class ComparatorRules {
   }
 
   /**
-   * Prefer {@link Comparator#naturalOrder()} over {@link Comparator#reverseOrder()} where possible.
+   * Prefer {@link Collectors#minBy(Comparator)} with {@link Comparator#naturalOrder()} over less
+   * explicit or more contrived alternatives.
    */
   static final class MinByNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
@@ -597,7 +600,8 @@ final class ComparatorRules {
   }
 
   /**
-   * Prefer {@link Comparator#naturalOrder()} over {@link Comparator#reverseOrder()} where possible.
+   * Prefer {@link Collectors#maxBy(Comparator)} with {@link Comparator#naturalOrder()} over less
+   * explicit or more contrived alternatives.
    */
   static final class MaxByNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
@@ -612,8 +616,8 @@ final class ComparatorRules {
     }
   }
 
-  /** Don't explicitly compare enums by their ordinal. */
-  static final class IsLessThan<E extends Enum<E>> {
+  /** Prefer {@link Enum#compareTo(Enum)} over less explicit alternatives. */
+  static final class EnumCompareToLessThanZero<E extends Enum<E>> {
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(E value1, E value2) {
@@ -627,8 +631,8 @@ final class ComparatorRules {
     }
   }
 
-  /** Don't explicitly compare enums by their ordinal. */
-  static final class IsLessThanOrEqualTo<E extends Enum<E>> {
+  /** Prefer {@link Enum#compareTo(Enum)} over less explicit alternatives. */
+  static final class EnumCompareToLessThanOrEqualToZero<E extends Enum<E>> {
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(E value1, E value2) {

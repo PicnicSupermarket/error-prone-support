@@ -50,10 +50,7 @@ final class Jackson2Rules {
     }
   }
 
-  /**
-   * Prefer {@link ObjectMapper#valueToTree(Object)} over more contrived and less efficient
-   * alternatives.
-   */
+  /** Prefer {@link ObjectMapper#valueToTree(Object)} over less efficient alternatives. */
   static final class ObjectMapperValueToTree {
     @BeforeTemplate
     JsonNode before(ObjectMapper objectMapper, Object object) throws IOException {
@@ -68,10 +65,7 @@ final class Jackson2Rules {
     }
   }
 
-  /**
-   * Prefer {@link ObjectMapper#convertValue(Object, Class)} over more contrived and less efficient
-   * alternatives.
-   */
+  /** Prefer {@link ObjectMapper#convertValue(Object, Class)} over less efficient alternatives. */
   static final class ObjectMapperConvertValueWithClass<T> {
     @BeforeTemplate
     T before(ObjectMapper objectMapper, Object object, Class<T> valueType) throws IOException {
@@ -87,8 +81,7 @@ final class Jackson2Rules {
   }
 
   /**
-   * Prefer {@link ObjectMapper#convertValue(Object, JavaType)} over more contrived and less
-   * efficient alternatives.
+   * Prefer {@link ObjectMapper#convertValue(Object, JavaType)} over less efficient alternatives.
    */
   static final class ObjectMapperConvertValueWithJavaType<T> {
     @BeforeTemplate
@@ -105,8 +98,8 @@ final class Jackson2Rules {
   }
 
   /**
-   * Prefer {@link ObjectMapper#convertValue(Object, TypeReference)} over more contrived and less
-   * efficient alternatives.
+   * Prefer {@link ObjectMapper#convertValue(Object, TypeReference)} over less efficient
+   * alternatives.
    */
   static final class ObjectMapperConvertValueWithTypeReference<T> {
     @BeforeTemplate

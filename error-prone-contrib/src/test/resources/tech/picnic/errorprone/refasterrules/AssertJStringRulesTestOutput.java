@@ -51,11 +51,11 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   AbstractAssert<?, ?> testAssertThatMatches() {
-    return assertThat("foo").matches(".*");
+    return assertThat("foo").matches("bar");
   }
 
   AbstractAssert<?, ?> testAssertThatDoesNotMatch() {
-    return assertThat("foo").doesNotMatch(".*");
+    return assertThat("foo").doesNotMatch("bar");
   }
 
   AbstractStringAssert<?> testAssertThatPathContent() throws IOException {

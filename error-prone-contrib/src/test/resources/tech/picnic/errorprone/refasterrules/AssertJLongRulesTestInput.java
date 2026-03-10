@@ -16,13 +16,13 @@ final class AssertJLongRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<AbstractLongAssert<?>> testAbstractLongAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(0L).isCloseTo(1, offset(0L)), assertThat(0L).isCloseTo(1, withPercentage(0)));
+        assertThat(0L).isCloseTo(1, offset(0L)), assertThat(0L).isCloseTo(2, withPercentage(0)));
   }
 
   ImmutableSet<AbstractLongAssert<?>> testAbstractLongAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(0L).isNotCloseTo(1, offset(0L)),
-        assertThat(0L).isNotCloseTo(1, withPercentage(0)));
+        assertThat(0L).isNotCloseTo(2, withPercentage(0)));
   }
 
   AbstractLongAssert<?> testAbstractLongAssertIsZero() {

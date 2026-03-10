@@ -12,8 +12,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
-import java.util.function.Function;
-import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
@@ -49,10 +47,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#get()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#GET}.
-   */
+  /** Prefer {@link WebClient#get()} over less idiomatic alternatives. */
   static final class WebClientGet {
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
@@ -70,10 +65,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#head()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#HEAD}.
-   */
+  /** Prefer {@link WebClient#head()} over less idiomatic alternatives. */
   static final class WebClientHead {
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
@@ -91,10 +83,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#options()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#OPTIONS}.
-   */
+  /** Prefer {@link WebClient#options()} over less idiomatic alternatives. */
   static final class WebClientOptions {
     @BeforeTemplate
     RequestHeadersSpec<?> before(WebClient webClient) {
@@ -112,10 +101,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#patch()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PATCH}.
-   */
+  /** Prefer {@link WebClient#patch()} over less idiomatic alternatives. */
   static final class WebClientPatch {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -133,10 +119,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#post()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#POST}.
-   */
+  /** Prefer {@link WebClient#post()} over less idiomatic alternatives. */
   static final class WebClientPost {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -154,10 +137,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#put()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PUT}.
-   */
+  /** Prefer {@link WebClient#put()} over less idiomatic alternatives. */
   static final class WebClientPut {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -175,11 +155,14 @@ final class WebClientRules {
     }
   }
 
-  /** Don't unnecessarily use {@link RequestHeadersUriSpec#uri(Function)}. */
-  static final class RequestHeadersUriSpecUri {
+  /**
+   * Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over more contrived alternatives.
+   */
+  static final class RequestHeadersUriSpecUri<
+      S extends RequestHeadersSpec<S>, T extends WebTestClient.RequestHeadersSpec<T>> {
     @BeforeTemplate
     RequestHeadersSpec<?> before(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        RequestHeadersUriSpec<S> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
@@ -188,7 +171,7 @@ final class WebClientRules {
 
     @BeforeTemplate
     WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        WebTestClient.RequestHeadersUriSpec<T> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
@@ -197,7 +180,7 @@ final class WebClientRules {
 
     @AfterTemplate
     RequestHeadersSpec<?> after(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec,
+        RequestHeadersUriSpec<S> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(path, Refaster.asVarargs(uriVariables));

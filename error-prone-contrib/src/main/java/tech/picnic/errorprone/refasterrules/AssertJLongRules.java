@@ -14,6 +14,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJLongRules {
   private AssertJLongRules() {}
 
+  /** Prefer {@link AbstractLongAssert#isEqualTo(long)} over more contrived alternatives. */
   static final class AbstractLongAssertIsEqualTo {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
@@ -27,6 +28,7 @@ final class AssertJLongRules {
     }
   }
 
+  /** Prefer {@link AbstractLongAssert#isNotEqualTo(long)} over more contrived alternatives. */
   static final class AbstractLongAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
@@ -40,6 +42,7 @@ final class AssertJLongRules {
     }
   }
 
+  /** Prefer {@link AbstractLongAssert#isEqualTo(long)} over less explicit alternatives. */
   static final class AbstractLongAssertIsZero {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert) {
@@ -52,6 +55,7 @@ final class AssertJLongRules {
     }
   }
 
+  /** Prefer {@link AbstractLongAssert#isNotEqualTo(long)} over less explicit alternatives. */
   static final class AbstractLongAssertIsNotZero {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert) {
@@ -64,6 +68,7 @@ final class AssertJLongRules {
     }
   }
 
+  /** Prefer {@link AbstractLongAssert#isEqualTo(long)} over less explicit alternatives. */
   static final class AbstractLongAssertIsOne {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert) {

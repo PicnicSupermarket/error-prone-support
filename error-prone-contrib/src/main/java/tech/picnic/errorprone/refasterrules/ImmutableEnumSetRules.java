@@ -17,10 +17,7 @@ import java.util.EnumSet;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/**
- * Refaster rules related to expressions dealing with {@code
- * com.google.common.collect.ImmutableEnumSet}s.
- */
+/** Refaster rules related to expressions dealing with {@link ImmutableSet}s of enums. */
 // XXX: Some of the rules defined here impact iteration order. That's a rather subtle change. Should
 // we emit a comment warning about this fact? (This may produce a lot of noise. A bug checker could
 // in some cases determine whether iteration order is important.)
@@ -32,8 +29,7 @@ final class ImmutableEnumSetRules {
   private ImmutableEnumSetRules() {}
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Iterable)} for enum collections to take advantage of the
-   * internally used {@link EnumSet}.
+   * Prefer {@link Sets#immutableEnumSet(Iterable)} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
    * original code produces a set that iterates over its elements in the same order as the input
@@ -41,24 +37,23 @@ final class ImmutableEnumSetRules {
    */
   static final class SetsImmutableEnumSetIterable<T extends Enum<T>> {
     @BeforeTemplate
-    ImmutableSet<T> before(Iterable<T> elements) {
-      return ImmutableSet.copyOf(elements);
+    ImmutableSet<T> before(Iterable<T> iterable) {
+      return ImmutableSet.copyOf(iterable);
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Collection<T> elements) {
-      return ImmutableSet.copyOf(elements);
+    ImmutableSet<T> before(Collection<T> iterable) {
+      return ImmutableSet.copyOf(iterable);
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Iterable<T> elements) {
-      return Sets.immutableEnumSet(elements);
+    ImmutableSet<T> after(Iterable<T> iterable) {
+      return Sets.immutableEnumSet(iterable);
     }
   }
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Iterable)} for enum collections to take advantage of the
-   * internally used {@link EnumSet}.
+   * Prefer {@code Sets.immutableEnumSet(Arrays.asList(array))} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
    * original code produces a set that iterates over its elements in the same order as defined in
@@ -66,20 +61,17 @@ final class ImmutableEnumSetRules {
    */
   static final class SetsImmutableEnumSetArraysAsList<T extends Enum<T>> {
     @BeforeTemplate
-    ImmutableSet<T> before(T[] elements) {
-      return ImmutableSet.copyOf(elements);
+    ImmutableSet<T> before(T[] array) {
+      return ImmutableSet.copyOf(array);
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(T[] elements) {
-      return Sets.immutableEnumSet(Arrays.asList(elements));
+    ImmutableSet<T> after(T[] array) {
+      return Sets.immutableEnumSet(Arrays.asList(array));
     }
   }
 
-  /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
-   */
+  /** Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives. */
   static final class SetsImmutableEnumSet1<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
@@ -95,8 +87,7 @@ final class ImmutableEnumSetRules {
   }
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
+   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
    * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
@@ -117,8 +108,7 @@ final class ImmutableEnumSetRules {
   }
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
+   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
    * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
@@ -140,8 +130,7 @@ final class ImmutableEnumSetRules {
   }
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
+   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
    * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
@@ -163,8 +152,7 @@ final class ImmutableEnumSetRules {
   }
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
+   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the {@link
    * ImmutableSet#of} expression produces a set that iterates over its elements in the listed order,
@@ -186,8 +174,7 @@ final class ImmutableEnumSetRules {
   }
 
   /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
+   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
    * original code produces a set that iterates over its elements in the listed order, the
@@ -206,11 +193,8 @@ final class ImmutableEnumSetRules {
     }
   }
 
-  /**
-   * Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} for enum collections to take advantage of
-   * the internally used {@link EnumSet}.
-   */
-  static final class SetsImmutableEnumSetVarArgs<T extends Enum<T>> {
+  /** Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives. */
+  static final class SetsImmutableEnumSetWithVarargs<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
     ImmutableSet<T> before(T e1, @Repeated T elements) {
@@ -224,14 +208,13 @@ final class ImmutableEnumSetRules {
   }
 
   /**
-   * Use {@link Sets#toImmutableEnumSet()} when possible, as it is more efficient than {@link
-   * ImmutableSet#toImmutableSet()} and produces a more compact object.
+   * Prefer {@link Sets#toImmutableEnumSet()} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rule is not completely behavior preserving: while the
    * original code produces a set that iterates over its elements in encounter order, the
    * replacement code iterates over the elements in enum definition order.
    */
-  static final class StreamToImmutableEnumSet<T extends Enum<T>> {
+  static final class StreamCollectToImmutableEnumSet<T extends Enum<T>> {
     @BeforeTemplate
     ImmutableSet<T> before(Stream<T> stream) {
       return stream.collect(toImmutableSet());

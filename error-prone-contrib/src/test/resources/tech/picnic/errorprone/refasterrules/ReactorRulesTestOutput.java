@@ -222,12 +222,12 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.empty(),
         Flux.empty(),
         Flux.empty(),
-        Flux.empty(),
         Flux.fromArray(new String[] {"foo"}),
         Flux.empty(),
         Flux.fromIterable(Iterables.cycle("bar")),
         Flux.empty(),
         Flux.fromStream(() -> Stream.generate(() -> "baz")),
+        Flux.empty(),
         Flux.empty(),
         Flux.empty(),
         Flux.empty(),
@@ -268,74 +268,74 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Mono<String>> testMonoUsing() {
     return ImmutableSet.of(
-        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("foo")),
-        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("bar")).next(),
-        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("baz")),
-        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("qux")).single());
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("foo")).next(),
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("bar")),
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("baz")).single(),
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("qux")));
   }
 
   ImmutableSet<Mono<String>> testMonoUsingEagerBoolean() {
     return ImmutableSet.of(
-        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("foo"), false),
-        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("bar"), false)
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("foo"), false)
             .next(),
-        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("baz"), true),
-        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("qux"), true)
-            .single());
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("bar"), false),
+        Flux.using(() -> new ByteArrayInputStream(new byte[0]), v -> Flux.just("baz"), true)
+            .single(),
+        Mono.using(() -> new ByteArrayInputStream(new byte[0]), v -> Mono.just("qux"), true));
   }
 
   ImmutableSet<Mono<String>> testMonoUsingResourceCleanup() {
     return ImmutableSet.of(
-        Mono.using(() -> 1, v -> Mono.just("foo"), v -> {}),
-        Flux.using(() -> 2, v -> Flux.just("bar"), v -> {}).next(),
-        Mono.using(() -> 3, v -> Mono.just("baz"), v -> {}),
-        Flux.using(() -> 4, v -> Flux.just("qux"), v -> {}).single());
+        Flux.using(() -> 1, v -> Flux.just("foo"), v -> {}).next(),
+        Mono.using(() -> 2, v -> Mono.just("bar"), v -> {}),
+        Flux.using(() -> 3, v -> Flux.just("baz"), v -> {}).single(),
+        Mono.using(() -> 4, v -> Mono.just("qux"), v -> {}));
   }
 
   ImmutableSet<Mono<String>> testMonoUsingConsumerEagerBoolean() {
     return ImmutableSet.of(
-        Mono.using(() -> 1, v -> Mono.just("foo"), v -> {}, false),
-        Flux.using(() -> 2, v -> Flux.just("bar"), v -> {}, false).next(),
-        Mono.using(() -> 3, v -> Mono.just("baz"), v -> {}, true),
-        Flux.using(() -> 4, v -> Flux.just("qux"), v -> {}, true).single());
+        Flux.using(() -> 1, v -> Flux.just("foo"), v -> {}, false).next(),
+        Mono.using(() -> 2, v -> Mono.just("bar"), v -> {}, false),
+        Flux.using(() -> 3, v -> Flux.just("baz"), v -> {}, true).single(),
+        Mono.using(() -> 4, v -> Mono.just("qux"), v -> {}, true));
   }
 
   ImmutableSet<Mono<String>> testMonoUsingWhenAsyncCleanup() {
     return ImmutableSet.of(
-        Mono.usingWhen(Mono.just(1), v -> Mono.just("foo"), v -> Mono.just(2)),
-        Flux.usingWhen(Mono.just(3), v -> Flux.just("bar"), v -> Mono.just(4)).next(),
-        Mono.usingWhen(Mono.just(5), v -> Mono.just("baz"), v -> Mono.just(6)),
-        Flux.usingWhen(Mono.just(7), v -> Flux.just("qux"), v -> Mono.just(8)).single());
+        Flux.usingWhen(Mono.just(1), v -> Flux.just("foo"), v -> Mono.just(2)).next(),
+        Mono.usingWhen(Mono.just(3), v -> Mono.just("bar"), v -> Mono.just(4)),
+        Flux.usingWhen(Mono.just(5), v -> Flux.just("baz"), v -> Mono.just(6)).single(),
+        Mono.usingWhen(Mono.just(7), v -> Mono.just("qux"), v -> Mono.just(8)));
   }
 
   ImmutableSet<Mono<String>> testMonoUsingWhenAsync() {
     return ImmutableSet.of(
-        Mono.usingWhen(
-            Mono.just(1),
-            v -> Mono.just("foo"),
-            v -> Mono.just(2),
-            (v, t) -> Mono.just(3),
-            v -> Mono.just(4)),
         Flux.usingWhen(
-                Mono.just(5),
-                v -> Flux.just("bar"),
-                v -> Mono.just(6),
-                (v, t) -> Mono.just(7),
-                v -> Mono.just(8))
+                Mono.just(1),
+                v -> Flux.just("foo"),
+                v -> Mono.just(2),
+                (v, t) -> Mono.just(3),
+                v -> Mono.just(4))
             .next(),
         Mono.usingWhen(
-            Mono.just(9),
-            v -> Mono.just("baz"),
-            v -> Mono.just(10),
-            (v, t) -> Mono.just(11),
-            v -> Mono.just(12)),
+            Mono.just(5),
+            v -> Mono.just("bar"),
+            v -> Mono.just(6),
+            (v, t) -> Mono.just(7),
+            v -> Mono.just(8)),
         Flux.usingWhen(
-                Mono.just(13),
-                v -> Flux.just("qux"),
-                v -> Mono.just(14),
-                (v, t) -> Mono.just(15),
-                v -> Mono.just(16))
-            .single());
+                Mono.just(9),
+                v -> Flux.just("baz"),
+                v -> Mono.just(10),
+                (v, t) -> Mono.just(11),
+                v -> Mono.just(12))
+            .single(),
+        Mono.usingWhen(
+            Mono.just(13),
+            v -> Mono.just("qux"),
+            v -> Mono.just(14),
+            (v, t) -> Mono.just(15),
+            v -> Mono.just(16)));
   }
 
   ImmutableSet<Flux<Integer>> testFluxSwitchIfEmptyOfEmptyPublisher() {
@@ -347,27 +347,26 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Flux.just(1).concatMap(Mono::just),
         Flux.just(2).concatMap(Mono::just),
         Flux.just(3).concatMap(Mono::just),
-        Flux.just(4).concatMap(Mono::just),
+        Flux.just(4).map(Mono::just).concatMap(v -> Mono.empty()),
         Flux.just(5).concatMap(Mono::just),
-        Flux.just(6).map(Mono::just).concatMap(v -> Mono.empty()));
+        Flux.just(6).concatMap(Mono::just));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapWithPrefetch() {
     return ImmutableSet.of(
         Flux.just(1).concatMap(Mono::just, 3),
         Flux.just(2).concatMap(Mono::just, 4),
-        Flux.just(3).concatMap(Mono::just, 5),
+        Flux.just(3).map(Mono::just).concatMap(v -> Mono.empty(), 5),
         Flux.just(4).concatMap(Mono::just, 6),
-        Flux.just(5).map(Mono::just).concatMap(v -> Mono.empty(), 7));
+        Flux.just(5).concatMap(Mono::just, 7));
   }
 
   ImmutableSet<Flux<Integer>> testMonoFlatMapIterable() {
     return ImmutableSet.of(
         Mono.just(1).flatMapIterable(ImmutableSet::of),
-        Mono.just(2).flatMapIterable(ImmutableSet::of),
+        Mono.just(2).map(ImmutableSet::of).flatMapIterable(v -> ImmutableSet.of()),
         Mono.just(3).flatMapIterable(ImmutableSet::of),
-        Mono.just(4).map(ImmutableSet::of).flatMapIterable(v -> ImmutableSet.of()),
-        Mono.just(5).flatMapIterable(ImmutableSet::of));
+        Mono.just(4).flatMapIterable(ImmutableSet::of));
   }
 
   Flux<Integer> testMonoFlatMapIterableIdentity() {
@@ -377,17 +376,15 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Flux<Integer>> testFluxConcatMapIterable() {
     return ImmutableSet.of(
         Flux.just(1).concatMapIterable(ImmutableList::of),
-        Flux.just(2).concatMapIterable(ImmutableList::of),
-        Flux.just(3).concatMapIterable(ImmutableList::of),
-        Flux.just(4).map(ImmutableList::of).concatMapIterable(v -> ImmutableSet.of()));
+        Flux.just(2).map(ImmutableList::of).concatMapIterable(v -> ImmutableSet.of()),
+        Flux.just(3).concatMapIterable(ImmutableList::of));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapIterableWithPrefetch() {
     return ImmutableSet.of(
         Flux.just(1).concatMapIterable(ImmutableList::of, 5),
-        Flux.just(2).concatMapIterable(ImmutableList::of, 5),
-        Flux.just(3).concatMapIterable(ImmutableList::of, 5),
-        Flux.just(4).map(ImmutableList::of).concatMapIterable(v -> ImmutableSet.of(), 5));
+        Flux.just(2).map(ImmutableList::of).concatMapIterable(v -> ImmutableSet.of(), 5),
+        Flux.just(3).concatMapIterable(ImmutableList::of, 5));
   }
 
   Flux<String> testMonoFlatMapToFlux() {
@@ -540,16 +537,15 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Mono<String>> testMonoFlatMap() {
     return ImmutableSet.of(
-        Mono.just("foo").flatMap(Mono::just),
-        Mono.just("bar").flatMap(Mono::just),
-        Mono.just("baz").map(Mono::just).flatMap(v -> Mono.empty()));
+        Mono.just("foo").map(Mono::just).flatMap(v -> Mono.empty()),
+        Mono.just("bar").flatMap(Mono::just));
   }
 
   ImmutableSet<Flux<Integer>> testMonoFlatMapMany() {
     return ImmutableSet.of(
-        Mono.just(1).flatMapMany(Mono::just),
+        Mono.just(1).map(Mono::just).flatMapMany(v -> Flux.empty()),
         Mono.just(2).flatMapMany(Mono::just),
-        Mono.just(3).map(Mono::just).flatMapMany(v -> Flux.empty()),
+        Mono.just(3).flatMapMany(Mono::just),
         Mono.just(4).flatMapMany(Mono::just),
         Mono.just(5).flatMapMany(Mono::just),
         Mono.just(6).flatMapMany(Mono::just),
@@ -560,8 +556,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
         Mono.just(11).flatMapMany(Mono::just),
         Mono.just(12).flatMapMany(Mono::just),
         Mono.just(13).flatMapMany(Mono::just),
-        Mono.just(14).flatMapMany(Mono::just),
-        Mono.just(15).flatMapMany(Mono::just));
+        Mono.just(14).flatMapMany(Mono::just));
   }
 
   ImmutableSet<Flux<String>> testConcatMapIterableIdentity() {
@@ -732,7 +727,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Context> testContextEmpty() {
-    return ImmutableSet.of(Context.empty(), Context.of(ImmutableMap.of(1, 2)));
+    return ImmutableSet.of(Context.of(ImmutableMap.of(1, 2)), Context.empty());
   }
 
   ImmutableSet<PublisherProbe<Void>> testPublisherProbeEmpty() {
@@ -768,19 +763,19 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     PublisherProbe.empty().assertWasNotRequested();
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy statements. */)
   void testAssertThatPublisherProbeWasSubscribed() {
     assertThat(PublisherProbe.of(Mono.just(1)).wasSubscribed()).isEqualTo(true);
     assertThat(PublisherProbe.of(Mono.just(2)).wasSubscribed()).isEqualTo(false);
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy statements. */)
   void testAssertThatPublisherProbeWasCancelled() {
     assertThat(PublisherProbe.of(Mono.just(1)).wasCancelled()).isEqualTo(true);
     assertThat(PublisherProbe.of(Mono.just(2)).wasCancelled()).isEqualTo(false);
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy statements. */)
   void testAssertThatPublisherProbeWasRequested() {
     assertThat(PublisherProbe.of(Mono.just(1)).wasRequested()).isEqualTo(true);
     assertThat(PublisherProbe.of(Mono.just(2)).wasRequested()).isEqualTo(false);
@@ -811,8 +806,8 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Mono.just(1).as(StepVerifier::create),
         Mono.just(2).as(StepVerifier::create),
-        Mono.just(3).as(StepVerifier::create),
-        Mono.just(4).as(StepVerifier::create).expectNextSequence(ImmutableList.of(5)));
+        Mono.just(3).as(StepVerifier::create).expectNextSequence(ImmutableList.of(4)),
+        Mono.just(5).as(StepVerifier::create));
   }
 
   ImmutableSet<StepVerifier.Step<String>> testStepVerifierStepExpectNext() {

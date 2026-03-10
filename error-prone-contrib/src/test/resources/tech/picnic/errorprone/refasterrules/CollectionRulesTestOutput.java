@@ -50,11 +50,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo").contains("bar");
   }
 
-  boolean testCollectionAddAllToCollectionExpression() {
+  boolean testCollectionAddAllExpression() {
     return new ArrayList<>().addAll(ImmutableSet.of("foo"));
   }
 
-  void testCollectionAddAllToCollectionBlock() {
+  void testCollectionAddAllBlock() {
     new ArrayList<>().addAll(ImmutableSet.of("foo"));
     new ArrayList<Number>().addAll(ImmutableSet.of(1));
     new ArrayList<Number>().addAll(ImmutableSet.of(2));
@@ -78,16 +78,16 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return Set.of(1, 2);
   }
 
-  ArrayList<String> testNewArrayListFromCollection() {
+  ArrayList<String> testNewArrayList() {
     return new ArrayList<>(ImmutableList.of("foo"));
-  }
-
-  Stream<Integer> testImmutableCollectionStream() {
-    return ImmutableSet.of(1).stream();
   }
 
   ImmutableList<Integer> testImmutableCollectionAsList() {
     return ImmutableSet.of(1).asList();
+  }
+
+  Stream<Integer> testImmutableCollectionStream() {
+    return ImmutableSet.of(1).stream();
   }
 
   boolean testImmutableCollectionContains() {
@@ -123,18 +123,18 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(ImmutableSet.of(1).iterator(), ImmutableSet.of(2).iterator());
   }
 
-  ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+  ImmutableSet<Optional<Integer>> testCollectionStreamFindFirst() {
     return ImmutableSet.of(
-        ImmutableSet.of(0).stream().findFirst(),
         ImmutableSet.of(1).stream().findFirst(),
-        ImmutableList.of(2).stream().findFirst(),
-        ImmutableSortedSet.of(3).stream().findFirst(),
-        ImmutableSet.of(1).stream().findFirst(),
-        ImmutableList.of(2).stream().findFirst(),
-        ImmutableSortedSet.of(3).stream().findFirst());
+        ImmutableSet.of(2).stream().findFirst(),
+        ImmutableList.of(3).stream().findFirst(),
+        ImmutableSortedSet.of(4).stream().findFirst(),
+        ImmutableSet.of(5).stream().findFirst(),
+        ImmutableList.of(6).stream().findFirst(),
+        ImmutableSortedSet.of(7).stream().findFirst());
   }
 
-  ImmutableSet<Optional<String>> testOptionalFirstQueueElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableQueuePeek() {
     return ImmutableSet.of(
         Optional.ofNullable(new LinkedList<String>().peek()),
         Optional.ofNullable(new LinkedList<String>().peek()),
@@ -143,7 +143,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         Optional.ofNullable(new LinkedList<String>().peek()));
   }
 
-  ImmutableSet<Optional<String>> testRemoveOptionalFirstNavigableSetElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableNavigableSetPollFirst() {
     return ImmutableSet.of(
         Optional.ofNullable(new TreeSet<String>().pollFirst()),
         Optional.ofNullable(new TreeSet<String>().pollFirst()),
@@ -151,7 +151,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         Optional.ofNullable(new TreeSet<String>().pollFirst()));
   }
 
-  ImmutableSet<Optional<String>> testRemoveOptionalFirstQueueElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableQueuePoll() {
     return ImmutableSet.of(
         Optional.ofNullable(new LinkedList<String>().poll()),
         Optional.ofNullable(new LinkedList<String>().poll()),
@@ -187,8 +187,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testListAdd() {
-    new ArrayList<String>(0).add("bar");
-    new ArrayList<String>(1).add("qux");
+    new ArrayList<String>(0).add("foo");
+    new ArrayList<String>(1).add("bar");
   }
 
   String testListRemoveFirst() {

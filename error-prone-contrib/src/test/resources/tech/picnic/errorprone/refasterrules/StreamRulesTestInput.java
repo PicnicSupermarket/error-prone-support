@@ -85,14 +85,14 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Stream.of(),
         Optional.empty().stream(),
-        ImmutableList.of().stream(),
         ImmutableList.of("foo").reverse().stream(),
-        Streams.stream((Iterable<String>) ImmutableSet.<String>of()),
+        ImmutableList.of().stream(),
         Streams.stream(ImmutableSet.of("bar")::iterator),
-        Streams.stream(ImmutableSet.of().iterator()),
+        Streams.stream((Iterable<String>) ImmutableSet.<String>of()),
         Streams.stream(ImmutableSet.of("baz").iterator()),
-        Arrays.stream(new String[0]),
-        Arrays.stream(new String[] {"qux"}));
+        Streams.stream(ImmutableSet.of().iterator()),
+        Arrays.stream(new String[] {"qux"}),
+        Arrays.stream(new String[0]));
   }
 
   ImmutableSet<Stream<String>> testStreamOfNullable() {
@@ -107,11 +107,11 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(new String[] {"foo", "bar"});
   }
 
-  Stream<Integer> testConcatOneStream() {
+  Stream<Integer> testStreamIdentity() {
     return Streams.concat(Stream.of(1));
   }
 
-  Stream<Integer> testConcatTwoStreams() {
+  Stream<Integer> testStreamConcat() {
     return Streams.concat(Stream.of(1), Stream.of(2));
   }
 
@@ -155,7 +155,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).sorted().limit(2);
   }
 
-  ImmutableSet<Optional<Integer>> testStreamMapFirst() {
+  ImmutableSet<Optional<Integer>> testStreamFindFirstMap() {
     return ImmutableSet.of(
         Stream.of("foo").map(s -> s.length()).findFirst(),
         Stream.of("bar").map(String::length).findFirst());
@@ -172,14 +172,15 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(7).collect(collectingAndThen(toImmutableList(), ImmutableList::isEmpty)),
         Stream.of(8).collect(collectingAndThen(toImmutableMap(k -> k, v -> v), Map::isEmpty)),
         Stream.of(9)
-            .collect(collectingAndThen(toImmutableMap(k -> k, v -> v), ImmutableMap::isEmpty)),
-        Stream.of(10).count() != 0,
-        Stream.of(11).count() > 0,
-        Stream.of(12).count() >= 1);
+            .collect(collectingAndThen(toImmutableMap(k -> k, v -> v), ImmutableMap::isEmpty)));
   }
 
-  boolean testStreamFindAnyIsPresent() {
-    return Stream.of(1).findFirst().isPresent();
+  ImmutableSet<Boolean> testStreamFindAnyIsPresent() {
+    return ImmutableSet.of(
+        Stream.of(1).count() != 0,
+        Stream.of(2).count() > 0,
+        Stream.of(3).count() >= 1,
+        Stream.of(4).findFirst().isPresent());
   }
 
   ImmutableSet<Optional<Integer>> testStreamFindFirst() {
@@ -224,9 +225,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of("bar").allMatch(not(String::isBlank)),
         Stream.of("baz").allMatch(pred.negate()),
         Stream.of("qux").filter(String::isEmpty).findAny().isEmpty(),
-        Stream.of("quux").map(s -> s.isBlank()).noneMatch(Boolean::booleanValue),
-        Stream.of("quuz").map(Boolean::valueOf).noneMatch(r -> r),
-        Stream.of("corge").map(toBooleanFunction).noneMatch(Boolean::booleanValue));
+        Stream.of("quux").map(toBooleanFunction).noneMatch(Boolean::booleanValue),
+        Stream.of("corge").map(s -> s.isBlank()).noneMatch(Boolean::booleanValue),
+        Stream.of("grault").map(toBooleanFunction).noneMatch(r -> r),
+        Stream.of("garply").map(Boolean::valueOf).noneMatch(r -> r));
   }
 
   ImmutableSet<Boolean> testStreamNoneMatch2() {
@@ -239,9 +241,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         !Stream.of("foo").noneMatch(s -> s.length() > 1),
         Stream.of("bar").filter(String::isEmpty).findAny().isPresent(),
-        Stream.of("baz").map(s -> s.isBlank()).anyMatch(Boolean::booleanValue),
-        Stream.of("qux").map(Boolean::valueOf).anyMatch(r -> r),
-        Stream.of("quux").map(toBooleanFunction).anyMatch(Boolean::booleanValue));
+        Stream.of("baz").map(toBooleanFunction).anyMatch(Boolean::booleanValue),
+        Stream.of("qux").map(s -> s.isBlank()).anyMatch(Boolean::booleanValue),
+        Stream.of("quux").map(toBooleanFunction).anyMatch(r -> r),
+        Stream.of("corge").map(Boolean::valueOf).anyMatch(r -> r));
   }
 
   ImmutableSet<Boolean> testStreamAllMatch() {
@@ -250,9 +253,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Stream.of("foo").noneMatch(not(String::isBlank)),
         Stream.of("bar").noneMatch(pred.negate()),
-        Stream.of("baz").map(s -> s.isBlank()).allMatch(Boolean::booleanValue),
-        Stream.of("qux").map(Boolean::valueOf).allMatch(r -> r),
-        Stream.of("quux").map(toBooleanFunction).anyMatch(Boolean::booleanValue));
+        Stream.of("baz").map(toBooleanFunction).allMatch(Boolean::booleanValue),
+        Stream.of("qux").map(s -> s.isBlank()).allMatch(Boolean::booleanValue),
+        Stream.of("quux").map(toBooleanFunction).allMatch(r -> r),
+        Stream.of("corge").map(Boolean::valueOf).allMatch(r -> r));
   }
 
   boolean testStreamAllMatch2() {
@@ -263,27 +267,24 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     Function<String, Integer> parseIntFunction = Integer::parseInt;
     return ImmutableSet.of(
         Stream.of("1").collect(summingInt(Integer::parseInt)),
-        Stream.of(2).map(i -> i * 2).reduce(0, Integer::sum),
-        Stream.of("3").map(Integer::parseInt).reduce(0, Integer::sum),
-        Stream.of("4").map(parseIntFunction).reduce(0, Integer::sum));
+        Stream.of("2").map(parseIntFunction).reduce(0, Integer::sum),
+        Stream.of(3).map(i -> i * 2).reduce(0, Integer::sum));
   }
 
   ImmutableSet<Double> testStreamMapToDoubleSum() {
     Function<String, Double> parseDoubleFunction = Double::parseDouble;
     return ImmutableSet.of(
         Stream.of("1").collect(summingDouble(Double::parseDouble)),
-        Stream.of(2).map(i -> i * 2.0).reduce(0.0, Double::sum),
-        Stream.of("3").map(Double::parseDouble).reduce(0.0, Double::sum),
-        Stream.of("4").map(parseDoubleFunction).reduce(0.0, Double::sum));
+        Stream.of("2").map(parseDoubleFunction).reduce(0.0, Double::sum),
+        Stream.of(3).map(i -> i * 2.0).reduce(0.0, Double::sum));
   }
 
   ImmutableSet<Long> testStreamMapToLongSum() {
     Function<String, Long> parseLongFunction = Long::parseLong;
     return ImmutableSet.of(
         Stream.of("1").collect(summingLong(Long::parseLong)),
-        Stream.of(2).map(i -> i * 2L).reduce(0L, Long::sum),
-        Stream.of("3").map(Long::parseLong).reduce(0L, Long::sum),
-        Stream.of("4").map(parseLongFunction).reduce(0L, Long::sum));
+        Stream.of("2").map(parseLongFunction).reduce(0L, Long::sum),
+        Stream.of(3).map(i -> i * 2L).reduce(0L, Long::sum));
   }
 
   IntSummaryStatistics testStreamMapToIntSummaryStatistics() {
@@ -324,9 +325,8 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Stream<Integer>> testStreamsConcat() {
     return ImmutableSet.of(
-        Stream.of(Stream.of(1), Stream.of(2)).flatMap(identity()),
-        Stream.of(Stream.of(3), Stream.of(4)).flatMap(v -> v),
-        Stream.of(Stream.of(5), Stream.of(6)).flatMap(v -> Stream.empty()));
+        Stream.of(Stream.of(1), Stream.of(2)).flatMap(v -> Stream.empty()),
+        Stream.of(Stream.of(3), Stream.of(4)).flatMap(identity()));
   }
 
   Stream<Integer> testStreamTakeWhile() {
@@ -367,7 +367,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Stream<String>> testCollectionsNCopiesStream() {
     return ImmutableSet.of(
-        Stream.generate(() -> "foo").limit(1),
-        Stream.generate(() -> UUID.randomUUID().toString()).limit(2));
+        Stream.generate(() -> UUID.randomUUID().toString()).limit(1),
+        Stream.generate(() -> "foo").limit(2));
   }
 }

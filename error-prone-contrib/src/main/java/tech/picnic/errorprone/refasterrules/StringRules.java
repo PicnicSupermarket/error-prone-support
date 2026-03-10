@@ -31,10 +31,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class StringRules {
   private StringRules() {}
 
-  /**
-   * Avoid unnecessary creation of new empty {@link String} objects; use the empty string literal
-   * instead.
-   */
+  /** Prefer {@code ""} over less efficient or less explicit alternatives. */
   static final class EmptyString {
     @BeforeTemplate
     @SuppressWarnings("java:S2129" /* This violation will be rewritten. */)
@@ -53,7 +50,7 @@ final class StringRules {
     }
   }
 
-  /** Avoid unnecessary creation of new {@link String} objects. */
+  /** Prefer using {@link String}s as-is over less efficient alternatives. */
   // XXX: Once `IdentityConversion` supports flagging constructor invocations, use that bug pattern
   // instead of this Refaster rule.
   static final class StringIdentity {
@@ -69,7 +66,7 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
+  /** Prefer {@link String#isEmpty()} over less explicit alternatives. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects
   // that target JDK 11 can disable `CharSequenceIsEmpty` without losing a valuable rule.)
@@ -93,7 +90,7 @@ final class StringRules {
     }
   }
 
-  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  /** Prefer {@link String#isEmpty()} over more verbose alternatives. */
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
   // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
   // to introduce a rule that suggests `String::isEmpty` where possible.
@@ -111,7 +108,7 @@ final class StringRules {
     }
   }
 
-  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  /** Prefer {@code not(String::isEmpty)} over less idiomatic alternatives. */
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
   // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
   // to introduce a rule that suggests `String::isEmpty` where possible.
@@ -128,7 +125,7 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link Strings#isNullOrEmpty(String)} over the more verbose alternative. */
+  /** Prefer {@link Strings#isNullOrEmpty(String)} over more verbose alternatives. */
   static final class StringIsNullOrEmpty {
     @BeforeTemplate
     boolean before(@Nullable String str) {
@@ -142,9 +139,13 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#isBlank()} over less efficient alternatives. */
-  // XXX: Note that this rule changes semantics, as `isBlank()` considers whitespace characters
-  // beyond U+0020, while `trim()` does not.
+  /**
+   * Prefer {@link String#isBlank()} over less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the behavior for strings containing
+   * whitespace characters beyond U+0020, as {@link String#isBlank()} considers those, while {@link
+   * String#trim()} does not.
+   */
   static final class StringIsBlank {
     @BeforeTemplate
     boolean before(String str) {
@@ -158,7 +159,10 @@ final class StringRules {
     }
   }
 
-  /** Don't use the ternary operator to create an optionally-absent string. */
+  /**
+   * Prefer {@code Optional.ofNullable(str).filter(not(String::isEmpty))} over more contrived
+   * alternatives.
+   */
   // XXX: This is a special case of `TernaryOperatorOptionalNegativeFiltering`.
   static final class OptionalNonEmptyString {
     @BeforeTemplate
@@ -174,6 +178,7 @@ final class StringRules {
     }
   }
 
+  /** Prefer {@link Optional#filter(Predicate)} over non-JDK alternatives. */
   static final class FilterEmptyString {
     @BeforeTemplate
     Optional<String> before(Optional<String> optional) {
@@ -187,31 +192,33 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#join(CharSequence, Iterable)} and variants over the Guava alternative. */
+  /**
+   * Prefer {@link String#join(CharSequence, Iterable)} over non-JDK or more contrived alternatives.
+   */
   // XXX: Joiner.on(char) isn't rewritten. Add separate rule?
   // XXX: Joiner#join(@Nullable Object first, @Nullable Object second, Object... rest) isn't
   // rewritten.
-  static final class JoinStrings {
+  static final class JoinStrings<T extends CharSequence> {
     @BeforeTemplate
-    String before(String delimiter, CharSequence[] elements) {
+    String before(String delimiter, T[] elements) {
       return Refaster.anyOf(
           Joiner.on(delimiter).join(elements), Arrays.stream(elements).collect(joining(delimiter)));
     }
 
     @BeforeTemplate
-    String before(String delimiter, Iterable<? extends CharSequence> elements) {
+    String before(String delimiter, Iterable<T> elements) {
       return Refaster.anyOf(
           Joiner.on(delimiter).join(elements),
           Streams.stream(elements).collect(joining(delimiter)));
     }
 
     @BeforeTemplate
-    String before(CharSequence delimiter, Collection<? extends CharSequence> elements) {
+    String before(CharSequence delimiter, Collection<T> elements) {
       return elements.stream().collect(joining(delimiter));
     }
 
     @AfterTemplate
-    String after(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
+    String after(CharSequence delimiter, Iterable<T> elements) {
       return String.join(delimiter, elements);
     }
   }
@@ -229,10 +236,7 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct invocation of {@link String#valueOf(Object)} over the indirection introduced by
-   * {@link Objects#toString(Object)}.
-   */
+  /** Prefer {@link String#valueOf(Object)} over more contrived alternatives. */
   static final class StringValueOf {
     @BeforeTemplate
     String before(Object object) {
@@ -245,10 +249,7 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct invocation of {@link String#String(char[], int, int)} over the indirection
-   * introduced by alternatives.
-   */
+  /** Prefer {@link String#String(char[], int, int)} over more contrived alternatives. */
   static final class NewStringFromCharArraySubSequence {
     @BeforeTemplate
     String before(char[] data, int offset, int count) {
@@ -262,10 +263,7 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct invocation of {@link String#String(char[])} over the indirection introduced by
-   * alternatives.
-   */
+  /** Prefer {@link String#String(char[])} over more contrived alternatives. */
   static final class NewStringFromCharArray {
     @BeforeTemplate
     String before(char[] data) {
@@ -278,10 +276,7 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct delegation to {@link String#valueOf(Object)} over the indirection introduced by
-   * {@link Objects#toString(Object)}.
-   */
+  /** Prefer {@link String#valueOf(Object)} over more contrived alternatives. */
   // XXX: This rule is analogous to `StringValueOf` above. Arguably this is its generalization.
   // If/when Refaster is extended to understand this, delete the rule above.
   static final class StringValueOfMethodReference {
@@ -296,7 +291,7 @@ final class StringRules {
     }
   }
 
-  /** Don't unnecessarily use the two-argument {@link String#substring(int, int)}. */
+  /** Prefer {@link String#substring(int)} over more verbose alternatives. */
   static final class SubstringRemainder {
     @BeforeTemplate
     String before(String str, int index) {
@@ -417,9 +412,13 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
-  // XXX: The replacement expression isn't fully equivalent: in case `substring` is empty, then
-  // the replacement yields `fromIndex - 1` rather than `fromIndex`.
+  /**
+   * Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> when {@code substring} is empty, this rewrite changes the result:
+   * the original expression returns {@code fromIndex}, while the replacement returns {@code
+   * fromIndex - 1}.
+   */
   static final class StringLastIndexOfStringWithIndex {
     @BeforeTemplate
     int before(String string, String substring, int fromIndex) {
@@ -446,11 +445,7 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}, as
-   * the former works more nicely with text blocks, while the latter does not appear advantageous in
-   * any circumstance (assuming one targets JDK 15+).
-   */
+  /** Prefer {@link String#formatted(Object...)} over less idiomatic alternatives. */
   static final class StringFormatted {
     @BeforeTemplate
     @FormatMethod

@@ -15,7 +15,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitRules {
   private JUnitRules() {}
 
-  /** Prefer statically imported {@link Arguments#arguments} over {@link Arguments#of} calls. */
+  /** Prefer {@link Arguments#arguments} over less idiomatic alternatives. */
   static final class ArgumentsEnumeration<T> {
     @BeforeTemplate
     Arguments before(@Repeated T objects) {

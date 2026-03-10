@@ -9,6 +9,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJIterableRulesTest implements RefasterRuleCollectionTestCase {
+  @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(Iterables.class);
   }

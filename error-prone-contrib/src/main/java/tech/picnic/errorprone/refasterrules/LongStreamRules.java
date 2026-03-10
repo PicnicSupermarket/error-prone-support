@@ -20,8 +20,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class LongStreamRules {
   private LongStreamRules() {}
 
-  /** Prefer {@link LongStream#range(long, long)} over the more contrived alternative. */
-  static final class LongStreamClosedOpenRange {
+  /** Prefer {@link LongStream#range(long, long)} over more verbose alternatives. */
+  static final class LongStreamRange {
     @BeforeTemplate
     LongStream before(long from, long to) {
       return LongStream.rangeClosed(from, to - 1);
@@ -33,8 +33,8 @@ final class LongStreamRules {
     }
   }
 
-  /** Don't unnecessarily call {@link Streams#concat(LongStream...)}. */
-  static final class ConcatOneLongStream {
+  /** Prefer the {@link LongStream} as-is over more contrived alternatives. */
+  static final class LongStreamIdentity {
     @BeforeTemplate
     LongStream before(LongStream stream) {
       return Streams.concat(stream);
@@ -47,20 +47,20 @@ final class LongStreamRules {
     }
   }
 
-  /** Prefer {@link LongStream#concat(LongStream, LongStream)} over the Guava alternative. */
-  static final class ConcatTwoLongStreams {
+  /** Prefer {@link LongStream#concat(LongStream, LongStream)} over non-JDK alternatives. */
+  static final class LongStreamConcat {
     @BeforeTemplate
-    LongStream before(LongStream s1, LongStream s2) {
-      return Streams.concat(s1, s2);
+    LongStream before(LongStream stream1, LongStream stream2) {
+      return Streams.concat(stream1, stream2);
     }
 
     @AfterTemplate
-    LongStream after(LongStream s1, LongStream s2) {
-      return LongStream.concat(s1, s2);
+    LongStream after(LongStream stream1, LongStream stream2) {
+      return LongStream.concat(stream1, stream2);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link LongStream#filter(LongPredicate)} operations. */
+  /** Prefer {@link LongStream#filter(LongPredicate)} over more contrived alternatives. */
   abstract static class FilterOuterLongStreamAfterFlatMap {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
@@ -76,7 +76,7 @@ final class LongStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link LongStream#filter(LongPredicate)} operations. */
+  /** Prefer {@link LongStream#filter(LongPredicate)} over more contrived alternatives. */
   abstract static class FilterOuterStreamAfterFlatMapToLong<T> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
@@ -92,7 +92,7 @@ final class LongStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link LongStream#map(LongUnaryOperator)} operations. */
+  /** Prefer {@link LongStream#map(LongUnaryOperator)} over more contrived alternatives. */
   abstract static class MapOuterLongStreamAfterFlatMap {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
@@ -108,7 +108,7 @@ final class LongStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link LongStream#map(LongUnaryOperator)} operations. */
+  /** Prefer {@link LongStream#map(LongUnaryOperator)} over more contrived alternatives. */
   abstract static class MapOuterStreamAfterFlatMapToLong<T> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
@@ -124,41 +124,41 @@ final class LongStreamRules {
     }
   }
 
-  /** Avoid unnecessary nesting of {@link LongStream#flatMap(LongFunction)} operations. */
-  abstract static class FlatMapOuterLongStreamAfterFlatMap {
+  /** Prefer {@link LongStream#flatMap(LongFunction)} over more contrived alternatives. */
+  abstract static class FlatMapOuterLongStreamAfterFlatMap<S extends LongStream> {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    LongStream before(LongStream stream, LongFunction<? extends LongStream> function) {
+    LongStream before(LongStream stream, LongFunction<S> function) {
       return stream.flatMap(v -> toLongStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongFunction<? extends LongStream> function) {
+    LongStream after(LongStream stream, LongFunction<S> function) {
       return stream.flatMap(v -> toLongStreamFunction(v)).flatMap(function);
     }
   }
 
-  /** Avoid unnecessary nesting of {@link LongStream#flatMap(LongFunction)} operations. */
-  abstract static class FlatMapOuterStreamAfterFlatMapToLong<T> {
+  /** Prefer {@link LongStream#flatMap(LongFunction)} over more contrived alternatives. */
+  abstract static class FlatMapOuterStreamAfterFlatMapToLong<T, S extends LongStream> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    LongStream before(Stream<T> stream, LongFunction<? extends LongStream> function) {
+    LongStream before(Stream<T> stream, LongFunction<S> function) {
       return stream.flatMapToLong(v -> toLongStreamFunction(v).flatMap(function));
     }
 
     @AfterTemplate
-    LongStream after(Stream<T> stream, LongFunction<? extends LongStream> function) {
+    LongStream after(Stream<T> stream, LongFunction<S> function) {
       return stream.flatMapToLong(v -> toLongStreamFunction(v)).flatMap(function);
     }
   }
 
   /**
-   * Apply {@link LongStream#filter(LongPredicate)} before {@link LongStream#sorted()} to reduce the
-   * number of elements to sort.
+   * Prefer {@link LongStream#filter(LongPredicate)} before {@link LongStream#sorted()} over less
+   * efficient alternatives.
    */
   static final class LongStreamFilterSorted {
     @BeforeTemplate
@@ -172,8 +172,8 @@ final class LongStreamRules {
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
-  static final class LongStreamIsEmpty {
+  /** Prefer {@link LongStream#findAny()} over less efficient alternatives. */
+  static final class LongStreamFindAnyIsEmpty {
     @BeforeTemplate
     boolean before(LongStream stream) {
       return Refaster.anyOf(
@@ -189,8 +189,8 @@ final class LongStreamRules {
     }
   }
 
-  /** In order to test whether a stream has any element, simply try to find one. */
-  static final class LongStreamIsNotEmpty {
+  /** Prefer {@link LongStream#findAny()} over less efficient alternatives. */
+  static final class LongStreamFindAnyIsPresent {
     @BeforeTemplate
     boolean before(LongStream stream) {
       return Refaster.anyOf(
@@ -206,6 +206,7 @@ final class LongStreamRules {
     }
   }
 
+  /** Prefer {@link LongStream#min()} over less efficient alternatives. */
   static final class LongStreamMin {
     @BeforeTemplate
     OptionalLong before(LongStream stream) {
@@ -234,6 +235,7 @@ final class LongStreamRules {
     }
   }
 
+  /** Prefer {@link LongStream#noneMatch(LongPredicate)} over less explicit alternatives. */
   abstract static class LongStreamNoneMatch2 {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
@@ -264,6 +266,7 @@ final class LongStreamRules {
     }
   }
 
+  /** Prefer {@link LongStream#allMatch(LongPredicate)} over more contrived alternatives. */
   static final class LongStreamAllMatch {
     @BeforeTemplate
     boolean before(LongStream stream, LongPredicate predicate) {
@@ -276,6 +279,7 @@ final class LongStreamRules {
     }
   }
 
+  /** Prefer {@link LongStream#allMatch(LongPredicate)} over less explicit alternatives. */
   abstract static class LongStreamAllMatch2 {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
@@ -291,6 +295,7 @@ final class LongStreamRules {
     }
   }
 
+  /** Prefer {@link LongStream#takeWhile(LongPredicate)} over more verbose alternatives. */
   static final class LongStreamTakeWhile {
     @BeforeTemplate
     LongStream before(LongStream stream, LongPredicate predicate) {

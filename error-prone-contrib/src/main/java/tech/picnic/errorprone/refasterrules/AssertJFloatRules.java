@@ -15,6 +15,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJFloatRules {
   private AssertJFloatRules() {}
 
+  /**
+   * Prefer {@link AbstractFloatAssert#isCloseTo(float, Offset)} over less explicit alternatives.
+   */
   static final class AbstractFloatAssertIsCloseToWithOffset {
     @BeforeTemplate
     AbstractFloatAssert<?> before(
@@ -35,6 +38,7 @@ final class AssertJFloatRules {
     }
   }
 
+  /** Prefer {@link AbstractFloatAssert#isEqualTo(float)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsEqualTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
@@ -48,6 +52,7 @@ final class AssertJFloatRules {
     }
   }
 
+  /** Prefer {@link AbstractFloatAssert#isNotEqualTo(float)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
@@ -61,6 +66,7 @@ final class AssertJFloatRules {
     }
   }
 
+  /** Prefer {@code isEqualTo(0)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsZero {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
@@ -73,6 +79,7 @@ final class AssertJFloatRules {
     }
   }
 
+  /** Prefer {@code isNotEqualTo(0)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsNotZero {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
@@ -85,6 +92,7 @@ final class AssertJFloatRules {
     }
   }
 
+  /** Prefer {@code isEqualTo(1)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsOne {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {

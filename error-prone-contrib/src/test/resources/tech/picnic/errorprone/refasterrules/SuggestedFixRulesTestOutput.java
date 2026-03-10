@@ -7,35 +7,35 @@ import com.sun.source.tree.Tree;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
-  SuggestedFix.Builder testSuggestedFixToBuilder() {
+  SuggestedFix.Builder testSuggestedFixBuilderToBuilder() {
     return SuggestedFix.emptyFix().toBuilder();
   }
 
-  SuggestedFix testSuggestedFixDelete() {
+  SuggestedFix testSuggestedFixBuilderDelete() {
     return SuggestedFix.delete((Tree) null);
   }
 
-  SuggestedFix testSuggestedFixReplaceTree() {
+  SuggestedFix testSuggestedFixBuilderReplaceTree() {
     return SuggestedFix.replace((Tree) null, "foo");
   }
 
-  SuggestedFix testSuggestedFixReplaceStartEnd() {
+  SuggestedFix testSuggestedFixBuilderReplaceStartEnd() {
     return SuggestedFix.replace(1, 2, "foo");
   }
 
-  SuggestedFix testSuggestedFixReplaceTreeStartEnd() {
+  SuggestedFix testSuggestedFixBuilderReplaceTreeStartEnd() {
     return SuggestedFix.replace(null, "foo", 1, 2);
   }
 
-  SuggestedFix testSuggestedFixSwap() {
+  SuggestedFix testSuggestedFixBuilderSwap() {
     return SuggestedFix.swap((Tree) null, (ExpressionTree) null, (VisitorState) null);
   }
 
-  SuggestedFix testSuggestedFixPrefixWith() {
+  SuggestedFix testSuggestedFixBuilderPrefixWith() {
     return SuggestedFix.prefixWith((Tree) null, "foo");
   }
 
-  SuggestedFix testSuggestedFixPostfixWith() {
+  SuggestedFix testSuggestedFixBuilderPostfixWith() {
     return SuggestedFix.postfixWith((Tree) null, "foo");
   }
 }

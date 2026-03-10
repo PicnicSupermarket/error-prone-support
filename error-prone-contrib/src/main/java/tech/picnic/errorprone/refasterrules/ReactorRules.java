@@ -54,6 +54,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.math.MathFlux;
 import reactor.test.StepVerifier;
+import reactor.test.StepVerifier.FirstStep;
 import reactor.test.publisher.PublisherProbe;
 import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
@@ -100,8 +101,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
-   * alternatives.
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less efficient alternatives.
    */
   static final class MonoTimeoutDurationMonoEmpty<T> {
     @BeforeTemplate
@@ -116,8 +116,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
-   * alternatives.
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less efficient alternatives.
    */
   static final class MonoTimeoutDurationMonoJust<T> {
     @BeforeTemplate
@@ -132,8 +131,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less performant
-   * alternatives.
+   * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less efficient alternatives.
    */
   static final class MonoTimeoutDuration<T> {
     @BeforeTemplate
@@ -148,7 +146,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less performant
+   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less efficient
    * alternatives.
    */
   static final class MonoTimeoutPublisherMonoEmpty<T, S> {
@@ -164,7 +162,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less performant
+   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less efficient
    * alternatives.
    */
   static final class MonoTimeoutPublisherMonoJust<T, S> {
@@ -180,7 +178,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less performant
+   * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less efficient
    * alternatives.
    */
   static final class MonoTimeoutPublisher<T, S> {
@@ -407,7 +405,9 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily defer {@link Mono#error(Throwable)}. */
+  /**
+   * Prefer {@link Mono#error(Supplier)} over unnecessarily deferring {@link Mono#error(Throwable)}.
+   */
   static final class MonoDeferredError<T> {
     @BeforeTemplate
     Mono<T> before(Throwable throwable) {
@@ -420,7 +420,9 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily defer {@link Flux#error(Throwable)}. */
+  /**
+   * Prefer {@link Flux#error(Supplier)} over unnecessarily deferring {@link Flux#error(Throwable)}.
+   */
   static final class FluxDeferredError<T> {
     @BeforeTemplate
     Flux<T> before(Throwable throwable) {
@@ -434,7 +436,8 @@ final class ReactorRules {
   }
 
   /**
-   * Don't unnecessarily pass {@link Mono#error(Supplier)} a method reference or lambda expression.
+   * Prefer passing {@link Mono#error(Supplier)} a direct supplier reference over a lambda or method
+   * reference that invokes another supplier.
    */
   // XXX: Drop this rule once the more general rule `AssortedRules#SupplierAsSupplier` works
   // reliably.
@@ -451,7 +454,8 @@ final class ReactorRules {
   }
 
   /**
-   * Don't unnecessarily pass {@link Flux#error(Supplier)} a method reference or lambda expression.
+   * Prefer passing {@link Flux#error(Supplier)} a direct supplier reference over a lambda or method
+   * reference that invokes another supplier.
    */
   // XXX: Drop this rule once the more general rule `AssortedRules#SupplierAsSupplier` works
   // reliably.
@@ -540,7 +544,7 @@ final class ReactorRules {
     Flux<T> before(
         Function<? super Object[], ? extends T> combinator,
         int prefetch,
-        Comparator<? super T> comparator,
+        Comparator<? super T> cmp,
         @Matches(IsEmpty.class) T[] emptyArray,
         @Matches(IsEmpty.class) Iterable<T> emptyIterable,
         @Matches(IsEmpty.class) Stream<T> emptyStream) {
@@ -553,13 +557,13 @@ final class ReactorRules {
           Flux.just(),
           Flux.merge(),
           Flux.merge(prefetch),
-          Flux.mergeComparing(comparator),
-          Flux.mergeComparing(prefetch, comparator),
-          Flux.mergeComparingDelayError(prefetch, comparator),
+          Flux.mergeComparing(cmp),
+          Flux.mergeComparing(prefetch, cmp),
+          Flux.mergeComparingDelayError(prefetch, cmp),
           Flux.mergeDelayError(prefetch),
-          Flux.mergePriority(comparator),
-          Flux.mergePriority(prefetch, comparator),
-          Flux.mergePriorityDelayError(prefetch, comparator),
+          Flux.mergePriority(cmp),
+          Flux.mergePriority(prefetch, cmp),
+          Flux.mergePriorityDelayError(prefetch, cmp),
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
           Flux.mergeSequentialDelayError(prefetch),
@@ -591,7 +595,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#timeout(Duration, Publisher)} over more contrived or less performant
+   * Prefer {@link Flux#timeout(Duration, Publisher)} over more contrived or less efficient
    * alternatives.
    */
   static final class FluxTimeoutFluxEmpty<T> {
@@ -640,7 +644,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#fromArray(Object[])}} over more ambiguous or contrived alternatives. */
+  /** Prefer {@link Flux#fromArray(Object[])} over more ambiguous or contrived alternatives. */
   static final class FluxFromArray<T> {
     @BeforeTemplate
     Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
@@ -653,7 +657,9 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily transform a {@link Mono} to an equivalent instance. */
+  /**
+   * Prefer using {@link Mono}s as-is over less efficient transformations to equivalent instances.
+   */
   static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
@@ -687,7 +693,10 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily transform a {@link Mono} to a {@link Flux} to expect exactly one item. */
+  /**
+   * Prefer using {@link Mono#single()} or {@link Mono#singleOptional()} over unnecessarily
+   * transforming a {@link Mono} to a {@link Flux}.
+   */
   static final class MonoSingle<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
@@ -859,7 +868,10 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily pass an empty publisher to {@link Flux#switchIfEmpty(Publisher)}. */
+  /**
+   * Prefer using {@link Flux}s as-is over unnecessarily passing an empty publisher to {@link
+   * Flux#switchIfEmpty(Publisher)}.
+   */
   static final class FluxSwitchIfEmptyOfEmptyPublisher<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux) {
@@ -917,7 +929,7 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid contrived alternatives to {@link Mono#flatMapIterable(Function)}. */
+  /** Prefer {@link Mono#flatMapIterable(Function)} over more contrived alternatives. */
   static final class MonoFlatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
     Flux<S> before(Mono<T> mono, Function<? super T, I> function) {
@@ -959,7 +971,7 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less clear syntax or
+   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less explicit syntax or
    * semantics.
    */
   static final class FluxConcatMapIterable<T, S, I extends Iterable<? extends S>> {
@@ -980,8 +992,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less clear syntax
-   * or semantics.
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less explicit
+   * syntax or semantics.
    */
   static final class FluxConcatMapIterableWithPrefetch<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
@@ -1004,8 +1016,8 @@ final class ReactorRules {
   }
 
   /**
-   * Don't use {@link Mono#flatMapMany(Function)} to implicitly convert a {@link Mono} to a {@link
-   * Flux}.
+   * Prefer using {@link Mono#flatMap(Function)} followed by {@code .flux()} over {@link
+   * Mono#flatMapMany(Function)} for explicit type conversion.
    */
   abstract static class MonoFlatMapToFlux<T, S> {
     // XXX: It would be more expressive if this `@Placeholder` were replaced with a `Function<?
@@ -1239,7 +1251,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
+  /** Prefer {@link Mono#flux()} over more contrived alternatives. */
   static final class MonoFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
@@ -1253,7 +1265,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer direct invocation of {@link Mono#then()}} over more contrived alternatives. */
+  /** Prefer direct invocation of {@link Mono#then()} over more contrived alternatives. */
   static final class MonoThen<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -1272,7 +1284,7 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  /** Prefer {@link Flux#then()} over vacuously invoking {@link Flux#ignoreElements()}. */
   static final class FluxThen<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -1298,7 +1310,9 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Mono#ignoreElement()}. */
+  /**
+   * Prefer {@link Mono#thenEmpty(Publisher)} over vacuously invoking {@link Mono#ignoreElement()}.
+   */
   static final class MonoThenEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -1313,7 +1327,9 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  /**
+   * Prefer {@link Flux#thenEmpty(Publisher)} over vacuously invoking {@link Flux#ignoreElements()}.
+   */
   static final class FluxThenEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -1328,7 +1344,7 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous operations prior to invocation of {@link Mono#thenMany(Publisher)}. */
+  /** Prefer {@link Mono#thenMany(Publisher)} over applying vacuous operations first. */
   static final class MonoThenMany<T, S> {
     @BeforeTemplate
     Flux<S> before(Mono<T> mono, Publisher<S> publisher) {
@@ -1358,7 +1374,9 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  /**
+   * Prefer {@link Flux#thenMany(Publisher)} over vacuously invoking {@link Flux#ignoreElements()}.
+   */
   static final class FluxThenMany<T, S> {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux, Publisher<S> publisher) {
@@ -1371,7 +1389,7 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous operations prior to invocation of {@link Mono#then(Mono)}. */
+  /** Prefer {@link Mono#then(Mono)} over applying vacuous operations first. */
   static final class MonoThenMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono1, Mono<S> mono2) {
@@ -1390,7 +1408,7 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid vacuous invocations of {@link Flux#ignoreElements()}. */
+  /** Prefer {@link Flux#then(Mono)} over vacuously invoking {@link Flux#ignoreElements()}. */
   static final class FluxThenMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Flux<T> flux, Mono<S> mono) {
@@ -1708,7 +1726,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#onErrorComplete(Class)}} over more contrived alternatives. */
+  /** Prefer {@link Mono#onErrorComplete(Class)} over more contrived alternatives. */
   static final class MonoOnErrorCompleteClass<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz) {
@@ -1722,7 +1740,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete(Class)}} over more contrived alternatives. */
+  /** Prefer {@link Flux#onErrorComplete(Class)} over more contrived alternatives. */
   static final class FluxOnErrorCompleteClass<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Class<? extends Throwable> clazz) {
@@ -1737,7 +1755,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#onErrorComplete(Predicate)}} over more contrived alternatives. */
+  /** Prefer {@link Mono#onErrorComplete(Predicate)} over more contrived alternatives. */
   static final class MonoOnErrorCompletePredicate<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, Predicate<? super Throwable> predicate) {
@@ -1750,7 +1768,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete(Predicate)}} over more contrived alternatives. */
+  /** Prefer {@link Flux#onErrorComplete(Predicate)} over more contrived alternatives. */
   static final class FluxOnErrorCompletePredicate<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Predicate<? super Throwable> predicate) {
@@ -1949,13 +1967,13 @@ final class ReactorRules {
    */
   static final class FluxFilterSortWithComparator<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
-      return flux.sort(comparator).filter(predicate);
+    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> cmp) {
+      return flux.sort(cmp).filter(predicate);
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> comparator) {
-      return flux.filter(predicate).sort(comparator);
+    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> cmp) {
+      return flux.filter(predicate).sort(cmp);
     }
   }
 
@@ -1981,13 +1999,13 @@ final class ReactorRules {
    */
   static final class FluxDistinctSortWithComparator<S, T extends S> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Comparator<S> comparator) {
-      return flux.sort(comparator).distinct();
+    Flux<T> before(Flux<T> flux, Comparator<S> cmp) {
+      return flux.sort(cmp).distinct();
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Comparator<S> comparator) {
-      return flux.distinct().sort(comparator);
+    Flux<T> after(Flux<T> flux, Comparator<S> cmp) {
+      return flux.distinct().sort(cmp);
     }
   }
 
@@ -2142,7 +2160,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
+  /** Prefer {@link reactor.util.context.Context#empty()} over more verbose alternatives. */
   // XXX: Introduce Refaster rules or a `BugChecker` that maps `(Immutable)Map.of(k, v)` to
   // `Context.of(k, v)` and likewise for multi-pair overloads.
   static final class ContextEmpty {
@@ -2157,7 +2175,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link PublisherProbe#empty()}} over more verbose alternatives. */
+  /** Prefer {@link PublisherProbe#empty()} over more verbose alternatives. */
   static final class PublisherProbeEmpty<T> {
     @BeforeTemplate
     PublisherProbe<T> before() {
@@ -2321,12 +2339,12 @@ final class ReactorRules {
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromMono<T> {
     @BeforeTemplate
-    StepVerifier.FirstStep<? extends T> before(Mono<T> mono) {
+    FirstStep<? extends T> before(Mono<T> mono) {
       return Refaster.anyOf(StepVerifier.create(mono), mono.flux().as(StepVerifier::create));
     }
 
     @AfterTemplate
-    StepVerifier.FirstStep<? extends T> after(Mono<T> mono) {
+    FirstStep<? extends T> after(Mono<T> mono) {
       return mono.as(StepVerifier::create);
     }
   }
@@ -2334,12 +2352,12 @@ final class ReactorRules {
   /** Prefer {@link Flux#as(Function)} when creating a {@link StepVerifier}. */
   static final class StepVerifierFromFlux<T> {
     @BeforeTemplate
-    StepVerifier.FirstStep<? extends T> before(Flux<T> flux) {
+    FirstStep<? extends T> before(Flux<T> flux) {
       return StepVerifier.create(flux);
     }
 
     @AfterTemplate
-    StepVerifier.FirstStep<? extends T> after(Flux<T> flux) {
+    FirstStep<? extends T> after(Flux<T> flux) {
       return flux.as(StepVerifier::create);
     }
   }
@@ -2385,7 +2403,7 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily invoke {@link StepVerifier#verifyLater()} multiple times. */
+  /** Prefer invoking {@link StepVerifier#verifyLater()} once over multiple invocations. */
   static final class StepVerifierVerifyLater {
     @BeforeTemplate
     StepVerifier before(StepVerifier stepVerifier) {
@@ -2398,7 +2416,7 @@ final class ReactorRules {
     }
   }
 
-  /** Don't unnecessarily have {@link StepVerifier.Step} expect no elements. */
+  /** Prefer using {@link StepVerifier.Step}s as-is over unnecessarily expecting no elements. */
   static final class StepVerifierStepIdentity<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
@@ -2429,7 +2447,10 @@ final class ReactorRules {
     }
   }
 
-  /** Avoid list collection when verifying that a {@link Flux} emits exactly one value. */
+  /**
+   * Prefer using {@link FirstStep#expectNext(Object)} over collecting a single-element {@link Flux}
+   * into a list.
+   */
   // XXX: This rule assumes that the matched collector does not drop elements. Consider introducing
   // a `@Matches(DoesNotDropElements.class)` or `@NotMatches(MayDropElements.class)` guard.
   static final class FluxAsStepVerifierExpectNext<T, L extends List<T>> {
@@ -2618,8 +2639,11 @@ final class ReactorRules {
   }
 
   /**
-   * Don't propagate {@link Mono} cancellations to an upstream cache value computation, as
-   * completion of such computations may benefit concurrent or subsequent cache usages.
+   * Prefer suppressing {@link Mono} cancellations to upstream cache value computations over
+   * propagating them, as completion of such computations may benefit concurrent or subsequent cache
+   * usages.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes cancellation propagation behavior.
    */
   static final class MonoFromFutureAsyncLoadingCacheGet<K, V> {
     @BeforeTemplate
@@ -2634,8 +2658,11 @@ final class ReactorRules {
   }
 
   /**
-   * Don't propagate {@link Mono} cancellations to upstream cache value computations, as completion
-   * of such computations may benefit concurrent or subsequent cache usages.
+   * Prefer suppressing {@link Mono} cancellations to upstream cache value computations over
+   * propagating them, as completion of such computations may benefit concurrent or subsequent cache
+   * usages.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes cancellation propagation behavior.
    */
   static final class MonoFromFutureAsyncLoadingCacheGetAll<K1, K2 extends K1, V> {
     @BeforeTemplate

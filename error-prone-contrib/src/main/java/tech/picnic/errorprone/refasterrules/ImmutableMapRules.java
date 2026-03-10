@@ -46,10 +46,7 @@ final class ImmutableMapRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableMap.Builder#buildOrThrow()} over the less explicit {@link
-   * ImmutableMap.Builder#build()}.
-   */
+  /** Prefer {@link ImmutableMap.Builder#buildOrThrow()} over less explicit alternatives. */
   static final class ImmutableMapBuilderBuildOrThrow<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(ImmutableMap.Builder<K, V> builder) {
@@ -63,16 +60,17 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
-  static final class EntryToImmutableMap<K, V> {
+  static final class ImmutableMapOfMapEntryGetKeyMapEntryGetValue<
+      K, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
+    ImmutableMap<K, V> before(Map.Entry<K2, V2> entry) {
       return Refaster.anyOf(
           ImmutableMap.<K, V>builder().put(entry).buildOrThrow(),
           Stream.of(entry).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(Map.Entry<? extends K, ? extends V> entry) {
+    ImmutableMap<K, V> after(Map.Entry<K2, V2> entry) {
       return ImmutableMap.of(entry.getKey(), entry.getValue());
     }
   }
@@ -81,48 +79,52 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
-  static final class IterableToImmutableMap<K, V> {
+  static final class MapsToMap<S, K extends S, V, V2 extends V, K2 extends K> {
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterator<K> iterable,
-        Function<? super K, ? extends V> valueFunction,
-        @Matches(IsIdentityOperation.class) Function<? super K, ? extends K> keyFunction) {
+        Function<S, V2> valueFunction,
+        @Matches(IsIdentityOperation.class) Function<S, K2> keyFunction) {
       return Streams.stream(iterable).collect(toImmutableMap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterable<K> iterable,
-        Function<? super K, ? extends V> valueFunction,
-        @Matches(IsIdentityOperation.class) Function<? super K, ? extends K> keyFunction) {
+        Function<S, V2> valueFunction,
+        @Matches(IsIdentityOperation.class) Function<S, K2> keyFunction) {
       return Streams.stream(iterable).collect(toImmutableMap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Collection<K> iterable,
-        Function<? super K, ? extends V> valueFunction,
-        @Matches(IsIdentityOperation.class) Function<? super K, ? extends K> keyFunction) {
+        Function<S, V2> valueFunction,
+        @Matches(IsIdentityOperation.class) Function<S, K2> keyFunction) {
       return iterable.stream().collect(toImmutableMap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
-        Set<K> iterable, com.google.common.base.Function<? super K, V> valueFunction) {
+        Set<K> iterable, com.google.common.base.Function<S, V> valueFunction) {
       return ImmutableMap.copyOf(Maps.asMap(iterable, valueFunction));
     }
 
     @AfterTemplate
     ImmutableMap<K, V> after(
-        Iterable<K> iterable, com.google.common.base.Function<? super K, V> valueFunction) {
+        Iterable<K> iterable, com.google.common.base.Function<S, V> valueFunction) {
       return Maps.toMap(iterable, valueFunction);
     }
   }
 
-  /** Prefer {@link ImmutableMap#copyOf(Iterable)} over more contrived alternatives. */
-  static final class EntryIterableToImmutableMap<K, V> {
+  /**
+   * Prefer {@link ImmutableMap#copyOf(Iterable)} over imprecisely typed or more contrived
+   * alternatives.
+   */
+  static final class ImmutableMapCopyOf<
+      K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
-    Map<K, V> before(Map<? extends K, ? extends V> iterable) {
+    Map<K, V> before(Map<K2, V2> iterable) {
       return Refaster.anyOf(
           ImmutableMap.copyOf(iterable.entrySet()),
           ImmutableMap.<K, V>builder().putAll(iterable).buildOrThrow(),
@@ -130,28 +132,25 @@ final class ImmutableMapRules {
     }
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
+    ImmutableMap<K, V> before(Iterable<E> iterable) {
       return Refaster.anyOf(
           ImmutableMap.<K, V>builder().putAll(iterable).buildOrThrow(),
           Streams.stream(iterable).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @BeforeTemplate
-    ImmutableMap<K, V> before(Collection<? extends Map.Entry<? extends K, ? extends V>> iterable) {
+    ImmutableMap<K, V> before(Collection<E> iterable) {
       return iterable.stream().collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
+    ImmutableMap<K, V> after(Iterable<E> iterable) {
       return ImmutableMap.copyOf(iterable);
     }
   }
 
-  /**
-   * Don't map a stream's elements to map entries, only to subsequently collect them into an {@link
-   * ImmutableMap}. The collection can be performed directly.
-   */
-  abstract static class StreamOfMapEntriesToImmutableMap<E, K, V> {
+  /** Prefer {@code stream.collect(toImmutableMap(...))} over more contrived alternatives. */
+  abstract static class StreamCollectToImmutableMap<E, K, V> {
     @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
 
@@ -173,46 +172,46 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over the
-   * stream-based alternative.
+   * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over more contrived
+   * alternatives.
    */
-  static final class IndexIterableToImmutableMap<K, V> {
+  static final class MapsUniqueIndex<S, K, V extends S, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterator<V> iterable,
-        Function<? super V, ? extends K> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<? super V, ? extends V> valueFunction) {
+        Function<S, K2> keyFunction,
+        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
       return Streams.stream(iterable).collect(toImmutableMap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterable<V> iterable,
-        Function<? super V, ? extends K> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<? super V, ? extends V> valueFunction) {
+        Function<S, K2> keyFunction,
+        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
       return Streams.stream(iterable).collect(toImmutableMap(keyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Collection<V> iterable,
-        Function<? super V, ? extends K> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<? super V, ? extends V> valueFunction) {
+        Function<S, K2> keyFunction,
+        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
       return iterable.stream().collect(toImmutableMap(keyFunction, valueFunction));
     }
 
     @AfterTemplate
     ImmutableMap<K, V> after(
-        Iterable<V> iterable, com.google.common.base.Function<? super V, K> keyFunction) {
+        Iterable<V> iterable, com.google.common.base.Function<S, K> keyFunction) {
       return Maps.uniqueIndex(iterable, keyFunction);
     }
   }
 
   /**
-   * Prefer creating an immutable copy of the result of {@link Maps#transformValues(Map,
-   * com.google.common.base.Function)} over more contrived alternatives.
+   * Prefer an immutable copy of {@link Maps#transformValues(Map, com.google.common.base.Function)}
+   * over more contrived alternatives.
    */
-  abstract static class TransformMapValuesToImmutableMap<K, V1, V2> {
+  abstract static class ImmutableMapCopyOfMapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse @Nullable V1 value);
 
@@ -233,10 +232,7 @@ final class ImmutableMapRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableMap#of()} over more contrived alternatives or alternatives that don't
-   * communicate the immutability of the resulting map at the type level.
-   */
+  /** Prefer {@link ImmutableMap#of()} over more verbose or imprecisely typed alternatives. */
   static final class ImmutableMapOf<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
@@ -254,8 +250,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives or alternatives
-   * that don't communicate the immutability of the resulting map at the type level.
+   * Prefer {@link ImmutableMap#of(Object, Object)} over more verbose or imprecisely typed
+   * alternatives.
    */
   // XXX: Note that the replacement of `Collections#singletonMap` is incorrect for nullable
   // elements.
@@ -276,8 +272,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object)} over alternatives that don't
-   * communicate the immutability of the resulting map at the type level.
+   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object)} over more verbose or imprecisely
+   * typed alternatives.
    */
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
@@ -295,8 +291,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object)} over
-   * alternatives that don't communicate the immutability of the resulting map at the type level.
+   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object)} over more
+   * verbose or imprecisely typed alternatives.
    */
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
@@ -316,8 +312,7 @@ final class ImmutableMapRules {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
-   * over alternatives that don't communicate the immutability of the resulting map at the type
-   * level.
+   * over more verbose or imprecisely typed alternatives.
    */
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
@@ -339,8 +334,7 @@ final class ImmutableMapRules {
 
   /**
    * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object,
-   * Object, Object)} over alternatives that don't communicate the immutability of the resulting map
-   * at the type level.
+   * Object, Object)} over more verbose or imprecisely typed alternatives.
    */
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
@@ -365,8 +359,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer creation of an immutable submap using {@link Maps#filterKeys(Map, Predicate)} over more
-   * contrived alternatives.
+   * Prefer an immutable copy of {@link Maps#filterKeys(Map, Predicate)} over more contrived
+   * alternatives.
    */
   abstract static class ImmutableMapCopyOfMapsFilterKeys<K, V> {
     @Placeholder(allowsIdentity = true)
@@ -386,8 +380,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer creation of an immutable submap using {@link Maps#filterValues(Map, Predicate)} over
-   * more contrived alternatives.
+   * Prefer an immutable copy of {@link Maps#filterValues(Map, Predicate)} over more contrived
+   * alternatives.
    */
   abstract static class ImmutableMapCopyOfMapsFilterValues<K, V> {
     @Placeholder(allowsIdentity = true)
@@ -406,19 +400,16 @@ final class ImmutableMapRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableMap#ofEntries(Map.Entry[])} over alternatives that don't communicate the
-   * immutability of the resulting map at the type level.
-   */
-  static final class ImmutableMapOfEntries<K, V> {
+  /** Prefer {@link ImmutableMap#ofEntries(Map.Entry[])} over imprecisely typed alternatives. */
+  static final class ImmutableMapOfEntries<K, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
-    Map<K, V> before(@Repeated Map.Entry<? extends K, ? extends V> entries) {
-      return Map.ofEntries(entries);
+    Map<K, V> before(@Repeated Map.Entry<K2, V2> entries) {
+      return Map.ofEntries(Refaster.asVarargs(entries));
     }
 
     @AfterTemplate
-    ImmutableMap<K, V> after(@Repeated Map.Entry<? extends K, ? extends V> entries) {
-      return ImmutableMap.ofEntries(entries);
+    ImmutableMap<K, V> after(@Repeated Map.Entry<K2, V2> entries) {
+      return ImmutableMap.ofEntries(Refaster.asVarargs(entries));
     }
   }
 
@@ -435,13 +426,4 @@ final class ImmutableMapRules {
       return builder.put(key, value);
     }
   }
-
-  // XXX: Add a rule for this:
-  // Maps.transformValues(streamOfEntries.collect(groupBy(fun)), ImmutableMap::copyOf)
-  // ->
-  // streamOfEntries.collect(groupBy(fun, toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))
-  //
-  // map.entrySet().stream().filter(keyPred).forEach(mapBuilder::put)
-  // ->
-  // mapBuilder.putAll(Maps.filterKeys(map, pred))
 }

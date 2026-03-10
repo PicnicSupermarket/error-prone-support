@@ -27,6 +27,7 @@ import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 final class AssertJNumberRules {
   private AssertJNumberRules() {}
 
+  /** Prefer {@link NumberAssert#isPositive()} over less explicit alternatives. */
   static final class NumberAssertIsPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -78,6 +79,7 @@ final class AssertJNumberRules {
     }
   }
 
+  /** Prefer {@link NumberAssert#isNotPositive()} over less explicit alternatives. */
   static final class NumberAssertIsNotPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -129,6 +131,7 @@ final class AssertJNumberRules {
     }
   }
 
+  /** Prefer {@link NumberAssert#isNegative()} over less explicit alternatives. */
   static final class NumberAssertIsNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -180,6 +183,7 @@ final class AssertJNumberRules {
     }
   }
 
+  /** Prefer {@link NumberAssert#isNotNegative()} over less explicit alternatives. */
   static final class NumberAssertIsNotNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -233,7 +237,7 @@ final class AssertJNumberRules {
 
   /**
    * Prefer {@link AbstractLongAssert#isOdd()} (and similar methods for other {@link NumberAssert}
-   * subtypes) over alternatives with less informative error messages.
+   * subtypes) over less explicit alternatives.
    *
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isOdd} test.
@@ -258,7 +262,7 @@ final class AssertJNumberRules {
 
   /**
    * Prefer {@link AbstractLongAssert#isEven()} (and similar methods for other {@link NumberAssert}
-   * subtypes) over alternatives with less informative error messages.
+   * subtypes) over less explicit alternatives.
    *
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isEven} test.

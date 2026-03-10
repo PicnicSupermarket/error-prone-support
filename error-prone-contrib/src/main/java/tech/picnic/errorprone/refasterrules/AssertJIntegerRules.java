@@ -14,6 +14,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJIntegerRules {
   private AssertJIntegerRules() {}
 
+  /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over more contrived alternatives. */
   static final class AbstractIntegerAssertIsEqualTo {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
@@ -27,6 +28,7 @@ final class AssertJIntegerRules {
     }
   }
 
+  /** Prefer {@link AbstractIntegerAssert#isNotEqualTo(int)} over more contrived alternatives. */
   static final class AbstractIntegerAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
@@ -40,6 +42,7 @@ final class AssertJIntegerRules {
     }
   }
 
+  /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over less explicit alternatives. */
   static final class AbstractIntegerAssertIsZero {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
@@ -52,6 +55,7 @@ final class AssertJIntegerRules {
     }
   }
 
+  /** Prefer {@link AbstractIntegerAssert#isNotEqualTo(int)} over less explicit alternatives. */
   static final class AbstractIntegerAssertIsNotZero {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
@@ -64,6 +68,7 @@ final class AssertJIntegerRules {
     }
   }
 
+  /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over less explicit alternatives. */
   static final class AbstractIntegerAssertIsOne {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {

@@ -8,7 +8,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -42,9 +41,10 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over more contrived alternatives.
+   * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over less efficient or more
+   * contrived alternatives.
    */
-  static final class IterableToImmutableList<T> {
+  static final class ImmutableListCopyOf<T> {
     @BeforeTemplate
     ImmutableList<T> before(T[] iterable) {
       return Refaster.anyOf(
@@ -78,7 +78,7 @@ final class ImmutableListRules {
   }
 
   /** Prefer {@link ImmutableList#toImmutableList()} over less idiomatic alternatives. */
-  static final class StreamToImmutableList<T> {
+  static final class StreamCollectToImmutableList<T> {
     @BeforeTemplate
     ImmutableList<T> before(Stream<T> stream) {
       return ImmutableList.copyOf(stream.iterator());
@@ -91,7 +91,10 @@ final class ImmutableListRules {
     }
   }
 
-  /** Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over more verbose or less efficient
+   * alternatives.
+   */
   static final class ImmutableListSortedCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableList<T> before(Iterable<T> iterable) {
@@ -112,32 +115,70 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over more contrived
+   * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient
    * alternatives.
    */
-  static final class ImmutableListSortedCopyOfWithCustomComparator<T> {
+  static final class ImmutableListSortedCopyOfWithComparator<S, T extends S> {
     @BeforeTemplate
-    ImmutableList<T> before(Comparator<T> cmp, Iterable<T> iterable) {
+    ImmutableList<T> before(Comparator<S> cmp, Iterable<T> iterable) {
       return Streams.stream(iterable).sorted(cmp).collect(toImmutableList());
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Comparator<T> cmp, Collection<T> iterable) {
+    ImmutableList<T> before(Comparator<S> cmp, Collection<T> iterable) {
       return iterable.stream().sorted(cmp).collect(toImmutableList());
     }
 
     @AfterTemplate
-    ImmutableList<T> after(Comparator<? super T> cmp, Collection<T> iterable) {
+    ImmutableList<T> after(Comparator<S> cmp, Collection<T> iterable) {
       return ImmutableList.sortedCopyOf(cmp, iterable);
     }
   }
 
   /**
-   * Collecting to an {@link ImmutableSet} and converting the result to an {@link ImmutableList} may
-   * be more efficient than deduplicating a stream and collecting the result to an {@link
-   * ImmutableList}.
+   * Prefer {@code ImmutableList.sortedCopyOf(iterable).iterator()} over less efficient
+   * alternatives.
    */
-  static final class StreamToDistinctImmutableList<T> {
+  static final class ImmutableListSortedCopyOfIterator<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Iterator<T> before(Iterable<T> iterable) {
+      return Streams.stream(iterable).sorted().iterator();
+    }
+
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> iterable) {
+      return iterable.stream().sorted().iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(Iterable<T> iterable) {
+      return ImmutableList.sortedCopyOf(iterable).iterator();
+    }
+  }
+
+  /**
+   * Prefer {@code ImmutableList.sortedCopyOf(cmp, iterable).iterator()} over less efficient
+   * alternatives.
+   */
+  static final class ImmutableListSortedCopyOfIteratorWithComparator<S, T extends S> {
+    @BeforeTemplate
+    Iterator<T> before(Comparator<S> cmp, Iterable<T> iterable) {
+      return Streams.stream(iterable).sorted(cmp).iterator();
+    }
+
+    @BeforeTemplate
+    Iterator<T> before(Comparator<S> cmp, Collection<T> iterable) {
+      return iterable.stream().sorted(cmp).iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(Comparator<S> cmp, Iterable<T> iterable) {
+      return ImmutableList.sortedCopyOf(cmp, iterable).iterator();
+    }
+  }
+
+  /** Prefer {@code stream.collect(toImmutableSet()).asList()} over less efficient alternatives. */
+  static final class StreamCollectToImmutableSetAsList<T> {
     @BeforeTemplate
     ImmutableList<T> before(Stream<T> stream) {
       return stream.distinct().collect(toImmutableList());
@@ -150,10 +191,7 @@ final class ImmutableListRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableList#of()} over more contrived alternatives or alternatives that don't
-   * communicate the immutability of the resulting list at the type level.
-   */
+  /** Prefer {@link ImmutableList#of()} over imprecisely typed or less efficient alternatives. */
   // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
   // this and similar Refaster rules are replaced with an Error Prone check.
   static final class ImmutableListOf<T> {
@@ -173,8 +211,7 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object)} over more contrived alternatives or alternatives that
-   * don't communicate the immutability of the resulting list at the type level.
+   * Prefer {@link ImmutableList#of(Object)} over imprecisely typed or less efficient alternatives.
    */
   // XXX: Note that the replacement of `Collections#singletonList` is incorrect for nullable
   // elements.
@@ -191,10 +228,7 @@ final class ImmutableListRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object)} over alternatives that don't communicate the
-   * immutability of the resulting list at the type level.
-   */
+  /** Prefer {@link ImmutableList#of(Object, Object)} over imprecisely typed alternatives. */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf2<T> {
@@ -210,8 +244,7 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object)} over alternatives that don't
-   * communicate the immutability of the resulting list at the type level.
+   * Prefer {@link ImmutableList#of(Object, Object, Object)} over imprecisely typed alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
@@ -228,8 +261,8 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over alternatives that don't
-   * communicate the immutability of the resulting list at the type level.
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over imprecisely typed
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
@@ -246,8 +279,8 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over alternatives that
-   * don't communicate the immutability of the resulting list at the type level.
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over imprecisely typed
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.

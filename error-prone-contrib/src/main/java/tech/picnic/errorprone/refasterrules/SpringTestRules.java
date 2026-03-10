@@ -13,12 +13,12 @@ final class SpringTestRules {
   private SpringTestRules() {}
 
   /**
-   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} over alternatives that implicitly
-   * perform a {@link JsonCompareMode#LENIENT lenient} comparison or are deprecated.
+   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} with lenient mode over deprecated
+   * alternatives.
    */
   static final class BodyContentSpecJsonLenient {
     @BeforeTemplate
-    @SuppressWarnings("deprecation" /* This deprecated method invocation will be rewritten. */)
+    @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
     BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
       return Refaster.anyOf(spec.json(expectedJson), spec.json(expectedJson, /* strict= */ false));
     }
@@ -30,11 +30,12 @@ final class SpringTestRules {
   }
 
   /**
-   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} over the deprecated alternative.
+   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} with strict mode over deprecated
+   * alternatives.
    */
   static final class BodyContentSpecJsonStrict {
     @BeforeTemplate
-    @SuppressWarnings("deprecation" /* This deprecated method invocation will be rewritten. */)
+    @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
     BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
       return spec.json(expectedJson, /* strict= */ true);
     }

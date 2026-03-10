@@ -22,11 +22,11 @@ final class MapEntryRules {
   private MapEntryRules() {}
 
   /**
-   * Prefer {@link Map#entry(Object, Object)} over alternative ways to create an immutable map
-   * entry.
+   * Prefer {@link Map#entry(Object, Object)} over non-JDK alternatives or the associated
+   * constructor.
    *
    * <p><strong>Warning:</strong> while both {@link Maps#immutableEntry(Object, Object)} and {@link
-   * AbstractMap.SimpleImmutableEntry} allow {@code null} keys and values, the preferred @link
+   * AbstractMap.SimpleImmutableEntry} allow {@code null} keys and values, the preferred {@link
    * Map#entry(Object, Object)} variant does not. Moreover, the {@link Map.Entry} instances produced
    * by the former approaches is {@link java.io.Serializable}, while this does not hold for the
    * object returned by the preferred approach.
@@ -60,15 +60,15 @@ final class MapEntryRules {
   }
 
   /** Prefer {@link Map.Entry#comparingByKey(Comparator)} over more verbose alternatives. */
-  static final class MapEntryComparingByKeyWithCustomComparator<K, V> {
+  static final class MapEntryComparingByKeyWithComparator<K extends C, V, C> {
     @BeforeTemplate
-    Comparator<Map.Entry<K, V>> before(Comparator<? super K> cmp) {
+    Comparator<Map.Entry<K, V>> before(Comparator<C> cmp) {
       return comparing(Map.Entry::getKey, cmp);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Comparator<Map.Entry<K, V>> after(Comparator<? super K> cmp) {
+    Comparator<Map.Entry<K, V>> after(Comparator<C> cmp) {
       return comparingByKey(cmp);
     }
   }
@@ -89,15 +89,15 @@ final class MapEntryRules {
   }
 
   /** Prefer {@link Map.Entry#comparingByValue(Comparator)} over more verbose alternatives. */
-  static final class MapEntryComparingByValueWithCustomComparator<K, V> {
+  static final class MapEntryComparingByValueWithComparator<K, V extends C, C> {
     @BeforeTemplate
-    Comparator<Map.Entry<K, V>> before(Comparator<? super V> cmp) {
+    Comparator<Map.Entry<K, V>> before(Comparator<C> cmp) {
       return comparing(Map.Entry::getValue, cmp);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Comparator<Map.Entry<K, V>> after(Comparator<? super V> cmp) {
+    Comparator<Map.Entry<K, V>> after(Comparator<C> cmp) {
       return comparingByValue(cmp);
     }
   }

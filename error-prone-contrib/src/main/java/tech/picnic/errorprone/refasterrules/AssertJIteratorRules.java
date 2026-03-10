@@ -16,6 +16,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJIteratorRules {
   private AssertJIteratorRules() {}
 
+  /** Prefer {@link IteratorAssert#hasNext()} over more contrived alternatives. */
   static final class AssertThatHasNext<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Iterator<T> iterator) {
@@ -29,6 +30,7 @@ final class AssertJIteratorRules {
     }
   }
 
+  /** Prefer {@link IteratorAssert#isExhausted()} over more contrived alternatives. */
   static final class AssertThatIsExhausted<T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Iterator<T> iterator) {

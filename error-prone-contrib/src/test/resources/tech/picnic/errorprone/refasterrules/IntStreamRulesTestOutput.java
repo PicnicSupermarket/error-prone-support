@@ -14,15 +14,15 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
-  IntStream testIntStreamClosedOpenRange() {
+  IntStream testIntStreamRange() {
     return IntStream.range(0, 42);
   }
 
-  IntStream testConcatOneIntStream() {
+  IntStream testIntStreamIdentity() {
     return IntStream.of(1);
   }
 
-  IntStream testConcatTwoIntStreams() {
+  IntStream testIntStreamConcat() {
     return IntStream.concat(IntStream.of(1), IntStream.of(2));
   }
 
@@ -51,7 +51,7 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   IntStream testIntStreamFilterSorted() {
-    return IntStream.of(1, 4, 3, 2).filter(i -> i % 2 == 0).sorted();
+    return IntStream.of(1).filter(i -> i > 0).sorted();
   }
 
   ImmutableSet<Boolean> testIntStreamIsEmpty() {
@@ -101,6 +101,6 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   IntStream testIntStreamTakeWhile() {
-    return IntStream.of(1, 2, 3).takeWhile(i -> i < 2);
+    return IntStream.of(1).takeWhile(i -> i > 0);
   }
 }

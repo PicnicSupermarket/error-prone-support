@@ -30,10 +30,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class TimeRules {
   private TimeRules() {}
 
-  /**
-   * Prefer {@link Clock#instant()} over {@link Instant#now(Clock)}, as it is more concise and more
-   * "OOP-py".
-   */
+  /** Prefer {@link Clock#instant()} over more verbose alternatives. */
   static final class ClockInstant {
     @BeforeTemplate
     Instant before(Clock clock) {
@@ -46,7 +43,7 @@ final class TimeRules {
     }
   }
 
-  /** Use {@link ZoneOffset#UTC} when possible. */
+  /** Prefer {@link ZoneOffset#UTC} over less explicit alternatives. */
   static final class UtcConstant {
     @BeforeTemplate
     ZoneId before() {
@@ -66,7 +63,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link LocalDate#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link LocalDate#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class LocalDateOfInstant {
     @BeforeTemplate
     LocalDate before(Instant instant, ZoneId zoneId) {
@@ -87,7 +84,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link LocalDateTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link LocalDateTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class LocalDateTimeOfInstant {
     @BeforeTemplate
     LocalDateTime before(Instant instant, ZoneId zoneId) {
@@ -107,7 +104,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link LocalTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link LocalTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class LocalTimeOfInstant {
     @BeforeTemplate
     LocalTime before(Instant instant, ZoneId zoneId) {
@@ -129,7 +126,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link OffsetDateTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link OffsetDateTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class OffsetDateTimeOfInstant {
     @BeforeTemplate
     OffsetDateTime before(Instant instant, ZoneId zoneId) {
@@ -142,7 +139,7 @@ final class TimeRules {
     }
   }
 
-  /** Don't unnecessarily transform an {@link Instant} to an equivalent instance. */
+  /** Prefer using {@link Instant}s as-is over less efficient alternatives. */
   static final class InstantIdentity {
     @BeforeTemplate
     Instant before(Instant instant, TemporalUnit temporalUnit) {
@@ -169,7 +166,7 @@ final class TimeRules {
   }
 
   /**
-   * Prefer {@link Instant#truncatedTo(TemporalUnit)} over less obvious alternatives.
+   * Prefer {@link Instant#truncatedTo(TemporalUnit)} over less efficient alternatives.
    *
    * <p>Note that {@link Instant#toEpochMilli()} throws an {@link ArithmeticException} for dates
    * very far in the past or future, while the suggested alternative doesn't.
@@ -186,7 +183,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Instant#truncatedTo(TemporalUnit)} over less obvious alternatives. */
+  /** Prefer {@link Instant#truncatedTo(TemporalUnit)} over less efficient alternatives. */
   static final class InstantTruncatedToSeconds {
     @BeforeTemplate
     Instant before(Instant instant) {
@@ -212,7 +209,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link OffsetTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link OffsetTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class OffsetTimeOfInstant {
     @BeforeTemplate
     OffsetTime before(Instant instant, ZoneId zoneId) {
@@ -243,22 +240,22 @@ final class TimeRules {
     }
   }
 
-  /** Use {@link Clock#systemUTC()} when possible. */
+  /** Prefer {@link Clock#systemUTC()} over more verbose alternatives. */
   static final class UtcClock {
     @BeforeTemplate
-    @SuppressWarnings("TimeZoneUsage")
+    @SuppressWarnings("TimeZoneUsage" /* This violation will be rewritten. */)
     Clock before() {
       return Clock.system(UTC);
     }
 
     @AfterTemplate
-    @SuppressWarnings("TimeZoneUsage")
+    @SuppressWarnings("TimeZoneUsage" /* This violation is preferred over the alternative. */)
     Clock after() {
       return Clock.systemUTC();
     }
   }
 
-  /** Prefer {@link Instant#EPOCH} over alternative representations. */
+  /** Prefer {@link Instant#EPOCH} over less efficient alternatives. */
   static final class EpochInstant {
     @BeforeTemplate
     Instant before() {
@@ -272,10 +269,7 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link Instant#isBefore(Instant)} over explicit comparison, as it yields more readable
-   * code.
-   */
+  /** Prefer {@link Instant#isBefore(Instant)} over less explicit alternatives. */
   static final class InstantIsBefore {
     @BeforeTemplate
     boolean before(Instant a, Instant b) {
@@ -289,10 +283,7 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link Instant#isBefore(Instant)} over explicit comparison, as it yields more readable
-   * code.
-   */
+  /** Prefer {@link Instant#isAfter(Instant)} over less explicit alternatives. */
   static final class InstantIsAfter {
     @BeforeTemplate
     boolean before(Instant a, Instant b) {
@@ -306,7 +297,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer the {@link LocalTime#MIN} over alternative representations. */
+  /** Prefer {@link LocalTime#MIN} over less explicit alternatives. */
   static final class LocalTimeMin {
     @BeforeTemplate
     LocalTime before() {
@@ -338,10 +329,7 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over less explicit alternatives. */
   static final class ChronoLocalDateIsBefore {
     @BeforeTemplate
     boolean before(ChronoLocalDate a, ChronoLocalDate b) {
@@ -355,10 +343,7 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link ChronoLocalDate#isAfter(ChronoLocalDate)} over less explicit alternatives. */
   static final class ChronoLocalDateIsAfter {
     @BeforeTemplate
     boolean before(ChronoLocalDate a, ChronoLocalDate b) {
@@ -373,8 +358,8 @@ final class TimeRules {
   }
 
   /**
-   * Prefer {@link ChronoLocalDateTime#isBefore(ChronoLocalDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoLocalDateTime#isBefore(ChronoLocalDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoLocalDateTimeIsBefore {
     @BeforeTemplate
@@ -390,8 +375,8 @@ final class TimeRules {
   }
 
   /**
-   * Prefer {@link ChronoLocalDateTime#isBefore(ChronoLocalDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoLocalDateTime#isAfter(ChronoLocalDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoLocalDateTimeIsAfter {
     @BeforeTemplate
@@ -407,8 +392,8 @@ final class TimeRules {
   }
 
   /**
-   * Prefer {@link ChronoZonedDateTime#isBefore(ChronoZonedDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoZonedDateTime#isBefore(ChronoZonedDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoZonedDateTimeIsBefore {
     @BeforeTemplate
@@ -424,8 +409,8 @@ final class TimeRules {
   }
 
   /**
-   * Prefer {@link ChronoZonedDateTime#isBefore(ChronoZonedDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoZonedDateTime#isAfter(ChronoZonedDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoZonedDateTimeIsAfter {
     @BeforeTemplate
@@ -440,10 +425,7 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over less explicit alternatives. */
   static final class OffsetDateTimeIsBefore {
     @BeforeTemplate
     boolean before(OffsetDateTime a, OffsetDateTime b) {
@@ -457,10 +439,7 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link OffsetDateTime#isAfter(OffsetDateTime)} over less explicit alternatives. */
   static final class OffsetDateTimeIsAfter {
     @BeforeTemplate
     boolean before(OffsetDateTime a, OffsetDateTime b) {
@@ -474,6 +453,7 @@ final class TimeRules {
     }
   }
 
+  /** Prefer {@link Duration#ZERO} over less explicit alternatives. */
   static final class ZeroDuration {
     @BeforeTemplate
     Duration before(TemporalUnit temporalUnit) {
@@ -494,7 +474,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofDays(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofDays(long)} over more contrived alternatives. */
   static final class DurationOfDays {
     @BeforeTemplate
     Duration before(long amount) {
@@ -507,7 +487,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofHours(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofHours(long)} over more contrived alternatives. */
   static final class DurationOfHours {
     @BeforeTemplate
     Duration before(long amount) {
@@ -520,7 +500,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofMillis(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofMillis(long)} over more contrived alternatives. */
   static final class DurationOfMillis {
     @BeforeTemplate
     Duration before(long amount) {
@@ -533,7 +513,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofMinutes(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofMinutes(long)} over more contrived alternatives. */
   static final class DurationOfMinutes {
     @BeforeTemplate
     Duration before(long amount) {
@@ -546,7 +526,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofNanos(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofNanos(long)} over more contrived alternatives. */
   static final class DurationOfNanos {
     @BeforeTemplate
     Duration before(long amount) {
@@ -559,7 +539,7 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofSeconds(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofSeconds(long)} over more contrived alternatives. */
   static final class DurationOfSeconds {
     @BeforeTemplate
     Duration before(long amount) {
@@ -573,8 +553,7 @@ final class TimeRules {
   }
 
   /**
-   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
-   * retained.)
+   * Prefer {@link Duration#between} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
    */
@@ -591,8 +570,7 @@ final class TimeRules {
   }
 
   /**
-   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
-   * retained.)
+   * Prefer {@link Duration#between} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
    */
@@ -623,6 +601,7 @@ final class TimeRules {
     }
   }
 
+  /** Prefer {@link Period#ZERO} over less explicit alternatives. */
   static final class ZeroPeriod {
     @BeforeTemplate
     Period before() {

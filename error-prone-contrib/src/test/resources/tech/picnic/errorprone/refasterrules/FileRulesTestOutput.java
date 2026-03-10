@@ -19,15 +19,15 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(FileInputStream.class, InputStreamReader.class);
   }
 
-  Path testPathOfUri() {
+  Path testPathOf() {
     return Path.of(URI.create("foo"));
   }
 
-  ImmutableSet<Path> testPathOfString() {
+  ImmutableSet<Path> testPathOfWithVarargs() {
     return ImmutableSet.of(Path.of("foo"), Path.of("bar", "baz", "qux"));
   }
 
-  Path testPathInstance() {
+  Path testPathIdentity() {
     return Path.of("foo");
   }
 
@@ -73,7 +73,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
         Files.newBufferedReader(Path.of("foo")), Files.newBufferedReader(Path.of("bar")));
   }
 
-  ImmutableSet<BufferedReader> testFilesNewBufferedReaderToPath() throws IOException {
+  ImmutableSet<BufferedReader> testFilesNewBufferedReaderFileToPath() throws IOException {
     return ImmutableSet.of(
         Files.newBufferedReader(new File("foo").toPath()),
         Files.newBufferedReader(new File("bar").toPath()));
@@ -83,7 +83,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8);
   }
 
-  BufferedReader testFilesNewBufferedReaderToPathWithCharset() throws IOException {
+  BufferedReader testFilesNewBufferedReaderFileToPathWithCharset() throws IOException {
     return Files.newBufferedReader(new File("foo").toPath(), StandardCharsets.UTF_8);
   }
 }

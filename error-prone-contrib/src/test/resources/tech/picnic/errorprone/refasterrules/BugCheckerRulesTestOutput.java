@@ -31,7 +31,7 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
         .expectUnchanged();
   }
 
-  ImmutableSet<String> testConstantsFormat() {
+  ImmutableSet<String> testSourceCodeToStringConstantExpression() {
     return ImmutableSet.of(
         SourceCode.toStringConstantExpression("foo", /* REPLACEME */ null),
         SourceCode.toStringConstantExpression("bar", /* REPLACEME */ null));

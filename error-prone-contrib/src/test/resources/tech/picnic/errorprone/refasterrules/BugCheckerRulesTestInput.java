@@ -31,7 +31,7 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
         .addOutputLines("A.java", "class A {}");
   }
 
-  ImmutableSet<String> testConstantsFormat() {
+  ImmutableSet<String> testSourceCodeToStringConstantExpression() {
     return ImmutableSet.of(Constants.format("foo"), "\"%s\"".formatted(Convert.quote("bar")));
   }
 

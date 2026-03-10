@@ -27,8 +27,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class FileRules {
   private FileRules() {}
 
-  /** Prefer the more idiomatic {@link Path#of(URI)} over {@link Paths#get(URI)}. */
-  static final class PathOfUri {
+  /** Prefer {@link Path#of(URI)} over less idiomatic alternatives. */
+  static final class PathOf {
     @BeforeTemplate
     Path before(URI uri) {
       return Paths.get(uri);
@@ -40,25 +40,22 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer the more idiomatic {@link Path#of(String, String...)} over {@link Paths#get(String,
-   * String...)}.
-   */
-  static final class PathOfString {
+  /** Prefer {@link Path#of(String, String...)} over less idiomatic alternatives. */
+  static final class PathOfWithVarargs {
     @BeforeTemplate
     Path before(String first, @Repeated String more) {
-      return Paths.get(first, more);
+      return Paths.get(first, Refaster.asVarargs(more));
     }
 
     @AfterTemplate
     Path after(String first, @Repeated String more) {
-      return Path.of(first, more);
+      return Path.of(first, Refaster.asVarargs(more));
     }
   }
 
-  /** Avoid redundant conversions from {@link Path} to {@link File}. */
+  /** Prefer the {@link Path} as-is over more contrived alternatives. */
   // XXX: Review whether a rule such as this one is better handled by the `IdentityConversion` rule.
-  static final class PathInstance {
+  static final class PathIdentity {
     @BeforeTemplate
     Path before(Path path) {
       return path.toFile().toPath();
@@ -70,7 +67,13 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link Path#resolveSibling(Path)} over more verbose alternatives. */
+  /**
+   * Prefer {@link Path#resolveSibling(Path)} over more fragile or more verbose alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code path} has no parent: the
+   * original code throws a {@link NullPointerException}, while the replacement handles this case
+   * gracefully.
+   */
   // XXX: Contrary to the original code, the alternative code gracefully handles the case where
   // `path` has no parent.
   static final class PathResolveSiblingPath {
@@ -87,7 +90,13 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link Path#resolveSibling(String)} over the more verbose alternatives. */
+  /**
+   * Prefer {@link Path#resolveSibling(String)} over more fragile or more verbose alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code path} has no parent: the
+   * original code throws a {@link NullPointerException}, while the replacement handles this case
+   * gracefully.
+   */
   // XXX: Contrary to the original code, the alternative code gracefully handles the case where
   // `path` has no parent.
   static final class PathResolveSiblingString {
@@ -131,8 +140,8 @@ final class FileRules {
   }
 
   /**
-   * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over alternatives that
-   * create files with more liberal permissions.
+   * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over less secure
+   * alternatives.
    *
    * <p>Note that {@link File#createTempFile} treats the given prefix as a path, and ignores all but
    * its file name. That is, the actual prefix used is derived from all characters following the
@@ -161,8 +170,8 @@ final class FileRules {
   }
 
   /**
-   * Prefer {@link Files#createTempFile(Path, String, String, FileAttribute[])} over alternatives
-   * that create files with more liberal permissions.
+   * Prefer {@link Files#createTempFile(Path, String, String, FileAttribute[])} over less secure
+   * alternatives.
    *
    * <p>Note that {@link File#createTempFile} treats the given prefix as a path, and ignores all but
    * its file name. That is, the actual prefix used is derived from all characters following the
@@ -183,8 +192,8 @@ final class FileRules {
   }
 
   /**
-   * Invoke {@link File#mkdirs()} before {@link Files#exists(Path, LinkOption...)} to avoid
-   * concurrency issues.
+   * Prefer this evaluation order of {@link File#mkdirs()} and {@link Files#exists(Path,
+   * LinkOption...)} over more fragile alternatives.
    */
   static final class PathToFileMkDirsFilesExists {
     @BeforeTemplate
@@ -199,7 +208,10 @@ final class FileRules {
     }
   }
 
-  /** Invoke {@link File#mkdirs()} before {@link File#exists()} to avoid concurrency issues. */
+  /**
+   * Prefer this evaluation order of {@link File#mkdirs()} and {@link File#exists()} over more
+   * fragile alternatives.
+   */
   static final class FileMkDirsFileExists {
     @BeforeTemplate
     boolean before(File file) {
@@ -213,7 +225,12 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
+  /**
+   * Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when no charset is specified: the
+   * original code uses the default charset, while the replacement always uses UTF-8.
+   */
   // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
   // code uses UTF-8 rather than the default charset.
   static final class FilesNewBufferedReaderPathOf {
@@ -236,10 +253,15 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
+  /**
+   * Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when no charset is specified: the
+   * original code uses the default charset, while the replacement always uses UTF-8.
+   */
   // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
   // code uses UTF-8 rather than the default charset.
-  static final class FilesNewBufferedReaderToPath {
+  static final class FilesNewBufferedReaderFileToPath {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
@@ -273,7 +295,7 @@ final class FileRules {
   }
 
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
-  static final class FilesNewBufferedReaderToPathWithCharset {
+  static final class FilesNewBufferedReaderFileToPathWithCharset {
     @BeforeTemplate
     BufferedReader before(File file, Charset charset) throws FileNotFoundException {
       return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));

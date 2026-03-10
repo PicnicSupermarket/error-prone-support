@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractCharSequenceAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to AssertJ assertions over {@link CharSequence}s. */
@@ -15,6 +16,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJCharSequenceRules {
   private AssertJCharSequenceRules() {}
 
+  /** Prefer {@link AbstractCharSequenceAssert#isEmpty()} over more contrived alternatives. */
   static final class AssertThatCharSequenceIsEmpty {
     @BeforeTemplate
     void before(CharSequence charSequence) {
@@ -31,6 +33,7 @@ final class AssertJCharSequenceRules {
     }
   }
 
+  /** Prefer {@link AbstractCharSequenceAssert#isNotEmpty()} over more contrived alternatives. */
   static final class AssertThatCharSequenceIsNotEmpty {
     @BeforeTemplate
     AbstractAssert<?, ?> before(CharSequence charSequence) {
@@ -47,6 +50,7 @@ final class AssertJCharSequenceRules {
     }
   }
 
+  /** Prefer {@link AbstractCharSequenceAssert#hasSize(int)} over more contrived alternatives. */
   static final class AssertThatCharSequenceHasSize {
     @BeforeTemplate
     AbstractAssert<?, ?> before(CharSequence charSequence, int length) {

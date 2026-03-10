@@ -16,30 +16,30 @@ final class AssertJDoubleRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsCloseToWithOffset() {
     return ImmutableSet.of(
-        assertThat(0.0).isEqualTo(1, offset(0.0)),
-        assertThat(0.0).isEqualTo(Double.valueOf(1), offset(0.0)));
+        assertThat(1.0).isEqualTo(2, offset(0.0)),
+        assertThat(1.0).isEqualTo(Double.valueOf(2), offset(0.0)));
   }
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat(0.0).isCloseTo(1, offset(0.0)), assertThat(0.0).isCloseTo(1, withPercentage(0)));
+        assertThat(1.0).isCloseTo(2, offset(0.0)), assertThat(1.0).isCloseTo(2, withPercentage(0)));
   }
 
   ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsNotEqualTo() {
     return ImmutableSet.of(
-        assertThat(0.0).isNotCloseTo(1, offset(0.0)),
-        assertThat(0.0).isNotCloseTo(1, withPercentage(0)));
+        assertThat(1.0).isNotCloseTo(2, offset(0.0)),
+        assertThat(1.0).isNotCloseTo(2, withPercentage(0)));
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsZero() {
-    return assertThat(0.0).isZero();
+    return assertThat(1.0).isZero();
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsNotZero() {
-    return assertThat(0.0).isNotZero();
+    return assertThat(1.0).isNotZero();
   }
 
   AbstractDoubleAssert<?> testAbstractDoubleAssertIsOne() {
-    return assertThat(0.0).isOne();
+    return assertThat(1.0).isOne();
   }
 }

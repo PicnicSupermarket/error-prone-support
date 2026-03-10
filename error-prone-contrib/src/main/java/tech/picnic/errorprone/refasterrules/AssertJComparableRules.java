@@ -15,6 +15,10 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJComparableRules {
   private AssertJComparableRules() {}
 
+  /**
+   * Prefer {@link AbstractComparableAssert#isEqualByComparingTo(Comparable)} over more contrived
+   * alternatives.
+   */
   static final class AssertThatIsEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -28,6 +32,10 @@ final class AssertJComparableRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractComparableAssert#isNotEqualByComparingTo(Comparable)} over more contrived
+   * alternatives.
+   */
   static final class AssertThatIsNotEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -41,6 +49,10 @@ final class AssertJComparableRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractComparableAssert#isLessThan(Comparable)} over more contrived
+   * alternatives.
+   */
   static final class AssertThatIsLessThan<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -54,6 +66,10 @@ final class AssertJComparableRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractComparableAssert#isLessThanOrEqualTo(Comparable)} over more contrived
+   * alternatives.
+   */
   static final class AssertThatIsLessThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -67,6 +83,10 @@ final class AssertJComparableRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractComparableAssert#isGreaterThan(Comparable)} over more contrived
+   * alternatives.
+   */
   static final class AssertThatIsGreaterThan<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
@@ -80,6 +100,10 @@ final class AssertJComparableRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractComparableAssert#isGreaterThanOrEqualTo(Comparable)} over more contrived
+   * alternatives.
+   */
   static final class AssertThatIsGreaterThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(T actual, T expected) {
