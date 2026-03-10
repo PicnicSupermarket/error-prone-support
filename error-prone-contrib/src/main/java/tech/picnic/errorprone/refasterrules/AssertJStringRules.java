@@ -11,17 +11,18 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link String}s. */
 @OnlineDocumentation
 final class AssertJStringRules {
   private AssertJStringRules() {}
 
-  static final class AbstractStringAssertStringIsEmpty {
+  /** Prefer {@link AbstractStringAssert#isEmpty()} over less explicit alternatives. */
+  static final class AbstractStringAssertIsEmpty {
     @BeforeTemplate
     void before(AbstractStringAssert<?> stringAssert) {
       stringAssert.isEqualTo("");
@@ -33,7 +34,8 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AbstractStringAssertStringIsNotEmpty {
+  /** Prefer {@link AbstractStringAssert#isNotEmpty()} over less explicit alternatives. */
+  static final class AbstractStringAssertIsNotEmpty {
     @BeforeTemplate
     AbstractStringAssert<?> before(AbstractStringAssert<?> stringAssert) {
       return stringAssert.isNotEqualTo("");
@@ -45,81 +47,108 @@ final class AssertJStringRules {
     }
   }
 
-  static final class AssertThatStringStartsWith {
+  /**
+   * Prefer {@link AbstractStringAssert#startsWith(CharSequence)} over more contrived alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatStartsWith {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String prefix) {
-      return assertThat(string.startsWith(prefix)).isTrue();
+    AbstractBooleanAssert<?> before(String actual, String prefix) {
+      return assertThat(actual.startsWith(prefix)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String prefix) {
-      return assertThat(string).startsWith(prefix);
+    AbstractStringAssert<?> after(String actual, String prefix) {
+      return assertThat(actual).startsWith(prefix);
     }
   }
 
-  static final class AssertThatStringDoesNotStartWith {
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotStartWith(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatDoesNotStartWith {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String prefix) {
-      return assertThat(string.startsWith(prefix)).isFalse();
+    AbstractBooleanAssert<?> before(String actual, String prefix) {
+      return assertThat(actual.startsWith(prefix)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String prefix) {
-      return assertThat(string).doesNotStartWith(prefix);
+    AbstractStringAssert<?> after(String actual, String prefix) {
+      return assertThat(actual).doesNotStartWith(prefix);
     }
   }
 
-  static final class AssertThatStringEndsWith {
+  /**
+   * Prefer {@link AbstractStringAssert#endsWith(CharSequence)} over more contrived alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatEndsWith {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String prefix) {
-      return assertThat(string.endsWith(prefix)).isTrue();
+    AbstractBooleanAssert<?> before(String actual, String suffix) {
+      return assertThat(actual.endsWith(suffix)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String prefix) {
-      return assertThat(string).endsWith(prefix);
+    AbstractStringAssert<?> after(String actual, String suffix) {
+      return assertThat(actual).endsWith(suffix);
     }
   }
 
-  static final class AssertThatStringDoesNotEndWith {
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotEndWith(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatDoesNotEndWith {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String prefix) {
-      return assertThat(string.endsWith(prefix)).isFalse();
+    AbstractBooleanAssert<?> before(String actual, String suffix) {
+      return assertThat(actual.endsWith(suffix)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String prefix) {
-      return assertThat(string).doesNotEndWith(prefix);
+    AbstractStringAssert<?> after(String actual, String suffix) {
+      return assertThat(actual).doesNotEndWith(suffix);
     }
   }
 
-  static final class AssertThatStringContains {
+  /**
+   * Prefer {@link AbstractStringAssert#contains(CharSequence...)} over more contrived alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatContains {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, CharSequence substring) {
-      return assertThat(string.contains(substring)).isTrue();
+    AbstractBooleanAssert<?> before(String actual, CharSequence s) {
+      return assertThat(actual.contains(s)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, CharSequence substring) {
-      return assertThat(string).contains(substring);
+    AbstractStringAssert<?> after(String actual, CharSequence s) {
+      return assertThat(actual).contains(s);
     }
   }
 
-  static final class AssertThatStringDoesNotContain {
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotContain(CharSequence...)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatDoesNotContain {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, CharSequence substring) {
-      return assertThat(string.contains(substring)).isFalse();
+    AbstractBooleanAssert<?> before(String actual, CharSequence s) {
+      return assertThat(actual.contains(s)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, CharSequence substring) {
-      return assertThat(string).doesNotContain(substring);
+    AbstractStringAssert<?> after(String actual, CharSequence s) {
+      return assertThat(actual).doesNotContain(s);
     }
   }
 
@@ -127,16 +156,17 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsEqualToIgnoringCase {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String other) {
-      return assertThat(string.equalsIgnoreCase(other)).isTrue();
+    AbstractBooleanAssert<?> before(String actual, String expected) {
+      return assertThat(actual.equalsIgnoreCase(expected)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String other) {
-      return assertThat(string).isEqualToIgnoringCase(other);
+    AbstractStringAssert<?> after(String actual, String expected) {
+      return assertThat(actual).isEqualToIgnoringCase(expected);
     }
   }
 
@@ -144,96 +174,107 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualToIgnoringCase {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string, String other) {
-      return assertThat(string.equalsIgnoreCase(other)).isFalse();
+    AbstractBooleanAssert<?> before(String actual, String expected) {
+      return assertThat(actual.equalsIgnoreCase(expected)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string, String other) {
-      return assertThat(string).isNotEqualToIgnoringCase(other);
+    AbstractStringAssert<?> after(String actual, String expected) {
+      return assertThat(actual).isNotEqualToIgnoringCase(expected);
     }
   }
 
   /** Prefer {@link AbstractStringAssert#isBlank()} over less explicit alternatives. */
   static final class AssertThatIsBlank {
     @BeforeTemplate
-    void before(String string) {
-      assertThat(string.isBlank()).isTrue();
+    void before(String actual) {
+      assertThat(actual.isBlank()).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(String string) {
-      assertThat(string).isBlank();
+    void after(String actual) {
+      assertThat(actual).isBlank();
     }
   }
 
   /** Prefer {@link AbstractStringAssert#isNotBlank()} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotBlank {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(String string) {
-      return assertThat(string.isBlank()).isFalse();
+    AbstractBooleanAssert<?> before(String actual) {
+      return assertThat(actual.isBlank()).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(String string) {
-      return assertThat(string).isNotBlank();
+    AbstractStringAssert<?> after(String actual) {
+      return assertThat(actual).isNotBlank();
     }
   }
 
+  /** Prefer {@link AbstractStringAssert#matches(CharSequence)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatMatches {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(String string, String regex) {
-      return assertThat(string.matches(regex)).isTrue();
+    AbstractBooleanAssert<?> before(String actual, String regex) {
+      return assertThat(actual.matches(regex)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string, String regex) {
-      return assertThat(string).matches(regex);
+    AbstractStringAssert<?> after(String actual, String regex) {
+      return assertThat(actual).matches(regex);
     }
   }
 
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotMatch(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotMatch {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(String string, String regex) {
-      return assertThat(string.matches(regex)).isFalse();
+    AbstractBooleanAssert<?> before(String actual, String regex) {
+      return assertThat(actual.matches(regex)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(String string, String regex) {
-      return assertThat(string).doesNotMatch(regex);
+    AbstractStringAssert<?> after(String actual, String regex) {
+      return assertThat(actual).doesNotMatch(regex);
     }
   }
 
-  static final class AssertThatPathContent {
+  /** Prefer {@code assertThat(path).content(charset)} over more contrived alternatives. */
+  static final class AssertThatContent {
     @BeforeTemplate
-    AbstractStringAssert<?> before(Path path, Charset charset) throws IOException {
-      return assertThat(Files.readString(path, charset));
+    AbstractStringAssert<?> before(Path actual, Charset charset) throws IOException {
+      return assertThat(Files.readString(actual, charset));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(Path path, Charset charset) {
-      return assertThat(path).content(charset);
+    AbstractStringAssert<?> after(Path actual, Charset charset) {
+      return assertThat(actual).content(charset);
     }
   }
 
-  static final class AssertThatPathContentUtf8 {
+  /** Prefer {@code assertThat(path).content(UTF_8)} over more contrived alternatives. */
+  static final class AssertThatContentUtf8 {
     @BeforeTemplate
-    AbstractStringAssert<?> before(Path path) throws IOException {
-      return assertThat(Files.readString(path));
+    AbstractStringAssert<?> before(Path actual) throws IOException {
+      return assertThat(Files.readString(actual));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractStringAssert<?> after(Path path) {
-      return assertThat(path).content(UTF_8);
+    AbstractStringAssert<?> after(Path actual) {
+      return assertThat(actual).content(UTF_8);
     }
   }
 }

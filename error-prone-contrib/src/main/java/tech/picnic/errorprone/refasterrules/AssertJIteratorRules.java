@@ -10,35 +10,40 @@ import java.util.Iterator;
 import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.IteratorAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Iterator}s. */
 @OnlineDocumentation
 final class AssertJIteratorRules {
   private AssertJIteratorRules() {}
 
+  /** Prefer {@link IteratorAssert#hasNext()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasNext<T> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Iterator<T> iterator) {
-      return assertThat(iterator.hasNext()).isTrue();
+    AbstractBooleanAssert<?> before(Iterator<T> actual) {
+      return assertThat(actual.hasNext()).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IteratorAssert<T> after(Iterator<T> iterator) {
-      return assertThat(iterator).hasNext();
+    IteratorAssert<T> after(Iterator<T> actual) {
+      return assertThat(actual).hasNext();
     }
   }
 
+  /** Prefer {@link IteratorAssert#isExhausted()} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsExhausted<T> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Iterator<T> iterator) {
-      return assertThat(iterator.hasNext()).isFalse();
+    AbstractBooleanAssert<?> before(Iterator<T> actual) {
+      return assertThat(actual.hasNext()).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IteratorAssert<T> after(Iterator<T> iterator) {
-      return assertThat(iterator).isExhausted();
+    IteratorAssert<T> after(Iterator<T> actual) {
+      return assertThat(actual).isExhausted();
     }
   }
 }

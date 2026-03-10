@@ -30,10 +30,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class TimeRules {
   private TimeRules() {}
 
-  /**
-   * Prefer {@link Clock#instant()} over {@link Instant#now(Clock)}, as it is more concise and more
-   * "OOP-py".
-   */
+  /** Prefer {@link Clock#instant()} over more verbose alternatives. */
   static final class ClockInstant {
     @BeforeTemplate
     Instant before(Clock clock) {
@@ -46,8 +43,8 @@ final class TimeRules {
     }
   }
 
-  /** Use {@link ZoneOffset#UTC} when possible. */
-  static final class UtcConstant {
+  /** Prefer {@link ZoneOffset#UTC} over less explicit alternatives. */
+  static final class Utc {
     @BeforeTemplate
     ZoneId before() {
       // `ZoneId.of("Z")` is not listed, because Error Prone flags it out of the box.
@@ -66,94 +63,94 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link LocalDate#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link LocalDate#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class LocalDateOfInstant {
     @BeforeTemplate
-    LocalDate before(Instant instant, ZoneId zoneId) {
+    LocalDate before(Instant instant, ZoneId zone) {
       return Refaster.anyOf(
-          instant.atZone(zoneId).toLocalDate(),
-          LocalDateTime.ofInstant(instant, zoneId).toLocalDate(),
-          OffsetDateTime.ofInstant(instant, zoneId).toLocalDate());
+          instant.atZone(zone).toLocalDate(),
+          LocalDateTime.ofInstant(instant, zone).toLocalDate(),
+          OffsetDateTime.ofInstant(instant, zone).toLocalDate());
     }
 
     @BeforeTemplate
-    LocalDate before(Instant instant, ZoneOffset zoneId) {
-      return instant.atOffset(zoneId).toLocalDate();
+    LocalDate before(Instant instant, ZoneOffset zone) {
+      return instant.atOffset(zone).toLocalDate();
     }
 
     @AfterTemplate
-    LocalDate after(Instant instant, ZoneId zoneId) {
-      return LocalDate.ofInstant(instant, zoneId);
+    LocalDate after(Instant instant, ZoneId zone) {
+      return LocalDate.ofInstant(instant, zone);
     }
   }
 
-  /** Prefer {@link LocalDateTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link LocalDateTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class LocalDateTimeOfInstant {
     @BeforeTemplate
-    LocalDateTime before(Instant instant, ZoneId zoneId) {
+    LocalDateTime before(Instant instant, ZoneId zone) {
       return Refaster.anyOf(
-          instant.atZone(zoneId).toLocalDateTime(),
-          OffsetDateTime.ofInstant(instant, zoneId).toLocalDateTime());
+          instant.atZone(zone).toLocalDateTime(),
+          OffsetDateTime.ofInstant(instant, zone).toLocalDateTime());
     }
 
     @BeforeTemplate
-    LocalDateTime before(Instant instant, ZoneOffset zoneId) {
-      return instant.atOffset(zoneId).toLocalDateTime();
+    LocalDateTime before(Instant instant, ZoneOffset zone) {
+      return instant.atOffset(zone).toLocalDateTime();
     }
 
     @AfterTemplate
-    LocalDateTime after(Instant instant, ZoneId zoneId) {
-      return LocalDateTime.ofInstant(instant, zoneId);
+    LocalDateTime after(Instant instant, ZoneId zone) {
+      return LocalDateTime.ofInstant(instant, zone);
     }
   }
 
-  /** Prefer {@link LocalTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link LocalTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class LocalTimeOfInstant {
     @BeforeTemplate
-    LocalTime before(Instant instant, ZoneId zoneId) {
+    LocalTime before(Instant instant, ZoneId zone) {
       return Refaster.anyOf(
-          instant.atZone(zoneId).toLocalTime(),
-          LocalDateTime.ofInstant(instant, zoneId).toLocalTime(),
-          OffsetDateTime.ofInstant(instant, zoneId).toLocalTime(),
-          OffsetTime.ofInstant(instant, zoneId).toLocalTime());
+          instant.atZone(zone).toLocalTime(),
+          LocalDateTime.ofInstant(instant, zone).toLocalTime(),
+          OffsetDateTime.ofInstant(instant, zone).toLocalTime(),
+          OffsetTime.ofInstant(instant, zone).toLocalTime());
     }
 
     @BeforeTemplate
-    LocalTime before(Instant instant, ZoneOffset zoneId) {
-      return instant.atOffset(zoneId).toLocalTime();
+    LocalTime before(Instant instant, ZoneOffset zone) {
+      return instant.atOffset(zone).toLocalTime();
     }
 
     @AfterTemplate
-    LocalTime after(Instant instant, ZoneId zoneId) {
-      return LocalTime.ofInstant(instant, zoneId);
+    LocalTime after(Instant instant, ZoneId zone) {
+      return LocalTime.ofInstant(instant, zone);
     }
   }
 
-  /** Prefer {@link OffsetDateTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link OffsetDateTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class OffsetDateTimeOfInstant {
     @BeforeTemplate
-    OffsetDateTime before(Instant instant, ZoneId zoneId) {
-      return instant.atZone(zoneId).toOffsetDateTime();
+    OffsetDateTime before(Instant instant, ZoneId zone) {
+      return instant.atZone(zone).toOffsetDateTime();
     }
 
     @AfterTemplate
-    OffsetDateTime after(Instant instant, ZoneId zoneId) {
-      return OffsetDateTime.ofInstant(instant, zoneId);
+    OffsetDateTime after(Instant instant, ZoneId zone) {
+      return OffsetDateTime.ofInstant(instant, zone);
     }
   }
 
-  /** Don't unnecessarily transform an {@link Instant} to an equivalent instance. */
+  /** Prefer using {@link Instant}s as-is over less efficient alternatives. */
   static final class InstantIdentity {
     @BeforeTemplate
-    Instant before(Instant instant, TemporalUnit temporalUnit) {
+    Instant before(Instant instant, TemporalUnit unit) {
       return Refaster.anyOf(
           instant.plus(Duration.ZERO),
-          instant.plus(0, temporalUnit),
+          instant.plus(0, unit),
           instant.plusNanos(0),
           instant.plusMillis(0),
           instant.plusSeconds(0),
           instant.minus(Duration.ZERO),
-          instant.minus(0, temporalUnit),
+          instant.minus(0, unit),
           instant.minusNanos(0),
           instant.minusMillis(0),
           instant.minusSeconds(0),
@@ -169,12 +166,12 @@ final class TimeRules {
   }
 
   /**
-   * Prefer {@link Instant#truncatedTo(TemporalUnit)} over less obvious alternatives.
+   * Prefer {@link Instant#truncatedTo(TemporalUnit)} over less efficient alternatives.
    *
    * <p>Note that {@link Instant#toEpochMilli()} throws an {@link ArithmeticException} for dates
    * very far in the past or future, while the suggested alternative doesn't.
    */
-  static final class InstantTruncatedToMilliseconds {
+  static final class InstantTruncatedToChronoUnitMillis {
     @BeforeTemplate
     Instant before(Instant instant) {
       return Instant.ofEpochMilli(instant.toEpochMilli());
@@ -186,8 +183,8 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Instant#truncatedTo(TemporalUnit)} over less obvious alternatives. */
-  static final class InstantTruncatedToSeconds {
+  /** Prefer {@link Instant#truncatedTo(TemporalUnit)} over less efficient alternatives. */
+  static final class InstantTruncatedToChronoUnitSeconds {
     @BeforeTemplate
     Instant before(Instant instant) {
       return Instant.ofEpochSecond(instant.getEpochSecond());
@@ -202,64 +199,64 @@ final class TimeRules {
   /** Prefer {@link Instant#atOffset(ZoneOffset)} over more verbose alternatives. */
   static final class InstantAtOffset {
     @BeforeTemplate
-    OffsetDateTime before(Instant instant, ZoneOffset zoneOffset) {
-      return OffsetDateTime.ofInstant(instant, zoneOffset);
+    OffsetDateTime before(Instant instant, ZoneOffset offset) {
+      return OffsetDateTime.ofInstant(instant, offset);
     }
 
     @AfterTemplate
-    OffsetDateTime after(Instant instant, ZoneOffset zoneOffset) {
-      return instant.atOffset(zoneOffset);
+    OffsetDateTime after(Instant instant, ZoneOffset offset) {
+      return instant.atOffset(offset);
     }
   }
 
-  /** Prefer {@link OffsetTime#ofInstant(Instant, ZoneId)} over more indirect alternatives. */
+  /** Prefer {@link OffsetTime#ofInstant(Instant, ZoneId)} over more contrived alternatives. */
   static final class OffsetTimeOfInstant {
     @BeforeTemplate
-    OffsetTime before(Instant instant, ZoneId zoneId) {
-      return OffsetDateTime.ofInstant(instant, zoneId).toOffsetTime();
+    OffsetTime before(Instant instant, ZoneId zone) {
+      return OffsetDateTime.ofInstant(instant, zone).toOffsetTime();
     }
 
     @BeforeTemplate
-    OffsetTime before(Instant instant, ZoneOffset zoneId) {
-      return instant.atOffset(zoneId).toOffsetTime();
+    OffsetTime before(Instant instant, ZoneOffset zone) {
+      return instant.atOffset(zone).toOffsetTime();
     }
 
     @AfterTemplate
-    OffsetTime after(Instant instant, ZoneId zoneId) {
-      return OffsetTime.ofInstant(instant, zoneId);
+    OffsetTime after(Instant instant, ZoneId zone) {
+      return OffsetTime.ofInstant(instant, zone);
     }
   }
 
   /** Prefer {@link Instant#atZone(ZoneId)} over more verbose alternatives. */
   static final class InstantAtZone {
     @BeforeTemplate
-    ZonedDateTime before(Instant instant, ZoneId zoneId) {
-      return ZonedDateTime.ofInstant(instant, zoneId);
+    ZonedDateTime before(Instant instant, ZoneId zone) {
+      return ZonedDateTime.ofInstant(instant, zone);
     }
 
     @AfterTemplate
-    ZonedDateTime after(Instant instant, ZoneId zoneId) {
-      return instant.atZone(zoneId);
+    ZonedDateTime after(Instant instant, ZoneId zone) {
+      return instant.atZone(zone);
     }
   }
 
-  /** Use {@link Clock#systemUTC()} when possible. */
-  static final class UtcClock {
+  /** Prefer {@link Clock#systemUTC()} over more verbose alternatives. */
+  static final class ClockSystemUTC {
     @BeforeTemplate
-    @SuppressWarnings("TimeZoneUsage")
+    @SuppressWarnings("TimeZoneUsage" /* This violation will be rewritten. */)
     Clock before() {
       return Clock.system(UTC);
     }
 
     @AfterTemplate
-    @SuppressWarnings("TimeZoneUsage")
+    @SuppressWarnings("TimeZoneUsage" /* This violation is preferred over the alternative. */)
     Clock after() {
       return Clock.systemUTC();
     }
   }
 
-  /** Prefer {@link Instant#EPOCH} over alternative representations. */
-  static final class EpochInstant {
+  /** Prefer {@link Instant#EPOCH} over less efficient alternatives. */
+  static final class InstantEpoch {
     @BeforeTemplate
     Instant before() {
       return Refaster.anyOf(
@@ -272,41 +269,35 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link Instant#isBefore(Instant)} over explicit comparison, as it yields more readable
-   * code.
-   */
+  /** Prefer {@link Instant#isBefore(Instant)} over less explicit alternatives. */
   static final class InstantIsBefore {
     @BeforeTemplate
-    boolean before(Instant a, Instant b) {
-      return a.compareTo(b) < 0;
+    boolean before(Instant instant, Instant otherInstant) {
+      return instant.compareTo(otherInstant) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(Instant a, Instant b) {
-      return a.isBefore(b);
+    boolean after(Instant instant, Instant otherInstant) {
+      return instant.isBefore(otherInstant);
     }
   }
 
-  /**
-   * Prefer {@link Instant#isBefore(Instant)} over explicit comparison, as it yields more readable
-   * code.
-   */
+  /** Prefer {@link Instant#isAfter(Instant)} over less explicit alternatives. */
   static final class InstantIsAfter {
     @BeforeTemplate
-    boolean before(Instant a, Instant b) {
-      return a.compareTo(b) > 0;
+    boolean before(Instant instant, Instant otherInstant) {
+      return instant.compareTo(otherInstant) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(Instant a, Instant b) {
-      return a.isAfter(b);
+    boolean after(Instant instant, Instant otherInstant) {
+      return instant.isAfter(otherInstant);
     }
   }
 
-  /** Prefer the {@link LocalTime#MIN} over alternative representations. */
+  /** Prefer {@link LocalTime#MIN} over less explicit alternatives. */
   static final class LocalTimeMin {
     @BeforeTemplate
     LocalTime before() {
@@ -338,145 +329,134 @@ final class TimeRules {
     }
   }
 
-  /**
-   * Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over less explicit alternatives. */
   static final class ChronoLocalDateIsBefore {
     @BeforeTemplate
-    boolean before(ChronoLocalDate a, ChronoLocalDate b) {
-      return a.compareTo(b) < 0;
+    boolean before(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDate a, ChronoLocalDate b) {
-      return a.isBefore(b);
+    boolean after(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.isBefore(other);
     }
   }
 
-  /**
-   * Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link ChronoLocalDate#isAfter(ChronoLocalDate)} over less explicit alternatives. */
   static final class ChronoLocalDateIsAfter {
     @BeforeTemplate
-    boolean before(ChronoLocalDate a, ChronoLocalDate b) {
-      return a.compareTo(b) > 0;
+    boolean before(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDate a, ChronoLocalDate b) {
-      return a.isAfter(b);
+    boolean after(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.isAfter(other);
     }
   }
 
   /**
-   * Prefer {@link ChronoLocalDateTime#isBefore(ChronoLocalDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoLocalDateTime#isBefore(ChronoLocalDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoLocalDateTimeIsBefore {
     @BeforeTemplate
-    boolean before(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> b) {
-      return a.compareTo(b) < 0;
+    boolean before(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> b) {
-      return a.isBefore(b);
+    boolean after(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.isBefore(other);
     }
   }
 
   /**
-   * Prefer {@link ChronoLocalDateTime#isBefore(ChronoLocalDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoLocalDateTime#isAfter(ChronoLocalDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoLocalDateTimeIsAfter {
     @BeforeTemplate
-    boolean before(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> b) {
-      return a.compareTo(b) > 0;
+    boolean before(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> b) {
-      return a.isAfter(b);
+    boolean after(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.isAfter(other);
     }
   }
 
   /**
-   * Prefer {@link ChronoZonedDateTime#isBefore(ChronoZonedDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoZonedDateTime#isBefore(ChronoZonedDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoZonedDateTimeIsBefore {
     @BeforeTemplate
-    boolean before(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> b) {
-      return a.compareTo(b) < 0;
+    boolean before(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> b) {
-      return a.isBefore(b);
+    boolean after(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.isBefore(other);
     }
   }
 
   /**
-   * Prefer {@link ChronoZonedDateTime#isBefore(ChronoZonedDateTime)} over explicit comparison, as
-   * it yields more readable code.
+   * Prefer {@link ChronoZonedDateTime#isAfter(ChronoZonedDateTime)} over less explicit
+   * alternatives.
    */
   static final class ChronoZonedDateTimeIsAfter {
     @BeforeTemplate
-    boolean before(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> b) {
-      return a.compareTo(b) > 0;
+    boolean before(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> b) {
-      return a.isAfter(b);
+    boolean after(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.isAfter(other);
     }
   }
 
-  /**
-   * Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over less explicit alternatives. */
   static final class OffsetDateTimeIsBefore {
     @BeforeTemplate
-    boolean before(OffsetDateTime a, OffsetDateTime b) {
-      return a.compareTo(b) < 0;
+    boolean before(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(OffsetDateTime a, OffsetDateTime b) {
-      return a.isBefore(b);
+    boolean after(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.isBefore(other);
     }
   }
 
-  /**
-   * Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over explicit comparison, as it yields
-   * more readable code.
-   */
+  /** Prefer {@link OffsetDateTime#isAfter(OffsetDateTime)} over less explicit alternatives. */
   static final class OffsetDateTimeIsAfter {
     @BeforeTemplate
-    boolean before(OffsetDateTime a, OffsetDateTime b) {
-      return a.compareTo(b) > 0;
+    boolean before(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(OffsetDateTime a, OffsetDateTime b) {
-      return a.isAfter(b);
+    boolean after(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.isAfter(other);
     }
   }
 
-  static final class ZeroDuration {
+  /** Prefer {@link Duration#ZERO} over less explicit alternatives. */
+  static final class DurationZero {
     @BeforeTemplate
-    Duration before(TemporalUnit temporalUnit) {
+    Duration before(TemporalUnit unit) {
       return Refaster.anyOf(
           Duration.ofNanos(0),
           Duration.ofMillis(0),
@@ -485,7 +465,7 @@ final class TimeRules {
           Duration.ofMinutes(0),
           Duration.ofHours(0),
           Duration.ofDays(0),
-          Duration.of(0, temporalUnit));
+          Duration.of(0, unit));
     }
 
     @AfterTemplate
@@ -494,136 +474,135 @@ final class TimeRules {
     }
   }
 
-  /** Prefer {@link Duration#ofDays(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofDays(long)} over more contrived alternatives. */
   static final class DurationOfDays {
     @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.DAYS);
+    Duration before(long days) {
+      return Duration.of(days, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofDays(amount);
+    Duration after(long days) {
+      return Duration.ofDays(days);
     }
   }
 
-  /** Prefer {@link Duration#ofHours(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofHours(long)} over more contrived alternatives. */
   static final class DurationOfHours {
     @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.HOURS);
+    Duration before(long hours) {
+      return Duration.of(hours, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofHours(amount);
+    Duration after(long hours) {
+      return Duration.ofHours(hours);
     }
   }
 
-  /** Prefer {@link Duration#ofMillis(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofMillis(long)} over more contrived alternatives. */
   static final class DurationOfMillis {
     @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.MILLIS);
+    Duration before(long millis) {
+      return Duration.of(millis, ChronoUnit.MILLIS);
     }
 
     @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofMillis(amount);
+    Duration after(long millis) {
+      return Duration.ofMillis(millis);
     }
   }
 
-  /** Prefer {@link Duration#ofMinutes(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofMinutes(long)} over more contrived alternatives. */
   static final class DurationOfMinutes {
     @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.MINUTES);
+    Duration before(long minutes) {
+      return Duration.of(minutes, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofMinutes(amount);
+    Duration after(long minutes) {
+      return Duration.ofMinutes(minutes);
     }
   }
 
-  /** Prefer {@link Duration#ofNanos(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofNanos(long)} over more contrived alternatives. */
   static final class DurationOfNanos {
     @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.NANOS);
+    Duration before(long nanos) {
+      return Duration.of(nanos, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofNanos(amount);
+    Duration after(long nanos) {
+      return Duration.ofNanos(nanos);
     }
   }
 
-  /** Prefer {@link Duration#ofSeconds(long)} over alternative representations. */
+  /** Prefer {@link Duration#ofSeconds(long)} over more contrived alternatives. */
   static final class DurationOfSeconds {
     @BeforeTemplate
-    Duration before(long amount) {
-      return Duration.of(amount, ChronoUnit.SECONDS);
+    Duration before(long seconds) {
+      return Duration.of(seconds, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
-    Duration after(long amount) {
-      return Duration.ofSeconds(amount);
+    Duration after(long seconds) {
+      return Duration.ofSeconds(seconds);
     }
   }
 
   /**
-   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
-   * retained.)
+   * Prefer {@link Duration#between} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
    */
-  static final class DurationBetweenInstants {
+  static final class DurationBetweenInstant {
     @BeforeTemplate
-    Duration before(Instant a, Instant b) {
-      return Duration.ofMillis(b.toEpochMilli() - a.toEpochMilli());
+    Duration before(Instant startInclusive, Instant endExclusive) {
+      return Duration.ofMillis(endExclusive.toEpochMilli() - startInclusive.toEpochMilli());
     }
 
     @AfterTemplate
-    Duration after(Instant a, Instant b) {
-      return Duration.between(a, b);
+    Duration after(Instant startInclusive, Instant endExclusive) {
+      return Duration.between(startInclusive, endExclusive);
     }
   }
 
   /**
-   * Don't unnecessarily convert to and from milliseconds. (This way nanosecond precision is
-   * retained.)
+   * Prefer {@link Duration#between} over less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
    */
-  static final class DurationBetweenOffsetDateTimes {
+  static final class DurationBetweenOffsetDateTime {
     @BeforeTemplate
-    Duration before(OffsetDateTime a, OffsetDateTime b) {
+    Duration before(OffsetDateTime startInclusive, OffsetDateTime endExclusive) {
       return Refaster.anyOf(
-          Duration.between(a.toInstant(), b.toInstant()),
-          Duration.ofSeconds(b.toEpochSecond() - a.toEpochSecond()));
+          Duration.between(startInclusive.toInstant(), endExclusive.toInstant()),
+          Duration.ofSeconds(endExclusive.toEpochSecond() - startInclusive.toEpochSecond()));
     }
 
     @AfterTemplate
-    Duration after(OffsetDateTime a, OffsetDateTime b) {
-      return Duration.between(a, b);
+    Duration after(OffsetDateTime startInclusive, OffsetDateTime endExclusive) {
+      return Duration.between(startInclusive, endExclusive);
     }
   }
 
   /** Prefer {@link Duration#isZero()} over more contrived alternatives. */
   static final class DurationIsZero {
     @BeforeTemplate
-    boolean before(Duration duration) {
-      return Refaster.anyOf(duration.equals(Duration.ZERO), Duration.ZERO.equals(duration));
+    boolean before(Duration other) {
+      return Refaster.anyOf(other.equals(Duration.ZERO), Duration.ZERO.equals(other));
     }
 
     @AfterTemplate
-    boolean after(Duration duration) {
-      return duration.isZero();
+    boolean after(Duration other) {
+      return other.isZero();
     }
   }
 
-  static final class ZeroPeriod {
+  /** Prefer {@link Period#ZERO} over less explicit alternatives. */
+  static final class PeriodZero {
     @BeforeTemplate
     Period before() {
       return Refaster.anyOf(
@@ -646,288 +625,288 @@ final class TimeRules {
   /** Prefer {@link LocalDate#plusDays(long)} over more contrived alternatives. */
   static final class LocalDatePlusDays {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int days) {
-      return localDate.plus(Period.ofDays(days));
+    LocalDate before(LocalDate localDate, int daysToAdd) {
+      return localDate.plus(Period.ofDays(daysToAdd));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long days) {
-      return localDate.plus(days, ChronoUnit.DAYS);
+    LocalDate before(LocalDate localDate, long daysToAdd) {
+      return localDate.plus(daysToAdd, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int days) {
-      return localDate.plusDays(days);
+    LocalDate after(LocalDate localDate, int daysToAdd) {
+      return localDate.plusDays(daysToAdd);
     }
   }
 
   /** Prefer {@link LocalDate#plusWeeks(long)} over more contrived alternatives. */
   static final class LocalDatePlusWeeks {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int weeks) {
-      return localDate.plus(Period.ofWeeks(weeks));
+    LocalDate before(LocalDate localDate, int weeksToAdd) {
+      return localDate.plus(Period.ofWeeks(weeksToAdd));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long weeks) {
-      return localDate.plus(weeks, ChronoUnit.WEEKS);
+    LocalDate before(LocalDate localDate, long weeksToAdd) {
+      return localDate.plus(weeksToAdd, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int weeks) {
-      return localDate.plusWeeks(weeks);
+    LocalDate after(LocalDate localDate, int weeksToAdd) {
+      return localDate.plusWeeks(weeksToAdd);
     }
   }
 
   /** Prefer {@link LocalDate#plusMonths(long)} over more contrived alternatives. */
   static final class LocalDatePlusMonths {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int months) {
-      return localDate.plus(Period.ofMonths(months));
+    LocalDate before(LocalDate localDate, int monthsToAdd) {
+      return localDate.plus(Period.ofMonths(monthsToAdd));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long months) {
-      return localDate.plus(months, ChronoUnit.MONTHS);
+    LocalDate before(LocalDate localDate, long monthsToAdd) {
+      return localDate.plus(monthsToAdd, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int months) {
-      return localDate.plusMonths(months);
+    LocalDate after(LocalDate localDate, int monthsToAdd) {
+      return localDate.plusMonths(monthsToAdd);
     }
   }
 
   /** Prefer {@link LocalDate#plusYears(long)} over more contrived alternatives. */
   static final class LocalDatePlusYears {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int years) {
-      return localDate.plus(Period.ofYears(years));
+    LocalDate before(LocalDate localDate, int yearsToAdd) {
+      return localDate.plus(Period.ofYears(yearsToAdd));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long years) {
-      return localDate.plus(years, ChronoUnit.YEARS);
+    LocalDate before(LocalDate localDate, long yearsToAdd) {
+      return localDate.plus(yearsToAdd, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int years) {
-      return localDate.plusYears(years);
+    LocalDate after(LocalDate localDate, int yearsToAdd) {
+      return localDate.plusYears(yearsToAdd);
     }
   }
 
   /** Prefer {@link LocalDate#minusDays(long)} over more contrived alternatives. */
   static final class LocalDateMinusDays {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int days) {
-      return localDate.minus(Period.ofDays(days));
+    LocalDate before(LocalDate localDate, int daysToSubtract) {
+      return localDate.minus(Period.ofDays(daysToSubtract));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long days) {
-      return localDate.minus(days, ChronoUnit.DAYS);
+    LocalDate before(LocalDate localDate, long daysToSubtract) {
+      return localDate.minus(daysToSubtract, ChronoUnit.DAYS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int days) {
-      return localDate.minusDays(days);
+    LocalDate after(LocalDate localDate, int daysToSubtract) {
+      return localDate.minusDays(daysToSubtract);
     }
   }
 
   /** Prefer {@link LocalDate#minusWeeks(long)} over more contrived alternatives. */
   static final class LocalDateMinusWeeks {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int weeks) {
-      return localDate.minus(Period.ofWeeks(weeks));
+    LocalDate before(LocalDate localDate, int weeksToSubtract) {
+      return localDate.minus(Period.ofWeeks(weeksToSubtract));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long weeks) {
-      return localDate.minus(weeks, ChronoUnit.WEEKS);
+    LocalDate before(LocalDate localDate, long weeksToSubtract) {
+      return localDate.minus(weeksToSubtract, ChronoUnit.WEEKS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int weeks) {
-      return localDate.minusWeeks(weeks);
+    LocalDate after(LocalDate localDate, int weeksToSubtract) {
+      return localDate.minusWeeks(weeksToSubtract);
     }
   }
 
   /** Prefer {@link LocalDate#minusMonths(long)} over more contrived alternatives. */
   static final class LocalDateMinusMonths {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int months) {
-      return localDate.minus(Period.ofMonths(months));
+    LocalDate before(LocalDate localDate, int monthsToSubtract) {
+      return localDate.minus(Period.ofMonths(monthsToSubtract));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long months) {
-      return localDate.minus(months, ChronoUnit.MONTHS);
+    LocalDate before(LocalDate localDate, long monthsToSubtract) {
+      return localDate.minus(monthsToSubtract, ChronoUnit.MONTHS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int months) {
-      return localDate.minusMonths(months);
+    LocalDate after(LocalDate localDate, int monthsToSubtract) {
+      return localDate.minusMonths(monthsToSubtract);
     }
   }
 
   /** Prefer {@link LocalDate#minusYears(long)} over more contrived alternatives. */
   static final class LocalDateMinusYears {
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, int years) {
-      return localDate.minus(Period.ofYears(years));
+    LocalDate before(LocalDate localDate, int yearsToSubtract) {
+      return localDate.minus(Period.ofYears(yearsToSubtract));
     }
 
     @BeforeTemplate
-    LocalDate before(LocalDate localDate, long years) {
-      return localDate.minus(years, ChronoUnit.YEARS);
+    LocalDate before(LocalDate localDate, long yearsToSubtract) {
+      return localDate.minus(yearsToSubtract, ChronoUnit.YEARS);
     }
 
     @AfterTemplate
-    LocalDate after(LocalDate localDate, int years) {
-      return localDate.minusYears(years);
+    LocalDate after(LocalDate localDate, int yearsToSubtract) {
+      return localDate.minusYears(yearsToSubtract);
     }
   }
 
   /** Prefer {@link LocalTime#plusNanos(long)} over more contrived alternatives. */
   static final class LocalTimePlusNanos {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int nanos) {
-      return localTime.plus(Duration.ofNanos(nanos));
+    LocalTime before(LocalTime localTime, int nanosToAdd) {
+      return localTime.plus(Duration.ofNanos(nanosToAdd));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long nanos) {
-      return localTime.plus(nanos, ChronoUnit.NANOS);
+    LocalTime before(LocalTime localTime, long nanosToAdd) {
+      return localTime.plus(nanosToAdd, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int nanos) {
-      return localTime.plusNanos(nanos);
+    LocalTime after(LocalTime localTime, int nanosToAdd) {
+      return localTime.plusNanos(nanosToAdd);
     }
   }
 
   /** Prefer {@link LocalTime#plusSeconds(long)} over more contrived alternatives. */
   static final class LocalTimePlusSeconds {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int seconds) {
-      return localTime.plus(Duration.ofSeconds(seconds));
+    LocalTime before(LocalTime localTime, int secondstoAdd) {
+      return localTime.plus(Duration.ofSeconds(secondstoAdd));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long seconds) {
-      return localTime.plus(seconds, ChronoUnit.SECONDS);
+    LocalTime before(LocalTime localTime, long secondstoAdd) {
+      return localTime.plus(secondstoAdd, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int seconds) {
-      return localTime.plusSeconds(seconds);
+    LocalTime after(LocalTime localTime, int secondstoAdd) {
+      return localTime.plusSeconds(secondstoAdd);
     }
   }
 
   /** Prefer {@link LocalTime#plusMinutes(long)} over more contrived alternatives. */
   static final class LocalTimePlusMinutes {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int minutes) {
-      return localTime.plus(Duration.ofMinutes(minutes));
+    LocalTime before(LocalTime localTime, int minutesToAdd) {
+      return localTime.plus(Duration.ofMinutes(minutesToAdd));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long minutes) {
-      return localTime.plus(minutes, ChronoUnit.MINUTES);
+    LocalTime before(LocalTime localTime, long minutesToAdd) {
+      return localTime.plus(minutesToAdd, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int minutes) {
-      return localTime.plusMinutes(minutes);
+    LocalTime after(LocalTime localTime, int minutesToAdd) {
+      return localTime.plusMinutes(minutesToAdd);
     }
   }
 
   /** Prefer {@link LocalTime#plusHours(long)} over more contrived alternatives. */
   static final class LocalTimePlusHours {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int hours) {
-      return localTime.plus(Duration.ofHours(hours));
+    LocalTime before(LocalTime localTime, int hoursToAdd) {
+      return localTime.plus(Duration.ofHours(hoursToAdd));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long hours) {
-      return localTime.plus(hours, ChronoUnit.HOURS);
+    LocalTime before(LocalTime localTime, long hoursToAdd) {
+      return localTime.plus(hoursToAdd, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int hours) {
-      return localTime.plusHours(hours);
+    LocalTime after(LocalTime localTime, int hoursToAdd) {
+      return localTime.plusHours(hoursToAdd);
     }
   }
 
   /** Prefer {@link LocalTime#minusNanos(long)} over more contrived alternatives. */
   static final class LocalTimeMinusNanos {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int nanos) {
-      return localTime.minus(Duration.ofNanos(nanos));
+    LocalTime before(LocalTime localTime, int nanosToSubtract) {
+      return localTime.minus(Duration.ofNanos(nanosToSubtract));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long nanos) {
-      return localTime.minus(nanos, ChronoUnit.NANOS);
+    LocalTime before(LocalTime localTime, long nanosToSubtract) {
+      return localTime.minus(nanosToSubtract, ChronoUnit.NANOS);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int nanos) {
-      return localTime.minusNanos(nanos);
+    LocalTime after(LocalTime localTime, int nanosToSubtract) {
+      return localTime.minusNanos(nanosToSubtract);
     }
   }
 
   /** Prefer {@link LocalTime#minusSeconds(long)} over more contrived alternatives. */
   static final class LocalTimeMinusSeconds {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int seconds) {
-      return localTime.minus(Duration.ofSeconds(seconds));
+    LocalTime before(LocalTime localTime, int secondsToSubtract) {
+      return localTime.minus(Duration.ofSeconds(secondsToSubtract));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long seconds) {
-      return localTime.minus(seconds, ChronoUnit.SECONDS);
+    LocalTime before(LocalTime localTime, long secondsToSubtract) {
+      return localTime.minus(secondsToSubtract, ChronoUnit.SECONDS);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int seconds) {
-      return localTime.minusSeconds(seconds);
+    LocalTime after(LocalTime localTime, int secondsToSubtract) {
+      return localTime.minusSeconds(secondsToSubtract);
     }
   }
 
   /** Prefer {@link LocalTime#minusMinutes(long)} over more contrived alternatives. */
   static final class LocalTimeMinusMinutes {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int minutes) {
-      return localTime.minus(Duration.ofMinutes(minutes));
+    LocalTime before(LocalTime localTime, int minutesToSubtract) {
+      return localTime.minus(Duration.ofMinutes(minutesToSubtract));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long minutes) {
-      return localTime.minus(minutes, ChronoUnit.MINUTES);
+    LocalTime before(LocalTime localTime, long minutesToSubtract) {
+      return localTime.minus(minutesToSubtract, ChronoUnit.MINUTES);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int minutes) {
-      return localTime.minusMinutes(minutes);
+    LocalTime after(LocalTime localTime, int minutesToSubtract) {
+      return localTime.minusMinutes(minutesToSubtract);
     }
   }
 
   /** Prefer {@link LocalTime#minusHours(long)} over more contrived alternatives. */
   static final class LocalTimeMinusHours {
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, int hours) {
-      return localTime.minus(Duration.ofHours(hours));
+    LocalTime before(LocalTime localTime, int hoursToSubtract) {
+      return localTime.minus(Duration.ofHours(hoursToSubtract));
     }
 
     @BeforeTemplate
-    LocalTime before(LocalTime localTime, long hours) {
-      return localTime.minus(hours, ChronoUnit.HOURS);
+    LocalTime before(LocalTime localTime, long hoursToSubtract) {
+      return localTime.minus(hoursToSubtract, ChronoUnit.HOURS);
     }
 
     @AfterTemplate
-    LocalTime after(LocalTime localTime, int hours) {
-      return localTime.minusHours(hours);
+    LocalTime after(LocalTime localTime, int hoursToSubtract) {
+      return localTime.minusHours(hoursToSubtract);
     }
   }
 

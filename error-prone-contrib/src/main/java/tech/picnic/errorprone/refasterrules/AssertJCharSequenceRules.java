@@ -8,55 +8,62 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractCharSequenceAssert;
+import org.assertj.core.api.AbstractIntegerAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link CharSequence}s. */
 @OnlineDocumentation
 final class AssertJCharSequenceRules {
   private AssertJCharSequenceRules() {}
 
-  static final class AssertThatCharSequenceIsEmpty {
+  /** Prefer {@link AbstractCharSequenceAssert#isEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsEmpty {
     @BeforeTemplate
-    void before(CharSequence charSequence) {
+    void before(CharSequence actual) {
       Refaster.anyOf(
-          assertThat(charSequence.isEmpty()).isTrue(),
-          assertThat(charSequence.length()).isEqualTo(0L),
-          assertThat(charSequence.length()).isNotPositive());
+          assertThat(actual.isEmpty()).isTrue(),
+          assertThat(actual.length()).isEqualTo(0L),
+          assertThat(actual.length()).isNotPositive());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(CharSequence charSequence) {
-      assertThat(charSequence).isEmpty();
+    void after(CharSequence actual) {
+      assertThat(actual).isEmpty();
     }
   }
 
-  static final class AssertThatCharSequenceIsNotEmpty {
+  /** Prefer {@link AbstractCharSequenceAssert#isNotEmpty()} over more contrived alternatives. */
+  static final class AssertThatIsNotEmpty {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(CharSequence charSequence) {
+    AbstractAssert<?, ?> before(CharSequence actual) {
       return Refaster.anyOf(
-          assertThat(charSequence.isEmpty()).isFalse(),
-          assertThat(charSequence.length()).isNotEqualTo(0),
-          assertThat(charSequence.length()).isPositive());
+          assertThat(actual.isEmpty()).isFalse(),
+          assertThat(actual.length()).isNotEqualTo(0),
+          assertThat(actual.length()).isPositive());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(CharSequence charSequence) {
-      return assertThat(charSequence).isNotEmpty();
+    AbstractCharSequenceAssert<?, ? extends CharSequence> after(CharSequence actual) {
+      return assertThat(actual).isNotEmpty();
     }
   }
 
-  static final class AssertThatCharSequenceHasSize {
+  /** Prefer {@link AbstractCharSequenceAssert#hasSize(int)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
+  static final class AssertThatHasSize {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(CharSequence charSequence, int length) {
-      return assertThat(charSequence.length()).isEqualTo(length);
+    AbstractIntegerAssert<?> before(CharSequence actual, int expected) {
+      return assertThat(actual.length()).isEqualTo(expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractAssert<?, ?> after(CharSequence charSequence, int length) {
-      return assertThat(charSequence).hasSize(length);
+    AbstractCharSequenceAssert<?, ? extends CharSequence> after(CharSequence actual, int expected) {
+      return assertThat(actual).hasSize(expected);
     }
   }
 }

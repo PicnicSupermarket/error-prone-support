@@ -15,17 +15,20 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitRules {
   private JUnitRules() {}
 
-  /** Prefer statically imported {@link Arguments#arguments} over {@link Arguments#of} calls. */
+  /** Prefer {@link Arguments#arguments} over less idiomatic alternatives. */
+  // XXX: Update `RefasterRuleName` so that this suppression can be dropped.
+  @SuppressWarnings(
+      "RefasterRuleName" /* Derived name `Arguments` clashes with the imported type. */)
   static final class ArgumentsEnumeration<T> {
     @BeforeTemplate
-    Arguments before(@Repeated T objects) {
-      return Arguments.of(objects);
+    Arguments before(@Repeated T arguments) {
+      return Arguments.of(arguments);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Arguments after(@Repeated T objects) {
-      return arguments(objects);
+    Arguments after(@Repeated T arguments) {
+      return arguments(arguments);
     }
   }
 }

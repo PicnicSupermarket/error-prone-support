@@ -16,11 +16,11 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.io.IOException;
-import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.assertj.core.api.ThrowableAssertAlternative;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /**
  * Refaster rules related to AssertJ assertions over expressions that may throw a {@link Throwable}
@@ -35,742 +35,964 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJThrowingCallableRules {
   private AssertJThrowingCallableRules() {}
 
+  /**
+   * Prefer {@link org.assertj.core.api.AbstractAssert#isInstanceOf} over more contrived
+   * alternatives.
+   */
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(ThrowingCallable throwingCallable, Class<T> exceptionType) {
+    void before(ThrowingCallable shouldRaiseThrowable, Class<T> type) {
       Refaster.anyOf(
-          assertThatThrownBy(throwingCallable).asInstanceOf(throwable(exceptionType)),
-          assertThatThrownBy(throwingCallable).asInstanceOf(type(exceptionType)));
+          assertThatThrownBy(shouldRaiseThrowable).asInstanceOf(throwable(type)),
+          assertThatThrownBy(shouldRaiseThrowable).asInstanceOf(type(type)));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(ThrowingCallable throwingCallable, Class<T> exceptionType) {
-      assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType);
+    void after(ThrowingCallable shouldRaiseThrowable, Class<T> type) {
+      assertThatThrownBy(shouldRaiseThrowable).isInstanceOf(type);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentException {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
-      return assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable shouldRaiseThrowable) {
+      return assertThatIllegalArgumentException().isThrownBy(shouldRaiseThrowable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable) {
-      return assertThatThrownBy(throwingCallable).isInstanceOf(IllegalArgumentException.class);
+    AbstractThrowableAssert<?, ? extends Throwable> after(ThrowingCallable shouldRaiseThrowable) {
+      return assertThatThrownBy(shouldRaiseThrowable).isInstanceOf(IllegalArgumentException.class);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatIllegalArgumentException().isThrownBy(throwingCallable).withMessage(message);
+        "AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatIllegalArgumentException()
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionRootCauseHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<?> before(ThrowingCallable shouldRaiseThrowable, String message) {
       return assertThatIllegalArgumentException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .havingRootCause()
           .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ?> after(ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalArgumentException.class)
           .rootCause()
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageParameters {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageVarargs {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+        "AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
       return assertThatIllegalArgumentException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .withMessage(message, parameters);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessage(message, parameters);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
       return assertThatIllegalArgumentException()
-          .isThrownBy(throwingCallable)
-          .withMessageStartingWith(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageStartingWith(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageStartingWith(message);
+          .hasMessageStartingWith(description);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
       return assertThatIllegalArgumentException()
-          .isThrownBy(throwingCallable)
-          .withMessageContaining(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageContaining(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining(message);
+          .hasMessageContaining(description);
     }
   }
 
-  static final class AssertThatThrownByIllegalArgumentExceptionHasMessageNotContainingAny {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageNotContainingAny {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalArgumentException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable, @Repeated CharSequence values) {
+        "AssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalArgumentException> before(
+        ThrowingCallable shouldRaiseThrowable, @Repeated CharSequence values) {
       return assertThatIllegalArgumentException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .withMessageNotContainingAny(values);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable, @Repeated CharSequence values) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, @Repeated CharSequence values) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageNotContainingAny(values);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateException {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalStateExceptionClass {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
-      return assertThatIllegalStateException().isThrownBy(throwingCallable);
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable shouldRaiseThrowable) {
+      return assertThatIllegalStateException().isThrownBy(shouldRaiseThrowable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable) {
-      return assertThatThrownBy(throwingCallable).isInstanceOf(IllegalStateException.class);
+    AbstractThrowableAssert<?, ? extends Throwable> after(ThrowingCallable shouldRaiseThrowable) {
+      return assertThatThrownBy(shouldRaiseThrowable).isInstanceOf(IllegalStateException.class);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatIllegalStateException().isThrownBy(throwingCallable).withMessage(message);
+        "AssertThatThrownByIsInstanceOfIllegalStateExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatIllegalStateException()
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalStateException.class)
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionRootCauseHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalStateExceptionClassRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalStateExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<?> before(ThrowingCallable shouldRaiseThrowable, String message) {
       return assertThatIllegalStateException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .havingRootCause()
           .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ?> after(ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalStateException.class)
           .rootCause()
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionHasMessageParameters {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageVarargs {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+        "AssertThatThrownByIsInstanceOfIllegalStateExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
       return assertThatIllegalStateException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .withMessage(message, parameters);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalStateException.class)
           .hasMessage(message, parameters);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionHasMessageStartingWith {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalStateExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
       return assertThatIllegalStateException()
-          .isThrownBy(throwingCallable)
-          .withMessageStartingWith(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageStartingWith(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalStateException.class)
-          .hasMessageStartingWith(message);
+          .hasMessageStartingWith(description);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionHasMessageContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalStateExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
       return assertThatIllegalStateException()
-          .isThrownBy(throwingCallable)
-          .withMessageContaining(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageContaining(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalStateException.class)
-          .hasMessageContaining(message);
+          .hasMessageContaining(description);
     }
   }
 
-  static final class AssertThatThrownByIllegalStateExceptionHasMessageNotContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByIllegalStateException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfIllegalStateExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IllegalStateException> before(
+        ThrowingCallable shouldRaiseThrowable, String content) {
       return assertThatIllegalStateException()
-          .isThrownBy(throwingCallable)
-          .withMessageNotContaining(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageNotContaining(content);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String content) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IllegalStateException.class)
-          .hasMessageNotContaining(message);
+          .hasMessageNotContaining(content);
     }
   }
 
-  static final class AssertThatThrownByNullPointerException {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfNullPointerExceptionClass {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
-      return assertThatNullPointerException().isThrownBy(throwingCallable);
+    ThrowableAssertAlternative<NullPointerException> before(ThrowingCallable shouldRaiseThrowable) {
+      return assertThatNullPointerException().isThrownBy(shouldRaiseThrowable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable) {
-      return assertThatThrownBy(throwingCallable).isInstanceOf(NullPointerException.class);
+    AbstractThrowableAssert<?, ? extends Throwable> after(ThrowingCallable shouldRaiseThrowable) {
+      return assertThatThrownBy(shouldRaiseThrowable).isInstanceOf(NullPointerException.class);
     }
   }
 
-  static final class AssertThatThrownByNullPointerExceptionHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatNullPointerException().isThrownBy(throwingCallable).withMessage(message);
+        "AssertThatThrownByIsInstanceOfNullPointerExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatNullPointerException().isThrownBy(shouldRaiseThrowable).withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(NullPointerException.class)
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByNullPointerExceptionRootCauseHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfNullPointerExceptionClassRootCauseHasMessage {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfNullPointerExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<?> before(ThrowingCallable shouldRaiseThrowable, String message) {
       return assertThatNullPointerException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .havingRootCause()
           .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ?> after(ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(NullPointerException.class)
           .rootCause()
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByNullPointerExceptionHasMessageParameters {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageVarargs {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
+        "AssertThatThrownByIsInstanceOfNullPointerExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
       return assertThatNullPointerException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .withMessage(message, parameters);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(NullPointerException.class)
           .hasMessage(message, parameters);
     }
   }
 
-  static final class AssertThatThrownByNullPointerExceptionHasMessageStartingWith {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageStartingWith {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfNullPointerExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
       return assertThatNullPointerException()
-          .isThrownBy(throwingCallable)
-          .withMessageStartingWith(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageStartingWith(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(NullPointerException.class)
-          .hasMessageStartingWith(message);
+          .hasMessageStartingWith(description);
     }
   }
 
-  static final class AssertThatThrownByNullPointerExceptionHasMessageContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfNullPointerExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
       return assertThatNullPointerException()
-          .isThrownBy(throwingCallable)
-          .withMessageContaining(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageContaining(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(NullPointerException.class)
-          .hasMessageContaining(message);
+          .hasMessageContaining(description);
     }
   }
 
-  static final class AssertThatThrownByNullPointerExceptionHasMessageNotContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final
+  class AssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageNotContaining {
     @BeforeTemplate
     @SuppressWarnings(
-        "AssertThatThrownByNullPointerException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+        "AssertThatThrownByIsInstanceOfNullPointerExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<NullPointerException> before(
+        ThrowingCallable shouldRaiseThrowable, String content) {
       return assertThatNullPointerException()
-          .isThrownBy(throwingCallable)
-          .withMessageNotContaining(message);
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageNotContaining(content);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String content) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(NullPointerException.class)
-          .hasMessageNotContaining(message);
+          .hasMessageNotContaining(content);
     }
   }
 
-  static final class AssertThatThrownByIOException {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClass {
     @BeforeTemplate
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable) {
-      return assertThatIOException().isThrownBy(throwingCallable);
+    ThrowableAssertAlternative<IOException> before(ThrowingCallable shouldRaiseThrowable) {
+      return assertThatIOException().isThrownBy(shouldRaiseThrowable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable) {
-      return assertThatThrownBy(throwingCallable).isInstanceOf(IOException.class);
+    AbstractThrowableAssert<?, ? extends Throwable> after(ThrowingCallable shouldRaiseThrowable) {
+      return assertThatThrownBy(shouldRaiseThrowable).isInstanceOf(IOException.class);
     }
   }
 
-  static final class AssertThatThrownByIOExceptionHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClassHasMessage {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatIOException().isThrownBy(throwingCallable).withMessage(message);
+    @SuppressWarnings(
+        "AssertThatThrownByIsInstanceOfIOExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatIOException().isThrownBy(shouldRaiseThrowable).withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IOException.class)
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByIOExceptionRootCauseHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClassRootCauseHasMessage {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
+    @SuppressWarnings(
+        "AssertThatThrownByIsInstanceOfIOExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<?> before(ThrowingCallable shouldRaiseThrowable, String message) {
       return assertThatIOException()
-          .isThrownBy(throwingCallable)
+          .isThrownBy(shouldRaiseThrowable)
           .havingRootCause()
           .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ?> after(ThrowingCallable shouldRaiseThrowable, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IOException.class)
           .rootCause()
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByIOExceptionHasMessageParameters {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClassHasMessageVarargs {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
-      return assertThatIOException().isThrownBy(throwingCallable).withMessage(message, parameters);
+    @SuppressWarnings(
+        "AssertThatThrownByIsInstanceOfIOExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
+      return assertThatIOException()
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessage(message, parameters);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable, String message, @Repeated Object parameters) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String message, @Repeated Object parameters) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IOException.class)
           .hasMessage(message, parameters);
     }
   }
 
-  static final class AssertThatThrownByIOExceptionHasMessageStartingWith {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClassHasMessageStartingWith {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatIOException().isThrownBy(throwingCallable).withMessageStartingWith(message);
+    @SuppressWarnings(
+        "AssertThatThrownByIsInstanceOfIOExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatIOException()
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageStartingWith(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IOException.class)
-          .hasMessageStartingWith(message);
+          .hasMessageStartingWith(description);
     }
   }
 
-  static final class AssertThatThrownByIOExceptionHasMessageContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClassHasMessageContaining {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatIOException().isThrownBy(throwingCallable).withMessageContaining(message);
+    @SuppressWarnings(
+        "AssertThatThrownByIsInstanceOfIOExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatIOException()
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageContaining(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IOException.class)
-          .hasMessageContaining(message);
+          .hasMessageContaining(description);
     }
   }
 
-  static final class AssertThatThrownByIOExceptionHasMessageNotContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfIOExceptionClassHasMessageNotContaining {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatThrownByIOException" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(ThrowingCallable throwingCallable, String message) {
-      return assertThatIOException().isThrownBy(throwingCallable).withMessageNotContaining(message);
+    @SuppressWarnings(
+        "AssertThatThrownByIsInstanceOfIOExceptionClass" /* This is a more specific template. */)
+    ThrowableAssertAlternative<IOException> before(
+        ThrowingCallable shouldRaiseThrowable, String content) {
+      return assertThatIOException()
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageNotContaining(content);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(ThrowingCallable throwingCallable, String message) {
-      return assertThatThrownBy(throwingCallable)
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, String content) {
+      return assertThatThrownBy(shouldRaiseThrowable)
           .isInstanceOf(IOException.class)
-          .hasMessageNotContaining(message);
+          .hasMessageNotContaining(content);
     }
   }
 
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByAsInstanceOfThrowable<T extends Throwable> {
     @BeforeTemplate
+    ThrowableAssertAlternative<T> before(ThrowingCallable shouldRaiseThrowable, Class<T> type) {
+      return assertThatExceptionOfType(type).isThrownBy(shouldRaiseThrowable);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractThrowableAssert<?, T> after(ThrowingCallable shouldRaiseThrowable, Class<T> type) {
+      return assertThatThrownBy(shouldRaiseThrowable).asInstanceOf(throwable(type));
+    }
+  }
+
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfHasMessage<T extends Throwable> {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
     ThrowableAssertAlternative<T> before(
-        ThrowingCallable throwingCallable, Class<T> exceptionType) {
-      return assertThatExceptionOfType(exceptionType).isThrownBy(throwingCallable);
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String message) {
+      return assertThatExceptionOfType(type).isThrownBy(shouldRaiseThrowable).withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractThrowableAssert<?, T> after(ThrowingCallable throwingCallable, Class<T> exceptionType) {
-      return assertThatThrownBy(throwingCallable).asInstanceOf(throwable(exceptionType));
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable).isInstanceOf(type).hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByHasMessage {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfRootCauseHasMessage<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatExceptionOfType(exceptionType)
-          .isThrownBy(throwingCallable)
-          .withMessage(message);
-    }
-
-    @AfterTemplate
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatThrownBy(throwingCallable).isInstanceOf(exceptionType).hasMessage(message);
-    }
-  }
-
-  static final class AssertThatThrownByRootCauseHasMessage {
-    @BeforeTemplate
-    @SuppressWarnings(
-        "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatExceptionOfType(exceptionType)
-          .isThrownBy(throwingCallable)
+    ThrowableAssertAlternative<?> before(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String message) {
+      return assertThatExceptionOfType(type)
+          .isThrownBy(shouldRaiseThrowable)
           .havingRootCause()
           .withMessage(message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatThrownBy(throwingCallable)
-          .isInstanceOf(exceptionType)
+    AbstractThrowableAssert<?, ?> after(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String message) {
+      return assertThatThrownBy(shouldRaiseThrowable)
+          .isInstanceOf(type)
           .rootCause()
           .hasMessage(message);
     }
   }
 
-  static final class AssertThatThrownByHasMessageParameters {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfHasMessageVarargs<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
+    ThrowableAssertAlternative<T> before(
+        ThrowingCallable shouldRaiseThrowable,
+        Class<T> type,
         String message,
         @Repeated Object parameters) {
-      return assertThatExceptionOfType(exceptionType)
-          .isThrownBy(throwingCallable)
+      return assertThatExceptionOfType(type)
+          .isThrownBy(shouldRaiseThrowable)
           .withMessage(message, parameters);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable,
+        Class<T> type,
         String message,
         @Repeated Object parameters) {
-      return assertThatThrownBy(throwingCallable)
-          .isInstanceOf(exceptionType)
+      return assertThatThrownBy(shouldRaiseThrowable)
+          .isInstanceOf(type)
           .hasMessage(message, parameters);
     }
   }
 
-  static final class AssertThatThrownByHasMessageStartingWith {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfHasMessageStartingWith<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatExceptionOfType(exceptionType)
-          .isThrownBy(throwingCallable)
-          .withMessageStartingWith(message);
+    ThrowableAssertAlternative<T> before(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String description) {
+      return assertThatExceptionOfType(type)
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageStartingWith(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatThrownBy(throwingCallable)
-          .isInstanceOf(exceptionType)
-          .hasMessageStartingWith(message);
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
+          .isInstanceOf(type)
+          .hasMessageStartingWith(description);
     }
   }
 
-  static final class AssertThatThrownByHasMessageContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfHasMessageContaining<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatExceptionOfType(exceptionType)
-          .isThrownBy(throwingCallable)
-          .withMessageContaining(message);
+    ThrowableAssertAlternative<T> before(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String description) {
+      return assertThatExceptionOfType(type)
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageContaining(description);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatThrownBy(throwingCallable)
-          .isInstanceOf(exceptionType)
-          .hasMessageContaining(message);
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String description) {
+      return assertThatThrownBy(shouldRaiseThrowable)
+          .isInstanceOf(type)
+          .hasMessageContaining(description);
     }
   }
 
-  static final class AssertThatThrownByHasMessageNotContaining {
+  /**
+   * Prefer {@link org.assertj.core.api.Assertions#assertThatThrownBy} over less idiomatic
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
+  static final class AssertThatThrownByIsInstanceOfHasMessageNotContaining<T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    AbstractObjectAssert<?, ?> before(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatExceptionOfType(exceptionType)
-          .isThrownBy(throwingCallable)
-          .withMessageNotContaining(message);
+    ThrowableAssertAlternative<T> before(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String content) {
+      return assertThatExceptionOfType(type)
+          .isThrownBy(shouldRaiseThrowable)
+          .withMessageNotContaining(content);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, ?> after(
-        ThrowingCallable throwingCallable,
-        Class<? extends Throwable> exceptionType,
-        String message) {
-      return assertThatThrownBy(throwingCallable)
-          .isInstanceOf(exceptionType)
-          .hasMessageNotContaining(message);
+    AbstractThrowableAssert<?, ? extends Throwable> after(
+        ThrowingCallable shouldRaiseThrowable, Class<T> type, String content) {
+      return assertThatThrownBy(shouldRaiseThrowable)
+          .isInstanceOf(type)
+          .hasMessageNotContaining(content);
     }
   }
 
+  /**
+   * Prefer {@link AbstractThrowableAssert#hasMessage(String, Object...)} over less efficient
+   * alternatives.
+   */
   // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
   // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertHasMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
         String message,
         @Repeated Object parameters) {
-      return abstractThrowableAssert.hasMessage(message.formatted(parameters));
+      return throwableAssert.hasMessage(message.formatted(parameters));
     }
 
     @AfterTemplate
     AbstractThrowableAssert<?, ? extends Throwable> after(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
         String message,
         @Repeated Object parameters) {
-      return abstractThrowableAssert.hasMessage(message, parameters);
+      return throwableAssert.hasMessage(message, parameters);
     }
   }
 
+  /**
+   * Prefer {@link AbstractThrowableAssert#withFailMessage(String, Object...)} over less efficient
+   * alternatives.
+   */
   // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
   // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertWithFailMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
-        String message,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
+        String newErrorMessage,
         @Repeated Object args) {
-      return abstractThrowableAssert.withFailMessage(message.formatted(args));
+      return throwableAssert.withFailMessage(newErrorMessage.formatted(args));
     }
 
     @AfterTemplate
     AbstractThrowableAssert<?, ? extends Throwable> after(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
-        String message,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
+        String newErrorMessage,
         @Repeated Object args) {
-      return abstractThrowableAssert.withFailMessage(message, args);
+      return throwableAssert.withFailMessage(newErrorMessage, args);
     }
   }
 
+  /** Prefer {@code throwableAssert.cause().isSameAs(expected)} over deprecated alternatives. */
   // XXX: This rule changes the `Throwable` against which subsequent assertions are made.
   static final class AbstractThrowableAssertCauseIsSameAs {
     @BeforeTemplate
-    @SuppressWarnings("deprecation" /* This deprecated API will be rewritten. */)
+    @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
     AbstractThrowableAssert<?, ? extends Throwable> before(
         AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
       return throwableAssert.hasCauseReference(expected);
     }
 
     @AfterTemplate
-    AbstractThrowableAssert<?, ? extends Throwable> after(
+    AbstractThrowableAssert<?, ?> after(
         AbstractThrowableAssert<?, ? extends Throwable> throwableAssert, Throwable expected) {
       return throwableAssert.cause().isSameAs(expected);
     }

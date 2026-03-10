@@ -22,63 +22,63 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class PrimitiveRules {
   private PrimitiveRules() {}
 
-  /** Avoid contrived ways of expressing the "less than" relationship. */
+  /** Prefer {@code a < b} over less explicit alternatives. */
   static final class LessThan {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a >= b);
+    boolean before(double d1, double d2) {
+      return !(d1 >= d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a < b;
+    boolean after(double d1, double d2) {
+      return d1 < d2;
     }
   }
 
-  /** Avoid contrived ways of expressing the "less than or equal to" relationship. */
+  /** Prefer {@code a <= b} over less explicit alternatives. */
   static final class LessThanOrEqualTo {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a > b);
+    boolean before(double d1, double d2) {
+      return !(d1 > d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a <= b;
+    boolean after(double d1, double d2) {
+      return d1 <= d2;
     }
   }
 
-  /** Avoid contrived ways of expressing the "greater than" relationship. */
+  /** Prefer {@code a > b} over less explicit alternatives. */
   static final class GreaterThan {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a <= b);
+    boolean before(double d1, double d2) {
+      return !(d1 <= d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a > b;
+    boolean after(double d1, double d2) {
+      return d1 > d2;
     }
   }
 
-  /** Avoid contrived ways of expressing the "greater than or equal to" relationship. */
+  /** Prefer {@code a >= b} over less explicit alternatives. */
   static final class GreaterThanOrEqualTo {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a < b);
+    boolean before(double d1, double d2) {
+      return !(d1 < d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a >= b;
+    boolean after(double d1, double d2) {
+      return d1 >= d2;
     }
   }
 
-  /** Prefer {@link Math#clamp(long, int, int)} over more verbose alternatives. */
+  /** Prefer {@link Math#clamp(long, int, int)} over non-JDK or more verbose alternatives. */
   static final class MathClampInt {
     // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
@@ -100,7 +100,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Math#clamp(long, long, long)} over more verbose alternatives. */
+  /** Prefer {@link Math#clamp(long, long, long)} over non-JDK or more verbose alternatives. */
   static final class MathClampLong {
     // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
@@ -122,7 +122,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Math#clamp(float, float, float)} over more verbose alternatives. */
+  /** Prefer {@link Math#clamp(float, float, float)} over non-JDK or more verbose alternatives. */
   static final class MathClampFloat {
     // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
@@ -144,7 +144,9 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Math#clamp(double, double, double)} over more verbose alternatives. */
+  /**
+   * Prefer {@link Math#clamp(double, double, double)} over non-JDK or more verbose alternatives.
+   */
   static final class MathClampDouble {
     // XXX: The `Math.min`/`Math.max` patterns do not throw an `IllegalArgumentException` if `min >
     // max`, while the `Math.clamp` pattern does. This is considered an acceptable behavioral
@@ -166,22 +168,22 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Math#toIntExact(long)} over the Guava alternative. */
+  /** Prefer {@link Math#toIntExact(long)} over non-JDK alternatives. */
   // XXX: This rule changes the exception possibly thrown from `IllegalArgumentException` to
   // `ArithmeticException`.
-  static final class LongToIntExact {
+  static final class MathToIntExact {
     @BeforeTemplate
-    int before(long l) {
-      return Ints.checkedCast(l);
+    int before(long value) {
+      return Ints.checkedCast(value);
     }
 
     @AfterTemplate
-    int after(long l) {
-      return Math.toIntExact(l);
+    int after(long value) {
+      return Math.toIntExact(value);
     }
   }
 
-  /** Prefer {@link Character#BYTES} over the Guava alternative. */
+  /** Prefer {@link Character#BYTES} over non-JDK alternatives. */
   static final class CharacterBytes {
     @BeforeTemplate
     int before() {
@@ -194,7 +196,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Short#BYTES} over the Guava alternative. */
+  /** Prefer {@link Short#BYTES} over non-JDK alternatives. */
   static final class ShortBytes {
     @BeforeTemplate
     int before() {
@@ -207,7 +209,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Integer#BYTES} over the Guava alternative. */
+  /** Prefer {@link Integer#BYTES} over non-JDK alternatives. */
   static final class IntegerBytes {
     @BeforeTemplate
     int before() {
@@ -220,7 +222,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Long#BYTES} over the Guava alternative. */
+  /** Prefer {@link Long#BYTES} over non-JDK alternatives. */
   static final class LongBytes {
     @BeforeTemplate
     int before() {
@@ -233,7 +235,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Float#BYTES} over the Guava alternative. */
+  /** Prefer {@link Float#BYTES} over non-JDK alternatives. */
   static final class FloatBytes {
     @BeforeTemplate
     int before() {
@@ -246,7 +248,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer {@link Double#BYTES} over the Guava alternative. */
+  /** Prefer {@link Double#BYTES} over non-JDK alternatives. */
   static final class DoubleBytes {
     @BeforeTemplate
     int before() {
@@ -259,7 +261,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer an {@link Integer#signum(int)} comparison to 0 over less idiomatic alternatives. */
+  /** Prefer {@code Integer.signum(i) > 0} over less idiomatic alternatives. */
   static final class IntegerSignumIsPositive {
     @BeforeTemplate
     boolean before(int i) {
@@ -273,7 +275,7 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer an {@link Integer#signum(int)} comparison to 0 over less idiomatic alternatives. */
+  /** Prefer {@code Integer.signum(i) < 0} over less idiomatic alternatives. */
   static final class IntegerSignumIsNegative {
     @BeforeTemplate
     boolean before(int i) {
@@ -287,35 +289,35 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer an {@link Long#signum(long)} comparison to 0 over less idiomatic alternatives. */
+  /** Prefer {@code Long.signum(i) > 0} over less idiomatic alternatives. */
   static final class LongSignumIsPositive {
     @BeforeTemplate
-    boolean before(long l) {
-      return Refaster.anyOf(Long.signum(l) == 1, Long.signum(l) >= 1);
+    boolean before(long i) {
+      return Refaster.anyOf(Long.signum(i) == 1, Long.signum(i) >= 1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(long l) {
-      return Long.signum(l) > 0;
+    boolean after(long i) {
+      return Long.signum(i) > 0;
     }
   }
 
-  /** Prefer an {@link Long#signum(long)} comparison to 0 over less idiomatic alternatives. */
+  /** Prefer {@code Long.signum(i) < 0} over less idiomatic alternatives. */
   static final class LongSignumIsNegative {
     @BeforeTemplate
-    boolean before(long l) {
-      return Refaster.anyOf(Long.signum(l) == -1, Long.signum(l) <= -1);
+    boolean before(long i) {
+      return Refaster.anyOf(Long.signum(i) == -1, Long.signum(i) <= -1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(long l) {
-      return Long.signum(l) < 0;
+    boolean after(long i) {
+      return Long.signum(i) < 0;
     }
   }
 
-  /** Prefer JDK's {@link Integer#compareUnsigned(int, int)} over third-party alternatives. */
+  /** Prefer {@link Integer#compareUnsigned(int, int)} over non-JDK alternatives. */
   static final class IntegerCompareUnsigned {
     @BeforeTemplate
     int before(int x, int y) {
@@ -328,135 +330,124 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer JDK's {@link Long#compareUnsigned(long, long)} over third-party alternatives. */
+  /** Prefer {@link Long#compareUnsigned(long, long)} over non-JDK alternatives. */
   static final class LongCompareUnsigned {
     @BeforeTemplate
-    long before(long x, long y) {
+    int before(long x, long y) {
       return UnsignedLongs.compare(x, y);
     }
 
     @AfterTemplate
-    long after(long x, long y) {
+    int after(long x, long y) {
       return Long.compareUnsigned(x, y);
     }
   }
 
-  /** Prefer JDK's {@link Integer#divideUnsigned(int, int)} over third-party alternatives. */
+  /** Prefer {@link Integer#divideUnsigned(int, int)} over non-JDK alternatives. */
   static final class IntegerDivideUnsigned {
     @BeforeTemplate
-    int before(int x, int y) {
-      return UnsignedInts.divide(x, y);
+    int before(int dividend, int divisor) {
+      return UnsignedInts.divide(dividend, divisor);
     }
 
     @AfterTemplate
-    int after(int x, int y) {
-      return Integer.divideUnsigned(x, y);
+    int after(int dividend, int divisor) {
+      return Integer.divideUnsigned(dividend, divisor);
     }
   }
 
-  /** Prefer JDK's {@link Long#divideUnsigned(long, long)} over third-party alternatives. */
+  /** Prefer {@link Long#divideUnsigned(long, long)} over non-JDK alternatives. */
   static final class LongDivideUnsigned {
     @BeforeTemplate
-    long before(long x, long y) {
-      return UnsignedLongs.divide(x, y);
+    long before(long dividend, long divisor) {
+      return UnsignedLongs.divide(dividend, divisor);
     }
 
     @AfterTemplate
-    long after(long x, long y) {
-      return Long.divideUnsigned(x, y);
+    long after(long dividend, long divisor) {
+      return Long.divideUnsigned(dividend, divisor);
     }
   }
 
-  /** Prefer JDK's {@link Integer#remainderUnsigned(int, int)} over third-party alternatives. */
+  /** Prefer {@link Integer#remainderUnsigned(int, int)} over non-JDK alternatives. */
   static final class IntegerRemainderUnsigned {
     @BeforeTemplate
-    int before(int x, int y) {
-      return UnsignedInts.remainder(x, y);
+    int before(int dividend, int divisor) {
+      return UnsignedInts.remainder(dividend, divisor);
     }
 
     @AfterTemplate
-    int after(int x, int y) {
-      return Integer.remainderUnsigned(x, y);
+    int after(int dividend, int divisor) {
+      return Integer.remainderUnsigned(dividend, divisor);
     }
   }
 
-  /** Prefer JDK's {@link Long#remainderUnsigned(long, long)} over third-party alternatives. */
+  /** Prefer {@link Long#remainderUnsigned(long, long)} over non-JDK alternatives. */
   static final class LongRemainderUnsigned {
     @BeforeTemplate
-    long before(long x, long y) {
-      return UnsignedLongs.remainder(x, y);
+    long before(long dividend, long divisor) {
+      return UnsignedLongs.remainder(dividend, divisor);
     }
 
     @AfterTemplate
-    long after(long x, long y) {
-      return Long.remainderUnsigned(x, y);
+    long after(long dividend, long divisor) {
+      return Long.remainderUnsigned(dividend, divisor);
     }
   }
 
-  /**
-   * Prefer JDK's {@link Integer#parseUnsignedInt(String)} over third-party or more verbose
-   * alternatives.
-   */
+  /** Prefer {@link Integer#parseUnsignedInt(String)} over non-JDK or more verbose alternatives. */
   static final class IntegerParseUnsignedInt {
     @BeforeTemplate
-    int before(String string) {
-      return Refaster.anyOf(
-          UnsignedInts.parseUnsignedInt(string), Integer.parseUnsignedInt(string, 10));
+    int before(String s) {
+      return Refaster.anyOf(UnsignedInts.parseUnsignedInt(s), Integer.parseUnsignedInt(s, 10));
     }
 
     @AfterTemplate
-    int after(String string) {
-      return Integer.parseUnsignedInt(string);
+    int after(String s) {
+      return Integer.parseUnsignedInt(s);
     }
   }
 
-  /**
-   * Prefer JDK's {@link Long#parseUnsignedLong(String)} over third-party or more verbose
-   * alternatives.
-   */
+  /** Prefer {@link Long#parseUnsignedLong(String)} over non-JDK or more verbose alternatives. */
   static final class LongParseUnsignedLong {
     @BeforeTemplate
-    long before(String string) {
-      return Refaster.anyOf(
-          UnsignedLongs.parseUnsignedLong(string), Long.parseUnsignedLong(string, 10));
+    long before(String s) {
+      return Refaster.anyOf(UnsignedLongs.parseUnsignedLong(s), Long.parseUnsignedLong(s, 10));
     }
 
     @AfterTemplate
-    long after(String string) {
-      return Long.parseUnsignedLong(string);
+    long after(String s) {
+      return Long.parseUnsignedLong(s);
     }
   }
 
-  /** Prefer JDK's {@link Integer#parseUnsignedInt(String, int)} over third-party alternatives. */
-  static final class IntegerParseUnsignedIntWithRadix {
+  /** Prefer {@link Integer#parseUnsignedInt(String, int)} over non-JDK alternatives. */
+  static final class IntegerParseUnsignedIntWithInt {
     @BeforeTemplate
-    int before(String string, int radix) {
-      return UnsignedInts.parseUnsignedInt(string, radix);
+    int before(String s, int radix) {
+      return UnsignedInts.parseUnsignedInt(s, radix);
     }
 
     @AfterTemplate
-    int after(String string, int radix) {
-      return Integer.parseUnsignedInt(string, radix);
+    int after(String s, int radix) {
+      return Integer.parseUnsignedInt(s, radix);
     }
   }
 
-  /** Prefer JDK's {@link Long#parseUnsignedLong(String, int)} over third-party alternatives. */
-  static final class LongParseUnsignedLongWithRadix {
+  /** Prefer {@link Long#parseUnsignedLong(String, int)} over non-JDK alternatives. */
+  static final class LongParseUnsignedLongWithInt {
     @BeforeTemplate
-    long before(String string, int radix) {
-      return UnsignedLongs.parseUnsignedLong(string, radix);
+    long before(String s, int radix) {
+      return UnsignedLongs.parseUnsignedLong(s, radix);
     }
 
     @AfterTemplate
-    long after(String string, int radix) {
-      return Long.parseUnsignedLong(string, radix);
+    long after(String s, int radix) {
+      return Long.parseUnsignedLong(s, radix);
     }
   }
 
-  /**
-   * Prefer JDK's {@link Integer#toUnsignedString(int)} over third-party or more verbose
-   * alternatives.
-   */
+  /** Prefer {@link Integer#toUnsignedString(int)} over non-JDK or more verbose alternatives. */
   static final class IntegerToUnsignedString {
     @BeforeTemplate
     String before(int i) {
@@ -469,9 +460,7 @@ final class PrimitiveRules {
     }
   }
 
-  /**
-   * Prefer JDK's {@link Long#toUnsignedString(long)} over third-party or more verbose alternatives.
-   */
+  /** Prefer {@link Long#toUnsignedString(long)} over non-JDK or more verbose alternatives. */
   static final class LongToUnsignedString {
     @BeforeTemplate
     String before(long i) {
@@ -484,8 +473,8 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer JDK's {@link Integer#toUnsignedString(int,int)} over third-party alternatives. */
-  static final class IntegerToUnsignedStringWithRadix {
+  /** Prefer {@link Integer#toUnsignedString(int, int)} over non-JDK alternatives. */
+  static final class IntegerToUnsignedStringWithInt {
     @BeforeTemplate
     String before(int i, int radix) {
       return UnsignedInts.toString(i, radix);
@@ -497,8 +486,8 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer JDK's {@link Long#toUnsignedString(long,int)} over third-party alternatives. */
-  static final class LongToUnsignedStringWithRadix {
+  /** Prefer {@link Long#toUnsignedString(long, int)} over non-JDK alternatives. */
+  static final class LongToUnsignedStringWithInt {
     @BeforeTemplate
     String before(long i, int radix) {
       return UnsignedLongs.toString(i, radix);
@@ -510,10 +499,10 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer JDK's {@link Arrays#compareUnsigned(byte[], byte[])} over third-party alternatives. */
+  /** Prefer {@link Arrays#compareUnsigned(byte[], byte[])} over non-JDK alternatives. */
   // XXX: This rule will yield non-compilable code if the result of the replaced expression is
   // dereferenced. Investigate how to make this safe.
-  static final class ArraysCompareUnsignedBytes {
+  static final class ArraysCompareUnsignedByte {
     @BeforeTemplate
     Comparator<byte[]> before() {
       return UnsignedBytes.lexicographicalComparator();
@@ -525,10 +514,10 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer JDK's {@link Arrays#compareUnsigned(int[], int[])} over third-party alternatives. */
+  /** Prefer {@link Arrays#compareUnsigned(int[], int[])} over non-JDK alternatives. */
   // XXX: This rule will yield non-compilable code if the result of the replaced expression is
   // dereferenced. Investigate how to make this safe.
-  static final class ArraysCompareUnsignedInts {
+  static final class ArraysCompareUnsignedInt {
     @BeforeTemplate
     Comparator<int[]> before() {
       return UnsignedInts.lexicographicalComparator();
@@ -540,10 +529,10 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer JDK's {@link Arrays#compareUnsigned(long[], long[])} over third-party alternatives. */
+  /** Prefer {@link Arrays#compareUnsigned(long[], long[])} over non-JDK alternatives. */
   // XXX: This rule will yield non-compilable code if the result of the replaced expression is
   // dereferenced. Investigate how to make this safe.
-  static final class ArraysCompareUnsignedLongs {
+  static final class ArraysCompareUnsignedLong {
     @BeforeTemplate
     Comparator<long[]> before() {
       return UnsignedLongs.lexicographicalComparator();

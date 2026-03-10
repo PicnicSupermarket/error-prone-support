@@ -11,27 +11,32 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link Map} instances. */
 @OnlineDocumentation
 final class MapRules {
   private MapRules() {}
 
+  /** Prefer {@link EnumMap} over less efficient alternatives. */
   // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
   // not allow an empty non-EnumMap to be provided.
-  static final class CreateEnumMap<K extends Enum<K>, V> {
+  @PossibleSourceIncompatibility
+  @SuppressWarnings("NonApiType" /* Refaster templates declare the most specific return type. */)
+  static final class NewEnumMapClass<K extends Enum<K>, V> {
     @BeforeTemplate
-    Map<K, V> before() {
+    HashMap<K, V> before() {
       return new HashMap<>();
     }
 
     @AfterTemplate
-    Map<K, V> after() {
+    EnumMap<K, V> after() {
       return new EnumMap<>(Refaster.<K>clazz());
     }
   }
 
-  static final class MapGetOrNull<K, V, T> {
+  /** Prefer {@link Map#get(Object)} over more verbose alternatives. */
+  static final class MapGet<K, V, T> {
     @BeforeTemplate
     @Nullable V before(Map<K, V> map, T key) {
       return map.getOrDefault(key, null);
@@ -43,9 +48,13 @@ final class MapRules {
     }
   }
 
-  /** Prefer {@link Map#getOrDefault(Object, Object)} over more contrived alternatives. */
-  // XXX: Note that `requireNonNullElse` throws an NPE if the second argument is `null`, while the
-  // alternative does not.
+  /**
+   * Prefer {@link Map#getOrDefault(Object, Object)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if {@code defaultValue} is {@code
+   * null}: {@link java.util.Objects#requireNonNullElse} throws a {@link NullPointerException} in
+   * that case, while {@link Map#getOrDefault(Object, Object)} does not.
+   */
   static final class MapGetOrDefault<K, V, T> {
     @BeforeTemplate
     V before(Map<K, V> map, T key, V defaultValue) {
@@ -110,8 +119,8 @@ final class MapRules {
     }
   }
 
-  /** Don't unnecessarily use {@link Map#entrySet()}. */
-  static final class MapKeyStream<K, V> {
+  /** Prefer {@link Map#keySet()} over more contrived alternatives. */
+  static final class MapKeySetStream<K, V> {
     @BeforeTemplate
     Stream<K> before(Map<K, V> map) {
       return map.entrySet().stream().map(Map.Entry::getKey);
@@ -123,11 +132,12 @@ final class MapRules {
     }
   }
 
-  /** Don't unnecessarily use {@link Map#entrySet()}. */
-  static final class MapValueStream<K, V> {
+  /** Prefer {@link Map#values()} over more contrived alternatives. */
+  static final class MapValuesStream<K, V> {
     @BeforeTemplate
     Stream<V> before(Map<K, V> map) {
-      return map.entrySet().stream().map(Map.Entry::getValue);
+      return Refaster.anyOf(
+          map.keySet().stream().map(map::get), map.entrySet().stream().map(Map.Entry::getValue));
     }
 
     @AfterTemplate

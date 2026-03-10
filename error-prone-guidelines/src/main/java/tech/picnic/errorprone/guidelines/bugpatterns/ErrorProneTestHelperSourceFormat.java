@@ -45,7 +45,7 @@ import java.util.Optional;
  * are not able to) remove imports that become obsolete as a result of applying their suggested
  * fix(es).
  */
-// XXX: Once we target JDK 17 (optionally?) suggest text block fixes.
+// XXX: Suggest using text blocks.
 // XXX: GJF guesses the line separator to be used by inspecting the source. When using text blocks
 // this may cause the current unconditional use of `\n` not to be sufficient when building on
 // Windows; TBD.

@@ -9,143 +9,157 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractDurationAssert;
 import org.assertj.core.api.AbstractLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
-/**
- * Refaster rules related to AssertJ assertions over {@link Duration}s.
- *
- * <p>These rules simplify and improve the readability of tests by using {@link Duration}-specific
- * AssertJ assertion methods instead of generic assertions.
- */
+/** Refaster rules related to AssertJ assertions over {@link Duration}s. */
 @OnlineDocumentation
 final class AssertJDurationRules {
   private AssertJDurationRules() {}
 
+  /** Prefer {@link AbstractDurationAssert#hasNanos(long)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasNanos {
     @BeforeTemplate
-    AbstractLongAssert<?> before(Duration duration, long nanos) {
-      return assertThat(duration.toNanos()).isEqualTo(nanos);
+    AbstractLongAssert<?> before(Duration actual, long otherNanos) {
+      return assertThat(actual.toNanos()).isEqualTo(otherNanos);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration, long nanos) {
-      return assertThat(duration).hasNanos(nanos);
+    AbstractDurationAssert<?> after(Duration actual, long otherNanos) {
+      return assertThat(actual).hasNanos(otherNanos);
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#hasMillis(long)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasMillis {
     @BeforeTemplate
-    AbstractLongAssert<?> before(Duration duration, long millis) {
-      return assertThat(duration.toMillis()).isEqualTo(millis);
+    AbstractLongAssert<?> before(Duration actual, long otherMillis) {
+      return assertThat(actual.toMillis()).isEqualTo(otherMillis);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration, long millis) {
-      return assertThat(duration).hasMillis(millis);
+    AbstractDurationAssert<?> after(Duration actual, long otherMillis) {
+      return assertThat(actual).hasMillis(otherMillis);
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#hasSeconds(long)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasSeconds {
     @BeforeTemplate
-    AbstractLongAssert<?> before(Duration duration, long seconds) {
-      return assertThat(duration.toSeconds()).isEqualTo(seconds);
+    AbstractLongAssert<?> before(Duration actual, long otherSeconds) {
+      return assertThat(actual.toSeconds()).isEqualTo(otherSeconds);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration, long seconds) {
-      return assertThat(duration).hasSeconds(seconds);
+    AbstractDurationAssert<?> after(Duration actual, long otherSeconds) {
+      return assertThat(actual).hasSeconds(otherSeconds);
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#hasMinutes(long)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasMinutes {
     @BeforeTemplate
-    AbstractLongAssert<?> before(Duration duration, long minutes) {
-      return assertThat(duration.toMinutes()).isEqualTo(minutes);
+    AbstractLongAssert<?> before(Duration actual, long otherMinutes) {
+      return assertThat(actual.toMinutes()).isEqualTo(otherMinutes);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration, long minutes) {
-      return assertThat(duration).hasMinutes(minutes);
+    AbstractDurationAssert<?> after(Duration actual, long otherMinutes) {
+      return assertThat(actual).hasMinutes(otherMinutes);
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#hasHours(long)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasHours {
     @BeforeTemplate
-    AbstractLongAssert<?> before(Duration duration, long hours) {
-      return assertThat(duration.toHours()).isEqualTo(hours);
+    AbstractLongAssert<?> before(Duration actual, long otherHours) {
+      return assertThat(actual.toHours()).isEqualTo(otherHours);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration, long hours) {
-      return assertThat(duration).hasHours(hours);
+    AbstractDurationAssert<?> after(Duration actual, long otherHours) {
+      return assertThat(actual).hasHours(otherHours);
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#hasDays(long)} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatHasDays {
     @BeforeTemplate
-    AbstractLongAssert<?> before(Duration duration, long days) {
-      return assertThat(duration.toDays()).isEqualTo(days);
+    AbstractLongAssert<?> before(Duration actual, long otherDays) {
+      return assertThat(actual.toDays()).isEqualTo(otherDays);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration, long days) {
-      return assertThat(duration).hasDays(days);
+    AbstractDurationAssert<?> after(Duration actual, long otherDays) {
+      return assertThat(actual).hasDays(otherDays);
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#isZero()} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsZero {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Duration duration) {
-      return assertThat(duration.isZero()).isTrue();
+    AbstractBooleanAssert<?> before(Duration actual) {
+      return assertThat(actual.isZero()).isTrue();
     }
 
     // XXX: This method can be folded into the preceding method using `Refaster#anyOf`, but by
     // keeping it separate, we show that this rule, contrary to the other one, retains the correct
     // return type.
     @BeforeTemplate
-    AbstractDurationAssert<?> before2(Duration duration) {
-      return assertThat(duration).isEqualTo(Duration.ZERO);
+    AbstractDurationAssert<?> before2(Duration actual) {
+      return assertThat(actual).isEqualTo(Duration.ZERO);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration) {
-      return assertThat(duration).isZero();
+    AbstractDurationAssert<?> after(Duration actual) {
+      return assertThat(actual).isZero();
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#isPositive()} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsPositive {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Duration duration) {
-      return assertThat(duration.isPositive()).isTrue();
+    AbstractBooleanAssert<?> before(Duration actual) {
+      return assertThat(actual.isPositive()).isTrue();
     }
 
     @BeforeTemplate
-    AbstractDurationAssert<?> before2(Duration duration) {
-      return assertThat(duration).isGreaterThan(Duration.ZERO);
+    AbstractDurationAssert<?> before2(Duration actual) {
+      return assertThat(actual).isGreaterThan(Duration.ZERO);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration) {
-      return assertThat(duration).isPositive();
+    AbstractDurationAssert<?> after(Duration actual) {
+      return assertThat(actual).isPositive();
     }
   }
 
+  /** Prefer {@link AbstractDurationAssert#isNegative()} over less explicit alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNegative {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Duration duration) {
-      return assertThat(duration.isNegative()).isTrue();
+    AbstractBooleanAssert<?> before(Duration actual) {
+      return assertThat(actual.isNegative()).isTrue();
     }
 
     // XXX: This method can be folded into the preceding method using `Refaster#anyOf`, but by
     // keeping it separate, we show that this rule, contrary to the other one, retains the correct
     // return type.
     @BeforeTemplate
-    AbstractDurationAssert<?> before2(Duration duration) {
-      return assertThat(duration).isLessThan(Duration.ZERO);
+    AbstractDurationAssert<?> before2(Duration actual) {
+      return assertThat(actual).isLessThan(Duration.ZERO);
     }
 
     @AfterTemplate
-    AbstractDurationAssert<?> after(Duration duration) {
-      return assertThat(duration).isNegative();
+    AbstractDurationAssert<?> after(Duration actual) {
+      return assertThat(actual).isNegative();
     }
   }
 }

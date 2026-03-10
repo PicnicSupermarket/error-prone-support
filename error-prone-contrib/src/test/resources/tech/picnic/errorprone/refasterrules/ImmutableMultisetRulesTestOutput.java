@@ -20,24 +20,23 @@ final class ImmutableMultisetRulesTest implements RefasterRuleCollectionTestCase
     return ImmutableMultiset.builder();
   }
 
-  ImmutableMultiset<ImmutableMultiset<Integer>> testEmptyImmutableMultiset() {
-    return ImmutableMultiset.of(ImmutableMultiset.of(), ImmutableMultiset.of());
+  ImmutableSet<ImmutableMultiset<Integer>> testImmutableMultisetOf() {
+    return ImmutableSet.of(ImmutableMultiset.of(), ImmutableMultiset.of());
   }
 
-  @SuppressWarnings("unchecked")
-  ImmutableMultiset<ImmutableMultiset<Integer>> testIterableToImmutableMultiset() {
-    return ImmutableMultiset.of(
-        ImmutableMultiset.copyOf(ImmutableList.of(1)),
-        ImmutableMultiset.copyOf(ImmutableList.of(2)::iterator),
-        ImmutableMultiset.copyOf(ImmutableList.of(3).iterator()),
-        ImmutableMultiset.copyOf(ImmutableMultiset.of(4)),
-        ImmutableMultiset.copyOf(ImmutableMultiset.of(5)::iterator),
-        ImmutableMultiset.copyOf(ImmutableMultiset.of(6).iterator()),
-        ImmutableMultiset.copyOf(new Integer[] {7}),
-        ImmutableMultiset.copyOf(new Integer[] {8}));
+  @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+  ImmutableSet<ImmutableMultiset<Integer>> testImmutableMultisetCopyOf() {
+    return ImmutableSet.of(
+        ImmutableMultiset.copyOf(new Integer[] {1}),
+        ImmutableMultiset.copyOf(new Integer[] {2}),
+        ImmutableMultiset.copyOf(ImmutableMultiset.of(3).iterator()),
+        ImmutableMultiset.copyOf(ImmutableList.of(4).iterator()),
+        ImmutableMultiset.copyOf(ImmutableMultiset.of(5)),
+        ImmutableMultiset.copyOf(ImmutableList.of(6)::iterator),
+        ImmutableMultiset.copyOf(ImmutableList.of(7)));
   }
 
-  ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
+  ImmutableMultiset<Integer> testStreamCollectToImmutableMultiset() {
     return Stream.of(1).collect(toImmutableMultiset());
   }
 }

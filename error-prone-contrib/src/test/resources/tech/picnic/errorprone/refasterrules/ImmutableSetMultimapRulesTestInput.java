@@ -25,49 +25,50 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
     return new ImmutableSetMultimap.Builder<>();
   }
 
-  ImmutableSetMultimap<String, Integer> testEmptyImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf0() {
     return ImmutableSetMultimap.<String, Integer>builder().build();
   }
 
-  ImmutableSetMultimap<String, Integer> testPairToImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf2() {
     return ImmutableSetMultimap.<String, Integer>builder().put("foo", 1).build();
   }
 
-  ImmutableSet<ImmutableSetMultimap<String, Integer>> testEntryToImmutableSetMultimap() {
+  ImmutableSet<ImmutableSetMultimap<String, Integer>>
+      testImmutableSetMultimapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(
         ImmutableSetMultimap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
-        Stream.of(Map.entry("foo", 1))
+        Stream.of(Map.entry("bar", 2))
             .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableSet<ImmutableSetMultimap<String, Integer>> testIterableToImmutableSetMultimap() {
+  ImmutableSet<ImmutableSetMultimap<String, Integer>> testImmutableSetMultimapCopyOf() {
     return ImmutableSet.of(
         ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
         ImmutableSetMultimap.<String, Integer>builder()
-            .putAll(ImmutableSetMultimap.of("foo", 1))
+            .putAll(ImmutableSetMultimap.of("bar", 2))
             .build(),
         ImmutableSetMultimap.<String, Integer>builder()
-            .putAll(ImmutableSetMultimap.of("foo", 1).entries())
+            .putAll(ImmutableSetMultimap.of("baz", 3).entries())
             .build(),
-        ImmutableSetMultimap.of("foo", 1).entries().stream()
+        Streams.stream(Iterables.cycle(Map.entry("quux", 5)))
             .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-        Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
+        ImmutableSetMultimap.of("qux", 4).entries().stream()
             .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableSetMultimap<Integer, String> testStreamOfMapEntriesToImmutableSetMultimap() {
+  ImmutableSetMultimap<Integer, String> testStreamCollectToImmutableSetMultimap() {
     return Stream.of(1, 2, 3)
         .map(n -> Map.entry(n, n.toString()))
         .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfMultimapsTransformValues() {
     return ImmutableSetMultimap.of("foo", 1L).entries().stream()
         .collect(toImmutableSetMultimap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue())));
   }
 
   ImmutableSet<ImmutableSetMultimap<String, Integer>>
-      testTransformMultimapValuesToImmutableSetMultimap2() {
+      testImmutableSetMultimapCopyOfMultimapsTransformValuesWithFunction() {
     return ImmutableSet.of(
         ImmutableSetMultimap.of("foo", 1L).asMap().entrySet().stream()
             .collect(
@@ -93,7 +94,7 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
 
-  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testImmutableSetMultimapBuilderPut() {
+  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableSetMultimap.<String, Integer>builder().put(Map.entry("foo", 1)),
         ImmutableSetMultimap.<String, Integer>builder().putAll("bar", 2));

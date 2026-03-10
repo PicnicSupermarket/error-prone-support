@@ -1,7 +1,9 @@
 package tech.picnic.errorprone.utils;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.errorprone.BugPattern;
@@ -14,6 +16,7 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.ReturnTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.VariableTreeMatcher;
 import com.google.errorprone.matchers.Description;
+import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionStatementTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
@@ -25,6 +28,44 @@ import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
 
 final class MoreASTHelpersTest {
+  @Test
+  void getRefasterTemplateMethods() {
+    CompilationTestHelper.newInstance(GetRefasterTemplateMethodsTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import com.google.errorprone.refaster.annotation.AfterTemplate;",
+            "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+            "import com.google.errorprone.refaster.annotation.Placeholder;",
+            "",
+            "class A {",
+            "  // BUG: Diagnostic contains: [after2, after1, before2, before3, before1]",
+            "  abstract class WithTemplateMethods {",
+            "    @Placeholder",
+            "    abstract void placeholder(int a);",
+            "",
+            "    @BeforeTemplate",
+            "    void before1(int a) {}",
+            "",
+            "    @BeforeTemplate",
+            "    void before2(int a, int b, int c) {}",
+            "",
+            "    @BeforeTemplate",
+            "    void before3(int a, int b) {}",
+            "",
+            "    @AfterTemplate",
+            "    void after1(int a) {}",
+            "",
+            "    @AfterTemplate",
+            "    void after2(int a, int b) {}",
+            "  }",
+            "",
+            "  class WithoutTemplateMethods {",
+            "    void notATemplate() {}",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   @Test
   void findMethods() {
     CompilationTestHelper.newInstance(FindMethodsTestChecker.class, getClass())
@@ -79,7 +120,7 @@ final class MoreASTHelpersTest {
 
   @Test
   void findMethodExitedOnReturn() {
-    CompilationTestHelper.newInstance(FindMethodReturnTestChecker.class, getClass())
+    CompilationTestHelper.newInstance(FndMethodExitedOnReturnTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.stream.Stream;",
@@ -116,6 +157,95 @@ final class MoreASTHelpersTest {
             "            toString();",
             "          }",
             "        });",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void findDirectReturnStatements() {
+    CompilationTestHelper.newInstance(FindDirectReturnStatementsTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  // BUG: Diagnostic contains: 0: []",
+            "  A() {}",
+            "",
+            "  // BUG: Diagnostic contains: 0: []",
+            "  void noReturn() {}",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return;]",
+            "  void voidReturn() {",
+            "    return;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return 1;]",
+            "  int intReturn() {",
+            "    return 1;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 2: [return 1;, return 2;]",
+            "  int branching(boolean b) {",
+            "    if (b) {",
+            "      return 1;",
+            "    }",
+            "    return 2;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return () -> {",
+            "  Runnable withLambdaInline() {",
+            "    return () -> {",
+            "      return;",
+            "    };",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return stream;]",
+            "  Stream<String> withLambdaSeparate() {",
+            "    Stream<String> stream =",
+            "        Stream.of(1)",
+            "            .map(",
+            "                n -> {",
+            "                  return String.valueOf(n);",
+            "                });",
+            "    return stream;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return new Object() {",
+            "  Object withAnonymousClassInline() {",
+            "    return new Object() {",
+            "      @Override",
+            "      // BUG: Diagnostic contains: 1: [return \"anonymous\";]",
+            "      public String toString() {",
+            "        return \"anonymous\";",
+            "      }",
+            "    };",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return object;]",
+            "  Object withAnonymousClassSeparate() {",
+            "    Object object =",
+            "        new Object() {",
+            "          @Override",
+            "          // BUG: Diagnostic contains: 1: [return \"anonymous\";]",
+            "          public String toString() {",
+            "            return \"anonymous\";",
+            "          }",
+            "        };",
+            "    return object;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: 1: [return null;]",
+            "  Object withLocalClass() {",
+            "    class LocalClass extends Object {",
+            "      @Override",
+            "      // BUG: Diagnostic contains: 1: [return \"anonymous\";]",
+            "      public String toString() {",
+            "        return \"anonymous\";",
+            "      }",
+            "    }",
+            "    return null;",
             "  }",
             "}")
         .doTest();
@@ -208,7 +338,7 @@ final class MoreASTHelpersTest {
    * MoreASTHelpers#findMethodExitedOnReturn(VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  private static final class FindMethodReturnTestChecker extends BugChecker
+  private static final class FndMethodExitedOnReturnTestChecker extends BugChecker
       implements ExpressionStatementTreeMatcher, ReturnTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -226,6 +356,27 @@ final class MoreASTHelpersTest {
       return MoreASTHelpers.findMethodExitedOnReturn(state)
           .map(m -> buildDescription(tree).setMessage(m.getName().toString()).build())
           .orElse(Description.NO_MATCH);
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link
+   * MoreASTHelpers#findDirectReturnStatements(MethodTree)}.
+   */
+  @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
+  private static final class FindDirectReturnStatementsTestChecker extends BugChecker
+      implements MethodTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchMethod(MethodTree tree, VisitorState state) {
+      ImmutableList<String> statements =
+          MoreASTHelpers.findDirectReturnStatements(tree).stream()
+              .map(s -> SourceCode.treeToString(s, state))
+              .collect(toImmutableList());
+      return buildDescription(tree)
+          .setMessage("%s: %s".formatted(statements.size(), statements.toString()))
+          .build();
     }
   }
 
@@ -270,6 +421,30 @@ final class MoreASTHelpersTest {
 
     private Description getDescription(Tree tree, VisitorState state) {
       return MoreASTHelpers.isStringTyped(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link
+   * MoreASTHelpers#getRefasterTemplateMethods(ClassTree, VisitorState)}.
+   */
+  @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
+  private static final class GetRefasterTemplateMethodsTestChecker extends BugChecker
+      implements BugChecker.ClassTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchClass(ClassTree tree, VisitorState state) {
+      ImmutableList<MethodTree> methods = MoreASTHelpers.getRefasterTemplateMethods(tree, state);
+      return methods.isEmpty()
+          ? Description.NO_MATCH
+          : buildDescription(tree)
+              .setMessage(
+                  methods.stream()
+                      .map(m -> m.getName().toString())
+                      .collect(toImmutableList())
+                      .toString())
+              .build();
     }
   }
 }

@@ -7,46 +7,52 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  @SuppressWarnings("RequireNonNull")
+  @SuppressWarnings("RequireNonNullExpression")
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(checkNotNull(null));
   }
 
-  void testCheckArgument() {
+  void testCheckArgumentNot() {
     if ("foo".isEmpty()) {
+      throw new IllegalArgumentException();
+    }
+    if (!"bar".isEmpty()) {
       throw new IllegalArgumentException();
     }
   }
 
-  void testCheckArgumentWithMessage() {
+  void testCheckArgumentNotWithString() {
     if ("foo".isEmpty()) {
-      throw new IllegalArgumentException("The string is empty");
+      throw new IllegalArgumentException("bar");
+    }
+    if (!"baz".isEmpty()) {
+      throw new IllegalArgumentException("qux");
     }
   }
 
-  void testCheckElementIndexWithMessage() {
+  void testCheckElementIndex() {
     if (1 < 0 || 1 >= 2) {
-      throw new IndexOutOfBoundsException("My index");
+      throw new IndexOutOfBoundsException("foo");
     }
   }
 
-  String testRequireNonNull() {
+  String testRequireNonNullExpression() {
     return checkNotNull("foo");
   }
 
-  void testRequireNonNullStatement() {
+  void testRequireNonNullBlock() {
     if ("foo" == null) {
       throw new NullPointerException();
     }
   }
 
-  String testRequireNonNullWithMessage() {
-    return checkNotNull("foo", "The string is null");
+  String testRequireNonNullWithStringExpression() {
+    return checkNotNull("foo", "bar");
   }
 
-  void testRequireNonNullWithMessageStatement() {
+  void testRequireNonNullWithStringBlock() {
     if ("foo" == null) {
-      throw new NullPointerException("The string is null");
+      throw new NullPointerException("bar");
     }
   }
 
@@ -56,21 +62,21 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  void testCheckPositionIndexWithMessage() {
+  void testCheckPositionIndexWithString() {
     if (1 < 0 || 1 > 2) {
-      throw new IndexOutOfBoundsException("My position");
+      throw new IndexOutOfBoundsException("foo");
     }
   }
 
-  void testCheckState() {
+  void testCheckStateNot() {
     if ("foo".isEmpty()) {
       throw new IllegalStateException();
     }
   }
 
-  void testCheckStateWithMessage() {
+  void testCheckStateNotWithString() {
     if ("foo".isEmpty()) {
-      throw new IllegalStateException("The string is empty");
+      throw new IllegalStateException("bar");
     }
   }
 }
