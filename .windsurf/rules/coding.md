@@ -7,6 +7,8 @@
 # Error Prone check coding guidelines
 
 - Follow the coding style established by existing checks.
+- For detailed conventions and step-by-step instructions, read
+  `.github/instructions/bug-checkers.instructions.md`.
 - Never use `VisitorState#getSourceForNode`; use `SourceCode#treeToString`
   instead.
 - Each check should have a corresponding test class file.

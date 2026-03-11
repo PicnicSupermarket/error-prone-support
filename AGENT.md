@@ -86,4 +86,9 @@ directories), read
 `.github/instructions/refaster-rules.instructions.md` for
 detailed conventions and step-by-step instructions.
 
+When working on `BugChecker` implementations (files in `bugpatterns/`
+directories), read
+`.github/instructions/bug-checkers.instructions.md` for
+detailed conventions and step-by-step instructions.
+
 [contributing]: CONTRIBUTING.md

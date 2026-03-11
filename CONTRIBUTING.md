@@ -99,6 +99,11 @@ testing conventions.
 
 ### `BugChecker` development
 
+> **Detailed guide**: See
+> [`.github/instructions/bug-checkers.instructions.md`][bug-checker-instructions]
+> for a comprehensive step-by-step guide including advanced patterns,
+> test templates, and common mistakes.
+
 Bug checkers live in `error-prone-contrib`, `error-prone-experimental`, and
 `error-prone-guidelines`. The general pattern:
 
@@ -228,6 +233,7 @@ knowing about:
 - `ConflictDetection.findMethodRenameBlocker()`: validate that a
   method rename does not introduce conflicts.
 
+[bug-checker-instructions]: .github/instructions/bug-checkers.instructions.md
 [documentation-java]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java
 [error-prone-criteria]: https://errorprone.info/docs/criteria
 [error-prone-support-developing]: https://github.com/PicnicSupermarket/error-prone-support/tree/master#-developing-error-prone-support
