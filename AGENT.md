@@ -79,4 +79,11 @@ Replace the module (`-pl`) and test class (`-Dtest=`) as needed.
    failures.
 10. If applicable, commit changes once more.
 
+## Task-specific instructions
+
+When working on Refaster rules (files in `refasterrules/`
+directories), read
+`.github/instructions/refaster-rules.instructions.md` for
+detailed conventions and step-by-step instructions.
+
 [contributing]: CONTRIBUTING.md

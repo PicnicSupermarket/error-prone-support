@@ -12,7 +12,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class BigDecimalRules {
   private BigDecimalRules() {}
 
-  /** Prefer using the constant {@link BigDecimal#ZERO} when possible. */
+  /** Prefer {@link BigDecimal#ZERO} over less efficient alternatives. */
   static final class BigDecimalZero {
     @BeforeTemplate
     BigDecimal before() {
@@ -25,7 +25,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#ONE} when possible. */
+  /** Prefer {@link BigDecimal#ONE} over less efficient alternatives. */
   static final class BigDecimalOne {
     @BeforeTemplate
     BigDecimal before() {
@@ -38,7 +38,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#TWO} when possible. */
+  /** Prefer {@link BigDecimal#TWO} over less efficient alternatives. */
   static final class BigDecimalTwo {
     @BeforeTemplate
     BigDecimal before() {
@@ -51,7 +51,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using the constant {@link BigDecimal#TEN} when possible. */
+  /** Prefer {@link BigDecimal#TEN} over less efficient alternatives. */
   static final class BigDecimalTen {
     @BeforeTemplate
     BigDecimal before() {
@@ -81,7 +81,7 @@ final class BigDecimalRules {
     }
   }
 
-  /** Prefer using {@link BigDecimal#signum()} over more contrived alternatives. */
+  /** Prefer {@link BigDecimal#signum()} over more contrived alternatives. */
   static final class BigDecimalSignumIsZero {
     @BeforeTemplate
     boolean before(BigDecimal value) {

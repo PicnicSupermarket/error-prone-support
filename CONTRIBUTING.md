@@ -129,6 +129,11 @@ Each package should have a `package-info.java` file annotated with
 
 ### Refaster rule development
 
+> **Detailed guide**: See
+> [`.github/instructions/refaster-rules.instructions.md`][refaster-instructions]
+> for a comprehensive step-by-step guide including advanced patterns,
+> test templates, and common mistakes.
+
 Refaster rules live in
 `error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/`.
 The general pattern:
@@ -231,4 +236,5 @@ knowing about:
 [error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [error-prone-support-patch]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
+[refaster-instructions]: .github/instructions/refaster-rules.instructions.md
 [refaster-rules-test]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java
