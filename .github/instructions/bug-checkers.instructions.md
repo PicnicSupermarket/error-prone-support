@@ -5,16 +5,16 @@ applyTo: "**/bugpatterns/**"
 # Bug Checkers: Conventions and Step-by-Step Guide
 
 This document describes the conventions for creating and modifying `BugChecker`
-implementations in this project. It serves as the canonical reference for all AI
-coding agents and human contributors.
+implementations in this project. It serves as the canonical reference for all
+AI coding agents and human contributors.
 
 For general project context, see [CONTRIBUTING.md][contributing].
 
 ## Overview
 
-A [`BugChecker`][bug-checker] is an Error Prone analysis pass that visits a
-specific AST node type and optionally suggests a fix. This project extends Error
-Prone with additional checkers for code quality, maintainability, and
+A [`BugChecker`][bug-checker] is an Error Prone analysis pass that visits
+specific AST node types and optionally suggests a fix. This project extends
+Error Prone with additional checkers for code quality, maintainability, and
 consistency. See Error Prone's [criteria for new checks][error-prone-criteria]
 for general guidance; this project additionally focuses on style enforcement.
 
@@ -94,21 +94,24 @@ Conventions:
     [`Documentation.java`][documentation-java].
   - `linkType`: Always `CUSTOM`.
   - `severity`: One of `ERROR`, `WARNING`, or `SUGGESTION`.
-  - `tags`: One or more from `StandardTags`: `SIMPLIFICATION`, `STYLE`,
-    `FRAGILE_CODE`, `LIKELY_ERROR`, `PERFORMANCE`, `REFACTORING`.
+  - `tags`: One or more from `StandardTags`: `CONCURRENCY`, `FRAGILE_CODE`,
+    `LIKELY_ERROR`, `PERFORMANCE`, `SIMPLIFICATION`, `STYLE` and `REFACTORING`.
 - **`private static final long serialVersionUID = 1L;`**: Required because
   `BugChecker` is `Serializable`.
-- **Explicit public nullary constructor** with Javadoc:
-  `/** Instantiates a new {@link CheckName} instance. */`
-- **`matchXxx()` return values**: `Description.NO_MATCH` for non-matches, or
-  `describeMatch(tree, fix)` for matches.
+- **Explicit public nullary constructor** with Javadoc: `/** Instantiates a new
+  {@link CheckName} instance. */`
+- **`matchXxx()` return values**: `Description.NO_MATCH` for non-matches, and
+  generally `describeMatch(tree, fix)` for matches.
 
 ### Real example: `IsInstanceLambdaUsage`
 
-This is the simplest complete checker with a fix:
+This is just about the simplest complete checker with a fix:
 
 ```java
-/** A {@link BugChecker} that flags lambda expressions that can be replaced with ... */
+/**
+ * A {@link BugChecker} that flags lambda expressions that can be replaced with a method reference
+ * of the form {@code T.class::isInstance}.
+ */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer `Class::isInstance` method reference over equivalent lambda expression",
@@ -147,8 +150,8 @@ public final class IsInstanceLambdaUsage extends BugChecker
 
 ### Static `Matcher<>` / `MultiMatcher<>` fields
 
-Use static matcher fields to check annotations, modifiers, or types. Example
-from `AutowiredConstructor`:
+Define static matcher fields to check for AST nodes that represent specific
+types or symbols. Example from `AutowiredConstructor`:
 
 ```java
 private static final MultiMatcher<Tree, AnnotationTree> AUTOWIRED_ANNOTATION =
@@ -162,9 +165,7 @@ types. Simply implement each interface and provide the corresponding
 `matchXxx()` method:
 
 ```java
-public final class MyCheck extends BugChecker
-    implements MethodTreeMatcher, ClassTreeMatcher {
-
+public final class MyCheck extends BugChecker implements MethodTreeMatcher, ClassTreeMatcher {
   @Override
   public Description matchMethod(MethodTree tree, VisitorState state) { ... }
 
@@ -197,18 +198,18 @@ Use the builder API when you need a custom message or want to offer multiple
 fix alternatives:
 
 ```java
-Description.Builder description = buildDescription(tree);
-description.setMessage("Custom message: %s".formatted(detail));
-description.addFix(primaryFix);
-description.addFix(alternativeFix);
-return description.build();
+return buildDescription(tree)
+    .setMessage("Custom message: %s".formatted(detail))
+	.addFix(primaryFix)
+    .addFix(alternativeFix)
+    .build();
 ```
 
 ### `@SuppressWarnings` on the checker class
 
-When the checker class itself triggers a static analysis warning, suppress it on
-the class. For example, checkers with fields (beyond `serialVersionUID`) may
-need:
+When the checker class itself triggers a static analysis warning that cannot be
+resolved properly, suppress it on the class. For example, checkers with fields
+(beyond `serialVersionUID`) may need:
 
 ```java
 @SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
@@ -298,12 +299,12 @@ final class {CheckName}Test {
 ```
 
 Conventions:
-- **Standalone class**: `final class {CheckName}Test` — no base class or
-  shared infrastructure.
+- **Standalone class**: `final class {CheckName}Test`; no base class or shared
+  infrastructure.
 - **`identification()` test**: Uses `CompilationTestHelper`. Include both
   positive and negative cases. Use `// BUG: Diagnostic contains:` on the line
-  **before** the flagged code. Optionally include a message fragment:
-  `// BUG: Diagnostic contains: exact text`.
+  **before** the flagged code. Optionally include a message fragment: `// BUG:
+  Diagnostic contains: exact text`.
 - **`replacement()` test**: Uses `BugCheckerRefactoringTestHelper` with
   `.doTest(TestMode.TEXT_MATCH)`.
 - **Test source style**: Class named `A`, single `A.java` preferred, inline
@@ -448,6 +449,8 @@ Common `BugChecker.*Matcher` interfaces and their `matchXxx()` methods:
 | `MethodTreeMatcher` | `MethodTree` | `matchMethod` |
 | `VariableTreeMatcher` | `VariableTree` | `matchVariable` |
 
+There are many more matcher interfaces; one for each Java AST node type.
+
 ## Reference: `error-prone-utils` utilities
 
 Key methods from the `error-prone-utils` module
@@ -477,9 +480,9 @@ Key methods from the `error-prone-utils` module
    must be on the line _before_ the flagged code, not on the same line.
 2. **Forgetting `private static final long serialVersionUID = 1L;`**: Required
    because `BugChecker` implements `Serializable`.
-3. **Omitting the explicit public nullary constructor**: Every checker must have
-   a public no-arg constructor with Javadoc, even if the body is empty.
-4. **Using `VisitorState#getSourceForNode` instead of
+3. **Omitting the explicit public nullary constructor**: Every checker must
+   have a public no-arg constructor with Javadoc, even if the body is empty.
+4. **Using `VisitorState#getSourceForNode` or `Tree#toString()` instead of
    `SourceCode#treeToString`**: Always use the project utility.
 5. **Creating a checker in `error-prone-contrib` when it enforces
    project-internal conventions**: Such checks belong in
@@ -487,7 +490,7 @@ Key methods from the `error-prone-utils` module
 6. **Not including negative cases in the identification test**: Always include
    code that should _not_ be flagged alongside the positive cases.
 
-[bug-checker]: https://errorprone.info/docs/writing-a-check
+[bug-checker]: https://errorprone.info/docs/plugins
 [contributing]: ../../CONTRIBUTING.md
 [documentation-java]: ../../error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java
 [error-prone-criteria]: https://errorprone.info/docs/criteria
