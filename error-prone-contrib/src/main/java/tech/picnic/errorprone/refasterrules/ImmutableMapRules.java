@@ -151,7 +151,7 @@ final class ImmutableMapRules {
    * Don't map a stream's elements to map entries, only to subsequently collect them into an {@link
    * ImmutableMap}. The collection can be performed directly.
    */
-  abstract static class StreamOfMapEntriesToImmutableMap<E, K, V> {
+  abstract static class StreamCollectToImmutableMap<E, K, V> {
     @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
 

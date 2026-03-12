@@ -70,6 +70,35 @@ Conventions:
   with identical parameter types, then `before2`, `before3`, etc. are also
   used.
 - The `@AfterTemplate` method is named `after`.
+- Method parameters are listed in the order in which they first occur in the
+  `@AfterTemplate` method.
+
+### Naming conventions
+
+Rules are named after the code in their `@AfterTemplate` method,
+following these guidelines:
+- The name is derived by concatenating all non-variable non-`@PlaceHolder`
+  identifiers as CamelCase.
+- In case of instance method or field references, the type of the dereferenced
+  parameter is also included.
+- In case of name clashes, rename new or existing rules as necessary to
+  disambiguate them:
+  - Variants with more template methods parameters are amended to include
+    `WithX` or `WithXAndY`, where `X and `Y` are the additional parameter
+    type(s).
+  - In case there's an expression (non-`void` returning) and block (`void`
+    returning) variant, append `Expression` and `Block` as appropriate).
+
+Examples:
+
+| Code | Name |
+|------------|------|
+| `return BigDecimal.ZERO` | `BigDecimalZero;` |
+| `return ImmutableList.sortedCopyOf(collection).iterator();` | `ImmutableListSortedCopyOfIterator` |
+| `return ImmutableList.sortedCopyOf(cmp, collection).iterator();` | `ImmutableListSortedCopyOfIterator` or `ImmutableListSortedCopyOfIteratorWithComparator` |
+| `return addTo.addAll(elementsToAdd);` | `CollectionAddAll` or `CollectionAddAllExpression` |
+| `addTo.addAll(elementsToAdd);` | `CollectionAddAll` or or `CollectionAddAllBlock` |
+| `return stream.collect(toImmutableMap(e -> keyFunction(e), e -> valueFunction(e))); | `StreamCollectToImmutableMap` |
 
 ### Real example: `BigDecimalRules.BigDecimalZero`
 
@@ -115,14 +144,15 @@ Template method parameters should avoid wildcard bounds where possible. Thus,
 do *not* write this:
 
 ```java
-static final class ThenComparing<S, T extends Comparable<? super T>> {
+/** Don't explicitly create {@link Comparator}s unnecessarily. */
+static final class ComparatorThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
   @BeforeTemplate
-  Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+  Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
     return cmp.thenComparing(comparing(function));
   }
 
   @AfterTemplate
-  Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+  Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
     return cmp.thenComparing(function);
   }
 }
@@ -130,7 +160,7 @@ static final class ThenComparing<S, T extends Comparable<? super T>> {
 
 Instead write:
 ```java
-static final class ThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
+static final class ComparatorThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
   @BeforeTemplate
   Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
     return cmp.thenComparing(comparing(function));
@@ -198,7 +228,7 @@ Use `@Placeholder` methods to parameterize rule behavior. In this case the rule
 class must be `abstract static` (not `static final`):
 
 ```java
-abstract static class StreamOfMapEntriesToImmutableMap<E, K, V> {
+abstract static class StreamCollectToImmutableMap<E, K, V> {
   @Placeholder(allowsIdentity = true)
   abstract K keyFunction(@MayOptionallyUse E element);
 
@@ -226,7 +256,7 @@ abstract static class StreamOfMapEntriesToImmutableMap<E, K, V> {
 Match varargs parameters:
 
 ```java
-static final class MinOfVarargs<S, T extends S> {
+static final class CollectionsMinArraysAsList<S, T extends S> {
   @BeforeTemplate
   T before(@Repeated T value, Comparator<S> cmp) {
     return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
@@ -257,7 +287,7 @@ When a rule matches structurally different patterns, define multiple
 `@BeforeTemplate` methods named `before`, `before2`, `before3`, etc.:
 
 ```java
-static final class CollectionAddAllToCollectionBlock<T, S extends T> {
+static final class CollectionAddAllBlock<T, S extends T> {
   @BeforeTemplate
   void before(Collection<T> addTo, Collection<S> elementsToAdd) {
     elementsToAdd.forEach(addTo::add);

@@ -60,7 +60,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
   }
 
-  ImmutableMap<Integer, String> testStreamOfMapEntriesToImmutableMap() {
+  ImmutableMap<Integer, String> testStreamCollectToImmutableMap() {
     return Stream.of(1, 2, 3).collect(toImmutableMap(n -> n, n -> n.toString()));
   }
 

@@ -125,7 +125,7 @@ final class CollectionRules {
    * Don't call {@link Iterables#addAll(Collection, Iterable)} when the elements to be added are
    * already part of a {@link Collection}.
    */
-  static final class CollectionAddAllToCollectionExpression<T, S extends T> {
+  static final class CollectionAddAllExpression<T, S extends T> {
     @BeforeTemplate
     boolean before(Collection<T> addTo, Collection<S> elementsToAdd) {
       return Iterables.addAll(addTo, elementsToAdd);
@@ -137,7 +137,7 @@ final class CollectionRules {
     }
   }
 
-  static final class CollectionAddAllToCollectionBlock<T, S extends T> {
+  static final class CollectionAddAllBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> addTo, Collection<S> elementsToAdd) {
       elementsToAdd.forEach(addTo::add);

@@ -128,7 +128,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
   }
 
-  int testMinOfVarargs() {
+  int testCollectionsMinArraysAsList() {
     return Stream.of(1, 2).min(naturalOrder()).orElseThrow();
   }
 

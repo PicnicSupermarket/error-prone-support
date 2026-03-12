@@ -51,11 +51,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo").stream().anyMatch("bar"::equals);
   }
 
-  boolean testCollectionAddAllToCollectionExpression() {
+  boolean testCollectionAddAllExpression() {
     return Iterables.addAll(new ArrayList<>(), ImmutableSet.of("foo"));
   }
 
-  void testCollectionAddAllToCollectionBlock() {
+  void testCollectionAddAllBlock() {
     ImmutableSet.of("foo").forEach(new ArrayList<>()::add);
     for (Number element : ImmutableSet.of(1)) {
       new ArrayList<Number>().add(element);

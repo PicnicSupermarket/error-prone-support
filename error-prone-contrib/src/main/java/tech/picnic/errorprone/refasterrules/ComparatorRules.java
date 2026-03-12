@@ -310,7 +310,7 @@ final class ComparatorRules {
    * Avoid unnecessary creation of a {@link Stream} to determine the minimum of a known collection
    * of values.
    */
-  static final class MinOfVarargs<S, T extends S> {
+  static final class CollectionsMinArraysAsList<S, T extends S> {
     @BeforeTemplate
     T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
