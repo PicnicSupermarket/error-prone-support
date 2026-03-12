@@ -665,15 +665,18 @@ final class CollectionRules {
   // XXX: collection.stream().noneMatch(e -> e.equals(other))
   // ^ This is !collection.contains(other). Do we already rewrite variations on this?
 
-  /** Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient alternatives. */
+  /**
+   * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient
+   * alternatives.
+   */
   static final class StreamSortedIterator<T> {
     @BeforeTemplate
-    Iterator<T> before(Collection<T> collection, Comparator<? super T> comparator) {
+    Iterator<T> before(Comparator<? super T> comparator, Collection<T> collection) {
       return collection.stream().sorted(comparator).iterator();
     }
 
     @AfterTemplate
-    Iterator<T> after(Collection<T> collection, Comparator<? super T> comparator) {
+    Iterator<T> after(Comparator<? super T> comparator, Collection<T> collection) {
       return ImmutableList.sortedCopyOf(comparator, collection).iterator();
     }
   }
