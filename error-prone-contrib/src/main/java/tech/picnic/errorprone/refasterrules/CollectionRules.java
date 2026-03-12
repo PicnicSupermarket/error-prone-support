@@ -661,38 +661,6 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over creating a sorted stream
-   * and extracting an iterator.
-   */
-  static final class SortedStreamIterator<T> {
-    @BeforeTemplate
-    Iterator<T> before(Collection<T> collection, java.util.Comparator<? super T> cmp) {
-      return collection.stream().sorted(cmp).iterator();
-    }
-
-    @AfterTemplate
-    Iterator<T> after(Collection<T> collection, java.util.Comparator<? super T> cmp) {
-      return ImmutableList.sortedCopyOf(cmp, collection).iterator();
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over creating a naturally sorted stream
-   * and extracting an iterator.
-   */
-  static final class SortedStreamIteratorNatural<T extends Comparable<T>> {
-    @BeforeTemplate
-    Iterator<T> before(Collection<T> collection) {
-      return collection.stream().sorted().iterator();
-    }
-
-    @AfterTemplate
-    Iterator<T> after(Collection<T> collection) {
-      return ImmutableList.sortedCopyOf(collection).iterator();
-    }
-  }
-
   // XXX: collection.stream().noneMatch(e -> e.equals(other))
   // ^ This is !collection.contains(other). Do we already rewrite variations on this?
 }

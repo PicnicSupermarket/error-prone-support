@@ -262,14 +262,4 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   String testSortedSetLast() {
     return ImmutableSortedSet.of("foo").getLast();
   }
-
-  ImmutableSet<Iterator<Integer>> testSortedStreamIterator() {
-    return ImmutableSet.of(
-        ImmutableList.of(1).stream().sorted(java.util.Comparator.naturalOrder()).iterator(),
-        ImmutableSet.of(2).stream().sorted(java.util.Comparator.reverseOrder()).iterator());
-  }
-
-  Iterator<String> testSortedStreamIteratorNatural() {
-    return ImmutableList.of("foo", "bar").stream().sorted().iterator();
-  }
 }
