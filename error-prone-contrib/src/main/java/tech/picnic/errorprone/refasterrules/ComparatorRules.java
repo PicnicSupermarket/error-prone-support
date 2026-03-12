@@ -118,14 +118,14 @@ final class ComparatorRules {
   }
 
   /** Don't explicitly create {@link Comparator}s unnecessarily. */
-  static final class ThenComparing<S, T extends Comparable<? super T>> {
+  static final class ThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
     @BeforeTemplate
-    Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
       return cmp.thenComparing(comparing(function));
     }
 
     @AfterTemplate
-    Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
       return cmp.thenComparing(function);
     }
   }
@@ -463,10 +463,10 @@ final class ComparatorRules {
   /**
    * Prefer {@link Comparators#max(Object, Object, Comparator)}}} over more verbose alternatives.
    */
-  static final class MaxOfPairCustomOrder<T> {
+  static final class MaxOfPairCustomOrder<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
-    T before(T value1, T value2, Comparator<? super T> cmp) {
+    T before(T value1, T value2, Comparator<S> cmp) {
       return Refaster.anyOf(
           cmp.compare(value1, value2) >= 0 ? value1 : value2,
           cmp.compare(value1, value2) < 0 ? value2 : value1,
@@ -481,7 +481,7 @@ final class ComparatorRules {
     }
 
     @AfterTemplate
-    T after(T value1, T value2, Comparator<? super T> cmp) {
+    T after(T value1, T value2, Comparator<S> cmp) {
       return Comparators.max(value1, value2, cmp);
     }
   }

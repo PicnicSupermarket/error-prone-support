@@ -109,6 +109,42 @@ BigDecimal before(double value) {
 }
 ```
 
+### Type parameter usage
+
+Template method parameters should avoid wildcard bounds where possible. Thus,
+do *not* write this:
+
+```java
+static final class ThenComparing<S, T extends Comparable<? super T>> {
+  @BeforeTemplate
+  Comparator<S> before(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    return cmp.thenComparing(comparing(function));
+  }
+
+  @AfterTemplate
+  Comparator<S> after(Comparator<S> cmp, Function<? super S, ? extends T> function) {
+    return cmp.thenComparing(function);
+  }
+}
+```
+
+Instead write:
+```java
+static final class ThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
+  @BeforeTemplate
+  Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
+    return cmp.thenComparing(comparing(function));
+  }
+
+  @AfterTemplate
+  Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
+    return cmp.thenComparing(function);
+  }
+}
+```
+
+This way before- and after-template method parameters are provably compatible.
+
 ## Step 2 - Advanced patterns
 
 ### `Refaster.anyOf(...)` for multiple before-patterns
@@ -288,8 +324,12 @@ Conventions:
 - Test method order must match rule declaration order.
 - When a rule uses `@AlsoNegation`, include both the positive and negated cases
   in the test method.
-- Make sure that all variants of before-templatess are matched, considering
-  also all `Refaster.anyOf` variants.
+- Make sure that all variants of before-templates are matched, considering also
+  all `Refaster.anyOf` variants.
+- In case of `@Matches`/`@NotMatches` constraints, include compliant and
+  non-compliant variants.
+- Beyond the requirements listed above, do not unnecessarily include additional
+  variants.
 - In case more than one expression matches, return an `ImmutableSet<SomeType>`,
   with the expressions nested inside `return ImmutableSet.of(...)`. (Unless the
   matched expressions are of type `void`, of course.)
@@ -297,6 +337,7 @@ Conventions:
   sub-expressions unless required. For integers, use 1, 2, 3, etc. For strings
   use "foo", "bar", "baz", "qux", "quux", "corge", "grault", "garply", "waldo",
   "fred", "plugh", "xyzzy", "thud".
+- Don't unnecessarily use fully qualified types.
 
 ### `elidedTypesAndStaticImports()`
 
@@ -367,6 +408,11 @@ output:
 ```sh
 mvn test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.skip
 ```
+
+Note that Refaster rules are not mutated by Pitest. As such, contrary to any
+other code change in this project, changes that only introduce or modify
+Refaster rules and associated tests do *not* require follow-up by running
+`./run-branch-mutation-tests.sh`.
 
 ## Reference: Custom annotations (from `refaster-support`)
 
