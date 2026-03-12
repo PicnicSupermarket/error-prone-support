@@ -144,15 +144,14 @@ Template method parameters should avoid wildcard bounds where possible. Thus,
 do *not* write this:
 
 ```java
-/** Don't explicitly create {@link Comparator}s unnecessarily. */
-static final class ComparatorThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
+static final class ComparatorThenComparing<S, T extends Comparable<? super T>> {
   @BeforeTemplate
-  Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
+  Comparator<S> before(Comparator<S> cmp, Function<? super T, ? extends T> function) {
     return cmp.thenComparing(comparing(function));
   }
 
   @AfterTemplate
-  Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
+  Comparator<S> after(Comparator<S> cmp, Function<? super T, ? extends T> function) {
     return cmp.thenComparing(function);
   }
 }
