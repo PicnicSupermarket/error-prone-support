@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -205,5 +206,14 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   String testSortedSetLast() {
     return ImmutableSortedSet.of("foo").last();
+  }
+
+  Iterator<Integer> testStreamSortedIterator() {
+    return ImmutableList.sortedCopyOf(Comparator.naturalOrder(), ImmutableList.of(3, 1, 2))
+        .iterator();
+  }
+
+  Iterator<Integer> testStreamSortedIteratorNaturalOrder() {
+    return ImmutableList.sortedCopyOf(ImmutableList.of(3, 1, 2)).iterator();
   }
 }

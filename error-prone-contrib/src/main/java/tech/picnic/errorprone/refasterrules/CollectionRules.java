@@ -17,6 +17,7 @@ import com.google.errorprone.refaster.annotation.Repeated;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
@@ -663,4 +664,30 @@ final class CollectionRules {
 
   // XXX: collection.stream().noneMatch(e -> e.equals(other))
   // ^ This is !collection.contains(other). Do we already rewrite variations on this?
+
+  /** Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient alternatives. */
+  static final class StreamSortedIterator<T> {
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> collection, Comparator<? super T> comparator) {
+      return collection.stream().sorted(comparator).iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(Collection<T> collection, Comparator<? super T> comparator) {
+      return ImmutableList.sortedCopyOf(comparator, collection).iterator();
+    }
+  }
+
+  /** Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over less efficient alternatives. */
+  static final class StreamSortedIteratorNaturalOrder<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> collection) {
+      return collection.stream().sorted().iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(Collection<T> collection) {
+      return ImmutableList.sortedCopyOf(collection).iterator();
+    }
+  }
 }
