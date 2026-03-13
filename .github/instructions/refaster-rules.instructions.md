@@ -64,8 +64,15 @@ Conventions:
 - Each rule is a `static final class` nested inside the outer class.
 - Every rule has a Javadoc comment of the form `/** Prefer X over Y. */`, where
   `X` is generally a Javadoc link to the preferred alternative, and Y is a
-  short qualitative description of the code in `@BeforeTemplate`s. E.g. "more
-  verbose alternatives", "less performant alternatives", etc.
+  short qualitative description of the code in `@BeforeTemplate`s. If
+  applicable, prefer one of the following variants (or combinations thereof):
+  - "Prefer X over more verbose alternatives."
+  - "Prefer X over more contrived alternatives."
+  - "Prefer X over less idiomatic alternatives."
+  - "Prefer X over less performant alternatives."
+  - "Prefer X over deprecated alternatives."
+  - "Prefer X over non-JDK alternatives."
+  - "Prefer X over less explicit alternatives."
 - `@BeforeTemplate` methods are named `before`. If there are multiple overloads
   with identical parameter types, then `before2`, `before3`, etc. are also
   used.
