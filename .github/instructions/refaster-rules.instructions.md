@@ -69,10 +69,11 @@ Conventions:
   - "Prefer X over more verbose alternatives."
   - "Prefer X over more contrived alternatives."
   - "Prefer X over less idiomatic alternatives."
-  - "Prefer X over less performant alternatives."
+  - "Prefer X over less efficient alternatives."
   - "Prefer X over deprecated alternatives."
   - "Prefer X over non-JDK alternatives."
   - "Prefer X over less explicit alternatives."
+  - "Prefer X over the associated constructor."
 - `@BeforeTemplate` methods are named `before`. If there are multiple overloads
   with identical parameter types, then `before2`, `before3`, etc. are also
   used.
