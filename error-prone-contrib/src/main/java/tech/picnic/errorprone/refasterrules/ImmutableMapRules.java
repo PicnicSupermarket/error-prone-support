@@ -63,7 +63,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
-  static final class EntryToImmutableMap<K, V> {
+  static final class ImmutableMapOfMapEntryGetKeyMapEntryGetValue<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
       return Refaster.anyOf(
@@ -81,7 +81,7 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
-  static final class IterableToImmutableMap<K, V> {
+  static final class MapsToMap<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterator<K> iterable,
@@ -120,7 +120,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#copyOf(Iterable)} over more contrived alternatives. */
-  static final class EntryIterableToImmutableMap<K, V> {
+  static final class ImmutableMapCopyOf<K, V> {
     @BeforeTemplate
     Map<K, V> before(Map<? extends K, ? extends V> iterable) {
       return Refaster.anyOf(
@@ -148,8 +148,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Don't map a stream's elements to map entries, only to subsequently collect them into an {@link
-   * ImmutableMap}. The collection can be performed directly.
+   * Prefer directly collecting a {@link Stream} into an {@link ImmutableMap} over first mapping
+   * elements to entries.
    */
   abstract static class StreamCollectToImmutableMap<E, K, V> {
     @Placeholder(allowsIdentity = true)
@@ -176,7 +176,7 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over the
    * stream-based alternative.
    */
-  static final class IndexIterableToImmutableMap<K, V> {
+  static final class MapsUniqueIndex<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterator<V> iterable,
@@ -209,10 +209,10 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer creating an immutable copy of the result of {@link Maps#transformValues(Map,
+   * Prefer an immutable copy of {@link Maps#transformValues(Map,
    * com.google.common.base.Function)} over more contrived alternatives.
    */
-  abstract static class TransformMapValuesToImmutableMap<K, V1, V2> {
+  abstract static class ImmutableMapCopyOfMapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse @Nullable V1 value);
 
@@ -365,8 +365,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer creation of an immutable submap using {@link Maps#filterKeys(Map, Predicate)} over more
-   * contrived alternatives.
+   * Prefer an immutable copy of {@link Maps#filterKeys(Map, Predicate)} over more contrived
+   * alternatives.
    */
   abstract static class ImmutableMapCopyOfMapsFilterKeys<K, V> {
     @Placeholder(allowsIdentity = true)
@@ -386,8 +386,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer creation of an immutable submap using {@link Maps#filterValues(Map, Predicate)} over
-   * more contrived alternatives.
+   * Prefer an immutable copy of {@link Maps#filterValues(Map, Predicate)} over more contrived
+   * alternatives.
    */
   abstract static class ImmutableMapCopyOfMapsFilterValues<K, V> {
     @Placeholder(allowsIdentity = true)

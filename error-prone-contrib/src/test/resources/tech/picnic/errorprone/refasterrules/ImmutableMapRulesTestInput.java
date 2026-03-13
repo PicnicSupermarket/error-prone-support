@@ -28,14 +28,14 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableMap.builder().build();
   }
 
-  ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
+  ImmutableSet<ImmutableMap<String, Integer>> testImmutableMapOfMapEntryGetKeyMapEntryGetValue() {
     return ImmutableSet.of(
         ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)).buildOrThrow(),
         Stream.of(Map.entry("foo", 1))
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
+  ImmutableSet<ImmutableMap<Integer, Integer>> testMapsToMap() {
     return ImmutableSet.of(
         ImmutableList.of(1).stream().collect(toImmutableMap(identity(), n -> n * 2)),
         ImmutableList.of(2).stream().collect(toImmutableMap(k -> k, n -> n * 2)),
@@ -55,7 +55,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(10), Integer::valueOf)));
   }
 
-  ImmutableSet<Map<String, Integer>> testEntryIterableToImmutableMap() {
+  ImmutableSet<Map<String, Integer>> testImmutableMapCopyOf() {
     return ImmutableSet.of(
         ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
         ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("foo", 1)).buildOrThrow(),
@@ -75,7 +75,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMap() {
+  ImmutableSet<ImmutableMap<Integer, Integer>> testMapsUniqueIndex() {
     return ImmutableSet.of(
         ImmutableList.of(1).stream().collect(toImmutableMap(n -> n * 2, identity())),
         ImmutableList.of(2).stream().collect(toImmutableMap(n -> n * 2, v -> v)),
@@ -94,7 +94,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
             .collect(toImmutableMap(n -> n.intValue(), v -> 0)));
   }
 
-  ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {
+  ImmutableSet<ImmutableMap<String, Integer>> testImmutableMapCopyOfMapsTransformValues() {
     return ImmutableSet.of(
         ImmutableMap.of("foo", 1L).entrySet().stream()
             .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue()))),
