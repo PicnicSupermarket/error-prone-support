@@ -135,7 +135,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(1).stream().iterator(), ImmutableSet.of(2).asList().iterator());
   }
 
-  ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+  ImmutableSet<Optional<Integer>> testCollectionStreamFindFirst() {
     return ImmutableSet.of(
         ImmutableSet.of(0).stream().findAny(),
         ImmutableSet.of(1).isEmpty()
@@ -158,7 +158,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testOptionalFirstQueueElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableQueuePeek() {
     return ImmutableSet.of(
         new LinkedList<String>().stream().findFirst(),
         new LinkedList<String>().isEmpty()
@@ -175,7 +175,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testRemoveOptionalFirstNavigableSetElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableNavigableSetPollFirst() {
     return ImmutableSet.of(
         new TreeSet<String>().isEmpty()
             ? Optional.empty()
@@ -191,7 +191,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testRemoveOptionalFirstQueueElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableQueuePoll() {
     return ImmutableSet.of(
         new LinkedList<String>().isEmpty()
             ? Optional.empty()
@@ -264,11 +264,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSortedSet.of("foo").getLast();
   }
 
-  Iterator<Integer> testStreamSortedIterator() {
+  Iterator<Integer> testImmutableListSortedCopyOfIteratorWithComparator() {
     return ImmutableList.of(3, 1, 2).stream().sorted(Comparator.naturalOrder()).iterator();
   }
 
-  Iterator<Integer> testStreamSortedIteratorNaturalOrder() {
+  Iterator<Integer> testImmutableListSortedCopyOfIterator() {
     return ImmutableList.of(3, 1, 2).stream().sorted().iterator();
   }
 }

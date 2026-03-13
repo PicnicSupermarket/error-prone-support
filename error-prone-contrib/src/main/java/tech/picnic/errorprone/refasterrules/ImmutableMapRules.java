@@ -63,7 +63,8 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
-  static final class ImmutableMapOfMapEntryGetKeyMapEntryGetValue<K, V, K2 extends K, V2 extends V> {
+  static final class ImmutableMapOfMapEntryGetKeyMapEntryGetValue<
+      K, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(Map.Entry<K2, V2> entry) {
       return Refaster.anyOf(
@@ -120,7 +121,8 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#copyOf(Iterable)} over more contrived alternatives. */
-  static final class ImmutableMapCopyOf<K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
+  static final class ImmutableMapCopyOf<
+      K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
     Map<K, V> before(Map<K2, V2> iterable) {
       return Refaster.anyOf(
@@ -209,8 +211,8 @@ final class ImmutableMapRules {
   }
 
   /**
-   * Prefer an immutable copy of {@link Maps#transformValues(Map,
-   * com.google.common.base.Function)} over more contrived alternatives.
+   * Prefer an immutable copy of {@link Maps#transformValues(Map, com.google.common.base.Function)}
+   * over more contrived alternatives.
    */
   abstract static class ImmutableMapCopyOfMapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)

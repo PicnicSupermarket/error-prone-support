@@ -48,7 +48,7 @@ final class CollectionRules {
     @SuppressWarnings({
       "java:S1155" /* This violation will be rewritten. */,
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
-      "OptionalFirstCollectionElement" /* This is a more specific template. */,
+      "CollectionStreamFindFirst" /* This is a more specific template. */,
       "StreamFindAnyIsEmpty" /* This is a more specific template. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
@@ -121,10 +121,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link Iterables#addAll(Collection, Iterable)} when the elements to be added are
-   * already part of a {@link Collection}.
-   */
+  /** Prefer {@link Collection#addAll(Collection)} over non-JDK alternatives. */
   static final class CollectionAddAllExpression<T, S extends T> {
     @BeforeTemplate
     boolean before(Collection<T> addTo, Collection<S> elementsToAdd) {
@@ -137,6 +134,7 @@ final class CollectionRules {
     }
   }
 
+  /** Prefer {@link Collection#addAll(Collection)} over more verbose alternatives. */
   static final class CollectionAddAllBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> addTo, Collection<S> elementsToAdd) {
@@ -165,22 +163,20 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link Iterables#removeAll(Iterable, Collection)} when the elements to be removed
-   * are already part of a {@link Collection}.
-   */
+  /** Prefer {@link Collection#removeAll(Collection)} over non-JDK alternatives. */
   static final class CollectionRemoveAllFromCollectionExpression<T, S extends T> {
     @BeforeTemplate
-    boolean before(Collection<T> removeTo, Collection<S> elementsToRemove) {
-      return Iterables.removeAll(removeTo, elementsToRemove);
+    boolean before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
+      return Iterables.removeAll(removeFrom, elementsToRemove);
     }
 
     @AfterTemplate
-    boolean after(Collection<T> removeTo, Collection<S> elementsToRemove) {
-      return removeTo.removeAll(elementsToRemove);
+    boolean after(Collection<T> removeFrom, Collection<S> elementsToRemove) {
+      return removeFrom.removeAll(elementsToRemove);
     }
   }
 
+  /** Prefer {@link Collection#removeAll(Collection)} over more verbose alternatives. */
   static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
@@ -210,7 +206,7 @@ final class CollectionRules {
     }
   }
 
-  /** Don't unnecessarily call {@link Stream#distinct()} on an already-unique stream of elements. */
+  /** Prefer {@link Set#stream()} over more contrived alternatives. */
   // XXX: This rule assumes that the `Set` relies on `Object#equals`, rather than a custom
   // equivalence relation.
   // XXX: Expressions that drop or reorder elements from the stream, such as `.filter`, `.skip` and
@@ -246,7 +242,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
+  /** Prefer {@link ArrayList#ArrayList(Collection)} over non-JDK alternatives. */
   @SuppressWarnings(
       "NonApiType" /* Matching against `List` would unnecessarily constrain the rule. */)
   static final class NewArrayListFromCollection<T> {
@@ -274,10 +270,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
-   * directly.
-   */
+  /** Prefer {@link ImmutableCollection#stream()} over more verbose alternatives. */
   static final class ImmutableCollectionStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
@@ -290,10 +283,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#contains(Object)} is
-   * called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#contains(Object)} over more verbose alternatives. */
   static final class ImmutableCollectionContains<T, S> {
     @BeforeTemplate
     boolean before(ImmutableCollection<T> collection, S elem) {
@@ -306,10 +296,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#parallelStream()}
-   * is called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#parallelStream()} over more verbose alternatives. */
   static final class ImmutableCollectionParallelStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
@@ -322,10 +309,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toString()} is
-   * called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#toString()} over more verbose alternatives. */
   static final class ImmutableCollectionToString<T> {
     @BeforeTemplate
     String before(ImmutableCollection<T> collection) {
@@ -355,7 +339,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer calling {@link Collection#toArray()} over more contrived alternatives. */
+  /** Prefer {@link Collection#toArray()} over more contrived alternatives. */
   static final class CollectionToArray<T> {
     @BeforeTemplate
     Object[] before(Collection<T> collection, int size) {
@@ -374,10 +358,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link
-   * ImmutableCollection#toArray(Object[])}` is called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#toArray(Object[])} over more verbose alternatives. */
   static final class ImmutableCollectionToArrayWithArray<T, S> {
     @BeforeTemplate
     Object[] before(ImmutableCollection<T> collection, S[] array) {
@@ -390,10 +371,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link
-   * ImmutableCollection#toArray(IntFunction)} is called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#toArray(IntFunction)} over more verbose alternatives. */
   static final class ImmutableCollectionToArrayWithGenerator<T, S> {
     @BeforeTemplate
     S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
@@ -424,13 +402,8 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
-   * Collection} as an {@link Optional}, and (when applicable) prefer {@link Stream#findFirst()}
-   * over {@link Stream#findAny()} to communicate that the collection's first element (if any,
-   * according to iteration order) will be returned.
-   */
-  static final class OptionalFirstCollectionElement<T> {
+  /** Prefer {@code collection.stream().findFirst()} over more contrived alternatives. */
+  static final class CollectionStreamFindFirst<T> {
     @BeforeTemplate
     Optional<T> before(Collection<T> collection) {
       return Refaster.anyOf(
@@ -454,11 +427,8 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Avoid contrived constructions when peeking at the first element of a possibly empty {@link
-   * Queue}.
-   */
-  static final class OptionalFirstQueueElement<T> {
+  /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
+  static final class OptionalOfNullableQueuePeek<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {
       return Refaster.anyOf(
@@ -474,11 +444,8 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Avoid contrived constructions when extracting the first element from a possibly empty {@link
-   * NavigableSet}.
-   */
-  static final class RemoveOptionalFirstNavigableSetElement<T> {
+  /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
+  static final class OptionalOfNullableNavigableSetPollFirst<T> {
     @BeforeTemplate
     Optional<T> before(NavigableSet<T> set) {
       return set.isEmpty()
@@ -492,11 +459,8 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Avoid contrived constructions when extracting the first element from a possibly empty {@link
-   * Queue}.
-   */
-  static final class RemoveOptionalFirstQueueElement<T> {
+  /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
+  static final class OptionalOfNullableQueuePoll<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {
       return queue.isEmpty()
@@ -513,14 +477,14 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Collection#forEach(Consumer)} over more contrived alternatives. */
-  static final class CollectionForEach<T> {
+  static final class CollectionForEach<S, T extends S> {
     @BeforeTemplate
-    void before(Collection<T> collection, Consumer<? super T> consumer) {
+    void before(Collection<T> collection, Consumer<S> consumer) {
       collection.stream().forEach(consumer);
     }
 
     @AfterTemplate
-    void after(Collection<T> collection, Consumer<? super T> consumer) {
+    void after(Collection<T> collection, Consumer<S> consumer) {
       collection.forEach(consumer);
     }
   }
@@ -669,20 +633,20 @@ final class CollectionRules {
    * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient
    * alternatives.
    */
-  static final class StreamSortedIterator<T> {
+  static final class ImmutableListSortedCopyOfIteratorWithComparator<S, T extends S> {
     @BeforeTemplate
-    Iterator<T> before(Comparator<? super T> comparator, Collection<T> collection) {
+    Iterator<T> before(Comparator<S> comparator, Collection<T> collection) {
       return collection.stream().sorted(comparator).iterator();
     }
 
     @AfterTemplate
-    Iterator<T> after(Comparator<? super T> comparator, Collection<T> collection) {
+    Iterator<T> after(Comparator<S> comparator, Collection<T> collection) {
       return ImmutableList.sortedCopyOf(comparator, collection).iterator();
     }
   }
 
   /** Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over less efficient alternatives. */
-  static final class StreamSortedIteratorNaturalOrder<T extends Comparable<? super T>> {
+  static final class ImmutableListSortedCopyOfIterator<T extends Comparable<? super T>> {
     @BeforeTemplate
     Iterator<T> before(Collection<T> collection) {
       return collection.stream().sorted().iterator();

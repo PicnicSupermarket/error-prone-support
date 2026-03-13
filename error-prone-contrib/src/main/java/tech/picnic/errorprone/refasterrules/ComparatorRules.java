@@ -142,8 +142,8 @@ final class ComparatorRules {
 
   /**
    * Prefer {@link Comparator#thenComparing(Function, Comparator)} with {@link
-   * Comparator#reverseOrder()} over explicitly wrapping with {@link
-   * Comparator#comparing(Function)} and {@link Comparator#reversed()}.
+   * Comparator#reverseOrder()} over explicitly wrapping with {@link Comparator#comparing(Function)}
+   * and {@link Comparator#reversed()}.
    */
   static final class ComparatorThenComparingReverseOrder<
       R, S extends R, T extends Comparable<? super T>, U extends T> {
@@ -373,9 +373,7 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Prefer {@link Comparators#min(Object, Object, Comparator)} over more verbose alternatives.
-   */
+  /** Prefer {@link Comparators#min(Object, Object, Comparator)} over more verbose alternatives. */
   static final class ComparatorsMinOfPairWithComparator<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
@@ -486,9 +484,7 @@ final class ComparatorRules {
     }
   }
 
-  /**
-   * Prefer {@link Comparators#max(Object, Object, Comparator)} over more verbose alternatives.
-   */
+  /** Prefer {@link Comparators#max(Object, Object, Comparator)} over more verbose alternatives. */
   static final class ComparatorsMaxOfPairWithComparator<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
