@@ -640,7 +640,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#fromArray(Object[])}} over more ambiguous or contrived alternatives. */
+  /** Prefer {@link Flux#fromArray(Object[])} over more ambiguous or contrived alternatives. */
   static final class FluxFromArray<T> {
     @BeforeTemplate
     Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
@@ -1239,7 +1239,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#flux()}} over more contrived alternatives. */
+  /** Prefer {@link Mono#flux()} over more contrived alternatives. */
   static final class MonoFlux<T> {
     @BeforeTemplate
     Flux<T> before(Mono<T> mono) {
@@ -1253,7 +1253,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer direct invocation of {@link Mono#then()}} over more contrived alternatives. */
+  /** Prefer direct invocation of {@link Mono#then()} over more contrived alternatives. */
   static final class MonoThen<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -1708,7 +1708,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#onErrorComplete(Class)}} over more contrived alternatives. */
+  /** Prefer {@link Mono#onErrorComplete(Class)} over more contrived alternatives. */
   static final class MonoOnErrorCompleteClass<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz) {
@@ -1722,7 +1722,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete(Class)}} over more contrived alternatives. */
+  /** Prefer {@link Flux#onErrorComplete(Class)} over more contrived alternatives. */
   static final class FluxOnErrorCompleteClass<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Class<? extends Throwable> clazz) {
@@ -1737,7 +1737,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#onErrorComplete(Predicate)}} over more contrived alternatives. */
+  /** Prefer {@link Mono#onErrorComplete(Predicate)} over more contrived alternatives. */
   static final class MonoOnErrorCompletePredicate<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono, Predicate<? super Throwable> predicate) {
@@ -1750,7 +1750,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#onErrorComplete(Predicate)}} over more contrived alternatives. */
+  /** Prefer {@link Flux#onErrorComplete(Predicate)} over more contrived alternatives. */
   static final class FluxOnErrorCompletePredicate<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Predicate<? super Throwable> predicate) {
@@ -2142,7 +2142,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link reactor.util.context.Context#empty()}} over more verbose alternatives. */
+  /** Prefer {@link reactor.util.context.Context#empty()} over more verbose alternatives. */
   // XXX: Introduce Refaster rules or a `BugChecker` that maps `(Immutable)Map.of(k, v)` to
   // `Context.of(k, v)` and likewise for multi-pair overloads.
   static final class ContextEmpty {
@@ -2157,7 +2157,7 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link PublisherProbe#empty()}} over more verbose alternatives. */
+  /** Prefer {@link PublisherProbe#empty()} over more verbose alternatives. */
   static final class PublisherProbeEmpty<T> {
     @BeforeTemplate
     PublisherProbe<T> before() {

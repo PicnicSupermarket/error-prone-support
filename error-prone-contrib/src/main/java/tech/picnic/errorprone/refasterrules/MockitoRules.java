@@ -20,7 +20,7 @@ final class MockitoRules {
   private MockitoRules() {}
 
   /**
-   * Prefer {@link Mockito#never()}} over explicitly specifying that the associated invocation must
+   * Prefer {@link Mockito#never()} over explicitly specifying that the associated invocation must
    * happen precisely zero times.
    */
   static final class Never {

@@ -12,7 +12,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class SuggestedFixRules {
   private SuggestedFixRules() {}
 
-  /** Prefer {@link SuggestedFix#toBuilder()}} over more contrived alternatives. */
+  /** Prefer {@link SuggestedFix#toBuilder()} over more contrived alternatives. */
   static final class SuggestedFixToBuilder {
     @BeforeTemplate
     SuggestedFix.Builder before(SuggestedFix fix) {
@@ -38,7 +38,7 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#replace(Tree, String)}} over more contrived alternatives. */
+  /** Prefer {@link SuggestedFix#replace(Tree, String)} over more contrived alternatives. */
   static final class SuggestedFixReplaceTree {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String replaceWith) {
@@ -51,7 +51,7 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#replace(int, int, String)}} over more contrived alternatives. */
+  /** Prefer {@link SuggestedFix#replace(int, int, String)} over more contrived alternatives. */
   static final class SuggestedFixReplaceStartEnd {
     @BeforeTemplate
     SuggestedFix before(int start, int end, String replaceWith) {
@@ -65,7 +65,7 @@ final class SuggestedFixRules {
   }
 
   /**
-   * Prefer {@link SuggestedFix#replace(Tree, String, int, int)}} over more contrived alternatives.
+   * Prefer {@link SuggestedFix#replace(Tree, String, int, int)} over more contrived alternatives.
    */
   static final class SuggestedFixReplaceTreeStartEnd {
     @BeforeTemplate
@@ -107,7 +107,7 @@ final class SuggestedFixRules {
     }
   }
 
-  /** Prefer {@link SuggestedFix#postfixWith(Tree, String)}} over more contrived alternatives. */
+  /** Prefer {@link SuggestedFix#postfixWith(Tree, String)} over more contrived alternatives. */
   static final class SuggestedFixPostfixWith {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String postfix) {

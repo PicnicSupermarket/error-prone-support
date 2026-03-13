@@ -61,43 +61,43 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return comparing(s -> RoundingMode.valueOf(s));
   }
 
-  Comparator<String> testThenComparing() {
+  Comparator<String> testComparatorThenComparing() {
     return Comparator.<String>naturalOrder().thenComparing(String::isEmpty);
   }
 
-  Comparator<String> testThenComparingReversed() {
+  Comparator<String> testComparatorThenComparingReverseOrder() {
     return Comparator.<String>naturalOrder().thenComparing(String::isEmpty, reverseOrder());
   }
 
-  Comparator<String> testThenComparingCustom() {
+  Comparator<String> testComparatorThenComparingWithComparator() {
     return Comparator.<String>naturalOrder().thenComparing(String::isEmpty, reverseOrder());
   }
 
-  Comparator<String> testThenComparingCustomReversed() {
+  Comparator<String> testComparatorThenComparingComparatorReversed() {
     return Comparator.<String>naturalOrder()
         .thenComparing(String::isEmpty, Comparator.<Boolean>reverseOrder().reversed());
   }
 
-  Comparator<Integer> testThenComparingDouble() {
+  Comparator<Integer> testComparatorThenComparingDouble() {
     return Comparator.<Integer>naturalOrder().thenComparingDouble(Integer::doubleValue);
   }
 
-  Comparator<Integer> testThenComparingInt() {
+  Comparator<Integer> testComparatorThenComparingInt() {
     return Comparator.<Integer>naturalOrder().thenComparingInt(Integer::intValue);
   }
 
-  Comparator<Integer> testThenComparingLong() {
+  Comparator<Integer> testComparatorThenComparingLong() {
     return Comparator.<Integer>naturalOrder().thenComparingLong(Integer::longValue);
   }
 
-  ImmutableSet<Comparator<String>> testThenComparingNaturalOrder() {
+  ImmutableSet<Comparator<String>> testComparatorThenComparingNaturalOrder() {
     return ImmutableSet.of(
         Comparator.<String>naturalOrder().thenComparing(naturalOrder()),
         Comparator.<String>naturalOrder().thenComparing(naturalOrder()),
         Comparator.<String>naturalOrder().thenComparing(s -> 0));
   }
 
-  ImmutableSet<Integer> testCompareTo() {
+  ImmutableSet<Integer> testComparableCompareTo() {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
@@ -110,7 +110,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
   }
 
-  String testMinOfArray() {
+  String testCollectionsMinArraysAsListOfArray() {
     return Collections.min(Arrays.asList(new String[0]), naturalOrder());
   }
 
@@ -122,7 +122,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return Collections.min(Arrays.asList(1, 2), naturalOrder());
   }
 
-  ImmutableSet<String> testMinOfPairNaturalOrder() {
+  ImmutableSet<String> testComparatorsMinOfPair() {
     return ImmutableSet.of(
         Comparators.min("a", "b"),
         Comparators.min("a", "b"),
@@ -135,7 +135,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.min("a", "b"));
   }
 
-  ImmutableSet<Object> testMinOfPairCustomOrder() {
+  ImmutableSet<Object> testComparatorsMinOfPairWithComparator() {
     return ImmutableSet.of(
         Comparators.min("a", "b", Comparator.comparingInt(String::length)),
         Comparators.min("a", "b", Comparator.comparingInt(String::length)),
@@ -151,7 +151,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
   }
 
-  String testMaxOfArray() {
+  String testCollectionsMaxArraysAsListOfArray() {
     return Collections.max(Arrays.asList(new String[0]), naturalOrder());
   }
 
@@ -159,11 +159,11 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return Collections.max(ImmutableSet.of("foo", "bar"), naturalOrder());
   }
 
-  int testMaxOfVarargs() {
+  int testCollectionsMaxArraysAsList() {
     return Collections.max(Arrays.asList(1, 2), naturalOrder());
   }
 
-  ImmutableSet<String> testMaxOfPairNaturalOrder() {
+  ImmutableSet<String> testComparatorsMaxOfPair() {
     return ImmutableSet.of(
         Comparators.max("a", "b"),
         Comparators.max("a", "b"),
@@ -176,7 +176,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.max("a", "b"));
   }
 
-  ImmutableSet<Object> testMaxOfPairCustomOrder() {
+  ImmutableSet<Object> testComparatorsMaxOfPairWithComparator() {
     return ImmutableSet.of(
         Comparators.max("a", "b", Comparator.comparingInt(String::length)),
         Comparators.max("a", "b", Comparator.comparingInt(String::length)),
@@ -219,13 +219,13 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return maxBy(naturalOrder());
   }
 
-  ImmutableSet<Boolean> testIsLessThan() {
+  ImmutableSet<Boolean> testEnumCompareToLessThan() {
     return ImmutableSet.of(
         RoundingMode.UP.compareTo(RoundingMode.DOWN) < 0,
         RoundingMode.UP.compareTo(RoundingMode.DOWN) >= 0);
   }
 
-  ImmutableSet<Boolean> testIsLessThanOrEqualTo() {
+  ImmutableSet<Boolean> testEnumCompareToLessThanOrEqualTo() {
     return ImmutableSet.of(
         RoundingMode.UP.compareTo(RoundingMode.DOWN) <= 0,
         RoundingMode.UP.compareTo(RoundingMode.DOWN) > 0);

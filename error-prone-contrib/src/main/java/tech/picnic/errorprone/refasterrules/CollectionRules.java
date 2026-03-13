@@ -392,7 +392,7 @@ final class CollectionRules {
 
   /**
    * Don't call {@link ImmutableCollection#asList()} if {@link
-   * ImmutableCollection#toArray(IntFunction)}} is called on the result; call it directly.
+   * ImmutableCollection#toArray(IntFunction)} is called on the result; call it directly.
    */
   static final class ImmutableCollectionToArrayWithGenerator<T, S> {
     @BeforeTemplate
@@ -606,7 +606,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link List#removeFirst()}} over less idiomatic alternatives. */
+  /** Prefer {@link List#removeFirst()} over less idiomatic alternatives. */
   // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
   // `NoSuchElementException`.
   static final class ListRemoveFirst<S, T extends S> {
@@ -621,7 +621,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link List#removeLast()}} over less idiomatic alternatives. */
+  /** Prefer {@link List#removeLast()} over less idiomatic alternatives. */
   // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
   // `NoSuchElementException`.
   static final class ListRemoveLast<S, T extends S> {
