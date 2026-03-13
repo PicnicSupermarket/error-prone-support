@@ -192,7 +192,7 @@
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.48.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
-        <version.maven>3.9.13</version.maven>
+        <version.maven>3.9.14</version.maven>
         <version.pitest-git>2.3.2</version.pitest-git>
     </properties>
 
