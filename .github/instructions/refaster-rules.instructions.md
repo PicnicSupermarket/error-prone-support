@@ -63,9 +63,10 @@ Conventions:
   `private` constructor.
 - Each rule is a `static final class` nested inside the outer class.
 - Every rule has a Javadoc comment of the form `/** Prefer X over Y. */`, where
-  `X` is generally a Javadoc link to the preferred alternative, and Y is a
-  short qualitative description of the code in `@BeforeTemplate`s. If
-  applicable, prefer one of the following variants (or combinations thereof):
+  `X` is generally a Javadoc link ({@link ...}) to the preferred alternative,
+  and Y is a short qualitative description of the code in `@BeforeTemplate`s.
+  If applicable, prefer one of the following variants (or combinations
+  thereof):
   - "Prefer X over more verbose alternatives."
   - "Prefer X over more contrived alternatives."
   - "Prefer X over less idiomatic alternatives."
@@ -80,6 +81,19 @@ Conventions:
 - The `@AfterTemplate` method is named `after`.
 - Method parameters are listed in the order in which they first occur in the
   `@AfterTemplate` method.
+
+### Rules as a term rewriting system
+
+The full set of all defined rules is meant to be repeatedly applied to a code
+base, until no further changes are required. In practice, this means that rules
+must not conflict or be redundant. That is, a new rule should not contain a
+`@BeforeTemplate` method with a (sub)expression that is rewritten by another
+rule. Said rewrite must be assumed to have happened already, and so the
+`@BeforeTemplate` method must use the replacement expression instead.
+
+Conversely, introducing a new rule may also allow other rules to be simplified
+or to become fully redundant. In this case, update or drop other rules as
+applicable.
 
 ### Naming conventions
 
@@ -502,6 +516,9 @@ Refaster rules and associated tests do *not* require follow-up by running
    super X` in `@BeforeTemplate`/`@AfterTemplate` method parameters instead of
    introducing additional class-level type parameters (see *Type parameter
    usage*).
+8. **Before-templates that are overly specific**: using expressions in
+   `@BeforeTemplate` methods that contain a subexpression matched by another
+   template; in this case the replacement expression must be used instead.
 
 [contributing]: ../../CONTRIBUTING.md
 [refaster]: https://errorprone.info/docs/refaster
