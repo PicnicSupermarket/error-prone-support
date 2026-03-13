@@ -214,10 +214,12 @@ Constrain which expressions a parameter may match using matchers
 from `tech.picnic.errorprone.refaster.matchers`:
 
 ```java
+// Note: `S` and `U` are class-level type parameters declared as
+// `<S, T extends Comparable<? super T>, U extends T>`.
 @BeforeTemplate
 Comparator<T> before(
     @Matches(IsIdentityOperation.class)
-        Function<? super T, ? extends T> keyExtractor) {
+        Function<S, U> keyExtractor) {
   return comparing(keyExtractor);
 }
 ```
@@ -493,6 +495,10 @@ Refaster rules and associated tests do *not* require follow-up by running
 6. **Using `abstract static class` without `@Placeholder`**: only use
    `abstract` when the rule needs `@Placeholder` methods; otherwise use `static
    final class`.
+7. **Wildcard bounds in template method parameters**: using `? extends X` or `?
+   super X` in `@BeforeTemplate`/`@AfterTemplate` method parameters instead of
+   introducing additional class-level type parameters (see *Type parameter
+   usage*).
 
 [contributing]: ../../CONTRIBUTING.md
 [refaster]: https://errorprone.info/docs/refaster
