@@ -11,7 +11,6 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -206,14 +205,5 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   String testSortedSetLast() {
     return ImmutableSortedSet.of("foo").last();
-  }
-
-  Iterator<Integer> testImmutableListSortedCopyOfIteratorWithComparator() {
-    return ImmutableList.sortedCopyOf(Comparator.naturalOrder(), ImmutableList.of(3, 1, 2))
-        .iterator();
-  }
-
-  Iterator<Integer> testImmutableListSortedCopyOfIterator() {
-    return ImmutableList.sortedCopyOf(ImmutableList.of(3, 1, 2)).iterator();
   }
 }
