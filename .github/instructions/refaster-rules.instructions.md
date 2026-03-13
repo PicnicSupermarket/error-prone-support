@@ -96,6 +96,9 @@ following these guidelines:
     type(s).
   - In case there's an expression (non-`void` returning) and block (`void`
     returning) variant, append `Expression` and `Block` as appropriate).
+- When invoking static methods or fields, check the rest of the code base to
+  assess whether a method or field is usually statically imported; if so,
+  follow that style.
 
 Examples:
 
