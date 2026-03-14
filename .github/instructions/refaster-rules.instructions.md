@@ -67,14 +67,34 @@ Conventions:
   and Y is a short qualitative description of the code in `@BeforeTemplate`s.
   If applicable, prefer one of the following variants (or combinations
   thereof):
-  - "Prefer X over more verbose alternatives."
-  - "Prefer X over more contrived alternatives."
-  - "Prefer X over less idiomatic alternatives."
-  - "Prefer X over less efficient alternatives."
   - "Prefer X over deprecated alternatives."
-  - "Prefer X over non-JDK alternatives."
+  - "Prefer X over less efficient alternatives."
   - "Prefer X over less explicit alternatives."
+  - "Prefer X over less idiomatic alternatives."
+  - "Prefer X over more contrived alternatives."
+  - "Prefer X over more verbose alternatives."
+  - "Prefer X over non-JDK alternatives."
   - "Prefer X over the associated constructor."
+
+  Use the qualifier that best describes _why_ the `@AfterTemplate` is
+  preferred. Do **not** copy the qualifier from a nearby rule; select it
+  independently based on the table below:
+
+  | Qualifier | When to use |
+  |-----------|------------|
+  | "deprecated" | The before-template uses an API annotated `@Deprecated` |
+  | "less efficient" | The after-template avoids unnecessary work such as fewer allocations, copies, intermediate data structures, or it uses a cached / pre-computed value |
+  | "less explicit" | The after-template conveys the programmer's intent more clearly |
+  | "less idiomatic" | A well-known Java or library idiom exists that directly expresses the intent |
+  | "more contrived" | The before-template takes a needlessly roundabout approach (e.g., converting to a stream and back) with no performance difference |
+  | "more verbose" | The before-template uses more code to express the same thing; the only issue is length |
+  | "non-JDK" | The before-template uses a third-party library call when a JDK equivalent exists |
+  | "the associated constructor" | The before-template uses `new X(...)` when a static factory method exists |
+
+  When multiple qualifiers apply, e.g. in the case of multiple
+  `@BeforeTemplate` methods or `Refaster.anyOf` usage, enumerate the most
+  relevant qualifier, e.g. by stating "Prefer X over less efficient or more
+  contrived alternatives".
 - `@BeforeTemplate` methods are named `before`. If there are multiple overloads
   with identical parameter types, then `before2`, `before3`, etc. are also
   used.
@@ -447,11 +467,26 @@ Conventions:
 - In case more than one expression matches, return an `ImmutableSet<SomeType>`,
   with the expressions nested inside `return ImmutableSet.of(...)`. (Unless the
   matched expressions are of type `void`, of course.)
-- Keep test expressions as simple as possible. Try not tyo repeat dummy
+- Keep test expressions as simple as possible. Try not to repeat dummy
   sub-expressions unless required. For integers, use 1, 2, 3, etc. For strings
   use "foo", "bar", "baz", "qux", "quux", "corge", "grault", "garply", "waldo",
   "fred", "plugh", "xyzzy", "thud".
-- Don't unnecessarily use fully qualified types.
+- For any type, use the simplest canonical expression available. Examples:
+  `ImmutableList.of(1)`, `ImmutableList.of()`, `Mono.empty()`, `Mono.just(1)`,
+  `Flux.just("foo")`, `new String[0]`, `new Object()`, `reverseOrder()`,
+  `naturalOrder()`. Prefer single-element or empty collections over
+  multi-element ones. Prefer `naturalOrder()` or `reverseOrder()` over
+  `Comparator.comparing(...)`.
+- Use distinct expressions for each distinct template method parameter and for
+  each test case (when a rule uses `Refaster.anyOf` or has multiple
+  `@BeforeTemplate` methods). For example, use `ImmutableList.of(1)` for the
+  first expression, `ImmutableList.of(2)` for the second, etc. That said,
+  **variation takes precedence over simplicity**: e.g., if a test needs three
+  distinct comparators, using `Comparator.comparing(String::length)` as the
+  third is acceptable after exhausting simpler alternatives like
+  `naturalOrder()` and `reverseOrder()`.
+- Don't unnecessarily use fully qualified types: unless there is a type clash,
+  always import types.
 
 ### `elidedTypesAndStaticImports()`
 
