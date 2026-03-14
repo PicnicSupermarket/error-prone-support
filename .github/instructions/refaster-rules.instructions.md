@@ -82,18 +82,76 @@ Conventions:
 - Method parameters are listed in the order in which they first occur in the
   `@AfterTemplate` method.
 
-### Rules as a term rewriting system
+### How rules interact with each other
 
-The full set of all defined rules is meant to be repeatedly applied to a code
-base, until no further changes are required. In practice, this means that rules
-must not conflict or be redundant. That is, a new rule should not contain a
-`@BeforeTemplate` method with a (sub)expression that is rewritten by another
-rule. Said rewrite must be assumed to have happened already, and so the
-`@BeforeTemplate` method must use the replacement expression instead.
+All Refaster rules in the project are applied to a codebase repeatedly, until
+no more changes occur. This means that every `@BeforeTemplate` must be written
+as if all other rules have already been applied. Follow these two principles:
 
-Conversely, introducing a new rule may also allow other rules to be simplified
-or to become fully redundant. In this case, update or drop other rules as
-applicable.
+#### Principle 1: Use already-rewritten expressions in `@BeforeTemplate`s
+
+When writing a `@BeforeTemplate`, check whether any sub-expression in it is
+matched by another existing rule. If so, use the *after-template* (rewritten)
+form of that sub-expression, not the *before-template* form.
+
+**Why:** The other rule will have already simplified that sub-expression. If
+you use the original (pre-rewrite) form, your rule will never match real code.
+
+**Example: `BigDecimalSignumIsZero` depends on `BigDecimalZero`:**
+
+`BigDecimalZero` rewrites `BigDecimal.valueOf(0)` → `BigDecimal.ZERO`.
+Therefore, `BigDecimalSignumIsZero` must use `BigDecimal.ZERO` in its
+`@BeforeTemplate`:
+
+```java
+// CORRECT: uses the already-rewritten form (`BigDecimal.ZERO`)
+static final class BigDecimalSignumIsZero {
+  @BeforeTemplate
+  boolean before(BigDecimal value) {
+    return value.compareTo(BigDecimal.ZERO) == 0;
+  }
+  // ...
+}
+
+// WRONG: uses the pre-rewrite form (`BigDecimal.valueOf(0)`)
+static final class BigDecimalSignumIsZero {
+  @BeforeTemplate
+  boolean before(BigDecimal value) {
+    return value.compareTo(BigDecimal.valueOf(0)) == 0;
+    //                     ^^^^^^^^^^^^^^^^^^^^^
+    //  BigDecimalZero already rewrites this to BigDecimal.ZERO,
+    //  so this template will never match.
+  }
+  // ...
+}
+```
+
+**Example: multi-step chain in `CollectionRules`:**
+
+`CollectionIteratorNext` rewrites
+`collection.stream().findFirst().orElseThrow()` →
+`collection.iterator().next()`. Then `SequencedCollectionGetFirst` matches
+`collection.iterator().next()`; it does **not** also include
+`collection.stream().findFirst().orElseThrow()`, because that form has already
+been rewritten.
+
+**Checklist:**
+- For each sub-expression in your `@BeforeTemplate`, search the codebase for
+  existing rules that rewrite it (look in other rules' `@AfterTemplate`
+  methods).
+- If found, replace the sub-expression with the other rule's `@AfterTemplate`
+  output.
+
+#### Principle 2: Check if your new rule makes existing rules redundant
+
+When you add a new rule, check whether it makes any existing rules partially or
+fully redundant:
+- Search for your new rule's `@AfterTemplate` expression in other rules'
+  `@BeforeTemplate` methods; those rules may now be simplifiable.
+- Search for your new rule's `@BeforeTemplate` expression in other rules'
+  `@AfterTemplate` methods; those rules may now be redundant.
+
+Update or remove affected rules as needed.
 
 ### Naming conventions
 
@@ -516,9 +574,10 @@ Refaster rules and associated tests do *not* require follow-up by running
    super X` in `@BeforeTemplate`/`@AfterTemplate` method parameters instead of
    introducing additional class-level type parameters (see *Type parameter
    usage*).
-8. **Before-templates that are overly specific**: using expressions in
-   `@BeforeTemplate` methods that contain a subexpression matched by another
-   template; in this case the replacement expression must be used instead.
+8. **Before-templates that use pre-rewrite expressions**: using expressions in
+   `@BeforeTemplate` methods that would already be rewritten by another rule;
+   see *Principle 1* under "How rules interact with each other" above for
+   examples and a checklist.
 
 [contributing]: ../../CONTRIBUTING.md
 [refaster]: https://errorprone.info/docs/refaster
