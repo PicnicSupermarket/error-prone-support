@@ -57,6 +57,16 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
             .collect(toImmutableList()));
   }
 
+  java.util.Iterator<Integer> testImmutableListSortedCopyOfIterator() {
+    return ImmutableList.of(1, 2, 3).stream().sorted().iterator();
+  }
+
+  java.util.Iterator<String> testImmutableListSortedCopyOfIteratorWithComparator() {
+    return ImmutableList.of("foo", "bar").stream()
+        .sorted(Comparator.comparing(String::length))
+        .iterator();
+  }
+
   ImmutableList<Integer> testStreamToDistinctImmutableList() {
     return Stream.of(1).distinct().collect(toImmutableList());
   }

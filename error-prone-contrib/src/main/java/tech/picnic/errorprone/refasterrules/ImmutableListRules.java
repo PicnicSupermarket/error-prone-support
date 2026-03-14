@@ -132,6 +132,35 @@ final class ImmutableListRules {
     }
   }
 
+  /** Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over more contrived alternatives. */
+  static final class ImmutableListSortedCopyOfIterator<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> collection) {
+      return collection.stream().sorted().iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(Collection<T> collection) {
+      return ImmutableList.sortedCopyOf(collection).iterator();
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over more contrived
+   * alternatives.
+   */
+  static final class ImmutableListSortedCopyOfIteratorWithComparator<T> {
+    @BeforeTemplate
+    Iterator<T> before(Comparator<T> cmp, Collection<T> collection) {
+      return collection.stream().sorted(cmp).iterator();
+    }
+
+    @AfterTemplate
+    Iterator<T> after(Comparator<? super T> cmp, Collection<T> collection) {
+      return ImmutableList.sortedCopyOf(cmp, collection).iterator();
+    }
+  }
+
   /**
    * Collecting to an {@link ImmutableSet} and converting the result to an {@link ImmutableList} may
    * be more efficient than deduplicating a stream and collecting the result to an {@link
