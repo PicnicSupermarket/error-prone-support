@@ -76,7 +76,7 @@ for eps_version in ${eps_versions}; do
       # Before the introduction of an `.sdkmanrc` file, all released Error Prone
       # Support versions were compatible with Java 17. Error Prone 2.43.0 raised
       # the baseline from Java 17 to Java 21.
-      default_java_version="$(echo -e "2.43.0\n${ep_version}" | sort -CV && echo 25-tem || echo 17.0.16-tem)"
+      default_java_version="$(echo -e "2.43.0\n${ep_version}" | sort -CV && echo 25.0.2-tem || echo 17.0.18-tem)"
       echo n | sdk install java "${default_java_version}"
       sdk use java "${default_java_version}"
 
