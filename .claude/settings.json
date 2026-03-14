@@ -4,6 +4,7 @@
       "Bash(./apply-error-prone-suggestions.sh:*)",
       "Bash(./run-full-build.sh:*)",
       "Bash(./run-pr-mutation-tests.sh:*)",
+      "Bash(gh:*)",
       "Bash(git:*)",
       "Bash(mvn:*)",
       "Bash(mvnd:*)",
