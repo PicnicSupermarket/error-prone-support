@@ -558,8 +558,19 @@ output:
 mvn test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.skip
 ```
 
-Note that Refaster rules are not mutated by Pitest. As such, contrary to any
-other code change in this project, changes that only introduce or modify
+## Step 7 - Clean the codebase
+
+Install the changes, apply the new rule(s) to the current repository, and
+validate that as a result the whole build passes:
+
+```sh
+mvn clean install -DskipTests -Dverification.skip
+./apply-error-prone-suggestions.sh
+./run-full-build.sh
+```
+
+NB: Note that Refaster rules are not mutated by Pitest. As such, contrary to
+any other code change in this project, changes that only introduce or modify
 Refaster rules and associated tests do *not* require follow-up by running
 `./run-branch-mutation-tests.sh`.
 

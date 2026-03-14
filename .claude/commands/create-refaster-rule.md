@@ -16,11 +16,4 @@ conventions and step-by-step guide. Then:
 4. **Create or modify the test output file** following Step 4.
 5. **Register the collection** (if new) following Step 5.
 6. **Verify** by running the tests as described in Step 6.
-7. **Self-review checklist** before committing:
-   - [ ] Javadoc qualifier matches the transformation semantics (see qualifier
-     decision guide in the instructions). Do not copy from adjacent rules.
-   - [ ] No fully qualified types in test files — all types are imported.
-   - [ ] Test data is minimal: single-element collections, simple comparators,
-     no unnecessary complexity.
-8. **Follow the workflow** described in `AGENT.md` (mutation tests, apply
-suggestions, full build).
+7. **Apply the new rule** using the commands in Step 7.
