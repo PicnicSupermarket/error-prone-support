@@ -1138,6 +1138,7 @@
                             <requireJavaVersion>
                                 <version>25</version>
                             </requireJavaVersion>
+                            <requireManagedDeps />
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
                             </requireMatchingCoordinates>
