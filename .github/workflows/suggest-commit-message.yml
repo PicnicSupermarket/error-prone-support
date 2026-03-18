@@ -214,7 +214,7 @@ jobs:
             fs.writeFileSync(promptPath, instructions.trim() + '\n', { encoding: 'utf8' });
       - name: Suggest commit message with Codex
         id: codex
-        uses: openai/codex-action@086169432f1d2ab2f4057540b1754d550f6a1189 # v1.4
+        uses: openai/codex-action@c25d10f3f498316d4b2496cc4c6dd58057a7b031 # v1.6
         with:
           # XXX: We're using `safety-strategy: unsafe` and
           # `sandbox: danger-full-access` so that the agent is able to access
