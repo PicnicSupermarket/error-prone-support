@@ -15,6 +15,7 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractCollectionAssert;
 import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
+import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
@@ -202,7 +203,8 @@ final class AssertJMapRules {
   @PossibleSourceIncompatibility
   static final class AssertThatMapContainsOnlyKey<K, V> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(Map<K, V> map, K key) {
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ObjectAssert<K>> before(
+        Map<K, V> map, K key) {
       return assertThat(map.keySet()).containsExactly(key);
     }
 
@@ -217,7 +219,7 @@ final class AssertJMapRules {
   @PossibleSourceIncompatibility
   static final class AssertThatMapContainsOnlyKeys<K, V, T extends K> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, Collection<? extends K>, K, ?> before(
+    AbstractCollectionAssert<?, Collection<? extends K>, K, ObjectAssert<K>> before(
         Map<K, V> map, Iterable<T> keys) {
       return assertThat(map.keySet()).hasSameElementsAs(keys);
     }

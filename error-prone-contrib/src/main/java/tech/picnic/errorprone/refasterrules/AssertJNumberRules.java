@@ -261,7 +261,7 @@ final class AssertJNumberRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    NumberAssert<?, ?> after(long number) {
+    AbstractLongAssert<?> after(long number) {
       return assertThat(number).isOdd();
     }
   }
@@ -287,7 +287,7 @@ final class AssertJNumberRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    NumberAssert<?, ?> after(long number) {
+    AbstractLongAssert<?> after(long number) {
       return assertThat(number).isEven();
     }
   }

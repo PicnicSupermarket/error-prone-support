@@ -8,7 +8,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
-import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractIterableSizeAssert;
 import org.assertj.core.api.IterableAssert;
@@ -50,7 +50,7 @@ final class AssertJIterableRules {
     }
 
     @BeforeTemplate
-    AbstractAssert<?, ?> before(Collection<E> iterable) {
+    AbstractBooleanAssert<?> before(Collection<E> iterable) {
       return assertThat(iterable.isEmpty()).isFalse();
     }
 

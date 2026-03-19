@@ -29,7 +29,7 @@ final class AssertJComparableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+    AbstractComparableAssert<?, T> after(T actual, T expected) {
       return assertThat(actual).isEqualByComparingTo(expected);
     }
   }
@@ -47,7 +47,7 @@ final class AssertJComparableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+    AbstractComparableAssert<?, T> after(T actual, T expected) {
       return assertThat(actual).isNotEqualByComparingTo(expected);
     }
   }
@@ -65,7 +65,7 @@ final class AssertJComparableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+    AbstractComparableAssert<?, T> after(T actual, T expected) {
       return assertThat(actual).isLessThan(expected);
     }
   }
@@ -83,7 +83,7 @@ final class AssertJComparableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+    AbstractComparableAssert<?, T> after(T actual, T expected) {
       return assertThat(actual).isLessThanOrEqualTo(expected);
     }
   }
@@ -101,7 +101,7 @@ final class AssertJComparableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+    AbstractComparableAssert<?, T> after(T actual, T expected) {
       return assertThat(actual).isGreaterThan(expected);
     }
   }
@@ -119,7 +119,7 @@ final class AssertJComparableRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, ?> after(T actual, T expected) {
+    AbstractComparableAssert<?, T> after(T actual, T expected) {
       return assertThat(actual).isGreaterThanOrEqualTo(expected);
     }
   }

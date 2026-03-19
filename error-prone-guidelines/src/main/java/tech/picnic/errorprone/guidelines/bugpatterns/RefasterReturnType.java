@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static com.google.errorprone.predicates.TypePredicates.isExactType;
+import static java.util.Objects.requireNonNullElse;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -34,6 +35,7 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.BoundKind;
+import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symtab;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.CapturedType;
@@ -45,13 +47,19 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.lang.model.type.TypeKind;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.NoType;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeVariable;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
  * A {@link BugChecker} that flags Refaster template methods whose declared return type is not the
  * most specific denotable type, as inferred from the method's return expression(s).
  */
+// XXX: Finalize reviewing the identification tests w.r.t. naming and scope.
+// XXX: Simplify the replacement tests.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
@@ -66,7 +74,10 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       anyOf(hasAnnotation(BeforeTemplate.class), hasAnnotation(AfterTemplate.class));
   private static final Matcher<ExpressionTree> REFASTER_ANY_OF =
       staticMethod().onClass(Refaster.class.getCanonicalName()).named("anyOf");
-  private static final Matcher<Tree> HAS_ALSO_NEGATION = hasAnnotation(AlsoNegation.class);
+  private static final Matcher<Tree> ALSO_NEGATION = hasAnnotation(AlsoNegation.class);
+  private static final TypePredicate IS_BOXED_VOID = isExactType(Suppliers.JAVA_LANG_VOID_TYPE);
+  private static final TypePredicate IS_BOXED_BOOLEAN =
+      isExactType(Suppliers.JAVA_LANG_BOOLEAN_TYPE);
 
   /** Instantiates a new {@link RefasterReturnType} instance. */
   public RefasterReturnType() {}
@@ -77,17 +88,31 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
       return Description.NO_MATCH;
     }
 
-    return inferReturnType(tree, state)
-        .flatMap(type -> toDenotable(type, /* isTypeArg= */ false, state))
-        .map(type -> ensureAlsoNegationCompatibility(type, state))
-        .map(type -> mapVoidTypeArgsToWildcard(type, state))
-        .filter(
-            type -> !state.getTypes().isSameType(type, ASTHelpers.getSymbol(tree).getReturnType()))
-        .map(type -> describeMatch(tree, createFix(tree, type, state)))
-        .orElse(Description.NO_MATCH);
+    /*
+     * Determine the most specific denotable return type that is also compatible with Refaster DSL
+     * and JSpecify requirements.
+     */
+    Type suggestion =
+        mapVoidTypeArgsToWildcard(
+            ensureAlsoNegationCompatibility(
+                toDenotable(inferReturnType(tree, state), /* isTypeArg= */ false, state), state),
+            state);
+
+    /*
+     * Suggest that the method's return type is replaced only if a more specific denotable type is
+     * found. Note that in case of intersection types the declared return type may be a *subtype* of
+     * the inferred return type. In that case we don't suggest a change either.
+     */
+    return state.getTypes().isSuperType(suggestion, ASTHelpers.getSymbol(tree).getReturnType())
+        ? Description.NO_MATCH
+        : describeMatch(tree, createFix(tree, suggestion, state));
   }
 
-  private static Optional<Type> inferReturnType(MethodTree tree, VisitorState state) {
+  /**
+   * Infers the most specific return type that may be associated with the given method definition,
+   * without considering whether this type is denotable.
+   */
+  private static Type inferReturnType(MethodTree tree, VisitorState state) {
     ImmutableList<Type> returnTypes =
         MoreASTHelpers.findDirectReturnStatements(tree).stream()
             .map(ReturnTree::getExpression)
@@ -104,9 +129,14 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
     return returnTypes.stream()
         .map(types::boxedTypeOrType)
         .reduce(types::lub)
-        .map(l -> unboxLubIfPossible(l, returnTypes, state));
+        .map(l -> unboxLubIfPossible(l, returnTypes, state))
+        .orElseGet(() -> requireNonNullElse(ASTHelpers.getType(tree.getReturnType()), Type.noType));
   }
 
+  /**
+   * Returns the primitive variant of the given LUB type, if the types from which it is derived are
+   * all primitive.
+   */
   private static Type unboxLubIfPossible(
       Type lub, ImmutableList<Type> allTypes, VisitorState state) {
     Types types = state.getTypes();
@@ -120,55 +150,41 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
    * Attempts to convert a possibly non-denotable type into its most specific denotable
    * approximation. Returns {@link Optional#empty()} if no denotable type can be constructed.
    */
-  // XXX: Also handle arrays.
-  private static Optional<Type> toDenotable(Type type, boolean isTypeArg, VisitorState state) {
-    TypeKind kind = type.getKind();
-    if (kind == TypeKind.NULL || kind == TypeKind.ERROR || kind == TypeKind.NONE) {
-      return Optional.empty();
-    }
-
-    // XXX: Add tests for union types (e.g. from multi-catch) and intersection types (e.g. from type
-    // inference with multiple bounds).
-    // XXX: Add test with local classes and anonymous classes that implement multiple interfaces.
-    if ((!isTypeArg && type.isCompound()) || (type.tsym != null && type.tsym.isAnonymous())) {
-      // XXX: Instead of only checking the first direct supertype, consider all direct supertypes.
-      // Any matches the declared return type, prefer that one.
-      return toDenotable(state.getTypes().supertype(type), isTypeArg, state);
+  // XXX: Also handle arrays; TEST and recurse!!!.
+  private static Type toDenotable(Type type, boolean isTypeArg, VisitorState state) {
+    Types types = state.getTypes();
+    if (type.tsym.isAnonymous() || isLocalClass(type)) {
+      // XXX: Here, should we also consider interfaces? Add some tests to document current behavior.
+      return toDenotable(types.supertype(type), isTypeArg, state);
     }
 
     Symtab symtab = state.getSymtab();
     return switch (type) {
-      case CapturedType capturedType -> {
-        if (!isTypeArg) {
-          yield Optional.empty();
-        }
-
-        WildcardType wildcard = capturedType.wildcard;
-        yield (wildcard.kind == BoundKind.UNBOUND
-                ? Optional.of(symtab.objectType)
-                : toDenotable(wildcard.type, isTypeArg, state))
-            .map(bound -> new WildcardType(bound, wildcard.kind, symtab.boundClass));
-      }
+      case CapturedType capturedType ->
+          isTypeArg
+              ? toDenotable(capturedType.wildcard, isTypeArg, state)
+              : toDenotable(capturedType.getUpperBound(), isTypeArg, state);
       case ClassType classType ->
-          Optional.of(
-              mapTypeArguments(
-                  classType,
-                  arg ->
-                      toDenotable(arg, /* isTypeArg= */ true, state)
-                          .orElseGet(
-                              () ->
-                                  new WildcardType(
-                                      symtab.objectType, BoundKind.UNBOUND, symtab.boundClass))));
-
-      case WildcardType wildcard when wildcard.type != null ->
-          toDenotable(wildcard.type, isTypeArg, state)
-              .map(
-                  bound ->
-                      state.getTypes().isSameType(bound, wildcard.type)
-                          ? wildcard
-                          : new WildcardType(bound, wildcard.kind, wildcard.tsym));
-      default -> Optional.of(type);
+          mapTypeArguments(classType, arg -> toDenotable(arg, /* isTypeArg= */ true, state));
+      case WildcardType wildcard -> toDenotable(wildcard, isTypeArg, state);
+      case NoType ignored -> symtab.voidType;
+      case TypeVariable ignored -> type;
+      case PrimitiveType ignored -> type;
+      case ArrayType ignored -> type;
+      default -> symtab.objectType;
     };
+  }
+
+  private static Type toDenotable(WildcardType type, boolean isTypeArg, VisitorState state) {
+    Type bound =
+        type.kind == BoundKind.EXTENDS
+            ? toDenotable(type.type, isTypeArg, state)
+            : state.getSymtab().objectType;
+    return isTypeArg ? new WildcardType(bound, type.kind, type.tsym) : bound;
+  }
+
+  private static boolean isLocalClass(Type type) {
+    return type.tsym instanceof ClassSymbol cs && cs.owner.getKind() == ElementKind.METHOD;
   }
 
   /**
@@ -178,24 +194,20 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
    * <p>This to meet a Refaster DSL requirement.
    */
   private static Type ensureAlsoNegationCompatibility(Type type, VisitorState state) {
-    Types types = state.getTypes();
-    Symtab symtab = state.getSymtab();
-    Type boxedBoolean = Suppliers.JAVA_LANG_BOOLEAN_TYPE.get(state);
-
-    return types.isSameType(type, boxedBoolean) && enclosingClassHasAlsoNegation(state)
-        ? symtab.booleanType
+    return IS_BOXED_BOOLEAN.apply(type, state) && hasAlsoNegation(state)
+        ? state.getSymtab().booleanType
         : type;
   }
 
-  private static boolean enclosingClassHasAlsoNegation(VisitorState state) {
+  private static boolean hasAlsoNegation(VisitorState state) {
     ClassTree enclosingClass = state.findEnclosing(ClassTree.class);
     return enclosingClass != null
         && enclosingClass.getMembers().stream()
-            .anyMatch(member -> HAS_ALSO_NEGATION.matches(member, state));
+            .anyMatch(member -> ALSO_NEGATION.matches(member, state));
   }
 
   /**
-   * Replaces all {@link Void} type arguments in the given type to {@code ? extends Void}.
+   * Replaces all {@link Void} type arguments in the given type with {@code ? extends Void}.
    *
    * <p>This does not meaningfully change the type (as {@link Void} is {@code final}), but in
    * combination with {@link #createFix(MethodTree, Type, VisitorState)} it ensures that suggested
@@ -206,7 +218,7 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
         ? mapTypeArguments(
             classType,
             arg ->
-                ASTHelpers.isSameType(arg, Suppliers.JAVA_LANG_VOID_TYPE.get(state), state)
+                IS_BOXED_VOID.apply(arg, state)
                     ? new WildcardType(arg, BoundKind.EXTENDS, state.getSymtab().boundClass)
                     : arg)
         : type;
@@ -215,32 +227,16 @@ public final class RefasterReturnType extends BugChecker implements MethodTreeMa
   private static SuggestedFix createFix(MethodTree tree, Type newReturnType, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
 
-    String prettyType = SuggestedFixes.prettyType(state, fix, newReturnType);
-
     /* Make sure that the new return type satisfies Error Prone's `VoidMissingNullable` check. */
     String replacementType =
-        referencesVoidType(newReturnType, state)
-            ? prettyType.replace(
+        SuggestedFixes.prettyType(state, fix, newReturnType)
+            .replace(
                 "Void",
                 '@'
                     + SuggestedFixes.qualifyType(state, fix, "org.jspecify.annotations.Nullable")
-                    + " Void")
-            : prettyType;
+                    + " Void");
 
     return fix.replace(tree.getReturnType(), replacementType).build();
-  }
-
-  private static boolean referencesVoidType(Type type, VisitorState state) {
-    return referencesType(type, isExactType(Suppliers.JAVA_LANG_VOID_TYPE), state);
-  }
-
-  private static boolean referencesType(Type type, TypePredicate predicate, VisitorState state) {
-    if (type instanceof WildcardType wildcard && wildcard.type != null) {
-      return referencesType(wildcard.type, predicate, state);
-    }
-
-    return predicate.apply(type, state)
-        || type.getTypeArguments().stream().anyMatch(arg -> referencesType(arg, predicate, state));
   }
 
   private static ClassType mapTypeArguments(ClassType classType, Function<Type, Type> typeMapper) {
