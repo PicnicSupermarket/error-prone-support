@@ -157,8 +157,8 @@ final class AssertJFileRules {
     }
   }
 
-  // XXX: This rule changes the `File` against which subsequent assertions are made.
   /** Prefer {@link AbstractFileAssert#hasParent(File)} over more verbose alternatives. */
+  // XXX: This rule changes the `File` against which subsequent assertions are made.
   static final class AssertThatHasParentFile {
     @BeforeTemplate
     AbstractFileAssert<?> before(File actual, File expected) {
@@ -171,8 +171,8 @@ final class AssertJFileRules {
     }
   }
 
-  // XXX: This rule changes the `File` against which subsequent assertions are made.
   /** Prefer {@link AbstractFileAssert#hasParent(String)} over more verbose alternatives. */
+  // XXX: This rule changes the `File` against which subsequent assertions are made.
   static final class AssertThatHasParentString {
     @BeforeTemplate
     AbstractFileAssert<?> before(File actual, String expected) {

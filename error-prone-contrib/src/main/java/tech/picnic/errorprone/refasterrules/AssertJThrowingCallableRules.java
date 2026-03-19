@@ -909,12 +909,12 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
-  // arguments to a wide range of format methods.
   /**
    * Prefer {@link AbstractThrowableAssert#hasMessage(String, Object...)} over less efficient
    * alternatives.
    */
+  // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
+  // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertHasMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
@@ -933,12 +933,12 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
-  // arguments to a wide range of format methods.
   /**
    * Prefer {@link AbstractThrowableAssert#withFailMessage(String, Object...)} over less efficient
    * alternatives.
    */
+  // XXX: Drop this rule in favour of a generic Error Prone check that flags `String.format(...)`
+  // arguments to a wide range of format methods.
   static final class AbstractThrowableAssertWithFailMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
@@ -957,8 +957,8 @@ final class AssertJThrowingCallableRules {
     }
   }
 
-  // XXX: This rule changes the `Throwable` against which subsequent assertions are made.
   /** Prefer {@code throwableAssert.cause().isSameAs(expected)} over deprecated alternatives. */
+  // XXX: This rule changes the `Throwable` against which subsequent assertions are made.
   static final class AbstractThrowableAssertCauseIsSameAs {
     @BeforeTemplate
     @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
