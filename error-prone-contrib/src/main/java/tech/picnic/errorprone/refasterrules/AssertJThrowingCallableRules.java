@@ -742,7 +742,7 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    ThrowableAssertAlternative<? extends Throwable> before(
+    ThrowableAssertAlternative<T> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -794,7 +794,7 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    ThrowableAssertAlternative<? extends Throwable> before(
+    ThrowableAssertAlternative<T> before(
         ThrowingCallable throwingCallable,
         Class<T> exceptionType,
         String message,
@@ -826,7 +826,7 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    ThrowableAssertAlternative<? extends Throwable> before(
+    ThrowableAssertAlternative<T> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -852,7 +852,7 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    ThrowableAssertAlternative<? extends Throwable> before(
+    ThrowableAssertAlternative<T> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)
@@ -878,7 +878,7 @@ final class AssertJThrowingCallableRules {
     @BeforeTemplate
     @SuppressWarnings(
         "AssertThatThrownByAsInstanceOfThrowable" /* This is a more specific template. */)
-    ThrowableAssertAlternative<? extends Throwable> before(
+    ThrowableAssertAlternative<T> before(
         ThrowingCallable throwingCallable, Class<T> exceptionType, String message) {
       return assertThatExceptionOfType(exceptionType)
           .isThrownBy(throwingCallable)

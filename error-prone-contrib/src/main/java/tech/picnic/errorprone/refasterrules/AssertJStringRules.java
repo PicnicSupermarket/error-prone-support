@@ -47,7 +47,9 @@ final class AssertJStringRules {
     }
   }
 
-  /** Prefer {@link AbstractStringAssert#startsWith(String)} over more contrived alternatives. */
+  /**
+   * Prefer {@link AbstractStringAssert#startsWith(CharSequence)} over more contrived alternatives.
+   */
   @PossibleSourceIncompatibility
   static final class AssertThatStringStartsWith {
     @BeforeTemplate
@@ -63,7 +65,8 @@ final class AssertJStringRules {
   }
 
   /**
-   * Prefer {@link AbstractStringAssert#doesNotStartWith(String)} over more contrived alternatives.
+   * Prefer {@link AbstractStringAssert#doesNotStartWith(CharSequence)} over more contrived
+   * alternatives.
    */
   @PossibleSourceIncompatibility
   static final class AssertThatStringDoesNotStartWith {
@@ -79,7 +82,9 @@ final class AssertJStringRules {
     }
   }
 
-  /** Prefer {@link AbstractStringAssert#endsWith(String)} over more contrived alternatives. */
+  /**
+   * Prefer {@link AbstractStringAssert#endsWith(CharSequence)} over more contrived alternatives.
+   */
   @PossibleSourceIncompatibility
   static final class AssertThatStringEndsWith {
     @BeforeTemplate
@@ -95,7 +100,8 @@ final class AssertJStringRules {
   }
 
   /**
-   * Prefer {@link AbstractStringAssert#doesNotEndWith(String)} over more contrived alternatives.
+   * Prefer {@link AbstractStringAssert#doesNotEndWith(CharSequence)} over more contrived
+   * alternatives.
    */
   @PossibleSourceIncompatibility
   static final class AssertThatStringDoesNotEndWith {
@@ -146,7 +152,8 @@ final class AssertJStringRules {
     }
   }
 
-  /** Prefer {@link AbstractStringAssert#matches(String)} over more contrived alternatives. */
+  /** Prefer {@link AbstractStringAssert#matches(CharSequence)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatMatches {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String regex) {
@@ -160,7 +167,11 @@ final class AssertJStringRules {
     }
   }
 
-  /** Prefer {@link AbstractStringAssert#doesNotMatch(String)} over more contrived alternatives. */
+  /**
+   * Prefer {@link AbstractStringAssert#doesNotMatch(CharSequence)} over more contrived
+   * alternatives.
+   */
+  @PossibleSourceIncompatibility
   static final class AssertThatDoesNotMatch {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String regex) {

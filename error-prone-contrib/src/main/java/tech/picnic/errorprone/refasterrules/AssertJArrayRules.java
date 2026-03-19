@@ -20,7 +20,7 @@ import tech.picnic.errorprone.refaster.matchers.IsMultidimensionalArray;
 final class AssertJArrayRules {
   private AssertJArrayRules() {}
 
-  /** Prefer {@link AbstractObjectArrayAssert#hasSize(int)} over less explicit alternatives. */
+  /** Prefer {@link ObjectArrayAssert#hasSize(int)} over less explicit alternatives. */
   @PossibleSourceIncompatibility
   static final class AssertThatHasSize<T> {
     @BeforeTemplate
@@ -36,9 +36,7 @@ final class AssertJArrayRules {
     }
   }
 
-  /**
-   * Prefer {@link AbstractObjectArrayAssert#hasSizeLessThan(int)} over less explicit alternatives.
-   */
+  /** Prefer {@link ObjectArrayAssert#hasSizeLessThan(int)} over less explicit alternatives. */
   @PossibleSourceIncompatibility
   static final class AssertThatHasSizeLessThan<T> {
     @BeforeTemplate
@@ -55,8 +53,7 @@ final class AssertJArrayRules {
   }
 
   /**
-   * Prefer {@link AbstractObjectArrayAssert#hasSizeLessThanOrEqualTo(int)} over less explicit
-   * alternatives.
+   * Prefer {@link ObjectArrayAssert#hasSizeLessThanOrEqualTo(int)} over less explicit alternatives.
    */
   @PossibleSourceIncompatibility
   static final class AssertThatHasSizeLessThanOrEqualTo<T> {
@@ -73,10 +70,7 @@ final class AssertJArrayRules {
     }
   }
 
-  /**
-   * Prefer {@link AbstractObjectArrayAssert#hasSizeGreaterThan(int)} over less explicit
-   * alternatives.
-   */
+  /** Prefer {@link ObjectArrayAssert#hasSizeGreaterThan(int)} over less explicit alternatives. */
   @PossibleSourceIncompatibility
   static final class AssertThatHasSizeGreaterThan<T> {
     @BeforeTemplate
@@ -93,7 +87,7 @@ final class AssertJArrayRules {
   }
 
   /**
-   * Prefer {@link AbstractObjectArrayAssert#hasSizeGreaterThanOrEqualTo(int)} over less explicit
+   * Prefer {@link ObjectArrayAssert#hasSizeGreaterThanOrEqualTo(int)} over less explicit
    * alternatives.
    */
   @PossibleSourceIncompatibility
@@ -111,10 +105,7 @@ final class AssertJArrayRules {
     }
   }
 
-  /**
-   * Prefer {@link AbstractObjectArrayAssert#hasSizeBetween(int, int)} over less explicit
-   * alternatives.
-   */
+  /** Prefer {@link ObjectArrayAssert#hasSizeBetween(int, int)} over less explicit alternatives. */
   @PossibleSourceIncompatibility
   static final class AssertThatHasSizeBetween<T> {
     @BeforeTemplate
