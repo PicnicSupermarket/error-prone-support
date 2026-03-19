@@ -195,10 +195,10 @@ final class AssertJMapRules {
     }
   }
 
+  /** Prefer {@code assertThat(map).containsOnlyKeys(Object)} over more contrived alternatives. */
   // XXX: Strictly speaking this rule could be merged into `AssertThatMapContainsOnlyKeys` below,
   // but that rule targets another `containsOnlyKeys` overload. Review how cases like this should
   // impact the preferred naming scheme.
-  /** Prefer {@code assertThat(map).containsOnlyKeys(Object)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
   static final class AssertThatMapContainsOnlyKey<K, V> {
     @BeforeTemplate
