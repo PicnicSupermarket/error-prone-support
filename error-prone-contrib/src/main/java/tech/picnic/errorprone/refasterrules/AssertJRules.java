@@ -233,13 +233,15 @@ final class AssertJRules {
   /** Prefer {@code assertThat(set).containsExactly(element)} over less explicit alternatives. */
   static final class AssertThatSetContainsExactlyOneElement<S, T extends S> {
     @BeforeTemplate
-    ObjectEnumerableAssert<?, S> before(Set<S> set, T element) {
+    AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> before(
+        Set<S> set, T element) {
       return assertThat(set).containsOnly(element);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ObjectEnumerableAssert<?, S> after(Set<S> set, T element) {
+    AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> after(
+        Set<S> set, T element) {
       return assertThat(set).containsExactly(element);
     }
   }
@@ -272,7 +274,6 @@ final class AssertJRules {
    * Prefer {@link AbstractCollectionAssert#hasSameElementsAs(Iterable)} over less explicit or more
    * contrived alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatSetsAreEqual<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<
@@ -288,7 +289,8 @@ final class AssertJRules {
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, S, ?> after(Set<S> set1, Iterable<T> set2) {
+    AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> after(
+        Set<S> set1, Iterable<T> set2) {
       return assertThat(set1).hasSameElementsAs(set2);
     }
   }
@@ -303,13 +305,15 @@ final class AssertJRules {
    */
   static final class AssertThatMultisetsAreEqual<S, T extends S> {
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, S, ?> before(Multiset<S> multiset1, Iterable<T> multiset2) {
+    AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> before(
+        Multiset<S> multiset1, Iterable<T> multiset2) {
       return assertThat(multiset1).isEqualTo(multiset2);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractCollectionAssert<?, ?, S, ?> after(Multiset<S> multiset1, Iterable<T> multiset2) {
+    AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> after(
+        Multiset<S> multiset1, Iterable<T> multiset2) {
       return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
     }
   }
@@ -597,7 +601,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, T, ?> before2(
+    AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrderElementsOf(iterable);
     }
@@ -622,7 +626,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    AbstractCollectionAssert<?, ?, T, ?> before2(
+    AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactlyInAnyOrder(array);
     }
@@ -650,7 +654,7 @@ final class AssertJRules {
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
-    AbstractCollectionAssert<?, ?, T, ?> before2(
+    AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector))
           .containsExactlyInAnyOrder(Refaster.asVarargs(elements));

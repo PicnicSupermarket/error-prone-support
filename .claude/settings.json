@@ -2,8 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(./apply-error-prone-suggestions.sh:*)",
+      "Bash(./run-branch-mutation-tests.sh:*)",
       "Bash(./run-full-build.sh:*)",
-      "Bash(./run-pr-mutation-tests.sh:*)",
       "Bash(sdk env:*)"
     ]
   }

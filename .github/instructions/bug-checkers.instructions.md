@@ -314,6 +314,25 @@ Conventions:
 - **Flag-based tests**: Use `.setArgs("-XepOpt:CheckerName:FlagName=value")` in
   a dedicated test method.
 
+### Test ordering and completeness
+
+The `identification()` test should structurally list both compliant
+(not-flagged) and non-compliant (flagged) code examples, ordered to follow the
+checker's validation logic, starting with early exits and progressing through
+the decision pipeline. Where multiple examples exercise the same logic path,
+list them from simple to complex. A human reviewer should be able to walk
+through the checker source and test source in tandem and verify that all cases
+are covered.
+
+The `replacement()` test should follow the same structural ordering, with one
+test case per distinct fix pattern.
+
+When tests are structured this way, high mutation test coverage follows
+naturally. Regardless, always ensure maximal test coverage by running
+`./run-branch-mutation-tests.sh` and adding additional test cases to address
+surviving mutants. Such additional test cases must be placed appropriately
+based on the specified guidelines.
+
 ### Real example: `IsInstanceLambdaUsageTest`
 
 ```java
