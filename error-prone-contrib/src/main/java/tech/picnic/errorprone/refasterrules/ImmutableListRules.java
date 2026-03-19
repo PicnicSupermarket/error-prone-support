@@ -9,6 +9,7 @@ import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
+import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -151,7 +152,7 @@ final class ImmutableListRules {
     }
 
     @AfterTemplate
-    Iterator<T> after(Iterable<T> iterable) {
+    UnmodifiableIterator<T> after(Iterable<T> iterable) {
       return ImmutableList.sortedCopyOf(iterable).iterator();
     }
   }
@@ -172,7 +173,7 @@ final class ImmutableListRules {
     }
 
     @AfterTemplate
-    Iterator<T> after(Comparator<S> cmp, Iterable<T> iterable) {
+    UnmodifiableIterator<T> after(Comparator<S> cmp, Iterable<T> iterable) {
       return ImmutableList.sortedCopyOf(cmp, iterable).iterator();
     }
   }
