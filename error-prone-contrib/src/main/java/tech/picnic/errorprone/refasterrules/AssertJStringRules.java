@@ -22,7 +22,7 @@ final class AssertJStringRules {
   private AssertJStringRules() {}
 
   /** Prefer {@link AbstractStringAssert#isEmpty()} over less explicit alternatives. */
-  static final class AbstractStringAssertStringIsEmpty {
+  static final class AbstractStringAssertIsEmpty {
     @BeforeTemplate
     void before(AbstractStringAssert<?> stringAssert) {
       stringAssert.isEqualTo("");
@@ -35,7 +35,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#isNotEmpty()} over less explicit alternatives. */
-  static final class AbstractStringAssertStringIsNotEmpty {
+  static final class AbstractStringAssertIsNotEmpty {
     @BeforeTemplate
     AbstractStringAssert<?> before(AbstractStringAssert<?> stringAssert) {
       return stringAssert.isNotEqualTo("");
@@ -51,7 +51,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#startsWith(CharSequence)} over more contrived alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatStringStartsWith {
+  static final class AssertThatStartsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String prefix) {
       return assertThat(string.startsWith(prefix)).isTrue();
@@ -69,7 +69,7 @@ final class AssertJStringRules {
    * alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatStringDoesNotStartWith {
+  static final class AssertThatDoesNotStartWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String prefix) {
       return assertThat(string.startsWith(prefix)).isFalse();
@@ -86,7 +86,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#endsWith(CharSequence)} over more contrived alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatStringEndsWith {
+  static final class AssertThatEndsWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String suffix) {
       return assertThat(string.endsWith(suffix)).isTrue();
@@ -104,7 +104,7 @@ final class AssertJStringRules {
    * alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatStringDoesNotEndWith {
+  static final class AssertThatDoesNotEndWith {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String suffix) {
       return assertThat(string.endsWith(suffix)).isFalse();
@@ -121,7 +121,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#contains(CharSequence...)} over more contrived alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatStringContains {
+  static final class AssertThatContains {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {
       return assertThat(string.contains(substring)).isTrue();
@@ -139,7 +139,7 @@ final class AssertJStringRules {
    * alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatStringDoesNotContain {
+  static final class AssertThatDoesNotContain {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, CharSequence substring) {
       return assertThat(string.contains(substring)).isFalse();
@@ -186,7 +186,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@code assertThat(path).content(charset)} over more contrived alternatives. */
-  static final class AssertThatPathContent {
+  static final class AssertThatContent {
     @BeforeTemplate
     AbstractStringAssert<?> before(Path path, Charset charset) throws IOException {
       return assertThat(Files.readString(path, charset));
@@ -200,7 +200,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@code assertThat(path).content(UTF_8)} over more contrived alternatives. */
-  static final class AssertThatPathContentUtf8 {
+  static final class AssertThatContentUtf8 {
     @BeforeTemplate
     AbstractStringAssert<?> before(Path path) throws IOException {
       return assertThat(Files.readString(path));

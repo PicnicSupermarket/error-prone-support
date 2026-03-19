@@ -48,7 +48,7 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(3).stream().sorted().collect(toImmutableList()));
   }
 
-  ImmutableSet<ImmutableList<String>> testImmutableListSortedCopyOfWithComparator() {
+  ImmutableSet<ImmutableList<String>> testImmutableListSortedCopyOfWithCollection() {
     return ImmutableSet.of(
         Streams.stream(ImmutableSet.of("foo")::iterator)
             .sorted(Comparator.comparing(String::length))
@@ -64,7 +64,7 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableList.of(2).stream().sorted().iterator());
   }
 
-  ImmutableSet<Iterator<String>> testImmutableListSortedCopyOfIteratorWithComparator() {
+  ImmutableSet<Iterator<String>> testImmutableListSortedCopyOfIteratorWithIterable() {
     return ImmutableSet.of(
         Streams.stream(ImmutableList.of("foo")::iterator)
             .sorted(Comparator.comparing(String::length))
@@ -76,7 +76,7 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).distinct().collect(toImmutableList());
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf() {
+  ImmutableSet<List<Integer>> testImmutableListOf0() {
     return ImmutableSet.of(
         ImmutableList.<Integer>builder().build(),
         Stream.<Integer>empty().collect(toImmutableList()),

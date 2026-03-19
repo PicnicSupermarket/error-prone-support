@@ -46,7 +46,7 @@ final class OptionalRules {
     // XXX: Refaster should be smart enough to also rewrite occurrences in which there are
     // parentheses around the null check, but that's currently not the case. Try to fix that.
     @BeforeTemplate
-    @SuppressWarnings("OptionalOfFilterNegated" /* Special case. */)
+    @SuppressWarnings("RefasterEmitCommentBeforeOptionalOfFilterNot" /* Special case. */)
     Optional<T> before(@Nullable T object) {
       return object == null ? Optional.empty() : Optional.of(object);
     }
@@ -84,7 +84,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
-  static final class OptionalOrElseThrow<T> {
+  static final class OptionalOrElseThrowWithOptional<T> {
     @BeforeTemplate
     @SuppressWarnings({
       "java:S3655" /* Matched expressions are in practice embedded in a larger context. */,
@@ -104,7 +104,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#orElseThrow()} over the less explicit {@link Optional#get()}. */
   // XXX: This rule is analogous to `OptionalOrElseThrow` above. Arguably this is its
   // generalization. If/when Refaster is extended to understand this, delete the rule above.
-  static final class OptionalOrElseThrowMethodReference<T> {
+  static final class OptionalOrElseThrow<T> {
     @BeforeTemplate
     Function<Optional<T>, T> before() {
       return Optional::get;
@@ -117,7 +117,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#equals(Object)} over more contrived alternatives. */
-  static final class OptionalEqualsOptional<T, S> {
+  static final class OptionalEqualsOptionalOf<T, S> {
     @BeforeTemplate
     boolean before(Optional<T> optional, S value) {
       return Refaster.anyOf(
@@ -131,7 +131,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@code Streams.stream(iterator).findFirst()} over more contrived alternatives. */
-  static final class OptionalFirstIteratorElement<T> {
+  static final class StreamsStreamFindFirst<T> {
     @BeforeTemplate
     Optional<T> before(Iterator<T> it) {
       return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
@@ -148,7 +148,7 @@ final class OptionalRules {
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Review whether a `@Matcher` can be used to avoid this.
-  abstract static class OptionalOfFilter<T> {
+  abstract static class RefasterEmitCommentBeforeOptionalOfFilter<T> {
     @Placeholder
     abstract boolean test(T value);
 
@@ -168,7 +168,7 @@ final class OptionalRules {
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Review whether a `@Matcher` can be used to avoid this.
-  abstract static class OptionalOfFilterNegated<T> {
+  abstract static class RefasterEmitCommentBeforeOptionalOfFilterNot<T> {
     @Placeholder
     abstract boolean test(T value);
 
@@ -186,7 +186,7 @@ final class OptionalRules {
 
   /** Prefer {@link Optional#filter(Predicate)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class MapOptionalToBoolean<S, T extends S> {
+  static final class OptionalFilterIsPresent<S, T extends S> {
     @BeforeTemplate
     Boolean before(Optional<T> optional, Function<S, Boolean> predicate) {
       return optional.map(predicate).orElse(false);
@@ -199,7 +199,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#map(Function)} over more contrived alternatives. */
-  abstract static class MapToNullable<T, S> {
+  abstract static class OptionalMap<T, S> {
     @Placeholder
     abstract S toNullableFunction(@MayOptionallyUse T element);
 
@@ -218,7 +218,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#flatMap(Function)} over more contrived alternatives. */
-  abstract static class FlatMapToOptional<T, S> {
+  abstract static class OptionalFlatMap<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
@@ -237,7 +237,7 @@ final class OptionalRules {
    * Prefer {@link Optional#or(Supplier)} combined with {@link Optional#orElseThrow()} over more
    * contrived alternatives.
    */
-  static final class OrOrElseThrow<T> {
+  static final class OptionalOrOrElseThrow<T> {
     @BeforeTemplate
     T before(Optional<T> optional1, Optional<T> optional2) {
       return optional1.orElseGet(() -> optional2.orElseThrow());
@@ -273,7 +273,7 @@ final class OptionalRules {
   // with JMH benchmarks; this would be a great use case.)
   // XXX: Perhaps `stream.mapMulti(Optional::ifPresent)` is what we should use. See
   // https://github.com/palantir/gradle-baseline/pull/2996.
-  static final class StreamFlatMapOptional<T> {
+  static final class StreamFlatMapOptionalStream<T> {
     @BeforeTemplate
     Stream<T> before(Stream<Optional<T>> stream) {
       return Refaster.anyOf(
@@ -297,7 +297,7 @@ final class OptionalRules {
    */
   // XXX: An alternative approach is to use `.flatMap(Optional::stream)`. That may be a bit longer,
   // but yields nicer code. Think about it.
-  abstract static class StreamMapToOptionalGet<T, S> {
+  abstract static class StreamFlatMapStream<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
@@ -367,7 +367,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#or(Supplier)} over more verbose alternatives. */
-  static final class OptionalOrOtherOptional<T> {
+  static final class OptionalOr<T> {
     @BeforeTemplate
     @SuppressWarnings({
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
@@ -435,7 +435,7 @@ final class OptionalRules {
   /** Prefer {@link Optional#map(Function)} over more contrived alternatives. */
   // XXX: If `StreamMapFirst` also simplifies `.findAny()` expressions, then this rule can be
   // dropped in favour of `StreamMapFirst` and `OptionalIdentity`.
-  static final class OptionalMap<W, S extends W, T, V extends T> {
+  static final class OptionalMapWithFunction<W, S extends W, T, V extends T> {
     @BeforeTemplate
     Optional<V> before(Optional<S> optional, Function<W, V> function) {
       return optional.stream().map(function).findAny();

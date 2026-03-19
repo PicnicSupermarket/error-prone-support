@@ -43,7 +43,7 @@ final class AssertJLongRules {
   }
 
   /** Prefer {@link AbstractLongAssert#isEqualTo(long)} over less explicit alternatives. */
-  static final class AbstractLongAssertIsZero {
+  static final class AbstractLongAssertIsEqualToZero {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert) {
       return longAssert.isZero();
@@ -56,7 +56,7 @@ final class AssertJLongRules {
   }
 
   /** Prefer {@link AbstractLongAssert#isNotEqualTo(long)} over less explicit alternatives. */
-  static final class AbstractLongAssertIsNotZero {
+  static final class AbstractLongAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert) {
       return longAssert.isNotZero();
@@ -69,7 +69,7 @@ final class AssertJLongRules {
   }
 
   /** Prefer {@link AbstractLongAssert#isEqualTo(long)} over less explicit alternatives. */
-  static final class AbstractLongAssertIsOne {
+  static final class AbstractLongAssertIsEqualToOne {
     @BeforeTemplate
     AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert) {
       return longAssert.isOne();

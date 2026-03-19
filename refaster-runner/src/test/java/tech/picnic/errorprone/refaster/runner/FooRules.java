@@ -11,6 +11,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.Severity;
 
 /** An example rule collection used to test {@link CodeTransformers} and {@link Refaster}. */
+@SuppressWarnings("RefasterRuleName" /* Rule names are part of the test fixture API. */)
 final class FooRules {
   private FooRules() {}
 

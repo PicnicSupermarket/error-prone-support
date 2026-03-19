@@ -5,24 +5,24 @@ import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ClassRulesTest implements RefasterRuleCollectionTestCase {
-  boolean testClassIsInstance() {
+  boolean testClassIsInstanceWithClassAndObject() {
     return CharSequence.class.isInstance("foo");
   }
 
-  boolean testInstanceof() {
+  boolean testRefasterIsInstance() {
     return "foo" instanceof CharSequence;
   }
 
-  Predicate<String> testClassLiteralIsInstancePredicate() {
+  Predicate<String> testClassIsInstance() {
     return CharSequence.class::isInstance;
   }
 
-  Predicate<String> testClassReferenceIsInstancePredicate() {
+  Predicate<String> testClassIsInstanceWithClass() {
     Class<?> clazz = CharSequence.class;
     return clazz::isInstance;
   }
 
-  Function<Number, Integer> testClassReferenceCast() {
+  Function<Number, Integer> testClassCast() {
     return Integer.class::cast;
   }
 }

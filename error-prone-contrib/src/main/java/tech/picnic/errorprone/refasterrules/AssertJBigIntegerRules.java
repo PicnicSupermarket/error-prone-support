@@ -48,7 +48,7 @@ final class AssertJBigIntegerRules {
   }
 
   /** Prefer {@code isEqualTo(0)} over more contrived alternatives. */
-  static final class AbstractBigIntegerAssertIsZero {
+  static final class AbstractBigIntegerAssertIsEqualToZero {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
       return Refaster.anyOf(
@@ -64,7 +64,7 @@ final class AssertJBigIntegerRules {
   }
 
   /** Prefer {@code isNotEqualTo(0)} over more contrived alternatives. */
-  static final class AbstractBigIntegerAssertIsNotZero {
+  static final class AbstractBigIntegerAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
       return Refaster.anyOf(
@@ -80,7 +80,7 @@ final class AssertJBigIntegerRules {
   }
 
   /** Prefer {@code isEqualTo(1)} over more contrived alternatives. */
-  static final class AbstractBigIntegerAssertIsOne {
+  static final class AbstractBigIntegerAssertIsEqualToOne {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
       return Refaster.anyOf(

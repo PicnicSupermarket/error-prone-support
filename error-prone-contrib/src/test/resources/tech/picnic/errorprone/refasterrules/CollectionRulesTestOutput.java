@@ -60,11 +60,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     new ArrayList<Number>().addAll(ImmutableSet.of(2));
   }
 
-  boolean testCollectionRemoveAllFromCollectionExpression() {
+  boolean testCollectionRemoveAllExpression() {
     return new ArrayList<>().removeAll(ImmutableSet.of("foo"));
   }
 
-  void testCollectionRemoveAllFromCollectionBlock() {
+  void testCollectionRemoveAllBlock() {
     new HashSet<>().removeAll(ImmutableSet.of("foo"));
     new HashSet<Number>().removeAll(ImmutableList.of(1));
     new HashSet<Number>().removeAll(ImmutableSet.of(2));
@@ -74,7 +74,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).stream();
   }
 
-  Set<Integer> testSetOfVarargs() {
+  Set<Integer> testSetOf() {
     return Set.of(1, 2);
   }
 
@@ -111,11 +111,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(1).toArray(), ImmutableSet.of(2).toArray(), ImmutableSet.of(3).toArray());
   }
 
-  Integer[] testImmutableCollectionToArrayWithArray() {
+  Integer[] testImmutableCollectionToArrayObject() {
     return ImmutableSet.of(1).toArray(new Integer[0]);
   }
 
-  Integer[] testImmutableCollectionToArrayWithGenerator() {
+  Integer[] testImmutableCollectionToArrayIntFunction() {
     return ImmutableSet.of(1).toArray(Integer[]::new);
   }
 

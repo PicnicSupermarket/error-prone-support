@@ -43,7 +43,7 @@ final class AssertJIntegerRules {
   }
 
   /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over less explicit alternatives. */
-  static final class AbstractIntegerAssertIsZero {
+  static final class AbstractIntegerAssertIsEqualToZero {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return intAssert.isZero();
@@ -56,7 +56,7 @@ final class AssertJIntegerRules {
   }
 
   /** Prefer {@link AbstractIntegerAssert#isNotEqualTo(int)} over less explicit alternatives. */
-  static final class AbstractIntegerAssertIsNotZero {
+  static final class AbstractIntegerAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return intAssert.isNotZero();
@@ -69,7 +69,7 @@ final class AssertJIntegerRules {
   }
 
   /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over less explicit alternatives. */
-  static final class AbstractIntegerAssertIsOne {
+  static final class AbstractIntegerAssertIsEqualToOne {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
       return intAssert.isOne();

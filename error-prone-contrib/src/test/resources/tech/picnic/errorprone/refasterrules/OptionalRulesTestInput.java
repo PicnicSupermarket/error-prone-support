@@ -31,21 +31,21 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return !Optional.of("foo").isEmpty();
   }
 
-  String testOptionalOrElseThrow() {
+  String testOptionalOrElseThrowWithOptional() {
     return Optional.of("foo").get();
   }
 
-  Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
+  Function<Optional<Integer>, Integer> testOptionalOrElseThrow() {
     return Optional::get;
   }
 
-  ImmutableSet<Boolean> testOptionalEqualsOptional() {
+  ImmutableSet<Boolean> testOptionalEqualsOptionalOf() {
     return ImmutableSet.of(
         Optional.of("foo").filter("bar"::equals).isPresent(),
         Optional.of("baz").stream().anyMatch("qux"::equals));
   }
 
-  ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
+  ImmutableSet<Optional<String>> testStreamsStreamFindFirst() {
     return ImmutableSet.of(
         ImmutableSet.of("foo").iterator().hasNext()
             ? Optional.of(ImmutableSet.of("foo").iterator().next())
@@ -55,33 +55,33 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.of(ImmutableSet.of("foo").iterator().next()));
   }
 
-  ImmutableSet<Optional<String>> testOptionalOfFilter() {
+  ImmutableSet<Optional<String>> testRefasterEmitCommentBeforeOptionalOfFilter() {
     return ImmutableSet.of(
         "foo".length() > 5 ? Optional.of("foo") : Optional.empty(),
         !("bar".length() > 5) ? Optional.empty() : Optional.of("bar"));
   }
 
-  ImmutableSet<Optional<String>> testOptionalOfFilterNegated() {
+  ImmutableSet<Optional<String>> testRefasterEmitCommentBeforeOptionalOfFilterNot() {
     return ImmutableSet.of(
         "foo".length() > 5 ? Optional.empty() : Optional.of("foo"),
         !("bar".length() > 5) ? Optional.of("bar") : Optional.empty());
   }
 
-  boolean testMapOptionalToBoolean() {
+  boolean testOptionalFilterIsPresent() {
     return Optional.of("foo").map(String::isEmpty).orElse(false);
   }
 
-  ImmutableSet<Optional<String>> testMapToNullable() {
+  ImmutableSet<Optional<String>> testOptionalMap() {
     return ImmutableSet.of(
         Optional.of(1).flatMap(n -> Optional.of(String.valueOf(n))),
         Optional.of(2).flatMap(n -> Optional.ofNullable(String.valueOf(n))));
   }
 
-  Optional<String> testFlatMapToOptional() {
+  Optional<String> testOptionalFlatMap() {
     return Optional.of(1).map(n -> Optional.of(String.valueOf(n)).orElseThrow());
   }
 
-  String testOrOrElseThrow() {
+  String testOptionalOrOrElseThrow() {
     return Optional.of("foo").orElseGet(() -> Optional.of("bar").orElseThrow());
   }
 
@@ -90,13 +90,13 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("foo").orElseGet(() -> toString()), Optional.of("bar").orElseGet(() -> "baz"));
   }
 
-  ImmutableSet<Object> testStreamFlatMapOptional() {
+  ImmutableSet<Object> testStreamFlatMapOptionalStream() {
     return ImmutableSet.of(
         Stream.of(Optional.empty()).filter(Optional::isPresent).map(Optional::orElseThrow),
         Stream.of(Optional.of("foo")).flatMap(Streams::stream));
   }
 
-  Stream<String> testStreamMapToOptionalGet() {
+  Stream<String> testStreamFlatMapStream() {
     return Stream.of(1).map(n -> Optional.of(String.valueOf(n)).orElseThrow());
   }
 
@@ -112,7 +112,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length()).flatMap(Optional::of));
   }
 
-  ImmutableSet<Optional<String>> testOptionalOrOtherOptional() {
+  ImmutableSet<Optional<String>> testOptionalOr() {
     return ImmutableSet.of(
         Optional.of("foo").map(Optional::of).orElse(Optional.of("bar")),
         Optional.of("baz").map(Optional::of).orElseGet(() -> Optional.of("qux")),
@@ -138,7 +138,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("bar").stream().filter(String::isEmpty).findAny());
   }
 
-  Optional<String> testOptionalMap() {
+  Optional<String> testOptionalMapWithFunction() {
     return Optional.of(1).stream().map(String::valueOf).findAny();
   }
 

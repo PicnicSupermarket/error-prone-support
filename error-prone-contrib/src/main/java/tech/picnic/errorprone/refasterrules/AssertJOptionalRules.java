@@ -25,7 +25,7 @@ final class AssertJOptionalRules {
 
   /** Prefer {@code assertThat(optional).get()} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatOptional<T> {
+  static final class AssertThatGet<T> {
     @BeforeTemplate
     ObjectAssert<T> before(Optional<T> optional) {
       return assertThat(optional.orElseThrow());
@@ -55,7 +55,7 @@ final class AssertJOptionalRules {
 
   /** Prefer {@code assertThat(optional).isPresent()} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatOptionalIsPresent<T> {
+  static final class AssertThatIsPresent<T> {
     @BeforeTemplate
     AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> optional) {
       return Refaster.anyOf(
@@ -86,7 +86,7 @@ final class AssertJOptionalRules {
 
   /** Prefer {@code assertThat(optional).isEmpty()} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatOptionalIsEmpty<T> {
+  static final class AssertThatIsEmpty<T> {
     @BeforeTemplate
     AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> optional) {
       return Refaster.anyOf(
@@ -137,7 +137,7 @@ final class AssertJOptionalRules {
    * Prefer {@code assertThat(optional).get().matches(predicate)} over more contrived alternatives.
    */
   @PossibleSourceIncompatibility
-  static final class AssertThatOptionalHasValueMatching<S, T extends S> {
+  static final class AssertThatGetMatches<S, T extends S> {
     @BeforeTemplate
     OptionalAssert<T> before(Optional<T> optional, Predicate<S> predicate) {
       return assertThat(optional.filter(predicate)).isPresent();

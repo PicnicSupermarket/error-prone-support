@@ -116,7 +116,7 @@ final class AssertJRules {
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsDouble`.
   @PossibleSourceIncompatibility
-  static final class AssertThatOptionalDouble {
+  static final class AssertThatHasValueOptionalDouble {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(OptionalDouble optional, double expected) {
       return assertThat(optional.getAsDouble()).isEqualTo(expected);
@@ -137,7 +137,7 @@ final class AssertJRules {
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsInt`.
   @PossibleSourceIncompatibility
-  static final class AssertThatOptionalInt {
+  static final class AssertThatHasValueOptionalInt {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(OptionalInt optional, int expected) {
       return assertThat(optional.getAsInt()).isEqualTo(expected);
@@ -158,7 +158,7 @@ final class AssertJRules {
   // XXX: There are several other variations that can also be optimized so as to avoid
   // unconditionally calling `getAsLong`.
   @PossibleSourceIncompatibility
-  static final class AssertThatOptionalLong {
+  static final class AssertThatHasValueOptionalLong {
     @BeforeTemplate
     AbstractLongAssert<?> before(OptionalLong optional, long expected) {
       return assertThat(optional.getAsLong()).isEqualTo(expected);
@@ -176,7 +176,7 @@ final class AssertJRules {
   //
 
   /** Prefer {@link ObjectEnumerableAssert#contains(Object[])} over more contrived alternatives. */
-  static final class ObjectEnumerableContainsOneElement<S, T extends S> {
+  static final class ObjectEnumerableAssertContains<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
@@ -197,7 +197,7 @@ final class AssertJRules {
    * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over more contrived
    * alternatives.
    */
-  static final class ObjectEnumerableDoesNotContainOneElement<S, T extends S> {
+  static final class ObjectEnumerableAssertDoesNotContain<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
@@ -215,7 +215,7 @@ final class AssertJRules {
    * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over more contrived
    * alternatives.
    */
-  static final class ObjectEnumerableContainsExactlyOneElement<S, T extends S> {
+  static final class ObjectEnumerableAssertContainsExactly<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(
@@ -231,7 +231,7 @@ final class AssertJRules {
   }
 
   /** Prefer {@code assertThat(set).containsExactly(element)} over less explicit alternatives. */
-  static final class AssertThatSetContainsExactlyOneElement<S, T extends S> {
+  static final class AssertThatContainsExactlySet<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> before(
         Set<S> set, T element) {
@@ -253,7 +253,7 @@ final class AssertJRules {
   /**
    * Prefer {@link ListAssert#containsExactlyElementsOf(Iterable)} over less explicit alternatives.
    */
-  static final class AssertThatListsAreEqual<S, T extends S> {
+  static final class AssertThatContainsExactlyElementsOfList<S, T extends S> {
     @BeforeTemplate
     ListAssert<S> before(List<S> list1, Iterable<T> list2) {
       return assertThat(list1).isEqualTo(list2);
@@ -274,7 +274,7 @@ final class AssertJRules {
    * Prefer {@link AbstractCollectionAssert#hasSameElementsAs(Iterable)} over less explicit or more
    * contrived alternatives.
    */
-  static final class AssertThatSetsAreEqual<S, T extends S> {
+  static final class AssertThatHasSameElementsAsSet<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<
             ? extends AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>>,
@@ -303,7 +303,7 @@ final class AssertJRules {
    * Prefer {@link AbstractCollectionAssert#containsExactlyInAnyOrderElementsOf(Iterable)} over less
    * explicit alternatives.
    */
-  static final class AssertThatMultisetsAreEqual<S, T extends S> {
+  static final class AssertThatContainsExactlyInAnyOrderElementsOfMultiset<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> before(
         Multiset<S> multiset1, Iterable<T> multiset2) {
@@ -326,7 +326,7 @@ final class AssertJRules {
   // XXX: To match in all cases there'll need to be a `@BeforeTemplate` variant for each
   // `assertThat` overload. Consider defining a `BugChecker` instead.
   @PossibleSourceIncompatibility
-  static final class AssertThatMapContainsEntry<K, V> {
+  static final class AssertThatContainsEntry<K, V> {
     @BeforeTemplate
     ObjectAssert<V> before(Map<K, V> map, K key, V value) {
       return assertThat(map.get(key)).isEqualTo(value);
@@ -346,7 +346,7 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsAnyElementsOf(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsAnyElementsOf<S, T extends S, U extends T> {
+  static final class AssertThatContainsAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -377,7 +377,7 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsAnyOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsAnyOf<S, T extends S, U extends T> {
+  static final class AssertThatContainsAnyOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -406,16 +406,16 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsAnyOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsAnyOfVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatContainsAnyOfVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsAnyOf" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
     IterableAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsAnyOf" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream,
         @Repeated U elements,
@@ -424,24 +424,23 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsAnyOf" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
     ListAssert<T> before3(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
     }
 
     @AfterTemplate
-    @SuppressWarnings("ObjectEnumerableContainsOneElement" /* Not a true singleton. */)
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsAnyOf(elements);
+      return assertThat(stream).containsAnyOf(Refaster.asVarargs(elements));
     }
   }
 
   /** Prefer {@link ListAssert#containsAll(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsAll<S, T extends S, U extends T> {
+  static final class AssertThatContainsAll<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -472,7 +471,7 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#contains(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContains<S, T extends S, U extends T> {
+  static final class AssertThatContains<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -501,16 +500,16 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#contains(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatContainsVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContains" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
     IterableAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContains" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream,
         @Repeated U elements,
@@ -519,7 +518,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContains" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
     ListAssert<T> before3(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
@@ -528,7 +527,7 @@ final class AssertJRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).contains(elements);
+      return assertThat(stream).contains(Refaster.asVarargs(elements));
     }
   }
 
@@ -537,7 +536,7 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsExactlyElementsOf<S, T extends S, U extends T> {
+  static final class AssertThatContainsExactlyElementsOfStream<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
@@ -554,7 +553,7 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsExactly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsExactly<S, T extends S, U extends T> {
+  static final class AssertThatContainsExactlyStream<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
@@ -571,9 +570,9 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsExactly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsExactlyVarargs<S, T extends S, U extends T> {
+  static final class AssertThatContainsExactlyVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsExactly" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsExactlyStream" /* Varargs converted to array. */)
     ListAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsExactly(Refaster.asVarargs(elements));
@@ -582,7 +581,7 @@ final class AssertJRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsExactly(elements);
+      return assertThat(stream).containsExactly(Refaster.asVarargs(elements));
     }
   }
 
@@ -592,7 +591,7 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsExactlyInAnyOrderElementsOf<
+  static final class AssertThatContainsExactlyInAnyOrderElementsOfStream<
       S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
@@ -618,7 +617,7 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsExactlyInAnyOrder<S, T extends S, U extends T> {
+  static final class AssertThatContainsExactlyInAnyOrder<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
@@ -643,9 +642,9 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsExactlyInAnyOrderVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatContainsExactlyInAnyOrderVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsExactlyInAnyOrder" /* Varargs converted to array. */)
     ListAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector))
@@ -653,7 +652,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsExactlyInAnyOrder" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsExactlyInAnyOrder" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Multiset<T>> collector) {
       return assertThat(stream.collect(collector))
@@ -661,17 +660,16 @@ final class AssertJRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("ObjectEnumerableContainsExactlyOneElement" /* Not a true singleton. */)
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsExactlyInAnyOrder(elements);
+      return assertThat(stream).containsExactlyInAnyOrder(Refaster.asVarargs(elements));
     }
   }
 
   /** Prefer {@link ListAssert#containsSequence(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsSequence<S, T extends S, U extends T> {
+  static final class AssertThatContainsSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
@@ -694,26 +692,25 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsSequence(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsSequenceVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatContainsSequenceVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsSequence" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsSequence" /* Varargs converted to array. */)
     ListAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsSequence(Refaster.asVarargs(elements));
     }
 
     @AfterTemplate
-    @SuppressWarnings("ObjectEnumerableContainsOneElement" /* Not a true singleton. */)
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsSequence(elements);
+      return assertThat(stream).containsSequence(Refaster.asVarargs(elements));
     }
   }
 
   /** Prefer {@link ListAssert#containsSubsequence(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsSubsequence<S, T extends S, U extends T> {
+  static final class AssertThatContainsSubsequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
@@ -736,9 +733,9 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsSubsequence(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsSubsequenceVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatContainsSubsequenceVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsSubsequence" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsSubsequence" /* Varargs converted to array. */)
     ListAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector))
@@ -746,10 +743,9 @@ final class AssertJRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("ObjectEnumerableContainsOneElement" /* Not a true singleton. */)
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsSubsequence(elements);
+      return assertThat(stream).containsSubsequence(Refaster.asVarargs(elements));
     }
   }
 
@@ -759,7 +755,7 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamDoesNotContainAnyElementsOf<S, T extends S, U extends T> {
+  static final class AssertThatDoesNotContainAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -790,7 +786,7 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#doesNotContain(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamDoesNotContain<S, T extends S, U extends T> {
+  static final class AssertThatDoesNotContain<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -819,16 +815,16 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#doesNotContain(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamDoesNotContainVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatDoesNotContainVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamDoesNotContain" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
     IterableAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamDoesNotContain" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream,
         @Repeated U elements,
@@ -837,7 +833,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamDoesNotContain" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
     ListAssert<T> before3(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
@@ -846,7 +842,7 @@ final class AssertJRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).doesNotContain(elements);
+      return assertThat(stream).doesNotContain(Refaster.asVarargs(elements));
     }
   }
 
@@ -855,7 +851,7 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamDoesNotContainSequence<S, T extends S, U extends T> {
+  static final class AssertThatDoesNotContainSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
@@ -880,9 +876,9 @@ final class AssertJRules {
    */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamDoesNotContainSequenceVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatDoesNotContainSequenceVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamDoesNotContainSequence" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatDoesNotContainSequence" /* Varargs converted to array. */)
     ListAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector))
@@ -890,17 +886,16 @@ final class AssertJRules {
     }
 
     @AfterTemplate
-    @SuppressWarnings("ObjectEnumerableDoesNotContainOneElement" /* Not a true singleton. */)
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).doesNotContainSequence(elements);
+      return assertThat(stream).doesNotContainSequence(Refaster.asVarargs(elements));
     }
   }
 
   /** Prefer {@link ListAssert#hasSameElementsAs(Iterable)} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamHasSameElementsAs<S, T extends S, U extends T> {
+  static final class AssertThatHasSameElementsAsStream<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -931,7 +926,7 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsOnly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsOnly<S, T extends S, U extends T> {
+  static final class AssertThatContainsOnly<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -960,16 +955,16 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#containsOnly(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamContainsOnlyVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatContainsOnlyVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsOnly" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
     IterableAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsOnly" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream,
         @Repeated U elements,
@@ -978,7 +973,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamContainsOnly" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
     ListAssert<T> before3(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
@@ -987,14 +982,14 @@ final class AssertJRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsOnly(elements);
+      return assertThat(stream).containsOnly(Refaster.asVarargs(elements));
     }
   }
 
   /** Prefer {@link ListAssert#isSubsetOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamIsSubsetOf<S, T extends S, U extends T> {
+  static final class AssertThatIsSubsetOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
         Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
@@ -1043,16 +1038,16 @@ final class AssertJRules {
   /** Prefer {@link ListAssert#isSubsetOf(Object[])} over less efficient alternatives. */
   // XXX: This rule assumes the `collector` doesn't completely discard certain values.
   @PossibleSourceIncompatibility
-  static final class AssertThatStreamIsSubsetOfVarArgs<S, T extends S, U extends T> {
+  static final class AssertThatIsSubsetOfVarargs<S, T extends S, U extends T> {
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamIsSubsetOf" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)
     IterableAssert<T> before(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamIsSubsetOf" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
         Stream<S> stream,
         @Repeated U elements,
@@ -1061,7 +1056,7 @@ final class AssertJRules {
     }
 
     @BeforeTemplate
-    @SuppressWarnings("AssertThatStreamIsSubsetOf" /* Varargs converted to array. */)
+    @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)
     ListAssert<T> before3(
         Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
       return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
@@ -1070,7 +1065,7 @@ final class AssertJRules {
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).isSubsetOf(elements);
+      return assertThat(stream).isSubsetOf(Refaster.asVarargs(elements));
     }
   }
 
@@ -1079,7 +1074,7 @@ final class AssertJRules {
   //
 
   /** Prefer {@code assertThat(predicate).accepts(object)} over less explicit alternatives. */
-  static final class AssertThatPredicateAccepts<T> {
+  static final class AssertThatAccepts<T> {
     @BeforeTemplate
     void before(Predicate<T> predicate, T object) {
       assertThat(predicate.test(object)).isTrue();
@@ -1093,7 +1088,7 @@ final class AssertJRules {
   }
 
   /** Prefer {@code assertThat(predicate).rejects(object)} over less explicit alternatives. */
-  static final class AssertThatPredicateRejects<T> {
+  static final class AssertThatRejects<T> {
     @BeforeTemplate
     void before(Predicate<T> predicate, T object) {
       assertThat(predicate.test(object)).isFalse();

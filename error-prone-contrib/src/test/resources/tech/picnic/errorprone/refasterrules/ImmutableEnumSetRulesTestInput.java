@@ -79,7 +79,7 @@ final class ImmutableEnumSetRulesTest implements RefasterRuleCollectionTestCase 
         RoundingMode.HALF_EVEN);
   }
 
-  ImmutableSet<RoundingMode> testSetsImmutableEnumSetWithVarargs() {
+  ImmutableSet<RoundingMode> testSetsImmutableEnumSetVarargs() {
     return ImmutableSet.copyOf(
         EnumSet.of(
             RoundingMode.UP,

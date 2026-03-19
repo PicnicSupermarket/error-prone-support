@@ -116,7 +116,7 @@ final class ImmutableSetRules {
    */
   // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
   // this and similar Refaster rules are replaced with an Error Prone check.
-  static final class ImmutableSetOf<T> {
+  static final class ImmutableSetOf0<T> {
     @BeforeTemplate
     Set<T> before() {
       return Refaster.anyOf(
@@ -235,7 +235,7 @@ final class ImmutableSetRules {
    * Prefer {@code Sets.difference(set, map.keySet()).immutableCopy()} over less efficient
    * alternatives.
    */
-  static final class SetsDifferenceKeySetImmutableCopy<T, K, V> {
+  static final class SetsDifferenceMapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
     ImmutableSet<T> before(Set<T> set, Map<K, V> map) {
       return set.stream()

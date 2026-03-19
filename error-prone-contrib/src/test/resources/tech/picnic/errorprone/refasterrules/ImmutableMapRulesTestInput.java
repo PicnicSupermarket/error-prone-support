@@ -24,11 +24,11 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
     return new ImmutableMap.Builder<>();
   }
 
-  ImmutableMap<Object, Object> testImmutableMapBuilderBuildOrThrow() {
+  ImmutableMap<Object, Object> testBuilderBuildOrThrow() {
     return ImmutableMap.builder().build();
   }
 
-  ImmutableSet<ImmutableMap<String, Integer>> testImmutableMapOfMapEntryGetKeyMapEntryGetValue() {
+  ImmutableSet<ImmutableMap<String, Integer>> testImmutableMapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(
         ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)).buildOrThrow(),
         Stream.of(Map.entry("bar", 2))
@@ -93,7 +93,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
             k -> Math.toIntExact(ImmutableMap.of("bar", 2L).get(k))));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf0() {
     return ImmutableSet.of(
         ImmutableMap.<String, String>builder().buildOrThrow(),
         ImmutableMap.ofEntries(),
@@ -101,7 +101,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.<String, String>of());
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf1() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf2() {
     return ImmutableSet.of(
         ImmutableMap.<String, String>builder().put("foo", "bar").buildOrThrow(),
         ImmutableMap.ofEntries(Map.entry("baz", "qux")),
@@ -109,20 +109,20 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.of("grault", "garply"));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf2() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf4() {
     return ImmutableSet.of(
         ImmutableMap.ofEntries(Map.entry("foo", "bar"), Map.entry("baz", "qux")),
         Map.of("quux", "corge", "grault", "garply"));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf3() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf6() {
     return ImmutableSet.of(
         ImmutableMap.ofEntries(
             Map.entry("foo", "bar"), Map.entry("baz", "qux"), Map.entry("quux", "corge")),
         Map.of("grault", "garply", "waldo", "fred", "plugh", "xyzzy"));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf4() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf8() {
     return ImmutableSet.of(
         ImmutableMap.ofEntries(
             Map.entry("foo", "bar"),
@@ -132,7 +132,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.of("waldo", "fred", "plugh", "xyzzy", "thud", "foo", "bar", "baz"));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf5() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf10() {
     return ImmutableSet.of(
         ImmutableMap.ofEntries(
             Map.entry("foo", "bar"),
@@ -162,7 +162,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.ofEntries(Map.entry("bar", 2), Map.entry("baz", 3)));
   }
 
-  ImmutableSet<ImmutableMap.Builder<String, Integer>> testImmutableMapBuilderPut() {
+  ImmutableSet<ImmutableMap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)),
         ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("bar", 2)));

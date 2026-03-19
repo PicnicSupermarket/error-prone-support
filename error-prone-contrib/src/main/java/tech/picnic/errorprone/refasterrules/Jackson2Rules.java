@@ -66,7 +66,7 @@ final class Jackson2Rules {
   }
 
   /** Prefer {@link ObjectMapper#convertValue(Object, Class)} over less efficient alternatives. */
-  static final class ObjectMapperConvertValueWithClass<T> {
+  static final class ObjectMapperConvertValueClass<T> {
     @BeforeTemplate
     T before(ObjectMapper objectMapper, Object object, Class<T> valueType) throws IOException {
       return Refaster.anyOf(
@@ -83,7 +83,7 @@ final class Jackson2Rules {
   /**
    * Prefer {@link ObjectMapper#convertValue(Object, JavaType)} over less efficient alternatives.
    */
-  static final class ObjectMapperConvertValueWithJavaType<T> {
+  static final class ObjectMapperConvertValueJavaType<T> {
     @BeforeTemplate
     T before(ObjectMapper objectMapper, Object object, JavaType valueType) throws IOException {
       return Refaster.anyOf(
@@ -101,7 +101,7 @@ final class Jackson2Rules {
    * Prefer {@link ObjectMapper#convertValue(Object, TypeReference)} over less efficient
    * alternatives.
    */
-  static final class ObjectMapperConvertValueWithTypeReference<T> {
+  static final class ObjectMapperConvertValueTypeReference<T> {
     @BeforeTemplate
     T before(ObjectMapper objectMapper, Object object, TypeReference<T> valueTypeRef)
         throws IOException {

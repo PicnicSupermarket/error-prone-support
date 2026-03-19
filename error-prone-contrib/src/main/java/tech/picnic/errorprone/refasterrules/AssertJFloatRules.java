@@ -18,7 +18,7 @@ final class AssertJFloatRules {
   /**
    * Prefer {@link AbstractFloatAssert#isCloseTo(float, Offset)} over less explicit alternatives.
    */
-  static final class AbstractFloatAssertIsCloseToWithOffset {
+  static final class AbstractFloatAssertIsCloseTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(
         AbstractFloatAssert<?> floatAssert, float n, Offset<Float> offset) {
@@ -67,7 +67,7 @@ final class AssertJFloatRules {
   }
 
   /** Prefer {@code isEqualTo(0)} over more contrived alternatives. */
-  static final class AbstractFloatAssertIsZero {
+  static final class AbstractFloatAssertIsEqualToZero {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isZero();
@@ -80,7 +80,7 @@ final class AssertJFloatRules {
   }
 
   /** Prefer {@code isNotEqualTo(0)} over more contrived alternatives. */
-  static final class AbstractFloatAssertIsNotZero {
+  static final class AbstractFloatAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isNotZero();
@@ -93,7 +93,7 @@ final class AssertJFloatRules {
   }
 
   /** Prefer {@code isEqualTo(1)} over more contrived alternatives. */
-  static final class AbstractFloatAssertIsOne {
+  static final class AbstractFloatAssertIsEqualToOne {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isOne();

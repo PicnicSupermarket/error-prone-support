@@ -210,7 +210,7 @@ final class AssertJStreamRules {
   /** Prefer {@code assertThat(collection)} over more contrived alternatives. */
   // XXX: Consider moving this rule to a new `AssertJCollectionRules` class.
   @PossibleSourceIncompatibility
-  static final class AssertThatCollection<T> {
+  static final class AssertThat<T> {
     @BeforeTemplate
     ListAssert<T> before(Collection<T> collection) {
       return assertThat(collection.stream());

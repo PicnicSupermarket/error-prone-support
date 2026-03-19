@@ -33,13 +33,13 @@ final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
         JsonMapper.shared().readTree(JsonMapper.shared().writeValueAsString("bar")));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithClass() {
+  ImmutableSet<Number> testObjectMapperConvertValueClass() {
     return ImmutableSet.of(
         new ObjectMapper().readValue(new ObjectMapper().writeValueAsBytes("foo"), Integer.class),
         JsonMapper.shared().readValue(JsonMapper.shared().writeValueAsString("bar"), Double.class));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithJavaType() {
+  ImmutableSet<Number> testObjectMapperConvertValueJavaType() {
     return ImmutableSet.of(
         new ObjectMapper()
             .readValue(
@@ -51,7 +51,7 @@ final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
                 SimpleType.constructUnsafe(Double.class)));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithTypeReference() {
+  ImmutableSet<Number> testObjectMapperConvertValueTypeReference() {
     return ImmutableSet.of(
         new ObjectMapper()
             .readValue(

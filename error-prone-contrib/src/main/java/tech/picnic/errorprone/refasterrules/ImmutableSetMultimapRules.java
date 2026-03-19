@@ -43,7 +43,7 @@ final class ImmutableSetMultimapRules {
   }
 
   /** Prefer {@link ImmutableSetMultimap#of()} over less efficient alternatives. */
-  static final class ImmutableSetMultimapOf<K, V> {
+  static final class ImmutableSetMultimapOf0<K, V> {
     @BeforeTemplate
     ImmutableSetMultimap<K, V> before() {
       return ImmutableSetMultimap.<K, V>builder().build();
@@ -59,7 +59,7 @@ final class ImmutableSetMultimapRules {
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
   // actually produces nicer code. So it's not clear we should add Refaster rules for those
   // variants.
-  static final class ImmutableSetMultimapOf1<K, V> {
+  static final class ImmutableSetMultimapOf2<K, V> {
     @BeforeTemplate
     ImmutableSetMultimap<K, V> before(K key, V value) {
       return ImmutableSetMultimap.<K, V>builder().put(key, value).build();
@@ -75,7 +75,7 @@ final class ImmutableSetMultimapRules {
    * Prefer {@link ImmutableSetMultimap#of(Object, Object)} over less efficient or more contrived
    * alternatives.
    */
-  static final class ImmutableSetMultimapOfMapEntryGetKeyMapEntryGetValue<
+  static final class ImmutableSetMultimapOfEntryGetKeyEntryGetValue<
       K, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableSetMultimap<K, V> before(Map.Entry<K2, V2> entry) {
@@ -223,7 +223,7 @@ final class ImmutableSetMultimapRules {
    * Prefer {@link ImmutableSetMultimap.Builder#put(Object, Object)} over more contrived
    * alternatives.
    */
-  static final class ImmutableSetMultimapBuilderPut<K, V> {
+  static final class BuilderPut<K, V> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ImmutableSetMultimap.Builder<K, V> before(

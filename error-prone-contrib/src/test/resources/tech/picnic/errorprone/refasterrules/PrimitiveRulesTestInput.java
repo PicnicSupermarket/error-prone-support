@@ -108,7 +108,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Doubles.constrainToRange(1.0, 2.0, 3.0));
   }
 
-  int testLongToIntExact() {
+  int testMathToIntExact() {
     return Ints.checkedCast(Long.MAX_VALUE);
   }
 
@@ -136,7 +136,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Doubles.BYTES;
   }
 
-  ImmutableSet<Boolean> testIntegerSignumIsOne() {
+  ImmutableSet<Boolean> testIntegerSignumEqualToOne() {
     return ImmutableSet.of(
         Integer.signum(1) > 0,
         Integer.signum(2) >= 1,
@@ -144,7 +144,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Integer.signum(4) < 1);
   }
 
-  ImmutableSet<Boolean> testIntegerSignumIsNegativeOne() {
+  ImmutableSet<Boolean> testIntegerSignumEqualToNegativeOne() {
     return ImmutableSet.of(
         Integer.signum(1) < 0,
         Integer.signum(2) <= -1,
@@ -152,12 +152,12 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Integer.signum(4) > -1);
   }
 
-  ImmutableSet<Boolean> testLongSignumIsOne() {
+  ImmutableSet<Boolean> testLongSignumEqualToOne() {
     return ImmutableSet.of(
         Long.signum(1L) > 0, Long.signum(2L) >= 1, Long.signum(3L) <= 0, Long.signum(4L) < 1);
   }
 
-  ImmutableSet<Boolean> testLongSignumIsNegativeOne() {
+  ImmutableSet<Boolean> testLongSignumEqualToNegativeOne() {
     return ImmutableSet.of(
         Long.signum(1L) < 0, Long.signum(2L) <= -1, Long.signum(3L) >= 0, Long.signum(4L) > -1);
   }
@@ -194,11 +194,11 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(UnsignedLongs.parseUnsignedLong("1"), Long.parseUnsignedLong("2", 10));
   }
 
-  int testIntegerParseUnsignedIntWithRadix() {
+  int testIntegerParseUnsignedIntWithInt() {
     return UnsignedInts.parseUnsignedInt("1", 2);
   }
 
-  long testLongParseUnsignedLongWithRadix() {
+  long testLongParseUnsignedLongWithInt() {
     return UnsignedLongs.parseUnsignedLong("1", 2);
   }
 
@@ -210,23 +210,23 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(UnsignedLongs.toString(1), Long.toUnsignedString(2, 10));
   }
 
-  String testIntegerToUnsignedStringWithRadix() {
+  String testIntegerToUnsignedStringWithInt() {
     return UnsignedInts.toString(1, 2);
   }
 
-  String testLongToUnsignedStringWithRadix() {
+  String testLongToUnsignedStringWithInt() {
     return UnsignedLongs.toString(1, 2);
   }
 
-  Comparator<byte[]> testArraysCompareUnsignedBytes() {
+  Comparator<byte[]> testArraysCompareUnsignedByte() {
     return UnsignedBytes.lexicographicalComparator();
   }
 
-  Comparator<int[]> testArraysCompareUnsignedInts() {
+  Comparator<int[]> testArraysCompareUnsignedInt() {
     return UnsignedInts.lexicographicalComparator();
   }
 
-  Comparator<long[]> testArraysCompareUnsignedLongs() {
+  Comparator<long[]> testArraysCompareUnsignedLong() {
     return UnsignedLongs.lexicographicalComparator();
   }
 }

@@ -16,7 +16,7 @@ final class SpringTestRules {
    * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} with lenient mode over deprecated
    * alternatives.
    */
-  static final class BodyContentSpecJsonLenient {
+  static final class BodyContentSpecJsonJsonCompareModeLenient {
     @BeforeTemplate
     @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
     BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
@@ -33,7 +33,7 @@ final class SpringTestRules {
    * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} with strict mode over deprecated
    * alternatives.
    */
-  static final class BodyContentSpecJsonStrict {
+  static final class BodyContentSpecJsonJsonCompareModeStrict {
     @BeforeTemplate
     @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
     BodyContentSpec before(BodyContentSpec spec, String expectedJson) {

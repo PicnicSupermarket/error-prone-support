@@ -21,7 +21,7 @@ final class MicrometerRules {
 
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
-  static final class TagsOfOne {
+  static final class TagsOf1 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag) {
       return Refaster.anyOf(ImmutableSet.of(tag), ImmutableList.of(tag));
@@ -35,7 +35,7 @@ final class MicrometerRules {
 
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
-  static final class TagsOfTwo {
+  static final class TagsOf2 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2) {
       return Refaster.anyOf(ImmutableSet.of(tag1, tag2), ImmutableList.of(tag1, tag2));
@@ -49,7 +49,7 @@ final class MicrometerRules {
 
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
-  static final class TagsOfThree {
+  static final class TagsOf3 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3) {
       return Refaster.anyOf(ImmutableSet.of(tag1, tag2, tag3), ImmutableList.of(tag1, tag2, tag3));
@@ -63,7 +63,7 @@ final class MicrometerRules {
 
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
-  static final class TagsOfFour {
+  static final class TagsOf4 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
       return Refaster.anyOf(
@@ -78,7 +78,7 @@ final class MicrometerRules {
 
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
-  static final class TagsOfFive {
+  static final class TagsOf5 {
     @BeforeTemplate
     ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {
       return Refaster.anyOf(

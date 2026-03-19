@@ -35,7 +35,7 @@ final class ImmutableTableRules {
   }
 
   /** Prefer {@link ImmutableTable.Builder#buildOrThrow()} over less explicit alternatives. */
-  static final class ImmutableTableBuilderBuildOrThrow<R, C, V> {
+  static final class BuilderBuildOrThrow<R, C, V> {
     @BeforeTemplate
     ImmutableTable<R, C, V> before(ImmutableTable.Builder<R, C, V> builder) {
       return builder.build();
@@ -114,7 +114,7 @@ final class ImmutableTableRules {
    * Prefer {@link ImmutableTable.Builder#put(Object, Object, Object)} over more contrived
    * alternatives.
    */
-  static final class ImmutableTableBuilderPut<R, C, V> {
+  static final class BuilderPut<R, C, V> {
     @BeforeTemplate
     ImmutableTable.Builder<R, C, V> before(
         ImmutableTable.Builder<R, C, V> builder, R rowKey, C columnKey, V value) {

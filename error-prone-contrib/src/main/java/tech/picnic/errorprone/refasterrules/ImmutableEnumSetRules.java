@@ -194,7 +194,7 @@ final class ImmutableEnumSetRules {
   }
 
   /** Prefer {@link Sets#immutableEnumSet(Enum, Enum[])} over less efficient alternatives. */
-  static final class SetsImmutableEnumSetWithVarargs<T extends Enum<T>> {
+  static final class SetsImmutableEnumSetVarargs<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
     ImmutableSet<T> before(T e1, @Repeated T elements) {

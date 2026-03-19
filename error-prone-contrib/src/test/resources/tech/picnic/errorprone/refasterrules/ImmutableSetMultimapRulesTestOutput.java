@@ -25,16 +25,16 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
     return ImmutableSetMultimap.builder();
   }
 
-  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf0() {
     return ImmutableSetMultimap.of();
   }
 
-  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf1() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf2() {
     return ImmutableSetMultimap.of("foo", 1);
   }
 
   ImmutableSet<ImmutableSetMultimap<String, Integer>>
-      testImmutableSetMultimapOfMapEntryGetKeyMapEntryGetValue() {
+      testImmutableSetMultimapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(
         ImmutableSetMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
         ImmutableSetMultimap.of(Map.entry("bar", 2).getKey(), Map.entry("bar", 2).getValue()));
@@ -75,7 +75,7 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
             Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
   }
 
-  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testImmutableSetMultimapBuilderPut() {
+  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableSetMultimap.<String, Integer>builder().put("foo", 1),
         ImmutableSetMultimap.<String, Integer>builder().put("bar", 2));

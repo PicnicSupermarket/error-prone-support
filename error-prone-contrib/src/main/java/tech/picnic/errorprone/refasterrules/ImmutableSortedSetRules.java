@@ -124,7 +124,8 @@ final class ImmutableSortedSetRules {
   // XXX: Also handle the variant with a custom comparator.
   // XXX: Note that this rule rewrites fewer expressions than `StreamToImmutableSet`, because
   // `#compareTo` and `#equals` may be inconsistent. We should separately flag such cases.
-  static final class StreamCollectToImmutableSortedSet<T extends Comparable<? super T>> {
+  static final class StreamCollectToImmutableSortedSetNaturalOrder<
+      T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(Stream<T> stream) {
       return ImmutableSortedSet.copyOf(stream.iterator());

@@ -41,7 +41,7 @@ final class FileRules {
   }
 
   /** Prefer {@link Path#of(String, String...)} over less idiomatic alternatives. */
-  static final class PathOfWithVarargs {
+  static final class PathOfVarargs {
     @BeforeTemplate
     Path before(String first, @Repeated String more) {
       return Paths.get(first, Refaster.asVarargs(more));
@@ -152,7 +152,7 @@ final class FileRules {
   static final class FilesCreateTempFileToFile {
     @BeforeTemplate
     @SuppressWarnings({
-      "FilesCreateTempFileInCustomDirectoryToFile" /* This is a more specific template. */,
+      "FilesCreateTempFileFileToPathToFile" /* This is a more specific template. */,
       "java:S5443" /* This violation will be rewritten. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
@@ -179,7 +179,7 @@ final class FileRules {
    * will instead throw an {@link IllegalArgumentException} if the prefix contains any file
    * separators.
    */
-  static final class FilesCreateTempFileInCustomDirectoryToFile {
+  static final class FilesCreateTempFileFileToPathToFile {
     @BeforeTemplate
     File before(File directory, String prefix, String suffix) throws IOException {
       return File.createTempFile(prefix, suffix, directory);
@@ -195,7 +195,7 @@ final class FileRules {
    * Prefer this evaluation order of {@link File#mkdirs()} and {@link Files#exists(Path,
    * LinkOption...)} over more fragile alternatives.
    */
-  static final class PathToFileMkDirsFilesExists {
+  static final class PathToFileMkdirsOrFilesExists {
     @BeforeTemplate
     boolean before(Path path) {
       return Files.exists(path) || path.toFile().mkdirs();
@@ -212,7 +212,7 @@ final class FileRules {
    * Prefer this evaluation order of {@link File#mkdirs()} and {@link File#exists()} over more
    * fragile alternatives.
    */
-  static final class FileMkDirsFileExists {
+  static final class FileMkdirsOrFileExists {
     @BeforeTemplate
     boolean before(File file) {
       return file.exists() || file.mkdirs();

@@ -19,15 +19,15 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
     return ImmutableSet.of(Arrays.class, Streams.class);
   }
 
-  ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetBuilder() {
+  ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetOrderedBy() {
     return ImmutableSortedMultiset.orderedBy(Comparator.comparingInt(String::length));
   }
 
-  ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetNaturalOrderBuilder() {
+  ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetNaturalOrder() {
     return ImmutableSortedMultiset.naturalOrder();
   }
 
-  ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetReverseOrderBuilder() {
+  ImmutableSortedMultiset.Builder<String> testImmutableSortedMultisetReverseOrder() {
     return ImmutableSortedMultiset.reverseOrder();
   }
 
@@ -49,7 +49,7 @@ final class ImmutableSortedMultisetRulesTest implements RefasterRuleCollectionTe
         ImmutableSortedMultiset.copyOf(ImmutableList.of(10)));
   }
 
-  ImmutableSortedMultiset<Integer> testStreamCollectToImmutableSortedMultiset() {
+  ImmutableSortedMultiset<Integer> testStreamCollectToImmutableSortedMultisetNaturalOrder() {
     return Stream.of(1).collect(toImmutableSortedMultiset(naturalOrder()));
   }
 }

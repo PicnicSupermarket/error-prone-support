@@ -32,19 +32,19 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
         ImmutableMultimap.builder());
   }
 
-  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf() {
+  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf0() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().build(), ImmutableMultimap.of());
   }
 
-  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf1() {
+  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf2() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put("foo", 1).build(),
         ImmutableMultimap.of("bar", 2));
   }
 
   ImmutableSet<ImmutableMultimap<String, Integer>>
-      testImmutableListMultimapOfMapEntryGetKeyMapEntryGetValue() {
+      testImmutableListMultimapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)).build(),
         Stream.of(Map.entry("bar", 2))
@@ -122,8 +122,7 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
                     Map.Entry::getKey, e -> e.getValue().stream().map(Math::toIntExact))));
   }
 
-  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>>
-      testImmutableListMultimapBuilderPut() {
+  ImmutableSet<ImmutableListMultimap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableListMultimap.<String, Integer>builder().put(Map.entry("foo", 1)),
         ImmutableListMultimap.<String, Integer>builder().putAll("bar", 2));

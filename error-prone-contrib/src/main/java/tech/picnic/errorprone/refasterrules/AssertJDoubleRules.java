@@ -18,7 +18,7 @@ final class AssertJDoubleRules {
   /**
    * Prefer {@link AbstractDoubleAssert#isCloseTo(double, Offset)} over less explicit alternatives.
    */
-  static final class AbstractDoubleAssertIsCloseToWithOffset {
+  static final class AbstractDoubleAssertIsCloseTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(
         AbstractDoubleAssert<?> doubleAssert, double n, Offset<Double> offset) {
@@ -68,7 +68,7 @@ final class AssertJDoubleRules {
   }
 
   /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over less explicit alternatives. */
-  static final class AbstractDoubleAssertIsZero {
+  static final class AbstractDoubleAssertIsEqualToZero {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
       return doubleAssert.isZero();
@@ -81,7 +81,7 @@ final class AssertJDoubleRules {
   }
 
   /** Prefer {@link AbstractDoubleAssert#isNotEqualTo(double)} over less explicit alternatives. */
-  static final class AbstractDoubleAssertIsNotZero {
+  static final class AbstractDoubleAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
       return doubleAssert.isNotZero();
@@ -94,7 +94,7 @@ final class AssertJDoubleRules {
   }
 
   /** Prefer {@link AbstractDoubleAssert#isEqualTo(double)} over less explicit alternatives. */
-  static final class AbstractDoubleAssertIsOne {
+  static final class AbstractDoubleAssertIsEqualToOne {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(AbstractDoubleAssert<?> doubleAssert) {
       return doubleAssert.isOne();

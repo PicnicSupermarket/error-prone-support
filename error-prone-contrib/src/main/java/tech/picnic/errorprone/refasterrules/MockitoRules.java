@@ -34,7 +34,7 @@ final class MockitoRules {
   }
 
   /** Prefer {@link Mockito#verify(Object)} over more verbose alternatives. */
-  static final class VerifyOnce<T> {
+  static final class Verify<T> {
     @BeforeTemplate
     T before(T mock) {
       return verify(mock, times(1));
@@ -61,7 +61,7 @@ final class MockitoRules {
   }
 
   /** Prefer {@code invocation.<T>getArgument(int)} over less explicit alternatives. */
-  static final class InvocationOnMockGetArgumentWithTypeArgument<T> {
+  static final class InvocationOnMockGetArgumentObject<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Cast is presumed safe in matched context. */)
     T before(InvocationOnMock invocation, int i) {

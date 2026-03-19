@@ -21,7 +21,7 @@ final class AssertJObjectRules {
 
   /** Prefer {@link ObjectAssert#isInstanceOf(Class)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatIsInstanceOf<S, T> {
+  static final class AssertThatIsInstanceOfClass<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object) {
       return assertThat(Refaster.<T>isInstance(object)).isTrue();
@@ -36,7 +36,7 @@ final class AssertJObjectRules {
 
   /** Prefer {@link ObjectAssert#isInstanceOf(Class)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatIsInstanceOf2<S, T> {
+  static final class AssertThatIsInstanceOf<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(T object, Class<S> clazz) {
       return assertThat(clazz.isInstance(object)).isTrue();
@@ -51,7 +51,7 @@ final class AssertJObjectRules {
 
   /** Prefer {@link ObjectAssert#isNotInstanceOf(Class)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatIsNotInstanceOf<S, T> {
+  static final class AssertThatIsNotInstanceOfClass<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object) {
       return assertThat(Refaster.<T>isInstance(object)).isFalse();
@@ -66,7 +66,7 @@ final class AssertJObjectRules {
 
   /** Prefer {@link ObjectAssert#isEqualTo(Object)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatIsIsEqualTo<S, T> {
+  static final class AssertThatIsEqualTo<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object1, T object2) {
       return assertThat(object1.equals(object2)).isTrue();
@@ -81,7 +81,7 @@ final class AssertJObjectRules {
 
   /** Prefer {@link ObjectAssert#isNotEqualTo(Object)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatIsIsNotEqualTo<S, T> {
+  static final class AssertThatIsNotEqualTo<S, T> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(S object1, T object2) {
       return assertThat(object1.equals(object2)).isFalse();

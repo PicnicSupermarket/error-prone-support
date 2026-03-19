@@ -46,7 +46,7 @@ final class MapEntryRules {
 
   /** Prefer {@link Map.Entry#comparingByKey()} over more verbose alternatives. */
   // XXX: Also rewrite `Comparator.comparing{Double,Int,Long}(Map.Entry::getKey)`.
-  static final class MapEntryComparingByKey<K extends Comparable<? super K>, V> {
+  static final class ComparingByKey<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
       return Refaster.anyOf(comparing(Map.Entry::getKey), comparingByKey(naturalOrder()));
@@ -60,7 +60,7 @@ final class MapEntryRules {
   }
 
   /** Prefer {@link Map.Entry#comparingByKey(Comparator)} over more verbose alternatives. */
-  static final class MapEntryComparingByKeyWithComparator<K extends C, V, C> {
+  static final class ComparingByKeyWithComparator<K extends C, V, C> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before(Comparator<C> cmp) {
       return comparing(Map.Entry::getKey, cmp);
@@ -75,7 +75,7 @@ final class MapEntryRules {
 
   /** Prefer {@link Map.Entry#comparingByValue()} over more verbose alternatives. */
   // XXX: Also rewrite `Comparator.comparing{Double,Int,Long}(Map.Entry::getValue)`.
-  static final class MapEntryComparingByValue<K, V extends Comparable<? super V>> {
+  static final class ComparingByValue<K, V extends Comparable<? super V>> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
       return Refaster.anyOf(comparing(Map.Entry::getValue), comparingByValue(naturalOrder()));
@@ -89,7 +89,7 @@ final class MapEntryRules {
   }
 
   /** Prefer {@link Map.Entry#comparingByValue(Comparator)} over more verbose alternatives. */
-  static final class MapEntryComparingByValueWithComparator<K, V extends C, C> {
+  static final class ComparingByValueWithComparator<K, V extends C, C> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before(Comparator<C> cmp) {
       return comparing(Map.Entry::getValue, cmp);

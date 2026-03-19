@@ -22,7 +22,7 @@ final class EqualityRules {
 
   /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
   // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
-  static final class EnumReferenceEquality<T extends Enum<T>> {
+  static final class EqualToWithEnum<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -45,7 +45,7 @@ final class EqualityRules {
   }
 
   /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
-  static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
+  static final class EqualTo<T extends Enum<T>> {
     @BeforeTemplate
     Predicate<T> before(T e) {
       return Refaster.anyOf(isEqual(e), e::equals);
@@ -64,7 +64,7 @@ final class EqualityRules {
   // XXX: Alternatively, the rule should be replaced with a plugin that also identifies cases where
   // the arguments are swapped but simplification is possible anyway, by virtue of `v` being
   // non-null.
-  static final class EqualsPredicate<T> {
+  static final class TEquals<T> {
     @BeforeTemplate
     Predicate<T> before(T v) {
       return e -> v.equals(e);
@@ -95,7 +95,7 @@ final class EqualityRules {
   // XXX: Replacing `a ? !b : b` with `a != b` changes semantics if both `a` and `b` are boxed
   // booleans.
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-  static final class Negation {
+  static final class NotEqualTo {
     @BeforeTemplate
     boolean before(boolean a, boolean b) {
       return Refaster.anyOf(!(a == b), a ? !b : b);
@@ -122,8 +122,11 @@ final class EqualityRules {
   /** Prefer {@code ==} over more contrived alternatives. */
   // XXX: Replacing `a ? b : !b` with `a == b` changes semantics if both `a` and `b` are boxed
   // booleans.
-  @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-  static final class IndirectDoubleNegation {
+  @SuppressWarnings({
+    "java:S1940" /* This violation will be rewritten. */,
+    "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+  })
+  static final class EqualToWithBoolean {
     @BeforeTemplate
     boolean before(boolean a, boolean b) {
       return Refaster.anyOf(!(a != b), a ? b : !b);
@@ -148,7 +151,7 @@ final class EqualityRules {
   }
 
   /** Prefer negated lambda expressions over more contrived alternatives. */
-  abstract static class PredicateLambda<T> {
+  abstract static class Not<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean predicate(@MayOptionallyUse T value);
 
@@ -164,7 +167,7 @@ final class EqualityRules {
   }
 
   /** Prefer {@link Object#equals(Object)} over more contrived alternatives. */
-  static final class Equals<T, S> {
+  static final class TEqualsWithObject<T, S> {
     @BeforeTemplate
     boolean before(T value1, S value2) {
       return Refaster.anyOf(

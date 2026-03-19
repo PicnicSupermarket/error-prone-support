@@ -13,7 +13,7 @@ final class SuggestedFixRules {
   private SuggestedFixRules() {}
 
   /** Prefer {@link SuggestedFix#toBuilder()} over more contrived alternatives. */
-  static final class SuggestedFixBuilderToBuilder {
+  static final class SuggestedFixToBuilder {
     @BeforeTemplate
     SuggestedFix.Builder before(SuggestedFix fix) {
       return SuggestedFix.builder().merge(fix);
@@ -26,7 +26,7 @@ final class SuggestedFixRules {
   }
 
   /** Prefer {@link SuggestedFix#delete(Tree)} over more contrived alternatives. */
-  static final class SuggestedFixBuilderDelete {
+  static final class SuggestedFixDelete {
     @BeforeTemplate
     SuggestedFix before(Tree tree) {
       return SuggestedFix.builder().delete(tree).build();
@@ -39,7 +39,7 @@ final class SuggestedFixRules {
   }
 
   /** Prefer {@link SuggestedFix#replace(Tree, String)} over more contrived alternatives. */
-  static final class SuggestedFixBuilderReplaceTree {
+  static final class SuggestedFixReplace2 {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String replaceWith) {
       return SuggestedFix.builder().replace(tree, replaceWith).build();
@@ -52,7 +52,7 @@ final class SuggestedFixRules {
   }
 
   /** Prefer {@link SuggestedFix#replace(int, int, String)} over more contrived alternatives. */
-  static final class SuggestedFixBuilderReplaceStartEnd {
+  static final class SuggestedFixReplace3 {
     @BeforeTemplate
     SuggestedFix before(int start, int end, String replaceWith) {
       return SuggestedFix.builder().replace(start, end, replaceWith).build();
@@ -67,7 +67,7 @@ final class SuggestedFixRules {
   /**
    * Prefer {@link SuggestedFix#replace(Tree, String, int, int)} over more contrived alternatives.
    */
-  static final class SuggestedFixBuilderReplaceTreeStartEnd {
+  static final class SuggestedFixReplace4 {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String replaceWith, int start, int end) {
       return SuggestedFix.builder().replace(tree, replaceWith, start, end).build();
@@ -82,7 +82,7 @@ final class SuggestedFixRules {
   /**
    * Prefer {@link SuggestedFix#swap(Tree, Tree, VisitorState)} over more contrived alternatives.
    */
-  static final class SuggestedFixBuilderSwap {
+  static final class SuggestedFixSwap {
     @BeforeTemplate
     SuggestedFix before(Tree tree1, Tree tree2, VisitorState state) {
       return SuggestedFix.builder().swap(tree1, tree2, state).build();
@@ -95,7 +95,7 @@ final class SuggestedFixRules {
   }
 
   /** Prefer {@link SuggestedFix#prefixWith(Tree, String)} over more contrived alternatives. */
-  static final class SuggestedFixBuilderPrefixWith {
+  static final class SuggestedFixPrefixWith {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String prefix) {
       return SuggestedFix.builder().prefixWith(tree, prefix).build();
@@ -108,7 +108,7 @@ final class SuggestedFixRules {
   }
 
   /** Prefer {@link SuggestedFix#postfixWith(Tree, String)} over more contrived alternatives. */
-  static final class SuggestedFixBuilderPostfixWith {
+  static final class SuggestedFixPostfixWith {
     @BeforeTemplate
     SuggestedFix before(Tree tree, String postfix) {
       return SuggestedFix.builder().postfixWith(tree, postfix).build();

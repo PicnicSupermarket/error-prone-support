@@ -19,7 +19,7 @@ final class AssertJCharSequenceRules {
   private AssertJCharSequenceRules() {}
 
   /** Prefer {@link AbstractCharSequenceAssert#isEmpty()} over more contrived alternatives. */
-  static final class AssertThatCharSequenceIsEmpty {
+  static final class AssertThatIsEmpty {
     @BeforeTemplate
     void before(CharSequence charSequence) {
       Refaster.anyOf(
@@ -36,7 +36,7 @@ final class AssertJCharSequenceRules {
   }
 
   /** Prefer {@link AbstractCharSequenceAssert#isNotEmpty()} over more contrived alternatives. */
-  static final class AssertThatCharSequenceIsNotEmpty {
+  static final class AssertThatIsNotEmpty {
     @BeforeTemplate
     AbstractAssert<?, ?> before(CharSequence charSequence) {
       return Refaster.anyOf(
@@ -54,7 +54,7 @@ final class AssertJCharSequenceRules {
 
   /** Prefer {@link AbstractCharSequenceAssert#hasSize(int)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatCharSequenceHasSize {
+  static final class AssertThatHasSize {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(CharSequence charSequence, int length) {
       return assertThat(charSequence.length()).isEqualTo(length);

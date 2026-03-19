@@ -79,7 +79,8 @@ final class ImmutableSortedMapRules {
   // variants.
   // XXX: We could also rewrite builders with non-natural orders, but that would affect
   // `ImmutableSortedMap#comparator()`.
-  static final class ImmutableSortedMapOf1<K extends Comparable<? super K>, V> {
+  static final class ImmutableSortedMapOfWithComparableAndObject<
+      K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(K key, V value) {
       return ImmutableSortedMap.<K, V>naturalOrder().put(key, value).buildOrThrow();
@@ -97,7 +98,7 @@ final class ImmutableSortedMapRules {
    */
   // XXX: We could also rewrite builders with non-natural orders, but that would affect
   // `ImmutableSortedMap#comparator()`.
-  static final class ImmutableSortedMapOfMapEntryGetKeyMapEntryGetValue<
+  static final class ImmutableSortedMapOfEntryGetKeyEntryGetValue<
       K extends Comparable<? super K>, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(Map.Entry<K2, V2> entry) {

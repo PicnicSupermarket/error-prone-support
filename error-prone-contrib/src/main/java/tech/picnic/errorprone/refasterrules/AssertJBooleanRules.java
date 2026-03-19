@@ -55,7 +55,7 @@ final class AssertJBooleanRules {
   }
 
   /** Prefer {@code assertThat(b).isTrue()} over more contrived alternatives. */
-  static final class AssertThatBooleanIsTrue {
+  static final class AssertThatIsTrue {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean b) {
       return assertThat(!b).isFalse();
@@ -82,7 +82,7 @@ final class AssertJBooleanRules {
   }
 
   /** Prefer {@code assertThat(b).isFalse()} over more contrived alternatives. */
-  static final class AssertThatBooleanIsFalse {
+  static final class AssertThatIsFalse {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean b) {
       return assertThat(!b).isTrue();

@@ -32,128 +32,148 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     assertThatThrownBy(() -> {}).asInstanceOf(type(IllegalArgumentException.class));
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentException() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClass() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {});
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessage() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionRootCauseHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassRootCauseHasMessage() {
     return assertThatIllegalArgumentException()
         .isThrownBy(() -> {})
         .havingRootCause()
         .withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessageParameters() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageVarargs() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
 
   AbstractObjectAssert<?, ?>
-      testAssertThatThrownByIllegalArgumentExceptionHasMessageStartingWith() {
+      testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageStartingWith() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessageStartingWith("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalArgumentExceptionHasMessageContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageContaining() {
     return assertThatIllegalArgumentException().isThrownBy(() -> {}).withMessageContaining("foo");
   }
 
   AbstractObjectAssert<?, ?>
-      testAssertThatThrownByIllegalArgumentExceptionHasMessageNotContainingAny() {
+      testAssertThatThrownByIsInstanceOfIllegalArgumentExceptionClassHasMessageNotContainingAny() {
     return assertThatIllegalArgumentException()
         .isThrownBy(() -> {})
         .withMessageNotContainingAny("foo", "bar");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateException() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfIllegalStateExceptionClass() {
     return assertThatIllegalStateException().isThrownBy(() -> {});
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessage() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionRootCauseHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalStateExceptionClassRootCauseHasMessage() {
     return assertThatIllegalStateException()
         .isThrownBy(() -> {})
         .havingRootCause()
         .withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageParameters() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageVarargs() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageStartingWith() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageStartingWith() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageStartingWith("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageContaining() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIllegalStateExceptionHasMessageNotContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIllegalStateExceptionClassHasMessageNotContaining() {
     return assertThatIllegalStateException().isThrownBy(() -> {}).withMessageNotContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerException() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfNullPointerExceptionClass() {
     return assertThatNullPointerException().isThrownBy(() -> {});
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessage() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionRootCauseHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfNullPointerExceptionClassRootCauseHasMessage() {
     return assertThatNullPointerException()
         .isThrownBy(() -> {})
         .havingRootCause()
         .withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageParameters() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageVarargs() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageStartingWith() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageStartingWith() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessageStartingWith("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageContaining() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessageContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByNullPointerExceptionHasMessageNotContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfNullPointerExceptionClassHasMessageNotContaining() {
     return assertThatNullPointerException().isThrownBy(() -> {}).withMessageNotContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOException() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfIOExceptionClass() {
     return assertThatIOException().isThrownBy(() -> {});
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessage() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfIOExceptionClassHasMessage() {
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionRootCauseHasMessage() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIOExceptionClassRootCauseHasMessage() {
     return assertThatIOException().isThrownBy(() -> {}).havingRootCause().withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageParameters() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfIOExceptionClassHasMessageVarargs() {
     return assertThatIOException().isThrownBy(() -> {}).withMessage("foo %s", "bar");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageStartingWith() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIOExceptionClassHasMessageStartingWith() {
     return assertThatIOException().isThrownBy(() -> {}).withMessageStartingWith("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIOExceptionClassHasMessageContaining() {
     return assertThatIOException().isThrownBy(() -> {}).withMessageContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByIOExceptionHasMessageNotContaining() {
+  AbstractObjectAssert<?, ?>
+      testAssertThatThrownByIsInstanceOfIOExceptionClassHasMessageNotContaining() {
     return assertThatIOException().isThrownBy(() -> {}).withMessageNotContaining("foo");
   }
 
@@ -161,38 +181,38 @@ final class AssertJThrowingCallableRulesTest implements RefasterRuleCollectionTe
     return assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {});
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessage() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfHasMessage() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByRootCauseHasMessage() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfRootCauseHasMessage() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .havingRootCause()
         .withMessage("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessageParameters() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfHasMessageVarargs() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .withMessage("foo %s", "bar");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessageStartingWith() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfHasMessageStartingWith() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .withMessageStartingWith("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessageContaining() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfHasMessageContaining() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .withMessageContaining("foo");
   }
 
-  AbstractObjectAssert<?, ?> testAssertThatThrownByHasMessageNotContaining() {
+  AbstractObjectAssert<?, ?> testAssertThatThrownByIsInstanceOfHasMessageNotContaining() {
     return assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> {})
         .withMessageNotContaining("foo");

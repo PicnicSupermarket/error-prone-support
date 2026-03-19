@@ -26,15 +26,15 @@ final class AssertJByteRulesTest implements RefasterRuleCollectionTestCase {
         assertThat((byte) 1).isNotCloseTo((byte) 2, withPercentage(0)));
   }
 
-  AbstractByteAssert<?> testAbstractByteAssertIsZero() {
+  AbstractByteAssert<?> testAbstractByteAssertIsEqualToZero() {
     return assertThat((byte) 1).isZero();
   }
 
-  AbstractByteAssert<?> testAbstractByteAssertIsNotZero() {
+  AbstractByteAssert<?> testAbstractByteAssertIsNotEqualToZero() {
     return assertThat((byte) 1).isNotZero();
   }
 
-  AbstractByteAssert<?> testAbstractByteAssertIsOne() {
+  AbstractByteAssert<?> testAbstractByteAssertIsEqualToOne() {
     return assertThat((byte) 1).isOne();
   }
 }

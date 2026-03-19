@@ -37,9 +37,9 @@ function patch() {
   local new_diff
   new_diff="$(git diff)"
 
-  if [ "${current_diff}" != "${new_diff}" ]; then
-    patch "${new_diff}"
-  fi
+#  if [ "${current_diff}" != "${new_diff}" ]; then
+#    patch "${new_diff}"
+#  fi
 }
 
 patch "$(git diff)"

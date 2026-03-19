@@ -108,7 +108,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparator#comparing(Function)} over less explicit alternatives. */
-  abstract static class ComparingEnum<E extends Enum<E>, T> {
+  abstract static class Comparing<E extends Enum<E>, T> {
     @Placeholder(allowsIdentity = true)
     abstract E toEnumFunction(@MayOptionallyUse T value);
 
@@ -247,7 +247,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparable#compareTo(Object)} over more verbose alternatives. */
-  static final class ComparableCompareTo<T extends Comparable<? super T>> {
+  static final class TCompareTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     int before(T value1, T value2) {
       return Refaster.anyOf(
@@ -291,7 +291,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
-  static final class CollectionsMinArraysAsListOfArray<S, T extends S> {
+  static final class CollectionsMinArraysAsList<S, T extends S> {
     @BeforeTemplate
     T before(T[] array, Comparator<S> cmp) {
       return Arrays.stream(array).min(cmp).orElseThrow();
@@ -317,7 +317,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
-  static final class CollectionsMinArraysAsList<S, T extends S> {
+  static final class CollectionsMinArraysAsListVarargs<S, T extends S> {
     @BeforeTemplate
     T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).min(cmp).orElseThrow();
@@ -333,7 +333,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#min(Comparable, Comparable)} over less efficient, more verbose, or
    * more contrived alternatives.
    */
-  static final class ComparatorsMinOfPair<T extends Comparable<? super T>> {
+  static final class ComparatorsMin2<T extends Comparable<? super T>> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2) {
@@ -361,7 +361,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#min(Object, Object, Comparator)} over less efficient or more verbose
    * alternatives.
    */
-  static final class ComparatorsMinOfPairWithComparator<S, T extends S> {
+  static final class ComparatorsMin3<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2, Comparator<S> cmp) {
@@ -401,7 +401,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
-  static final class CollectionsMaxArraysAsListOfArray<S, T extends S> {
+  static final class CollectionsMaxArraysAsList<S, T extends S> {
     @BeforeTemplate
     T before(T[] array, Comparator<S> cmp) {
       return Arrays.stream(array).max(cmp).orElseThrow();
@@ -427,7 +427,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
-  static final class CollectionsMaxArraysAsList<S, T extends S> {
+  static final class CollectionsMaxArraysAsListVarargs<S, T extends S> {
     @BeforeTemplate
     T before(@Repeated T value, Comparator<S> cmp) {
       return Stream.of(Refaster.asVarargs(value)).max(cmp).orElseThrow();
@@ -443,7 +443,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#max(Comparable, Comparable)} over less efficient, more verbose, or
    * more contrived alternatives.
    */
-  static final class ComparatorsMaxOfPair<T extends Comparable<? super T>> {
+  static final class ComparatorsMax2<T extends Comparable<? super T>> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2) {
@@ -471,7 +471,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#max(Object, Object, Comparator)} over less efficient or more verbose
    * alternatives.
    */
-  static final class ComparatorsMaxOfPairWithComparator<S, T extends S> {
+  static final class ComparatorsMax3<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
     T before(T value1, T value2, Comparator<S> cmp) {
@@ -557,7 +557,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparators#min(Comparable, Comparable)} over more verbose alternatives. */
-  static final class ComparatorsMin<T extends Comparable<? super T>> {
+  static final class ComparatorsMin0<T extends Comparable<? super T>> {
     @BeforeTemplate
     BinaryOperator<T> before() {
       return BinaryOperator.minBy(naturalOrder());
@@ -570,7 +570,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparators#max(Comparable, Comparable)} over more verbose alternatives. */
-  static final class ComparatorsMax<T extends Comparable<? super T>> {
+  static final class ComparatorsMax0<T extends Comparable<? super T>> {
     @BeforeTemplate
     BinaryOperator<T> before() {
       return BinaryOperator.maxBy(naturalOrder());
@@ -617,7 +617,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Enum#compareTo(Enum)} over less explicit alternatives. */
-  static final class EnumCompareToLessThanZero<E extends Enum<E>> {
+  static final class ECompareToLessThanZero<E extends Enum<E>> {
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(E value1, E value2) {
@@ -632,7 +632,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Enum#compareTo(Enum)} over less explicit alternatives. */
-  static final class EnumCompareToLessThanOrEqualToZero<E extends Enum<E>> {
+  static final class ECompareToLessThanOrEqualToZero<E extends Enum<E>> {
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(E value1, E value2) {

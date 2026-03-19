@@ -18,17 +18,17 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(HashSet.class, Preconditions.class, Sets.class, Streams.class);
   }
 
-  int testCheckIndex() {
+  int testCheckIndexExpression() {
     return Preconditions.checkElementIndex(0, 1);
   }
 
-  void testCheckIndexConditional() {
+  void testCheckIndexBlock() {
     if (1 < 0 || 1 >= 2) {
       throw new IndexOutOfBoundsException();
     }
   }
 
-  ImmutableSet<String> testIteratorGetNextOrDefault() {
+  ImmutableSet<String> testIteratorsGetNext() {
     return ImmutableSet.of(
         ImmutableList.of("a").iterator().hasNext()
             ? ImmutableList.of("a").iterator().next()
@@ -38,7 +38,7 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   // XXX: Only the first statement is rewritten. Make smarter.
-  ImmutableSet<Boolean> testLogicalImplication() {
+  ImmutableSet<Boolean> testOr() {
     return ImmutableSet.of(
         toString().isEmpty() || (!toString().isEmpty() && Boolean.TRUE),
         !toString().isEmpty() || (toString().isEmpty() && Boolean.TRUE),
@@ -46,7 +46,7 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
         3 >= 4 || (3 < 4 && Boolean.TRUE));
   }
 
-  Stream<String> testUnboundedSingleElementStream() {
+  Stream<String> testStreamGenerate() {
     return Streams.stream(Iterables.cycle("foo"));
   }
 
@@ -64,11 +64,11 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
         Collections.disjoint(ImmutableList.of(7), new HashSet<>(ImmutableList.of(8))));
   }
 
-  boolean testIterableIsEmpty() {
+  boolean testIterablesIsEmpty() {
     return !ImmutableList.of().iterator().hasNext();
   }
 
-  ImmutableSet<Stream<String>> testSplitToStream() {
+  ImmutableSet<Stream<String>> testSplitterSplitToStream() {
     return ImmutableSet.of(
         Streams.stream(Splitter.on(':').split("foo")),
         Splitter.on(',').splitToList(new StringBuilder("bar")).stream());

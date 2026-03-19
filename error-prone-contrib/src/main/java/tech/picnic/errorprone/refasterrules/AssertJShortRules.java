@@ -44,7 +44,7 @@ final class AssertJShortRules {
   }
 
   /** Prefer {@link AbstractShortAssert#isEqualTo(short)} over less explicit alternatives. */
-  static final class AbstractShortAssertIsZero {
+  static final class AbstractShortAssertIsEqualToZero {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isZero();
@@ -57,7 +57,7 @@ final class AssertJShortRules {
   }
 
   /** Prefer {@link AbstractShortAssert#isNotEqualTo(short)} over less explicit alternatives. */
-  static final class AbstractShortAssertIsNotZero {
+  static final class AbstractShortAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isNotZero();
@@ -70,7 +70,7 @@ final class AssertJShortRules {
   }
 
   /** Prefer {@link AbstractShortAssert#isEqualTo(short)} over less explicit alternatives. */
-  static final class AbstractShortAssertIsOne {
+  static final class AbstractShortAssertIsEqualToOne {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isOne();

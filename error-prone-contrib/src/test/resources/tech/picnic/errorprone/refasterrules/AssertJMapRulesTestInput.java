@@ -56,7 +56,7 @@ final class AssertJMapRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(ImmutableMap.of(13, 0)).containsOnlyKeys();
   }
 
-  void testAssertThatMapIsEmpty() {
+  void testAssertThatIsEmpty() {
     assertThat(ImmutableMap.of(1, 0)).hasSize(0);
     assertThat(ImmutableMap.of(2, 0).isEmpty()).isTrue();
     assertThat(ImmutableMap.of(3, 0).size()).isEqualTo(0L);
@@ -72,7 +72,7 @@ final class AssertJMapRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(ImmutableMap.of(2, 0)).isNotEqualTo(ImmutableMap.of()));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapIsNotEmpty() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotEmpty() {
     return ImmutableSet.of(
         assertThat(ImmutableMap.of(1, 0).isEmpty()).isFalse(),
         assertThat(ImmutableMap.of(2, 0).size()).isNotEqualTo(0),
@@ -86,12 +86,12 @@ final class AssertJMapRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(ImmutableMap.of(1, 2, 3, 4)).isEqualTo(ImmutableMap.of(1, 2, 3, 4));
   }
 
-  MapAssert<Integer, Integer> testAbstractMapAssertContainsExactlyEntriesOf() {
+  MapAssert<Integer, Integer> testAbstractMapAssertContainsExactlyEntriesOfImmutableMapOf() {
     return assertThat(ImmutableMap.of(1, 2))
         .containsExactlyInAnyOrderEntriesOf(ImmutableMap.of(1, 2));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapHasSize() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatHasSize() {
     return ImmutableSet.of(
         assertThat(ImmutableMap.of(1, 2).size()).isEqualTo(1),
         assertThat(ImmutableMap.of(3, 4).keySet()).hasSize(1),
@@ -103,33 +103,33 @@ final class AssertJMapRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat(ImmutableMap.of(1, 2)).hasSize(ImmutableMap.of(3, 4).size());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapContainsKey() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsKey() {
     return ImmutableSet.of(
         assertThat(ImmutableMap.of(1, 2).containsKey(3)).isTrue(),
         assertThat(ImmutableMap.of(4, 5).keySet()).contains(6));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapDoesNotContainKey() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatDoesNotContainKey() {
     return ImmutableSet.of(
         assertThat(ImmutableMap.of(1, 2).containsKey(3)).isFalse(),
         assertThat(ImmutableMap.of(4, 5).keySet()).doesNotContain(6));
   }
 
-  AbstractAssert<?, ?> testAssertThatMapContainsOnlyKey() {
+  AbstractAssert<?, ?> testAssertThatContainsOnlyKeysObject() {
     return assertThat(ImmutableMap.of(1, 2).keySet()).containsExactly(3);
   }
 
-  AbstractAssert<?, ?> testAssertThatMapContainsOnlyKeys() {
+  AbstractAssert<?, ?> testAssertThatContainsOnlyKeysIterable() {
     return assertThat(ImmutableMap.of(1, 2).keySet()).hasSameElementsAs(ImmutableSet.of(3));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapContainsValue() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsValue() {
     return ImmutableSet.of(
         assertThat(ImmutableMap.of(1, 2).containsValue(3)).isTrue(),
         assertThat(ImmutableMap.of(4, 5).values()).contains(6));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatMapDoesNotContainValue() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatDoesNotContainValue() {
     return ImmutableSet.of(
         assertThat(ImmutableMap.of(1, 2).containsValue(3)).isFalse(),
         assertThat(ImmutableMap.of(4, 5).values()).doesNotContain(6));

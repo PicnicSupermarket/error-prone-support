@@ -49,7 +49,7 @@ final class ImmutableSortedSetRulesTest implements RefasterRuleCollectionTestCas
         ImmutableSortedSet.copyOf(ImmutableList.of(10)));
   }
 
-  ImmutableSortedSet<Integer> testStreamCollectToImmutableSortedSet() {
+  ImmutableSortedSet<Integer> testStreamCollectToImmutableSortedSetNaturalOrder() {
     return Stream.of(1).collect(toImmutableSortedSet(naturalOrder()));
   }
 }

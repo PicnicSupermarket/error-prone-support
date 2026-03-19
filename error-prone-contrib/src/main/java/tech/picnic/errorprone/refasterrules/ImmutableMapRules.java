@@ -47,7 +47,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap.Builder#buildOrThrow()} over less explicit alternatives. */
-  static final class ImmutableMapBuilderBuildOrThrow<K, V> {
+  static final class BuilderBuildOrThrow<K, V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(ImmutableMap.Builder<K, V> builder) {
       return builder.build();
@@ -60,8 +60,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#of(Object, Object)} over more contrived alternatives. */
-  static final class ImmutableMapOfMapEntryGetKeyMapEntryGetValue<
-      K, V, K2 extends K, V2 extends V> {
+  static final class ImmutableMapOfEntryGetKeyEntryGetValue<K, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(Map.Entry<K2, V2> entry) {
       return Refaster.anyOf(
@@ -233,7 +232,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap#of()} over more verbose or imprecisely typed alternatives. */
-  static final class ImmutableMapOf<K, V> {
+  static final class ImmutableMapOf0<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
       return Refaster.anyOf(
@@ -255,7 +254,7 @@ final class ImmutableMapRules {
    */
   // XXX: Note that the replacement of `Collections#singletonMap` is incorrect for nullable
   // elements.
-  static final class ImmutableMapOf1<K, V> {
+  static final class ImmutableMapOf2<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1) {
       return Refaster.anyOf(
@@ -277,7 +276,7 @@ final class ImmutableMapRules {
    */
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
-  static final class ImmutableMapOf2<K, V> {
+  static final class ImmutableMapOf4<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2) {
       return Refaster.anyOf(
@@ -296,7 +295,7 @@ final class ImmutableMapRules {
    */
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
-  static final class ImmutableMapOf3<K, V> {
+  static final class ImmutableMapOf6<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
       return Refaster.anyOf(
@@ -317,7 +316,7 @@ final class ImmutableMapRules {
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
   @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableMapOf4<K, V> {
+  static final class ImmutableMapOf8<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
       return Refaster.anyOf(
@@ -339,7 +338,7 @@ final class ImmutableMapRules {
   // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
   // also make it easier to rewrite various `ImmutableMap.builder()` variants.
   @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableMapOf5<K, V> {
+  static final class ImmutableMapOf10<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
       return Refaster.anyOf(
@@ -414,7 +413,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@link ImmutableMap.Builder#put(Object, Object)} over more contrived alternatives. */
-  static final class ImmutableMapBuilderPut<K, V> {
+  static final class BuilderPut<K, V> {
     @BeforeTemplate
     ImmutableMap.Builder<K, V> before(ImmutableMap.Builder<K, V> builder, K key, V value) {
       return Refaster.anyOf(

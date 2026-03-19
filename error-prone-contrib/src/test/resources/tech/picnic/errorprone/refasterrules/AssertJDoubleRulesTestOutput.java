@@ -14,7 +14,7 @@ final class AssertJDoubleRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(withPercentage(0));
   }
 
-  ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsCloseToWithOffset() {
+  ImmutableSet<AbstractDoubleAssert<?>> testAbstractDoubleAssertIsCloseTo() {
     return ImmutableSet.of(
         assertThat(1.0).isCloseTo(2, offset(0.0)),
         assertThat(1.0).isCloseTo(Double.valueOf(2), offset(0.0)));
@@ -28,15 +28,15 @@ final class AssertJDoubleRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(assertThat(1.0).isNotEqualTo(2), assertThat(1.0).isNotEqualTo(2));
   }
 
-  AbstractDoubleAssert<?> testAbstractDoubleAssertIsZero() {
+  AbstractDoubleAssert<?> testAbstractDoubleAssertIsEqualToZero() {
     return assertThat(1.0).isEqualTo(0);
   }
 
-  AbstractDoubleAssert<?> testAbstractDoubleAssertIsNotZero() {
+  AbstractDoubleAssert<?> testAbstractDoubleAssertIsNotEqualToZero() {
     return assertThat(1.0).isNotEqualTo(0);
   }
 
-  AbstractDoubleAssert<?> testAbstractDoubleAssertIsOne() {
+  AbstractDoubleAssert<?> testAbstractDoubleAssertIsEqualToOne() {
     return assertThat(1.0).isEqualTo(1);
   }
 }

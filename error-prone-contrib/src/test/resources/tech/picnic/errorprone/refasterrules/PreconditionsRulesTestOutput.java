@@ -12,36 +12,36 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  @SuppressWarnings("RequireNonNull")
+  @SuppressWarnings("RequireNonNullExpression")
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(checkNotNull(null));
   }
 
-  void testCheckArgument() {
+  void testCheckArgumentNot() {
     checkArgument(!"foo".isEmpty());
   }
 
-  void testCheckArgumentWithMessage() {
+  void testCheckArgumentNotWithString() {
     checkArgument(!"foo".isEmpty(), "The string is empty");
   }
 
-  void testCheckElementIndexWithMessage() {
+  void testCheckElementIndex() {
     checkElementIndex(1, 2, "My index");
   }
 
-  String testRequireNonNull() {
+  String testRequireNonNullExpression() {
     return requireNonNull("foo");
   }
 
-  void testRequireNonNullStatement() {
+  void testRequireNonNullBlock() {
     requireNonNull("foo");
   }
 
-  String testRequireNonNullWithMessage() {
+  String testRequireNonNullWithStringExpression() {
     return requireNonNull("foo", "The string is null");
   }
 
-  void testRequireNonNullWithMessageStatement() {
+  void testRequireNonNullWithStringBlock() {
     requireNonNull("foo", "The string is null");
   }
 
@@ -49,15 +49,15 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     checkPositionIndex(1, 2);
   }
 
-  void testCheckPositionIndexWithMessage() {
+  void testCheckPositionIndexWithString() {
     checkPositionIndex(1, 2, "My position");
   }
 
-  void testCheckState() {
+  void testCheckStateNot() {
     checkState(!"foo".isEmpty());
   }
 
-  void testCheckStateWithMessage() {
+  void testCheckStateNotWithString() {
     checkState(!"foo".isEmpty(), "The string is empty");
   }
 }

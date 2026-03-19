@@ -164,7 +164,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Collection#removeAll(Collection)} over non-JDK alternatives. */
-  static final class CollectionRemoveAllFromCollectionExpression<T, S extends T> {
+  static final class CollectionRemoveAllExpression<T, S extends T> {
     @BeforeTemplate
     boolean before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
       return Iterables.removeAll(removeFrom, elementsToRemove);
@@ -177,7 +177,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Collection#removeAll(Collection)} over more verbose alternatives. */
-  static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
+  static final class CollectionRemoveAllBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
       elementsToRemove.forEach(removeFrom::remove);
@@ -230,7 +230,7 @@ final class CollectionRules {
   // OpenRewrite.
   // XXX: The replacement code throws `IllegalArgumentException` on duplicate elements, while the
   // original code deduplicates them.
-  static final class SetOfVarargs<T> {
+  static final class SetOf<T> {
     @BeforeTemplate
     Set<T> before(@Repeated T elements) {
       return Stream.of(Refaster.asVarargs(elements)).collect(toUnmodifiableSet());
@@ -359,7 +359,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link ImmutableCollection#toArray(Object[])} over more verbose alternatives. */
-  static final class ImmutableCollectionToArrayWithArray<T, S> {
+  static final class ImmutableCollectionToArrayObject<T, S> {
     @BeforeTemplate
     S[] before(ImmutableCollection<T> collection, S[] array) {
       return collection.asList().toArray(array);
@@ -372,7 +372,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link ImmutableCollection#toArray(IntFunction)} over more verbose alternatives. */
-  static final class ImmutableCollectionToArrayWithGenerator<T, S> {
+  static final class ImmutableCollectionToArrayIntFunction<T, S> {
     @BeforeTemplate
     S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
       return collection.asList().toArray(generator);

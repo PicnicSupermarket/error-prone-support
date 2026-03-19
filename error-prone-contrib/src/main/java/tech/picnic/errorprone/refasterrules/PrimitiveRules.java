@@ -171,7 +171,7 @@ final class PrimitiveRules {
   /** Prefer {@link Math#toIntExact(long)} over non-JDK alternatives. */
   // XXX: This rule changes the exception possibly thrown from `IllegalArgumentException` to
   // `ArithmeticException`.
-  static final class LongToIntExact {
+  static final class MathToIntExact {
     @BeforeTemplate
     int before(long l) {
       return Ints.checkedCast(l);
@@ -262,7 +262,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Integer.signum(i) == 1} over less explicit alternatives. */
-  static final class IntegerSignumIsOne {
+  static final class IntegerSignumEqualToOne {
     @BeforeTemplate
     boolean before(int i) {
       return Refaster.anyOf(Integer.signum(i) > 0, Integer.signum(i) >= 1);
@@ -276,7 +276,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Integer.signum(i) == -1} over less explicit alternatives. */
-  static final class IntegerSignumIsNegativeOne {
+  static final class IntegerSignumEqualToNegativeOne {
     @BeforeTemplate
     boolean before(int i) {
       return Refaster.anyOf(Integer.signum(i) < 0, Integer.signum(i) <= -1);
@@ -290,7 +290,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Long.signum(l) == 1} over less explicit alternatives. */
-  static final class LongSignumIsOne {
+  static final class LongSignumEqualToOne {
     @BeforeTemplate
     boolean before(long l) {
       return Refaster.anyOf(Long.signum(l) > 0, Long.signum(l) >= 1);
@@ -304,7 +304,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Long.signum(l) == -1} over less explicit alternatives. */
-  static final class LongSignumIsNegativeOne {
+  static final class LongSignumEqualToNegativeOne {
     @BeforeTemplate
     boolean before(long l) {
       return Refaster.anyOf(Long.signum(l) < 0, Long.signum(l) <= -1);
@@ -424,7 +424,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@link Integer#parseUnsignedInt(String, int)} over non-JDK alternatives. */
-  static final class IntegerParseUnsignedIntWithRadix {
+  static final class IntegerParseUnsignedIntWithInt {
     @BeforeTemplate
     int before(String string, int radix) {
       return UnsignedInts.parseUnsignedInt(string, radix);
@@ -437,7 +437,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@link Long#parseUnsignedLong(String, int)} over non-JDK alternatives. */
-  static final class LongParseUnsignedLongWithRadix {
+  static final class LongParseUnsignedLongWithInt {
     @BeforeTemplate
     long before(String string, int radix) {
       return UnsignedLongs.parseUnsignedLong(string, radix);
@@ -476,7 +476,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@link Integer#toUnsignedString(int, int)} over non-JDK alternatives. */
-  static final class IntegerToUnsignedStringWithRadix {
+  static final class IntegerToUnsignedStringWithInt {
     @BeforeTemplate
     String before(int i, int radix) {
       return UnsignedInts.toString(i, radix);
@@ -489,7 +489,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@link Long#toUnsignedString(long, int)} over non-JDK alternatives. */
-  static final class LongToUnsignedStringWithRadix {
+  static final class LongToUnsignedStringWithInt {
     @BeforeTemplate
     String before(long i, int radix) {
       return UnsignedLongs.toString(i, radix);
@@ -504,7 +504,7 @@ final class PrimitiveRules {
   /** Prefer {@link Arrays#compareUnsigned(byte[], byte[])} over non-JDK alternatives. */
   // XXX: This rule will yield non-compilable code if the result of the replaced expression is
   // dereferenced. Investigate how to make this safe.
-  static final class ArraysCompareUnsignedBytes {
+  static final class ArraysCompareUnsignedByte {
     @BeforeTemplate
     Comparator<byte[]> before() {
       return UnsignedBytes.lexicographicalComparator();
@@ -519,7 +519,7 @@ final class PrimitiveRules {
   /** Prefer {@link Arrays#compareUnsigned(int[], int[])} over non-JDK alternatives. */
   // XXX: This rule will yield non-compilable code if the result of the replaced expression is
   // dereferenced. Investigate how to make this safe.
-  static final class ArraysCompareUnsignedInts {
+  static final class ArraysCompareUnsignedInt {
     @BeforeTemplate
     Comparator<int[]> before() {
       return UnsignedInts.lexicographicalComparator();
@@ -534,7 +534,7 @@ final class PrimitiveRules {
   /** Prefer {@link Arrays#compareUnsigned(long[], long[])} over non-JDK alternatives. */
   // XXX: This rule will yield non-compilable code if the result of the replaced expression is
   // dereferenced. Investigate how to make this safe.
-  static final class ArraysCompareUnsignedLongs {
+  static final class ArraysCompareUnsignedLong {
     @BeforeTemplate
     Comparator<long[]> before() {
       return UnsignedLongs.lexicographicalComparator();
