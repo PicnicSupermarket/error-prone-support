@@ -166,10 +166,12 @@ final class WebClientRules {
   /**
    * Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over more contrived alternatives.
    */
+  // XXX: Resolve the `RefasterReturnType` warning suppressions by splitting this rule.
   @PossibleSourceIncompatibility
   static final class RequestHeadersUriSpecUri<
       S extends RequestHeadersSpec<S>, T extends WebTestClient.RequestHeadersSpec<T>> {
     @BeforeTemplate
+    @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     RequestHeadersSpec<?> before(
         RequestHeadersUriSpec<S> requestHeadersUriSpec,
         String path,
@@ -179,6 +181,7 @@ final class WebClientRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     WebTestClient.RequestHeadersSpec<?> before(
         WebTestClient.RequestHeadersUriSpec<T> requestHeadersUriSpec,
         String path,
@@ -188,7 +191,7 @@ final class WebClientRules {
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(
+    S after(
         RequestHeadersUriSpec<S> requestHeadersUriSpec,
         String path,
         @Repeated Object uriVariables) {
