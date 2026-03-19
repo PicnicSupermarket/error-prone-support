@@ -275,7 +275,7 @@ final class JUnitToAssertJRules {
   private JUnitToAssertJRules() {}
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatBooleanArrayContainsExactly {
+  static final class AssertThatContainsExactlyBoolean {
     @BeforeTemplate
     void before(boolean[] actual, boolean[] expected) {
       assertArrayEquals(expected, actual);
@@ -289,7 +289,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatBooleanArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyBooleanString {
     @BeforeTemplate
     void before(boolean[] actual, String message, boolean[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -303,7 +303,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatBooleanArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyBooleanSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -319,7 +319,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatByteArrayContainsExactly {
+  static final class AssertThatContainsExactlyByte {
     @BeforeTemplate
     void before(byte[] actual, byte[] expected) {
       assertArrayEquals(expected, actual);
@@ -333,7 +333,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatByteArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyByteString {
     @BeforeTemplate
     void before(byte[] actual, String message, byte[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -347,7 +347,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatByteArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyByteSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -363,7 +363,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatCharArrayContainsExactly {
+  static final class AssertThatContainsExactlyChar {
     @BeforeTemplate
     void before(char[] actual, char[] expected) {
       assertArrayEquals(expected, actual);
@@ -377,7 +377,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatCharArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyCharString {
     @BeforeTemplate
     void before(char[] actual, String message, char[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -391,7 +391,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatCharArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyCharSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -407,7 +407,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatShortArrayContainsExactly {
+  static final class AssertThatContainsExactlyShort {
     @BeforeTemplate
     void before(short[] actual, short[] expected) {
       assertArrayEquals(expected, actual);
@@ -421,7 +421,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatShortArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyShortString {
     @BeforeTemplate
     void before(short[] actual, String message, short[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -435,7 +435,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatShortArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyShortSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -451,7 +451,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatIntArrayContainsExactly {
+  static final class AssertThatContainsExactlyInt {
     @BeforeTemplate
     void before(int[] actual, int[] expected) {
       assertArrayEquals(expected, actual);
@@ -465,7 +465,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatIntArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyIntString {
     @BeforeTemplate
     void before(int[] actual, String message, int[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -479,7 +479,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatIntArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyIntSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -495,7 +495,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatLongArrayContainsExactly {
+  static final class AssertThatContainsExactlyLong {
     @BeforeTemplate
     void before(long[] actual, long[] expected) {
       assertArrayEquals(expected, actual);
@@ -509,7 +509,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatLongArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyLongString {
     @BeforeTemplate
     void before(long[] actual, String message, long[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -523,7 +523,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatLongArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyLongSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -539,7 +539,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatFloatArrayContainsExactly {
+  static final class AssertThatContainsExactlyFloat {
     @BeforeTemplate
     void before(float[] actual, float[] expected) {
       assertArrayEquals(expected, actual);
@@ -553,7 +553,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatFloatArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyFloatString {
     @BeforeTemplate
     void before(float[] actual, String message, float[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -567,7 +567,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatFloatArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyFloatSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -585,7 +585,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
    */
-  static final class AssertThatFloatArrayContainsExactlyWithOffset {
+  static final class AssertThatContainsExactlyOffsetFloat {
     @BeforeTemplate
     void before(float[] actual, float[] expected, float delta) {
       assertArrayEquals(expected, actual, delta);
@@ -601,7 +601,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
    */
-  static final class AssertThatFloatArrayWithFailMessageStringContainsExactlyWithOffset {
+  static final class AssertThatWithFailMessageContainsExactlyOffsetFloatString {
     @BeforeTemplate
     void before(float[] actual, String message, float[] expected, float delta) {
       assertArrayEquals(expected, actual, delta, message);
@@ -617,7 +617,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
    */
-  static final class AssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset {
+  static final class AssertThatWithFailMessageContainsExactlyOffsetFloatSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -634,7 +634,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatDoubleArrayContainsExactly {
+  static final class AssertThatContainsExactlyDouble {
     @BeforeTemplate
     void before(double[] actual, double[] expected) {
       assertArrayEquals(expected, actual);
@@ -648,7 +648,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatDoubleArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyDoubleString {
     @BeforeTemplate
     void before(double[] actual, String message, double[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -662,7 +662,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatDoubleArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyDoubleSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -680,7 +680,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
    */
-  static final class AssertThatDoubleArrayContainsExactlyWithOffset {
+  static final class AssertThatContainsExactlyOffsetDouble {
     @BeforeTemplate
     void before(double[] actual, double[] expected, double delta) {
       assertArrayEquals(expected, actual, delta);
@@ -696,7 +696,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
    */
-  static final class AssertThatDoubleArrayWithFailMessageStringContainsExactlyWithOffset {
+  static final class AssertThatWithFailMessageContainsExactlyOffsetDoubleString {
     @BeforeTemplate
     void before(double[] actual, String message, double[] expected, double delta) {
       assertArrayEquals(expected, actual, delta, message);
@@ -712,7 +712,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThat(...).containsExactly(..., offset(...))} over non-AssertJ alternatives.
    */
-  static final class AssertThatDoubleArrayWithFailMessageSupplierContainsExactlyWithOffset {
+  static final class AssertThatWithFailMessageContainsExactlyOffsetDoubleSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -730,7 +730,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatObjectArrayContainsExactly {
+  static final class AssertThatContainsExactlyObject {
     @BeforeTemplate
     void before(Object[] actual, Object[] expected) {
       assertArrayEquals(expected, actual);
@@ -744,7 +744,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatObjectArrayWithFailMessageStringContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyObjectString {
     @BeforeTemplate
     void before(Object[] actual, String message, Object[] expected) {
       assertArrayEquals(expected, actual, message);
@@ -758,7 +758,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
-  static final class AssertThatObjectArrayWithFailMessageSupplierContainsExactly {
+  static final class AssertThatWithFailMessageContainsExactlyObjectSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -856,7 +856,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractBooleanAssert#isTrue()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsTrue {
+  static final class AssertThatWithFailMessageIsTrueString {
     @BeforeTemplate
     void before(boolean actual, String message) {
       assertTrue(actual, message);
@@ -870,7 +870,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractBooleanAssert#isTrue()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsTrue {
+  static final class AssertThatWithFailMessageIsTrueSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -900,7 +900,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractBooleanAssert#isFalse()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsFalse {
+  static final class AssertThatWithFailMessageIsFalseString {
     @BeforeTemplate
     void before(boolean actual, String message) {
       assertFalse(actual, message);
@@ -914,7 +914,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractBooleanAssert#isFalse()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsFalse {
+  static final class AssertThatWithFailMessageIsFalseSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -944,7 +944,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNull()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsNull {
+  static final class AssertThatWithFailMessageIsNullString {
     @BeforeTemplate
     void before(Object actual, String message) {
       assertNull(actual, message);
@@ -958,7 +958,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNull()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsNull {
+  static final class AssertThatWithFailMessageIsNullSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -988,7 +988,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNotNull()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsNotNull {
+  static final class AssertThatWithFailMessageIsNotNullString {
     @BeforeTemplate
     void before(Object actual, String message) {
       assertNotNull(actual, message);
@@ -1002,7 +1002,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNotNull()} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsNotNull {
+  static final class AssertThatWithFailMessageIsNotNullSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -1032,7 +1032,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isSameAs(Object)} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsSameAs {
+  static final class AssertThatWithFailMessageIsSameAsString {
     @BeforeTemplate
     void before(Object actual, String message, Object expected) {
       assertSame(expected, actual, message);
@@ -1046,7 +1046,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isSameAs(Object)} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsSameAs {
+  static final class AssertThatWithFailMessageIsSameAsSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -1076,7 +1076,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNotSameAs(Object)} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsNotSameAs {
+  static final class AssertThatWithFailMessageIsNotSameAsString {
     @BeforeTemplate
     void before(Object actual, String message, Object expected) {
       assertNotSame(expected, actual, message);
@@ -1090,7 +1090,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNotSameAs(Object)} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsNotSameAs {
+  static final class AssertThatWithFailMessageIsNotSameAsSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -1124,7 +1124,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatThrownBy(...).isExactlyInstanceOf(...)} over non-AssertJ alternatives.
    */
-  static final class AssertThatThrownByWithFailMessageStringIsExactlyInstanceOf<
+  static final class AssertThatThrownByWithFailMessageIsExactlyInstanceOfString<
       T extends Throwable> {
     @BeforeTemplate
     void before(Executable throwingCallable, String message, Class<T> clazz) {
@@ -1141,7 +1141,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatThrownBy(...).isExactlyInstanceOf(...)} over non-AssertJ alternatives.
    */
-  static final class AssertThatThrownByWithFailMessageSupplierIsExactlyInstanceOf<
+  static final class AssertThatThrownByWithFailMessageIsExactlyInstanceOfSupplier<
       T extends Throwable> {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
@@ -1173,7 +1173,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
-  static final class AssertThatThrownByWithFailMessageStringIsInstanceOf<T extends Throwable> {
+  static final class AssertThatThrownByWithFailMessageIsInstanceOfString<T extends Throwable> {
     @BeforeTemplate
     void before(Executable throwingCallable, String message, Class<T> clazz) {
       assertThrows(clazz, throwingCallable, message);
@@ -1187,7 +1187,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
-  static final class AssertThatThrownByWithFailMessageSupplierIsInstanceOf<T extends Throwable> {
+  static final class AssertThatThrownByWithFailMessageIsInstanceOfSupplier<T extends Throwable> {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -1227,7 +1227,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatCode(...).doesNotThrowAnyException()} over non-AssertJ alternatives.
    */
-  static final class AssertThatCodeWithFailMessageStringDoesNotThrowAnyException {
+  static final class AssertThatCodeWithFailMessageDoesNotThrowAnyExceptionString {
     @BeforeTemplate
     void before(Executable throwingCallable, String message) {
       assertDoesNotThrow(throwingCallable, message);
@@ -1248,7 +1248,7 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatCode(...).doesNotThrowAnyException()} over non-AssertJ alternatives.
    */
-  static final class AssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException {
+  static final class AssertThatCodeWithFailMessageDoesNotThrowAnyExceptionSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
@@ -1285,7 +1285,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isInstanceOf(Class)} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageStringIsInstanceOf<T> {
+  static final class AssertThatWithFailMessageIsInstanceOfString<T> {
     @BeforeTemplate
     void before(Object actual, String message, Class<T> clazz) {
       assertInstanceOf(clazz, actual, message);
@@ -1299,7 +1299,7 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isInstanceOf(Class)} over non-AssertJ alternatives. */
-  static final class AssertThatWithFailMessageSupplierIsInstanceOf<T> {
+  static final class AssertThatWithFailMessageIsInstanceOfSupplier<T> {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)

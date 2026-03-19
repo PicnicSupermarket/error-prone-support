@@ -44,7 +44,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZoneOffset#UTC} over less explicit alternatives. */
-  static final class UtcConstant {
+  static final class Utc {
     @BeforeTemplate
     ZoneId before() {
       // `ZoneId.of("Z")` is not listed, because Error Prone flags it out of the box.
@@ -171,7 +171,7 @@ final class TimeRules {
    * <p>Note that {@link Instant#toEpochMilli()} throws an {@link ArithmeticException} for dates
    * very far in the past or future, while the suggested alternative doesn't.
    */
-  static final class InstantTruncatedToMilliseconds {
+  static final class InstantTruncatedToChronoUnitMillis {
     @BeforeTemplate
     Instant before(Instant instant) {
       return Instant.ofEpochMilli(instant.toEpochMilli());
@@ -184,7 +184,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Instant#truncatedTo(TemporalUnit)} over less efficient alternatives. */
-  static final class InstantTruncatedToSeconds {
+  static final class InstantTruncatedToChronoUnitSeconds {
     @BeforeTemplate
     Instant before(Instant instant) {
       return Instant.ofEpochSecond(instant.getEpochSecond());
@@ -241,7 +241,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Clock#systemUTC()} over more verbose alternatives. */
-  static final class UtcClock {
+  static final class ClockSystemUTC {
     @BeforeTemplate
     @SuppressWarnings("TimeZoneUsage" /* This violation will be rewritten. */)
     Clock before() {
@@ -256,7 +256,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Instant#EPOCH} over less efficient alternatives. */
-  static final class EpochInstant {
+  static final class InstantEpoch {
     @BeforeTemplate
     Instant before() {
       return Refaster.anyOf(
@@ -454,7 +454,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Duration#ZERO} over less explicit alternatives. */
-  static final class ZeroDuration {
+  static final class DurationZero {
     @BeforeTemplate
     Duration before(TemporalUnit temporalUnit) {
       return Refaster.anyOf(
@@ -557,7 +557,7 @@ final class TimeRules {
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
    */
-  static final class DurationBetweenInstants {
+  static final class DurationBetweenInstant {
     @BeforeTemplate
     Duration before(Instant a, Instant b) {
       return Duration.ofMillis(b.toEpochMilli() - a.toEpochMilli());
@@ -574,7 +574,7 @@ final class TimeRules {
    *
    * <p><strong>Warning:</strong> this rewrite rule increases precision!
    */
-  static final class DurationBetweenOffsetDateTimes {
+  static final class DurationBetweenOffsetDateTime {
     @BeforeTemplate
     Duration before(OffsetDateTime a, OffsetDateTime b) {
       return Refaster.anyOf(
@@ -602,7 +602,7 @@ final class TimeRules {
   }
 
   /** Prefer {@link Period#ZERO} over less explicit alternatives. */
-  static final class ZeroPeriod {
+  static final class PeriodZero {
     @BeforeTemplate
     Period before() {
       return Refaster.anyOf(

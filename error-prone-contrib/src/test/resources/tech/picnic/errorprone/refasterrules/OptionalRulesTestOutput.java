@@ -31,27 +31,27 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").isPresent();
   }
 
-  String testOptionalOrElseThrow() {
+  String testOptionalOrElseThrowWithOptional() {
     return Optional.of("foo").orElseThrow();
   }
 
-  Function<Optional<Integer>, Integer> testOptionalOrElseThrowMethodReference() {
+  Function<Optional<Integer>, Integer> testOptionalOrElseThrow() {
     return Optional::orElseThrow;
   }
 
-  ImmutableSet<Boolean> testOptionalEqualsOptional() {
+  ImmutableSet<Boolean> testOptionalEqualsOptionalOf() {
     return ImmutableSet.of(
         Optional.of("foo").equals(Optional.of("bar")),
         Optional.of("baz").equals(Optional.of("qux")));
   }
 
-  ImmutableSet<Optional<String>> testOptionalFirstIteratorElement() {
+  ImmutableSet<Optional<String>> testStreamsStreamFindFirst() {
     return ImmutableSet.of(
         stream(ImmutableSet.of("foo").iterator()).findFirst(),
         stream(ImmutableSet.of("foo").iterator()).findFirst());
   }
 
-  ImmutableSet<Optional<String>> testOptionalOfFilter() {
+  ImmutableSet<Optional<String>> testRefasterEmitCommentBeforeOptionalOfFilter() {
     return ImmutableSet.of(
         /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")
             .filter(v -> v.length() > 5),
@@ -59,7 +59,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
             .filter(v -> v.length() > 5));
   }
 
-  ImmutableSet<Optional<String>> testOptionalOfFilterNegated() {
+  ImmutableSet<Optional<String>> testRefasterEmitCommentBeforeOptionalOfFilterNot() {
     return ImmutableSet.of(
         /* Or Optional.ofNullable (can't auto-infer). */ Optional.of("foo")
             .filter(v -> v.length() <= 5),
@@ -67,20 +67,20 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
             .filter(v -> v.length() <= 5));
   }
 
-  boolean testMapOptionalToBoolean() {
+  boolean testOptionalFilterIsPresent() {
     return Optional.of("foo").filter(String::isEmpty).isPresent();
   }
 
-  ImmutableSet<Optional<String>> testMapToNullable() {
+  ImmutableSet<Optional<String>> testOptionalMap() {
     return ImmutableSet.of(
         Optional.of(1).map(n -> String.valueOf(n)), Optional.of(2).map(n -> String.valueOf(n)));
   }
 
-  Optional<String> testFlatMapToOptional() {
+  Optional<String> testOptionalFlatMap() {
     return Optional.of(1).flatMap(n -> Optional.of(String.valueOf(n)));
   }
 
-  String testOrOrElseThrow() {
+  String testOptionalOrOrElseThrow() {
     return Optional.of("foo").or(() -> Optional.of("bar")).orElseThrow();
   }
 
@@ -89,13 +89,13 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("foo").orElseGet(() -> toString()), Optional.of("bar").orElse("baz"));
   }
 
-  ImmutableSet<Object> testStreamFlatMapOptional() {
+  ImmutableSet<Object> testStreamFlatMapOptionalStream() {
     return ImmutableSet.of(
         Stream.of(Optional.empty()).flatMap(Optional::stream),
         Stream.of(Optional.of("foo")).flatMap(Optional::stream));
   }
 
-  Stream<String> testStreamMapToOptionalGet() {
+  Stream<String> testStreamFlatMapStream() {
     return Stream.of(1).flatMap(n -> Optional.of(String.valueOf(n)).stream());
   }
 
@@ -111,7 +111,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of("foo").flatMap(v -> Optional.of(v.length())).flatMap(Optional::of);
   }
 
-  ImmutableSet<Optional<String>> testOptionalOrOtherOptional() {
+  ImmutableSet<Optional<String>> testOptionalOr() {
     return ImmutableSet.of(
         Optional.of("foo").or(() -> Optional.of("bar")),
         Optional.of("baz").or(() -> Optional.of("qux")),
@@ -136,7 +136,7 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Optional.of("foo").filter(String::isEmpty), Optional.of("bar").filter(String::isEmpty));
   }
 
-  Optional<String> testOptionalMap() {
+  Optional<String> testOptionalMapWithFunction() {
     return Optional.of(1).map(String::valueOf);
   }
 

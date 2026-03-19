@@ -16,6 +16,9 @@ final class JUnitRules {
   private JUnitRules() {}
 
   /** Prefer {@link Arguments#arguments} over less idiomatic alternatives. */
+  // XXX: Update `RefasterRuleName` so that this suppression can be dropped.
+  @SuppressWarnings(
+      "RefasterRuleName" /* Derived name `Arguments` clashes with the imported type. */)
   static final class ArgumentsEnumeration<T> {
     @BeforeTemplate
     Arguments before(@Repeated T objects) {

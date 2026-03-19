@@ -23,7 +23,7 @@ final class MapRules {
   // not allow an empty non-EnumMap to be provided.
   @PossibleSourceIncompatibility
   @SuppressWarnings("NonApiType" /* Refaster templates declare the most specific return type. */)
-  static final class CreateEnumMap<K extends Enum<K>, V> {
+  static final class NewEnumMapClass<K extends Enum<K>, V> {
     @BeforeTemplate
     HashMap<K, V> before() {
       return new HashMap<>();
@@ -36,7 +36,7 @@ final class MapRules {
   }
 
   /** Prefer {@link Map#get(Object)} over more verbose alternatives. */
-  static final class MapGetOrNull<K, V, T> {
+  static final class MapGet<K, V, T> {
     @BeforeTemplate
     @Nullable V before(Map<K, V> map, T key) {
       return map.getOrDefault(key, null);
@@ -120,7 +120,7 @@ final class MapRules {
   }
 
   /** Prefer {@link Map#keySet()} over more contrived alternatives. */
-  static final class MapKeyStream<K, V> {
+  static final class MapKeySetStream<K, V> {
     @BeforeTemplate
     Stream<K> before(Map<K, V> map) {
       return map.entrySet().stream().map(Map.Entry::getKey);
@@ -133,7 +133,7 @@ final class MapRules {
   }
 
   /** Prefer {@link Map#values()} over more contrived alternatives. */
-  static final class MapValueStream<K, V> {
+  static final class MapValuesStream<K, V> {
     @BeforeTemplate
     Stream<V> before(Map<K, V> map) {
       return map.entrySet().stream().map(Map.Entry::getValue);

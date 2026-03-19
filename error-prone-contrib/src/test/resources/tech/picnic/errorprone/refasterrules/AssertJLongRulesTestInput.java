@@ -25,15 +25,15 @@ final class AssertJLongRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(0L).isNotCloseTo(2, withPercentage(0)));
   }
 
-  AbstractLongAssert<?> testAbstractLongAssertIsZero() {
+  AbstractLongAssert<?> testAbstractLongAssertIsEqualToZero() {
     return assertThat(0L).isZero();
   }
 
-  AbstractLongAssert<?> testAbstractLongAssertIsNotZero() {
+  AbstractLongAssert<?> testAbstractLongAssertIsNotEqualToZero() {
     return assertThat(0L).isNotZero();
   }
 
-  AbstractLongAssert<?> testAbstractLongAssertIsOne() {
+  AbstractLongAssert<?> testAbstractLongAssertIsEqualToOne() {
     return assertThat(0L).isOne();
   }
 }

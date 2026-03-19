@@ -45,7 +45,7 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 
-  ImmutableSet<Set<Integer>> testImmutableSetOf() {
+  ImmutableSet<Set<Integer>> testImmutableSetOf0() {
     return ImmutableSet.of(
         ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of());
   }
@@ -76,7 +76,7 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
         Sets.difference(ImmutableSet.of(3), ImmutableSet.of(4)).immutableCopy());
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceKeySetImmutableCopy() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMapKeySetImmutableCopy() {
     return ImmutableSet.of(
         Sets.difference(ImmutableSet.of(1), ImmutableMap.of(2, 3).keySet()).immutableCopy(),
         Sets.difference(ImmutableSet.of(4), ImmutableMap.of(5, 6).keySet()).immutableCopy());

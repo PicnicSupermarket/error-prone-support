@@ -19,7 +19,7 @@ final class AssertJBooleanRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(assertThat(true).isTrue(), assertThat(false).isTrue());
   }
 
-  AbstractBooleanAssert<?> testAssertThatBooleanIsTrue() {
+  AbstractBooleanAssert<?> testAssertThatIsTrue() {
     return assertThat(Boolean.TRUE).isTrue();
   }
 
@@ -27,7 +27,7 @@ final class AssertJBooleanRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(assertThat(true).isFalse(), assertThat(false).isFalse());
   }
 
-  AbstractBooleanAssert<?> testAssertThatBooleanIsFalse() {
+  AbstractBooleanAssert<?> testAssertThatIsFalse() {
     return assertThat(Boolean.TRUE).isFalse();
   }
 }

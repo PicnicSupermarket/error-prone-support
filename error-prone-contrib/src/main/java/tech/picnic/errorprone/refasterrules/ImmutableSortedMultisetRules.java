@@ -25,7 +25,7 @@ final class ImmutableSortedMultisetRules {
   /**
    * Prefer {@link ImmutableSortedMultiset#orderedBy(Comparator)} over the associated constructor.
    */
-  static final class ImmutableSortedMultisetBuilder<T> {
+  static final class ImmutableSortedMultisetOrderedBy<T> {
     @BeforeTemplate
     ImmutableSortedMultiset.Builder<T> before(Comparator<T> cmp) {
       return new ImmutableSortedMultiset.Builder<>(cmp);
@@ -38,7 +38,7 @@ final class ImmutableSortedMultisetRules {
   }
 
   /** Prefer {@link ImmutableSortedMultiset#naturalOrder()} over more verbose alternatives. */
-  static final class ImmutableSortedMultisetNaturalOrderBuilder<T extends Comparable<? super T>> {
+  static final class ImmutableSortedMultisetNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedMultiset.Builder<T> before() {
       return ImmutableSortedMultiset.orderedBy(Comparator.<T>naturalOrder());
@@ -51,7 +51,7 @@ final class ImmutableSortedMultisetRules {
   }
 
   /** Prefer {@link ImmutableSortedMultiset#reverseOrder()} over more verbose alternatives. */
-  static final class ImmutableSortedMultisetReverseOrderBuilder<T extends Comparable<? super T>> {
+  static final class ImmutableSortedMultisetReverseOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedMultiset.Builder<T> before() {
       return ImmutableSortedMultiset.orderedBy(Comparator.<T>reverseOrder());
@@ -126,7 +126,8 @@ final class ImmutableSortedMultisetRules {
    * idiomatic alternatives.
    */
   // XXX: Also handle the variant with a custom comparator.
-  static final class StreamCollectToImmutableSortedMultiset<T extends Comparable<? super T>> {
+  static final class StreamCollectToImmutableSortedMultisetNaturalOrder<
+      T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedMultiset<T> before(Stream<T> stream) {
       return ImmutableSortedMultiset.copyOf(stream.iterator());

@@ -26,27 +26,27 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
     return LongStream.concat(LongStream.of(1), LongStream.of(2));
   }
 
-  LongStream testFilterOuterLongStreamAfterFlatMap() {
+  LongStream testLongStreamFlatMapFilter() {
     return LongStream.of(1).flatMap(v -> LongStream.of(v * v)).filter(n -> n > 1);
   }
 
-  LongStream testFilterOuterStreamAfterFlatMapToLong() {
+  LongStream testStreamFlatMapToLongFilter() {
     return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).filter(n -> n > 1);
   }
 
-  LongStream testMapOuterLongStreamAfterFlatMap() {
+  LongStream testLongStreamFlatMapMap() {
     return LongStream.of(1).flatMap(v -> LongStream.of(v * v)).map(n -> n * 1);
   }
 
-  LongStream testMapOuterStreamAfterFlatMapToLong() {
+  LongStream testStreamFlatMapToLongMap() {
     return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).map(n -> n * 1);
   }
 
-  LongStream testFlatMapOuterLongStreamAfterFlatMap() {
+  LongStream testLongStreamFlatMapFlatMap() {
     return LongStream.of(1).flatMap(v -> LongStream.of(v * v)).flatMap(LongStream::of);
   }
 
-  LongStream testFlatMapOuterStreamAfterFlatMapToLong() {
+  LongStream testStreamFlatMapToLongFlatMap() {
     return Stream.of(1).flatMapToLong(v -> LongStream.of(v * v)).flatMap(LongStream::of);
   }
 
@@ -74,7 +74,7 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
     return LongStream.of(1).min();
   }
 
-  ImmutableSet<Boolean> testLongStreamNoneMatch() {
+  ImmutableSet<Boolean> testLongStreamNoneMatchWithLongPredicate() {
     LongPredicate pred = i -> i > 0;
     return ImmutableSet.of(
         LongStream.of(1).noneMatch(n -> n > 1),
@@ -82,7 +82,7 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
         LongStream.of(3).noneMatch(pred));
   }
 
-  boolean testLongStreamNoneMatch2() {
+  boolean testLongStreamNoneMatch() {
     return LongStream.of(1).noneMatch(n -> n > 1);
   }
 
@@ -91,12 +91,12 @@ final class LongStreamRulesTest implements RefasterRuleCollectionTestCase {
         LongStream.of(1).anyMatch(n -> n > 1), LongStream.of(2).anyMatch(n -> n > 2));
   }
 
-  boolean testLongStreamAllMatch() {
+  boolean testLongStreamAllMatchWithLongPredicate() {
     LongPredicate pred = i -> i > 0;
     return LongStream.of(1).allMatch(pred);
   }
 
-  boolean testLongStreamAllMatch2() {
+  boolean testLongStreamAllMatch() {
     return LongStream.of(1).allMatch(n -> n > 1);
   }
 

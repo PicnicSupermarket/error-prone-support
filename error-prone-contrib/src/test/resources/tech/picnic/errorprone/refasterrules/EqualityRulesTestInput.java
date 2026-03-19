@@ -18,7 +18,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
-  ImmutableSet<Boolean> testEnumReferenceEquality() {
+  ImmutableSet<Boolean> testEqualToWithEnum() {
     return ImmutableSet.of(
         RoundingMode.UP.equals(RoundingMode.DOWN),
         Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
@@ -28,11 +28,11 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         RoundingMode.UP.ordinal() != RoundingMode.DOWN.ordinal());
   }
 
-  ImmutableSet<Predicate<RoundingMode>> testEnumReferenceEqualityLambda() {
+  ImmutableSet<Predicate<RoundingMode>> testEqualTo() {
     return ImmutableSet.of(isEqual(RoundingMode.DOWN), RoundingMode.UP::equals);
   }
 
-  boolean testEqualsPredicate() {
+  boolean testTEquals() {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch(s -> "bar".equals(s));
@@ -43,7 +43,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
-  ImmutableSet<Boolean> testNegation() {
+  ImmutableSet<Boolean> testNotEqualTo() {
     return ImmutableSet.of(
         !(true == false),
         true ? !false : false,
@@ -58,7 +58,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
-  ImmutableSet<Boolean> testIndirectDoubleNegation() {
+  ImmutableSet<Boolean> testEqualToWithBoolean() {
     return ImmutableSet.of(
         !(true != false),
         true ? false : !false,
@@ -72,11 +72,11 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         !(BoundType.OPEN != BoundType.CLOSED));
   }
 
-  Predicate<String> testPredicateLambda() {
+  Predicate<String> testNot() {
     return not(v -> v.isEmpty());
   }
 
-  ImmutableSet<Boolean> testEquals() {
+  ImmutableSet<Boolean> testTEqualsWithObject() {
     return ImmutableSet.of(
         Optional.of("foo").equals(Optional.of("bar")),
         Optional.of("baz").equals(Optional.ofNullable("qux")),

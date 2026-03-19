@@ -44,7 +44,7 @@ final class RandomGeneratorRules {
   // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
   // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
   // code, but only in situations that are likely unintended.
-  static final class RandomGeneratorNextDoubleWithOrigin {
+  static final class RandomGeneratorNextDoublePlus {
     @BeforeTemplate
     double before(RandomGenerator random, double a, double b) {
       return a + random.nextDouble(b);
@@ -80,7 +80,7 @@ final class RandomGeneratorRules {
   // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
   // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
   // code, but only in situations that are likely unintended.
-  static final class RandomGeneratorNextIntWithOrigin {
+  static final class RandomGeneratorNextIntPlus {
     @BeforeTemplate
     int before(RandomGenerator random, int a, int b) {
       return a + random.nextInt(b);
@@ -132,7 +132,7 @@ final class RandomGeneratorRules {
   // XXX: This rule assumes that `a` is not an expensive or side-effectful expression.
   // XXX: The replacement code throws an `IllegalArgumentException` in more cases than the original
   // code, but only in situations that are likely unintended.
-  static final class RandomGeneratorNextLongWithOrigin {
+  static final class RandomGeneratorNextLongPlus {
     @BeforeTemplate
     long before(RandomGenerator random, long a, long b) {
       return a + random.nextLong(b);

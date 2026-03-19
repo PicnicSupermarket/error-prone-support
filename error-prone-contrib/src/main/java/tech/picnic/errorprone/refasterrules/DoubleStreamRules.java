@@ -48,7 +48,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#filter(DoublePredicate)} over more contrived alternatives. */
-  abstract static class FilterOuterDoubleStreamAfterFlatMap {
+  abstract static class DoubleStreamFlatMapFilter {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
@@ -64,7 +64,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#filter(DoublePredicate)} over more contrived alternatives. */
-  abstract static class FilterOuterStreamAfterFlatMapToDouble<T> {
+  abstract static class StreamFlatMapToDoubleFilter<T> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
@@ -80,7 +80,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#map(DoubleUnaryOperator)} over more contrived alternatives. */
-  abstract static class MapOuterDoubleStreamAfterFlatMap {
+  abstract static class DoubleStreamFlatMapMap {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
@@ -96,7 +96,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#map(DoubleUnaryOperator)} over more contrived alternatives. */
-  abstract static class MapOuterStreamAfterFlatMapToDouble<T> {
+  abstract static class StreamFlatMapToDoubleMap<T> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
@@ -112,7 +112,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#flatMap(DoubleFunction)} over more contrived alternatives. */
-  abstract static class FlatMapOuterDoubleStreamAfterFlatMap<S extends DoubleStream> {
+  abstract static class DoubleStreamFlatMapFlatMap<S extends DoubleStream> {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
@@ -128,7 +128,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#flatMap(DoubleFunction)} over more contrived alternatives. */
-  abstract static class FlatMapOuterStreamAfterFlatMapToDouble<T, S extends DoubleStream> {
+  abstract static class StreamFlatMapToDoubleFlatMap<T, S extends DoubleStream> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
@@ -160,7 +160,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#findAny()} over less efficient alternatives. */
-  static final class DoubleStreamIsEmpty {
+  static final class DoubleStreamFindAnyIsEmpty {
     @BeforeTemplate
     boolean before(DoubleStream stream) {
       return Refaster.anyOf(
@@ -177,7 +177,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#findAny()} over less efficient alternatives. */
-  static final class DoubleStreamIsNotEmpty {
+  static final class DoubleStreamFindAnyIsPresent {
     @BeforeTemplate
     boolean before(DoubleStream stream) {
       return Refaster.anyOf(
@@ -207,7 +207,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over more contrived alternatives. */
-  static final class DoubleStreamNoneMatch {
+  static final class DoubleStreamNoneMatchWithDoublePredicate {
     @BeforeTemplate
     boolean before(DoubleStream stream, DoublePredicate predicate) {
       return Refaster.anyOf(
@@ -223,7 +223,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over less explicit alternatives. */
-  abstract static class DoubleStreamNoneMatch2 {
+  abstract static class DoubleStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
 
@@ -254,7 +254,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#allMatch(DoublePredicate)} over more contrived alternatives. */
-  static final class DoubleStreamAllMatch {
+  static final class DoubleStreamAllMatchWithDoublePredicate {
     @BeforeTemplate
     boolean before(DoubleStream stream, DoublePredicate predicate) {
       return stream.noneMatch(predicate.negate());
@@ -267,7 +267,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#allMatch(DoublePredicate)} over less explicit alternatives. */
-  abstract static class DoubleStreamAllMatch2 {
+  abstract static class DoubleStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
 

@@ -21,7 +21,7 @@ final class RxJava2AdapterRules {
   private RxJava2AdapterRules() {}
 
   /** Prefer {@link RxJava2Adapter#completableToMono} over less idiomatic alternatives. */
-  static final class CompletableToMono {
+  static final class CompletableAsRxJava2AdapterCompletableToMono {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
     Mono<? extends @Nullable Void> before(Completable completable) {
@@ -38,7 +38,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#flowableToFlux} over less idiomatic alternatives. */
-  static final class FlowableToFlux<T> {
+  static final class FlowableAsRxJava2AdapterFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flowable<T> flowable) {
       return Refaster.anyOf(
@@ -56,7 +56,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#fluxToFlowable} over less idiomatic alternatives. */
-  static final class FluxToFlowable<T> {
+  static final class FluxAsRxJava2AdapterFluxToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Flux<T> flux) {
       return Refaster.anyOf(
@@ -72,7 +72,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#fluxToObservable} over less idiomatic alternatives. */
-  static final class FluxToObservable<T> {
+  static final class FluxAsRxJava2AdapterFluxToObservable<T> {
     @BeforeTemplate
     Observable<T> before(Flux<T> flux) {
       return Refaster.anyOf(
@@ -88,7 +88,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#maybeToMono} over less idiomatic alternatives. */
-  static final class MaybeToMono<T> {
+  static final class MaybeAsRxJava2AdapterMaybeToMono<T> {
     @BeforeTemplate
     Mono<T> before(Maybe<T> maybe) {
       return Refaster.anyOf(
@@ -102,7 +102,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#monoToCompletable} over less idiomatic alternatives. */
-  static final class MonoToCompletable<T> {
+  static final class MonoAsRxJava2AdapterMonoToCompletable<T> {
     @BeforeTemplate
     Completable before(Mono<T> mono) {
       return Refaster.anyOf(
@@ -118,7 +118,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#monoToFlowable} over less idiomatic alternatives. */
-  static final class MonoToFlowable<T> {
+  static final class MonoAsRxJava2AdapterMonoToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Mono<T> mono) {
       return Refaster.anyOf(
@@ -134,7 +134,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#monoToMaybe} over less idiomatic alternatives. */
-  static final class MonoToMaybe<T> {
+  static final class MonoAsRxJava2AdapterMonoToMaybe<T> {
     @BeforeTemplate
     Maybe<T> before(Mono<T> mono) {
       return RxJava2Adapter.monoToMaybe(mono);
@@ -147,7 +147,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#monoToSingle} over less idiomatic alternatives. */
-  static final class MonoToSingle<T> {
+  static final class MonoAsRxJava2AdapterMonoToSingle<T> {
     @BeforeTemplate
     Single<T> before(Mono<T> mono) {
       return Refaster.anyOf(
@@ -166,7 +166,7 @@ final class RxJava2AdapterRules {
    * Prefer chaining {@link Observable#toFlowable(BackpressureStrategy)} with {@link
    * RxJava2Adapter#flowableToFlux} over less idiomatic alternatives.
    */
-  static final class ObservableToFlux<T> {
+  static final class ObservableToFlowableAsRxJava2AdapterFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Observable<T> observable, BackpressureStrategy strategy) {
       return Refaster.anyOf(
@@ -182,7 +182,7 @@ final class RxJava2AdapterRules {
   }
 
   /** Prefer {@link RxJava2Adapter#singleToMono} over less idiomatic alternatives. */
-  static final class SingleToMono<T> {
+  static final class SingleAsRxJava2AdapterSingleToMono<T> {
     @BeforeTemplate
     Mono<T> before(Single<T> single) {
       return Refaster.anyOf(

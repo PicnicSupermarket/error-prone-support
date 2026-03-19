@@ -61,7 +61,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#filter(LongPredicate)} over more contrived alternatives. */
-  abstract static class FilterOuterLongStreamAfterFlatMap {
+  abstract static class LongStreamFlatMapFilter {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
@@ -77,7 +77,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#filter(LongPredicate)} over more contrived alternatives. */
-  abstract static class FilterOuterStreamAfterFlatMapToLong<T> {
+  abstract static class StreamFlatMapToLongFilter<T> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
@@ -93,7 +93,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#map(LongUnaryOperator)} over more contrived alternatives. */
-  abstract static class MapOuterLongStreamAfterFlatMap {
+  abstract static class LongStreamFlatMapMap {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
@@ -109,7 +109,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#map(LongUnaryOperator)} over more contrived alternatives. */
-  abstract static class MapOuterStreamAfterFlatMapToLong<T> {
+  abstract static class StreamFlatMapToLongMap<T> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
@@ -125,7 +125,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#flatMap(LongFunction)} over more contrived alternatives. */
-  abstract static class FlatMapOuterLongStreamAfterFlatMap<S extends LongStream> {
+  abstract static class LongStreamFlatMapFlatMap<S extends LongStream> {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
@@ -141,7 +141,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#flatMap(LongFunction)} over more contrived alternatives. */
-  abstract static class FlatMapOuterStreamAfterFlatMapToLong<T, S extends LongStream> {
+  abstract static class StreamFlatMapToLongFlatMap<T, S extends LongStream> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
@@ -220,7 +220,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#noneMatch(LongPredicate)} over more contrived alternatives. */
-  static final class LongStreamNoneMatch {
+  static final class LongStreamNoneMatchWithLongPredicate {
     @BeforeTemplate
     boolean before(LongStream stream, LongPredicate predicate) {
       return Refaster.anyOf(
@@ -236,7 +236,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#noneMatch(LongPredicate)} over less explicit alternatives. */
-  abstract static class LongStreamNoneMatch2 {
+  abstract static class LongStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
 
@@ -267,7 +267,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#allMatch(LongPredicate)} over more contrived alternatives. */
-  static final class LongStreamAllMatch {
+  static final class LongStreamAllMatchWithLongPredicate {
     @BeforeTemplate
     boolean before(LongStream stream, LongPredicate predicate) {
       return stream.noneMatch(predicate.negate());
@@ -280,7 +280,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#allMatch(LongPredicate)} over less explicit alternatives. */
-  abstract static class LongStreamAllMatch2 {
+  abstract static class LongStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
 

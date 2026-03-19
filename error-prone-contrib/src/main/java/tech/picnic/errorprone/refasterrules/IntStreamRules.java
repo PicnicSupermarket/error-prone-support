@@ -61,7 +61,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#filter(IntPredicate)} over more contrived alternatives. */
-  abstract static class FilterOuterIntStreamAfterFlatMap {
+  abstract static class IntStreamFlatMapFilter {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
 
@@ -77,7 +77,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#filter(IntPredicate)} over more contrived alternatives. */
-  abstract static class FilterOuterStreamAfterFlatMapToInt<T> {
+  abstract static class StreamFlatMapToIntFilter<T> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
@@ -93,7 +93,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#map(IntUnaryOperator)} over more contrived alternatives. */
-  abstract static class MapOuterIntStreamAfterFlatMap {
+  abstract static class IntStreamFlatMapMap {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
 
@@ -109,7 +109,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#map(IntUnaryOperator)} over more contrived alternatives. */
-  abstract static class MapOuterStreamAfterFlatMapToInt<T> {
+  abstract static class StreamFlatMapToIntMap<T> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
@@ -125,7 +125,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#flatMap(IntFunction)} over more contrived alternatives. */
-  abstract static class FlatMapOuterIntStreamAfterFlatMap<S extends IntStream> {
+  abstract static class IntStreamFlatMapFlatMap<S extends IntStream> {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
 
@@ -141,7 +141,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#flatMap(IntFunction)} over more contrived alternatives. */
-  abstract static class FlatMapOuterStreamAfterFlatMapToInt<T, S extends IntStream> {
+  abstract static class StreamFlatMapToIntFlatMap<T, S extends IntStream> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
@@ -173,7 +173,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#findAny()} over less efficient alternatives. */
-  static final class IntStreamIsEmpty {
+  static final class IntStreamFindAnyIsEmpty {
     @BeforeTemplate
     boolean before(IntStream stream) {
       return Refaster.anyOf(
@@ -190,7 +190,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#findAny()} over less efficient alternatives. */
-  static final class IntStreamIsNotEmpty {
+  static final class IntStreamFindAnyIsPresent {
     @BeforeTemplate
     boolean before(IntStream stream) {
       return Refaster.anyOf(
@@ -220,7 +220,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#noneMatch(IntPredicate)} over more contrived alternatives. */
-  static final class IntStreamNoneMatch {
+  static final class IntStreamNoneMatchWithIntPredicate {
     @BeforeTemplate
     boolean before(IntStream stream, IntPredicate predicate) {
       return Refaster.anyOf(
@@ -236,7 +236,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#noneMatch(IntPredicate)} over less explicit alternatives. */
-  abstract static class IntStreamNoneMatch2 {
+  abstract static class IntStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
 
@@ -267,7 +267,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#allMatch(IntPredicate)} over more contrived alternatives. */
-  static final class IntStreamAllMatch {
+  static final class IntStreamAllMatchWithIntPredicate {
     @BeforeTemplate
     boolean before(IntStream stream, IntPredicate predicate) {
       return stream.noneMatch(predicate.negate());
@@ -280,7 +280,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#allMatch(IntPredicate)} over less explicit alternatives. */
-  abstract static class IntStreamAllMatch2 {
+  abstract static class IntStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
 

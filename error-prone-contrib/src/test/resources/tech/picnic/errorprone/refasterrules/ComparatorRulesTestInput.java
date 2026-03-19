@@ -50,7 +50,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.comparing(identity(), Comparator.comparingInt(String::length)));
   }
 
-  Comparator<String> testComparingEnum() {
+  Comparator<String> testComparing() {
     return Comparator.comparingInt(s -> RoundingMode.valueOf(s).ordinal());
   }
 
@@ -95,7 +95,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>naturalOrder().thenComparing(identity()));
   }
 
-  ImmutableSet<Integer> testComparableCompareTo() {
+  ImmutableSet<Integer> testTCompareTo() {
     return ImmutableSet.of(
         Comparator.<String>naturalOrder().compare("foo", "bar"),
         Comparator.<String>reverseOrder().compare("baz", "qux"));
@@ -111,7 +111,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.max(ImmutableList.of("bar"), reverseOrder()));
   }
 
-  String testCollectionsMinArraysAsListOfArray() {
+  String testCollectionsMinArraysAsList() {
     return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
   }
 
@@ -119,11 +119,11 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
   }
 
-  int testCollectionsMinArraysAsList() {
+  int testCollectionsMinArraysAsListVarargs() {
     return Stream.of(1, 2).min(naturalOrder()).orElseThrow();
   }
 
-  ImmutableSet<String> testComparatorsMinOfPair() {
+  ImmutableSet<String> testComparatorsMin2() {
     return ImmutableSet.of(
         "foo".compareTo("bar") <= 0 ? "foo" : "bar",
         "baz".compareTo("qux") > 0 ? "qux" : "baz",
@@ -136,7 +136,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(ImmutableSet.of("qux", "quux")));
   }
 
-  ImmutableSet<Object> testComparatorsMinOfPairWithComparator() {
+  ImmutableSet<Object> testComparatorsMin3() {
     return ImmutableSet.of(
         Comparator.comparingInt(String::length).compare("foo", "bar") <= 0 ? "foo" : "bar",
         Comparator.comparingInt(String::length).compare("baz", "qux") > 0 ? "qux" : "baz",
@@ -155,7 +155,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(ImmutableList.of("bar"), reverseOrder()));
   }
 
-  String testCollectionsMaxArraysAsListOfArray() {
+  String testCollectionsMaxArraysAsList() {
     return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
   }
 
@@ -163,11 +163,11 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
   }
 
-  int testCollectionsMaxArraysAsList() {
+  int testCollectionsMaxArraysAsListVarargs() {
     return Stream.of(1, 2).max(naturalOrder()).orElseThrow();
   }
 
-  ImmutableSet<String> testComparatorsMaxOfPair() {
+  ImmutableSet<String> testComparatorsMax2() {
     return ImmutableSet.of(
         "foo".compareTo("bar") >= 0 ? "foo" : "bar",
         "baz".compareTo("qux") < 0 ? "qux" : "baz",
@@ -180,7 +180,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.max(ImmutableSet.of("qux", "quux")));
   }
 
-  ImmutableSet<Object> testComparatorsMaxOfPairWithComparator() {
+  ImmutableSet<Object> testComparatorsMax3() {
     return ImmutableSet.of(
         Comparator.comparingInt(String::length).compare("foo", "bar") >= 0 ? "foo" : "bar",
         Comparator.comparingInt(String::length).compare("baz", "qux") < 0 ? "qux" : "baz",
@@ -209,11 +209,11 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return least(1, reverseOrder());
   }
 
-  BinaryOperator<String> testComparatorsMin() {
+  BinaryOperator<String> testComparatorsMin0() {
     return BinaryOperator.minBy(naturalOrder());
   }
 
-  BinaryOperator<String> testComparatorsMax() {
+  BinaryOperator<String> testComparatorsMax0() {
     return BinaryOperator.maxBy(naturalOrder());
   }
 
@@ -225,13 +225,13 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return minBy(reverseOrder());
   }
 
-  ImmutableSet<Boolean> testEnumCompareToLessThanZero() {
+  ImmutableSet<Boolean> testECompareToLessThanZero() {
     return ImmutableSet.of(
         RoundingMode.UP.ordinal() < RoundingMode.DOWN.ordinal(),
         RoundingMode.UP.ordinal() >= RoundingMode.DOWN.ordinal());
   }
 
-  ImmutableSet<Boolean> testEnumCompareToLessThanOrEqualToZero() {
+  ImmutableSet<Boolean> testECompareToLessThanOrEqualToZero() {
     return ImmutableSet.of(
         RoundingMode.UP.ordinal() <= RoundingMode.DOWN.ordinal(),
         RoundingMode.UP.ordinal() > RoundingMode.DOWN.ordinal());

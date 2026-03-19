@@ -14,7 +14,7 @@ final class AssertJFloatRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(withPercentage(0));
   }
 
-  ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsCloseToWithOffset() {
+  ImmutableSet<AbstractFloatAssert<?>> testAbstractFloatAssertIsCloseTo() {
     return ImmutableSet.of(
         assertThat(1f).isEqualTo(2, offset(0f)),
         assertThat(1f).isEqualTo(Float.valueOf(2), offset(0f)));
@@ -31,15 +31,15 @@ final class AssertJFloatRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(1f).isNotCloseTo(2, withPercentage(0)));
   }
 
-  AbstractFloatAssert<?> testAbstractFloatAssertIsZero() {
+  AbstractFloatAssert<?> testAbstractFloatAssertIsEqualToZero() {
     return assertThat(1f).isZero();
   }
 
-  AbstractFloatAssert<?> testAbstractFloatAssertIsNotZero() {
+  AbstractFloatAssert<?> testAbstractFloatAssertIsNotEqualToZero() {
     return assertThat(1f).isNotZero();
   }
 
-  AbstractFloatAssert<?> testAbstractFloatAssertIsOne() {
+  AbstractFloatAssert<?> testAbstractFloatAssertIsEqualToOne() {
     return assertThat(1f).isOne();
   }
 }

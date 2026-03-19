@@ -18,23 +18,23 @@ final class MapEntryRulesTest implements RefasterRuleCollectionTestCase {
         Maps.immutableEntry("foo", 1), new AbstractMap.SimpleImmutableEntry<>("bar", 2));
   }
 
-  ImmutableSet<Comparator<Map.Entry<Integer, String>>> testMapEntryComparingByKey() {
+  ImmutableSet<Comparator<Map.Entry<Integer, String>>> testComparingByKey() {
     return ImmutableSet.of(
         Comparator.comparing(Map.Entry::getKey),
         Map.Entry.comparingByKey(Comparator.naturalOrder()));
   }
 
-  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByKeyWithComparator() {
+  Comparator<Map.Entry<Integer, String>> testComparingByKeyWithComparator() {
     return Comparator.comparing(Map.Entry::getKey, Comparator.comparingInt(i -> i * 2));
   }
 
-  ImmutableSet<Comparator<Map.Entry<Integer, String>>> testMapEntryComparingByValue() {
+  ImmutableSet<Comparator<Map.Entry<Integer, String>>> testComparingByValue() {
     return ImmutableSet.of(
         Comparator.comparing(Map.Entry::getValue),
         Map.Entry.comparingByValue(Comparator.naturalOrder()));
   }
 
-  Comparator<Map.Entry<Integer, String>> testMapEntryComparingByValueWithComparator() {
+  Comparator<Map.Entry<Integer, String>> testComparingByValueWithComparator() {
     return Comparator.comparing(Map.Entry::getValue, Comparator.comparingInt(String::length));
   }
 }

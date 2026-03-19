@@ -119,7 +119,7 @@ final class ImmutableListRules {
    * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient
    * alternatives.
    */
-  static final class ImmutableListSortedCopyOfWithComparator<S, T extends S> {
+  static final class ImmutableListSortedCopyOfWithCollection<S, T extends S> {
     @BeforeTemplate
     ImmutableList<T> before(Comparator<S> cmp, Iterable<T> iterable) {
       return Streams.stream(iterable).sorted(cmp).collect(toImmutableList());
@@ -161,7 +161,7 @@ final class ImmutableListRules {
    * Prefer {@code ImmutableList.sortedCopyOf(cmp, iterable).iterator()} over less efficient
    * alternatives.
    */
-  static final class ImmutableListSortedCopyOfIteratorWithComparator<S, T extends S> {
+  static final class ImmutableListSortedCopyOfIteratorWithIterable<S, T extends S> {
     @BeforeTemplate
     Iterator<T> before(Comparator<S> cmp, Iterable<T> iterable) {
       return Streams.stream(iterable).sorted(cmp).iterator();
@@ -195,7 +195,7 @@ final class ImmutableListRules {
   /** Prefer {@link ImmutableList#of()} over imprecisely typed or less efficient alternatives. */
   // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
   // this and similar Refaster rules are replaced with an Error Prone check.
-  static final class ImmutableListOf<T> {
+  static final class ImmutableListOf0<T> {
     @BeforeTemplate
     List<T> before() {
       return Refaster.anyOf(

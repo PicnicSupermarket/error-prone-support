@@ -2,25 +2,18 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
-import static java.util.Collections.disjoint;
 import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -33,8 +26,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssortedRules {
   private AssortedRules() {}
 
-  /** Prefer {@link Objects#checkIndex(int, int)} over the Guava alternative. */
-  static final class CheckIndex {
+  /** Prefer {@link Objects#checkIndex(int, int)} over non-JDK alternatives. */
+  static final class CheckIndexExpression {
     @BeforeTemplate
     int before(int index, int size) {
       return checkElementIndex(index, size);
@@ -48,12 +41,12 @@ final class AssortedRules {
   }
 
   /**
-   * Prefer {@link Objects#checkIndex(int, int)} over less descriptive or more verbose alternatives.
+   * Prefer {@link Objects#checkIndex(int, int)} over less explicit alternatives.
    *
    * <p>If a custom error message is desired, consider using Guava's {@link
    * com.google.common.base.Preconditions#checkElementIndex(int, int, String)}.
    */
-  static final class CheckIndexConditional {
+  static final class CheckIndexBlock {
     @BeforeTemplate
     void before(int index, int size) {
       if (index < 0 || index >= size) {
@@ -69,7 +62,7 @@ final class AssortedRules {
   }
 
   /** Prefer {@link Iterators#getNext(Iterator, Object)} over more contrived alternatives. */
-  static final class IteratorGetNextOrDefault<T> {
+  static final class IteratorsGetNext<T> {
     @BeforeTemplate
     T before(Iterator<T> iterator, T defaultValue) {
       return Refaster.anyOf(
@@ -84,11 +77,11 @@ final class AssortedRules {
     }
   }
 
-  /** Don't unnecessarily repeat boolean expressions. */
+  /** Prefer {@code firstTest || secondTest} over more contrived alternatives. */
   // XXX: This rule captures only the simplest case. `@AlsoNegation` doesn't help. Consider
   // contributing a Refaster patch, which handles the negation in the `@BeforeTemplate` more
   // intelligently.
-  static final class LogicalImplication {
+  static final class Or {
     @BeforeTemplate
     @SuppressWarnings("java:S2589" /* This violation will be rewritten. */)
     boolean before(boolean firstTest, boolean secondTest) {
@@ -104,7 +97,7 @@ final class AssortedRules {
   /**
    * Prefer {@link Stream#generate(java.util.function.Supplier)} over more contrived alternatives.
    */
-  static final class UnboundedSingleElementStream<T> {
+  static final class StreamGenerate<T> {
     @BeforeTemplate
     Stream<T> before(T object) {
       return Streams.stream(Iterables.cycle(object));
@@ -117,7 +110,7 @@ final class AssortedRules {
   }
 
   /** Prefer {@link Iterables#isEmpty(Iterable)} over more contrived alternatives. */
-  static final class IterableIsEmpty<T> {
+  static final class IterablesIsEmpty<T> {
     @BeforeTemplate
     boolean before(Iterable<T> iterable) {
       return !iterable.iterator().hasNext();
@@ -130,7 +123,7 @@ final class AssortedRules {
   }
 
   /** Prefer {@link Splitter#splitToStream(CharSequence)} over less efficient alternatives. */
-  static final class SplitToStream {
+  static final class SplitterSplitToStream {
     @BeforeTemplate
     Stream<String> before(Splitter splitter, CharSequence charSequence) {
       return Refaster.anyOf(

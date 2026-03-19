@@ -51,7 +51,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo").stream().anyMatch("bar"::equals);
   }
 
-  ImmutableSet<Boolean> testCollectionsDisjoint() {
+  ImmutableSet<Boolean> testDisjoint() {
     return ImmutableSet.of(
         Sets.intersection(ImmutableSet.of(1), ImmutableSet.of(2)).isEmpty(),
         ImmutableSet.of(3).stream().noneMatch(ImmutableSet.of(4)::contains),
@@ -75,11 +75,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  boolean testCollectionRemoveAllFromCollectionExpression() {
+  boolean testCollectionRemoveAllExpression() {
     return Iterables.removeAll(new ArrayList<>(), ImmutableSet.of("foo"));
   }
 
-  void testCollectionRemoveAllFromCollectionBlock() {
+  void testCollectionRemoveAllBlock() {
     ImmutableSet.of("foo").forEach(new HashSet<>()::remove);
     for (Number element : ImmutableList.of(1)) {
       new HashSet<Number>().remove(element);
@@ -93,7 +93,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).stream().distinct();
   }
 
-  Set<Integer> testSetOfVarargs() {
+  Set<Integer> testSetOf() {
     return Stream.of(1, 2).collect(toUnmodifiableSet());
   }
 
@@ -132,11 +132,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(3).asList().toArray());
   }
 
-  Integer[] testImmutableCollectionToArrayWithArray() {
+  Integer[] testImmutableCollectionToArrayObject() {
     return ImmutableSet.of(1).asList().toArray(new Integer[0]);
   }
 
-  Integer[] testImmutableCollectionToArrayWithGenerator() {
+  Integer[] testImmutableCollectionToArrayIntFunction() {
     return ImmutableSet.of(1).asList().toArray(Integer[]::new);
   }
 

@@ -23,7 +23,7 @@ final class AssertJIterableRules {
   private AssertJIterableRules() {}
 
   /** Prefer {@code assertThat(iterable).isEmpty()} over more contrived alternatives. */
-  static final class AssertThatIterableIsEmpty<E> {
+  static final class AssertThatIsEmpty<E> {
     @BeforeTemplate
     void before(Iterable<E> iterable) {
       assertThat(iterable.iterator()).isExhausted();
@@ -43,7 +43,7 @@ final class AssertJIterableRules {
 
   /** Prefer {@code assertThat(iterable).isNotEmpty()} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class AssertThatIterableIsNotEmpty<E> {
+  static final class AssertThatIsNotEmpty<E> {
     @BeforeTemplate
     IteratorAssert<E> before(Iterable<E> iterable) {
       return assertThat(iterable.iterator()).hasNext();
@@ -62,7 +62,7 @@ final class AssertJIterableRules {
   }
 
   /** Prefer {@code assertThat(iterable).size()} over non-JDK or more contrived alternatives. */
-  static final class AssertThatIterableSize<E> {
+  static final class AssertThatSize<E> {
     @BeforeTemplate
     AbstractIntegerAssert<?> before(Iterable<E> iterable) {
       return assertThat(Iterables.size(iterable));
@@ -88,7 +88,7 @@ final class AssertJIterableRules {
   // `assertThat(E)`. In most cases a more specific overload of `assertThat` is invoked, in which
   // case this rule won't match. Look into a more robust approach.
   @PossibleSourceIncompatibility
-  static final class AssertThatIterableHasOneElementEqualTo<S, E extends S> {
+  static final class AssertThatContainsExactly<S, E extends S> {
     @BeforeTemplate
     ObjectAssert<S> before(Iterable<S> iterable, E element) {
       return assertThat(Iterables.getOnlyElement(iterable)).isEqualTo(element);

@@ -8,10 +8,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -21,15 +18,15 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Iterables.class, Preconditions.class, Splitter.class, Streams.class);
   }
 
-  int testCheckIndex() {
+  int testCheckIndexExpression() {
     return checkIndex(0, 1);
   }
 
-  void testCheckIndexConditional() {
+  void testCheckIndexBlock() {
     checkIndex(1, 2);
   }
 
-  ImmutableSet<String> testIteratorGetNextOrDefault() {
+  ImmutableSet<String> testIteratorsGetNext() {
     return ImmutableSet.of(
         Iterators.getNext(ImmutableList.of("a").iterator(), "foo"),
         Iterators.getNext(ImmutableList.of("b").iterator(), "bar"),
@@ -37,7 +34,7 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   // XXX: Only the first statement is rewritten. Make smarter.
-  ImmutableSet<Boolean> testLogicalImplication() {
+  ImmutableSet<Boolean> testOr() {
     return ImmutableSet.of(
         toString().isEmpty() || Boolean.TRUE,
         !toString().isEmpty() || (toString().isEmpty() && Boolean.TRUE),
@@ -45,29 +42,15 @@ final class AssortedRulesTest implements RefasterRuleCollectionTestCase {
         3 >= 4 || (3 < 4 && Boolean.TRUE));
   }
 
-  Stream<String> testUnboundedSingleElementStream() {
+  Stream<String> testStreamGenerate() {
     return Stream.generate(() -> "foo");
   }
 
-  ImmutableSet<Boolean> testDisjointSets() {
-    return ImmutableSet.of(
-        Collections.disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
-        Collections.disjoint(ImmutableSet.of(3), ImmutableSet.of(4)));
-  }
-
-  ImmutableSet<Boolean> testDisjointCollections() {
-    return ImmutableSet.of(
-        Collections.disjoint(ImmutableList.of(1), ImmutableList.of(2)),
-        Collections.disjoint(ImmutableList.of(3), ImmutableList.of(4)),
-        Collections.disjoint(ImmutableList.of(5), ImmutableList.of(6)),
-        Collections.disjoint(ImmutableList.of(7), ImmutableList.of(8)));
-  }
-
-  boolean testIterableIsEmpty() {
+  boolean testIterablesIsEmpty() {
     return Iterables.isEmpty(ImmutableList.of());
   }
 
-  ImmutableSet<Stream<String>> testSplitToStream() {
+  ImmutableSet<Stream<String>> testSplitterSplitToStream() {
     return ImmutableSet.of(
         Splitter.on(':').splitToStream("foo"),
         Splitter.on(',').splitToStream(new StringBuilder("bar")));

@@ -19,7 +19,7 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableTable.builder();
   }
 
-  ImmutableTable<Object, Object, Object> testImmutableTableBuilderBuildOrThrow() {
+  ImmutableTable<Object, Object, Object> testBuilderBuildOrThrow() {
     return ImmutableTable.builder().buildOrThrow();
   }
 
@@ -44,7 +44,7 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableTable.of();
   }
 
-  ImmutableSet<ImmutableTable.Builder<String, String, Integer>> testImmutableTableBuilderPut() {
+  ImmutableSet<ImmutableTable.Builder<String, String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableTable.<String, String, Integer>builder().put("foo", "bar", 1),
         ImmutableTable.<String, String, Integer>builder().put("baz", "qux", 2));

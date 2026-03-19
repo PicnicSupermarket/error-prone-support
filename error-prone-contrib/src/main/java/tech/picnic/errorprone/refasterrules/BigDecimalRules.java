@@ -88,7 +88,7 @@ final class BigDecimalRules {
   }
 
   /** Prefer a {@link BigDecimal#signum()} comparison to 0 over less explicit alternatives. */
-  static final class BigDecimalSignumIsZero {
+  static final class BigDecimalSignumEqualToZero {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
@@ -106,7 +106,7 @@ final class BigDecimalRules {
    * Prefer a {@link BigDecimal#signum()} comparison to 1 over less efficient or less explicit
    * alternatives.
    */
-  static final class BigDecimalSignumIsOne {
+  static final class BigDecimalSignumEqualToOne {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(
@@ -127,7 +127,7 @@ final class BigDecimalRules {
    * Prefer a {@link BigDecimal#signum()} comparison to -1 over less efficient or less explicit
    * alternatives.
    */
-  static final class BigDecimalSignumIsNegativeOne {
+  static final class BigDecimalSignumEqualToNegativeOne {
     @BeforeTemplate
     boolean before(BigDecimal value) {
       return Refaster.anyOf(

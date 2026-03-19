@@ -174,23 +174,23 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(ImmutableMap.of()).withFailMessage("waldo").isEqualTo(ImmutableMap.of(1, 2));
   }
 
-  void testAssertThatFloatIsCloseToOffset() {
+  void testAssertThatIsCloseToOffsetFloat() {
     assertThat(1.0f).isCloseTo(2.0f, offset(0.0f));
   }
 
-  void testAssertThatFloatWithFailMessageIsCloseToOffset() {
+  void testAssertThatWithFailMessageIsCloseToOffsetFloat() {
     assertThat(1.0f).withFailMessage("foo").isCloseTo(2.0f, offset(0.0f));
   }
 
-  void testAssertThatDoubleIsCloseToOffset() {
+  void testAssertThatIsCloseToOffsetDouble() {
     assertThat(1.0).isCloseTo(2.0, offset(0.0));
   }
 
-  void testAssertThatDoubleWithFailMessageIsCloseToOffset() {
+  void testAssertThatWithFailMessageIsCloseToOffsetDouble() {
     assertThat(1.0).withFailMessage("foo").isCloseTo(2.0, offset(0.0));
   }
 
-  void testAssertThatArrayContainsExactly() {
+  void testAssertThatContainsExactly() {
     assertThat(new boolean[] {false}).containsExactly(new boolean[] {true});
     assertThat(new byte[] {2}).containsExactly(new byte[] {1});
     assertThat(new char[] {'b'}).containsExactly(new char[] {'a'});
@@ -202,7 +202,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(new Object[] {"bar"}).containsExactly(new Object[] {"foo"});
   }
 
-  void testAssertThatArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactly() {
     assertThat(new boolean[] {false}).withFailMessage("foo").containsExactly(new boolean[] {true});
     assertThat(new byte[] {2}).withFailMessage("bar").containsExactly(new byte[] {1});
     assertThat(new char[] {'b'}).withFailMessage("baz").containsExactly(new char[] {'a'});
@@ -214,45 +214,44 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(new Object[] {"bar"}).withFailMessage("waldo").containsExactly(new Object[] {"foo"});
   }
 
-  void testAssertThatFloatArrayContainsExactlyOffset() {
+  void testAssertThatContainsExactlyOffsetFloat() {
     assertThat(new float[] {2.0f}).containsExactly(new float[] {1.0f}, offset(0.0f));
   }
 
-  void testAssertThatFloatArrayWithFailMessageContainsExactlyOffset() {
+  void testAssertThatWithFailMessageContainsExactlyOffsetFloat() {
     assertThat(new float[] {2.0f})
         .withFailMessage("foo")
         .containsExactly(new float[] {1.0f}, offset(0.0f));
   }
 
-  void testAssertThatDoubleArrayContainsExactlyOffset() {
+  void testAssertThatContainsExactlyOffsetDouble() {
     assertThat(new double[] {2.0}).containsExactly(new double[] {1.0}, offset(0.0));
   }
 
-  void testAssertThatDoubleArrayWithFailMessageContainsExactlyOffset() {
+  void testAssertThatWithFailMessageContainsExactlyOffsetDouble() {
     assertThat(new double[] {2.0})
         .withFailMessage("foo")
         .containsExactly(new double[] {1.0}, offset(0.0));
   }
 
-  void testAssertThatArrayContainsExactlyInAnyOrder() {
+  void testAssertThatContainsExactlyInAnyOrder() {
     assertThat(new Object[] {"bar"}).containsExactlyInAnyOrder(new Object[] {"foo"});
   }
 
-  void testAssertThatArrayWithFailMessageContainsExactlyInAnyOrder() {
+  void testAssertThatWithFailMessageContainsExactlyInAnyOrder() {
     assertThat(new Object[] {"bar"})
         .withFailMessage("foo")
         .containsExactlyInAnyOrder(new Object[] {"foo"});
   }
 
-  void testAssertThatIteratorToIterableContainsExactlyElementsOfImmutableListCopyOf() {
+  void testAssertThatToIterableContainsExactlyElementsOfImmutableListCopyOf() {
     assertThat(new ArrayList<Number>().iterator())
         .toIterable()
         .containsExactlyElementsOf(copyOf(new ArrayList<Integer>().iterator()));
     assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator());
   }
 
-  void
-      testAssertThatIteratorToIterableWithFailMessageContainsExactlyElementsOfImmutableListCopyOf() {
+  void testAssertThatToIterableWithFailMessageContainsExactlyElementsOfImmutableListCopyOf() {
     assertThat(new ArrayList<Number>().iterator())
         .toIterable()
         .withFailMessage("foo")
@@ -260,7 +259,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(new ArrayList<Number>().iterator(), new ArrayList<String>().iterator(), "bar");
   }
 
-  void testAssertThatIterableContainsExactlyElementsOf() {
+  void testAssertThatContainsExactlyElementsOf() {
     assertThat(Iterables.unmodifiableIterable(new ArrayList<Number>()))
         .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<Integer>()));
     assertEquals(
@@ -270,7 +269,7 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(new ArrayList<Number>(), new ArrayList<String>());
   }
 
-  void testAssertThatIterableWithFailMessageContainsExactlyElementsOf() {
+  void testAssertThatWithFailMessageContainsExactlyElementsOf() {
     assertThat(Iterables.unmodifiableIterable(new ArrayList<Number>()))
         .withFailMessage("foo")
         .containsExactlyElementsOf(Iterables.unmodifiableIterable(new ArrayList<Integer>()));
@@ -284,12 +283,12 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertEquals(new ArrayList<Number>(), new ArrayList<String>(), "qux");
   }
 
-  void testAssertThatSetHasSameElementsAs() {
+  void testAssertThatHasSameElementsAs() {
     assertThat(ImmutableSet.<Number>of()).hasSameElementsAs(ImmutableSet.<Integer>of());
     assertEquals(ImmutableSet.<Number>of(), ImmutableSet.<String>of());
   }
 
-  void testAssertThatSetWithFailMessageHasSameElementsAs() {
+  void testAssertThatWithFailMessageHasSameElementsAs() {
     assertThat(ImmutableSet.<Number>of())
         .withFailMessage("foo")
         .hasSameElementsAs(ImmutableSet.<Integer>of());
@@ -326,19 +325,19 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertThat(ImmutableMap.of()).withFailMessage("xyzzy").isNotEqualTo(ImmutableMap.of(1, 2));
   }
 
-  void testAssertThatFloatIsNotCloseToOffset() {
+  void testAssertThatIsNotCloseToOffsetFloat() {
     assertThat(1.0f).isNotCloseTo(2.0f, offset(0.0f));
   }
 
-  void testAssertThatFloatWithFailMessageIsNotCloseToOffset() {
+  void testAssertThatWithFailMessageIsNotCloseToOffsetFloat() {
     assertThat(1.0f).withFailMessage("foo").isNotCloseTo(2.0f, offset(0.0f));
   }
 
-  void testAssertThatDoubleIsNotCloseToOffset() {
+  void testAssertThatIsNotCloseToOffsetDouble() {
     assertThat(1.0).isNotCloseTo(2.0, offset(0.0));
   }
 
-  void testAssertThatDoubleWithFailMessageIsNotCloseToOffset() {
+  void testAssertThatWithFailMessageIsNotCloseToOffsetDouble() {
     assertThat(1.0).withFailMessage("foo").isNotCloseTo(2.0, offset(0.0));
   }
 

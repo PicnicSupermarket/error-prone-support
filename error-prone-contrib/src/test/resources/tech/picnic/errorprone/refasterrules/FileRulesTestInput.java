@@ -26,7 +26,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return Paths.get(URI.create("foo"));
   }
 
-  ImmutableSet<Path> testPathOfWithVarargs() {
+  ImmutableSet<Path> testPathOfVarargs() {
     return ImmutableSet.of(Paths.get("foo"), Paths.get("bar", "baz", "qux"));
   }
 
@@ -55,17 +55,17 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
         File.createTempFile("foo", "bar"), File.createTempFile("baz", "qux", null));
   }
 
-  File testFilesCreateTempFileInCustomDirectoryToFile() throws IOException {
+  File testFilesCreateTempFileFileToPathToFile() throws IOException {
     return File.createTempFile("foo", "bar", new File("baz"));
   }
 
-  ImmutableSet<Boolean> testPathToFileMkDirsFilesExists() {
+  ImmutableSet<Boolean> testPathToFileMkdirsOrFilesExists() {
     return ImmutableSet.of(
         Files.exists(Path.of("foo")) || Path.of("foo").toFile().mkdirs(),
         !Files.exists(Path.of("bar")) && !Path.of("bar").toFile().mkdirs());
   }
 
-  ImmutableSet<Boolean> testFileMkDirsFileExists() {
+  ImmutableSet<Boolean> testFileMkdirsOrFileExists() {
     return ImmutableSet.of(
         new File("foo").exists() || new File("foo").mkdirs(),
         !new File("bar").exists() && !new File("bar").mkdirs());

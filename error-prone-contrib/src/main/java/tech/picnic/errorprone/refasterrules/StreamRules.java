@@ -88,7 +88,7 @@ final class StreamRules {
   // XXX: We can additionally introduce a rule that maps `OptionalInt.empty().stream()` to
   // `IntStream.empty()`, and likewise for `OptionalLong` and `OptionalDouble`, but those
   // expressions are highly unlikely to be seen in the wild.
-  static final class EmptyStream<T> {
+  static final class StreamEmpty<T> {
     @BeforeTemplate
     Stream<T> before(
         @Matches(IsEmpty.class) Collection<T> collection,
@@ -132,7 +132,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Arrays#stream(Object[])} over less explicit alternatives. */
-  static final class StreamOfArray<T> {
+  static final class ArraysStream<T> {
     @BeforeTemplate
     Stream<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
       return Stream.of(array);
@@ -172,7 +172,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#filter(Predicate)} over more contrived alternatives. */
-  abstract static class FilterOuterStreamAfterFlatMap<T, S2, S extends S2> {
+  abstract static class StreamFlatMapFilter<T, S2, S extends S2> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
 
@@ -188,7 +188,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#map(Function)} over more contrived alternatives. */
-  abstract static class MapOuterStreamAfterFlatMap<T, S2, S extends S2, R> {
+  abstract static class StreamFlatMapMap<T, S2, S extends S2, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
 
@@ -204,7 +204,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#flatMap(Function)} over more contrived alternatives. */
-  abstract static class FlatMapOuterStreamAfterFlatMap<T, S2, S extends S2, R> {
+  abstract static class StreamFlatMapFlatMap<T, S2, S extends S2, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
 
@@ -409,7 +409,7 @@ final class StreamRules {
   /**
    * Prefer {@code stream.map(map::get).filter(Objects::nonNull)} over less efficient alternatives.
    */
-  static final class StreamMapFilter<T, K, V> {
+  static final class StreamMapMapGetFilterObjectsNonNull<T, K, V> {
     @BeforeTemplate
     Stream<V> before(Stream<T> stream, Map<K, V> map) {
       return stream.filter(map::containsKey).map(map::get);
@@ -482,7 +482,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
-  static final class StreamNoneMatch<S, T extends S> {
+  static final class StreamNoneMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
     boolean before(Stream<T> stream, Predicate<S> predicate) {
@@ -508,7 +508,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over less explicit alternatives. */
-  abstract static class StreamNoneMatch2<T> {
+  abstract static class StreamNoneMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
@@ -548,7 +548,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#allMatch(Predicate)} over more contrived alternatives. */
-  static final class StreamAllMatch<S, T extends S> {
+  static final class StreamAllMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<S> predicate) {
       return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
@@ -570,7 +570,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#allMatch(Predicate)} over less explicit alternatives. */
-  abstract static class StreamAllMatch2<T> {
+  abstract static class StreamAllMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
 
@@ -726,7 +726,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#reduce(Object, BinaryOperator)} over less efficient alternatives. */
-  static final class StreamReduceWithIdentity<T> {
+  static final class StreamReduceWithBinaryOperator<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
     T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {

@@ -17,11 +17,11 @@ final class MapRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(HashMap.class, requireNonNullElse(null, null));
   }
 
-  Map<RoundingMode, String> testCreateEnumMap() {
+  Map<RoundingMode, String> testNewEnumMapClass() {
     return new EnumMap<>(RoundingMode.class);
   }
 
-  String testMapGetOrNull() {
+  String testMapGet() {
     return ImmutableMap.of(1, "foo").get("bar");
   }
 
@@ -51,11 +51,11 @@ final class MapRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableMap.of("foo", 1).containsValue(2);
   }
 
-  Stream<String> testMapKeyStream() {
+  Stream<String> testMapKeySetStream() {
     return ImmutableMap.of("foo", 1).keySet().stream();
   }
 
-  Stream<Integer> testMapValueStream() {
+  Stream<Integer> testMapValuesStream() {
     return ImmutableMap.of("foo", 1).values().stream();
   }
 }

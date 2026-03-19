@@ -23,7 +23,7 @@ final class NullRules {
   private NullRules() {}
 
   /** Prefer {@code == null} over less idiomatic alternatives. */
-  static final class IsNull {
+  static final class EqualToNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
       return Refaster.anyOf(null == object, Objects.isNull(object));
@@ -36,7 +36,7 @@ final class NullRules {
   }
 
   /** Prefer {@code != null} over less idiomatic alternatives. */
-  static final class IsNotNull {
+  static final class NotEqualToNull {
     @BeforeTemplate
     boolean before(@Nullable Object object) {
       return Refaster.anyOf(null != object, Objects.nonNull(object));

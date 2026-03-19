@@ -31,7 +31,7 @@ final class WebClientRules {
 
   /** Prefer {@link RequestBodySpec#bodyValue(Object)} over more contrived alternatives. */
   @PossibleSourceIncompatibility
-  static final class BodyValue<T> {
+  static final class RequestBodySpecBodyValue<T> {
     @BeforeTemplate
     RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T value) {
       return requestBodySpec.body(fromValue(value));

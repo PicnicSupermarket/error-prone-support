@@ -27,21 +27,21 @@ final class AssertJBigIntegerRulesTest implements RefasterRuleCollectionTestCase
         assertThat(BigInteger.ONE).isNotCloseTo(BigInteger.TWO, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsZero() {
+  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsEqualToZero() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isZero(),
         assertThat(BigInteger.ONE).isEqualTo(0L),
         assertThat(BigInteger.TWO).isEqualTo(BigInteger.ZERO));
   }
 
-  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotZero() {
+  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotEqualToZero() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isNotZero(),
         assertThat(BigInteger.ONE).isNotEqualTo(0L),
         assertThat(BigInteger.TWO).isNotEqualTo(BigInteger.ZERO));
   }
 
-  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsOne() {
+  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsEqualToOne() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isOne(),
         assertThat(BigInteger.ONE).isEqualTo(1L),

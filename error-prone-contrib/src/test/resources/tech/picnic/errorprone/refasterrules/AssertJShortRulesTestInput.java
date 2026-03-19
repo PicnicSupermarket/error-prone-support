@@ -26,15 +26,15 @@ final class AssertJShortRulesTest implements RefasterRuleCollectionTestCase {
         assertThat((short) 1).isNotCloseTo((short) 2, withPercentage(0)));
   }
 
-  AbstractShortAssert<?> testAbstractShortAssertIsZero() {
+  AbstractShortAssert<?> testAbstractShortAssertIsEqualToZero() {
     return assertThat((short) 1).isZero();
   }
 
-  AbstractShortAssert<?> testAbstractShortAssertIsNotZero() {
+  AbstractShortAssert<?> testAbstractShortAssertIsNotEqualToZero() {
     return assertThat((short) 1).isNotZero();
   }
 
-  AbstractShortAssert<?> testAbstractShortAssertIsOne() {
+  AbstractShortAssert<?> testAbstractShortAssertIsEqualToOne() {
     return assertThat((short) 1).isOne();
   }
 }
