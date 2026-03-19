@@ -171,8 +171,6 @@ precise one applies) produces misleading documentation. Follow this process:
   efficient alternatives."` (adjust the qualifier as appropriate).
 - Use `{@link Foo}s` (appended `s`) for plural forms; **not** `{@link Foo}
   instances`.
-- Developer-facing `// XXX:` comments must appear **after** the Javadoc block
-  and **before** the class or method declaration; never inside Javadoc.
 
 ### How rules interact with each other
 
