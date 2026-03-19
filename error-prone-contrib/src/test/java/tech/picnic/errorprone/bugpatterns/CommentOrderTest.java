@@ -1,0 +1,101 @@
+package tech.picnic.errorprone.bugpatterns;
+
+import com.google.errorprone.BugCheckerRefactoringTestHelper;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
+import com.google.errorprone.CompilationTestHelper;
+import org.junit.jupiter.api.Test;
+
+final class CommentOrderTest {
+  @Test
+  void identification() {
+    CompilationTestHelper.newInstance(CommentOrder.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "class A {",
+            "  /** Only Javadoc on method. */",
+            "  void onlyJavadoc() {}",
+            "",
+            "  // Only line comment on method.",
+            "  void onlyLineComment() {}",
+            "",
+            "  /** Javadoc first. */",
+            "  // Non-Javadoc after Javadoc is correct.",
+            "  void correctOrder() {}",
+            "",
+            "  // Blank line before Javadoc.",
+            "",
+            "  /** Separated by blank line. */",
+            "  void blankLineSeparated() {}",
+            "",
+            "  // Line comment before Javadoc.",
+            "  /** Method with preceding line comment. */",
+            "  // BUG: Diagnostic contains:",
+            "  void singleLineComment() {}",
+            "",
+            "  // First line comment.",
+            "  // Second line comment.",
+            "  /** Method with multiple preceding line comments. */",
+            "  // BUG: Diagnostic contains:",
+            "  void multipleLineComments() {}",
+            "",
+            "  /* Block comment before Javadoc. */",
+            "  /** Method with preceding block comment. */",
+            "  // BUG: Diagnostic contains:",
+            "  void blockComment() {}",
+            "",
+            "  // Comment before class Javadoc.",
+            "  /** Nested class. */",
+            "  // BUG: Diagnostic contains:",
+            "  class Nested {",
+            "    // Comment inside nested class.",
+            "    /** Nested method. */",
+            "    // BUG: Diagnostic contains:",
+            "    void nestedMethod() {}",
+            "  }",
+            "",
+            "  // Comment before field Javadoc.",
+            "  /** Documented field. */",
+            "  // BUG: Diagnostic contains:",
+            "  int field = 0;",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void replacement() {
+    BugCheckerRefactoringTestHelper.newInstance(CommentOrder.class, getClass())
+        .addInputLines(
+            "A.java",
+            "class A {",
+            "  // Line comment.",
+            "  /** Javadoc. */",
+            "  void singleLine() {}",
+            "",
+            "  // First.",
+            "  // Second.",
+            "  /** Multiple. */",
+            "  void multiLine() {}",
+            "",
+            "  /* Block. */",
+            "  /** Javadoc. */",
+            "  void block() {}",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "class A {",
+            "  /** Javadoc. */",
+            "  // Line comment.",
+            "  void singleLine() {}",
+            "",
+            "  /** Multiple. */",
+            "  // First.",
+            "  // Second.",
+            "  void multiLine() {}",
+            "",
+            "  /** Javadoc. */",
+            "  /* Block. */",
+            "  void block() {}",
+            "}")
+        .doTest(TestMode.TEXT_MATCH);
+  }
+}
