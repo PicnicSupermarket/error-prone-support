@@ -223,8 +223,6 @@ final class FileRules {
   static final class FilesNewInputStreamPathOf {
     @BeforeTemplate
     @SuppressWarnings({
-      "FilesNewBufferedReaderPathOf" /* This is a more specific template. */,
-      "FilesNewBufferedReaderPathOfWithCharset" /* This is a more specific template. */,
       "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
@@ -246,8 +244,6 @@ final class FileRules {
   static final class FilesNewInputStreamToPath {
     @BeforeTemplate
     @SuppressWarnings({
-      "FilesNewBufferedReaderToPath" /* This is a more specific template. */,
-      "FilesNewBufferedReaderToPathWithCharset" /* This is a more specific template. */,
       "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
@@ -311,15 +307,13 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
-      "FilesNewInputStreamPathOf" /* This is a less specific template. */,
-      "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(String path) throws IOException {
       return Refaster.anyOf(
           Files.newBufferedReader(Path.of(path), UTF_8),
-          new BufferedReader(new InputStreamReader(new FileInputStream(path))));
+          new BufferedReader(new InputStreamReader(Files.newInputStream(Path.of(path)))));
     }
 
     @AfterTemplate
@@ -335,15 +329,13 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
-      "FilesNewInputStreamToPath" /* This is a less specific template. */,
-      "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
     BufferedReader before(File file) throws IOException {
       return Refaster.anyOf(
           Files.newBufferedReader(file.toPath(), UTF_8),
-          new BufferedReader(new InputStreamReader(new FileInputStream(file))));
+          new BufferedReader(new InputStreamReader(Files.newInputStream(file.toPath()))));
     }
 
     @AfterTemplate
@@ -355,9 +347,9 @@ final class FileRules {
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
   static final class FilesNewBufferedReaderPathOfWithCharset {
     @BeforeTemplate
-    @SuppressWarnings("FilesNewInputStreamPathOf" /* This is a less specific template. */)
-    BufferedReader before(String path, Charset charset) throws FileNotFoundException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
+    BufferedReader before(String path, Charset charset) throws IOException {
+      return new BufferedReader(
+          new InputStreamReader(Files.newInputStream(Path.of(path)), charset));
     }
 
     @AfterTemplate
@@ -369,9 +361,9 @@ final class FileRules {
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
   static final class FilesNewBufferedReaderToPathWithCharset {
     @BeforeTemplate
-    @SuppressWarnings("FilesNewInputStreamToPath" /* This is a less specific template. */)
-    BufferedReader before(File file, Charset charset) throws FileNotFoundException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
+    BufferedReader before(File file, Charset charset) throws IOException {
+      return new BufferedReader(
+          new InputStreamReader(Files.newInputStream(file.toPath()), charset));
     }
 
     @AfterTemplate
