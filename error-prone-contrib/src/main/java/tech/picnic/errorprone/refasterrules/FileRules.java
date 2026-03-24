@@ -268,8 +268,11 @@ final class FileRules {
    */
   static final class FilesNewOutputStreamPathOf {
     @BeforeTemplate
-    @SuppressWarnings(
-        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    @SuppressWarnings({
+      "java:S1943" /* This violation will be rewritten. */,
+      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     OutputStream before(String path) throws FileNotFoundException {
       return new FileOutputStream(path);
     }
@@ -286,8 +289,11 @@ final class FileRules {
    */
   static final class FilesNewOutputStreamToPath {
     @BeforeTemplate
-    @SuppressWarnings(
-        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    @SuppressWarnings({
+      "java:S1943" /* This violation will be rewritten. */,
+      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
     OutputStream before(File file) throws FileNotFoundException {
       return new FileOutputStream(file);
     }
