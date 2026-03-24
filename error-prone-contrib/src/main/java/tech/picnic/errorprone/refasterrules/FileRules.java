@@ -305,6 +305,7 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
+      "FilesNewInputStreamPathOf" /* This is a less specific template. */,
       "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
@@ -328,6 +329,7 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
+      "FilesNewInputStreamToPath" /* This is a less specific template. */,
       "java:S1943" /* This violation will be rewritten. */,
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
@@ -347,6 +349,7 @@ final class FileRules {
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
   static final class FilesNewBufferedReaderPathOfWithCharset {
     @BeforeTemplate
+    @SuppressWarnings("FilesNewInputStreamPathOf" /* This is a less specific template. */)
     BufferedReader before(String path, Charset charset) throws FileNotFoundException {
       return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
     }
@@ -360,6 +363,7 @@ final class FileRules {
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
   static final class FilesNewBufferedReaderToPathWithCharset {
     @BeforeTemplate
+    @SuppressWarnings("FilesNewInputStreamToPath" /* This is a less specific template. */)
     BufferedReader before(File file, Charset charset) throws FileNotFoundException {
       return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
     }
