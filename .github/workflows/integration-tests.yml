@@ -3,15 +3,12 @@
 # The tests run in the following scenarios:
 # - Any time code is pushed to the default branch.
 # - When a user leaves a pull request comment containing the string
-#   `/integration-test`.
+#   `/integration-test`. Optionally specify one or more project names
+#   (e.g. `/integration-test checkstyle metrics`) to run a subset of tests.
 #
 # XXX: Review whether the build matrix should also vary JDK or OS versions.
 # XXX: Have the integration test scripts select the JDK version to use, rather
 # than having this workflow set the same `JAVA_HOME` override for all.
-# XXX: Support `/integration-test [name...]` comment syntax to specify the
-# subset of integration tests to run.
-# See this example of a dynamic build matrix:
-# https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: Run integration tests
 on:
   issue_comment:
@@ -32,19 +29,40 @@ jobs:
       pull-requests: write
     outputs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
+      matrix: ${{ steps.determine-matrix.outputs.matrix }}
     steps:
+      - name: Determine integration tests to run
+        id: determine-matrix
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const allTests = ['checkstyle', 'metrics', 'prometheus-java-client'];
+            const comment = context.payload.comment.body;
+            const match = comment.match(/\/integration-test\s+(.*)/s);
+
+            if (match) {
+              const requested = match[1].split(/[\s,]+/).map(s => s.trim()).filter(s => s.length > 0);
+              const valid = requested.filter(t => allTests.includes(t));
+              if (valid.length > 0) {
+                core.setOutput('matrix', JSON.stringify(valid));
+                return;
+              }
+            }
+
+            core.setOutput('matrix', JSON.stringify(allTests));
       - name: Post comment with workflow link
         id: post-comment
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const tests = ${{ steps.determine-matrix.outputs.matrix }};
 
             const response = await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `[Integration tests](${runUrl}) started. :rocket:`
+              body: `[Integration tests](${runUrl}) for **${tests.join(', ')}** started. :rocket:`
             });
 
             core.setOutput('commentId', response.data.id);
@@ -58,10 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        integration-test:
-          - checkstyle
-          - metrics
-          - prometheus-java-client
+        integration-test: ${{ fromJson(needs.acknowledge-request.outputs.matrix || '["checkstyle","metrics","prometheus-java-client"]') }}
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
