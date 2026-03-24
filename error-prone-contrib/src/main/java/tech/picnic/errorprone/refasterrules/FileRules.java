@@ -11,8 +11,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -210,6 +213,88 @@ final class FileRules {
     @AlsoNegation
     boolean after(File file) {
       return file.mkdirs() || file.exists();
+    }
+  }
+
+  /**
+   * Prefer {@link Files#newInputStream(Path, java.nio.file.OpenOption...)} over the {@link
+   * FileInputStream#FileInputStream(String)} constructor.
+   */
+  static final class FilesNewInputStreamPathOf {
+    @BeforeTemplate
+    @SuppressWarnings({
+      "FilesNewBufferedReaderPathOf" /* This is a more specific template. */,
+      "FilesNewBufferedReaderPathOfWithCharset" /* This is a more specific template. */,
+      "java:S1943" /* This violation will be rewritten. */,
+      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
+    InputStream before(String path) throws FileNotFoundException {
+      return new FileInputStream(path);
+    }
+
+    @AfterTemplate
+    InputStream after(String path) throws IOException {
+      return Files.newInputStream(Path.of(path));
+    }
+  }
+
+  /**
+   * Prefer {@link Files#newInputStream(Path, java.nio.file.OpenOption...)} over the {@link
+   * FileInputStream#FileInputStream(File)} constructor.
+   */
+  static final class FilesNewInputStreamToPath {
+    @BeforeTemplate
+    @SuppressWarnings({
+      "FilesNewBufferedReaderToPath" /* This is a more specific template. */,
+      "FilesNewBufferedReaderToPathWithCharset" /* This is a more specific template. */,
+      "java:S1943" /* This violation will be rewritten. */,
+      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
+      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+    })
+    InputStream before(File file) throws FileNotFoundException {
+      return new FileInputStream(file);
+    }
+
+    @AfterTemplate
+    InputStream after(File file) throws IOException {
+      return Files.newInputStream(file.toPath());
+    }
+  }
+
+  /**
+   * Prefer {@link Files#newOutputStream(Path, java.nio.file.OpenOption...)} over the {@link
+   * FileOutputStream#FileOutputStream(String)} constructor.
+   */
+  static final class FilesNewOutputStreamPathOf {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    OutputStream before(String path) throws FileNotFoundException {
+      return new FileOutputStream(path);
+    }
+
+    @AfterTemplate
+    OutputStream after(String path) throws IOException {
+      return Files.newOutputStream(Path.of(path));
+    }
+  }
+
+  /**
+   * Prefer {@link Files#newOutputStream(Path, java.nio.file.OpenOption...)} over the {@link
+   * FileOutputStream#FileOutputStream(File)} constructor.
+   */
+  static final class FilesNewOutputStreamToPath {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    OutputStream before(File file) throws FileNotFoundException {
+      return new FileOutputStream(file);
+    }
+
+    @AfterTemplate
+    OutputStream after(File file) throws IOException {
+      return Files.newOutputStream(file.toPath());
     }
   }
 
