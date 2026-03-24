@@ -27,6 +27,13 @@ final class CommentOrderTest {
             "  /** Separated by blank line. */",
             "  void blankLineSeparated() {}",
             "",
+            "  // Separated group.",
+            "",
+            "  // Direct comment.",
+            "  /** Only the direct comment group is flagged. */",
+            "  // BUG: Diagnostic contains:",
+            "  void partialGroup() {}",
+            "",
             "  // Line comment before Javadoc.",
             "  /** Method with preceding line comment. */",
             "  // BUG: Diagnostic contains:",
@@ -98,6 +105,12 @@ final class CommentOrderTest {
             "  // Before field.",
             "  /** Field. */",
             "  int x = 0;",
+            "",
+            "  // Separated group.",
+            "",
+            "  // Direct comment.",
+            "  /** Only the direct comment is swapped. */",
+            "  void partialGroup() {}",
             "}")
         .addOutputLines(
             "A.java",
@@ -127,6 +140,12 @@ final class CommentOrderTest {
             "  /** Field. */",
             "  // Before field.",
             "  int x = 0;",
+            "",
+            "  // Separated group.",
+            "",
+            "  /** Only the direct comment is swapped. */",
+            "  // Direct comment.",
+            "  void partialGroup() {}",
             "}")
         .doTest(TestMode.TEXT_MATCH);
   }

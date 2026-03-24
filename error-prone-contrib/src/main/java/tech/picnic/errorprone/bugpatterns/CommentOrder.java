@@ -6,7 +6,9 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.Var;
@@ -25,8 +27,6 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
-import java.util.HashMap;
-import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -55,7 +55,7 @@ public final class CommentOrder extends BugChecker implements CompilationUnitTre
     String sourceString = source.toString();
     ImmutableList<ErrorProneToken> tokens = ErrorProneTokens.getTokens(sourceString, state.context);
 
-    Map<Integer, SuggestedFix> violations = findViolations(tokens, sourceString);
+    ImmutableMap<Integer, SuggestedFix> violations = findViolations(tokens, sourceString);
 
     if (!violations.isEmpty()) {
       new TreeScanner<@Nullable Void, @Nullable Void>() {
@@ -89,9 +89,9 @@ public final class CommentOrder extends BugChecker implements CompilationUnitTre
     return Description.NO_MATCH;
   }
 
-  private static Map<Integer, SuggestedFix> findViolations(
+  private static ImmutableMap<Integer, SuggestedFix> findViolations(
       ImmutableList<ErrorProneToken> tokens, String source) {
-    Map<Integer, SuggestedFix> violations = new HashMap<>();
+    ImmutableMap.Builder<Integer, SuggestedFix> violations = ImmutableMap.builder();
 
     for (ErrorProneToken token : tokens) {
       ImmutableList<ErrorProneComment> comments = token.comments();
@@ -115,7 +115,7 @@ public final class CommentOrder extends BugChecker implements CompilationUnitTre
           firstNonJavadocIndex = j;
         }
 
-        if (firstNonJavadocIndex >= i) {
+        if (firstNonJavadocIndex == i) {
           continue;
         }
 
@@ -138,7 +138,7 @@ public final class CommentOrder extends BugChecker implements CompilationUnitTre
       }
     }
 
-    return violations;
+    return violations.buildOrThrow();
   }
 
   private static boolean isJavadoc(ErrorProneComment comment) {
@@ -148,16 +148,6 @@ public final class CommentOrder extends BugChecker implements CompilationUnitTre
 
   private static boolean hasBlankLineBetween(
       ErrorProneComment first, ErrorProneComment second, String source) {
-    String between = source.substring(first.getEndPos(), second.getPos());
-    @Var int newlineCount = 0;
-    for (int k = 0; k < between.length(); k++) {
-      if (between.charAt(k) == '\n') {
-        newlineCount++;
-        if (newlineCount >= 2) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return CharMatcher.is('\n').countIn(source.substring(first.getEndPos(), second.getPos())) >= 2;
   }
 }
