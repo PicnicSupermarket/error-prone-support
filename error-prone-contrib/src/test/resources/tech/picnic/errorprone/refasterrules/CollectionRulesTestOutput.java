@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Collections.disjoint;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableList;
@@ -48,6 +49,16 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testCollectionContains() {
     return ImmutableSet.of("foo").contains("bar");
+  }
+
+  ImmutableSet<Boolean> testCollectionsDisjoint() {
+    return ImmutableSet.of(
+        disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
+        disjoint(ImmutableSet.of(3), ImmutableSet.of(4)),
+        disjoint(ImmutableList.of(5), ImmutableList.of(6)),
+        disjoint(ImmutableList.of(7), ImmutableList.of(8)),
+        disjoint(ImmutableList.of(9), ImmutableList.of(10)),
+        disjoint(ImmutableList.of(11), ImmutableList.of(12)));
   }
 
   boolean testCollectionAddAllToCollectionExpression() {
