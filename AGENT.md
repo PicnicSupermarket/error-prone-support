@@ -63,32 +63,39 @@ Replace the module (`-pl`) and test class (`-Dtest=`) as needed.
 
 ## Workflow
 
-1. Implement the changes and associated tests.
-2. Run the tests, and iterate until the tests pass.
-3. Commit your changes.
-4. Run a quick full build using
-   `mvn clean install -DskipTests -Dverification.skip`.
-5. Run `./run-branch-mutation-tests.sh` to determine mutation test
-   coverage using Pitest (PIT) and try to resolve any surviving
-   mutants listed in `<module>/target/pit-reports/mutations.csv`.
-6. If there are changes, commit them.
-7. Run `./apply-error-prone-suggestions.sh` to clean up the code;
-   ask for help if this step fails.
-8. Again, if there are changes, commit them.
-9. Run `./run-full-build.sh` and attempt to resolve any build
-   failures.
-10. If applicable, commit changes once more.
+1.  Implement the changes and associated tests.
+2.  Run the tests, and iterate until the tests pass.
+3.  Commit your changes.
+4.  Carefully review your changes (both code and tests) and bring them down to
+    their essence, while fully complying with repository best practices and
+    maximizing test coverage. Apply all suggested improvements.
+5.  Repeat the previous step with a fresh look, and keep doing this until
+    reaching diminishing returns.
+6.  Commit your new changes (if any).
+7.  Run a quick full build using `mvn clean install -DskipTests
+    -Dverification.skip`.
+8.  Run `./run-branch-mutation-tests.sh` to determine mutation test coverage
+    using Pitest (PIT) and try to resolve any surviving mutants listed in
+    `<module>/target/pit-reports/mutations.csv`.
+9.  If there are changes, commit them.
+10. Run `./apply-error-prone-suggestions.sh` to clean up the code and inspect
+    the resultant changes using `git diff`.
+    - If this command fails, try to understand why and fix the issue.
+    - If there are changes, validate that they make sense. If not, and they are
+      due to newly introduced changes, undo the changes and attempt to fix the
+      bug.
+11. Once again, if there are changes, commit them.
+12. Run `./run-full-build.sh` and attempt to resolve any build failures.
+13. If applicable, commit changes once more.
 
 ## Task-specific instructions
 
-When working on Refaster rules (files in `refasterrules/`
-directories), read
-`.github/instructions/refaster-rules.instructions.md` for
-detailed conventions and step-by-step instructions.
+When working on Refaster rules (files in `refasterrules/` directories), read
+`.github/instructions/refaster-rules.instructions.md` for detailed conventions
+and step-by-step instructions.
 
 When working on `BugChecker` implementations (files in `bugpatterns/`
-directories), read
-`.github/instructions/bug-checkers.instructions.md` for
+directories), read `.github/instructions/bug-checkers.instructions.md` for
 detailed conventions and step-by-step instructions.
 
 [contributing]: CONTRIBUTING.md
