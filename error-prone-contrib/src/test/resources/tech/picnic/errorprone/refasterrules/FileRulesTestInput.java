@@ -87,26 +87,14 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return new FileOutputStream(new File("foo"));
   }
 
-  ImmutableSet<BufferedReader> testFilesNewBufferedReaderPathOf() throws IOException {
+  ImmutableSet<BufferedReader> testFilesNewBufferedReader() throws IOException {
     return ImmutableSet.of(
         Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8),
         new BufferedReader(new InputStreamReader(Files.newInputStream(Path.of("bar")))));
   }
 
-  ImmutableSet<BufferedReader> testFilesNewBufferedReaderToPath() throws IOException {
-    return ImmutableSet.of(
-        Files.newBufferedReader(new File("foo").toPath(), StandardCharsets.UTF_8),
-        new BufferedReader(new InputStreamReader(Files.newInputStream(new File("bar").toPath()))));
-  }
-
-  BufferedReader testFilesNewBufferedReaderPathOfWithCharset() throws IOException {
+  BufferedReader testFilesNewBufferedReaderWithCharset() throws IOException {
     return new BufferedReader(
         new InputStreamReader(Files.newInputStream(Path.of("foo")), StandardCharsets.UTF_8));
-  }
-
-  BufferedReader testFilesNewBufferedReaderToPathWithCharset() throws IOException {
-    return new BufferedReader(
-        new InputStreamReader(
-            Files.newInputStream(new File("foo").toPath()), StandardCharsets.UTF_8));
   }
 }
