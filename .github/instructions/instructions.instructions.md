@@ -1,0 +1,119 @@
+---
+applyTo: "**/.github/instructions/**"
+---
+
+# Instruction File Conventions
+
+This document describes how `.github/instructions/*.instructions.md` files are
+written and maintained in this project.
+
+All instruction files must also follow the writing conventions in
+[`documentation.instructions.md`](documentation.instructions.md).
+
+## Instruction files serve all agents and humans
+<!-- check: skip -->
+
+Instruction files are the canonical reference for coding conventions in this
+project. They are designed to be consulted by:
+
+- AI coding agents of any platform (Claude, Copilot, Gemini, Codex and others).
+- AI models of any capability level (from small/fast models to large frontier
+  models).
+- Human contributors.
+
+Write rules clearly and unambiguously. Use concrete **Do**/**Don't** examples.
+Avoid jargon that assumes familiarity with a specific agent platform.
+
+## `applyTo` frontmatter
+<!-- check: `applyTo` frontmatter is present and targets the right files -->
+
+Every instruction file must include an `applyTo` field in the YAML frontmatter,
+with the following exceptions (which apply to workflow actions rather than
+specific source files and are loaded via skills, not pattern matching):
+
+- `review.instructions.md` (auto-generated, loaded explicitly during review).
+- `commit-message.instructions.md` (applies when writing commit messages).
+- `pull-request.instructions.md` (applies when creating pull requests).
+
+The `applyTo` field tells agent platforms (e.g., GitHub Copilot) which files
+the instructions apply to. Use glob patterns. These globs are best-effort
+hints: they may be approximate when a file's scope spans multiple file types or
+directories.
+
+```yaml
+---
+applyTo: "**/*.java"
+---
+```
+
+## Review checklist annotations
+<!-- check: skip -->
+
+Instruction files support `<!-- check: -->` HTML comment annotations that feed
+into the auto-generated review checklist (`review.instructions.md`). The
+annotations are invisible in rendered markdown but are parsed by
+`./generate-review-checklist.sh`.
+
+### Annotation syntax
+<!-- check: skip -->
+
+Annotations are placed on the line immediately after a heading.
+
+**Default** (no annotation): the heading text becomes a checklist item.
+
+```markdown
+### Prefer Guava immutable collections
+```
+
+Produces: `- [ ] Prefer Guava immutable collections`
+
+**Custom text**: override the default with a more specific item.
+
+```markdown
+### Prefer Guava immutable collections
+<!-- check: All collection types use `ImmutableList`/`ImmutableSet`/`ImmutableMap` -->
+```
+
+Produces: `- [ ] All collection types use ...`
+
+**Multiple items**: one heading can produce multiple checklist items.
+
+```markdown
+### Declare least-privilege permissions
+<!-- check: `permissions` declared at workflow level with `contents: read` -->
+<!-- check: Job-level permissions scoped to only what is needed -->
+```
+
+**Skip**: exclude a heading from the checklist.
+
+```markdown
+### Overview
+<!-- check: skip -->
+```
+
+### Heading levels in the generated checklist
+<!-- check: skip -->
+
+- `##` headings become section group labels (not checklist items) unless
+  annotated with `<!-- check: -->`.
+- `###` and deeper headings become checklist items by default.
+
+## Regenerate the review checklist after editing
+<!-- check: `./generate-review-checklist.sh` executed after instruction file changes -->
+
+After editing any instruction file, run:
+
+```sh
+./generate-review-checklist.sh
+```
+
+This regenerates `.github/instructions/review.instructions.md`. Commit the
+updated file alongside your instruction file changes. CI validates that the
+generated file is in sync with the source files.
+
+## `review.instructions.md` is auto-generated
+<!-- check: skip -->
+
+Do not edit `review.instructions.md` manually. It is derived from the `<!--
+check: -->` annotations in the other instruction files. Any manual edits will
+be overwritten by the generator and rejected by CI.

@@ -8,9 +8,12 @@ This document describes the conventions for creating and modifying Refaster
 rules in this project. It serves as the canonical reference for all AI coding
 agents and human contributors.
 
-For general project context, see [CONTRIBUTING.md][contributing].
+For general Java style conventions (collections, nullability, imports, etc.),
+see [`java-style.instructions.md`][java-style]. For testing conventions, see
+[`testing.instructions.md`][testing].
 
 ## Overview
+<!-- check: skip -->
 
 [Refaster][refaster] rules define source code transformations using
 `@BeforeTemplate` / `@AfterTemplate` method pairs. Each `@BeforeTemplate`
@@ -18,6 +21,7 @@ matches a code pattern; the `@AfterTemplate` specifies its replacement. Rules
 are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 
 ## File locations
+<!-- check: skip -->
 
 | Purpose | Path |
 |---------|------|
@@ -27,6 +31,7 @@ are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 | Test registration | `error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java` |
 
 ## Step 1 - Create the rule file
+<!-- check: skip -->
 
 Create (or extend) `{Topic}Rules.java`. A new collection looks like this:
 
@@ -60,7 +65,7 @@ final class {Topic}Rules {
 
 Conventions:
 - The outer class is `final`, annotated with `@OnlineDocumentation`, and has a
-  `private` constructor.
+  `private` no-arg constructor.
 - The outer class's Javadoc follows one of these patterns:
   - For AssertJ assertion collections: `Refaster rules related to AssertJ
     assertions over {topic}s.` (use the concrete subject type, e.g. `{@link
@@ -71,6 +76,7 @@ Conventions:
   - For other rule collections: `Refaster rules related to expressions dealing
     with {@link Topic}s.`
 - Each rule is a `static final class` nested inside the outer class.
+  (Exception: rules with a `@Placeholder` method have `abstract static class`.)
 - Every rule has a Javadoc comment of the form `/** Prefer X over Y. */`, where
   `X` is generally a Javadoc link ({@link ...}) to the preferred alternative,
   and `Y` is a qualifier describing the before-template code. See [Javadoc
@@ -88,6 +94,8 @@ Conventions:
   in the `@AfterTemplate` method.
 
 ### Javadoc conventions
+<!-- check: Javadoc follows "Prefer X over Y" format -->
+<!-- check: Correct Javadoc qualifier chosen (deprecated, less efficient, etc.) -->
 
 If applicable, prefer one of the following qualifier variants (or combinations
 thereof) in the Javadoc comment:
@@ -113,8 +121,8 @@ on the table below:
 |-----------|-------------|
 | "deprecated" | The before-template uses an API annotated `@Deprecated` |
 | "imprecisely typed" | The before-template returns a broader type that does not communicate a key property (such as immutability, sortedness, or subtype specificity) that the after-template's return type does. For example, `Map.of()` returns `Map` while `ImmutableMap.of()` returns `ImmutableMap`, communicating immutability at the type level |
-| "less efficient" | The after-template avoids unnecessary work that is evident from inspecting the code (no benchmarks required). Look for: (1) unnecessary object allocations — e.g., `str.substring(i).indexOf(ch)` allocates a new string vs. `str.indexOf(ch, i)` which does not; (2) unnecessary intermediate data structures — e.g., materializing a List only to stream it; (3) unnecessary serialization/deserialization round-trips; (4) worse algorithmic complexity — e.g., sorting O(n log n) to find a min/max that can be found in O(n); (5) using a general API when a specialized, allocation-free alternative exists — e.g., `str.trim().isEmpty()` vs. `str.isBlank()`, or `BigDecimal.valueOf(0)` vs. the cached `BigDecimal.ZERO`. If in doubt, inspect the implementation of invoked methods |
-| "less explicit" | The after-template conveys the programmer's intent more clearly. |
+| "less efficient" | The after-template avoids unnecessary work that is evident from inspecting the code (no benchmarks required). Look for: (1) unnecessary object allocations, e.g., `str.substring(i).indexOf(ch)` allocates a new string vs. `str.indexOf(ch, i)` which does not; (2) unnecessary intermediate data structures, e.g., materializing a `List` only to stream it; (3) unnecessary serialization/deserialization round-trips; (4) worse algorithmic complexity, e.g., sorting O(n log n) to find a min/max that can be found in O(n); (5) using a general API when a specialized, allocation-free alternative exists, e.g., `str.trim().isEmpty()` vs. `str.isBlank()`, or `BigDecimal.valueOf(0)` vs. the cached `BigDecimal.ZERO`. If in doubt, inspect the implementation of invoked methods |
+| "less explicit" | The after-template conveys the programmer's intent more clearly |
 | "less idiomatic" | A well-known Java or library idiom exists that directly expresses the intent |
 | "less secure" | The before-template creates resources or performs operations with weaker security properties (such as more liberal file permissions) than the after-template |
 | "more contrived" | The before-template takes a needlessly roundabout approach (e.g., converting to a stream and back) **and** you have verified that none of the other categories in this list apply |
@@ -125,15 +133,17 @@ on the table below:
 | "the associated constructor" | The before-template uses `new X(...)` when a static factory method exists |
 
 When multiple qualifiers apply (e.g. in case of multiple `@BeforeTemplate`
-methods or `Refaster.anyOf` usage), enumerare all that apply: e.g. "Prefer X
+methods or `Refaster.anyOf` usage), enumerate all that apply: e.g. "Prefer X
 over less efficient, more fragile or more contrived alternatives".
 
 #### Choosing the right Javadoc qualifier
+<!-- check: skip -->
 
 Selecting the wrong qualifier (or defaulting to "more contrived" when a more
 precise one applies) produces misleading documentation. Follow this process:
 
-1. **Inspect the before-template's operations.** For each expression, ask:
+1. **Inspect the before-template's operations.** For each expression, ask
+   questions such as:
    - Does it allocate an object that the after-template avoids? (-> "less
      efficient")
    - Does it build an intermediate collection, array, or string that the
@@ -151,17 +161,18 @@ precise one applies) produces misleading documentation. Follow this process:
    only when the before-template takes a roundabout path (e.g., converting to a
    stream and back) but the operations are otherwise equivalent in cost. If
    there is _any_ observable difference in allocations, complexity, or work
-   performed, prefer "less efficient" — possibly combined with another
-   qualifier if appropriate (e.g., "more contrived and less efficient").
-   Note: redundant single-object allocations (e.g., a `Map.Entry` or a
-   one-element collection) are considered negligible and do not warrant the
-   "less efficient" qualifier. "More contrived" is appropriate for these cases.
+   performed, prefer "less efficient", possibly combined with another qualifier
+   if appropriate (e.g., "more contrived and less efficient"). Note: redundant
+   single-object allocations (e.g., a `Map.Entry` or a one-element collection)
+   are considered negligible and do not warrant the "less efficient" qualifier.
+   "More contrived" is appropriate for these cases.
 4. **When in doubt, trace the operations.** List what the before-template does
    step by step (allocate X, iterate Y, copy Z) and what the after-template
    does. If the after-template's list is strictly shorter or avoids a costly
    step, "less efficient" applies.
 
-#### Genral Javadoc comment rules
+#### General Javadoc comment rules
+<!-- check: skip -->
 
 - Every rule class Javadoc **must** use the `"Prefer X over Y"` form. Rewrite
   imperative prohibitions like `"Avoid using X"` or `"Don't use X"` into this
@@ -173,12 +184,13 @@ precise one applies) produces misleading documentation. Follow this process:
   instances`.
 
 ### How rules interact with each other
+<!-- check: skip -->
 
 All Refaster rules in the project are applied to a codebase repeatedly, until
 no more changes occur. This means that every `@BeforeTemplate` must be written
 as if all other rules have already been applied. Follow these two principles:
 
-#### Principle 1: Use already-rewritten expressions in `@BeforeTemplate`s
+#### `@BeforeTemplate`s use already-rewritten expressions
 
 When writing a `@BeforeTemplate`, check whether any sub-expression in it is
 matched by another existing rule. If so, use the *after-template* (rewritten)
@@ -193,24 +205,28 @@ you use the original (pre-rewrite) form, your rule will never match real code.
 Therefore, `BigDecimalSignumIsZero` must use `BigDecimal.ZERO` in its
 `@BeforeTemplate`:
 
+**Do:**
+
 ```java
-// CORRECT: uses the already-rewritten form (`BigDecimal.ZERO`)
 static final class BigDecimalSignumIsZero {
   @BeforeTemplate
   boolean before(BigDecimal value) {
+    // Uses the already-rewritten form (`BigDecimal.ZERO`).
     return value.compareTo(BigDecimal.ZERO) == 0;
   }
   // ...
 }
+```
 
-// WRONG: uses the pre-rewrite form (`BigDecimal.valueOf(0)`)
+**Don't:**
+
+```java
 static final class BigDecimalSignumIsZero {
   @BeforeTemplate
   boolean before(BigDecimal value) {
+    // BigDecimalZero already rewrites `BigDecimal.valueOf(0)` to
+    // `BigDecimal.ZERO`, so this template will never match.
     return value.compareTo(BigDecimal.valueOf(0)) == 0;
-    //                     ^^^^^^^^^^^^^^^^^^^^^
-    //  BigDecimalZero already rewrites this to BigDecimal.ZERO,
-    //  so this template will never match.
   }
   // ...
 }
@@ -232,7 +248,15 @@ been rewritten.
 - If found, replace the sub-expression with the other rule's `@AfterTemplate`
   output.
 
-#### Principle 2: Check if your new rule makes existing rules redundant
+#### New rule has distinct `@AfterTemplate`
+
+Before creating a new rule, check whether an existing rule already has the same
+`@AfterTemplate` expression as the new rule. If so, extend the existing rule
+instead of creating a new rule. Do this by generalizing an existing
+`@BeforeTemplate` using `Refaster.anyOf`. Only if that is not possible
+introduce an additional `@BeforeTemplate` method.
+
+#### New rule does not make existing rules redundant
 
 When you add a new rule, check whether it makes any existing rules partially or
 fully redundant:
@@ -244,6 +268,7 @@ fully redundant:
 Update or remove affected rules as needed.
 
 #### Exception: collapsing passes
+<!-- check: skip -->
 
 A rule _may_ include pre-rewrite sub-expressions in its `@BeforeTemplate` if
 the rule is a "more specific template" for those expressions. This should only
@@ -256,15 +281,16 @@ code. This allows the rule to match code that would otherwise be rewritten in
 multiple passes, collapsing those passes into a single, more targeted rewrite.
 
 ### Parameter naming conventions
+<!-- check: Parameter names follow type-based naming conventions -->
 
-Template method parameters are generally derived from their type name
-(e.g. `Collection` -> `collection`). Nested types are named after their inner
-type (e.g. `Table.Cell` -> `cell`). In some cases we use a canonical
-abbriviation (e.g. `Comparator` -> `cmp`). If a parameter has different types
-between methods, name the parameter after the widest type used. If multiple
-parameters have the same type, add a number suffix. However, when multiple
-parameters share a type but play distinct roles, prefer semantic names over
-numbered suffixes (e.g., `addTo`/`elementsToAdd` instead of
+Template method parameters are generally derived from their type name (e.g.
+`Collection` -> `collection`). Nested types are named after their inner type
+(e.g. `Table.Cell` -> `cell`). In some cases we use a canonical abbreviation
+(e.g. `Comparator` -> `cmp`). If a parameter has different types between
+methods, name the parameter after the widest type used. If multiple parameters
+have the same type, add a number suffix. However, when multiple parameters
+share a type but play distinct roles, prefer semantic names over numbered
+suffixes (e.g., `addTo`/`elementsToAdd` instead of
 `collection1`/`collection2`). Some examples:
 
 | Parameter type combination | Name |
@@ -287,7 +313,8 @@ numbered suffixes (e.g., `addTo`/`elementsToAdd` instead of
 | `Table.Cell` | `cell` |
 | `T[]` | `array` |
 
-### Naming conventions
+### Rule named after `@AfterTemplate` content
+<!-- check: Rule class name derived from `@AfterTemplate` identifiers -->
 
 Rules are named after the code in their `@AfterTemplate` method, following
 these guidelines:
@@ -305,11 +332,11 @@ these guidelines:
 - In case of arity-based name clashes, rename new or existing rules as
   necessary to disambiguate them:
   - Variants with more template methods parameters are amended to include
-    `WithX` or `WithXAndY`, where `X and `Y` are the additional parameter
-    type(s). If the additional paramater type is `@Repeated`, use
+    `WithX` or `WithXAndY`, where `X` and `Y` are the additional parameter
+    type(s). If the additional parameter type is `@Repeated`, use
     `WithVarargs`.
   - In case there's an expression (non-`void` returning) and block (`void`
-    returning) variant, append `Expression` and `Block` as appropriate).
+    returning) variant, append `Expression` and `Block` as appropriate.
   - When rules differ only in the number of arguments (arity), append a numeric
     suffix: e.g., `ImmutableMapOf1`, `ImmutableMapOf2`, etc.
 - When invoking static methods or fields, check the rest of the code base to
@@ -332,17 +359,18 @@ Examples:
 
 | Code | Name |
 |------------|------|
-| `return BigDecimal.ZERO` | `BigDecimalZero;` |
+| `return BigDecimal.ZERO` | `BigDecimalZero` |
 | `return ImmutableList.sortedCopyOf(collection).iterator();` | `ImmutableListSortedCopyOfIterator` |
 | `return ImmutableList.sortedCopyOf(cmp, collection).iterator();` | `ImmutableListSortedCopyOfIterator` or `ImmutableListSortedCopyOfIteratorWithComparator` |
 | `return addTo.addAll(elementsToAdd);` | `CollectionAddAll` or `CollectionAddAllExpression` |
 | `addTo.addAll(elementsToAdd);` | `CollectionAddAll` or `CollectionAddAllBlock` |
-| `return stream.collect(toImmutableMap(e -> keyFunction(e), e -> valueFunction(e))); | `StreamCollectToImmutableMap` |
+| `return stream.collect(toImmutableMap(e -> keyFunction(e), e -> valueFunction(e)));` | `StreamCollectToImmutableMap` |
 | `return new ArrayList<>(collection);` | `NewArrayList` |
 | `return value1.compareTo(value2) < 0;` | `StringCompareToLessThanZero` or `EnumCompareToLessThanZero` |
 | `return cmp;` | `ComparatorIdentity` |
 
 ### Real example: `BigDecimalRules.BigDecimalZero`
+<!-- check: skip -->
 
 ```java
 /** Prefer {@link BigDecimal#ZERO} over less efficient alternatives. */
@@ -360,8 +388,9 @@ static final class BigDecimalZero {
 ```
 
 ### `@SuppressWarnings` on template methods
+<!-- check: `@SuppressWarnings` entries have explanatory comments -->
 
-When a template method triggers a compiler or static-analysis warning, it's
+When a template method triggers a compiler or static-analysis warning, it is
 generally okay to suppress it with a comment. Preferably, use an established
 comment text. For example, if the warning can be suppressed using key
 `java:S2111`, then first search for existing references:
@@ -390,24 +419,15 @@ Established comment patterns:
 | `/* Safe generic array type creation. */` | Suppressing `"unchecked"` for generic array creation |
 | `/* Cast is presumed safe in matched context. */` | Suppressing `"unchecked"` for casts |
 | `/* Parentheses compensate for a Refaster bug. */` | Suppressing `"UnnecessaryParentheses"` |
-| `/* SonarCloud thinks that \`someParamater\` itself is \`@Nullable\`. */` | Suppressing SonarCloud false positive on `Supplier<@Nullable String>` parameters |
+| `/* SonarCloud thinks that \`someParameter\` itself is \`@Nullable\`. */` | Suppressing SonarCloud false positive on `Supplier<@Nullable String>` parameters |
 | `/* Each variant requires a separate \`@BeforeTemplate\` method. */` | Rule class exceeds method-count threshold due to per-type overloads |
 
-Every `@SuppressWarnings` entry must have a `/* ... */` comment explaining why
-the suppression is necessary. If multiple suppression entries are required, add
-an additional
-`"z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"`
-entry at the end of the list. This self-documenting entry is the only entry
-that must *not* come with a comment.
-
-Note: `@SuppressWarnings` may appear on the rule class (not just template
-methods) when a warning applies structurally to the whole rule.
-
-The requirement that every `@SuppressWarnings` entry must have a `/* ... */`
-comment applies to all Java files in the project, including test resource
-files.
+For general `@SuppressWarnings` conventions (smallest-scope principle,
+comment requirements for all Java files), see
+[`java-style.instructions.md`][java-style].
 
 ### Behavior-changing warnings in Javadoc
+<!-- check: Behavior-changing rules have `<p><strong>Warning:</strong>` in Javadoc -->
 
 When a rule changes observable behavior (e.g., throws an exception instead of
 silently deduplicating, or changes iteration order), add a
@@ -426,6 +446,7 @@ Example:
 ```
 
 ### `// XXX:` comments
+<!-- check: Known limitations documented with `// XXX:` comments -->
 
 Use class- or method-level `// XXX:` comments to document:
 - Known limitations or behavioral differences between the before- and
@@ -435,12 +456,31 @@ Use class- or method-level `// XXX:` comments to document:
 - References to related rules or checks that may overlap.
 
 ### Method and type parameter usage
+<!-- check: Type parameters are as wide as possible; wildcard bounds eliminated -->
 
 Where applicable, make sure that method and type parameters are as wide as
 possible.
 
 For example, when matching invocations of `Stream<T>#forEach(Consumer<? super
-T> action)`, do *not* write:
+T> action)`:
+
+**Do:**
+
+```java
+static final class CollectionForEach<S, T extends S> {
+  @BeforeTemplate
+  void before(Collection<T> collection, Consumer<S> consumer) {
+    collection.stream().forEach(consumer);
+  }
+
+  @AfterTemplate
+  void after(Collection<T> collection, Consumer<S> consumer) {
+    collection.forEach(consumer);
+  }
+}
+```
+
+**Don't:**
 
 ```java
 static final class CollectionForEach<T> {
@@ -456,23 +496,26 @@ static final class CollectionForEach<T> {
 }
 ```
 
-Instead write:
+Template method parameters and `@Placeholder` methods should avoid wildcard
+bounds where possible:
+
+**Do:**
+
 ```java
-static final class CollectionForEach<S, T extends S> {
+static final class ComparatorThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
   @BeforeTemplate
-  void before(Collection<T> collection, Consumer<S> consumer) {
-    collection.stream().forEach(consumer);
+  Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
+    return cmp.thenComparing(comparing(function));
   }
 
   @AfterTemplate
-  void after(Collection<T> collection, Consumer<S> consumer) {
-    collection.forEach(consumer);
+  Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
+    return cmp.thenComparing(function);
   }
 }
 ```
 
-Template method parameters and `@Placeholder` methods should avoid wildcard
-bounds where possible. Thus, do *not* write this:
+**Don't:**
 
 ```java
 static final class ComparatorThenComparing<S, T extends Comparable<? super T>> {
@@ -488,36 +531,41 @@ static final class ComparatorThenComparing<S, T extends Comparable<? super T>> {
 }
 ```
 
-Instead write:
-```java
-static final class ComparatorThenComparing<R, S extends R, T extends Comparable<? super T>, U extends T> {
-  @BeforeTemplate
-  Comparator<S> before(Comparator<S> cmp, Function<R, U> function) {
-    return cmp.thenComparing(comparing(function));
-  }
-
-  @AfterTemplate
-  Comparator<S> after(Comparator<S> cmp, Function<R, U> function) {
-    return cmp.thenComparing(function);
-  }
-}
-```
-
 This way before- and after-template method parameters are provably compatible.
 
 When eliminating a wildcard from a method parameter is not possible in Java's
-type system, add a `// XXX:` comment explaining why the wildcard cannot be
+type system, add an `// XXX:` comment explaining why the wildcard cannot be
 eliminated.
 
 ### Use the most specific return type
 
-Method return types do not influence Refaster matching, but do aid in rule
-understanding and review. Thus, always declare the most specific return type
+Method return types generally do not influence Refaster matching, but do aid in
+rule understanding and review. Always declare the most specific return type
 possible.
 
+**Do:**
+
+```java
+@AfterTemplate
+ImmutableList<T> after(ImmutableList<T> list) {
+  return list.reverse();
+}
+```
+
+**Don't:**
+
+```java
+@AfterTemplate
+List<T> after(ImmutableList<T> list) {
+  return list.reverse();
+}
+```
+
 ## Step 2 - Advanced patterns
+<!-- check: skip -->
 
 ### `Refaster.anyOf(...)` for multiple before-patterns
+<!-- check: skip -->
 
 Match several syntactically distinct but otherwise equivalent patterns in a
 single `@BeforeTemplate`:
@@ -542,11 +590,11 @@ Optional<T> before(Queue<T> queue) {
 
 ### Prefer `Refaster.anyOf` over multiple `@BeforeTemplate` methods
 
-When several before-patterns differ only in a sub-expression but share the same
-overall structure and parameter types, use `Refaster.anyOf` inside a single
-`@BeforeTemplate` method rather than defining separate `@BeforeTemplate`
-overloads. This keeps rules concise and makes it immediately clear which parts
-of the expression vary.
+Whenever two or more before-patterns can be combined into a single
+`@BeforeTemplate` method by wrapping one or more sub-expressions in
+`Refaster.anyOf(...)`, do so instead of defining separate `@BeforeTemplate`
+overloads. Do this even if the expressions use parameters in a different order,
+or if some expressions use only a subset of the parameters.
 
 Multiple `@BeforeTemplate` methods are still necessary when the alternatives:
 - have **different parameter types** (e.g., `Collection<T>` vs.
@@ -556,12 +604,44 @@ Multiple `@BeforeTemplate` methods are still necessary when the alternatives:
 - are **void-returning statements** whose entire invocation structure differs
   (e.g., `list.addLast(e);` vs. `list.add(list.size(), e);`).
 
-In short: if two before-patterns can be expressed as a single template with one
-or more `Refaster.anyOf` calls substituted for the varying sub-expressions,
-they should be. Reserve separate `@BeforeTemplate` methods for cases where this
-is not possible.
+In general: try hard to use `Refaster.anyOf` instead of multiple
+`@BeforeTemplate` methods. Only if that is really not possible, introduce an
+additional method.
+
+### Multiple `@BeforeTemplate` overloads
+<!-- check: skip -->
+
+When a rule matches structurally different patterns that cannot be combined
+using `Refaster.anyOf`, define multiple `@BeforeTemplate` methods named
+`before`, `before2`, `before3`, etc.:
+
+```java
+static final class CollectionAddAllBlock<T, S extends T> {
+  @BeforeTemplate
+  void before(Collection<T> addTo, Collection<S> elementsToAdd) {
+    elementsToAdd.forEach(addTo::add);
+  }
+
+  @BeforeTemplate
+  void before2(Collection<T> addTo, Collection<S> elementsToAdd) {
+    for (T element : elementsToAdd) {
+      addTo.add(element);
+    }
+  }
+
+  @AfterTemplate
+  void after(Collection<T> addTo, Collection<S> elementsToAdd) {
+    addTo.addAll(elementsToAdd);
+  }
+}
+```
+
+When a rule matches the same conceptual pattern across multiple parameter types
+(e.g., `T[]`, `Iterator<T>`, `Iterable<T>`, `Collection<T>`), declare
+`@BeforeTemplate` methods in order from widest to narrowest.
 
 ### `@AlsoNegation` for auto-negated variants
+<!-- check: skip -->
 
 When `@AlsoNegation` is applied to an `@AfterTemplate`, Refaster automatically
 generates a negated variant (e.g., `a == 0` also matches `a != 0`, and
@@ -575,15 +655,19 @@ boolean after(BigDecimal value) {
 }
 ```
 
-Use `@AlsoNegation` when the negated form is simply the logical negation of the
-`@AfterTemplate` expression (i.e., prepending `!`). Use **separate rules** when
-the positive and negative cases have structurally different preferred
-expressions (e.g., `optional.isEmpty()` vs. `optional.isPresent()`).
+Use `@AlsoNegation` only if either a `@BeforeTemplate` or `@AfterTemplate`
+method contains an expression whose negation is best expressed not by simply
+prepending a `!`. For example, `a == b` is best negated as `a != b`, and `a <
+b` is best negated as `a >= b`. Do **not** use `@AlsoNegation` when the
+positive and negative cases have different preferred expressions (e.g.,
+`optional.isEmpty()` vs.  `optional.isPresent()`); write separate rules
+instead.
 
 ### `@Matches` / `@NotMatches` for parameter constraints
+<!-- check: skip -->
 
-Constrain which expressions a parameter may match using matchers
-from `tech.picnic.errorprone.refaster.matchers`:
+Constrain which expressions a parameter may match using matchers from
+`tech.picnic.errorprone.refaster.matchers`:
 
 ```java
 // Note: `S` and `U` are class-level type parameters declared as
@@ -604,6 +688,7 @@ List<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
 ```
 
 ### `@Placeholder` with abstract classes
+<!-- check: skip -->
 
 Use `@Placeholder` methods to parameterize rule behavior. In this case the rule
 class must be `abstract static` (not `static final`). These abstract classes
@@ -635,6 +720,7 @@ abstract static class StreamCollectToImmutableMap<E, K, V> {
 ```
 
 ### `@Repeated` with `Refaster.asVarargs()`
+<!-- check: skip -->
 
 Match varargs parameters:
 
@@ -657,6 +743,7 @@ When using `@Repeated` parameters, **always** wrap them with
 methods.
 
 ### `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`
+<!-- check: skip -->
 
 Force the replacement to use a static import:
 
@@ -669,40 +756,12 @@ Comparator<T> after() {
 ```
 
 This annotation may be intentionally omitted when a static import would clash
-with an existing import from the before-template's library. An `// XXX:`
-comment must explain the omission in such cases.
-
-### Multiple `@BeforeTemplate` overloads
-
-When a rule matches structurally different patterns, define multiple
-`@BeforeTemplate` methods named `before`, `before2`, `before3`, etc.:
-
-```java
-static final class CollectionAddAllBlock<T, S extends T> {
-  @BeforeTemplate
-  void before(Collection<T> addTo, Collection<S> elementsToAdd) {
-    elementsToAdd.forEach(addTo::add);
-  }
-
-  @BeforeTemplate
-  void before2(Collection<T> addTo, Collection<S> elementsToAdd) {
-    for (T element : elementsToAdd) {
-      addTo.add(element);
-    }
-  }
-
-  @AfterTemplate
-  void after(Collection<T> addTo, Collection<S> elementsToAdd) {
-    addTo.addAll(elementsToAdd);
-  }
-}
-```
-
-When a rule matches the same conceptual pattern across multiple parameter types
-(e.g., `T[]`, `Iterator<T>`, `Iterable<T>`, `Collection<T>`), declare
-`@BeforeTemplate` methods in order from widest to narrowest.
+with an existing import (e.g., two libraries define a method with the same
+name). When `@UseImportPolicy` is omitted for this reason, add an `// XXX:`
+comment to the rule class explaining the omission.
 
 ### `@Description` and `@Severity`
+<!-- check: skip -->
 
 Override the default description or severity for a rule:
 
@@ -723,6 +782,7 @@ static final class SomeStrictRule {
 ```
 
 ## Step 3 - Create the test input file
+<!-- check: skip -->
 
 Create `{Topic}RulesTestInput.java` in
 `src/test/resources/tech/picnic/errorprone/refasterrules/`:
@@ -755,10 +815,6 @@ Conventions:
   rule with a ternary expression or `if`-statement in its `@BeforeTemplate`
   should include both the canonical and negated forms in tests: e.g.
   `condition ? a : b` and `!condition ? b : a`.
-- When a rule uses `@AlsoNegation`, include negated variants only if the
-  before- or after-template would structurally change under negation (e.g. `<`
-  -> `>=`). If the after-template is unchanged (e.g. in case of
-  `collection.isEmpty()`), the negated form can be omitted.
 - Test cases must appear in the order of the rule's `@BeforeTemplate` methods;
   within each `@BeforeTemplate`, list `Refaster.anyOf` alternatives in
   declaration order. For nested `Refaster.anyOf` expressions, enumerate test
@@ -812,9 +868,10 @@ Conventions:
   always import types.
 
 ### `elidedTypesAndStaticImports()`
+<!-- check: skip -->
 
-When the test uses types or static imports that appear in the input
-but not in the output (because the rule rewrites them away), override
+When the test uses types or static imports that appear in the input but not in
+the output (because the rule rewrites them away), override
 `elidedTypesAndStaticImports()` to include a reference to those identifiers:
 
 ```java
@@ -832,10 +889,11 @@ the output. Only list types/imports that are not used by any `after-template`
 test expression in the output file.
 
 ## Step 4 - Create the test output file
+<!-- check: skip -->
 
-Create `{Topic}RulesTestOutput.java` in the same directory. It has
-the **identical structure** as the input file but with the _expected
-output_ after the rules are applied:
+Create `{Topic}RulesTestOutput.java` in the same directory. It has a structure
+that is **identical** to the input file but with the _expected output_ after
+the rules are applied:
 
 ```java
 package tech.picnic.errorprone.refasterrules;
@@ -857,6 +915,7 @@ Conventions:
   to `elidedTypesAndStaticImports()` usage).
 
 ## Step 5 - Register the collection
+<!-- check: skip -->
 
 Add the new rule collection class to the `RULE_COLLECTIONS` set in
 [`RefasterRulesTest.java`][refaster-rules-test]. Entries are listed in
@@ -874,6 +933,7 @@ private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
 ```
 
 ## Step 6 - Verify
+<!-- check: skip -->
 
 Run the tests to confirm that the rules compile and produce the expected
 output:
@@ -883,6 +943,7 @@ mvn clean test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.s
 ```
 
 ## Step 7 - Clean the codebase
+<!-- check: skip -->
 
 Install the changes, apply the new rule(s) to the current repository, and
 validate that as a result the whole build passes:
@@ -899,6 +960,7 @@ Refaster rules and associated tests do *not* require follow-up by running
 `./run-branch-mutation-tests.sh`.
 
 ## Reference: Custom annotations (from `refaster-support`)
+<!-- check: skip -->
 
 | Annotation | Target | Purpose |
 |------------|--------|---------|
@@ -907,7 +969,12 @@ Refaster rules and associated tests do *not* require follow-up by running
 | `@Severity(SeverityLevel.X)` | Inner rule class | Overrides the default severity level |
 | `@TypeMigration(of=X.class, unmigratedMethods={"..."})` | Outer collection class | Marks a rule collection as part of a type migration. Lists method signatures that cannot yet be migrated, with comments explaining why (e.g., no target equivalent, complex semantics). See `JUnitToAssertJRules` and `TestNGToAssertJRules` for examples |
 
+The `unmigratedMethods` list in `@TypeMigration` is managed by the
+`ExhaustiveRefasterTypeMigration` check. Do not update it manually; run
+`./apply-error-prone-suggestions.sh` to keep it in sync.
+
 ## Reference: Available matchers (for `@Matches` / `@NotMatches`)
+<!-- check: skip -->
 
 | Matcher | What it checks |
 |---------|---------------|
@@ -916,7 +983,7 @@ Refaster rules and associated tests do *not* require follow-up by running
 | `IsEmpty` | Expression is an empty collection, array, string literal or other type of expression considered "empty" |
 | `IsIdentityOperation` | Expression is an identity function (e.g., `x -> x`, `identity()`) |
 | `IsLambdaExpressionOrMethodReference` | Expression is a lambda or method reference |
-| `IsList` | Expression type implements `List` |
+| `IsList` | Expression type implements `java.util.List` |
 | `IsMultidimensionalArray` | Expression type is a multidimensional array |
 | `IsRefasterAsVarargs` | Expression is a `Refaster.asVarargs(...)` call |
 | `RequiresComputation` | Expression is not a simple literal, identifier, or member select |
@@ -924,6 +991,13 @@ Refaster rules and associated tests do *not* require follow-up by running
 | `ThrowsCheckedException` | Expression may throw a checked exception |
 
 ## Common mistakes
+<!-- check: Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
+<!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
+<!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
+<!-- check: Test class named `{Topic}RulesTest` (not TestInput/TestOutput) -->
+<!-- check: `RULE_COLLECTIONS` entries in alphabetical order -->
+<!-- check: `@BeforeTemplate`s use already-rewritten sub-expressions -->
+<!-- check: `static final class` used (not `abstract`) unless `@Placeholder` is needed -->
 
 1. **Forgetting to register** the collection in `RefasterRulesTest.java`
    `RULE_COLLECTIONS`.
@@ -937,22 +1011,20 @@ Refaster rules and associated tests do *not* require follow-up by running
    `{Topic}RulesTestOutput`.
 5. **Non-alphabetical registration**: entries in `RULE_COLLECTIONS` must be in
    alphabetical order.
-6. **Using `abstract static class` without `@Placeholder`**: only use
-   `abstract` when the rule needs `@Placeholder` methods; otherwise use `static
-   final class`.
-7. **Wildcard bounds in template method parameters**: using `? extends X` or `?
+6. **Wildcard bounds in template method parameters**: using `? extends X` or `?
    super X` in `@BeforeTemplate`/`@AfterTemplate` method parameters instead of
-   introducing additional class-level type parameters (see *Type parameter
-   usage*).
-8. **Before-templates that use pre-rewrite expressions**: using expressions in
+   introducing additional class-level type parameters (see *Method and type
+   parameter usage*).
+7. **Before-templates that use pre-rewrite expressions**: using expressions in
    `@BeforeTemplate` methods that would already be rewritten by another rule;
-   see *Principle 1* under "How rules interact with each other" above for
-   examples and a checklist.
-9. **Not following all test method conventions**: there's a long list of
-   guidelines for creating or modifying the test input file, and it's very easy
-   to overlook a requirement. Go over the list one-by-one, carefully, and
-   update the test code if necessary.
+   see *`@BeforeTemplate`s use already-rewritten expressions* under "How rules
+   interact with each other" above for examples and a checklist.
+8. **Not following all test method conventions**: there is a long list of
+   guidelines for creating or modifying the test input file, and it is easy to
+   overlook a requirement. Go over the list one by one and update the test code
+   if necessary.
 
-[contributing]: ../../CONTRIBUTING.md
+[java-style]: java-style.instructions.md
 [refaster]: https://errorprone.info/docs/refaster
-[refaster-rules-test]: ../../../error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java
+[refaster-rules-test]: ../../error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java
+[testing]: testing.instructions.md

@@ -1,0 +1,57 @@
+---
+applyTo: "**/*.md,**/*.sh,**/*.xml,**/*.yml"
+---
+
+# Documentation Conventions
+
+This document describes the writing conventions for documentation in this
+repository. These conventions apply to all text files: Markdown, shell script
+comments, YAML comments, XML comments, and any other file containing prose or
+comments. For Java-specific conventions (including Javadoc), see
+`java-style.instructions.md`.
+
+## Text width
+<!-- check: Prose wraps at 79 characters -->
+
+Wrap prose at 79 characters. In vim: `set tw=79`. This applies to:
+
+- Markdown files (`.md`).
+- Comment blocks in shell scripts.
+- YAML and XML comments.
+- Instruction files.
+
+Code blocks, tables and URLs may exceed the limit. Do not break URLs across lines.
+
+## Use only ASCII characters
+<!-- check: No non-ASCII characters (no em-dashes, special arrows, etc.) -->
+
+Use only ASCII characters. Do not use em-dashes, unicode arrows, or other
+non-ASCII symbols. Use `->` for arrows. Avoid dashes used as parenthetical
+separators (including the ASCII `--` form); rephrase using commas, semicolons,
+or parentheses instead.
+
+## Punctuation in lists
+<!-- check: Enumerated items end with a period -->
+
+Enumerated and bulleted list items end with a period. Exception: items that are
+single words or short noun phrases (e.g., items in a definition list or table
+of contents).
+
+## Single space after sentences
+<!-- check: skip -->
+
+Use a single space after a period, not two.
+
+## `XXX` comments for future work
+<!-- check: Use `XXX:` for future work (not `TODO:` or `FIXME:`) -->
+
+Use `XXX:` (not `TODO:` or `FIXME:`) to mark future work in all file types. In
+Markdown, use `<!-- XXX: ... -->`. In shell scripts, use `# XXX: ...`. In Java,
+use `// XXX: ...`.
+
+## Respect `.editorconfig`
+<!-- check: skip -->
+
+This repository includes an `.editorconfig` file. Configure your editor to
+respect it. It enforces indentation style, trailing whitespace removal, and
+final newlines.

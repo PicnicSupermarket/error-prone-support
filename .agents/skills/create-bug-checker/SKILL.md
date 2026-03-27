@@ -6,12 +6,12 @@ description: >
   checker and tests, and following the repository validation workflow.
 ---
 
-# Create Bug Checker
+# Create `BugChecker`
 
 Use this skill for requests to add or change files in `*/bugpatterns/*`.
 
-Read `.github/instructions/bug-checkers.instructions.md` for the full
-conventions and step-by-step guide. Then:
+Read [`.github/instructions/bug-checkers.instructions.md`][bug-checkers] for
+the full conventions and step-by-step guide. Then:
 
 1. **Determine the target module.** Based on the purpose of the requested
    checker, decide whether it belongs in `error-prone-contrib`
@@ -21,5 +21,9 @@ conventions and step-by-step guide. Then:
    patterns) from the instructions.
 3. **Create the test file** following Step 3.
 4. **Verify** by running the tests as described in Step 4.
-5. **Follow the workflow** described in `AGENT.md` (mutation tests, apply
+5. **Review** your changes against the applicable sections of
+   `.github/instructions/review.instructions.md`.
+6. **Follow the workflow** described in `AGENT.md` (mutation tests, apply
    suggestions, full build).
+
+[bug-checkers]: ../../../.github/instructions/bug-checkers.instructions.md

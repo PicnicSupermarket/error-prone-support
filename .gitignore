@@ -11,8 +11,5 @@ target
 *.iml
 *.swp
 
-# Git worktrees for isolated development.
-.worktrees
-
 # The Git repositories checked out by the integration test framework.
 integration-tests/.repos

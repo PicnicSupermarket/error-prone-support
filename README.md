@@ -189,7 +189,7 @@ rules][refaster-rules].
 
 ## 👷 Developing Error Prone Support
 
-<!-- XXX: Move to CONTRIBUTING.md. -->
+<!-- XXX: Move this to `CONTRIBUTING.md`. -->
 
 This is a [Maven][maven] project, so running `mvn clean install` performs a
 full clean build and installs the library to your local Maven repository. While

@@ -17,7 +17,7 @@ error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
 if [ "${#}" -lt 10 ] || [ "${#}" -gt 12 ] || ([ "${#}" = 12 ] && [ "${11:---sync}" != '--sync' ]); then
-  >&2 echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <shared_error_prone_flags> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]"
+  echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <shared_error_prone_flags> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]" >&2
   exit 1
 fi
 
@@ -51,7 +51,7 @@ case "$(uname -s)" in
     sed_command=gsed
     ;;
   *)
-    echo "Unsupported distribution $(uname -s) for this script."
+    echo "Unsupported distribution $(uname -s) for this script." >&2
     exit 1
     ;;
 esac

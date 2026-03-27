@@ -8,9 +8,12 @@ This document describes the conventions for creating and modifying `BugChecker`
 implementations in this project. It serves as the canonical reference for all
 AI coding agents and human contributors.
 
-For general project context, see [CONTRIBUTING.md][contributing].
+For general Java style conventions (collections, nullability, imports, etc.),
+see [`java-style.instructions.md`][java-style]. For testing conventions, see
+[`testing.instructions.md`][testing].
 
 ## Overview
+<!-- check: skip -->
 
 A [`BugChecker`][bug-checker] is an Error Prone analysis pass that visits
 specific AST node types and optionally suggests a fix. This project extends
@@ -19,6 +22,7 @@ consistency. See Error Prone's [criteria for new checks][error-prone-criteria]
 for general guidance; this project additionally focuses on style enforcement.
 
 ## File locations
+<!-- check: skip -->
 
 | Purpose | Path |
 |---------|------|
@@ -37,6 +41,7 @@ Where `{module}` is one of:
 The same conventions apply to all three modules.
 
 ## Step 1 - Create the checker file
+<!-- check: skip -->
 
 Create `{CheckName}.java` in the appropriate module's `bugpatterns/` directory.
 A complete checker looks like this:
@@ -104,6 +109,7 @@ Conventions:
   generally `describeMatch(tree, fix)` for matches.
 
 ### Real example: `IsInstanceLambdaUsage`
+<!-- check: skip -->
 
 This is just about the simplest complete checker with a fix:
 
@@ -147,8 +153,10 @@ public final class IsInstanceLambdaUsage extends BugChecker
 ```
 
 ## Step 2 - Advanced patterns
+<!-- check: skip -->
 
 ### Static `Matcher<>` / `MultiMatcher<>` fields
+<!-- check: skip -->
 
 Define static matcher fields to check for AST nodes that represent specific
 types or symbols. Example from `AutowiredConstructor`:
@@ -159,40 +167,43 @@ private static final MultiMatcher<Tree, AnnotationTree> AUTOWIRED_ANNOTATION =
 ```
 
 ### Multiple matcher interfaces
+<!-- check: skip -->
 
 A checker can implement multiple matcher interfaces to visit different node
 types. Simply implement each interface and provide the corresponding
 `matchXxx()` method:
 
 ```java
-public final class MyCheck extends BugChecker implements MethodTreeMatcher, ClassTreeMatcher {
-  @Override
-  public Description matchMethod(MethodTree tree, VisitorState state) { ... }
-
+public final class MyCheck extends BugChecker implements ClassTreeMatcher, MethodTreeMatcher {
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) { ... }
+
+  @Override
+  public Description matchMethod(MethodTree tree, VisitorState state) { ... }
 }
 ```
 
 ### `SuggestedFix` options
+<!-- check: skip -->
 
 Common fix patterns:
 
 ```java
 // Simple replacement.
-SuggestedFix.replace(tree, "newCode")
+SuggestedFix.replace(tree, "newCode");
 
 // Delete a node and its trailing whitespace.
-SourceCode.deleteWithTrailingWhitespace(tree, state)
+SourceCode.deleteWithTrailingWhitespace(tree, state);
 
 // Rename a variable (updates all references).
-SuggestedFixes.renameVariable(tree, "newName", state)
+SuggestedFixes.renameVariable(tree, "newName", state);
 
 // Compose multiple fixes.
-SuggestedFix.builder().merge(fix1).merge(fix2).build()
+SuggestedFix.builder().merge(fix1).merge(fix2).build();
 ```
 
 ### `buildDescription(tree)` for custom messages or multiple fixes
+<!-- check: skip -->
 
 Use the builder API when you need a custom message or want to offer multiple
 fix alternatives:
@@ -200,12 +211,13 @@ fix alternatives:
 ```java
 return buildDescription(tree)
     .setMessage("Custom message: %s".formatted(detail))
-	.addFix(primaryFix)
+    .addFix(primaryFix)
     .addFix(alternativeFix)
     .build();
 ```
 
 ### `@SuppressWarnings` on the checker class
+<!-- check: skip -->
 
 When the checker class itself triggers a static analysis warning that cannot be
 resolved properly, suppress it on the class. For example, checkers with fields
@@ -217,6 +229,7 @@ public final class ConstantNaming extends BugChecker implements VariableTreeMatc
 ```
 
 ### `ErrorProneFlags` for user-configurable behaviour
+<!-- check: skip -->
 
 For checkers that accept user-provided flags, use the two-constructor pattern:
 
@@ -235,6 +248,7 @@ CheckName(ErrorProneFlags flags) {
 Flag-based tests then use `.setArgs("-XepOpt:CheckName:FlagName=value")`.
 
 ### `ThirdPartyLibrary` guard
+<!-- check: skip -->
 
 When a fix introduces a dependency on a third-party library, guard it:
 
@@ -245,6 +259,7 @@ if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
 ```
 
 ## Step 3 - Create the test file
+<!-- check: skip -->
 
 Create `{CheckName}Test.java` in the corresponding module's test `bugpatterns/`
 directory. A complete test class looks like this:
@@ -315,6 +330,7 @@ Conventions:
   a dedicated test method.
 
 ### Test ordering and completeness
+<!-- check: `identification()` test cases follow checker validation logic -->
 
 The `identification()` test should structurally list both compliant
 (not-flagged) and non-compliant (flagged) code examples, ordered to follow the
@@ -334,6 +350,7 @@ surviving mutants. Such additional test cases must be placed appropriately
 based on the specified guidelines.
 
 ### Real example: `IsInstanceLambdaUsageTest`
+<!-- check: skip -->
 
 ```java
 final class IsInstanceLambdaUsageTest {
@@ -383,6 +400,7 @@ final class IsInstanceLambdaUsageTest {
 ```
 
 ### Real example: `AutowiredConstructorTest`
+<!-- check: skip -->
 
 ```java
 final class AutowiredConstructorTest {
@@ -442,6 +460,7 @@ final class AutowiredConstructorTest {
 ```
 
 ## Step 4 - Verify
+<!-- check: skip -->
 
 Run the tests to confirm that the checker compiles and produces the expected
 diagnostics:
@@ -454,6 +473,7 @@ Replace the module (`-pl`) as needed for `error-prone-experimental` or
 `error-prone-guidelines`.
 
 ## Reference: Matcher interfaces
+<!-- check: skip -->
 
 Common `BugChecker.*Matcher` interfaces and their `matchXxx()` methods:
 
@@ -471,6 +491,7 @@ Common `BugChecker.*Matcher` interfaces and their `matchXxx()` methods:
 There are many more matcher interfaces; one for each Java AST node type.
 
 ## Reference: `error-prone-utils` utilities
+<!-- check: skip -->
 
 Key methods from the `error-prone-utils` module
 (`tech.picnic.errorprone.utils`):
@@ -493,7 +514,21 @@ Key methods from the `error-prone-utils` module
 | `MoreJUnitMatchers` | `TEST_METHOD` | Matches JUnit test methods |
 | `MoreJUnitMatchers` | `SETUP_OR_TEARDOWN_METHOD` | Matches JUnit setup/teardown methods |
 
+## Avoid suggesting breaking changes in fixes
+<!-- check: Suggested fixes do not introduce compilation errors -->
+
+Suggested fixes must not introduce compilation errors. If a fix might break
+compilation (e.g., renaming a public method, making a field `final`), either
+restrict the check to `private` members only, flag the issue without suggesting
+a fix, or introduce a flag to control behavior.
+
 ## Common mistakes
+<!-- check: `// BUG: Diagnostic contains:` is on the line before the flagged code -->
+<!-- check: `serialVersionUID = 1L` is present -->
+<!-- check: Public no-arg constructor with Javadoc is present -->
+<!-- check: `SourceCode#treeToString` used instead of `Tree#toString()` -->
+<!-- check: Checker is in the correct module (contrib vs guidelines) -->
+<!-- check: Identification test includes negative (non-flagged) cases -->
 
 1. **Wrong comment placement for `// BUG: Diagnostic contains:`**: The comment
    must be on the line _before_ the flagged code, not on the same line.
@@ -510,6 +545,7 @@ Key methods from the `error-prone-utils` module
    code that should _not_ be flagged alongside the positive cases.
 
 [bug-checker]: https://errorprone.info/docs/plugins
-[contributing]: ../../CONTRIBUTING.md
 [documentation-java]: ../../error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java
 [error-prone-criteria]: https://errorprone.info/docs/criteria
+[java-style]: java-style.instructions.md
+[testing]: testing.instructions.md
