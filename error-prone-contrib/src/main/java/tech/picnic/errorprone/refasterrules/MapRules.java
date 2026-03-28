@@ -136,7 +136,8 @@ final class MapRules {
   static final class MapValuesStream<K, V> {
     @BeforeTemplate
     Stream<V> before(Map<K, V> map) {
-      return map.entrySet().stream().map(Map.Entry::getValue);
+      return Refaster.anyOf(
+          map.keySet().stream().map(map::get), map.entrySet().stream().map(Map.Entry::getValue));
     }
 
     @AfterTemplate
