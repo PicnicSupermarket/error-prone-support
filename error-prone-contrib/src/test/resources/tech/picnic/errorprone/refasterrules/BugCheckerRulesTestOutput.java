@@ -40,7 +40,9 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Boolean> testNameContentEquals() {
     return ImmutableSet.of(
         ((Name) null).contentEquals("foo".subSequence(0, 1)),
-        ((com.sun.tools.javac.util.Name) null).contentEquals("bar"));
+        ((Name) null).contentEquals("bar".subSequence(0, 1)),
+        ((com.sun.tools.javac.util.Name) null).contentEquals("bar"),
+        ((com.sun.tools.javac.util.Name) null).contentEquals("qux"));
   }
 
   int testASTHelpersGetStartPosition() {

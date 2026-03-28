@@ -82,12 +82,13 @@ final class BugCheckerRules {
   static final class NameContentEquals {
     @BeforeTemplate
     boolean before(Name name, CharSequence string) {
-      return name.toString().equals(string.toString());
+      return Refaster.anyOf(
+          name.toString().equals(string.toString()), string.toString().equals(name.toString()));
     }
 
     @BeforeTemplate
     boolean before(Name name, String string) {
-      return name.toString().equals(string);
+      return Refaster.anyOf(name.toString().equals(string), string.equals(name.toString()));
     }
 
     @AfterTemplate
