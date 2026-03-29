@@ -52,7 +52,7 @@ is the PR number. This suffix is added after the PR is created (see
 apply to local-only commits.
 
 ## Commit body
-<!-- check: skip -->
+<!-- check: Commit body does not repeat or lightly paraphrase the subject line -->
 
 When a commit warrants explanation beyond the subject line:
 
@@ -65,7 +65,7 @@ When a commit warrants explanation beyond the subject line:
 - List URLs last, preceded by `See:` if there is one, and `See:\n` followed by
   a list of `- URL` items if there are multiple.
 - Never split URLs across lines, even if they exceed 72 characters.
-
+- Never repeat or lightly paraphrase the subject line in the body.
 
 ## Upgrade commits
 <!-- check: skip -->
@@ -119,6 +119,8 @@ intermediate releases:
 
 ### Upgrade release notes
 <!-- check: Upgrades of listed libraries include wiki or release notes page -->
+<!-- check: No URLs were hallucinated. -->
+<!-- check: Release notes are not summarized in commit message. -->
 
 The following libraries have dedicated release notes or wiki pages that must be
 included as the first URL:
@@ -153,7 +155,8 @@ If no past commits exist, the default GitHub URL pattern is:
 If relevant URLs cannot be found, a commit message that consists only of the
 summary line is acceptable.
 
-Do not hallucinate URLs. Do not fabricate version numbers.
+Do not hallucinate URLs. Do not fabricate version numbers. Do not include a
+summary of the release notes.
 
 ## Examples
 <!-- check: skip -->

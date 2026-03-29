@@ -55,10 +55,16 @@ the files you modified.
 - [ ] New BugChecker subjects follow "Introduce `{CheckerName}` check" pattern
 - [ ] Upgrade subjects follow "Upgrade {Name} {old} -> {new}" pattern
 
+### Commit body
+
+- [ ] Commit body does not repeat or lightly paraphrase the subject line
+
 ### Upgrade commit body: release notes URLs
 
 - [ ] Upgrade commits include release notes URLs matching past commit patterns
-- [ ] Major/minor upgrades of listed libraries include wiki or release notes page
+- [ ] Upgrades of listed libraries include wiki or release notes page
+- [ ] No URLs were hallucinated.
+- [ ] Release notes are not summarized in commit message.
 
 ## Documentation Conventions (`documentation.instructions.md`)
 
