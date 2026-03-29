@@ -47,13 +47,18 @@ the files you modified.
 
 - [ ] Subject line uses imperative mood, starts capitalized, no trailing period
 
-### Upgrade commits
+### Subject line verbs
 
-- [ ] Upgrade subjects follow `Upgrade {Name} {old} -> {new}` pattern
+- [ ] New Refaster rule subjects follow "Introduce `{RuleName}` Refaster rule" pattern
+- [ ] New Refaster collection subjects follow "Introduce `{Topic}Rules` Refaster rule collection" pattern
+- [ ] Refaster rule extension subjects follow "Extend `{RuleName}` Refaster rule" pattern
+- [ ] New BugChecker subjects follow "Introduce `{CheckerName}` check" pattern
+- [ ] Upgrade subjects follow "Upgrade {Name} {old} -> {new}" pattern
 
 ### Upgrade commit body: release notes URLs
 
 - [ ] Upgrade commits include release notes URLs matching past commit patterns
+- [ ] Major/minor upgrades of listed libraries include wiki or release notes page
 
 ## Documentation Conventions (`documentation.instructions.md`)
 

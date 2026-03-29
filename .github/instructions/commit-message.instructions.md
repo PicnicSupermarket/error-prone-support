@@ -90,15 +90,56 @@ Rules:
 Upgrade commits must include a `See:` section listing release notes URLs.
 Order the entries as follows:
 
-1. Custom release note documents (wiki, docs, JIRA, changelog).
-2. GitHub release pages for all intermediate versions, in ascending order.
+1. Custom release note documents (wiki, docs, JIRA, changelog). List **all**
+   that apply.
+2. GitHub release pages for all intermediate versions, in ascending order. List
+   **all** that apply.
 3. The full compare URL.
 
-Include ALL intermediate versions. When upgrading from v1.0 to v1.3, include
-release links for v1.1, v1.2, and v1.3.
+Include **all** intermediate versions. When upgrading from v1.0 to v1.3,
+include release links for v1.1, v1.2, and v1.3. For major and minor version
+upgrades, also include milestones (M1, M2, ...) and release candidates (RC1,
+RC2, ...). To discover these, fetch the release tags from the GitHub API:
 
-To discover the correct URL patterns for a given dependency, check its most
-recent upgrade commits:
+```sh
+curl -s 'https://api.github.com/repos/{owner}/{repo}/releases?per_page=100' \
+  | jq -r '.[].tag_name' | sort -V
+```
+
+This is especially important for the following libraries, which often have many
+intermediate releases:
+
+- Jackson.
+- JUnit.
+- Micrometer.
+- Project Reactor.
+- Spring Boot.
+- Spring Framework.
+- Spring Security.
+
+### Upgrade release notes
+<!-- check: Upgrades of listed libraries include wiki or release notes page -->
+
+The following libraries have dedicated release notes or wiki pages that must be
+included as the first URL:
+
+| Library | Versions | Release notes URL pattern |
+|---|---|
+| Jackson | major/minor/patch | `https://github.com/FasterXML/jackson/wiki/Jackson-Release-{version}` |
+| Spring Boot | major/minor | `https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-{version}-Release-Notes` |
+| Spring Framework | major/minor | `https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-{version}-Release-Notes` |
+| Spring Security | major/minor | `https://docs.spring.io/spring-security/reference/{version}/whats-new.html` |
+
+In these URL patterns, `{version}` generally refers to the major.minor (e.g.
+7.1) or major.minor.patch (e.g. 7.1.2) version, as applicable. In case of
+Jackson, trailing zero versions are omitted (so 7.1.0 becomes 7.1). Check past
+upgrade commits for examples. Also consult page upgrade commits to discover
+similar pages for other libraries.
+
+Again: in case of a large version bump, include all release notes that apply.
+
+To discover the correct URL patterns for a given dependency, **always** check
+its most recent upgrade commits:
 
 ```sh
 git log --grep='^Upgrade Spr' --format='%B%n---' -n 10
@@ -174,6 +215,33 @@ See:
 - https://checkstyle.sourceforge.io/releasenotes.html
 - https://github.com/checkstyle/checkstyle/releases/tag/checkstyle-13.3.0
 - https://github.com/checkstyle/checkstyle/compare/checkstyle-13.2.0...checkstyle-13.3.0
+```
+
+**Major version upgrade with wiki, milestones and release candidates:**
+
+```
+Upgrade Spring 6.2.12 -> 7.0.0 (#1978)
+
+See:
+- https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-7.0-Release-Notes
+- https://github.com/spring-projects/spring-framework/releases/tag/v6.2.13
+- https://github.com/spring-projects/spring-framework/releases/tag/v6.2.14
+- https://github.com/spring-projects/spring-framework/releases/tag/v6.2.15
+- https://github.com/spring-projects/spring-framework/releases/tag/v6.2.16
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M1
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M2
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M3
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M4
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M5
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M6
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M7
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M8
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-M9
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-RC1
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-RC2
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0-RC3
+- https://github.com/spring-projects/spring-framework/releases/tag/v7.0.0
+- https://github.com/spring-projects/spring-framework/compare/v6.2.12...v7.0.0
 ```
 
 **Upgrade with Picnic Error Prone fork URLs:**

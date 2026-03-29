@@ -113,7 +113,7 @@ jobs:
             const allowedDomains = process.env.ALLOWED_ENDPOINTS.split(/\s+/).map(line => line.split(':')[0]).filter(Boolean);
 
             const instructions = `
-            You are an experienced maintainer helping to craft the squash commit message for a GitHub pull request.
+            You are an experienced maintainer crafting the squash commit message for a GitHub pull request.
 
             Pull request metadata:
             - Repository: ${repository}
