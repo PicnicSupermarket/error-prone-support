@@ -11,12 +11,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
@@ -213,10 +217,74 @@ final class FileRules {
     }
   }
 
+  /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewInputStreamPathOf {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    InputStream before(String path) throws FileNotFoundException {
+      return new FileInputStream(path);
+    }
+
+    @AfterTemplate
+    InputStream after(String path) throws IOException {
+      return Files.newInputStream(Path.of(path));
+    }
+  }
+
+  /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewInputStreamToPath {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    InputStream before(File file) throws FileNotFoundException {
+      return new FileInputStream(file);
+    }
+
+    @AfterTemplate
+    InputStream after(File file) throws IOException {
+      return Files.newInputStream(file.toPath());
+    }
+  }
+
+  /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewOutputStreamPathOf {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    OutputStream before(String path) throws FileNotFoundException {
+      return new FileOutputStream(path);
+    }
+
+    @AfterTemplate
+    OutputStream after(String path) throws IOException {
+      return Files.newOutputStream(Path.of(path));
+    }
+  }
+
+  /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewOutputStreamToPath {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    OutputStream before(File file) throws FileNotFoundException {
+      return new FileOutputStream(file);
+    }
+
+    @AfterTemplate
+    OutputStream after(File file) throws IOException {
+      return Files.newOutputStream(file.toPath());
+    }
+  }
+
   /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
   // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
   // code uses UTF-8 rather than the default charset.
-  static final class FilesNewBufferedReaderPathOf {
+  static final class FilesNewBufferedReader {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
@@ -224,64 +292,28 @@ final class FileRules {
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    BufferedReader before(String path) throws IOException {
+    BufferedReader before(Path path) throws IOException {
       return Refaster.anyOf(
-          Files.newBufferedReader(Path.of(path), UTF_8),
-          new BufferedReader(new InputStreamReader(new FileInputStream(path))));
+          Files.newBufferedReader(path, UTF_8),
+          new BufferedReader(new InputStreamReader(Files.newInputStream(path))));
     }
 
     @AfterTemplate
-    BufferedReader after(String path) throws IOException {
-      return Files.newBufferedReader(Path.of(path));
-    }
-  }
-
-  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
-  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
-  // code uses UTF-8 rather than the default charset.
-  static final class FilesNewBufferedReaderToPath {
-    @BeforeTemplate
-    @SuppressWarnings({
-      "DefaultCharset" /* This violation will be rewritten. */,
-      "java:S1943" /* This violation will be rewritten. */,
-      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
-      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
-    })
-    BufferedReader before(File file) throws IOException {
-      return Refaster.anyOf(
-          Files.newBufferedReader(file.toPath(), UTF_8),
-          new BufferedReader(new InputStreamReader(new FileInputStream(file))));
-    }
-
-    @AfterTemplate
-    BufferedReader after(File file) throws IOException {
-      return Files.newBufferedReader(file.toPath());
+    BufferedReader after(Path path) throws IOException {
+      return Files.newBufferedReader(path);
     }
   }
 
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
-  static final class FilesNewBufferedReaderPathOfWithCharset {
+  static final class FilesNewBufferedReaderWithCharset {
     @BeforeTemplate
-    BufferedReader before(String path, Charset charset) throws FileNotFoundException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
+    BufferedReader before(Path path, Charset charset) throws IOException {
+      return new BufferedReader(new InputStreamReader(Files.newInputStream(path), charset));
     }
 
     @AfterTemplate
-    BufferedReader after(String path, Charset charset) throws IOException {
-      return Files.newBufferedReader(Path.of(path), charset);
-    }
-  }
-
-  /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
-  static final class FilesNewBufferedReaderToPathWithCharset {
-    @BeforeTemplate
-    BufferedReader before(File file, Charset charset) throws FileNotFoundException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
-    }
-
-    @AfterTemplate
-    BufferedReader after(File file, Charset charset) throws IOException {
-      return Files.newBufferedReader(file.toPath(), charset);
+    BufferedReader after(Path path, Charset charset) throws IOException {
+      return Files.newBufferedReader(path, charset);
     }
   }
 }
