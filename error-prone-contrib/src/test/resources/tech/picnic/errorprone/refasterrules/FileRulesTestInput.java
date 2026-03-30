@@ -75,7 +75,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return new FileInputStream("foo");
   }
 
-  InputStream testFilesNewInputStreamToPath() throws IOException {
+  InputStream testFilesNewInputStreamFileToPath() throws IOException {
     return new FileInputStream(new File("foo"));
   }
 
@@ -83,7 +83,7 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return new FileOutputStream("foo");
   }
 
-  OutputStream testFilesNewOutputStreamToPath() throws IOException {
+  OutputStream testFilesNewOutputStreamFileToPath() throws IOException {
     return new FileOutputStream(new File("foo"));
   }
 

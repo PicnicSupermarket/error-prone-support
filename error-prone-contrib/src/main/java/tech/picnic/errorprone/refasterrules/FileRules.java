@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with files. */
 @OnlineDocumentation
@@ -231,11 +232,12 @@ final class FileRules {
 
   /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  @PossibleSourceIncompatibility
   static final class FilesNewInputStreamPathOf {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
-    InputStream before(String path) throws FileNotFoundException {
+    FileInputStream before(String path) throws FileNotFoundException {
       return new FileInputStream(path);
     }
 
@@ -247,11 +249,12 @@ final class FileRules {
 
   /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
-  static final class FilesNewInputStreamToPath {
+  @PossibleSourceIncompatibility
+  static final class FilesNewInputStreamFileToPath {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
-    InputStream before(File file) throws FileNotFoundException {
+    FileInputStream before(File file) throws FileNotFoundException {
       return new FileInputStream(file);
     }
 
@@ -263,11 +266,12 @@ final class FileRules {
 
   /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  @PossibleSourceIncompatibility
   static final class FilesNewOutputStreamPathOf {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
-    OutputStream before(String path) throws FileNotFoundException {
+    FileOutputStream before(String path) throws FileNotFoundException {
       return new FileOutputStream(path);
     }
 
@@ -279,11 +283,12 @@ final class FileRules {
 
   /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
   // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
-  static final class FilesNewOutputStreamToPath {
+  @PossibleSourceIncompatibility
+  static final class FilesNewOutputStreamFileToPath {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
-    OutputStream before(File file) throws FileNotFoundException {
+    FileOutputStream before(File file) throws FileNotFoundException {
       return new FileOutputStream(file);
     }
 
