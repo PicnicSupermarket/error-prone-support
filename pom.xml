@@ -841,6 +841,9 @@
                                         <property name="regexp" value="true" />
                                     </module>
                                     <module name="IllegalCatch" />
+                                    <module name="IllegalSymbol">
+                                        <property name="symbolCodes" value="0x0080-0x10FFFF" />
+                                    </module>
                                     <module name="IllegalThrows" />
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
@@ -908,7 +911,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.3.0</version>
+                            <version>13.4.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
