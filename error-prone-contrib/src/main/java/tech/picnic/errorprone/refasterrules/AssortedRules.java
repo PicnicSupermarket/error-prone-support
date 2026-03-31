@@ -2,25 +2,18 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
-import static java.util.Collections.disjoint;
 import static java.util.Objects.checkIndex;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -113,49 +106,6 @@ final class AssortedRules {
     @AfterTemplate
     Stream<T> after(T object) {
       return Stream.generate(() -> object);
-    }
-  }
-
-  /**
-   * Prefer {@link Collections#disjoint(Collection, Collection)} over more contrived alternatives.
-   */
-  static final class DisjointSets<T> {
-    @BeforeTemplate
-    boolean before(Set<T> collection1, Set<T> collection2) {
-      return Sets.intersection(collection1, collection2).isEmpty();
-    }
-
-    @BeforeTemplate
-    boolean before2(Collection<T> collection1, Collection<T> collection2) {
-      return collection1.stream().noneMatch(collection2::contains);
-    }
-
-    @AfterTemplate
-    boolean after(Collection<T> collection1, Collection<T> collection2) {
-      return disjoint(collection1, collection2);
-    }
-  }
-
-  /**
-   * Don't unnecessarily copy collections before passing them to {@link
-   * Collections#disjoint(Collection, Collection)}.
-   */
-  // XXX: Other copy operations could be elided too, but these are most common after application of
-  // the `DisjointSets` rule defined above. If we ever introduce a generic "makes a copy" stand-in,
-  // use it here.
-  static final class DisjointCollections<T> {
-    @BeforeTemplate
-    boolean before(Collection<T> collection1, Collection<T> collection2) {
-      return Refaster.anyOf(
-          disjoint(ImmutableSet.copyOf(collection1), collection2),
-          disjoint(new HashSet<>(collection1), collection2),
-          disjoint(collection1, ImmutableSet.copyOf(collection2)),
-          disjoint(collection1, new HashSet<>(collection2)));
-    }
-
-    @AfterTemplate
-    boolean after(Collection<T> collection1, Collection<T> collection2) {
-      return disjoint(collection1, collection2);
     }
   }
 
