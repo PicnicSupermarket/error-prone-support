@@ -10,8 +10,8 @@ different testing patterns used across modules.
 
 For domain-specific testing conventions, see also:
 
-- [Bug checker testing][bug-checker-instructions] (test file structure)
-- [Refaster rule testing][refaster-instructions] (test input/output files)
+- The test file structure of [Bug checkers][bug-checker-instructions].
+- The test input/output file structure of [Refaster rules][refaster-instructions].
 
 ## General conventions
 

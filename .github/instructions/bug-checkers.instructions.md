@@ -4,13 +4,13 @@ applyTo: "**/bugpatterns/**"
 
 # Bug Checker Conventions
 
-This document describes the conventions for `BugChecker` implementations in
-this project. It serves as the canonical reference for all AI coding agents and
-human contributors.
+This document describes the conventions for `BugChecker` implementations and
+tests in this project. It serves as the canonical reference for all AI coding
+agents and human contributors.
 
 For general Java style conventions (collections, nullability, imports, etc.),
-see [`java-style.instructions.md`][java-style]. For testing conventions, see
-[`testing.instructions.md`][testing].
+see [`java-style.instructions.md`][java-style]. For general testing
+conventions, see [`testing.instructions.md`][testing].
 
 ## Overview
 <!-- check: skip -->
@@ -355,8 +355,8 @@ CompilationTestHelper.newInstance(MyCheck.class, getClass())
     .doTest();
 ```
 
-Note the `// BUG: Diagnostic matches: key1` syntax (instead of
-`// BUG: Diagnostic contains:`).
+Note the `// BUG: Diagnostic matches: key1` syntax (instead of `// BUG:
+Diagnostic contains:`).
 
 ### Test ordering and completeness
 <!-- check: `identification()` test cases follow checker validation logic -->
