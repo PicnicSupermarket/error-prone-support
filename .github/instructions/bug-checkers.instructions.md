@@ -22,7 +22,7 @@ consistency. See Error Prone's [criteria for new checks][error-prone-criteria]
 for general guidance; this project additionally focuses on style enforcement.
 
 ## File locations
-<!-- check: skip -->
+<!-- check: Checker is in the correct module (contrib vs experimental vs guidelines) -->
 
 | Purpose | Path |
 |---------|------|
@@ -41,10 +41,12 @@ Where `{module}` is one of:
 The same conventions apply to all three modules.
 
 ## Checker file structure
-<!-- check: skip -->
+<!-- check: `serialVersionUID = 1L` is present -->
+<!-- check: Public no-arg constructor with Javadoc is present -->
+<!-- check: `SourceCode#treeToString` used instead of `Tree#toString()` -->
 
-Create `{CheckName}.java` in the appropriate module's `bugpatterns/` directory.
-A complete checker looks like this:
+Checker files are placed in the appropriate module's `bugpatterns/` directory as
+`{CheckName}.java`. A complete checker looks like this:
 
 ```java
 package tech.picnic.errorprone.bugpatterns;
@@ -259,10 +261,11 @@ if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
 ```
 
 ## Test file structure
-<!-- check: skip -->
+<!-- check: `// BUG: Diagnostic contains:` is on the line before the flagged code -->
+<!-- check: Identification test includes negative (non-flagged) cases listed first -->
 
-Create `{CheckName}Test.java` in the corresponding module's test `bugpatterns/`
-directory. A complete test class looks like this:
+Test files are placed in the corresponding module's test `bugpatterns/`
+directory as `{CheckName}Test.java`. A complete test class looks like this:
 
 ```java
 package tech.picnic.errorprone.bugpatterns;
@@ -331,10 +334,36 @@ Conventions:
   file per test. Introduce additional test methods or files only when required
   (e.g., to test different flag configurations or multi-file scenarios). Inline
   source as varargs strings.
-- **Multi-fix test**: Use `.setFixChooser(FixChoosers.SECOND)` to test the
-  second fix option.
-- **Flag-based tests**: Use `.setArgs("-XepOpt:CheckerName:FlagName=value")` in
-  a dedicated test method.
+### Testing multiple suggested fixes
+<!-- check: skip -->
+
+When a check provides multiple fix alternatives, use `.setFixChooser()` to
+select which fix to test:
+
+```java
+BugCheckerRefactoringTestHelper.newInstance(MyCheck.class, getClass())
+    .setFixChooser(SECOND)
+    .addInputLines("A.java", ...)
+    .addOutputLines("A.java", ...)
+    .doTest(TestMode.TEXT_MATCH);
+```
+
+### Testing flag-based configuration
+<!-- check: skip -->
+
+For `BugChecker`s that accept flags (see the `ErrorProneFlags` section above),
+use `.setArgs()` to test behaviour under different flag values:
+
+```java
+@Test
+void replacementWithCustomFlag() {
+  BugCheckerRefactoringTestHelper.newInstance(MyCheck.class, getClass())
+      .setArgs("-XepOpt:MyCheck:FlagName=value")
+      .addInputLines("A.java", ...)
+      .addOutputLines("A.java", ...)
+      .doTest(TestMode.TEXT_MATCH);
+}
+```
 
 ### Diagnostic matching with predicates
 <!-- check: skip -->
@@ -496,8 +525,7 @@ final class AutowiredConstructorTest {
 ## Verification
 <!-- check: skip -->
 
-Run the tests to confirm that the checker compiles and produces the expected
-diagnostics:
+To confirm that the checker compiles and produces the expected diagnostics, run:
 
 ```sh
 mvn test -pl error-prone-contrib -Dtest=MyCheckerTest -Dverification.skip
@@ -555,28 +583,6 @@ Suggested fixes must not introduce compilation errors. If a fix might break
 compilation (e.g., renaming a public method, making a field `final`), either
 restrict the check to `private` members only, flag the issue without suggesting
 a fix, or introduce a flag to control behavior.
-
-## Common mistakes
-<!-- check: `// BUG: Diagnostic contains:` is on the line before the flagged code -->
-<!-- check: `serialVersionUID = 1L` is present -->
-<!-- check: Public no-arg constructor with Javadoc is present -->
-<!-- check: `SourceCode#treeToString` used instead of `Tree#toString()` -->
-<!-- check: Checker is in the correct module (contrib vs guidelines) -->
-<!-- check: Identification test includes negative (non-flagged) cases -->
-
-1. **Wrong comment placement for `// BUG: Diagnostic contains:`**: The comment
-   must be on the line _before_ the flagged code, not on the same line.
-2. **Forgetting `private static final long serialVersionUID = 1L;`**: Required
-   because `BugChecker` implements `Serializable`.
-3. **Omitting the explicit public nullary constructor**: Every checker must
-   have a public no-arg constructor with Javadoc, even if the body is empty.
-4. **Using `VisitorState#getSourceForNode` or `Tree#toString()` instead of
-   `SourceCode#treeToString`**: Always use the project utility.
-5. **Creating a checker in `error-prone-contrib` when it enforces
-   project-internal conventions**: Such checks belong in
-   `error-prone-guidelines`.
-6. **Not including negative cases in the identification test**: Always include
-   code that should _not_ be flagged alongside the positive cases.
 
 [bug-checker]: https://errorprone.info/docs/plugins
 [documentation-java]: ../../error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java

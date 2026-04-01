@@ -31,9 +31,10 @@ are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 | Test registration | `error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java` |
 
 ## Rule file structure
-<!-- check: skip -->
+<!-- check: `static final class` used (not `abstract`) unless `@Placeholder` is needed -->
 
-Create (or extend) `{Topic}Rules.java`. A new collection looks like this:
+Rule collections are defined in `{Topic}Rules.java` files. A new collection
+looks like this:
 
 ```java
 package tech.picnic.errorprone.refasterrules;
@@ -191,6 +192,7 @@ no more changes occur. This means that every `@BeforeTemplate` must be written
 as if all other rules have already been applied. Follow these two principles:
 
 #### `@BeforeTemplate`s use already-rewritten expressions
+<!-- check: `@BeforeTemplate`s use already-rewritten sub-expressions -->
 
 When writing a `@BeforeTemplate`, check whether any sub-expression in it is
 matched by another existing rule. If so, use the *after-template* (rewritten)
@@ -782,9 +784,11 @@ static final class SomeStrictRule {
 ```
 
 ## Test input file
-<!-- check: skip -->
+<!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
+<!-- check: Test class named `{Topic}RulesTest` (not TestInput/TestOutput) -->
+<!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
 
-Create `{Topic}RulesTestInput.java` in
+The test input file `{Topic}RulesTestInput.java` is placed in
 `src/test/resources/tech/picnic/errorprone/refasterrules/`:
 
 ```java
@@ -916,7 +920,8 @@ Optional<String> testOptionalIsEmpty() {
 ## Test output file
 <!-- check: skip -->
 
-Create `{Topic}RulesTestOutput.java` in the same directory. It has a structure
+The test output file `{Topic}RulesTestOutput.java` is in the same directory. It
+has a structure
 that is **identical** to the input file but with the _expected output_ after
 the rules are applied:
 
@@ -940,9 +945,10 @@ Conventions:
   to `elidedTypesAndStaticImports()` usage).
 
 ## Collection registration
-<!-- check: skip -->
+<!-- check: Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
+<!-- check: `RULE_COLLECTIONS` entries in alphabetical order -->
 
-Add the new rule collection class to the `RULE_COLLECTIONS` set in
+New rule collections are registered in the `RULE_COLLECTIONS` set in
 [`RefasterRulesTest.java`][refaster-rules-test]. Entries are listed in
 **alphabetical order**:
 
@@ -960,8 +966,7 @@ private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
 ## Verification
 <!-- check: skip -->
 
-Run the tests to confirm that the rules compile and produce the expected
-output:
+To confirm that the rules compile and produce the expected output, run:
 
 ```sh
 mvn clean test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.skip
@@ -970,8 +975,8 @@ mvn clean test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.s
 ## Applying rules to the codebase
 <!-- check: skip -->
 
-Install the changes, apply the new rule(s) to the current repository, and
-validate that as a result the whole build passes:
+After making changes, install them, apply the new rule(s) to the current
+repository, and validate that the whole build passes:
 
 ```sh
 mvn clean install -DskipTests -Dverification.skip
@@ -1014,40 +1019,6 @@ The `unmigratedMethods` list in `@TypeMigration` is managed by the
 | `RequiresComputation` | Expression is not a simple literal, identifier, or member select |
 | `ReturnsMono` | Expression returns `Mono<T>` |
 | `ThrowsCheckedException` | Expression may throw a checked exception |
-
-## Common mistakes
-<!-- check: Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
-<!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
-<!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
-<!-- check: Test class named `{Topic}RulesTest` (not TestInput/TestOutput) -->
-<!-- check: `RULE_COLLECTIONS` entries in alphabetical order -->
-<!-- check: `@BeforeTemplate`s use already-rewritten sub-expressions -->
-<!-- check: `static final class` used (not `abstract`) unless `@Placeholder` is needed -->
-
-1. **Forgetting to register** the collection in `RefasterRulesTest.java`
-   `RULE_COLLECTIONS`.
-2. **Wrong test method name**: must be `testFooBar()` matching the inner class
-   name `FooBar` exactly.
-3. **Missing `elidedTypesAndStaticImports()`**: if the input uses types/imports
-   that the output does not, the test will fail unless these are listed in
-   `elidedTypesAndStaticImports()` in both the input and output test file.
-4. **Wrong test class name**: the class inside the test resource files must be
-   named `{Topic}RulesTest`, not `{Topic}RulesTestInput` or
-   `{Topic}RulesTestOutput`.
-5. **Non-alphabetical registration**: entries in `RULE_COLLECTIONS` must be in
-   alphabetical order.
-6. **Wildcard bounds in template method parameters**: using `? extends X` or `?
-   super X` in `@BeforeTemplate`/`@AfterTemplate` method parameters instead of
-   introducing additional class-level type parameters (see *Method and type
-   parameter usage*).
-7. **Before-templates that use pre-rewrite expressions**: using expressions in
-   `@BeforeTemplate` methods that would already be rewritten by another rule;
-   see *`@BeforeTemplate`s use already-rewritten expressions* under "How rules
-   interact with each other" above for examples and a checklist.
-8. **Not following all test method conventions**: there is a long list of
-   guidelines for creating or modifying the test input file, and it is easy to
-   overlook a requirement. Go over the list one by one and update the test code
-   if necessary.
 
 [java-style]: java-style.instructions.md
 [refaster]: https://errorprone.info/docs/refaster

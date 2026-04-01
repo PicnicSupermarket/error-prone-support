@@ -24,22 +24,25 @@ the files you modified.
 
 ## Bug Checker Conventions (`bug-checkers.instructions.md`)
 
+### File locations
+
+- [ ] Checker is in the correct module (contrib vs experimental vs guidelines)
+
+### Checker file structure
+
+- [ ] `serialVersionUID = 1L` is present
+- [ ] Public no-arg constructor with Javadoc is present
+- [ ] `SourceCode#treeToString` used instead of `Tree#toString()`
+
 ### Test file structure
 
+- [ ] `// BUG: Diagnostic contains:` is on the line before the flagged code
+- [ ] Identification test includes negative (non-flagged) cases listed first
 - [ ] `identification()` test cases follow checker validation logic
 
 ### Avoid suggesting breaking changes in fixes
 
 - [ ] Suggested fixes do not introduce compilation errors
-
-### Common mistakes
-
-- [ ] `// BUG: Diagnostic contains:` is on the line before the flagged code
-- [ ] `serialVersionUID = 1L` is present
-- [ ] Public no-arg constructor with Javadoc is present
-- [ ] `SourceCode#treeToString` used instead of `Tree#toString()`
-- [ ] Checker is in the correct module (contrib vs guidelines)
-- [ ] Identification test includes negative (non-flagged) cases
 
 ## Commit Message Conventions (`commit-message.instructions.md`)
 
@@ -237,9 +240,10 @@ the files you modified.
 
 ### Rule file structure
 
+- [ ] `static final class` used (not `abstract`) unless `@Placeholder` is needed
 - [ ] Javadoc follows "Prefer X over Y" format
 - [ ] Correct Javadoc qualifier chosen (deprecated, less efficient, etc.)
-- [ ] `@BeforeTemplate`s use already-rewritten expressions
+- [ ] `@BeforeTemplate`s use already-rewritten sub-expressions
 - [ ] New rule has distinct `@AfterTemplate`
 - [ ] New rule does not make existing rules redundant
 - [ ] Parameter names follow type-based naming conventions
@@ -254,15 +258,16 @@ the files you modified.
 
 - [ ] Prefer `Refaster.anyOf` over multiple `@BeforeTemplate` methods
 
-### Common mistakes
+### Test input file
+
+- [ ] Test method names match inner class names exactly (`testFooBar` for `FooBar`)
+- [ ] Test class named `{Topic}RulesTest` (not TestInput/TestOutput)
+- [ ] `elidedTypesAndStaticImports()` lists all replaced types/imports
+
+### Collection registration
 
 - [ ] Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS`
-- [ ] Test method names match inner class names exactly (`testFooBar` for `FooBar`)
-- [ ] `elidedTypesAndStaticImports()` lists all replaced types/imports
-- [ ] Test class named `{Topic}RulesTest` (not TestInput/TestOutput)
 - [ ] `RULE_COLLECTIONS` entries in alphabetical order
-- [ ] `@BeforeTemplate`s use already-rewritten sub-expressions
-- [ ] `static final class` used (not `abstract`) unless `@Placeholder` is needed
 
 ## Shell Script Conventions (`scripts.instructions.md`)
 
