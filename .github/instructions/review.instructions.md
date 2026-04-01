@@ -22,9 +22,9 @@ the files you modified.
 
 - [ ] Agent-specific files use symlinks to canonical sources
 
-## Bug Checkers: Conventions and Step-by-Step Guide (`bug-checkers.instructions.md`)
+## Bug Checker Conventions (`bug-checkers.instructions.md`)
 
-### Step 3 - Create the test file
+### Test file structure
 
 - [ ] `identification()` test cases follow checker validation logic
 
@@ -233,9 +233,9 @@ the files you modified.
 
 - [ ] PR description contains a suggested commit message in a fenced code block
 
-## Refaster Rules: Conventions and Step-by-Step Guide (`refaster-rules.instructions.md`)
+## Refaster Rule Conventions (`refaster-rules.instructions.md`)
 
-### Step 1 - Create the rule file
+### Rule file structure
 
 - [ ] Javadoc follows "Prefer X over Y" format
 - [ ] Correct Javadoc qualifier chosen (deprecated, less efficient, etc.)
@@ -250,7 +250,7 @@ the files you modified.
 - [ ] Type parameters are as wide as possible; wildcard bounds eliminated
 - [ ] Use the most specific return type
 
-### Step 2 - Advanced patterns
+### Advanced patterns
 
 - [ ] Prefer `Refaster.anyOf` over multiple `@BeforeTemplate` methods
 
@@ -318,24 +318,6 @@ the files you modified.
 - [ ] Use distinct values per test line
 - [ ] Use metasyntactic variable names
 - [ ] Format test source strings with Google Java Format
-
-### `BugChecker` testing
-
-- [ ] Identification tests
-- [ ] Replacement tests
-- [ ] Prefer single test files
-- [ ] Include negative cases, listed first
-- [ ] Testing flag-based configuration
-- [ ] Testing multiple suggested fixes
-- [ ] Identification tests are comprehensive; replacement tests are focused
-
-### Refaster rule testing
-
-- [ ] File pair convention
-- [ ] Test method names match inner class names exactly (`testFooBar` for `FooBar`)
-- [ ] Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS`
-- [ ] `elidedTypesAndStaticImports()` lists all replaced types/imports
-- [ ] Avoid local variables in Refaster test code
 
 ### Utility and matcher testing
 

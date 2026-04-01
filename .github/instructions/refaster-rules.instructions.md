@@ -2,11 +2,11 @@
 applyTo: "**/refasterrules/**"
 ---
 
-# Refaster Rules: Conventions and Step-by-Step Guide
+# Refaster Rule Conventions
 
-This document describes the conventions for creating and modifying Refaster
-rules in this project. It serves as the canonical reference for all AI coding
-agents and human contributors.
+This document describes the conventions for Refaster rules in this project. It
+serves as the canonical reference for all AI coding agents and human
+contributors.
 
 For general Java style conventions (collections, nullability, imports, etc.),
 see [`java-style.instructions.md`][java-style]. For testing conventions, see
@@ -30,7 +30,7 @@ are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 | Test output | `error-prone-contrib/src/test/resources/tech/picnic/errorprone/refasterrules/{Topic}RulesTestOutput.java` |
 | Test registration | `error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java` |
 
-## Step 1 - Create the rule file
+## Rule file structure
 <!-- check: skip -->
 
 Create (or extend) `{Topic}Rules.java`. A new collection looks like this:
@@ -561,7 +561,7 @@ List<T> after(ImmutableList<T> list) {
 }
 ```
 
-## Step 2 - Advanced patterns
+## Advanced patterns
 <!-- check: skip -->
 
 ### `Refaster.anyOf(...)` for multiple before-patterns
@@ -781,7 +781,7 @@ static final class SomeStrictRule {
 }
 ```
 
-## Step 3 - Create the test input file
+## Test input file
 <!-- check: skip -->
 
 Create `{Topic}RulesTestInput.java` in
@@ -888,7 +888,32 @@ This tells the test framework that these imports are expected to disappear from
 the output. Only list types/imports that are not used by any `after-template`
 test expression in the output file.
 
-## Step 4 - Create the test output file
+### Avoid local variables
+<!-- check: skip -->
+
+Do not create local variables in Refaster test input/output files. Inline
+expressions directly. This keeps tests minimal and matches the expression-level
+granularity of Refaster rules. Refaster test methods must also be nullary (take
+no parameters).
+
+**Do:**
+
+```java
+Optional<String> testOptionalIsEmpty() {
+  return Optional.of("foo").filter(String::isEmpty).isPresent();
+}
+```
+
+**Don't:**
+
+```java
+Optional<String> testOptionalIsEmpty() {
+  Optional<String> opt = Optional.of("foo");
+  return opt.filter(String::isEmpty).isPresent();
+}
+```
+
+## Test output file
 <!-- check: skip -->
 
 Create `{Topic}RulesTestOutput.java` in the same directory. It has a structure
@@ -914,7 +939,7 @@ Conventions:
 - Imports may differ (added as the rules dictate; removals shouldn't happen due
   to `elidedTypesAndStaticImports()` usage).
 
-## Step 5 - Register the collection
+## Collection registration
 <!-- check: skip -->
 
 Add the new rule collection class to the `RULE_COLLECTIONS` set in
@@ -932,7 +957,7 @@ private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
     );
 ```
 
-## Step 6 - Verify
+## Verification
 <!-- check: skip -->
 
 Run the tests to confirm that the rules compile and produce the expected
@@ -942,7 +967,7 @@ output:
 mvn clean test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.skip
 ```
 
-## Step 7 - Clean the codebase
+## Applying rules to the codebase
 <!-- check: skip -->
 
 Install the changes, apply the new rule(s) to the current repository, and

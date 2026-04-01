@@ -11,19 +11,19 @@ description: >
 Use this skill for requests to add or change files in `*/bugpatterns/*`.
 
 Read [`.github/instructions/bug-checkers.instructions.md`][bug-checkers] for
-the full conventions and step-by-step guide. Then:
+the full conventions. Then:
 
-1. **Determine the target module.** Based on the purpose of the requested
-   checker, decide whether it belongs in `error-prone-contrib`
-   (general-purpose), `error-prone-experimental` (experimental), or
-   `error-prone-guidelines` (project-specific conventions).
-2. **Create the checker file** following Step 1 (and Step 2 for advanced
-   patterns) from the instructions.
-3. **Create the test file** following Step 3.
-4. **Verify** by running the tests as described in Step 4.
-5. **Review** your changes against the applicable sections of
-   `.github/instructions/review.instructions.md`.
+1. **Determine the target module** based on the purpose of the checker:
+   `error-prone-contrib` (general-purpose), `error-prone-experimental`
+   (experimental), or `error-prone-guidelines` (project-specific).
+2. **Implement the checker** following the conventions in the instructions
+   (checker file structure and advanced patterns).
+3. **Write the test** following the test file structure conventions.
+4. **Verify** by running the tests.
+5. **Review** your changes against
+   [`.github/instructions/review.instructions.md`][review].
 6. **Follow the workflow** described in `AGENT.md` (mutation tests, apply
    suggestions, full build).
 
 [bug-checkers]: ../../../.github/instructions/bug-checkers.instructions.md
+[review]: ../../../.github/instructions/review.instructions.md

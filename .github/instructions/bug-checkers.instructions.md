@@ -2,11 +2,11 @@
 applyTo: "**/bugpatterns/**"
 ---
 
-# Bug Checkers: Conventions and Step-by-Step Guide
+# Bug Checker Conventions
 
-This document describes the conventions for creating and modifying `BugChecker`
-implementations in this project. It serves as the canonical reference for all
-AI coding agents and human contributors.
+This document describes the conventions for `BugChecker` implementations in
+this project. It serves as the canonical reference for all AI coding agents and
+human contributors.
 
 For general Java style conventions (collections, nullability, imports, etc.),
 see [`java-style.instructions.md`][java-style]. For testing conventions, see
@@ -40,7 +40,7 @@ Where `{module}` is one of:
 
 The same conventions apply to all three modules.
 
-## Step 1 - Create the checker file
+## Checker file structure
 <!-- check: skip -->
 
 Create `{CheckName}.java` in the appropriate module's `bugpatterns/` directory.
@@ -152,7 +152,7 @@ public final class IsInstanceLambdaUsage extends BugChecker
 }
 ```
 
-## Step 2 - Advanced patterns
+## Advanced patterns
 <!-- check: skip -->
 
 ### Static `Matcher<>` / `MultiMatcher<>` fields
@@ -258,7 +258,7 @@ if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
 }
 ```
 
-## Step 3 - Create the test file
+## Test file structure
 <!-- check: skip -->
 
 Create `{CheckName}Test.java` in the corresponding module's test `bugpatterns/`
@@ -319,15 +319,44 @@ Conventions:
 - **`identification()` test**: Uses `CompilationTestHelper`. Include both
   positive and negative cases. Use `// BUG: Diagnostic contains:` on the line
   **before** the flagged code. Optionally include a message fragment: `// BUG:
-  Diagnostic contains: exact text`.
+  Diagnostic contains: exact text`. The substring variant is useful for checks
+  with dynamic diagnostic messages and for reducing duplication between
+  `identification()` and `replacement()` tests by matching against the
+  suggested replacement code. When using this approach, ensure that enough
+  replacement cases remain to validate that the suggested fix compiles.
 - **`replacement()` test**: Uses `BugCheckerRefactoringTestHelper` with
   `.doTest(TestMode.TEXT_MATCH)`.
-- **Test source style**: Class named `A`, single `A.java` preferred, inline
+- **Prefer single test files**: Prefer a single `identification()` and
+  `replacement()` test method per test class. Prefer a single `A.java` test
+  file per test. Introduce additional test methods or files only when required
+  (e.g., to test different flag configurations or multi-file scenarios). Inline
   source as varargs strings.
 - **Multi-fix test**: Use `.setFixChooser(FixChoosers.SECOND)` to test the
   second fix option.
 - **Flag-based tests**: Use `.setArgs("-XepOpt:CheckerName:FlagName=value")` in
   a dedicated test method.
+
+### Diagnostic matching with predicates
+<!-- check: skip -->
+
+For checks that produce multiple distinct messages, use `expectErrorMessage()`
+with a key and a lambda predicate:
+
+```java
+CompilationTestHelper.newInstance(MyCheck.class, getClass())
+    .expectErrorMessage("key1", m -> m.contains("Prefer X"))
+    .expectErrorMessage("key2", m -> m.contains("Prefer Y"))
+    .addSourceLines(
+        "A.java",
+        "class A {",
+        "  // BUG: Diagnostic matches: key1",
+        "  ...",
+        "}")
+    .doTest();
+```
+
+Note the `// BUG: Diagnostic matches: key1` syntax (instead of
+`// BUG: Diagnostic contains:`).
 
 ### Test ordering and completeness
 <!-- check: `identification()` test cases follow checker validation logic -->
@@ -335,13 +364,18 @@ Conventions:
 The `identification()` test should structurally list both compliant
 (not-flagged) and non-compliant (flagged) code examples, ordered to follow the
 checker's validation logic, starting with early exits and progressing through
-the decision pipeline. Where multiple examples exercise the same logic path,
-list them from simple to complex. A human reviewer should be able to walk
-through the checker source and test source in tandem and verify that all cases
-are covered.
+the decision pipeline. List non-violating (negative) cases before violating
+(positive) cases. Code without a `// BUG:` comment is implicitly a negative
+case. Where multiple examples exercise the same logic path, list them from
+simple to complex. A human reviewer should be able to walk through the checker
+source and test source in tandem and verify that all cases are covered.
 
-The `replacement()` test should follow the same structural ordering, with one
-test case per distinct fix pattern.
+The `identification()` test should cover all edge cases, including negative
+cases and all supported code patterns. The `replacement()` test only needs to
+verify that the fix transformation is correct and yields valid code in all
+relevant cases; it does not need to repeat all edge cases from
+`identification()`. Within `replacement()`, follow the same structural
+ordering, with one test case per distinct fix pattern.
 
 When tests are structured this way, high mutation test coverage follows
 naturally. Regardless, always ensure maximal test coverage by running
@@ -459,7 +493,7 @@ final class AutowiredConstructorTest {
 }
 ```
 
-## Step 4 - Verify
+## Verification
 <!-- check: skip -->
 
 Run the tests to confirm that the checker compiles and produces the expected

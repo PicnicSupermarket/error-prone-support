@@ -8,10 +8,10 @@ This document serves as the canonical reference for testing conventions in this
 repository, for both AI coding agents and human contributors. It covers the
 different testing patterns used across modules.
 
-For detailed step-by-step guides on testing specific types of code, see also:
+For domain-specific testing conventions, see also:
 
-- [Bug checker testing][bug-checker-instructions] (Steps 3-4)
-- [Refaster rule testing][refaster-instructions] (Steps 3-6)
+- [Bug checker testing][bug-checker-instructions] (test file structure)
+- [Refaster rule testing][refaster-instructions] (test input/output files)
 
 ## General conventions
 
@@ -85,204 +85,14 @@ indentation). Apply the same formatting rules as production code.
 
 `BugChecker` tests use a two-phase pattern: identification (does the check flag
 the right code?) and replacement (does the suggested fix produce correct
-output?).
-
-### Identification tests
-
-Use `CompilationTestHelper` to verify that the checker flags the expected
-diagnostics. Place `// BUG: Diagnostic contains:` on the line immediately
-before the flagged code.
-
-```java
-@Test
-void identification() {
-  CompilationTestHelper.newInstance(MyCheck.class, getClass())
-      .addSourceLines(
-          "A.java",
-          "class A {",
-          "  void m() {",
-          "    // BUG: Diagnostic contains:",
-          "    Optional.of(1).get();",
-          "  }",
-          "}")
-      .doTest();
-}
-```
-
-For checks that produce multiple distinct messages, use `expectErrorMessage()`
-with a key and a lambda predicate:
-
-```java
-CompilationTestHelper.newInstance(MyCheck.class, getClass())
-    .expectErrorMessage("key1", m -> m.contains("Prefer X"))
-    .expectErrorMessage("key2", m -> m.contains("Prefer Y"))
-    .addSourceLines(
-        "A.java",
-        "class A {",
-        "  // BUG: Diagnostic matches: key1",
-        "  ...",
-        "}")
-    .doTest();
-```
-
-Note that `// BUG: Diagnostic contains:` is the "any diagnostic message will
-do" variant of the more general `// BUG: Diagnostic contains: <text>`
-assertion. A `// BUG: Diagnostic contains: <text>` comment asserts that the
-check reports a diagnostic on the subsequent line whose message contains
-`<text>` as a substring. This form of validation is useful for checks with
-dynamic diagnostic messages and for reducing duplication between
-`identification()` and `replacement()` tests by matching against the suggested
-replacement code. When using this approach, ensure that enough replacement
-cases remain to validate that the suggested fix compiles.
-
-### Replacement tests
-
-Use `BugCheckerRefactoringTestHelper` to verify the suggested fix transforms
-input code to expected output.
-
-```java
-@Test
-void replacement() {
-  BugCheckerRefactoringTestHelper.newInstance(MyCheck.class, getClass())
-      .addInputLines(
-          "A.java",
-          "class A {",
-          "  void m() {",
-          "    Optional.of(1).get();",
-          "  }",
-          "}")
-      .addOutputLines(
-          "A.java",
-          "class A {",
-          "  void m() {",
-          "    Optional.of(1).orElseThrow();",
-          "  }",
-          "}")
-      .doTest(TestMode.TEXT_MATCH);
-}
-```
-
-### Prefer single test files
-
-Prefer a single `identification()` and `replacement()` test method per test
-class. Prefer a single `A.java` test file per test. Introduce additional test
-methods or files only when required (e.g., to test different flag
-configurations or multi-file scenarios).
-
-### Include negative cases, listed first
-
-Always test code that should NOT trigger the check. List non-violating
-(negative) cases before violating (positive) cases in the identification test.
-Code without a `// BUG:` comment is implicitly a negative case.
-
-### Testing flag-based configuration
-
-For BugCheckers that accept flags, use `.setArgs()`:
-
-```java
-@Test
-void replacementWithCustomFlag() {
-  BugCheckerRefactoringTestHelper.newInstance(MyCheck.class, getClass())
-      .setArgs("-XepOpt:MyCheck:FlagName=value")
-      .addInputLines("A.java", ...)
-      .addOutputLines("A.java", ...)
-      .doTest(TestMode.TEXT_MATCH);
-}
-```
-
-### Testing multiple suggested fixes
-
-When a check provides multiple fix alternatives, use `.setFixChooser()` to
-select which fix to test:
-
-```java
-BugCheckerRefactoringTestHelper.newInstance(MyCheck.class, getClass())
-    .setFixChooser(SECOND)
-    .addInputLines("A.java", ...)
-    .addOutputLines("A.java", ...)
-    .doTest(TestMode.TEXT_MATCH);
-```
-
-### Identification tests are comprehensive; replacement tests are focused
-
-The `identification()` test should cover all edge cases, including negative
-cases and all supported code patterns. The `replacement()` test only needs to
-verify that the fix transformation is correct and yields valid code in all
-relevant cases; it does not need to repeat all edge cases from
-`identification()`.
+output?). For the complete conventions, templates, and examples, see
+[`bug-checkers.instructions.md`][bug-checker-instructions].
 
 ## Refaster rule testing
 
-Refaster rules are tested using input/output file pairs that demonstrate the
-before and after of each rule. For detailed conventions on Refaster rule
-design, see [refaster-rules.instructions.md][refaster-instructions].
-
-### File pair convention
-
-Each rule collection `{Topic}Rules.java` has:
-
-- `src/test/resources/.../refasterrules/{Topic}RulesTestInput.java`
-- `src/test/resources/.../refasterrules/{Topic}RulesTestOutput.java`
-
-Both files define a class named `{Topic}RulesTest` that implements
-`RefasterRuleCollectionTestCase`.
-
-### Test method naming
-<!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
-
-Each inner rule class `FooBar` in a rule collection must have a corresponding
-`testFooBar()` method in both the input and output files of said rule
-collection.
-
-### Registration
-<!-- check: Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
-
-New rule collections must be registered in `RefasterRulesTest.java`'s
-`RULE_COLLECTIONS` set, in alphabetical order.
-
-### `elidedTypesAndStaticImports()`
-<!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
-
-Override this method in the test input class to preserve imports that are only
-used in code replaced by rules. Without this, the compiler would flag unused
-imports.
-
-```java
-@Override
-public ImmutableSet<Object> elidedTypesAndStaticImports() {
-  return ImmutableSet.of(
-      Stream.class,
-      collectingAndThen(null, null),
-      counting());
-}
-```
-
-### Avoid local variables in Refaster test code
-
-Do not create local variables in Refaster test input/output files. Inline
-expressions directly. This keeps tests minimal and matches the expression-level
-granularity of Refaster rules. Refaster test methods must also be nullary (take
-no parameters).
-
-**Do:**
-
-```java
-Optional<String> testOptionalIsEmpty() {
-  return Optional.of("foo").filter(String::isEmpty).isPresent();
-}
-```
-
-**Don't:**
-
-```java
-Optional<String> testOptionalIsEmpty() {
-  Optional<String> opt = Optional.of("foo");
-  return opt.filter(String::isEmpty).isPresent();
-}
-```
-
-For the full step-by-step guide, see
-[refaster-rules.instructions.md][refaster-instructions].
+Refaster rules are tested using input/output file pairs. For the complete
+conventions, templates, and examples, see
+[`refaster-rules.instructions.md`][refaster-instructions].
 
 ## Utility and matcher testing
 
