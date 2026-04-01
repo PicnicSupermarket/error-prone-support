@@ -334,6 +334,7 @@ Conventions:
   file per test. Introduce additional test methods or files only when required
   (e.g., to test different flag configurations or multi-file scenarios). Inline
   source as varargs strings.
+
 ### Testing multiple suggested fixes
 <!-- check: skip -->
 
@@ -525,7 +526,8 @@ final class AutowiredConstructorTest {
 ## Verification
 <!-- check: skip -->
 
-To confirm that the checker compiles and produces the expected diagnostics, run:
+To confirm that the checker compiles and produces the expected diagnostics,
+run:
 
 ```sh
 mvn test -pl error-prone-contrib -Dtest=MyCheckerTest -Dverification.skip

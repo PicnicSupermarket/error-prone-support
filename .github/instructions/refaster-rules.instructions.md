@@ -785,7 +785,7 @@ static final class SomeStrictRule {
 
 ## Test input file
 <!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
-<!-- check: Test class named `{Topic}RulesTest` (not TestInput/TestOutput) -->
+<!-- check: Test class named `{Topic}RulesTest` (not `*TestInput`/`*TestOutput`) -->
 <!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
 
 The test input file `{Topic}RulesTestInput.java` is placed in
