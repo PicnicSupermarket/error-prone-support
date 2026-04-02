@@ -31,7 +31,7 @@ are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 | Test registration | `error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java` |
 
 ## Rule file structure
-<!-- check: `static final class` used (not `abstract`) unless `@Placeholder` is needed -->
+<!-- check: Rule classes use `static final class` (not `abstract`) unless `@Placeholder` is needed -->
 
 Rule collections are defined in `{Topic}Rules.java` files. A new collection
 looks like this:
@@ -96,7 +96,7 @@ Conventions:
 
 ### Javadoc conventions
 <!-- check: Javadoc follows "Prefer X over Y" format -->
-<!-- check: Correct Javadoc qualifier chosen (deprecated, less efficient, etc.) -->
+<!-- check: Javadoc qualifier is correct (deprecated, less efficient, etc.) -->
 
 If applicable, prefer one of the following qualifier variants (or combinations
 thereof) in the Javadoc comment:
@@ -316,7 +316,7 @@ suffixes (e.g., `addTo`/`elementsToAdd` instead of
 | `T[]` | `array` |
 
 ### Rule named after `@AfterTemplate` content
-<!-- check: Rule class name derived from `@AfterTemplate` identifiers -->
+<!-- check: Rule class name is derived from `@AfterTemplate` identifiers -->
 
 Rules are named after the code in their `@AfterTemplate` method, following
 these guidelines:
@@ -448,7 +448,7 @@ Example:
 ```
 
 ### `// XXX:` comments
-<!-- check: Known limitations documented with `// XXX:` comments -->
+<!-- check: Known limitations are documented with `// XXX:` comments -->
 
 Use class- or method-level `// XXX:` comments to document:
 - Known limitations or behavioral differences between the before- and
@@ -458,7 +458,7 @@ Use class- or method-level `// XXX:` comments to document:
 - References to related rules or checks that may overlap.
 
 ### Method and type parameter usage
-<!-- check: Type parameters are as wide as possible; wildcard bounds eliminated -->
+<!-- check: Type parameters are as wide as possible; wildcard bounds are eliminated -->
 
 Where applicable, make sure that method and type parameters are as wide as
 possible.
@@ -785,7 +785,7 @@ static final class SomeStrictRule {
 
 ## Test input file
 <!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
-<!-- check: Test class named `{Topic}RulesTest` (not `*TestInput`/`*TestOutput`) -->
+<!-- check: Test class is named `{Topic}RulesTest` (not `*TestInput`/`*TestOutput`) -->
 <!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
 
 The test input file `{Topic}RulesTestInput.java` is placed in
@@ -945,8 +945,8 @@ Conventions:
   to `elidedTypesAndStaticImports()` usage).
 
 ## Collection registration
-<!-- check: Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
-<!-- check: `RULE_COLLECTIONS` entries in alphabetical order -->
+<!-- check: Collection is registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
+<!-- check: `RULE_COLLECTIONS` entries are in alphabetical order -->
 
 New rule collections are registered in the `RULE_COLLECTIONS` set in
 [`RefasterRulesTest.java`][refaster-rules-test]. Entries are listed in

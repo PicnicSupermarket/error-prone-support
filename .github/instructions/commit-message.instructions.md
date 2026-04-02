@@ -119,8 +119,8 @@ intermediate releases:
 
 ### Upgrade release notes
 <!-- check: Upgrades of listed libraries include wiki or release notes page -->
-<!-- check: No URLs were hallucinated. -->
-<!-- check: Release notes are not summarized in commit message. -->
+<!-- check: No URLs are hallucinated -->
+<!-- check: Release notes are not summarized in commit message -->
 
 The following libraries have dedicated release notes or wiki pages that must be
 included as the first URL:

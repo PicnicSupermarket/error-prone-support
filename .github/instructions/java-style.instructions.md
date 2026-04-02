@@ -542,7 +542,7 @@ reimplementing common operations:
 - `Documentation.BUG_PATTERNS_BASE_URL`: documentation link base URL.
 - `Flags.getList()` / `Flags.getSet()`: parse Error Prone flag values.
 
-### Guard clauses for `Description.NO_MATCH`
+### Use guard clauses for `Description.NO_MATCH`
 
 Structure match methods with early returns for `NO_MATCH`. For complex logic,
 use `Optional` chains that terminate with `.orElse(NO_MATCH)`.
@@ -717,8 +717,8 @@ public class MyChecker extends BugChecker implements MethodTreeMatcher {
 ```
 
 ### Class member ordering
-<!-- check: Fields ordered: static final, static non-final, instance final, instance non-final -->
-<!-- check: Methods: constructors, static factory methods, overrides, then by usage order: first instance, then static -->
+<!-- check: Fields are ordered: static final, static non-final, instance final, instance non-final -->
+<!-- check: Methods are ordered: constructors, static factory methods, overrides, then by usage order: first instance, then static -->
 
 Within a class, order members as follows:
 

@@ -32,7 +32,7 @@ the files you modified.
 
 - [ ] `serialVersionUID = 1L` is present
 - [ ] Public no-arg constructor with Javadoc is present
-- [ ] `SourceCode#treeToString` used instead of `Tree#toString()`
+- [ ] `SourceCode#treeToString` is used instead of `Tree#toString()`
 
 ### Test file structure
 
@@ -66,8 +66,8 @@ the files you modified.
 
 - [ ] Upgrade commits include release notes URLs matching past commit patterns
 - [ ] Upgrades of listed libraries include wiki or release notes page
-- [ ] No URLs were hallucinated.
-- [ ] Release notes are not summarized in commit message.
+- [ ] No URLs are hallucinated
+- [ ] Release notes are not summarized in commit message
 
 ## Documentation Conventions (`documentation.instructions.md`)
 
@@ -97,7 +97,7 @@ the files you modified.
 
 - [ ] `step-security/harden-runner` is the first step of every job
 - [ ] `disable-sudo-and-containers: true` (or `disable-sudo: true` if incompatible)
-- [ ] `egress-policy` omitted (defaults to `block`; use `audit` only while developing)
+- [ ] `egress-policy` is omitted (defaults to `block`; use `audit` only while developing)
 
 ### Declare least-privilege permissions
 
@@ -169,7 +169,7 @@ the files you modified.
 - [ ] Compose matchers with `allOf()`, `anyOf()`, `not()`
 - [ ] Use `ASTHelpers` qualified, not statically imported
 - [ ] Use `SourceCode`, `MoreASTHelpers`, `Documentation` from `error-prone-utils`
-- [ ] Guard clauses for `Description.NO_MATCH`
+- [ ] Use guard clauses for `Description.NO_MATCH`
 - [ ] Avoid `compilesWithFix` in `BugChecker` implementations
 - [ ] `VisitorState` comes last in method signatures
 - [ ] `@BugPattern` summary should not end with a period
@@ -193,8 +193,8 @@ the files you modified.
 ### Class structure and naming
 
 - [ ] Prefer `final` classes and minimal visibility
-- [ ] Fields ordered: static final, static non-final, instance final, instance non-final
-- [ ] Methods: constructors, static factory methods, overrides, then by usage order: first instance, then static
+- [ ] Fields are ordered: static final, static non-final, instance final, instance non-final
+- [ ] Methods are ordered: constructors, static factory methods, overrides, then by usage order: first instance, then static
 - [ ] No empty first line inside a class body
 - [ ] Keep lists and members sorted lexicographically
 - [ ] Utility classes are `final` with a private constructor
@@ -240,18 +240,18 @@ the files you modified.
 
 ### Rule file structure
 
-- [ ] `static final class` used (not `abstract`) unless `@Placeholder` is needed
+- [ ] Rule classes use `static final class` (not `abstract`) unless `@Placeholder` is needed
 - [ ] Javadoc follows "Prefer X over Y" format
-- [ ] Correct Javadoc qualifier chosen (deprecated, less efficient, etc.)
+- [ ] Javadoc qualifier is correct (deprecated, less efficient, etc.)
 - [ ] `@BeforeTemplate`s use already-rewritten sub-expressions
 - [ ] New rule has distinct `@AfterTemplate`
 - [ ] New rule does not make existing rules redundant
 - [ ] Parameter names follow type-based naming conventions
-- [ ] Rule class name derived from `@AfterTemplate` identifiers
+- [ ] Rule class name is derived from `@AfterTemplate` identifiers
 - [ ] `@SuppressWarnings` entries have explanatory comments
 - [ ] Behavior-changing rules have `<p><strong>Warning:</strong>` in Javadoc
-- [ ] Known limitations documented with `// XXX:` comments
-- [ ] Type parameters are as wide as possible; wildcard bounds eliminated
+- [ ] Known limitations are documented with `// XXX:` comments
+- [ ] Type parameters are as wide as possible; wildcard bounds are eliminated
 - [ ] Use the most specific return type
 
 ### Advanced patterns
@@ -261,13 +261,13 @@ the files you modified.
 ### Test input file
 
 - [ ] Test method names match inner class names exactly (`testFooBar` for `FooBar`)
-- [ ] Test class named `{Topic}RulesTest` (not TestInput/TestOutput)
+- [ ] Test class is named `{Topic}RulesTest` (not `*TestInput`/`*TestOutput`)
 - [ ] `elidedTypesAndStaticImports()` lists all replaced types/imports
 
 ### Collection registration
 
-- [ ] Collection registered in `RefasterRulesTest.java` `RULE_COLLECTIONS`
-- [ ] `RULE_COLLECTIONS` entries in alphabetical order
+- [ ] Collection is registered in `RefasterRulesTest.java` `RULE_COLLECTIONS`
+- [ ] `RULE_COLLECTIONS` entries are in alphabetical order
 
 ## Shell Script Conventions (`scripts.instructions.md`)
 
@@ -316,22 +316,16 @@ the files you modified.
 
 ### General conventions
 
-- [ ] Test class structure
-- [ ] Test method naming
+- [ ] Test classes are `final` and named `{ClassName}Test`
 - [ ] Prefer parameterized tests over multiple similar test methods
 - [ ] Keep test inputs minimal
 - [ ] Use distinct values per test line
 - [ ] Use metasyntactic variable names
 - [ ] Format test source strings with Google Java Format
 
-### Utility and matcher testing
-
-- [ ] Wrapper `BugChecker` pattern for matchers
-- [ ] Testing utility methods
-
 ### Mutation testing
 
 - [ ] Run mutation tests
 - [ ] Kill every killable mutant
-- [ ] Mutation test results analyzed and surviving mutants addressed
+- [ ] Mutation test results are analyzed and surviving mutants are addressed
 - [ ] Document unkillable mutants

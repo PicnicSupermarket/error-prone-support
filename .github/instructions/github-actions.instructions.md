@@ -44,7 +44,7 @@ to its most recent release.
 ## Include `step-security/harden-runner` in every job
 <!-- check: `step-security/harden-runner` is the first step of every job -->
 <!-- check: `disable-sudo-and-containers: true` (or `disable-sudo: true` if incompatible) -->
-<!-- check: `egress-policy` omitted (defaults to `block`; use `audit` only while developing) -->
+<!-- check: `egress-policy` is omitted (defaults to `block`; use `audit` only while developing) -->
 
 The first step of every job must be `step-security/harden-runner`.
 

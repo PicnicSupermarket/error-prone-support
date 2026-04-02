@@ -43,7 +43,7 @@ The same conventions apply to all three modules.
 ## Checker file structure
 <!-- check: `serialVersionUID = 1L` is present -->
 <!-- check: Public no-arg constructor with Javadoc is present -->
-<!-- check: `SourceCode#treeToString` used instead of `Tree#toString()` -->
+<!-- check: `SourceCode#treeToString` is used instead of `Tree#toString()` -->
 
 Checker files are placed in the appropriate module's `bugpatterns/` directory as
 `{CheckName}.java`. A complete checker looks like this:

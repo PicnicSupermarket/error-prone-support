@@ -16,6 +16,7 @@ For domain-specific testing conventions, see also:
 ## General conventions
 
 ### Test class structure
+<!-- check: Test classes are `final` and named `{ClassName}Test` -->
 
 - All test classes must be `final`.
 - Test class naming: `{ClassName}Test`.
@@ -27,6 +28,7 @@ For domain-specific testing conventions, see also:
   [java-style.instructions.md][java-style-instructions].
 
 ### Test method naming
+<!-- check: skip -->
 
 - `BugChecker` tests use `identification()` and `replacement()`.
 - Refaster rule tests use `test{RuleName}()` methods.
@@ -100,6 +102,7 @@ Utilities and matchers in `error-prone-utils` and `refaster-support` require a
 different testing approach because they are not `BugChecker`s themselves.
 
 ### Wrapper `BugChecker` pattern for matchers
+<!-- check: skip -->
 
 To test a `Matcher<ExpressionTree>` implementation, create a private inner
 `BugChecker` that wraps it using `AbstractMatcherTestChecker`:
@@ -131,6 +134,7 @@ final class IsEmptyTest {
 ```
 
 ### Testing utility methods
+<!-- check: skip -->
 
 Utility methods that operate on AST nodes (e.g., `MoreASTHelpers`) are tested
 using the same `CompilationTestHelper` approach with a custom wrapper
@@ -171,7 +175,7 @@ If a mutation survives because a code path is unreachable, consider removing
 the dead code.
 
 ### Interpreting mutation results
-<!-- check: Mutation test results analyzed and surviving mutants addressed -->
+<!-- check: Mutation test results are analyzed and surviving mutants are addressed -->
 
 Each line in `mutations.csv` describes a mutation and its status:
 
