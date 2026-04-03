@@ -85,6 +85,7 @@ final class RefasterRulesTest {
           RxJava2AdapterRules.class,
           SpringTestRules.class,
           StreamRules.class,
+          StringBuilderRules.class,
           StringRules.class,
           SuggestedFixRules.class,
           TestNGToAssertJRules.class,
