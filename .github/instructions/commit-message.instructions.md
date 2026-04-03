@@ -48,7 +48,7 @@ The following special formats must be followed exactly:
 
 After a pull request is created, the subject line ends with ` (#N)` where `N`
 is the PR number. This suffix is added after the PR is created (see
-[`pull-request.instructions.md`](pull-request.instructions.md)). It does not
+[`pull-request.instructions.md`][pull-request]). It does not
 apply to local-only commits.
 
 ## Commit body
@@ -257,3 +257,5 @@ See:
 - https://github.com/google/error-prone/compare/v2.47.0...v2.48.0
 - https://github.com/PicnicSupermarket/error-prone/compare/v2.47.0-picnic-1...v2.48.0-picnic-1
 ```
+
+[pull-request]: pull-request.instructions.md

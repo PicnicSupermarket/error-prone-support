@@ -83,6 +83,16 @@ the files you modified.
 
 - [ ] Enumerated items end with a period
 
+### Markdown links
+
+- [ ] Links use reference style (`[text][ref]`, not `[text](url)`)
+- [ ] Link reference definitions are at the bottom of the file
+- [ ] Link reference definitions are in lexicographic order
+
+### Single space after sentences
+
+- [ ] Single space after sentences (not two)
+
 ### `XXX` comments for future work
 
 - [ ] Use `XXX:` for future work (not `TODO:` or `FIXME:`)
@@ -92,6 +102,10 @@ the files you modified.
 ### Pin all actions by commit hash
 
 - [ ] All actions pinned by full SHA with version comment
+
+### Use consistent action versions
+
+- [ ] Newly added actions use the same hash/version as existing usages in the repo
 
 ### Include `step-security/harden-runner` in every job
 
@@ -120,6 +134,10 @@ the files you modified.
 
 - [ ] All `if:` conditions use `${{ }}` wrapping
 
+### Omit action inputs that match their default value
+
+- [ ] Action inputs that match their defaults are omitted
+
 ### YAML formatting
 
 - [ ] Bracket arrays use whitespace padding (`[ a, b ]`)
@@ -133,6 +151,15 @@ the files you modified.
 ### Regenerate the review checklist after editing
 
 - [ ] `./generate-review-checklist.sh` executed after instruction file changes
+
+### Section headers must be review-compatible
+
+- [ ] Every section header has an explicit `check:` annotation, or is self-evidently verifiable
+- [ ] `check: skip` is used only for non-verifiable sections (context, background, parent groups)
+
+### Bias towards multiple check annotations
+
+- [ ] Sections with multiple verifiable requirements list multiple `check:` annotations
 
 ## Java Style Conventions (`java-style.instructions.md`)
 

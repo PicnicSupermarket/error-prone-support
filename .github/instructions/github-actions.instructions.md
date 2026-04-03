@@ -28,7 +28,7 @@ version comment after the hash.
 ```
 
 ## Use consistent action versions
-<!-- check: skip -->
+<!-- check: Newly added actions use the same hash/version as existing usages in the repo -->
 
 When adding a step that uses an action already present in another workflow, use
 the same commit hash and version comment. Do not upgrade an action as a side
@@ -148,7 +148,7 @@ if: github.ref == github.event.repository.default_branch
 ```
 
 ## Omit action inputs that match their default value
-<!-- check: skip -->
+<!-- check: Action inputs that match their defaults are omitted -->
 
 Do not specify action `with:` inputs when they match the action's default
 value. This reduces noise and makes intentional overrides obvious.

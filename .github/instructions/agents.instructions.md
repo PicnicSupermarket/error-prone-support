@@ -63,7 +63,7 @@ customization.
 
 `AGENT.md` references `.github/instructions/*.instructions.md` files for
 detailed conventions. See
-[`instructions.instructions.md`](instructions.instructions.md) for the
+[`instructions.instructions.md`][instructions] for the
 conventions governing these instruction files themselves.
 
 ## Human contributors use `CONTRIBUTING.md`
@@ -73,5 +73,6 @@ conventions governing these instruction files themselves.
 reporting, PR process, and module overview, and cross-references the
 instruction files for detailed coding conventions.
 
-[agents-md]: https://agents.md
 [agent-skills]: https://agentskills.io
+[agents-md]: https://agents.md
+[instructions]: instructions.instructions.md

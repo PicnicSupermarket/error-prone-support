@@ -8,7 +8,7 @@ This document describes the writing conventions for documentation in this
 repository. These conventions apply to all text files: Markdown, shell script
 comments, YAML comments, XML comments, and any other file containing prose or
 comments. For Java-specific conventions (including Javadoc), see
-`java-style.instructions.md`.
+[`java-style.instructions.md`][java-style].
 
 ## Text width
 <!-- check: Prose wraps at 79 characters -->
@@ -37,8 +37,34 @@ Enumerated and bulleted list items end with a period. Exception: items that are
 single words or short noun phrases (e.g., items in a definition list or table
 of contents).
 
+## Markdown links
+<!-- check: Links use reference style (`[text][ref]`, not `[text](url)`) -->
+<!-- check: Link reference definitions are at the bottom of the file -->
+<!-- check: Link reference definitions are in lexicographic order -->
+
+Use reference-style links throughout: `[text][ref]` in prose, with
+`[ref]: url` definitions collected exclusively at the bottom of the file.
+Do not use inline links or scatter definitions through the document.
+
+**Do:**
+
+```markdown
+See [`java-style.instructions.md`][java-style] for Java conventions.
+
+[java-style]: java-style.instructions.md
+```
+
+**Don't:**
+
+```markdown
+See [`java-style.instructions.md`](java-style.instructions.md) for Java
+conventions.
+```
+
+Order all reference definitions lexicographically by reference name.
+
 ## Single space after sentences
-<!-- check: skip -->
+<!-- check: Single space after sentences (not two) -->
 
 Use a single space after a period, not two.
 
@@ -55,3 +81,5 @@ use `// XXX: ...`.
 This repository includes an `.editorconfig` file. Configure your editor to
 respect it. It enforces indentation style, trailing whitespace removal, and
 final newlines.
+
+[java-style]: java-style.instructions.md
