@@ -21,9 +21,9 @@ configuration is kept to a minimum.
 `AGENT.md` in the repository root is the canonical entry point for all AI
 coding agents. It contains:
 
-- Project overview and build commands
-- The implementation workflow (plan, implement, test, review, verify)
-- References to task-specific instruction files
+- Project overview and build commands.
+- The implementation workflow (plan, implement, test, review, verify).
+- References to task-specific instruction files.
 
 Do not duplicate `AGENT.md` content in agent-specific files.
 
@@ -62,9 +62,8 @@ customization.
 <!-- check: skip -->
 
 `AGENT.md` references `.github/instructions/*.instructions.md` files for
-detailed conventions. See
-[`instructions.instructions.md`][instructions] for the
-conventions governing these instruction files themselves.
+detailed conventions. See [`instructions.instructions.md`][instructions] for
+the conventions governing these instruction files themselves.
 
 ## Human contributors use `CONTRIBUTING.md`
 <!-- check: skip -->

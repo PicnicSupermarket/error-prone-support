@@ -42,9 +42,9 @@ of contents).
 <!-- check: Link reference definitions are at the bottom of the file -->
 <!-- check: Link reference definitions are in lexicographic order -->
 
-Use reference-style links throughout: `[text][ref]` in prose, with
-`[ref]: url` definitions collected exclusively at the bottom of the file.
-Do not use inline links or scatter definitions through the document.
+Use reference-style links throughout: `[text][ref]` in prose, with `[ref]: url`
+definitions collected exclusively at the bottom of the file. Do not use inline
+links or scatter definitions through the document.
 
 **Do:**
 

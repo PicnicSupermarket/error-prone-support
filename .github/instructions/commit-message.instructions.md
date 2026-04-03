@@ -48,8 +48,8 @@ The following special formats must be followed exactly:
 
 After a pull request is created, the subject line ends with ` (#N)` where `N`
 is the PR number. This suffix is added after the PR is created (see
-[`pull-request.instructions.md`][pull-request]). It does not
-apply to local-only commits.
+[`pull-request.instructions.md`][pull-request]). It does not apply to
+local-only commits.
 
 ## Commit body
 <!-- check: Commit body does not repeat or lightly paraphrase the subject line -->

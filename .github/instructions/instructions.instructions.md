@@ -126,15 +126,14 @@ guidance:
 - Use `<!-- check: skip -->` only for sections that describe context,
   background, parent groupings, or other non-verifiable information.
 
-A heading that is neither self-evidently verifiable nor explicitly annotated
-is a defect: less capable agents will misinterpret it.
+A heading that is neither self-evidently verifiable nor explicitly annotated is
+a defect: less capable agents will misinterpret it.
 
 ## Bias towards multiple check annotations
 <!-- check: Sections with multiple verifiable requirements list multiple `check:` annotations -->
 
-When a section covers more than one verifiable requirement, emit one
-`<!-- check: -->` annotation per requirement rather than a single coarse
-item.
+When a section covers more than one verifiable requirement, emit one `<!--
+check: -->` annotation per requirement rather than a single coarse item.
 
 **Do:**
 
@@ -151,9 +150,9 @@ item.
 <!-- check: Permissions are declared correctly -->
 ```
 
-Multiple fine-grained items make agent execution more predictable: agents
-can process each item independently and less capable models are less likely
-to conflate unrelated requirements into a single pass.
+Multiple fine-grained items make agent execution more predictable: agents can
+process each item independently and less capable models are less likely to
+conflate unrelated requirements into a single pass.
 
 ## `review.instructions.md` is auto-generated
 <!-- check: skip -->
