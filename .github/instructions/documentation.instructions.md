@@ -15,10 +15,9 @@ comments. For Java-specific conventions (including Javadoc), see
 
 Wrap prose at 79 characters. In vim: `set tw=79`. This applies to:
 
-- Markdown files (`.md`).
+- Markdown files, including instruction and skill files (`.md`).
 - Comment blocks in shell scripts.
 - YAML and XML comments.
-- Instruction files.
 
 Code blocks, tables and URLs may exceed the limit. Do not break URLs across lines.
 
@@ -62,6 +61,20 @@ conventions.
 ```
 
 Order all reference definitions lexicographically by reference name.
+
+### Link reference naming
+<!-- check: Link reference names follow the naming convention -->
+
+Name link references by category:
+
+- **Instruction files**: filename stem without `.instructions.md` (e.g.,
+  `[bug-checkers]` for `bug-checkers.instructions.md`).
+- **Skill files**: `skill-` prefix + skill name (e.g., `[skill-bug-checker]`
+  for `.agents/skills/bug-checker/SKILL.md`).
+- **Other files**: descriptive lowercase name (e.g., `[agent-md]` for
+  `AGENT.md`).
+
+Do not abbreviate reference names. Use the full name for consistency.
 
 ## Single space after sentences
 <!-- check: Single space after sentences (not two) -->

@@ -1,9 +1,9 @@
 ---
 name: write-java-code
 description: >
-  Use this skill when writing or modifying Java code in this repository. When
-  creating or modifying `Bugcheckers`, use it alongside the
-  `create-bug-checker` skill.
+  Use this skill when writing or modifying Java code in this repository outside
+  `*/refasterrules/*`. When also creating or modifying `BugChecker`s, use it
+  alongside the `bug-checker` skill.
 ---
 
 # Write Java Code

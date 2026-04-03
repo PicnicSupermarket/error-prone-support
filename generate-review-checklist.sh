@@ -10,6 +10,8 @@
 #
 # The output file should be committed to the repository. CI validates that it
 # matches the regenerated output.
+#
+# XXX: Consider reimplementing this logic using Java in `documentation-support`.
 
 set -e -u -o pipefail
 
@@ -115,12 +117,12 @@ function Pandoc(doc)
 end
 EOF
 
-cat > "$OUTPUT_FILE" << 'EOF'
+cat > "${OUTPUT_FILE}" << 'EOF'
 ---
 description: >
   Auto-generated review checklist derived from the project's instruction files.
   Do not edit manually; edit the source instruction files instead and then run
-  `./generate-review-checklist.sh `to regenerate.
+  `./generate-review-checklist.sh` to regenerate.
 ---
 
 # Review Checklist

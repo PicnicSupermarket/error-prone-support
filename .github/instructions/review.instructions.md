@@ -2,7 +2,7 @@
 description: >
   Auto-generated review checklist derived from the project's instruction files.
   Do not edit manually; edit the source instruction files instead and then run
-  `./generate-review-checklist.sh `to regenerate.
+  `./generate-review-checklist.sh` to regenerate.
 ---
 
 # Review Checklist
@@ -88,6 +88,7 @@ the files you modified.
 - [ ] Links use reference style (`[text][ref]`, not `[text](url)`)
 - [ ] Link reference definitions are at the bottom of the file
 - [ ] Link reference definitions are in lexicographic order
+- [ ] Link reference names follow the naming convention
 
 ### Single space after sentences
 
@@ -137,6 +138,12 @@ the files you modified.
 ### Omit action inputs that match their default value
 
 - [ ] Action inputs that match their defaults are omitted
+
+### Naming conventions
+
+- [ ] Workflow names use imperative form (e.g., "Run mutation tests")
+- [ ] Job names are short, lowercase identifiers (e.g., `build`, `validate`)
+- [ ] Step names use imperative form (e.g., "Install Harden-Runner")
 
 ### YAML formatting
 
@@ -274,7 +281,7 @@ the files you modified.
 - [ ] New rule has distinct `@AfterTemplate`
 - [ ] New rule does not make existing rules redundant
 - [ ] Parameter names follow type-based naming conventions
-- [ ] Rule class name is derived from `@AfterTemplate` identifiers
+- [ ] Rule class name is derived *only* from `@AfterTemplate` identifiers
 - [ ] `@SuppressWarnings` entries have explanatory comments
 - [ ] Behavior-changing rules have `<p><strong>Warning:</strong>` in Javadoc
 - [ ] Known limitations are documented with `// XXX:` comments
@@ -289,7 +296,9 @@ the files you modified.
 
 - [ ] Test method names match inner class names exactly (`testFooBar` for `FooBar`)
 - [ ] Test class is named `{Topic}RulesTest` (not `*TestInput`/`*TestOutput`)
+- [ ] Dummy values follow canonical order: integers `1`, `2`, `3`, ...; strings `"foo"`, `"bar"`, `"baz"`, ...
 - [ ] `elidedTypesAndStaticImports()` lists all replaced types/imports
+- [ ] `elidedTypesAndStaticImports()` is omitted when there are no identifiers to list
 
 ### Collection registration
 
@@ -319,6 +328,7 @@ the files you modified.
 
 ### Error handling
 
+- [ ] Optional arguments use `${1:-}` and required arguments use `${1:?message}`
 - [ ] Error and usage messages use `echo "..." >&2`
 
 ### Temporary files
@@ -333,11 +343,19 @@ the files you modified.
 
 ### Skills are small and reference instruction files
 
-- [ ] Skill file is small (under 30 lines) and references instruction files
+- [ ] Skill file is small (under 50 lines) and references instruction files
+
+### Skill naming convention
+
+- [ ] Skill name matches heading slugified to lowercase kebab-case
 
 ### Skill description determines when the skill triggers
 
 - [ ] Skill `description` clearly states when to use the skill
+
+### Reference skills by slash-command name
+
+- [ ] Skill references in prose use `` `/skill-name` `` as link text
 
 ## Testing Conventions (`testing.instructions.md`)
 
@@ -349,6 +367,12 @@ the files you modified.
 - [ ] Use distinct values per test line
 - [ ] Use metasyntactic variable names
 - [ ] Format test source strings with Google Java Format
+
+### Documentation module testing
+
+- [ ] `documentation-support` tests use `Compilation.compileWithDocumentationGenerator()`
+- [ ] `documentation-support` tests verify JSON output with `Json.read()` and AssertJ
+- [ ] `documentation-support` tests use `@TempDir` for temporary output directories
 
 ### Mutation testing
 

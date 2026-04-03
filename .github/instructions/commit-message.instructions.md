@@ -54,13 +54,18 @@ local-only commits.
 ## Commit body
 <!-- check: Commit body does not repeat or lightly paraphrase the subject line -->
 
+For commits that introduce or extend Refaster rules or `BugChecker`s, the
+subject line is usually sufficient. Add a body only when the motivation is
+non-obvious from the code itself. Do not narrate the optimization or restate
+what the rule does.
+
 When a commit warrants explanation beyond the subject line:
 
 - Wrap body paragraphs at 72 characters.
 - Focus on "what" and "why", not implementation details.
 - Use `While there,` to describe bundled incidental changes.
-- If multi disparate things are changed, use `Summary of changes:` followed by
-  a bulleted list for complex multi-part commits.
+- If multiple disparate things are changed, use `Summary of changes:` followed
+  by a bulleted list for complex multi-part commits.
 - Use `Resolves #N.` (with period) to close GitHub issues.
 - List URLs last, preceded by `See:` if there is one, and `See:\n` followed by
   a list of `- URL` items if there are multiple.
@@ -126,7 +131,7 @@ The following libraries have dedicated release notes or wiki pages that must be
 included as the first URL:
 
 | Library | Versions | Release notes URL pattern |
-|---|---|
+|---|---|---|
 | Jackson | major/minor/patch | `https://github.com/FasterXML/jackson/wiki/Jackson-Release-{version}` |
 | Spring Boot | major/minor | `https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-{version}-Release-Notes` |
 | Spring Framework | major/minor | `https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-{version}-Release-Notes` |
@@ -135,7 +140,7 @@ included as the first URL:
 In these URL patterns, `{version}` generally refers to the major.minor (e.g.
 7.1) or major.minor.patch (e.g. 7.1.2) version, as applicable. In case of
 Jackson, trailing zero versions are omitted (so 7.1.0 becomes 7.1). Check past
-upgrade commits for examples. Also consult page upgrade commits to discover
+upgrade commits for examples. Also consult past upgrade commits to discover
 similar pages for other libraries.
 
 Again: in case of a large version bump, include all release notes that apply.

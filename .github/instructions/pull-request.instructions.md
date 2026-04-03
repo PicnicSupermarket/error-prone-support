@@ -3,7 +3,7 @@
 This document describes the conventions for creating and formatting pull
 requests in this repository. For commit message conventions (which determine
 the PR title and suggested commit message), see
-[`commit-message.instructions.md`][commit-message-instructions].
+[`commit-message.instructions.md`][commit-message].
 
 ## PR title
 <!-- check: PR title matches the commit message summary (without `(#N)`) -->
@@ -52,5 +52,5 @@ After the PR is created and the PR number is known, edit the description to add
 the ` (#N)` suffix to the summary line inside the code block.
 
 [assign-milestone-workflow]: ../workflows/assign-milestone.yml
-[commit-message-instructions]: commit-message.instructions.md
+[commit-message]: commit-message.instructions.md
 [github-release]: ../release.yml

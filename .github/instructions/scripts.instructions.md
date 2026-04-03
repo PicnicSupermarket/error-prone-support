@@ -146,7 +146,7 @@ fi
 <!-- check: skip -->
 
 ### Argument validation
-<!-- check: skip -->
+<!-- check: Optional arguments use `${1:-}` and required arguments use `${1:?message}` -->
 
 Validate argument counts early with a usage message:
 

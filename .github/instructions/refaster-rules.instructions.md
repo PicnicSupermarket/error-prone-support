@@ -73,7 +73,7 @@ Conventions:
     BigDecimal}` or `{@code int}`, not an abstract class such as
     `AbstractBigDecimalAssert` or `AbstractIntegerAssert`).
   - For migration collections (annotated with `@TypeMigration`): `Refaster
-    rules that replace {SourceLibrary} APIs with {TargetLibrary} equivalents.
+    rules that replace {SourceLibrary} APIs with {TargetLibrary} equivalents.`
   - For other rule collections: `Refaster rules related to expressions dealing
     with {@link Topic}s.`
 - Each rule is a `static final class` nested inside the outer class.
@@ -316,7 +316,7 @@ suffixes (e.g., `addTo`/`elementsToAdd` instead of
 | `T[]` | `array` |
 
 ### Rule named after `@AfterTemplate` content
-<!-- check: Rule class name is derived from `@AfterTemplate` identifiers -->
+<!-- check: Rule class name is derived *only* from `@AfterTemplate` identifiers -->
 
 Rules are named after the code in their `@AfterTemplate` method, following
 these guidelines:
@@ -662,8 +662,7 @@ method contains an expression whose negation is best expressed not by simply
 prepending a `!`. For example, `a == b` is best negated as `a != b`, and `a <
 b` is best negated as `a >= b`. Do **not** use `@AlsoNegation` when the
 positive and negative cases have different preferred expressions (e.g.,
-`optional.isEmpty()` vs.  `optional.isPresent()`); write separate rules
-instead.
+`optional.isEmpty()` vs. `optional.isPresent()`); write separate rules instead.
 
 ### `@Matches` / `@NotMatches` for parameter constraints
 <!-- check: skip -->
@@ -786,7 +785,7 @@ static final class SomeStrictRule {
 ## Test input file
 <!-- check: Test method names match inner class names exactly (`testFooBar` for `FooBar`) -->
 <!-- check: Test class is named `{Topic}RulesTest` (not `*TestInput`/`*TestOutput`) -->
-<!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
+<!-- check: Dummy values follow canonical order: integers `1`, `2`, `3`, ...; strings `"foo"`, `"bar"`, `"baz"`, ... -->
 
 The test input file `{Topic}RulesTestInput.java` is placed in
 `src/test/resources/tech/picnic/errorprone/refasterrules/`:
@@ -872,7 +871,8 @@ Conventions:
   always import types.
 
 ### `elidedTypesAndStaticImports()`
-<!-- check: skip -->
+<!-- check: `elidedTypesAndStaticImports()` lists all replaced types/imports -->
+<!-- check: `elidedTypesAndStaticImports()` is omitted when there are no identifiers to list -->
 
 When the test uses types or static imports that appear in the input but not in
 the output (because the rule rewrites them away), override
@@ -891,6 +891,9 @@ public ImmutableSet<Object> elidedTypesAndStaticImports() {
 This tells the test framework that these imports are expected to disappear from
 the output. Only list types/imports that are not used by any `after-template`
 test expression in the output file.
+
+If no identifiers are elided, do not override this method. The default
+implementation in `RefasterRuleCollectionTestCase` returns an empty set.
 
 ### Avoid local variables
 <!-- check: skip -->
@@ -920,10 +923,9 @@ Optional<String> testOptionalIsEmpty() {
 ## Test output file
 <!-- check: skip -->
 
-The test output file `{Topic}RulesTestOutput.java` is in the same directory. It
-has a structure
-that is **identical** to the input file but with the _expected output_ after
-the rules are applied:
+The test output file `{Topic}RulesTestOutput.java` is in the same directory.
+It has a structure that is **identical** to the input file but with the
+_expected output_ after the rules are applied:
 
 ```java
 package tech.picnic.errorprone.refasterrules;

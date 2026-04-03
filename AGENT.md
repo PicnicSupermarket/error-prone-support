@@ -110,6 +110,28 @@ Implementation tasks must adhere to the following procedure:
     go.
 14. If applicable, commit changes once more.
 
+## Skills
+
+Skills in `.agents/skills/` provide focused guidance for specific task types.
+Invoke them by name (e.g., `/write-java-code` in Claude Code) or let the agent
+platform activate them automatically based on context.
+
+**Implementation:** [`bug-checker`][skill-bug-checker],
+[`refaster-rule`][skill-refaster-rule],
+[`write-java-code`][skill-write-java-code],
+[`write-documentation`][skill-write-documentation],
+[`write-github-actions-workflow`][skill-write-github-actions-workflow],
+[`write-shell-script`][skill-write-shell-script].
+
+**Workflow:** [`write-commit-message`][skill-write-commit-message],
+[`open-pull-request`][skill-open-pull-request],
+[`upgrade-dependency`][skill-upgrade-dependency].
+
+**Validation:** [`review-changes`][skill-review-changes],
+[`run-mutation-tests`][skill-run-mutation-tests],
+[`apply-self-check`][skill-apply-self-check],
+[`finalize-changes`][skill-finalize-changes].
+
 ## Code style
 
 When writing or modifying Java code in this repository, follow the conventions
@@ -121,21 +143,21 @@ When writing or modifying tests, also follow
 ## Task-specific instructions
 
 When working on Refaster rules (files with `*/refasterrules/*` paths), read
-[`.github/instructions/refaster-rules.instructions.md`][refaster-instructions]
-for detailed conventions and step-by-step instructions.
+[`.github/instructions/refaster-rules.instructions.md`][refaster-rules] for
+detailed conventions.
 
 When working on `BugChecker` implementations (files with `*/bugpatterns/*`
 paths), read
-[`.github/instructions/bug-checkers.instructions.md`][bug-checker-instructions]
-for detailed conventions and step-by-step instructions.
+[`.github/instructions/bug-checkers.instructions.md`][bug-checkers] for
+detailed conventions.
 
 When working on GitHub Actions workflows (files in `.github/workflows/`), read
 [`.github/instructions/github-actions.instructions.md`][github-actions] for
 detailed conventions.
 
 When working on shell scripts (`*.sh`), read
-[`.github/instructions/scripts.instructions.md`][scripts] for
-detailed conventions.
+[`.github/instructions/scripts.instructions.md`][scripts] for detailed
+conventions.
 
 ## Writing conventions
 
@@ -159,7 +181,7 @@ When creating a pull request, follow
 label, milestone, reviewer, and description conventions.
 
 [agents]: .github/instructions/agents.instructions.md
-[bug-checker-instructions]: .github/instructions/bug-checkers.instructions.md
+[bug-checkers]: .github/instructions/bug-checkers.instructions.md
 [commit-message]: .github/instructions/commit-message.instructions.md
 [contributing]: CONTRIBUTING.md
 [documentation]: .github/instructions/documentation.instructions.md
@@ -167,8 +189,21 @@ label, milestone, reviewer, and description conventions.
 [instructions]: .github/instructions/instructions.instructions.md
 [java-style]: .github/instructions/java-style.instructions.md
 [pull-request]: .github/instructions/pull-request.instructions.md
-[refaster-instructions]: .github/instructions/refaster-rules.instructions.md
+[refaster-rules]: .github/instructions/refaster-rules.instructions.md
 [review]: .github/instructions/review.instructions.md
 [scripts]: .github/instructions/scripts.instructions.md
+[skill-apply-self-check]: .agents/skills/apply-self-check/SKILL.md
+[skill-bug-checker]: .agents/skills/bug-checker/SKILL.md
+[skill-finalize-changes]: .agents/skills/finalize-changes/SKILL.md
+[skill-open-pull-request]: .agents/skills/open-pull-request/SKILL.md
+[skill-refaster-rule]: .agents/skills/refaster-rule/SKILL.md
+[skill-review-changes]: .agents/skills/review-changes/SKILL.md
+[skill-run-mutation-tests]: .agents/skills/run-mutation-tests/SKILL.md
 [skills]: .github/instructions/skills.instructions.md
+[skill-upgrade-dependency]: .agents/skills/upgrade-dependency/SKILL.md
+[skill-write-commit-message]: .agents/skills/write-commit-message/SKILL.md
+[skill-write-documentation]: .agents/skills/write-documentation/SKILL.md
+[skill-write-github-actions-workflow]: .agents/skills/write-github-actions-workflow/SKILL.md
+[skill-write-java-code]: .agents/skills/write-java-code/SKILL.md
+[skill-write-shell-script]: .agents/skills/write-shell-script/SKILL.md
 [testing]: .github/instructions/testing.instructions.md

@@ -154,7 +154,9 @@ Do not specify action `with:` inputs when they match the action's default
 value. This reduces noise and makes intentional overrides obvious.
 
 ## Naming conventions
-<!-- check: skip -->
+<!-- check: Workflow names use imperative form (e.g., "Run mutation tests") -->
+<!-- check: Job names are short, lowercase identifiers (e.g., `build`, `validate`) -->
+<!-- check: Step names use imperative form (e.g., "Install Harden-Runner") -->
 
 - **Workflow names**: use imperative form ("Run mutation tests", "Validate
   review checklist"). Avoid bare noun phrases ("Mutation testing").

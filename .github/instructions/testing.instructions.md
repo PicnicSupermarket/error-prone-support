@@ -10,8 +10,8 @@ different testing patterns used across modules.
 
 For domain-specific testing conventions, see also:
 
-- The test file structure of [Bug checkers][bug-checker-instructions].
-- The test input/output file structure of [Refaster rules][refaster-instructions].
+- The test file structure of [Bug checkers][bug-checkers].
+- The test input/output file structure of [Refaster rules][refaster-rules].
 
 ## General conventions
 
@@ -25,7 +25,7 @@ For domain-specific testing conventions, see also:
   tests without shared mutable state.
 - Test code follows the same style conventions as production code (immutable
   collections, functional style, etc.). See
-  [java-style.instructions.md][java-style-instructions].
+  [java-style.instructions.md][java-style].
 
 ### Test method naming
 <!-- check: skip -->
@@ -75,8 +75,7 @@ ImmutableSet.of(
 For string test values, use: `"foo"`, `"bar"`, `"baz"`, `"qux"`, `"quux"`,
 `"quuz"`, `"corge"` and other metasyntactic variables, in their canonical
 order. For integers, use `1`, `2`, `3`, etc. For detailed conventions on
-Refaster rule design, see
-[refaster-rules.instructions.md][refaster-instructions].
+Refaster rule design, see [refaster-rules.instructions.md][refaster-rules].
 
 ### Format test source strings with Google Java Format
 
@@ -88,13 +87,13 @@ indentation). Apply the same formatting rules as production code.
 `BugChecker` tests use a two-phase pattern: identification (does the check flag
 the right code?) and replacement (does the suggested fix produce correct
 output?). For the complete conventions, templates, and examples, see
-[`bug-checkers.instructions.md`][bug-checker-instructions].
+[`bug-checkers.instructions.md`][bug-checkers].
 
 ## Refaster rule testing
 
 Refaster rules are tested using input/output file pairs. For the complete
 conventions, templates, and examples, see
-[`refaster-rules.instructions.md`][refaster-instructions].
+[`refaster-rules.instructions.md`][refaster-rules].
 
 ## Utility and matcher testing
 
@@ -142,6 +141,9 @@ using the same `CompilationTestHelper` approach with a custom wrapper
 diagnostics.
 
 ## Documentation module testing
+<!-- check: `documentation-support` tests use `Compilation.compileWithDocumentationGenerator()` -->
+<!-- check: `documentation-support` tests verify JSON output with `Json.read()` and AssertJ -->
+<!-- check: `documentation-support` tests use `@TempDir` for temporary output directories -->
 
 Tests in `documentation-support` verify documentation generation from Java
 source annotations. They typically:
@@ -201,6 +203,6 @@ observable in test output. Mark such guards with a `/* Fast path: <reason>. */`
 comment to signal that the early return is intentional and the resulting mutant
 is unkillable.
 
-[bug-checker-instructions]: bug-checkers.instructions.md
-[java-style-instructions]: java-style.instructions.md
-[refaster-instructions]: refaster-rules.instructions.md
+[bug-checkers]: bug-checkers.instructions.md
+[java-style]: java-style.instructions.md
+[refaster-rules]: refaster-rules.instructions.md

@@ -102,17 +102,15 @@ testing conventions.
 Bug checkers live in `error-prone-contrib`, `error-prone-experimental`, and
 `error-prone-guidelines`. External contributors will generally want to improve
 or introduce checkers in `error-prone-contrib`. See
-[`.github/instructions/bug-checkers.instructions.md`][bug-checker-instructions]
-for a comprehensive step-by-step guide to creating new checkers, including
-advanced patterns, test templates, and common mistakes.
+[`.github/instructions/bug-checkers.instructions.md`][bug-checkers] for the
+conventions covering checker implementation, testing, and advanced patterns.
 
 ### Refaster rule development
 
 Refaster rules live in
 `error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/`. See
-[`.github/instructions/refaster-rules.instructions.md`][refaster-instructions]
-for a comprehensive step-by-step guide to creating new Refaster rules,
-including advanced patterns, test templates, and common mistakes.
+[`.github/instructions/refaster-rules.instructions.md`][refaster-rules] for the
+conventions covering rule implementation, testing, and advanced patterns.
 
 ### Testing conventions
 
@@ -126,7 +124,7 @@ See [`.github/instructions/java-style.instructions.md`][java-style] for
 detailed code style conventions and a list of key utilities from the
 `error-prone-utils` module.
 
-[bug-checker-instructions]: .github/instructions/bug-checkers.instructions.md
+[bug-checkers]: .github/instructions/bug-checkers.instructions.md
 [java-style]: .github/instructions/java-style.instructions.md
 [documentation-java]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java
 [error-prone-criteria]: https://errorprone.info/docs/criteria
@@ -136,6 +134,6 @@ detailed code style conventions and a list of key utilities from the
 [error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [error-prone-support-patch]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
-[refaster-instructions]: .github/instructions/refaster-rules.instructions.md
+[refaster-rules]: .github/instructions/refaster-rules.instructions.md
 [refaster-rules-test]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java
 [testing]: .github/instructions/testing.instructions.md

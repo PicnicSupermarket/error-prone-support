@@ -1,12 +1,12 @@
 ---
-name: create-refaster-rule
+name: refaster-rule
 description: >
   Use this skill when asked to create or modify Refaster rules in this
   repository. It covers choosing the right rule collection, updating test
   fixtures and registration, and following the repository validation workflow.
 ---
 
-# Create Refaster Rule
+# Refaster Rule
 
 Use this skill for requests to add or change files in `*/refasterrules/*`.
 
@@ -21,9 +21,10 @@ for the full conventions. Then:
 4. **Register the collection** (if new) in `RefasterRulesTest.java`.
 5. **Verify** by running the tests.
 6. **Review** all changes against
-   [`.github/instructions/review.instructions.md`][review], and go over the
-   instructions to validate that all requirements are met.
-7. **Apply the new rule** to the codebase and validate the full build.
+   [`.github/instructions/review.instructions.md`][review].
+7. **Follow the workflow** in [`AGENT.md`][agent-md] (apply suggestions, full
+   build).
 
+[agent-md]: ../../../AGENT.md
 [refaster-rules]: ../../../.github/instructions/refaster-rules.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md
