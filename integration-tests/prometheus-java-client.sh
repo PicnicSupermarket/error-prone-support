@@ -14,7 +14,7 @@ validation_error_prone_flags=''
 validation_build_flags=''
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
-  >&2 echo "Usage: ${0} [--sync] [<report_directory>]"
+  echo "Usage: ${0} [--sync] [<report_directory>]" >&2
   exit 1
 fi
 

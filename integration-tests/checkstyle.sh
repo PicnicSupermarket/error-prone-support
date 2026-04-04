@@ -16,7 +16,7 @@ validation_error_prone_flags=''
 validation_build_flags='-Dtest=!AllChecksTest#allCheckstyleModulesHaveXdocDocumentation,!XdocsCategoryIndexTest#allChecksListedInCategoryIndexAndDescriptionMatches,!XdocsJavaDocsTest#allCheckSectionJavaDocs,!XdocsMobileWrapperTest#allCheckSectionMobileWrapper,!XdocsPagesTest#allCheckSections,!XdocsPagesTest#allModulesPageInSyncWithModuleSummaries,!XdocsPagesTest#allSubSections,!XdocsPagesTest#allXmlExamples'
 
 if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
-  >&2 echo "Usage: ${0} [--sync] [<report_directory>]"
+  echo "Usage: ${0} [--sync] [<report_directory>]" >&2
   exit 1
 fi
 
