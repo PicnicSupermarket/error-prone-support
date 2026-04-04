@@ -7,6 +7,7 @@ import static java.util.Comparator.naturalOrder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import com.google.common.collect.UnmodifiableIterator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,7 +19,12 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Arrays.class, Collections.class, Comparator.class, Streams.class, naturalOrder());
+        Arrays.class,
+        Collections.class,
+        Comparator.class,
+        Streams.class,
+        UnmodifiableIterator.class,
+        naturalOrder());
   }
 
   ImmutableList.Builder<String> testImmutableListBuilder() {
@@ -53,6 +59,21 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableList.sortedCopyOf(Comparator.comparing(String::length), ImmutableSet.of("foo")),
         ImmutableList.sortedCopyOf(
             Comparator.comparing(String::isEmpty), ImmutableSet.of("bar")::iterator));
+  }
+
+  ImmutableSet<java.util.Iterator<Integer>> testImmutableListSortedCopyOfIterator() {
+    return ImmutableSet.of(
+        ImmutableList.sortedCopyOf(ImmutableSet.of(1)).iterator(),
+        ImmutableList.sortedCopyOf(ImmutableSet.of(2)::iterator).iterator());
+  }
+
+  ImmutableSet<java.util.Iterator<String>> testImmutableListSortedCopyOfIteratorWithComparator() {
+    return ImmutableSet.of(
+        ImmutableList.sortedCopyOf(Comparator.comparing(String::length), ImmutableSet.of("foo"))
+            .iterator(),
+        ImmutableList.sortedCopyOf(
+                Comparator.comparing(String::isEmpty), ImmutableSet.of("bar")::iterator)
+            .iterator());
   }
 
   ImmutableList<Integer> testStreamToDistinctImmutableList() {
