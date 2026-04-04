@@ -9,18 +9,18 @@
 set -e -u -o pipefail
 
 if [ -z "${SONAR_TOKEN}" ]; then
-  echo 'Environment variable `SONAR_TOKEN` is not set.'
+  echo 'Environment variable `SONAR_TOKEN` is not set.' >&2
   exit 1
 fi
 
-export_profile() {
+function export_profile() {
   local profile="${1}"
 
   curl --fail --silent --user "${SONAR_TOKEN}:" \
       "https://sonarcloud.io/api/qualityprofiles/export?qualityProfile=${profile}&language=java&organization=picnic-technologies"
 }
 
-tabulate() {
+function tabulate() {
   faq --raw-output '
     def enumerate_params:
       if .parameters == "" then

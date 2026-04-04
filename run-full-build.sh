@@ -13,7 +13,7 @@ settings="$(dirname "${0}")/settings.xml"
 toolchains="${HOME}/.m2/toolchains.xml"
 
 if ! grep -q "<version>${TARGET_JDK}</version>" "${toolchains}"; then
-  echo "Error: JDK version ${TARGET_JDK} not specified in ${toolchains}." 1>&2
+  echo "Error: JDK version ${TARGET_JDK} not specified in ${toolchains}." >&2
   exit 1
 fi
 
