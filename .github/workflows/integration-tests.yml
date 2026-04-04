@@ -12,7 +12,7 @@
 # subset of integration tests to run.
 # See this example of a dynamic build matrix:
 # https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
-name: Integration tests
+name: Run integration tests
 on:
   issue_comment:
     types: [ created ]
@@ -70,7 +70,6 @@ jobs:
           # integration test projects have unit tests that start Docker
           # containers.
           disable-sudo: true
-          egress-policy: block
           # XXX: After updating the validation build flags in
           # `integration-tests/prometheus-java-client.sh`, review whether the
           # Docker domains specified here can be dropped.

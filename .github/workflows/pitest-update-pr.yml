@@ -1,14 +1,13 @@
 # Updates a pull request based on the corresponding mutation testing analysis
 # performed by the `pitest-analyze-pr.yml` workflow. See
 # https://blog.pitest.org/oss-pitest-pr/ for details.
-name: Mutation testing - post results
+name: Post mutation test results
 on:
   workflow_run:
     workflows: ["Mutation testing"]
-    types:
-      - completed
+    types: [ completed ]
 permissions:
-  actions: read
+  contents: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -25,7 +24,6 @@ jobs:
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             api.github.com:443

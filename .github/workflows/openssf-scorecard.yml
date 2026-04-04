@@ -3,7 +3,7 @@
 # registered with GitHub's code scanning dashboard. When a pull request is
 # analyzed, any offending lines are annotated. See
 # https://securityscorecards.dev for details.
-name: OpenSSF Scorecard update
+name: Update OpenSSF Scorecard
 on:
   pull_request:
   push:
@@ -26,7 +26,6 @@ jobs:
           # XXX: We can't currently use `disable-sudo-and-containers` here, as
           # the OpenSSF Scorecard analysis step below runs a Docker container.
           disable-sudo: true
-          egress-policy: block
           allowed-endpoints: >
             api.deps.dev:443
             api.github.com:443

@@ -1,11 +1,7 @@
 name: Suggest PR commit message
 on:
   pull_request:
-    types:
-      - edited
-      - opened
-      - reopened
-      - synchronize
+    types: [ edited, opened, reopened, synchronize ]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -32,7 +28,7 @@ jobs:
     # No commit message is suggested for code originating from forked
     # repositories, as such workflow runs do not have access to the requisite
     # secrets.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
       contents: read
       pull-requests: write
@@ -48,7 +44,6 @@ jobs:
           # XXX: Consider splitting this workflow into three jobs, with
           # `openai/codex-action` being the sole step of the second job.
           disable-sudo-and-containers: false
-          egress-policy: block
           allowed-endpoints: ${{ env.ALLOWED_ENDPOINTS }}
       - name: Resolve pull request metadata
         id: pr-details
