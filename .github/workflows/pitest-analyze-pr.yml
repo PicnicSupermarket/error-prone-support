@@ -2,7 +2,7 @@
 # uploads the results. The associated PR is subsequently updated by the
 # `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
 # for details.
-name: Mutation testing
+name: Run mutation tests
 on:
   pull_request:
 permissions:
@@ -17,7 +17,6 @@ jobs:
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443

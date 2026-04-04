@@ -2,7 +2,7 @@
 # Identified issues are registered with GitHub's code scanning dashboard. When
 # a pull request is analyzed, any offending lines are annotated. See
 # https://codeql.github.com for details.
-name: CodeQL analysis
+name: Run CodeQL analysis
 on:
   pull_request:
   push:
@@ -27,7 +27,6 @@ jobs:
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             api.github.com:443
@@ -48,7 +47,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
-        if: matrix.language == 'java'
+        if: ${{ matrix.language == 'java' }}
         run: mvn package -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1

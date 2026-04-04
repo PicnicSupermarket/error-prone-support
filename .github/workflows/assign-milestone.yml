@@ -1,8 +1,7 @@
 name: Assign milestone to dependency upgrade PR
 on:
   pull_request_target:
-    types:
-      - labeled
+    types: [ labeled ]
 permissions:
   contents: read
 jobs:
@@ -18,7 +17,6 @@ jobs:
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.github.com:443
       - name: Assign first upcoming milestone

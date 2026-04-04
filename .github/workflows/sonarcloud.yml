@@ -1,6 +1,6 @@
 # Analyzes the code base using SonarCloud. See
 # https://sonarcloud.io/project/overview?id=PicnicSupermarket_error-prone-support.
-name: SonarCloud analysis
+name: Run SonarCloud analysis
 on:
   pull_request:
   push:
@@ -15,14 +15,13 @@ jobs:
   analyze:
     # Analysis of code in forked repositories is skipped, as such workflow runs
     # do not have access to the requisite secrets.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             analysis-sensorcache-eu-central-1-prod.s3.amazonaws.com:443
             api.adoptium.net:443

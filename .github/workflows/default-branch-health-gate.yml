@@ -9,12 +9,7 @@
 name: Require that all checks on the default branch pass
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - labeled
-      - unlabeled
+    types: [ opened, synchronize, reopened, labeled, unlabeled ]
 permissions:
   contents: read
 jobs:
@@ -26,7 +21,6 @@ jobs:
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.github.com:443
             github.com:443
