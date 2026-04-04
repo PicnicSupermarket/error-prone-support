@@ -189,6 +189,8 @@ rules][refaster-rules].
 
 ## 👷 Developing Error Prone Support
 
+<!-- XXX: Move this to `CONTRIBUTING.md`. -->
+
 This is a [Maven][maven] project, so running `mvn clean install` performs a
 full clean build and installs the library to your local Maven repository. While
 the project targets JDK 21, building it requires JDK 25. If you use
@@ -261,9 +263,9 @@ details.
 ## 💡 How it works
 
 This project provides additional [`BugChecker`][error-prone-bugchecker]
-implementations.
-
-<!-- XXX: Extend this section. -->
+implementations and [Refaster][refaster] rules. See the [development
+guide][contributing-dev-guide] in `CONTRIBUTING.md` for details on the project
+architecture, how to write new checks and rules, and testing conventions.
 
 ## ✍️ Contributing
 
@@ -289,6 +291,7 @@ OSS license generously provided by [Arcmutate][arcmutate]. Check them out!
 [codeql-master]: https://github.com/PicnicSupermarket/error-prone-support/actions/workflows/codeql.yml?query=branch:master+event:push
 [conference-talk]: https://www.youtube.com/watch?v=-47WD-3wKBs
 [contributing]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md
+[contributing-dev-guide]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-development-guide
 [contributing-pull-request]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/CONTRIBUTING.md#-opening-a-pull-request
 [error-prone-bugchecker]: https://github.com/google/error-prone/blob/master/check_api/src/main/java/com/google/errorprone/bugpatterns/BugChecker.java
 [error-prone-fork-packages]: https://github.com/PicnicSupermarket/error-prone/packages

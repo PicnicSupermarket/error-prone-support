@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./apply-error-prone-suggestions.sh:*)",
+      "Bash(./generate-review-checklist.sh)",
+      "Bash(./run-branch-mutation-tests.sh:*)",
+      "Bash(./run-full-build.sh:*)",
+      "Bash(sdk env:*)"
+    ]
+  }
+}

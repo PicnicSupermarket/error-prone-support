@@ -75,10 +75,9 @@ jobs:
             core.setOutput('baseSha', pr.base.sha ?? '');
             core.setOutput('headRef', pr.head.ref ?? '');
             core.setOutput('headSha', pr.head.sha ?? '');
-      - name: Check out pull request head
+      - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ steps.pr-details.outputs.headSha }}
           fetch-depth: 0
       - name: Prepare Codex prompt
         id: prompt
@@ -107,45 +106,66 @@ jobs:
             const baseSha = env.BASE_SHA;
             const headRef = env.HEAD_REF;
             const headSha = env.HEAD_SHA;
+            const commitMessageInstructions = fs
+              .readFileSync('.github/instructions/commit-message.instructions.md', 'utf8')
+              .trim();
+            const reviewInstructions = fs
+              .readFileSync('.github/instructions/review.instructions.md', 'utf8')
+              .trim();
 
             const cleanedBody = (body || '').trim() || '<no pull request description>';
 
             // Determine whether this is an upgrade PR.
-            const upgradeMatch = title?.match(/^Upgrade (.+?) \S+ -> \S+/);
+            const upgradeMatch = title?.match(/^Upgrade (.+?) (\S+) -> (\S+)/);
             const upgradeLibrary = upgradeMatch ? upgradeMatch[1] : null;
+            const upgradeFromVersion = upgradeMatch ? upgradeMatch[2] : null;
+            const upgradeToVersion = upgradeMatch ? upgradeMatch[3] : null;
+            const commitMessageReviewSection = reviewInstructions
+              .split(/^## /m)
+              .find(section => section.startsWith('Commit Message Conventions '))
+              ?.trim();
+
+            if (!commitMessageReviewSection) {
+              throw new Error('Unable to locate commit message section in review instructions');
+            }
 
             // Extract domain names from list of endpoints to which Harden-Runner will allow access.
             const allowedDomains = process.env.ALLOWED_ENDPOINTS.split(/\s+/).map(line => line.split(':')[0]).filter(Boolean);
 
             const instructions = `
-            You are an experienced maintainer helping to craft the squash commit message for a GitHub pull request.
+            <task>
+            Craft the squash commit message for this GitHub pull request.
+            </task>
 
-            Pull request metadata:
-            - Repository: ${repository}
-            - Number: ${prNumber}
-            - Title: ${title}
-            - Author: ${author}
-            - Base branch: ${baseRef} (${baseSha})
-            - Head branch: ${headRef} (${headSha})
+            <context>
+            Repository: ${repository}
+            Number: ${prNumber}
+            Title: ${title}
+            Author: ${author}
+            Base branch: ${baseRef} (${baseSha})
+            Head branch: ${headRef} (${headSha})
 
             Pull request description:
             \`\`\`
             ${cleanedBody}
             \`\`\`
+            </context>
 
-            Requirements:
-            1. Write the summary line in the imperative mood. Try not to exceed 80 characters.
-            2. End the summary line with the PR number in parentheses, i.e., " (#${prNumber})".
-            3. Wrap each body paragraph at 72 characters. Focus on the "what" and "why" rather than implementation details.
-            4. Keep the overall message concise.
-            5. Match the established format used in similar past commits.
-            6. Wrap code references in backticks.
-            7. For dependency upgrades in particular, *very precisely* follow the pattern of past commit messages: reuse the summary wording (only adjust version numbers) and list updated changelog, release note, and diff URLs in the body.
-            8. Don't hallucinate URLs, version numbers, or other factual information.
-            9. Never split URLs across multiple lines, even if they exceed 72 characters.
-            10. If the pull request description already contains a suitable commit message, prefer using that as-is.
+            <rules-and-examples>
+            Treat the following contents of \`.github/instructions/commit-message.instructions.md\` as mandatory:
 
-            To help you craft an appropriate commit message, execute the following commands to gather context:
+            ~~~~md
+            ${commitMessageInstructions}
+            ~~~~
+
+            Workflow-specific notes:
+            - End the summary line with " (#${prNumber})".
+            - If the pull request description already contains a suitable commit message, prefer using that as-is.
+            ${upgradeLibrary ? `- This is an upgrade PR for ${upgradeLibrary} (${upgradeFromVersion} -> ${upgradeToVersion}). Prefer a minimal body, often just the \`See:\` section. Use recent upgrade commits and fetched release tags as the source of truth for URLs. Do not invent missing milestone or RC tags or swap in migration guides for established release notes pages.` : ''}
+            </rules-and-examples>
+
+            <commands>
+            Run these commands before drafting the message:
 
             1. Get the changed files:
             \`\`\`
@@ -157,49 +177,32 @@ jobs:
             git diff ${baseSha}...${headSha} | head -500
             \`\`\`
 
-            ${upgradeLibrary ? `3. Since this appears to be an upgrade PR for ${upgradeLibrary}, collect relevant past upgrade commit messages, and consider the general style of other recent upgrade commit messages:
+            ${upgradeLibrary ? `3. Collect recent upgrade commit messages for ${upgradeLibrary} and compare them with other upgrade commits:
             \`\`\`
             git log -P -i --grep '^Upgrade \\Q${upgradeLibrary}\\E' --pretty='format:%h %B%n---' -n 20 ${baseSha}
             git log -P -i --grep '^Upgrade (?!\\Q${upgradeLibrary}\\E)' --pretty='format:%h %B%n---' -n 150 ${baseSha}
             \`\`\`
 
-            4. If this is a GitHub-hosted library, collect milestones and release candidates that may not be included in the changelog:
+            4. If this library is hosted on GitHub, identify the concrete upstream owner and repository, replace \`OWNER/REPO\`, and fetch published tags:
             \`\`\`
-            curl -s "https://api.github.com/repos/{owner}/{repo}/releases?per_page=100" | jq -r '.[].tag_name' | sort -h | tail -n 50
+            curl -s "https://api.github.com/repos/OWNER/REPO/releases?per_page=100" | jq -r '.[].tag_name' | sort -V | tail -n 50
             \`\`\`` : `3. Get examples of recent non-upgrade commits:
             \`\`\`
             git log --grep '^Upgrade' --invert-grep --pretty='format:%h %B%n---' -n 50 ${baseSha}
             \`\`\``}
 
-            Some further guidelines to help you craft good upgrade commit messages:
-            - Unless highly salient, don't summarize code changes made as part of the upgrade.
-            - Don't bother linking to anchors within changelogs or release notes; just link to the main page.
-            - For GitHub-hosted projects, always link to all relevant GitHub release pages, including those for milestones, release candidates and other intermediate versions. This is especially important for major and minor version upgrades of the following libraries:
-              - Jackson
-              - JUnit
-              - Micrometer
-              - Project Reactor
-              - Spring Framework
-              - Spring Boot
-              - Spring Security
-            - For GitHub-hosted projects, always link to the full diff between versions.
-            - Enumerate links in the following order:
-              1. First, link to custom release note documents.
-              2. Then list all GitHub release links in ascending order.
-              3. Finally, provide the full diff link.
-            - If the upgrade involves multiple dependencies, group the links by dependency.
-            - When the Maven \u0060version.error-prone-orig\u0060 property is changed, this upgrades both Error Prone and Picnic's Error Prone fork. In this case:
-              - Make sure that the commit message includes a diff URL for the latter.
-              - Don't explicitly mention that \u0060version.error-prone-orig\u0060 got changed; just focus on the fact that Error Prone is being upgraded.
-            - For major and minor version upgrades, check past dependency upgrade commit messages to infer documentation, blog or wiki URLs to which to link. Do this for at least the following libraries:
-              - Jackson: https://github.com/FasterXML/jackson/wiki/Jackson-Release-{version}
-              - Spring Framework: https://github.com/spring-projects/spring-framework/wiki/Spring-Framework-{version}-Release-Notes
-              - Spring Boot: https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-{version}-Release-Notes
-              - Spring Security: https://docs.spring.io/spring-security/reference/{version}/whats-new.html
-            - If you really can't find relevant URLs to reference, and there's nothing else to say, it's acceptable to have a commit message that only consists of the summary line.
-
-            Note that your network access is limited to the following domains; don't attempt \`curl\` or \`wget\` commands to other hosts:
+            Your network access is limited to:
             ${allowedDomains.map(domain => `- ${domain}`).join('\n')}
+            </commands>
+
+            <validation>
+            Before returning JSON, verify the following:
+            ${`## ${commitMessageReviewSection}`}
+
+            ### Subject line format (continued)
+
+            - [ ] The summary ends with " (#${prNumber})".
+            </validation>
 
             Return a JSON object with the following shape:
             {
@@ -224,6 +227,7 @@ jobs:
           sandbox: danger-full-access
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           prompt-file: /tmp/codex-prompt-suggest-commit-message.md
+          model: gpt-5.4-nano
           output-schema: |
             {
               "type": "object",
