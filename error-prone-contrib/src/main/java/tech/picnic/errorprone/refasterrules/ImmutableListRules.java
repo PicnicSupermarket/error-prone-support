@@ -10,6 +10,7 @@ import static java.util.Comparator.naturalOrder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
@@ -129,6 +130,48 @@ final class ImmutableListRules {
     @AfterTemplate
     ImmutableList<T> after(Comparator<? super T> cmp, Collection<T> iterable) {
       return ImmutableList.sortedCopyOf(cmp, iterable);
+    }
+  }
+
+  /**
+   * Prefer {@code ImmutableList.sortedCopyOf(iterable).iterator()} over less efficient
+   * alternatives.
+   */
+  static final class ImmutableListSortedCopyOfIterator<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Iterator<T> before(Iterable<T> iterable) {
+      return Streams.stream(iterable).sorted().iterator();
+    }
+
+    @BeforeTemplate
+    Iterator<T> before(Collection<T> iterable) {
+      return iterable.stream().sorted().iterator();
+    }
+
+    @AfterTemplate
+    UnmodifiableIterator<T> after(Iterable<T> iterable) {
+      return ImmutableList.sortedCopyOf(iterable).iterator();
+    }
+  }
+
+  /**
+   * Prefer {@code ImmutableList.sortedCopyOf(cmp, iterable).iterator()} over less efficient
+   * alternatives.
+   */
+  static final class ImmutableListSortedCopyOfIteratorWithComparator<S, T extends S> {
+    @BeforeTemplate
+    Iterator<T> before(Comparator<S> cmp, Iterable<T> iterable) {
+      return Streams.stream(iterable).sorted(cmp).iterator();
+    }
+
+    @BeforeTemplate
+    Iterator<T> before(Comparator<S> cmp, Collection<T> iterable) {
+      return iterable.stream().sorted(cmp).iterator();
+    }
+
+    @AfterTemplate
+    UnmodifiableIterator<T> after(Comparator<S> cmp, Iterable<T> iterable) {
+      return ImmutableList.sortedCopyOf(cmp, iterable).iterator();
     }
   }
 
