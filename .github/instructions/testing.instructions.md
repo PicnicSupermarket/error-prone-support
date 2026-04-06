@@ -51,8 +51,9 @@ to read and focused on the behavior under test.
 This applies to Refaster tests and `BugChecker` replacement tests.
 
 Use different numbers and strings on each line in test cases so that
-correctness of rewriting is verifiable. If two lines used the same values, a
-faulty rewrite that swaps arguments would go undetected.
+correctness of rewriting is verifiable. If two lines use the same values, a
+faulty rewrite that swaps arguments or applies to the wrong line would go
+undetected.
 
 **Do:**
 
