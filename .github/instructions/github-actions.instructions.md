@@ -147,6 +147,41 @@ if: ${{ github.ref == github.event.repository.default_branch }}
 if: github.ref == github.event.repository.default_branch
 ```
 
+## Never interpolate `${{ }}` expressions into `run:` or `script:` blocks
+<!-- check: No `${{ }}` expressions are interpolated into `run:` or `script:` blocks -->
+
+Never embed `${{ expression }}` directly inside a `run:` shell block or a
+`github-script` `script:` block. GitHub Actions evaluates the expression before
+passing the result to the shell or JavaScript engine. If the expression
+contains user-controlled content (e.g. a PR title, comment body, or branch name
+from a fork), the substituted value can break out of its string context and
+execute arbitrary code.
+
+Pass the value through an environment variable instead; the shell and the
+JavaScript runtime then treat it as data, not code.
+
+**Do:**
+
+```yaml
+- name: Use value
+  run: echo "${MY_VALUE}"
+  env:
+    MY_VALUE: ${{ github.event.comment.body }}
+```
+
+**Don't:**
+
+```yaml
+- name: Use value
+  run: echo "${{ github.event.comment.body }}"
+```
+
+The same rule applies to `github-script` `script:` blocks: pass expressions
+through `env:` and read them via `process.env.MY_VAR`.
+
+Exception: runner-owned context values such as `runner.temp` and `runner.os`
+cannot contain user-supplied content, so interpolating them directly is safe.
+
 ## Omit action inputs that match their default value
 <!-- check: Action inputs that match their defaults are omitted -->
 

@@ -135,6 +135,10 @@ the files you modified.
 
 - [ ] All `if:` conditions use `${{ }}` wrapping
 
+### Never interpolate `${{ }}` expressions into `run:` or `script:` blocks
+
+- [ ] No `${{ }}` expressions are interpolated into `run:` or `script:` blocks
+
 ### Omit action inputs that match their default value
 
 - [ ] Action inputs that match their defaults are omitted
