@@ -4,7 +4,7 @@
 name: Post mutation test results
 on:
   workflow_run:
-    workflows: ["Mutation testing"]
+    workflows: ["Run mutation tests"]
     types: [ completed ]
 permissions:
   contents: read
