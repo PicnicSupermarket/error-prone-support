@@ -4,7 +4,6 @@ import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.THIRD;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -98,7 +97,7 @@ final class FluxImplicitBlockTest {
             "    Flux.just(2).toStream();",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -135,7 +134,7 @@ final class FluxImplicitBlockTest {
             "    Flux.just(6).collect(toImmutableList()).block().stream() /* e */;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -172,6 +171,6 @@ final class FluxImplicitBlockTest {
             "    Flux.just(6).collect(toList()).block().stream() /* e */;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

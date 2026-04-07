@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -491,6 +490,6 @@ final class JUnitValueSourceTest {
             "  @ValueSource(ints = 1)",
             "  void sameNameFactory(int i) {}",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -203,6 +202,6 @@ final class NonStaticImportTest {
             "    private static final Instant OTHER_MAX = Instant.MAX;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

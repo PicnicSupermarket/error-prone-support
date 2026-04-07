@@ -12,7 +12,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugCheckerInfo;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.CompilationTestHelper;
 import java.util.regex.Pattern;
@@ -224,7 +223,7 @@ final class RefasterTest {
             "    boolean b4 = \"qux\".length() == 3;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -252,6 +251,6 @@ final class RefasterTest {
             "    boolean b4 = \"qux\".toCharArray().length == 3;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
