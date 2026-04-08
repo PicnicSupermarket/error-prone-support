@@ -69,7 +69,7 @@ the conventions governing these instruction files themselves.
 <!-- check: skip -->
 
 `CONTRIBUTING.md` is the entry point for human contributors. It covers bug
-reporting, PR process, and module overview, and cross-references the
+reporting, the PR process and module overview, and cross-references the
 instruction files for detailed coding conventions.
 
 [agent-skills]: https://agentskills.io

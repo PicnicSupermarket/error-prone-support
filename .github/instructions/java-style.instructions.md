@@ -528,7 +528,7 @@ MethodSymbol method = getSymbol(tree);
 ```
 
 ### Use `error-prone-utils` utilities
-<!-- check: Use `SourceCode`, `MoreASTHelpers`, `Documentation` from `error-prone-utils` -->
+<!-- check: Shared utilities from `error-prone-utils` are used rather than reimplemented -->
 
 Reuse shared utilities from the `error-prone-utils` module instead of
 reimplementing common operations:
@@ -635,7 +635,7 @@ closing `</p>` tags.
 
 ```java
 /**
- * First paragraph describing the main purpose.
+ * First sentence describing the main purpose.
  *
  * <p>Second paragraph with additional details. This paragraph explains the
  * edge cases and any caveats to be aware of.
@@ -661,7 +661,8 @@ that must *not* come with a comment.
 ### Use `// XXX:` for future work, not `// TODO:`
 
 Mark known limitations, future improvements, and technical debt with `// XXX:`
-comments (with colon). Never use `// TODO:` or `// FIXME:`.
+comments (with colon). Never use `// TODO:` or `// FIXME:`. Don't place `XXX`
+comments inside block or Javadoc comments.
 
 **Do:**
 
@@ -669,6 +670,14 @@ comments (with colon). Never use `// TODO:` or `// FIXME:`.
 // XXX: Also match effectively final variables that reference provably-empty
 // objects.
 // XXX: Consider supporting custom matchers for additional container types.
+```
+
+**Don't:**
+
+```java
+// TODO: Also match effectively final variables that reference provably-empty
+// objects.
+/* XXX: Consider supporting custom matchers for additional container types. */
 ```
 
 ### Javadoc sentences must end with a period
@@ -791,28 +800,6 @@ public final class MoreASTHelpers {
   search methods that return `Optional`.
 - Do not include the collection type in variable names: use `names` instead of
   `namesList`, `entries` instead of `entryMap`.
-
-### `BugChecker` constructor pattern
-<!-- check: `BugChecker` has a public no-arg constructor with Javadoc -->
-
-`BugChecker`s that support configuration flags use a two-constructor pattern: a
-public no-arg constructor that delegates to a package-private `@Inject`
-constructor.
-
-```java
-public MyChecker() {
-  this(ErrorProneFlags.empty());
-}
-
-@Inject
-MyChecker(ErrorProneFlags flags) {
-  this.exemptedNames =
-      Sets.union(
-              DEFAULTS,
-              Flags.getSet(flags, FLAG_NAME))
-          .immutableCopy();
-}
-```
 
 ## Java language features
 

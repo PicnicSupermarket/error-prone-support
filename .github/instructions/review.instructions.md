@@ -56,7 +56,7 @@ the files you modified.
 - [ ] New Refaster collection subjects follow "Introduce `{Topic}Rules` Refaster rule collection" pattern
 - [ ] Refaster rule extension subjects follow "Extend `{RuleName}` Refaster rule" pattern
 - [ ] New BugChecker subjects follow "Introduce `{CheckerName}` check" pattern
-- [ ] Upgrade subjects follow "Upgrade {Name} {old} -> {new}" pattern
+- [ ] Dependency upgrade subjects follow "Upgrade {Name} {old} -> {new}" pattern
 
 ### Commit body
 
@@ -206,7 +206,7 @@ the files you modified.
 - [ ] Prefer `instanceof` pattern matching over `Tree#getKind()`
 - [ ] Compose matchers with `allOf()`, `anyOf()`, `not()`
 - [ ] Use `ASTHelpers` qualified, not statically imported
-- [ ] Use `SourceCode`, `MoreASTHelpers`, `Documentation` from `error-prone-utils`
+- [ ] Shared utilities from `error-prone-utils` are used rather than reimplemented
 - [ ] Use guard clauses for `Description.NO_MATCH`
 - [ ] Avoid `compilesWithFix` in `BugChecker` implementations
 - [ ] `VisitorState` comes last in method signatures
@@ -237,7 +237,6 @@ the files you modified.
 - [ ] Keep lists and members sorted lexicographically
 - [ ] Utility classes are `final` with a private constructor
 - [ ] Class and method names follow project naming conventions
-- [ ] `BugChecker` has a public no-arg constructor with Javadoc
 
 ### Java language features
 

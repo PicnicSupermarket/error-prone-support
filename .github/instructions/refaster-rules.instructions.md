@@ -256,7 +256,8 @@ Before creating a new rule, check whether an existing rule already has the same
 `@AfterTemplate` expression as the new rule. If so, extend the existing rule
 instead of creating a new rule. Do this by generalizing an existing
 `@BeforeTemplate` using `Refaster.anyOf`. Only if that is not possible
-introduce an additional `@BeforeTemplate` method.
+(generally when distinct parameter types or constraints are required) introduce
+an additional `@BeforeTemplate` method.
 
 #### New rule does not make existing rules redundant
 

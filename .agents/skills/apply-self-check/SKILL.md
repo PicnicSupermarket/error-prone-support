@@ -19,5 +19,5 @@ Use this skill to apply automated fixes and resolve build warnings.
    -Dverification.warn` to collect all warnings. Ignore warnings that are
    non-actionable or unrelated to the current change. **Batch-fix** the
    remaining warnings in one pass, then re-run `./run-full-build.sh`.
-5. **Repeat** steps 3-4 until clean.
+5. **Repeat** steps 3-4 until the build passes.
 6. **Commit** any manual fixes.

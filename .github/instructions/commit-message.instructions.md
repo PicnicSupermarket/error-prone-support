@@ -23,7 +23,7 @@ The subject line is the first line of the commit message. Format it as follows:
 <!-- check: New Refaster collection subjects follow "Introduce `{Topic}Rules` Refaster rule collection" pattern -->
 <!-- check: Refaster rule extension subjects follow "Extend `{RuleName}` Refaster rule" pattern -->
 <!-- check: New BugChecker subjects follow "Introduce `{CheckerName}` check" pattern -->
-<!-- check: Upgrade subjects follow "Upgrade {Name} {old} -> {new}" pattern -->
+<!-- check: Dependency upgrade subjects follow "Upgrade {Name} {old} -> {new}" pattern -->
 
 To understand the appropriate verb and phrasing for a given change, inspect the
 100 most recent non-merge commits:
