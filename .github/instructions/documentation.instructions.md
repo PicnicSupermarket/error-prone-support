@@ -24,7 +24,7 @@ Code blocks, tables and URLs may exceed the limit. Do not break URLs across line
 ## Use only ASCII characters
 <!-- check: No non-ASCII characters (no em-dashes, special arrows, etc.) -->
 
-Use only ASCII characters. Do not use em-dashes, unicode arrows, or other
+Use only ASCII characters. Do not use em-dashes, Unicode arrows, or other
 non-ASCII symbols. Use `->` for arrows. Avoid dashes used as parenthetical
 separators (including the ASCII `--` form); rephrase using commas, semicolons,
 or parentheses instead.

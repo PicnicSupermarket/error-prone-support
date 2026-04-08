@@ -65,7 +65,7 @@ When a commit warrants explanation beyond the subject line:
 - Focus on "what" and "why", not implementation details.
 - Use `While there,` to describe bundled incidental changes.
 - If multiple disparate things are changed, use `Summary of changes:` followed
-  by a bulleted list for complex multi-part commits.
+  by a bulleted list for complex multipart commits.
 - Use `Resolves #N.` (with period) to close GitHub issues.
 - List URLs last, preceded by `See:` if there is one, and `See:\n` followed by
   a list of `- URL` items if there are multiple.
@@ -154,8 +154,8 @@ git log --grep='^Upgrade Spr' --format='%B%n---' -n 10
 
 If no past commits exist, the default GitHub URL pattern is:
 
-- Release: `https://github.com/{owner}/{repo}/releases/tag/v{new}`
-- Compare: `https://github.com/{owner}/{repo}/compare/v{old}...v{new}`
+- Release: `https://github.com/{owner}/{repo}/releases/tag/v{new}`.
+- Compare: `https://github.com/{owner}/{repo}/compare/v{old}...v{new}`.
 
 If relevant URLs cannot be found, a commit message that consists only of the
 summary line is acceptable.

@@ -42,7 +42,7 @@ mvn clean install -Dverification.warn
 mvn fmt:format
 
 # Full build: first against vanilla Error Prone, then against Picnic fork with
-self-check.
+# self-check.
 ./run-full-build.sh
 
 # Apply Error Prone auto-fixes to this project (also formats).

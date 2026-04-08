@@ -184,10 +184,10 @@ the dead code.
 
 Each line in `mutations.csv` describes a mutation and its status:
 
-- `KILLED`: a test detected the mutation (good)
-- `SURVIVED`: no test detected the mutation (fix this)
-- `NO_COVERAGE`: no test covers this line (fix this)
-- `TIMED_OUT`: mutation caused infinite loop (usually acceptable)
+- `KILLED`: a test detected the mutation (good).
+- `SURVIVED`: no test detected the mutation (fix this).
+- `NO_COVERAGE`: no test covers this line (fix this).
+- `TIMED_OUT`: mutation caused infinite loop (usually acceptable).
 
 Focus on `SURVIVED` and `NO_COVERAGE` entries. For each one, either add a test
 that detects the mutation or verify that the mutated code path is genuinely
