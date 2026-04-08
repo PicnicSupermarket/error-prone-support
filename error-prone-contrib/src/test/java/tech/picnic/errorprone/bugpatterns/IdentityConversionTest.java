@@ -2,7 +2,6 @@ package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -286,7 +285,7 @@ final class IdentityConversionTest {
             "",
             "  void bar(Publisher<Integer> publisher) {}",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -327,6 +326,6 @@ final class IdentityConversionTest {
             "    ImmutableCollection<Integer> list2 = ImmutableList.copyOf(new ArrayList<>(ImmutableList.of(1)));",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

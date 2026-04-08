@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,6 @@ final class ErrorProneTestHelperSourceFormatTest {
         .addSourceLines(
             "A.java",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
-            "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
             "import tech.picnic.errorprone.guidelines.bugpatterns.RefasterAnyOfUsage;",
             "",
@@ -45,7 +43,7 @@ final class ErrorProneTestHelperSourceFormatTest {
             "        .addInputLines(\"B.java\", \"import java.util.Map;\", \"\", \"class B {}\")",
             "        // Unused import, but in an output file, so not flagged.",
             "        .addOutputLines(\"B.java\", \"import java.util.Map;\", \"\", \"class B {}\")",
-            "        .doTest(TestMode.TEXT_MATCH);",
+            "        .doTest();",
             "  }",
             "}")
         .doTest();
@@ -61,7 +59,6 @@ final class ErrorProneTestHelperSourceFormatTest {
         .addInputLines(
             "A.java",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
-            "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
             "import tech.picnic.errorprone.guidelines.bugpatterns.RefasterAnyOfUsage;",
             "",
@@ -97,13 +94,12 @@ final class ErrorProneTestHelperSourceFormatTest {
             "            \"import java.util.List;\",",
             "            \"\",",
             "            \"interface A extends List<A>, Map<A,A> { }\")",
-            "        .doTest(TestMode.TEXT_MATCH);",
+            "        .doTest();",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
             "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
-            "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
             "import com.google.errorprone.CompilationTestHelper;",
             "import tech.picnic.errorprone.guidelines.bugpatterns.RefasterAnyOfUsage;",
             "",
@@ -137,9 +133,9 @@ final class ErrorProneTestHelperSourceFormatTest {
             "            \"import java.util.Map;\",",
             "            \"\",",
             "            \"interface A extends List<A>, Map<A, A> {}\")",
-            "        .doTest(TestMode.TEXT_MATCH);",
+            "        .doTest();",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

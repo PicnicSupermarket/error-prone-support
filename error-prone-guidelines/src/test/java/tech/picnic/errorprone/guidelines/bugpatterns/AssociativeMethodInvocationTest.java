@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -105,6 +104,6 @@ final class AssociativeMethodInvocationTest {
             "    Refaster.anyOf(Matchers.allOf(), 1, 2, Matchers.anyOf());",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

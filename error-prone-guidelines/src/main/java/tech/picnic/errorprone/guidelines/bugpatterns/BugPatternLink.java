@@ -5,10 +5,10 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
-import static com.google.errorprone.matchers.FieldMatchers.staticField;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.packageStartsWith;
+import static com.google.errorprone.matchers.field.FieldMatchers.staticField;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -52,9 +52,11 @@ public final class BugPatternLink extends BugChecker implements ClassTreeMatcher
   private static final Matcher<ClassTree> IS_ERROR_PRONE_SUPPORT_CLASS =
       packageStartsWith("tech.picnic.errorprone");
   private static final Matcher<ExpressionTree> IS_LINK_TYPE_NONE =
-      staticField(BugPattern.LinkType.class.getCanonicalName(), "NONE");
+      staticField().onClass(BugPattern.LinkType.class.getCanonicalName()).named("NONE");
   private static final Matcher<ExpressionTree> IS_BUG_PATTERNS_BASE_URL =
-      staticField("tech.picnic.errorprone.utils.Documentation", "BUG_PATTERNS_BASE_URL");
+      staticField()
+          .onClass("tech.picnic.errorprone.utils.Documentation")
+          .named("BUG_PATTERNS_BASE_URL");
   private static final MultiMatcher<ClassTree, AnnotationTree> HAS_BUG_PATTERN_ANNOTATION =
       annotations(AT_LEAST_ONE, isType(BugPattern.class.getCanonicalName()));
 

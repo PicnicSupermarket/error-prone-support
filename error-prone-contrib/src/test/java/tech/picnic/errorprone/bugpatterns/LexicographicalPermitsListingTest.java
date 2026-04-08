@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -65,6 +64,6 @@ final class LexicographicalPermitsListingTest {
             "",
             "  sealed class UnsortedPermitsClass permits X, Y, Z {}",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
