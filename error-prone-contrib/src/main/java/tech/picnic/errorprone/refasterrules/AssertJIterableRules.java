@@ -76,9 +76,7 @@ final class AssertJIterableRules {
     }
   }
 
-  /**
-   * Prefer {@link ObjectEnumerableAssert#contains(Object[])} over less explicit alternatives.
-   */
+  /** Prefer {@link ObjectEnumerableAssert#contains(Object[])} over less explicit alternatives. */
   static final class AssertThatIterableContains<E> {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
@@ -93,8 +91,7 @@ final class AssertJIterableRules {
   }
 
   /**
-   * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over less explicit
-   * alternatives.
+   * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over less explicit alternatives.
    */
   static final class AssertThatIterableDoesNotContain<E> {
     @BeforeTemplate
@@ -114,8 +111,7 @@ final class AssertJIterableRules {
    */
   static final class AssertThatIterableContainsAll<E> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(
-        Collection<E> iterable, Collection<? extends E> elements) {
+    AbstractBooleanAssert<?> before(Collection<E> iterable, Collection<? extends E> elements) {
       return assertThat(iterable.containsAll(elements)).isTrue();
     }
 
