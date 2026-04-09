@@ -64,8 +64,6 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // XXX: `assertThat(optional.map(fun)).hasValue(v)` ->
 // `assertThat(optional).get().extracting(fun).isEqualTo(v)` (if the get fails the map was useless)
 // XXX: `someAssert.extracting(pred).isEqualTo(true)` -> `someAssert.matches(pred)`
-// XXX: `assertThat(someCollection.contains(s)).isTrue()` -> assertThat(someCollection).contains(s)`
-// XXX: `assertThat(someString.matches(s)).isTrue()` -> assertThat(someString).matches(s)`
 // XXX: `assertThat(n > k).isTrue()` -> assertThat(n).isGreaterThan(k)` (etc. Also `==`!)
 // XXX: `assertThat(n > k && n < m).isTrue()` -> assertThat(n).isStrictlyBetween(k, m)` (etc.)
 // XXX: `assertThat(ImmutableList.copyOf(iterable))` -> assertThat(iterable)` (etc.)
