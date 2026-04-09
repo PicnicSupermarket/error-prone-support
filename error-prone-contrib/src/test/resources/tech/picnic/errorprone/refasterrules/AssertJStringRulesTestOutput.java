@@ -50,19 +50,19 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat("foo").doesNotContain("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringIsEqualToIgnoringCase() {
+  AbstractAssert<?, ?> testAssertThatIsEqualToIgnoringCase() {
     return assertThat("foo").isEqualToIgnoringCase("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringIsNotEqualToIgnoringCase() {
+  AbstractAssert<?, ?> testAssertThatIsNotEqualToIgnoringCase() {
     return assertThat("foo").isNotEqualToIgnoringCase("bar");
   }
 
-  void testAssertThatStringIsBlank() {
+  void testAssertThatIsBlank() {
     assertThat("foo").isBlank();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringIsNotBlank() {
+  AbstractAssert<?, ?> testAssertThatIsNotBlank() {
     return assertThat("foo").isNotBlank();
   }
 

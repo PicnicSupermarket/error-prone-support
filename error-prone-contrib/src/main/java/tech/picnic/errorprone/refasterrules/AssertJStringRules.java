@@ -127,7 +127,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
-  static final class AssertThatStringIsEqualToIgnoringCase {
+  static final class AssertThatIsEqualToIgnoringCase {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String other) {
       return assertThat(string.equalsIgnoreCase(other)).isTrue();
@@ -144,7 +144,7 @@ final class AssertJStringRules {
    * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
-  static final class AssertThatStringIsNotEqualToIgnoringCase {
+  static final class AssertThatIsNotEqualToIgnoringCase {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string, String other) {
       return assertThat(string.equalsIgnoreCase(other)).isFalse();
@@ -158,7 +158,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#isBlank()} over less explicit alternatives. */
-  static final class AssertThatStringIsBlank {
+  static final class AssertThatIsBlank {
     @BeforeTemplate
     void before(String string) {
       assertThat(string.isBlank()).isTrue();
@@ -172,7 +172,7 @@ final class AssertJStringRules {
   }
 
   /** Prefer {@link AbstractStringAssert#isNotBlank()} over less explicit alternatives. */
-  static final class AssertThatStringIsNotBlank {
+  static final class AssertThatIsNotBlank {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(String string) {
       return assertThat(string.isBlank()).isFalse();
