@@ -8,7 +8,6 @@ This document describes the conventions used by shell scripts in this project.
 All scripts are written in Bash.
 
 ## Structure
-<!-- check: skip -->
 
 ### Shebang and safety flags
 <!-- check: Script starts with `#!/usr/bin/env bash` and `set -e -u -o pipefail` -->
@@ -48,7 +47,6 @@ Use `#` on each line. Explain purpose, prerequisites, and constraints. Comments
 explain _why_, not _what_.
 
 ## Variables
-<!-- check: skip -->
 
 ### Naming
 <!-- check: Variables use the correct casing convention -->
@@ -97,7 +95,6 @@ root=`git rev-parse --show-toplevel`
 ```
 
 ## Functions
-<!-- check: skip -->
 
 ### Declaration
 <!-- check: Functions use `function name() {` syntax with `local` for all variables -->
@@ -145,7 +142,6 @@ fi
 <!-- XXX: Consider consistently using safer Bash `[[ ]]` variant instead. -->
 
 ## Error handling
-<!-- check: skip -->
 
 ### Argument validation
 <!-- check: Optional arguments use `${1:-}` and required arguments use `${1:?message}` -->
@@ -207,7 +203,6 @@ and `EXIT` (normal exit). Always include `--` in the `rm` command to prevent
 filename interpretation.
 
 ## Path handling
-<!-- check: skip -->
 
 Prefer `git rev-parse --show-toplevel` for the repository root and `dirname
 "${0}"` for paths relative to the script. Use `git -C` when operating on a Git
@@ -215,7 +210,6 @@ repository in another directory. Avoid bare `cd` in the main script flow; use
 `pushd`/`popd` for temporary directory changes.
 
 ## Formatting
-<!-- check: skip -->
 
 ### Indentation
 <!-- check: Two-space indentation (no tabs) -->

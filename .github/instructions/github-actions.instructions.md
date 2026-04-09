@@ -201,7 +201,6 @@ value. This reduces noise and makes intentional overrides obvious.
   code", "Build project").
 
 ## Java and Maven setup
-<!-- check: skip -->
 
 For workflows that build Java code:
 
@@ -216,12 +215,10 @@ For workflows that build Java code:
   the latest values).
 
 ## Configure workflow triggers
-<!-- check: skip -->
 
 - Use `paths:` trigger filters when a workflow only applies to specific files.
 
 ## YAML formatting
-<!-- check: skip -->
 
 - 2-space indentation.
 - Single quotes for simple strings.

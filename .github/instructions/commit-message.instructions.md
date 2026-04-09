@@ -44,7 +44,6 @@ The following special formats must be followed exactly:
   section below).
 
 ## PR number suffix
-<!-- check: skip -->
 
 After a pull request is created, the subject line ends with ` (#N)` where `N`
 is the PR number. This suffix is added after the PR is created (see
@@ -73,7 +72,6 @@ When a commit warrants explanation beyond the subject line:
 - Never repeat or lightly paraphrase the subject line in the body.
 
 ## Upgrade commits
-<!-- check: skip -->
 
 Dependency upgrade commits use the subject format:
 
@@ -164,7 +162,6 @@ Do not hallucinate URLs. Do not fabricate version numbers. Do not include a
 summary of the release notes.
 
 ## Examples
-<!-- check: skip -->
 
 **Simple Refaster rule introduction (subject only):**
 

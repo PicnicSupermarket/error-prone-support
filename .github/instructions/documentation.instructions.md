@@ -89,7 +89,6 @@ Markdown, use `<!-- XXX: ... -->`. In shell scripts, use `# XXX: ...`. In Java,
 use `// XXX: ...`.
 
 ## Respect `.editorconfig`
-<!-- check: skip -->
 
 This repository includes an `.editorconfig` file. Configure your editor to
 respect it. It enforces indentation style, trailing whitespace removal, and

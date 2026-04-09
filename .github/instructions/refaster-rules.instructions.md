@@ -13,7 +13,6 @@ see [`java-style.instructions.md`][java-style]. For general testing
 conventions, see [`testing.instructions.md`][testing].
 
 ## Overview
-<!-- check: skip -->
 
 [Refaster][refaster] rules define source code transformations using
 `@BeforeTemplate` / `@AfterTemplate` method pairs. Each `@BeforeTemplate`
@@ -21,7 +20,6 @@ matches a code pattern; the `@AfterTemplate` specifies its replacement. Rules
 are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 
 ## File locations
-<!-- check: skip -->
 
 | Purpose | Path |
 |---------|------|
@@ -565,7 +563,6 @@ List<T> after(ImmutableList<T> list) {
 ```
 
 ## Advanced patterns
-<!-- check: skip -->
 
 ### `Refaster.anyOf(...)` for multiple before-patterns
 <!-- check: skip -->
@@ -922,7 +919,6 @@ Optional<String> testOptionalIsEmpty() {
 ```
 
 ## Test output file
-<!-- check: skip -->
 
 The test output file `{Topic}RulesTestOutput.java` is in the same directory.
 It has a structure that is **identical** to the input file but with the
@@ -967,7 +963,6 @@ private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
 ```
 
 ## Verification
-<!-- check: skip -->
 
 To confirm that the rules compile and produce the expected output, run:
 
@@ -976,7 +971,6 @@ mvn clean test -pl error-prone-contrib -Dtest=RefasterRulesTest -Dverification.s
 ```
 
 ## Applying rules to the codebase
-<!-- check: skip -->
 
 After making changes, install them, apply the new rule(s) to the current
 repository, and validate that the whole build passes:
@@ -993,7 +987,6 @@ Refaster rules and associated tests do *not* require follow-up by running
 `./run-branch-mutation-tests.sh`.
 
 ## Reference: Custom annotations (from `refaster-support`)
-<!-- check: skip -->
 
 | Annotation | Target | Purpose |
 |------------|--------|---------|
@@ -1007,7 +1000,6 @@ The `unmigratedMethods` list in `@TypeMigration` is managed by the
 `./apply-error-prone-suggestions.sh` to keep it in sync.
 
 ## Reference: Available matchers (for `@Matches` / `@NotMatches`)
-<!-- check: skip -->
 
 | Matcher | What it checks |
 |---------|---------------|

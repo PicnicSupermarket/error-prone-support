@@ -87,7 +87,6 @@ After committing, invoke finalize-changes to run the full build.
 ```
 
 ## One skill per task type
-<!-- check: skip -->
 
 Each distinct type of task (creating a `BugChecker`, writing a Refaster rule,
 modifying a workflow, writing general Java code, etc.) should have its own

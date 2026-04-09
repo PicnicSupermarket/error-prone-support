@@ -8,7 +8,6 @@ This document describes how AI coding agent configuration files are organized
 in this project.
 
 ## Agent-agnostic philosophy
-<!-- check: skip -->
 
 This project uses an agent-agnostic approach to AI coding guidance. The bulk of
 conventions and instructions live in `.github/instructions/*.instructions.md`
@@ -47,7 +46,6 @@ If an agent-specific addition is needed (e.g., Claude hooks in
 shared location.
 
 ## Follow standard agent specifications
-<!-- check: skip -->
 
 This project follows the [AGENTS.md][agents-md] and [Agent
 Skills][agent-skills] specifications. For agents that support these
@@ -59,14 +57,12 @@ native support for a specification), it should suggest removing the
 customization.
 
 ## Detailed conventions live in instruction files
-<!-- check: skip -->
 
 `AGENT.md` references `.github/instructions/*.instructions.md` files for
 detailed conventions. See [`instructions.instructions.md`][instructions] for
 the conventions governing these instruction files themselves.
 
 ## Human contributors use `CONTRIBUTING.md`
-<!-- check: skip -->
 
 `CONTRIBUTING.md` is the entry point for human contributors. It covers bug
 reporting, the PR process and module overview, and cross-references the

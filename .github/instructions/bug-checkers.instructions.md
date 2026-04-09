@@ -13,7 +13,6 @@ see [`java-style.instructions.md`][java-style]. For general testing
 conventions, see [`testing.instructions.md`][testing].
 
 ## Overview
-<!-- check: skip -->
 
 A [`BugChecker`][bug-checker] is an Error Prone analysis pass that visits
 specific AST node types and optionally suggests a fix. This project extends
@@ -155,7 +154,6 @@ public final class IsInstanceLambdaUsage extends BugChecker
 ```
 
 ## Advanced patterns
-<!-- check: skip -->
 
 ### Static `Matcher<>` / `MultiMatcher<>` fields
 <!-- check: skip -->
@@ -524,7 +522,6 @@ final class AutowiredConstructorTest {
 ```
 
 ## Verification
-<!-- check: skip -->
 
 To confirm that the checker compiles and produces the expected diagnostics,
 run:
@@ -537,7 +534,6 @@ Replace the module (`-pl`) as needed for `error-prone-experimental` or
 `error-prone-guidelines`.
 
 ## Reference: Matcher interfaces
-<!-- check: skip -->
 
 Common `BugChecker.*Matcher` interfaces and their `matchXxx()` methods:
 
@@ -555,7 +551,6 @@ Common `BugChecker.*Matcher` interfaces and their `matchXxx()` methods:
 There are many more matcher interfaces; one for each Java AST node type.
 
 ## Reference: `error-prone-utils` utilities
-<!-- check: skip -->
 
 Key methods from the `error-prone-utils` module
 (`tech.picnic.errorprone.utils`):

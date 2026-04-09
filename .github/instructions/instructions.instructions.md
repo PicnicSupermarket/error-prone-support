@@ -11,7 +11,6 @@ All instruction files must also follow the writing conventions in
 [`documentation.instructions.md`][documentation].
 
 ## Instruction files serve all agents and humans
-<!-- check: skip -->
 
 Instruction files are the canonical reference for coding conventions in this
 project. They are designed to be consulted by:
@@ -47,7 +46,6 @@ applyTo: "**/*.java"
 ```
 
 ## Review checklist annotations
-<!-- check: skip -->
 
 Instruction files support `<!-- check: -->` HTML comment annotations that feed
 into the auto-generated review checklist (`review.instructions.md`). The
@@ -155,7 +153,6 @@ process each item independently and less capable models are less likely to
 conflate unrelated requirements into a single pass.
 
 ## `review.instructions.md` is auto-generated
-<!-- check: skip -->
 
 Do not edit `review.instructions.md` manually. It is derived from the `<!--
 check: -->` annotations in the other instruction files. Any manual edits will
