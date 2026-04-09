@@ -7,6 +7,8 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollection;
 final class RefasterRulesTest {
   // XXX: Create a JUnit extension to automatically discover the rule collections in a given context
   // to make sure the list is exhaustive.
+  // XXX: When the entries here aren't lexicographically sorted, somehow
+  // `LexicographicalAnnotationAttributeListing` doesn't flag that; investigate why.
   @ValueSource(
       classes = {
         AssertJArrayRules.class,
@@ -19,9 +21,9 @@ final class RefasterRulesTest {
         AssertJDoubleRules.class,
         AssertJDurationRules.class,
         AssertJEnumerableRules.class,
-        AssertJInstantRules.class,
         AssertJFileRules.class,
         AssertJFloatRules.class,
+        AssertJInstantRules.class,
         AssertJIntegerRules.class,
         AssertJIterableRules.class,
         AssertJIteratorRules.class,
@@ -49,12 +51,12 @@ final class RefasterRulesTest {
         EqualityRules.class,
         FileRules.class,
         ImmutableEnumSetRules.class,
-        ImmutableListRules.class,
         ImmutableListMultimapRules.class,
+        ImmutableListRules.class,
         ImmutableMapRules.class,
         ImmutableMultisetRules.class,
-        ImmutableSetRules.class,
         ImmutableSetMultimapRules.class,
+        ImmutableSetRules.class,
         ImmutableSortedMapRules.class,
         ImmutableSortedMultisetRules.class,
         ImmutableSortedSetRules.class,
