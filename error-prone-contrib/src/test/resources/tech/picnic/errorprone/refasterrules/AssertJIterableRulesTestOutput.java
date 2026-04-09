@@ -28,15 +28,15 @@ final class AssertJIterableRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(ImmutableSet.of(1)).size(), assertThat(ImmutableSet.of(2)).size());
   }
 
-  AbstractAssert<?, ?> testAssertThatCollectionContains() {
+  AbstractAssert<?, ?> testAssertThatIterableContains() {
     return assertThat(ImmutableSet.of(1)).contains(1);
   }
 
-  AbstractAssert<?, ?> testAssertThatCollectionDoesNotContain() {
+  AbstractAssert<?, ?> testAssertThatIterableDoesNotContain() {
     return assertThat(ImmutableSet.of(1)).doesNotContain(1);
   }
 
-  AbstractAssert<?, ?> testAssertThatCollectionContainsAll() {
+  AbstractAssert<?, ?> testAssertThatIterableContainsAll() {
     return assertThat(ImmutableSet.of(1)).containsAll(ImmutableSet.of(2));
   }
 
