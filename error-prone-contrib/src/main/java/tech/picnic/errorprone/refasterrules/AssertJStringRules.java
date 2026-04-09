@@ -124,7 +124,7 @@ final class AssertJStringRules {
   }
 
   /**
-   * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(String)} over less explicit
+   * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
   static final class AssertThatStringIsEqualToIgnoringCase {
@@ -141,7 +141,7 @@ final class AssertJStringRules {
   }
 
   /**
-   * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(String)} over less explicit
+   * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(CharSequence)} over less explicit
    * alternatives.
    */
   static final class AssertThatStringIsNotEqualToIgnoringCase {
