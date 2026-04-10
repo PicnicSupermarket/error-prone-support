@@ -7,8 +7,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollection;
 final class RefasterRulesTest {
   // XXX: Create a JUnit extension to automatically discover the rule collections in a given context
   // to make sure the list is exhaustive.
-  // XXX: When the entries here aren't lexicographically sorted, somehow
-  // `LexicographicalAnnotationAttributeListing` doesn't flag that; investigate why.
+  @ParameterizedTest
   @ValueSource(
       classes = {
         AssertJArrayRules.class,
@@ -90,7 +89,6 @@ final class RefasterRulesTest {
         TimeRules.class,
         WebClientRules.class
       })
-  @ParameterizedTest
   void validateRuleCollection(Class<?> clazz) {
     RefasterRuleCollection.validate(clazz);
   }
