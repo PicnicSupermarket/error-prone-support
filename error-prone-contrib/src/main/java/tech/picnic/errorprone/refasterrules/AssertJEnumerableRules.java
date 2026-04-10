@@ -5,6 +5,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
+import java.util.Arrays;
 import java.util.Collection;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractIterableAssert;
@@ -223,6 +224,32 @@ final class AssertJEnumerableRules {
     @AfterTemplate
     EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int lower, int upper) {
       return enumAssert.hasSizeBetween(lower, upper);
+    }
+  }
+
+  static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyElementsOf(Arrays.asList(array));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactly(array);
+    }
+  }
+
+  static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyInAnyOrder(array);
     }
   }
 

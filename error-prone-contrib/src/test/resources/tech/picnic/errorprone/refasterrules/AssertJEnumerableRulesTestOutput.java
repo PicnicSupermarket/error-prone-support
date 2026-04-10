@@ -4,14 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.util.Arrays;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.EnumerableAssert;
+import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Iterables.class);
+    return ImmutableSet.of(Arrays.class, Iterables.class);
   }
 
   void testEnumerableAssertIsEmpty() {
@@ -83,6 +85,15 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     return ImmutableSet.of(
         assertThat(ImmutableSet.of(1)).hasSizeBetween(2, 3),
         assertThat(ImmutableSet.of(4)).hasSizeBetween(5, 6));
+  }
+
+  ObjectEnumerableAssert<?, Integer> testObjectEnumerableContainsExactlyFromArraysAsList() {
+    return assertThat(ImmutableSet.of(1)).containsExactly(new Integer[] {1, 2});
+  }
+
+  ObjectEnumerableAssert<?, Integer>
+      testObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList() {
+    return assertThat(ImmutableSet.of(1)).containsExactlyInAnyOrder(new Integer[] {1, 2});
   }
 
   ImmutableSet<EnumerableAssert<?, Character>> testEnumerableAssertHasSameSizeAs() {

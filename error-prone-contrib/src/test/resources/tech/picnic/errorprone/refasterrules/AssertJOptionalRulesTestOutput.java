@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
+import java.util.function.Consumer;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.OptionalAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -44,6 +45,11 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<AbstractAssert<?, ?>> testAbstractOptionalAssertContainsSame() {
     return ImmutableSet.of(
         assertThat(Optional.of(1)).containsSame(1), assertThat(Optional.of(2)).containsSame(2));
+  }
+
+  AbstractAssert<?, ?> testAbstractOptionalAssertHasValueSatisfying() {
+    Consumer<Integer> consumer = value -> assertThat(value).isEqualTo(1);
+    return assertThat(Optional.of(1)).hasValueSatisfying(consumer);
   }
 
   AbstractAssert<?, ?> testAssertThatOptionalHasValueMatching() {
