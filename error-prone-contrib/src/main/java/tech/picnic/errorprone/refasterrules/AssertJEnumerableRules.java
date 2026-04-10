@@ -256,6 +256,7 @@ final class AssertJEnumerableRules {
 
   static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
     @BeforeTemplate
+    @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
     ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
       return enumAssert.containsExactlyElementsOf(Arrays.asList(array));
     }
@@ -269,6 +270,7 @@ final class AssertJEnumerableRules {
 
   static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
     @BeforeTemplate
+    @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
     ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
       return enumAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
     }
