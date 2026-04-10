@@ -49,6 +49,22 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     return assertThat("foo".contains("bar")).isFalse();
   }
 
+  AbstractAssert<?, ?> testAssertThatIsEqualToIgnoringCase() {
+    return assertThat("foo".equalsIgnoreCase("bar")).isTrue();
+  }
+
+  AbstractAssert<?, ?> testAssertThatIsNotEqualToIgnoringCase() {
+    return assertThat("foo".equalsIgnoreCase("bar")).isFalse();
+  }
+
+  void testAssertThatIsBlank() {
+    assertThat("foo".isBlank()).isTrue();
+  }
+
+  AbstractAssert<?, ?> testAssertThatIsNotBlank() {
+    return assertThat("foo".isBlank()).isFalse();
+  }
+
   AbstractAssert<?, ?> testAssertThatMatches() {
     return assertThat("foo".matches(".*")).isTrue();
   }
