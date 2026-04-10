@@ -87,6 +87,14 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
         assertThat(ImmutableSet.of(4)).hasSizeBetween(5, 6));
   }
 
+  ImmutableSet<EnumerableAssert<?, Character>> testEnumerableAssertHasSameSizeAs() {
+    return ImmutableSet.of(
+        assertThat("foo").hasSameSizeAs(ImmutableSet.of(1)),
+        assertThat("bar").hasSameSizeAs(ImmutableSet.of(2)),
+        assertThat("baz").hasSameSizeAs(new Integer[0]),
+        assertThat("qux").hasSameSizeAs("quux"));
+  }
+
   ObjectEnumerableAssert<?, Integer> testObjectEnumerableContainsExactlyFromArraysAsList() {
     return assertThat(ImmutableSet.of(1)).containsExactly(new Integer[] {1, 2});
   }
@@ -94,13 +102,5 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
   ObjectEnumerableAssert<?, Integer>
       testObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList() {
     return assertThat(ImmutableSet.of(1)).containsExactlyInAnyOrder(new Integer[] {1, 2});
-  }
-
-  ImmutableSet<EnumerableAssert<?, Character>> testEnumerableAssertHasSameSizeAs() {
-    return ImmutableSet.of(
-        assertThat("foo").hasSameSizeAs(ImmutableSet.of(1)),
-        assertThat("bar").hasSameSizeAs(ImmutableSet.of(2)),
-        assertThat("baz").hasSameSizeAs(new Integer[0]),
-        assertThat("qux").hasSameSizeAs("quux"));
   }
 }

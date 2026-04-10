@@ -227,32 +227,6 @@ final class AssertJEnumerableRules {
     }
   }
 
-  static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactlyElementsOf(Arrays.asList(array));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactly(array);
-    }
-  }
-
-  static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
-    @BeforeTemplate
-    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactlyInAnyOrder(array);
-    }
-  }
-
   static final class EnumerableAssertHasSameSizeAs<S, E> {
     @BeforeTemplate
     EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Iterable<E> iterable) {
@@ -277,6 +251,32 @@ final class AssertJEnumerableRules {
     @AfterTemplate
     EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<E> iterable) {
       return enumAssert.hasSameSizeAs(iterable);
+    }
+  }
+
+  static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyElementsOf(Arrays.asList(array));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactly(array);
+    }
+  }
+
+  static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
+    @BeforeTemplate
+    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyInAnyOrder(array);
     }
   }
 }
