@@ -3,8 +3,8 @@
 # The tests run in the following scenarios:
 # - Any time code is pushed to the default branch.
 # - When a user leaves a pull request comment containing the string
-#   `/integration-test`. Optionally specify one or more project names
-#   (e.g. `/integration-test checkstyle metrics`) to run a subset of tests.
+#   `/integration-test [name...]`. If no integration test names are specified,
+#   all tests are executed.
 #
 # XXX: Review whether the build matrix should also vary JDK or OS versions.
 # XXX: Have the integration test scripts select the JDK version to use, rather
@@ -29,11 +29,10 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
-            api.github.com:443
             github.com:443
       - name: Check out integration tests
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -76,7 +75,7 @@ jobs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -170,7 +169,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
