@@ -305,8 +305,8 @@ the files you modified.
 
 ### Collection registration
 
-- [ ] Collection is registered in `RefasterRulesTest.java` `RULE_COLLECTIONS`
-- [ ] `RULE_COLLECTIONS` entries are in alphabetical order
+- [ ] Collection is registered in `RefasterRulesTest.java` `@ValueSource`
+- [ ] `@ValueSource` entries are in alphabetical order
 
 ## Shell Script Conventions (`scripts.instructions.md`)
 

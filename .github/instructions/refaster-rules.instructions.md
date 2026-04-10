@@ -944,22 +944,22 @@ Conventions:
   to `elidedTypesAndStaticImports()` usage).
 
 ## Collection registration
-<!-- check: Collection is registered in `RefasterRulesTest.java` `RULE_COLLECTIONS` -->
-<!-- check: `RULE_COLLECTIONS` entries are in alphabetical order -->
+<!-- check: Collection is registered in `RefasterRulesTest.java` `@ValueSource` -->
+<!-- check: `@ValueSource` entries are in alphabetical order -->
 
-New rule collections are registered in the `RULE_COLLECTIONS` set in
+New rule collections are registered in the `@ValueSource` annotation in
 [`RefasterRulesTest.java`][refaster-rules-test]. Entries are listed in
 **alphabetical order**:
 
 ```java
-private static final ImmutableSet<Class<?>> RULE_COLLECTIONS =
-    ImmutableSet.of(
-        // ...
-        BigDecimalRules.class,
-        // --> insert {Topic}Rules.class here, alphabetically
-        BugCheckerRules.class,
-        // ...
-    );
+@ValueSource(
+    classes = {
+      // ...
+      BigDecimalRules.class,
+      // --> insert {Topic}Rules.class here, alphabetically
+      BugCheckerRules.class,
+      // ...
+    })
 ```
 
 ## Verification
