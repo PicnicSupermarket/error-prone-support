@@ -13,8 +13,6 @@ import com.sun.tools.javac.util.List;
  *
  * <p>These methods are additions to the ones found in {@link TypePredicates}.
  */
-// XXX: The methods in this class are tested only indirectly. Consider adding a dedicated test
-// class, or make sure that each method is explicitly covered by a tested analog in `MoreMatchers`.
 public final class MoreTypePredicates {
   private MoreTypePredicates() {}
 
