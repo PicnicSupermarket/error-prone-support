@@ -47,15 +47,14 @@ jobs:
             const fs = require('fs');
             const allTests = fs.readdirSync('integration-tests')
               .filter(f => f.endsWith('.sh') && f !== 'run-integration-test.sh')
-              .map(f => f.slice(0, -3))
-              .sort();
+              .map(f => f.slice(0, -3));
 
             const comment = context.payload.comment?.body;
             if (comment) {
               const match = comment.match(/\/integration-test\s+(.*)/);
               if (match) {
                 const requested = match[1].split(/[\s,]+/).map(s => s.trim());
-                const valid = requested.filter(t => allTests.includes(t));
+                const valid = requested.filter(t => allTests.includes(t)).sort();
                 if (valid.length > 0) {
                   core.setOutput('matrix', JSON.stringify(valid));
                   return;
