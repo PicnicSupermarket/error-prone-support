@@ -106,13 +106,13 @@ final class ReactorRules {
    */
   static final class MonoTimeoutMonoEmptyDuration<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Duration duration) {
-      return mono.timeout(duration).onErrorComplete(TimeoutException.class);
+    Mono<T> before(Mono<T> mono, Duration timeout) {
+      return mono.timeout(timeout).onErrorComplete(TimeoutException.class);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Duration duration) {
-      return mono.timeout(duration, Mono.empty());
+    Mono<T> after(Mono<T> mono, Duration timeout) {
+      return mono.timeout(timeout, Mono.empty());
     }
   }
 
@@ -121,13 +121,13 @@ final class ReactorRules {
    */
   static final class MonoTimeoutMonoJustDuration<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Duration duration, T fallbackValue) {
-      return mono.timeout(duration).onErrorReturn(TimeoutException.class, fallbackValue);
+    Mono<T> before(Mono<T> mono, Duration timeout, T data) {
+      return mono.timeout(timeout).onErrorReturn(TimeoutException.class, data);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Duration duration, T fallbackValue) {
-      return mono.timeout(duration, Mono.just(fallbackValue));
+    Mono<T> after(Mono<T> mono, Duration timeout, T data) {
+      return mono.timeout(timeout, Mono.just(data));
     }
   }
 
@@ -136,13 +136,13 @@ final class ReactorRules {
    */
   static final class MonoTimeoutDuration<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Duration duration, Mono<T> fallback) {
-      return mono.timeout(duration).onErrorResume(TimeoutException.class, e -> fallback);
+    Mono<T> before(Mono<T> mono, Duration timeout, Mono<T> fallback) {
+      return mono.timeout(timeout).onErrorResume(TimeoutException.class, e -> fallback);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Duration duration, Mono<T> fallback) {
-      return mono.timeout(duration, fallback);
+    Mono<T> after(Mono<T> mono, Duration timeout, Mono<T> fallback) {
+      return mono.timeout(timeout, fallback);
     }
   }
 
@@ -152,13 +152,13 @@ final class ReactorRules {
    */
   static final class MonoTimeoutMonoEmptyPublisher<T, S> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Publisher<S> other) {
-      return mono.timeout(other).onErrorComplete(TimeoutException.class);
+    Mono<T> before(Mono<T> mono, Publisher<S> firstTimeout) {
+      return mono.timeout(firstTimeout).onErrorComplete(TimeoutException.class);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Publisher<S> other) {
-      return mono.timeout(other, Mono.empty());
+    Mono<T> after(Mono<T> mono, Publisher<S> firstTimeout) {
+      return mono.timeout(firstTimeout, Mono.empty());
     }
   }
 
@@ -168,13 +168,13 @@ final class ReactorRules {
    */
   static final class MonoTimeoutMonoJustPublisher<T, S> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Publisher<S> other, T fallbackValue) {
-      return mono.timeout(other).onErrorReturn(TimeoutException.class, fallbackValue);
+    Mono<T> before(Mono<T> mono, Publisher<S> firstTimeout, T data) {
+      return mono.timeout(firstTimeout).onErrorReturn(TimeoutException.class, data);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Publisher<S> other, T fallbackValue) {
-      return mono.timeout(other, Mono.just(fallbackValue));
+    Mono<T> after(Mono<T> mono, Publisher<S> firstTimeout, T data) {
+      return mono.timeout(firstTimeout, Mono.just(data));
     }
   }
 
@@ -184,52 +184,52 @@ final class ReactorRules {
    */
   static final class MonoTimeoutPublisher<T, S> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Publisher<S> other, Mono<T> fallback) {
-      return mono.timeout(other).onErrorResume(TimeoutException.class, e -> fallback);
+    Mono<T> before(Mono<T> mono, Publisher<S> firstTimeout, Mono<T> fallback) {
+      return mono.timeout(firstTimeout).onErrorResume(TimeoutException.class, e -> fallback);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Publisher<S> other, Mono<T> fallback) {
-      return mono.timeout(other, fallback);
+    Mono<T> after(Mono<T> mono, Publisher<S> firstTimeout, Mono<T> fallback) {
+      return mono.timeout(firstTimeout, fallback);
     }
   }
 
   /** Prefer {@link Mono#just(Object)} over more contrived alternatives. */
   static final class MonoJust<T> {
     @BeforeTemplate
-    Mono<T> before(T value) {
-      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(value)), Flux.just(value).next());
+    Mono<T> before(T data) {
+      return Refaster.anyOf(Mono.justOrEmpty(Optional.of(data)), Flux.just(data).next());
     }
 
     @AfterTemplate
-    Mono<T> after(T value) {
-      return Mono.just(value);
+    Mono<T> after(T data) {
+      return Mono.just(data);
     }
   }
 
   /** Prefer {@link Mono#justOrEmpty(Object)} over more contrived alternatives. */
   static final class MonoJustOrEmptyObject<T extends @Nullable Object> {
     @BeforeTemplate
-    Mono<T> before(T value) {
-      return Mono.justOrEmpty(Optional.ofNullable(value));
+    Mono<T> before(T data) {
+      return Mono.justOrEmpty(Optional.ofNullable(data));
     }
 
     @AfterTemplate
-    Mono<T> after(T value) {
-      return Mono.justOrEmpty(value);
+    Mono<T> after(T data) {
+      return Mono.justOrEmpty(data);
     }
   }
 
   /** Prefer {@link Mono#justOrEmpty(Optional)} over more verbose alternatives. */
   static final class MonoJustOrEmptyOptional<T> {
     @BeforeTemplate
-    Mono<T> before(Optional<T> optional) {
-      return Mono.just(optional).filter(Optional::isPresent).map(Optional::orElseThrow);
+    Mono<T> before(Optional<T> data) {
+      return Mono.just(data).filter(Optional::isPresent).map(Optional::orElseThrow);
     }
 
     @AfterTemplate
-    Mono<T> after(Optional<T> optional) {
-      return Mono.justOrEmpty(optional);
+    Mono<T> after(Optional<T> data) {
+      return Mono.justOrEmpty(data);
     }
   }
 
@@ -243,15 +243,14 @@ final class ReactorRules {
     @BeforeTemplate
     @SuppressWarnings(
         "MonoFromSupplier" /* `optional` may match a checked exception-throwing expression. */)
-    Mono<T> before(Optional<T> optional) {
+    Mono<T> before(Optional<T> data) {
       return Refaster.anyOf(
-          Mono.fromCallable(() -> optional.orElse(null)),
-          Mono.fromSupplier(() -> optional.orElse(null)));
+          Mono.fromCallable(() -> data.orElse(null)), Mono.fromSupplier(() -> data.orElse(null)));
     }
 
     @AfterTemplate
-    Mono<T> after(Optional<T> optional) {
-      return Mono.defer(() -> Mono.justOrEmpty(optional));
+    Mono<T> after(Optional<T> data) {
+      return Mono.defer(() -> Mono.justOrEmpty(data));
     }
   }
 
@@ -279,13 +278,13 @@ final class ReactorRules {
    */
   static final class MonoJustOrEmptySwitchIfEmpty<T> {
     @BeforeTemplate
-    Mono<T> before(Optional<T> optional, Mono<T> mono) {
-      return optional.map(Mono::just).orElse(mono);
+    Mono<T> before(Optional<T> data, Mono<T> alternate) {
+      return data.map(Mono::just).orElse(alternate);
     }
 
     @AfterTemplate
-    Mono<T> after(Optional<T> optional, Mono<T> mono) {
-      return Mono.justOrEmpty(optional).switchIfEmpty(mono);
+    Mono<T> after(Optional<T> data, Mono<T> alternate) {
+      return Mono.justOrEmpty(data).switchIfEmpty(alternate);
     }
   }
 
@@ -296,13 +295,13 @@ final class ReactorRules {
    */
   static final class MonoZip<T, S> {
     @BeforeTemplate
-    Mono<Tuple2<T, S>> before(Mono<T> mono, Mono<S> other) {
-      return mono.zipWith(other);
+    Mono<Tuple2<T, S>> before(Mono<T> p1, Mono<S> p2) {
+      return p1.zipWith(p2);
     }
 
     @AfterTemplate
-    Mono<Tuple2<T, S>> after(Mono<T> mono, Mono<S> other) {
-      return Mono.zip(mono, other);
+    Mono<Tuple2<T, S>> after(Mono<T> p1, Mono<S> p2) {
+      return Mono.zip(p1, p2);
     }
   }
 
@@ -313,13 +312,13 @@ final class ReactorRules {
    */
   static final class MonoZipMapFunction<T, S, R> {
     @BeforeTemplate
-    Mono<R> before(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
-      return mono.zipWith(other, combinator);
+    Mono<R> before(Mono<T> p1, Mono<S> p2, BiFunction<T, S, R> function) {
+      return p1.zipWith(p2, function);
     }
 
     @AfterTemplate
-    Mono<R> after(Mono<T> mono, Mono<S> other, BiFunction<T, S, R> combinator) {
-      return Mono.zip(mono, other).map(function(combinator));
+    Mono<R> after(Mono<T> p1, Mono<S> p2, BiFunction<T, S, R> function) {
+      return Mono.zip(p1, p2).map(function(function));
     }
   }
 
@@ -330,13 +329,13 @@ final class ReactorRules {
    */
   static final class FluxZip<T, S> {
     @BeforeTemplate
-    Flux<Tuple2<T, S>> before(Flux<T> flux, Publisher<S> other) {
-      return flux.zipWith(other);
+    Flux<Tuple2<T, S>> before(Flux<T> source1, Publisher<S> source2) {
+      return source1.zipWith(source2);
     }
 
     @AfterTemplate
-    Flux<Tuple2<T, S>> after(Flux<T> flux, Publisher<S> other) {
-      return Flux.zip(flux, other);
+    Flux<Tuple2<T, S>> after(Flux<T> source1, Publisher<S> source2) {
+      return Flux.zip(source1, source2);
     }
   }
 
@@ -347,26 +346,26 @@ final class ReactorRules {
    */
   static final class FluxZipMapFunction<T, S, R> {
     @BeforeTemplate
-    Flux<R> before(Flux<T> flux, Publisher<S> other, BiFunction<T, S, R> combinator) {
-      return flux.zipWith(other, combinator);
+    Flux<R> before(Flux<T> source1, Publisher<S> source2, BiFunction<T, S, R> function) {
+      return source1.zipWith(source2, function);
     }
 
     @AfterTemplate
-    Flux<R> after(Flux<T> flux, Publisher<S> other, BiFunction<T, S, R> combinator) {
-      return Flux.zip(flux, other).map(function(combinator));
+    Flux<R> after(Flux<T> source1, Publisher<S> source2, BiFunction<T, S, R> function) {
+      return Flux.zip(source1, source2).map(function(function));
     }
   }
 
   /** Prefer {@link Flux#zipWithIterable(Iterable)} over more contrived alternatives. */
   static final class FluxZipWithIterable<T, S> {
     @BeforeTemplate
-    Flux<Tuple2<T, S>> before(Flux<T> flux, Iterable<S> iterable) {
-      return Flux.zip(flux, Flux.fromIterable(iterable));
+    Flux<Tuple2<T, S>> before(Flux<T> source1, Iterable<S> iterable) {
+      return Flux.zip(source1, Flux.fromIterable(iterable));
     }
 
     @AfterTemplate
-    Flux<Tuple2<T, S>> after(Flux<T> flux, Iterable<S> iterable) {
-      return flux.zipWithIterable(iterable);
+    Flux<Tuple2<T, S>> after(Flux<T> source1, Iterable<S> iterable) {
+      return source1.zipWithIterable(iterable);
     }
   }
 
@@ -374,18 +373,14 @@ final class ReactorRules {
   static final class FluxZipWithIterableWithBiFunction<T, S, R> {
     @BeforeTemplate
     Flux<R> before(
-        Flux<T> flux,
-        Iterable<S> iterable,
-        BiFunction<? super T, ? super S, ? extends R> function) {
-      return flux.zipWith(Flux.fromIterable(iterable), function);
+        Flux<T> flux, Iterable<S> iterable, BiFunction<? super T, ? super S, ? extends R> zipper) {
+      return flux.zipWith(Flux.fromIterable(iterable), zipper);
     }
 
     @AfterTemplate
     Flux<R> after(
-        Flux<T> flux,
-        Iterable<S> iterable,
-        BiFunction<? super T, ? super S, ? extends R> function) {
-      return flux.zipWithIterable(iterable, function);
+        Flux<T> flux, Iterable<S> iterable, BiFunction<? super T, ? super S, ? extends R> zipper) {
+      return flux.zipWithIterable(iterable, zipper);
     }
   }
 
@@ -395,14 +390,14 @@ final class ReactorRules {
    */
   static final class FluxZipWithIterableMapFunction<T, S, R> {
     @BeforeTemplate
-    Flux<R> before(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
-      return flux.zipWithIterable(iterable, combinator);
+    Flux<R> before(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> function) {
+      return flux.zipWithIterable(iterable, function);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Flux<R> after(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> combinator) {
-      return flux.zipWithIterable(iterable).map(function(combinator));
+    Flux<R> after(Flux<T> flux, Iterable<S> iterable, BiFunction<T, S, R> function) {
+      return flux.zipWithIterable(iterable).map(function(function));
     }
   }
 
@@ -411,13 +406,13 @@ final class ReactorRules {
    */
   static final class MonoErrorThrowable<T> {
     @BeforeTemplate
-    Mono<T> before(Throwable throwable) {
-      return Mono.defer(() -> Mono.error(throwable));
+    Mono<T> before(Throwable error) {
+      return Mono.defer(() -> Mono.error(error));
     }
 
     @AfterTemplate
-    Mono<T> after(Throwable throwable) {
-      return Mono.error(() -> throwable);
+    Mono<T> after(Throwable error) {
+      return Mono.error(() -> error);
     }
   }
 
@@ -426,13 +421,13 @@ final class ReactorRules {
    */
   static final class FluxErrorThrowable<T> {
     @BeforeTemplate
-    Flux<T> before(Throwable throwable) {
-      return Flux.defer(() -> Flux.error(throwable));
+    Flux<T> before(Throwable error) {
+      return Flux.defer(() -> Flux.error(error));
     }
 
     @AfterTemplate
-    Flux<T> after(Throwable throwable) {
-      return Flux.error(() -> throwable);
+    Flux<T> after(Throwable error) {
+      return Flux.error(() -> error);
     }
   }
 
@@ -444,13 +439,13 @@ final class ReactorRules {
   // reliably.
   static final class MonoErrorSupplier<T, E extends Throwable> {
     @BeforeTemplate
-    Mono<T> before(Supplier<E> supplier) {
-      return Mono.error(() -> supplier.get());
+    Mono<T> before(Supplier<E> errorSupplier) {
+      return Mono.error(() -> errorSupplier.get());
     }
 
     @AfterTemplate
-    Mono<T> after(Supplier<E> supplier) {
-      return Mono.error(supplier);
+    Mono<T> after(Supplier<E> errorSupplier) {
+      return Mono.error(errorSupplier);
     }
   }
 
@@ -462,29 +457,29 @@ final class ReactorRules {
   // reliably.
   static final class FluxErrorSupplier<T, E extends Throwable> {
     @BeforeTemplate
-    Flux<T> before(Supplier<E> supplier) {
-      return Flux.error(() -> supplier.get());
+    Flux<T> before(Supplier<E> errorSupplier) {
+      return Flux.error(() -> errorSupplier.get());
     }
 
     @AfterTemplate
-    Flux<T> after(Supplier<E> supplier) {
-      return Flux.error(supplier);
+    Flux<T> after(Supplier<E> errorSupplier) {
+      return Flux.error(errorSupplier);
     }
   }
 
   /** Prefer {@link Mono#thenReturn(Object)} over more verbose alternatives. */
   static final class MonoThenReturn<T, S> {
     @BeforeTemplate
-    Mono<S> before(Mono<T> mono, S object) {
+    Mono<S> before(Mono<T> mono, S value) {
       return Refaster.anyOf(
-          mono.ignoreElement().thenReturn(object),
-          mono.then().thenReturn(object),
-          mono.then(Mono.just(object)));
+          mono.ignoreElement().thenReturn(value),
+          mono.then().thenReturn(value),
+          mono.then(Mono.just(value)));
     }
 
     @AfterTemplate
-    Mono<S> after(Mono<T> mono, S object) {
-      return mono.thenReturn(object);
+    Mono<S> after(Mono<T> mono, S value) {
+      return mono.thenReturn(value);
     }
   }
 
@@ -512,26 +507,26 @@ final class ReactorRules {
   /** Prefer {@link Mono#defaultIfEmpty(Object)} over more contrived alternatives. */
   static final class MonoDefaultIfEmpty<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, T object) {
-      return mono.switchIfEmpty(Mono.just(object));
+    Mono<T> before(Mono<T> mono, T defaultV) {
+      return mono.switchIfEmpty(Mono.just(defaultV));
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, T object) {
-      return mono.defaultIfEmpty(object);
+    Mono<T> after(Mono<T> mono, T defaultV) {
+      return mono.defaultIfEmpty(defaultV);
     }
   }
 
   /** Prefer {@link Flux#defaultIfEmpty(Object)} over more contrived alternatives. */
   static final class FluxDefaultIfEmpty<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, T object) {
-      return flux.switchIfEmpty(Refaster.anyOf(Mono.just(object), Flux.just(object)));
+    Flux<T> before(Flux<T> flux, T defaultV) {
+      return flux.switchIfEmpty(Refaster.anyOf(Mono.just(defaultV), Flux.just(defaultV)));
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, T object) {
-      return flux.defaultIfEmpty(object);
+    Flux<T> after(Flux<T> flux, T defaultV) {
+      return flux.defaultIfEmpty(defaultV);
     }
   }
 
@@ -546,9 +541,9 @@ final class ReactorRules {
     Flux<T> before(
         Function<? super Object[], ? extends T> combinator,
         int prefetch,
-        Comparator<? super T> cmp,
-        @Matches(IsEmpty.class) T[] emptyArray,
-        @Matches(IsEmpty.class) Iterable<T> emptyIterable,
+        Comparator<? super T> comparator,
+        @Matches(IsEmpty.class) T[] array,
+        @Matches(IsEmpty.class) Iterable<T> it,
         @Matches(IsEmpty.class) Stream<T> emptyStream) {
       return Refaster.anyOf(
           Flux.zip(combinator),
@@ -559,18 +554,18 @@ final class ReactorRules {
           Flux.just(),
           Flux.merge(),
           Flux.merge(prefetch),
-          Flux.mergeComparing(cmp),
-          Flux.mergeComparing(prefetch, cmp),
-          Flux.mergeComparingDelayError(prefetch, cmp),
+          Flux.mergeComparing(comparator),
+          Flux.mergeComparing(prefetch, comparator),
+          Flux.mergeComparingDelayError(prefetch, comparator),
           Flux.mergeDelayError(prefetch),
-          Flux.mergePriority(cmp),
-          Flux.mergePriority(prefetch, cmp),
-          Flux.mergePriorityDelayError(prefetch, cmp),
+          Flux.mergePriority(comparator),
+          Flux.mergePriority(prefetch, comparator),
+          Flux.mergePriorityDelayError(prefetch, comparator),
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
           Flux.mergeSequentialDelayError(prefetch),
-          Flux.fromArray(emptyArray),
-          Flux.fromIterable(emptyIterable),
+          Flux.fromArray(array),
+          Flux.fromIterable(it),
           Flux.fromStream(() -> emptyStream));
     }
 
@@ -602,13 +597,13 @@ final class ReactorRules {
    */
   static final class FluxTimeoutFluxEmpty<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Duration duration) {
-      return flux.timeout(duration).onErrorComplete(TimeoutException.class);
+    Flux<T> before(Flux<T> flux, Duration timeout) {
+      return flux.timeout(timeout).onErrorComplete(TimeoutException.class);
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Duration duration) {
-      return flux.timeout(duration, Flux.empty());
+    Flux<T> after(Flux<T> flux, Duration timeout) {
+      return flux.timeout(timeout, Flux.empty());
     }
   }
 
@@ -616,34 +611,34 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class FluxJust<T> {
     @BeforeTemplate
-    Flux<Integer> before(int value) {
-      return Flux.range(value, 1);
+    Flux<Integer> before(int data) {
+      return Flux.range(data, 1);
     }
 
     @BeforeTemplate
-    Flux<T> before(T value) {
+    Flux<T> before(T data) {
       return Refaster.anyOf(
-          Mono.just(value).flux(),
-          Flux.fromStream(() -> Stream.of(value)),
-          Mono.just(value).repeat().take(1));
+          Mono.just(data).flux(),
+          Flux.fromStream(() -> Stream.of(data)),
+          Mono.just(data).repeat().take(1));
     }
 
     @AfterTemplate
-    Flux<T> after(T value) {
-      return Flux.just(value);
+    Flux<T> after(T data) {
+      return Flux.just(data);
     }
   }
 
   /** Prefer {@link Flux#just(Object[])} over more contrived alternatives. */
   static final class FluxJustVarargs<T> {
     @BeforeTemplate
-    Flux<T> before(@Repeated T values) {
-      return Flux.fromStream(() -> Stream.of(Refaster.asVarargs(values)));
+    Flux<T> before(@Repeated T data) {
+      return Flux.fromStream(() -> Stream.of(Refaster.asVarargs(data)));
     }
 
     @AfterTemplate
-    Flux<T> after(@Repeated T values) {
-      return Flux.just(values);
+    Flux<T> after(@Repeated T data) {
+      return Flux.just(data);
     }
   }
 
@@ -890,19 +885,19 @@ final class ReactorRules {
     @SuppressWarnings("NestedPublishers")
     Flux<S> before(
         Flux<T> flux,
-        Function<? super T, ? extends P> function,
+        Function<? super T, ? extends P> mapper,
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          flux.concatMap(function, 0),
-          flux.flatMap(function, 1),
-          flux.flatMapSequential(function, 1),
-          flux.map(function).concatMap(identityOperation));
+          flux.concatMap(mapper, 0),
+          flux.flatMap(mapper, 1),
+          flux.flatMapSequential(mapper, 1),
+          flux.map(mapper).concatMap(identityOperation));
     }
 
     @AfterTemplate
-    Flux<S> after(Flux<T> flux, Function<? super T, ? extends P> function) {
-      return flux.concatMap(function);
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends P> mapper) {
+      return flux.concatMap(mapper);
     }
   }
 
@@ -912,43 +907,43 @@ final class ReactorRules {
     @SuppressWarnings("NestedPublishers")
     Flux<S> before(
         Flux<T> flux,
-        Function<? super T, ? extends P> function,
+        Function<? super T, ? extends P> mapper,
         int prefetch,
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          flux.flatMap(function, 1, prefetch),
-          flux.flatMapSequential(function, 1, prefetch),
-          flux.map(function).concatMap(identityOperation, prefetch));
+          flux.flatMap(mapper, 1, prefetch),
+          flux.flatMapSequential(mapper, 1, prefetch),
+          flux.map(mapper).concatMap(identityOperation, prefetch));
     }
 
     @AfterTemplate
-    Flux<S> after(Flux<T> flux, Function<? super T, ? extends P> function, int prefetch) {
-      return flux.concatMap(function, prefetch);
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends P> mapper, int prefetch) {
+      return flux.concatMap(mapper, prefetch);
     }
   }
 
   /** Prefer {@link Mono#flatMapIterable(Function)} over more contrived alternatives. */
   static final class MonoFlatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono, Function<? super T, I> function) {
-      return mono.map(function).flatMapMany(Flux::fromIterable);
+    Flux<S> before(Mono<T> mono, Function<? super T, I> mapper) {
+      return mono.map(mapper).flatMapMany(Flux::fromIterable);
     }
 
     @BeforeTemplate
     Flux<S> before(
         Mono<T> mono,
-        Function<? super T, I> function,
+        Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
             Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          mono.map(function).flatMapIterable(identityOperation),
-          mono.flux().concatMapIterable(function));
+          mono.map(mapper).flatMapIterable(identityOperation),
+          mono.flux().concatMapIterable(mapper));
     }
 
     @AfterTemplate
-    Flux<S> after(Mono<T> mono, Function<? super T, I> function) {
-      return mono.flatMapIterable(function);
+    Flux<S> after(Mono<T> mono, Function<? super T, I> mapper) {
+      return mono.flatMapIterable(mapper);
     }
   }
 
@@ -977,16 +972,16 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<S> before(
         Flux<T> flux,
-        Function<? super T, I> function,
+        Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
             Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          flux.flatMapIterable(function), flux.map(function).concatMapIterable(identityOperation));
+          flux.flatMapIterable(mapper), flux.map(mapper).concatMapIterable(identityOperation));
     }
 
     @AfterTemplate
-    Flux<S> after(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function) {
-      return flux.concatMapIterable(function);
+    Flux<S> after(Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> mapper) {
+      return flux.concatMapIterable(mapper);
     }
   }
 
@@ -998,19 +993,19 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<S> before(
         Flux<T> flux,
-        Function<? super T, I> function,
+        Function<? super T, I> mapper,
         int prefetch,
         @Matches(IsIdentityOperation.class)
             Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
       return Refaster.anyOf(
-          flux.flatMapIterable(function, prefetch),
-          flux.map(function).concatMapIterable(identityOperation, prefetch));
+          flux.flatMapIterable(mapper, prefetch),
+          flux.map(mapper).concatMapIterable(identityOperation, prefetch));
     }
 
     @AfterTemplate
     Flux<S> after(
-        Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> function, int prefetch) {
-      return flux.concatMapIterable(function, prefetch);
+        Flux<T> flux, Function<? super T, ? extends Iterable<? extends S>> mapper, int prefetch) {
+      return flux.concatMapIterable(mapper, prefetch);
     }
   }
 
@@ -1066,7 +1061,7 @@ final class ReactorRules {
     abstract S transformation(@MayOptionallyUse T value);
 
     @BeforeTemplate
-    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
+    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int concurrency) {
       return Refaster.anyOf(
           flux.concatMap(x -> Mono.just(transformation(x))),
           flux.concatMap(x -> Flux.just(transformation(x))),
@@ -1078,20 +1073,20 @@ final class ReactorRules {
           flux.concatMapDelayError(x -> Flux.just(transformation(x)), prefetch),
           flux.concatMapDelayError(x -> Mono.just(transformation(x)), delayUntilEnd, prefetch),
           flux.concatMapDelayError(x -> Flux.just(transformation(x)), delayUntilEnd, prefetch),
-          flux.flatMap(x -> Mono.just(transformation(x)), maxConcurrency),
-          flux.flatMap(x -> Flux.just(transformation(x)), maxConcurrency),
-          flux.flatMap(x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
-          flux.flatMap(x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
-          flux.flatMapDelayError(x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
-          flux.flatMapDelayError(x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
-          flux.flatMapSequential(x -> Mono.just(transformation(x)), maxConcurrency),
-          flux.flatMapSequential(x -> Flux.just(transformation(x)), maxConcurrency),
-          flux.flatMapSequential(x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
-          flux.flatMapSequential(x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
+          flux.flatMap(x -> Mono.just(transformation(x)), concurrency),
+          flux.flatMap(x -> Flux.just(transformation(x)), concurrency),
+          flux.flatMap(x -> Mono.just(transformation(x)), concurrency, prefetch),
+          flux.flatMap(x -> Flux.just(transformation(x)), concurrency, prefetch),
+          flux.flatMapDelayError(x -> Mono.just(transformation(x)), concurrency, prefetch),
+          flux.flatMapDelayError(x -> Flux.just(transformation(x)), concurrency, prefetch),
+          flux.flatMapSequential(x -> Mono.just(transformation(x)), concurrency),
+          flux.flatMapSequential(x -> Flux.just(transformation(x)), concurrency),
+          flux.flatMapSequential(x -> Mono.just(transformation(x)), concurrency, prefetch),
+          flux.flatMapSequential(x -> Flux.just(transformation(x)), concurrency, prefetch),
           flux.flatMapSequentialDelayError(
-              x -> Mono.just(transformation(x)), maxConcurrency, prefetch),
+              x -> Mono.just(transformation(x)), concurrency, prefetch),
           flux.flatMapSequentialDelayError(
-              x -> Flux.just(transformation(x)), maxConcurrency, prefetch),
+              x -> Flux.just(transformation(x)), concurrency, prefetch),
           flux.switchMap(x -> Mono.just(transformation(x))),
           flux.switchMap(x -> Flux.just(transformation(x))));
     }
@@ -1134,7 +1129,7 @@ final class ReactorRules {
 
     @BeforeTemplate
     @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
-    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int maxConcurrency) {
+    Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int concurrency) {
       return Refaster.anyOf(
           flux.concatMap(
               x ->
@@ -1170,40 +1165,40 @@ final class ReactorRules {
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
-              maxConcurrency),
+              concurrency),
           flux.flatMap(
               x ->
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
-              maxConcurrency,
+              concurrency,
               prefetch),
           flux.flatMapDelayError(
               x ->
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
-              maxConcurrency,
+              concurrency,
               prefetch),
           flux.flatMapSequential(
               x ->
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
-              maxConcurrency),
+              concurrency),
           flux.flatMapSequential(
               x ->
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
-              maxConcurrency,
+              concurrency,
               prefetch),
           flux.flatMapSequentialDelayError(
               x ->
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
-              maxConcurrency,
+              concurrency,
               prefetch),
           flux.switchMap(
               x ->
@@ -1319,14 +1314,14 @@ final class ReactorRules {
   static final class MonoThenEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> before(Mono<T> mono, Publisher<Void> publisher) {
-      return mono.ignoreElement().thenEmpty(publisher);
+    Mono<Void> before(Mono<T> mono, Publisher<Void> other) {
+      return mono.ignoreElement().thenEmpty(other);
     }
 
     @AfterTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> after(Mono<T> mono, Publisher<Void> publisher) {
-      return mono.thenEmpty(publisher);
+    Mono<Void> after(Mono<T> mono, Publisher<Void> other) {
+      return mono.thenEmpty(other);
     }
   }
 
@@ -1336,28 +1331,27 @@ final class ReactorRules {
   static final class FluxThenEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> before(Flux<T> flux, Publisher<Void> publisher) {
-      return flux.ignoreElements().thenEmpty(publisher);
+    Mono<Void> before(Flux<T> flux, Publisher<Void> other) {
+      return flux.ignoreElements().thenEmpty(other);
     }
 
     @AfterTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> after(Flux<T> flux, Publisher<Void> publisher) {
-      return flux.thenEmpty(publisher);
+    Mono<Void> after(Flux<T> flux, Publisher<Void> other) {
+      return flux.thenEmpty(other);
     }
   }
 
   /** Prefer {@link Mono#thenMany(Publisher)} over applying vacuous operations first. */
   static final class MonoThenMany<T, S> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono, Publisher<S> publisher) {
-      return Refaster.anyOf(
-          mono.ignoreElement().thenMany(publisher), mono.flux().thenMany(publisher));
+    Flux<S> before(Mono<T> mono, Publisher<S> other) {
+      return Refaster.anyOf(mono.ignoreElement().thenMany(other), mono.flux().thenMany(other));
     }
 
     @AfterTemplate
-    Flux<S> after(Mono<T> mono, Publisher<S> publisher) {
-      return mono.thenMany(publisher);
+    Flux<S> after(Mono<T> mono, Publisher<S> other) {
+      return mono.thenMany(other);
     }
   }
 
@@ -1367,13 +1361,13 @@ final class ReactorRules {
    */
   static final class MonoThenFlux<T, S> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono1, Mono<S> mono2) {
-      return mono1.thenMany(mono2);
+    Flux<S> before(Mono<T> mono1, Mono<S> other) {
+      return mono1.thenMany(other);
     }
 
     @AfterTemplate
-    Flux<S> after(Mono<T> mono1, Mono<S> mono2) {
-      return mono1.then(mono2).flux();
+    Flux<S> after(Mono<T> mono1, Mono<S> other) {
+      return mono1.then(other).flux();
     }
   }
 
@@ -1382,13 +1376,13 @@ final class ReactorRules {
    */
   static final class FluxThenMany<T, S> {
     @BeforeTemplate
-    Flux<S> before(Flux<T> flux, Publisher<S> publisher) {
-      return flux.ignoreElements().thenMany(publisher);
+    Flux<S> before(Flux<T> flux, Publisher<S> other) {
+      return flux.ignoreElements().thenMany(other);
     }
 
     @AfterTemplate
-    Flux<S> after(Flux<T> flux, Publisher<S> publisher) {
-      return flux.thenMany(publisher);
+    Flux<S> after(Flux<T> flux, Publisher<S> other) {
+      return flux.thenMany(other);
     }
   }
 
@@ -1396,19 +1390,19 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class MonoThenWithMono<T, S> {
     @BeforeTemplate
-    Mono<S> before(Mono<T> mono1, Mono<S> mono2) {
-      return Refaster.anyOf(mono1.ignoreElement().then(mono2), mono1.flux().then(mono2));
+    Mono<S> before(Mono<T> mono1, Mono<S> other) {
+      return Refaster.anyOf(mono1.ignoreElement().then(other), mono1.flux().then(other));
     }
 
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> before2(Mono<T> mono1, Mono<Void> mono2) {
-      return mono1.thenEmpty(mono2);
+    Mono<Void> before2(Mono<T> mono1, Mono<Void> other) {
+      return mono1.thenEmpty(other);
     }
 
     @AfterTemplate
-    Mono<S> after(Mono<T> mono1, Mono<S> mono2) {
-      return mono1.then(mono2);
+    Mono<S> after(Mono<T> mono1, Mono<S> other) {
+      return mono1.then(other);
     }
   }
 
@@ -1416,19 +1410,19 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class FluxThenWithMono<T, S> {
     @BeforeTemplate
-    Mono<S> before(Flux<T> flux, Mono<S> mono) {
-      return flux.ignoreElements().then(mono);
+    Mono<S> before(Flux<T> flux, Mono<S> other) {
+      return flux.ignoreElements().then(other);
     }
 
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> before2(Flux<T> flux, Mono<Void> mono) {
-      return flux.thenEmpty(mono);
+    Mono<Void> before2(Flux<T> flux, Mono<Void> other) {
+      return flux.thenEmpty(other);
     }
 
     @AfterTemplate
-    Mono<S> after(Flux<T> flux, Mono<S> mono) {
-      return flux.then(mono);
+    Mono<S> after(Flux<T> flux, Mono<S> other) {
+      return flux.then(other);
     }
   }
 
@@ -1439,11 +1433,11 @@ final class ReactorRules {
   // rule. Consider introducing an Error Prone check for this.
   static final class MonoSingleOptional<T> {
     @BeforeTemplate
-    Mono<Optional<T>> before(Mono<T> mono, Optional<T> optional, Mono<Optional<T>> alternate) {
+    Mono<Optional<T>> before(Mono<T> mono, Optional<T> defaultV, Mono<Optional<T>> alternate) {
       return Refaster.anyOf(
           mono.flux().collect(toOptional()),
           mono.map(Optional::of).defaultIfEmpty(Optional.empty()),
-          mono.singleOptional().defaultIfEmpty(optional),
+          mono.singleOptional().defaultIfEmpty(defaultV),
           mono.singleOptional().switchIfEmpty(alternate),
           mono.transform(Mono::singleOptional));
     }
@@ -1513,15 +1507,15 @@ final class ReactorRules {
     @SuppressWarnings("NestedPublishers")
     Mono<T> before(
         Mono<S> mono,
-        Function<? super S, ? extends P> function,
+        Function<? super S, ? extends P> transformer,
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Mono<? extends T>> identityOperation) {
-      return mono.map(function).flatMap(identityOperation);
+      return mono.map(transformer).flatMap(identityOperation);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<S> mono, Function<? super S, ? extends P> function) {
-      return mono.flatMap(function);
+    Mono<T> after(Mono<S> mono, Function<? super S, ? extends P> transformer) {
+      return mono.flatMap(transformer);
     }
   }
 
@@ -1531,35 +1525,35 @@ final class ReactorRules {
     @SuppressWarnings("NestedPublishers")
     Flux<T> before(
         Mono<S> mono,
-        Function<? super S, P> function,
+        Function<? super S, P> mapper,
         @Matches(IsIdentityOperation.class)
             Function<? super P, ? extends Publisher<? extends T>> identityOperation,
         int prefetch,
         boolean delayUntilEnd,
-        int maxConcurrency) {
+        int concurrency) {
       return Refaster.anyOf(
-          mono.map(function).flatMapMany(identityOperation),
-          mono.flux().concatMap(function),
-          mono.flux().concatMap(function, prefetch),
-          mono.flux().concatMapDelayError(function),
-          mono.flux().concatMapDelayError(function, prefetch),
-          mono.flux().concatMapDelayError(function, delayUntilEnd, prefetch),
-          mono.flux().flatMap(function, maxConcurrency),
-          mono.flux().flatMap(function, maxConcurrency, prefetch),
-          mono.flux().flatMapDelayError(function, maxConcurrency, prefetch),
-          mono.flux().flatMapSequential(function, maxConcurrency),
-          mono.flux().flatMapSequential(function, maxConcurrency, prefetch),
-          mono.flux().flatMapSequentialDelayError(function, maxConcurrency, prefetch));
+          mono.map(mapper).flatMapMany(identityOperation),
+          mono.flux().concatMap(mapper),
+          mono.flux().concatMap(mapper, prefetch),
+          mono.flux().concatMapDelayError(mapper),
+          mono.flux().concatMapDelayError(mapper, prefetch),
+          mono.flux().concatMapDelayError(mapper, delayUntilEnd, prefetch),
+          mono.flux().flatMap(mapper, concurrency),
+          mono.flux().flatMap(mapper, concurrency, prefetch),
+          mono.flux().flatMapDelayError(mapper, concurrency, prefetch),
+          mono.flux().flatMapSequential(mapper, concurrency),
+          mono.flux().flatMapSequential(mapper, concurrency, prefetch),
+          mono.flux().flatMapSequentialDelayError(mapper, concurrency, prefetch));
     }
 
     @BeforeTemplate
-    Flux<T> before(Mono<S> mono, Function<? super S, Publisher<? extends T>> function) {
-      return mono.flux().switchMap(function);
+    Flux<T> before(Mono<S> mono, Function<? super S, Publisher<? extends T>> mapper) {
+      return mono.flux().switchMap(mapper);
     }
 
     @AfterTemplate
-    Flux<T> after(Mono<S> mono, Function<? super S, ? extends P> function) {
-      return mono.flatMapMany(function);
+    Flux<T> after(Mono<S> mono, Function<? super S, ? extends P> mapper) {
+      return mono.flatMapMany(mapper);
     }
   }
 
@@ -1608,15 +1602,14 @@ final class ReactorRules {
     // XXX: Once the `MethodReferenceUsage` check is generally enabled, drop the second
     // `Refaster.anyOf` variant.
     @BeforeTemplate
-    Flux<T> before(Collection<T> collection) {
+    Flux<T> before(Collection<T> it) {
       return Flux.fromStream(
-          Refaster.<Supplier<Stream<? extends T>>>anyOf(
-              collection::stream, () -> collection.stream()));
+          Refaster.<Supplier<Stream<? extends T>>>anyOf(it::stream, () -> it.stream()));
     }
 
     @AfterTemplate
-    Flux<T> after(Collection<T> collection) {
-      return Flux.fromIterable(collection);
+    Flux<T> after(Collection<T> it) {
+      return Flux.fromIterable(it);
     }
   }
 
@@ -1652,14 +1645,18 @@ final class ReactorRules {
   static final class MonoDoOnError<T> {
     @BeforeTemplate
     Mono<T> before(
-        Mono<T> mono, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return mono.doOnError(clazz::isInstance, onError);
+        Mono<T> mono,
+        Class<? extends Throwable> exceptionType,
+        Consumer<? super Throwable> onError) {
+      return mono.doOnError(exceptionType::isInstance, onError);
     }
 
     @AfterTemplate
     Mono<T> after(
-        Mono<T> mono, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return mono.doOnError(clazz, onError);
+        Mono<T> mono,
+        Class<? extends Throwable> exceptionType,
+        Consumer<? super Throwable> onError) {
+      return mono.doOnError(exceptionType, onError);
     }
   }
 
@@ -1670,14 +1667,18 @@ final class ReactorRules {
   static final class FluxDoOnError<T> {
     @BeforeTemplate
     Flux<T> before(
-        Flux<T> flux, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return flux.doOnError(clazz::isInstance, onError);
+        Flux<T> flux,
+        Class<? extends Throwable> exceptionType,
+        Consumer<? super Throwable> onError) {
+      return flux.doOnError(exceptionType::isInstance, onError);
     }
 
     @AfterTemplate
     Flux<T> after(
-        Flux<T> flux, Class<? extends Throwable> clazz, Consumer<? super Throwable> onError) {
-      return flux.doOnError(clazz, onError);
+        Flux<T> flux,
+        Class<? extends Throwable> exceptionType,
+        Consumer<? super Throwable> onError) {
+      return flux.doOnError(exceptionType, onError);
     }
   }
 
@@ -1690,13 +1691,13 @@ final class ReactorRules {
     Mono<T> before(
         Mono<T> mono,
         Consumer<? super Throwable> onThrowable,
-        Class<E> clazz,
+        Class<E> exceptionType,
         Consumer<? super E> onError,
         Predicate<? super Throwable> predicate) {
       return Refaster.anyOf(
           mono.onErrorResume(e -> Mono.empty()),
           mono.onErrorComplete().doOnError(onThrowable),
-          mono.onErrorComplete().doOnError(clazz, onError),
+          mono.onErrorComplete().doOnError(exceptionType, onError),
           mono.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
@@ -1715,13 +1716,13 @@ final class ReactorRules {
     Flux<T> before(
         Flux<T> flux,
         Consumer<? super Throwable> onThrowable,
-        Class<E> clazz,
+        Class<E> exceptionType,
         Consumer<? super E> onError,
         Predicate<? super Throwable> predicate) {
       return Refaster.anyOf(
           flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty())),
           flux.onErrorComplete().doOnError(onThrowable),
-          flux.onErrorComplete().doOnError(clazz, onError),
+          flux.onErrorComplete().doOnError(exceptionType, onError),
           flux.onErrorComplete().doOnError(predicate, onThrowable));
     }
 
@@ -1734,29 +1735,29 @@ final class ReactorRules {
   /** Prefer {@link Mono#onErrorComplete(Class)} over more contrived alternatives. */
   static final class MonoOnErrorCompleteWithClass<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz) {
+    Mono<T> before(Mono<T> mono, Class<? extends Throwable> type) {
       return Refaster.anyOf(
-          mono.onErrorComplete(clazz::isInstance), mono.onErrorResume(clazz, e -> Mono.empty()));
+          mono.onErrorComplete(type::isInstance), mono.onErrorResume(type, e -> Mono.empty()));
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Class<? extends Throwable> clazz) {
-      return mono.onErrorComplete(clazz);
+    Mono<T> after(Mono<T> mono, Class<? extends Throwable> type) {
+      return mono.onErrorComplete(type);
     }
   }
 
   /** Prefer {@link Flux#onErrorComplete(Class)} over more contrived alternatives. */
   static final class FluxOnErrorCompleteWithClass<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Class<? extends Throwable> clazz) {
+    Flux<T> before(Flux<T> flux, Class<? extends Throwable> type) {
       return Refaster.anyOf(
-          flux.onErrorComplete(clazz::isInstance),
-          flux.onErrorResume(clazz, e -> Refaster.anyOf(Mono.empty(), Flux.empty())));
+          flux.onErrorComplete(type::isInstance),
+          flux.onErrorResume(type, e -> Refaster.anyOf(Mono.empty(), Flux.empty())));
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Class<? extends Throwable> clazz) {
-      return flux.onErrorComplete(clazz);
+    Flux<T> after(Flux<T> flux, Class<? extends Throwable> type) {
+      return flux.onErrorComplete(type);
     }
   }
 
@@ -1794,17 +1795,17 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Mono<T> mono,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         BiConsumer<Throwable, Object> errorConsumer) {
-      return mono.onErrorContinue(clazz::isInstance, errorConsumer);
+      return mono.onErrorContinue(type::isInstance, errorConsumer);
     }
 
     @AfterTemplate
     Mono<T> after(
         Mono<T> mono,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         BiConsumer<Throwable, Object> errorConsumer) {
-      return mono.onErrorContinue(clazz, errorConsumer);
+      return mono.onErrorContinue(type, errorConsumer);
     }
   }
 
@@ -1816,17 +1817,17 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<T> before(
         Flux<T> flux,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         BiConsumer<Throwable, Object> errorConsumer) {
-      return flux.onErrorContinue(clazz::isInstance, errorConsumer);
+      return flux.onErrorContinue(type::isInstance, errorConsumer);
     }
 
     @AfterTemplate
     Flux<T> after(
         Flux<T> flux,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         BiConsumer<Throwable, Object> errorConsumer) {
-      return flux.onErrorContinue(clazz, errorConsumer);
+      return flux.onErrorContinue(type, errorConsumer);
     }
   }
 
@@ -1838,17 +1839,17 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Mono<T> mono,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Throwable> mapper) {
-      return mono.onErrorMap(clazz::isInstance, mapper);
+      return mono.onErrorMap(type::isInstance, mapper);
     }
 
     @AfterTemplate
     Mono<T> after(
         Mono<T> mono,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Throwable> mapper) {
-      return mono.onErrorMap(clazz, mapper);
+      return mono.onErrorMap(type, mapper);
     }
   }
 
@@ -1860,17 +1861,17 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<T> before(
         Flux<T> flux,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Throwable> mapper) {
-      return flux.onErrorMap(clazz::isInstance, mapper);
+      return flux.onErrorMap(type::isInstance, mapper);
     }
 
     @AfterTemplate
     Flux<T> after(
         Flux<T> flux,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Throwable> mapper) {
-      return flux.onErrorMap(clazz, mapper);
+      return flux.onErrorMap(type, mapper);
     }
   }
 
@@ -1882,17 +1883,17 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Mono<T> mono,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Mono<? extends T>> fallback) {
-      return mono.onErrorResume(clazz::isInstance, fallback);
+      return mono.onErrorResume(type::isInstance, fallback);
     }
 
     @AfterTemplate
     Mono<T> after(
         Mono<T> mono,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Mono<? extends T>> fallback) {
-      return mono.onErrorResume(clazz, fallback);
+      return mono.onErrorResume(type, fallback);
     }
   }
 
@@ -1904,17 +1905,17 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<T> before(
         Flux<T> flux,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Publisher<? extends T>> fallback) {
-      return flux.onErrorResume(clazz::isInstance, fallback);
+      return flux.onErrorResume(type::isInstance, fallback);
     }
 
     @AfterTemplate
     Flux<T> after(
         Flux<T> flux,
-        Class<? extends Throwable> clazz,
+        Class<? extends Throwable> type,
         Function<? super Throwable, ? extends Publisher<? extends T>> fallback) {
-      return flux.onErrorResume(clazz, fallback);
+      return flux.onErrorResume(type, fallback);
     }
   }
 
@@ -1924,13 +1925,13 @@ final class ReactorRules {
    */
   static final class MonoOnErrorReturn<T> {
     @BeforeTemplate
-    Mono<T> before(Mono<T> mono, Class<? extends Throwable> clazz, T fallbackValue) {
-      return mono.onErrorReturn(clazz::isInstance, fallbackValue);
+    Mono<T> before(Mono<T> mono, Class<? extends Throwable> type, T fallbackValue) {
+      return mono.onErrorReturn(type::isInstance, fallbackValue);
     }
 
     @AfterTemplate
-    Mono<T> after(Mono<T> mono, Class<? extends Throwable> clazz, T fallbackValue) {
-      return mono.onErrorReturn(clazz, fallbackValue);
+    Mono<T> after(Mono<T> mono, Class<? extends Throwable> type, T fallbackValue) {
+      return mono.onErrorReturn(type, fallbackValue);
     }
   }
 
@@ -1940,13 +1941,13 @@ final class ReactorRules {
    */
   static final class FluxOnErrorReturn<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Class<? extends Throwable> clazz, T fallbackValue) {
-      return flux.onErrorReturn(clazz::isInstance, fallbackValue);
+    Flux<T> before(Flux<T> flux, Class<? extends Throwable> type, T fallbackValue) {
+      return flux.onErrorReturn(type::isInstance, fallbackValue);
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Class<? extends Throwable> clazz, T fallbackValue) {
-      return flux.onErrorReturn(clazz, fallbackValue);
+    Flux<T> after(Flux<T> flux, Class<? extends Throwable> type, T fallbackValue) {
+      return flux.onErrorReturn(type, fallbackValue);
     }
   }
 
@@ -1956,13 +1957,13 @@ final class ReactorRules {
    */
   static final class FluxFilterSort<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
-      return flux.sort().filter(predicate);
+    Flux<T> before(Flux<T> flux, Predicate<? super T> p) {
+      return flux.sort().filter(p);
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
-      return flux.filter(predicate).sort();
+    Flux<T> after(Flux<T> flux, Predicate<? super T> p) {
+      return flux.filter(p).sort();
     }
   }
 
@@ -1972,13 +1973,13 @@ final class ReactorRules {
    */
   static final class FluxFilterSortWithComparator<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> cmp) {
-      return flux.sort(cmp).filter(predicate);
+    Flux<T> before(Flux<T> flux, Predicate<? super T> p, Comparator<? super T> sortFunction) {
+      return flux.sort(sortFunction).filter(p);
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate, Comparator<? super T> cmp) {
-      return flux.filter(predicate).sort(cmp);
+    Flux<T> after(Flux<T> flux, Predicate<? super T> p, Comparator<? super T> sortFunction) {
+      return flux.filter(p).sort(sortFunction);
     }
   }
 
@@ -2004,13 +2005,13 @@ final class ReactorRules {
    */
   static final class FluxDistinctSortWithComparator<S, T extends S> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Comparator<S> cmp) {
-      return flux.sort(cmp).distinct();
+    Flux<T> before(Flux<T> flux, Comparator<S> sortFunction) {
+      return flux.sort(sortFunction).distinct();
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Comparator<S> cmp) {
-      return flux.distinct().sort(cmp);
+    Flux<T> after(Flux<T> flux, Comparator<S> sortFunction) {
+      return flux.distinct().sort(sortFunction);
     }
   }
 
@@ -2020,13 +2021,13 @@ final class ReactorRules {
    */
   static final class FluxTakeWhile<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<T> flux, Predicate<? super T> predicate) {
-      return flux.takeWhile(predicate).filter(predicate);
+    Flux<T> before(Flux<T> flux, Predicate<? super T> continuePredicate) {
+      return flux.takeWhile(continuePredicate).filter(continuePredicate);
     }
 
     @AfterTemplate
-    Flux<T> after(Flux<T> flux, Predicate<? super T> predicate) {
-      return flux.takeWhile(predicate);
+    Flux<T> after(Flux<T> flux, Predicate<? super T> continuePredicate) {
+      return flux.takeWhile(continuePredicate);
     }
   }
 
@@ -2098,14 +2099,14 @@ final class ReactorRules {
   static final class FluxTransformMathFluxMinSingleOrEmptyWithComparator<
       T extends Comparable<? super T>> {
     @BeforeTemplate
-    Mono<T> before(Flux<T> flux, Comparator<? super T> cmp) {
+    Mono<T> before(Flux<T> flux, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          flux.sort(cmp).next(), flux.collect(minBy(cmp)).flatMap(Mono::justOrEmpty));
+          flux.sort(comparator).next(), flux.collect(minBy(comparator)).flatMap(Mono::justOrEmpty));
     }
 
     @AfterTemplate
-    Mono<T> after(Flux<T> flux, Comparator<? super T> cmp) {
-      return flux.transform(f -> MathFlux.min(f, cmp)).singleOrEmpty();
+    Mono<T> after(Flux<T> flux, Comparator<? super T> comparator) {
+      return flux.transform(f -> MathFlux.min(f, comparator)).singleOrEmpty();
     }
   }
 
@@ -2129,42 +2130,42 @@ final class ReactorRules {
   static final class FluxTransformMathFluxMaxSingleOrEmptyWithComparator<
       T extends Comparable<? super T>> {
     @BeforeTemplate
-    Mono<T> before(Flux<T> flux, Comparator<? super T> cmp) {
+    Mono<T> before(Flux<T> flux, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          flux.sort(cmp).last(), flux.collect(maxBy(cmp)).flatMap(Mono::justOrEmpty));
+          flux.sort(comparator).last(), flux.collect(maxBy(comparator)).flatMap(Mono::justOrEmpty));
     }
 
     @AfterTemplate
-    Mono<T> after(Flux<T> flux, Comparator<? super T> cmp) {
-      return flux.transform(f -> MathFlux.max(f, cmp)).singleOrEmpty();
+    Mono<T> after(Flux<T> flux, Comparator<? super T> comparator) {
+      return flux.transform(f -> MathFlux.max(f, comparator)).singleOrEmpty();
     }
   }
 
   /** Prefer {@link MathFlux#min(Publisher)} over more contrived alternatives. */
   static final class MathFluxMin<T extends Comparable<? super T>> {
     @BeforeTemplate
-    Mono<T> before(Publisher<T> publisher) {
+    Mono<T> before(Publisher<T> source) {
       return Refaster.anyOf(
-          MathFlux.min(publisher, naturalOrder()), MathFlux.max(publisher, reverseOrder()));
+          MathFlux.min(source, naturalOrder()), MathFlux.max(source, reverseOrder()));
     }
 
     @AfterTemplate
-    Mono<T> after(Publisher<T> publisher) {
-      return MathFlux.min(publisher);
+    Mono<T> after(Publisher<T> source) {
+      return MathFlux.min(source);
     }
   }
 
   /** Prefer {@link MathFlux#max(Publisher)} over more contrived alternatives. */
   static final class MathFluxMax<T extends Comparable<? super T>> {
     @BeforeTemplate
-    Mono<T> before(Publisher<T> publisher) {
+    Mono<T> before(Publisher<T> source) {
       return Refaster.anyOf(
-          MathFlux.min(publisher, reverseOrder()), MathFlux.max(publisher, naturalOrder()));
+          MathFlux.min(source, reverseOrder()), MathFlux.max(source, naturalOrder()));
     }
 
     @AfterTemplate
-    Mono<T> after(Publisher<T> publisher) {
-      return MathFlux.max(publisher);
+    Mono<T> after(Publisher<T> source) {
+      return MathFlux.max(source);
     }
   }
 
@@ -2288,8 +2289,8 @@ final class ReactorRules {
   static final class AssertThatPublisherProbeWasSubscribedIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
-    void before(PublisherProbe<T> probe, boolean wasSubscribed) {
-      if (wasSubscribed) {
+    void before(PublisherProbe<T> probe, boolean expected) {
+      if (expected) {
         probe.assertWasSubscribed();
       } else {
         probe.assertWasNotSubscribed();
@@ -2297,8 +2298,8 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe, boolean wasSubscribed) {
-      assertThat(probe.wasSubscribed()).isEqualTo(wasSubscribed);
+    void after(PublisherProbe<T> probe, boolean expected) {
+      assertThat(probe.wasSubscribed()).isEqualTo(expected);
     }
   }
 
@@ -2309,8 +2310,8 @@ final class ReactorRules {
   static final class AssertThatPublisherProbeWasCancelledIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
-    void before(PublisherProbe<T> probe, boolean wasCancelled) {
-      if (wasCancelled) {
+    void before(PublisherProbe<T> probe, boolean expected) {
+      if (expected) {
         probe.assertWasCancelled();
       } else {
         probe.assertWasNotCancelled();
@@ -2318,8 +2319,8 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe, boolean wasCancelled) {
-      assertThat(probe.wasCancelled()).isEqualTo(wasCancelled);
+    void after(PublisherProbe<T> probe, boolean expected) {
+      assertThat(probe.wasCancelled()).isEqualTo(expected);
     }
   }
 
@@ -2330,8 +2331,8 @@ final class ReactorRules {
   static final class AssertThatPublisherProbeWasRequestedIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
-    void before(PublisherProbe<T> probe, boolean wasRequested) {
-      if (wasRequested) {
+    void before(PublisherProbe<T> probe, boolean expected) {
+      if (expected) {
         probe.assertWasRequested();
       } else {
         probe.assertWasNotRequested();
@@ -2339,34 +2340,35 @@ final class ReactorRules {
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe, boolean wasRequested) {
-      assertThat(probe.wasRequested()).isEqualTo(wasRequested);
+    void after(PublisherProbe<T> probe, boolean expected) {
+      assertThat(probe.wasRequested()).isEqualTo(expected);
     }
   }
 
   /** Prefer {@link Mono#as(Function)} when creating a {@link StepVerifier}. */
   static final class MonoAsStepVerifierCreate<T> {
     @BeforeTemplate
-    FirstStep<T> before(Mono<T> mono) {
-      return Refaster.anyOf(StepVerifier.create(mono), mono.flux().as(StepVerifier::create));
+    FirstStep<T> before(Mono<T> publisher) {
+      return Refaster.anyOf(
+          StepVerifier.create(publisher), publisher.flux().as(StepVerifier::create));
     }
 
     @AfterTemplate
-    FirstStep<T> after(Mono<T> mono) {
-      return mono.as(StepVerifier::create);
+    FirstStep<T> after(Mono<T> publisher) {
+      return publisher.as(StepVerifier::create);
     }
   }
 
   /** Prefer {@link Flux#as(Function)} when creating a {@link StepVerifier}. */
   static final class FluxAsStepVerifierCreate<T> {
     @BeforeTemplate
-    FirstStep<T> before(Flux<T> flux) {
-      return StepVerifier.create(flux);
+    FirstStep<T> before(Flux<T> publisher) {
+      return StepVerifier.create(publisher);
     }
 
     @AfterTemplate
-    FirstStep<T> after(Flux<T> flux) {
-      return flux.as(StepVerifier::create);
+    FirstStep<T> after(Flux<T> publisher) {
+      return publisher.as(StepVerifier::create);
     }
   }
 
@@ -2446,14 +2448,14 @@ final class ReactorRules {
   /** Prefer {@link StepVerifier.Step#expectNext(Object)} over more verbose alternatives. */
   static final class StepExpectNext<T> {
     @BeforeTemplate
-    StepVerifier.Step<T> before(StepVerifier.Step<T> step, T object) {
+    StepVerifier.Step<T> before(StepVerifier.Step<T> step, T obj) {
       return Refaster.anyOf(
-          step.expectNextMatches(e -> e.equals(object)), step.expectNextMatches(object::equals));
+          step.expectNextMatches(e -> e.equals(obj)), step.expectNextMatches(obj::equals));
     }
 
     @AfterTemplate
-    StepVerifier.Step<T> after(StepVerifier.Step<T> step, T object) {
-      return step.expectNext(object);
+    StepVerifier.Step<T> after(StepVerifier.Step<T> step, T obj) {
+      return step.expectNext(obj);
     }
   }
 
@@ -2466,8 +2468,8 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class FluxAsStepVerifierCreateExpectNext<T, L extends List<T>> {
     @BeforeTemplate
-    StepVerifier.Step<L> before(Flux<T> flux, T object, Collector<? super T, ?, L> listCollector) {
-      return flux.collect(listCollector)
+    StepVerifier.Step<L> before(Flux<T> flux, T object, Collector<? super T, ?, L> collector) {
+      return flux.collect(collector)
           .as(StepVerifier::create)
           .assertNext(list -> assertThat(list).containsExactly(object));
     }
@@ -2507,16 +2509,16 @@ final class ReactorRules {
   /** Prefer {@link StepVerifier.LastStep#verifyError(Class)} over more verbose alternatives. */
   static final class LastStepVerifyErrorWithClass<T extends Throwable> {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, Class<T> clazz) {
+    Duration before(StepVerifier.LastStep step, Class<T> type) {
       return Refaster.anyOf(
-          step.expectError(clazz).verify(),
-          step.verifyErrorMatches(clazz::isInstance),
-          step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(clazz)));
+          step.expectError(type).verify(),
+          step.verifyErrorMatches(type::isInstance),
+          step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(type)));
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, Class<T> clazz) {
-      return step.verifyError(clazz);
+    Duration after(StepVerifier.LastStep step, Class<T> type) {
+      return step.verifyError(type);
     }
   }
 
@@ -2568,20 +2570,20 @@ final class ReactorRules {
       T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings("StepVerifierVerify" /* This is a more specific template. */)
-    StepVerifier.Assertions before(StepVerifier.LastStep step, Class<T> clazz, String message) {
+    StepVerifier.Assertions before(StepVerifier.LastStep step, Class<T> type, String message) {
       return Refaster.anyOf(
           step.expectError()
               .verifyThenAssertThat()
-              .hasOperatorErrorOfType(clazz)
+              .hasOperatorErrorOfType(type)
               .hasOperatorErrorWithMessage(message),
-          step.expectError(clazz).verifyThenAssertThat().hasOperatorErrorWithMessage(message),
-          step.expectErrorMessage(message).verifyThenAssertThat().hasOperatorErrorOfType(clazz));
+          step.expectError(type).verifyThenAssertThat().hasOperatorErrorWithMessage(message),
+          step.expectErrorMessage(message).verifyThenAssertThat().hasOperatorErrorOfType(type));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Duration after(StepVerifier.LastStep step, Class<T> clazz, String message) {
-      return step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(clazz).hasMessage(message));
+    Duration after(StepVerifier.LastStep step, Class<T> type, String message) {
+      return step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(type).hasMessage(message));
     }
   }
 
@@ -2696,26 +2698,26 @@ final class ReactorRules {
   static final class FluxFromStream<T> {
     // XXX: Constrain the `future` parameter using `@Matches(RequiresComputation.class)`.
     @BeforeTemplate
-    Flux<T> before(Stream<T> stream) {
-      return Flux.fromStream(stream);
+    Flux<T> before(Stream<T> s) {
+      return Flux.fromStream(s);
     }
 
     @AfterTemplate
-    Flux<T> after(Stream<T> stream) {
-      return Flux.fromStream(() -> stream);
+    Flux<T> after(Stream<T> s) {
+      return Flux.fromStream(() -> s);
     }
   }
 
   /** Prefer fluent {@link Flux#next()} over less explicit alternatives. */
   static final class FluxNext<T> {
     @BeforeTemplate
-    Mono<T> before(Flux<T> flux) {
-      return Mono.from(flux);
+    Mono<T> before(Flux<T> source) {
+      return Mono.from(source);
     }
 
     @AfterTemplate
-    Mono<T> after(Flux<T> flux) {
-      return flux.next();
+    Mono<T> after(Flux<T> source) {
+      return source.next();
     }
   }
 }

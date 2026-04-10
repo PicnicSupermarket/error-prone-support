@@ -47,34 +47,34 @@ final class ImmutableListRules {
    */
   static final class ImmutableListCopyOf<T> {
     @BeforeTemplate
-    ImmutableList<T> before(T[] iterable) {
+    ImmutableList<T> before(T[] elements) {
       return Refaster.anyOf(
-          ImmutableList.<T>builder().add(iterable).build(),
-          Arrays.stream(iterable).collect(toImmutableList()));
+          ImmutableList.<T>builder().add(elements).build(),
+          Arrays.stream(elements).collect(toImmutableList()));
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Iterator<T> iterable) {
+    ImmutableList<T> before(Iterator<T> elements) {
       return Refaster.anyOf(
-          ImmutableList.<T>builder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableList()));
+          ImmutableList.<T>builder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableList()));
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Iterable<T> iterable) {
+    ImmutableList<T> before(Iterable<T> elements) {
       return Refaster.anyOf(
-          ImmutableList.<T>builder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableList()));
+          ImmutableList.<T>builder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableList()));
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Collection<T> iterable) {
-      return iterable.stream().collect(toImmutableList());
+    ImmutableList<T> before(Collection<T> elements) {
+      return elements.stream().collect(toImmutableList());
     }
 
     @AfterTemplate
-    ImmutableList<T> after(Iterable<T> iterable) {
-      return ImmutableList.copyOf(iterable);
+    ImmutableList<T> after(Iterable<T> elements) {
+      return ImmutableList.copyOf(elements);
     }
   }
 
@@ -98,20 +98,20 @@ final class ImmutableListRules {
    */
   static final class ImmutableListSortedCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate
-    ImmutableList<T> before(Iterable<T> iterable) {
+    ImmutableList<T> before(Iterable<T> elements) {
       return Refaster.anyOf(
-          ImmutableList.sortedCopyOf(naturalOrder(), iterable),
-          Streams.stream(iterable).sorted().collect(toImmutableList()));
+          ImmutableList.sortedCopyOf(naturalOrder(), elements),
+          Streams.stream(elements).sorted().collect(toImmutableList()));
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Collection<T> iterable) {
-      return iterable.stream().sorted().collect(toImmutableList());
+    ImmutableList<T> before(Collection<T> elements) {
+      return elements.stream().sorted().collect(toImmutableList());
     }
 
     @AfterTemplate
-    ImmutableList<T> after(Collection<T> iterable) {
-      return ImmutableList.sortedCopyOf(iterable);
+    ImmutableList<T> after(Collection<T> elements) {
+      return ImmutableList.sortedCopyOf(elements);
     }
   }
 
@@ -121,18 +121,18 @@ final class ImmutableListRules {
    */
   static final class ImmutableListSortedCopyOfWithComparator<S, T extends S> {
     @BeforeTemplate
-    ImmutableList<T> before(Comparator<S> cmp, Iterable<T> iterable) {
-      return Streams.stream(iterable).sorted(cmp).collect(toImmutableList());
+    ImmutableList<T> before(Comparator<S> comparator, Iterable<T> elements) {
+      return Streams.stream(elements).sorted(comparator).collect(toImmutableList());
     }
 
     @BeforeTemplate
-    ImmutableList<T> before(Comparator<S> cmp, Collection<T> iterable) {
-      return iterable.stream().sorted(cmp).collect(toImmutableList());
+    ImmutableList<T> before(Comparator<S> comparator, Collection<T> elements) {
+      return elements.stream().sorted(comparator).collect(toImmutableList());
     }
 
     @AfterTemplate
-    ImmutableList<T> after(Comparator<S> cmp, Collection<T> iterable) {
-      return ImmutableList.sortedCopyOf(cmp, iterable);
+    ImmutableList<T> after(Comparator<S> comparator, Collection<T> elements) {
+      return ImmutableList.sortedCopyOf(comparator, elements);
     }
   }
 
@@ -142,18 +142,18 @@ final class ImmutableListRules {
    */
   static final class ImmutableListSortedCopyOfIterator<T extends Comparable<? super T>> {
     @BeforeTemplate
-    Iterator<T> before(Iterable<T> iterable) {
-      return Streams.stream(iterable).sorted().iterator();
+    Iterator<T> before(Iterable<T> elements) {
+      return Streams.stream(elements).sorted().iterator();
     }
 
     @BeforeTemplate
-    Iterator<T> before(Collection<T> iterable) {
-      return iterable.stream().sorted().iterator();
+    Iterator<T> before(Collection<T> elements) {
+      return elements.stream().sorted().iterator();
     }
 
     @AfterTemplate
-    UnmodifiableIterator<T> after(Iterable<T> iterable) {
-      return ImmutableList.sortedCopyOf(iterable).iterator();
+    UnmodifiableIterator<T> after(Iterable<T> elements) {
+      return ImmutableList.sortedCopyOf(elements).iterator();
     }
   }
 
@@ -163,18 +163,18 @@ final class ImmutableListRules {
    */
   static final class ImmutableListSortedCopyOfIteratorWithComparator<S, T extends S> {
     @BeforeTemplate
-    Iterator<T> before(Comparator<S> cmp, Iterable<T> iterable) {
-      return Streams.stream(iterable).sorted(cmp).iterator();
+    Iterator<T> before(Comparator<S> comparator, Iterable<T> elements) {
+      return Streams.stream(elements).sorted(comparator).iterator();
     }
 
     @BeforeTemplate
-    Iterator<T> before(Comparator<S> cmp, Collection<T> iterable) {
-      return iterable.stream().sorted(cmp).iterator();
+    Iterator<T> before(Comparator<S> comparator, Collection<T> elements) {
+      return elements.stream().sorted(comparator).iterator();
     }
 
     @AfterTemplate
-    UnmodifiableIterator<T> after(Comparator<S> cmp, Iterable<T> iterable) {
-      return ImmutableList.sortedCopyOf(cmp, iterable).iterator();
+    UnmodifiableIterator<T> after(Comparator<S> comparator, Iterable<T> elements) {
+      return ImmutableList.sortedCopyOf(comparator, elements).iterator();
     }
   }
 

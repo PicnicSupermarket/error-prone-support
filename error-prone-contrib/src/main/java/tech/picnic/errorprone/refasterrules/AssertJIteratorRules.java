@@ -21,14 +21,14 @@ final class AssertJIteratorRules {
   @PossibleSourceIncompatibility
   static final class AssertThatHasNext<T> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Iterator<T> iterator) {
-      return assertThat(iterator.hasNext()).isTrue();
+    AbstractBooleanAssert<?> before(Iterator<T> actual) {
+      return assertThat(actual.hasNext()).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IteratorAssert<T> after(Iterator<T> iterator) {
-      return assertThat(iterator).hasNext();
+    IteratorAssert<T> after(Iterator<T> actual) {
+      return assertThat(actual).hasNext();
     }
   }
 
@@ -36,14 +36,14 @@ final class AssertJIteratorRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsExhausted<T> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Iterator<T> iterator) {
-      return assertThat(iterator.hasNext()).isFalse();
+    AbstractBooleanAssert<?> before(Iterator<T> actual) {
+      return assertThat(actual.hasNext()).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IteratorAssert<T> after(Iterator<T> iterator) {
-      return assertThat(iterator).isExhausted();
+    IteratorAssert<T> after(Iterator<T> actual) {
+      return assertThat(actual).isExhausted();
     }
   }
 }

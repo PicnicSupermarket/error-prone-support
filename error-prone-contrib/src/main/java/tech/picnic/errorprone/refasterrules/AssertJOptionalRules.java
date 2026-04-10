@@ -27,14 +27,14 @@ final class AssertJOptionalRules {
   @PossibleSourceIncompatibility
   static final class AssertThatGet<T> {
     @BeforeTemplate
-    ObjectAssert<T> before(Optional<T> optional) {
-      return assertThat(optional.orElseThrow());
+    ObjectAssert<T> before(Optional<T> actual) {
+      return assertThat(actual.orElseThrow());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, T> after(Optional<T> optional) {
-      return assertThat(optional).get();
+    AbstractObjectAssert<?, T> after(Optional<T> actual) {
+      return assertThat(actual).get();
     }
   }
 
@@ -57,15 +57,15 @@ final class AssertJOptionalRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsPresent<T> {
     @BeforeTemplate
-    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> optional) {
+    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> actual) {
       return Refaster.anyOf(
-          assertThat(optional.isPresent()).isTrue(), assertThat(optional.isEmpty()).isFalse());
+          assertThat(actual.isPresent()).isTrue(), assertThat(actual.isEmpty()).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    OptionalAssert<T> after(Optional<T> optional) {
-      return assertThat(optional).isPresent();
+    OptionalAssert<T> after(Optional<T> actual) {
+      return assertThat(actual).isPresent();
     }
   }
 
@@ -88,32 +88,33 @@ final class AssertJOptionalRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsEmpty<T> {
     @BeforeTemplate
-    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> optional) {
+    AbstractBooleanAssert<? extends AbstractBooleanAssert<?>> before(Optional<T> actual) {
       return Refaster.anyOf(
-          assertThat(optional.isEmpty()).isTrue(), assertThat(optional.isPresent()).isFalse());
+          assertThat(actual.isEmpty()).isTrue(), assertThat(actual.isPresent()).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    OptionalAssert<T> after(Optional<T> optional) {
-      return assertThat(optional).isEmpty();
+    OptionalAssert<T> after(Optional<T> actual) {
+      return assertThat(actual).isEmpty();
     }
   }
 
   /** Prefer {@link AbstractOptionalAssert#hasValue(Object)} over more contrived alternatives. */
   static final class AbstractOptionalAssertHasValue<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
+    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T expectedValue) {
       return Refaster.anyOf(
-          optionalAssert.get().isEqualTo(value),
-          optionalAssert.isEqualTo(Optional.of(value)),
-          optionalAssert.contains(value),
-          optionalAssert.isPresent().hasValue(value));
+          optionalAssert.get().isEqualTo(expectedValue),
+          optionalAssert.isEqualTo(Optional.of(expectedValue)),
+          optionalAssert.contains(expectedValue),
+          optionalAssert.isPresent().hasValue(expectedValue));
     }
 
     @AfterTemplate
-    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
-      return optionalAssert.hasValue(value);
+    AbstractOptionalAssert<?, T> after(
+        AbstractOptionalAssert<?, T> optionalAssert, T expectedValue) {
+      return optionalAssert.hasValue(expectedValue);
     }
   }
 
@@ -122,14 +123,16 @@ final class AssertJOptionalRules {
    */
   static final class AbstractOptionalAssertContainsSame<T> {
     @BeforeTemplate
-    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T value) {
+    AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T expectedValue) {
       return Refaster.anyOf(
-          optionalAssert.get().isSameAs(value), optionalAssert.isPresent().isSameAs(value));
+          optionalAssert.get().isSameAs(expectedValue),
+          optionalAssert.isPresent().isSameAs(expectedValue));
     }
 
     @AfterTemplate
-    AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
-      return optionalAssert.containsSame(value);
+    AbstractOptionalAssert<?, T> after(
+        AbstractOptionalAssert<?, T> optionalAssert, T expectedValue) {
+      return optionalAssert.containsSame(expectedValue);
     }
   }
 
@@ -139,14 +142,14 @@ final class AssertJOptionalRules {
   @PossibleSourceIncompatibility
   static final class AssertThatGetMatches<S, T extends S> {
     @BeforeTemplate
-    OptionalAssert<T> before(Optional<T> optional, Predicate<S> predicate) {
-      return assertThat(optional.filter(predicate)).isPresent();
+    OptionalAssert<T> before(Optional<T> actual, Predicate<S> predicate) {
+      return assertThat(actual.filter(predicate)).isPresent();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractObjectAssert<?, T> after(Optional<T> optional, Predicate<S> predicate) {
-      return assertThat(optional).get().matches(predicate);
+    AbstractObjectAssert<?, T> after(Optional<T> actual, Predicate<S> predicate) {
+      return assertThat(actual).get().matches(predicate);
     }
   }
 }

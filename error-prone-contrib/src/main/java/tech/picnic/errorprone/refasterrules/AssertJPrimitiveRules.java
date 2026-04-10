@@ -77,49 +77,49 @@ final class AssertJPrimitiveRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractBooleanAssert<?> before(boolean actual, boolean other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractByteAssert<?> before(byte actual, byte expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractByteAssert<?> before(byte actual, byte other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractCharacterAssert<?> before(char actual, char expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractCharacterAssert<?> before(char actual, char other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractShortAssert<?> before(short actual, short expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractShortAssert<?> before(short actual, short other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(int actual, int expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractIntegerAssert<?> before(int actual, int other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractLongAssert<?> before(long actual, long expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractLongAssert<?> before(long actual, long other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractFloatAssert<?> before(float actual, float expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractFloatAssert<?> before(float actual, float other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractDoubleAssert<?> before(double actual, double expected) {
-      return assertThat(actual).isNotSameAs(expected);
+    AbstractDoubleAssert<?> before(double actual, double other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean actual, boolean expected) {
-      return assertThat(actual).isNotEqualTo(expected);
+    AbstractBooleanAssert<?> after(boolean actual, boolean other) {
+      return assertThat(actual).isNotEqualTo(other);
     }
   }
 
@@ -127,15 +127,15 @@ final class AssertJPrimitiveRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsLessThan {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual < expected).isTrue(), assertThat(actual >= expected).isFalse());
+          assertThat(actual < other).isTrue(), assertThat(actual >= other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isLessThan(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isLessThan(other);
     }
   }
 
@@ -143,15 +143,15 @@ final class AssertJPrimitiveRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual <= expected).isTrue(), assertThat(actual > expected).isFalse());
+          assertThat(actual <= other).isTrue(), assertThat(actual > other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isLessThanOrEqualTo(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isLessThanOrEqualTo(other);
     }
   }
 
@@ -159,15 +159,15 @@ final class AssertJPrimitiveRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThan {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual > expected).isTrue(), assertThat(actual <= expected).isFalse());
+          assertThat(actual > other).isTrue(), assertThat(actual <= other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isGreaterThan(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isGreaterThan(other);
     }
   }
 
@@ -175,15 +175,15 @@ final class AssertJPrimitiveRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual >= expected).isTrue(), assertThat(actual < expected).isFalse());
+          assertThat(actual >= other).isTrue(), assertThat(actual < other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isGreaterThanOrEqualTo(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isGreaterThanOrEqualTo(other);
     }
   }
 }

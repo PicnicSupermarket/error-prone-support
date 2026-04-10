@@ -23,14 +23,14 @@ final class AssertJComparableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isEqualTo(0);
+    AbstractIntegerAssert<?> before(T actual, T other) {
+      return assertThat(actual.compareTo(other)).isEqualTo(0);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, T> after(T actual, T expected) {
-      return assertThat(actual).isEqualByComparingTo(expected);
+    AbstractComparableAssert<?, T> after(T actual, T other) {
+      return assertThat(actual).isEqualByComparingTo(other);
     }
   }
 
@@ -41,14 +41,14 @@ final class AssertJComparableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualByComparingTo<T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isNotEqualTo(0);
+    AbstractIntegerAssert<?> before(T actual, T other) {
+      return assertThat(actual.compareTo(other)).isNotEqualTo(0);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, T> after(T actual, T expected) {
-      return assertThat(actual).isNotEqualByComparingTo(expected);
+    AbstractComparableAssert<?, T> after(T actual, T other) {
+      return assertThat(actual).isNotEqualByComparingTo(other);
     }
   }
 
@@ -59,14 +59,14 @@ final class AssertJComparableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsLessThan<T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isNegative();
+    AbstractIntegerAssert<?> before(T actual, T other) {
+      return assertThat(actual.compareTo(other)).isNegative();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, T> after(T actual, T expected) {
-      return assertThat(actual).isLessThan(expected);
+    AbstractComparableAssert<?, T> after(T actual, T other) {
+      return assertThat(actual).isLessThan(other);
     }
   }
 
@@ -77,14 +77,14 @@ final class AssertJComparableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsLessThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isNotPositive();
+    AbstractIntegerAssert<?> before(T actual, T other) {
+      return assertThat(actual.compareTo(other)).isNotPositive();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, T> after(T actual, T expected) {
-      return assertThat(actual).isLessThanOrEqualTo(expected);
+    AbstractComparableAssert<?, T> after(T actual, T other) {
+      return assertThat(actual).isLessThanOrEqualTo(other);
     }
   }
 
@@ -95,14 +95,14 @@ final class AssertJComparableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThan<T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isPositive();
+    AbstractIntegerAssert<?> before(T actual, T other) {
+      return assertThat(actual.compareTo(other)).isPositive();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, T> after(T actual, T expected) {
-      return assertThat(actual).isGreaterThan(expected);
+    AbstractComparableAssert<?, T> after(T actual, T other) {
+      return assertThat(actual).isGreaterThan(other);
     }
   }
 
@@ -113,14 +113,14 @@ final class AssertJComparableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsGreaterThanOrEqualTo<T extends Comparable<? super T>> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(T actual, T expected) {
-      return assertThat(actual.compareTo(expected)).isNotNegative();
+    AbstractIntegerAssert<?> before(T actual, T other) {
+      return assertThat(actual.compareTo(other)).isNotNegative();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractComparableAssert<?, T> after(T actual, T expected) {
-      return assertThat(actual).isGreaterThanOrEqualTo(expected);
+    AbstractComparableAssert<?, T> after(T actual, T other) {
+      return assertThat(actual).isGreaterThanOrEqualTo(other);
     }
   }
 }

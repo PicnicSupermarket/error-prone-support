@@ -250,19 +250,19 @@ final class AssertJNumberRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsOdd {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
-      return assertThat(number % 2).isEqualTo(1);
+    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int actual) {
+      return assertThat(actual % 2).isEqualTo(1);
     }
 
     @BeforeTemplate
-    AbstractLongAssert<?> before(long number) {
-      return assertThat(number % 2).isEqualTo(1);
+    AbstractLongAssert<?> before(long actual) {
+      return assertThat(actual % 2).isEqualTo(1);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractLongAssert<?> after(long number) {
-      return assertThat(number).isOdd();
+    AbstractLongAssert<?> after(long actual) {
+      return assertThat(actual).isOdd();
     }
   }
 
@@ -276,19 +276,19 @@ final class AssertJNumberRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsEven {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
-      return assertThat(number % 2).isEqualTo(0);
+    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int actual) {
+      return assertThat(actual % 2).isEqualTo(0);
     }
 
     @BeforeTemplate
-    AbstractLongAssert<?> before(long number) {
-      return assertThat(number % 2).isEqualTo(0);
+    AbstractLongAssert<?> before(long actual) {
+      return assertThat(actual % 2).isEqualTo(0);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractLongAssert<?> after(long number) {
-      return assertThat(number).isEven();
+    AbstractLongAssert<?> after(long actual) {
+      return assertThat(actual).isEven();
     }
   }
 }

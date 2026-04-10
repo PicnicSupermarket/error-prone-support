@@ -25,26 +25,26 @@ final class NullRules {
   /** Prefer {@code == null} over less idiomatic alternatives. */
   static final class EqualToNull {
     @BeforeTemplate
-    boolean before(@Nullable Object object) {
-      return Refaster.anyOf(null == object, Objects.isNull(object));
+    boolean before(@Nullable Object obj) {
+      return Refaster.anyOf(null == obj, Objects.isNull(obj));
     }
 
     @AfterTemplate
-    boolean after(@Nullable Object object) {
-      return object == null;
+    boolean after(@Nullable Object obj) {
+      return obj == null;
     }
   }
 
   /** Prefer {@code != null} over less idiomatic alternatives. */
   static final class NotEqualToNull {
     @BeforeTemplate
-    boolean before(@Nullable Object object) {
-      return Refaster.anyOf(null != object, Objects.nonNull(object));
+    boolean before(@Nullable Object obj) {
+      return Refaster.anyOf(null != obj, Objects.nonNull(obj));
     }
 
     @AfterTemplate
-    boolean after(@Nullable Object object) {
-      return object != null;
+    boolean after(@Nullable Object obj) {
+      return obj != null;
     }
   }
 
@@ -57,15 +57,15 @@ final class NullRules {
   // an NPE.
   static final class RequireNonNullElse<T> {
     @BeforeTemplate
-    T before(T first, T second) {
+    T before(T obj, T defaultObj) {
       return Refaster.anyOf(
-          MoreObjects.firstNonNull(first, second), Optional.ofNullable(first).orElse(second));
+          MoreObjects.firstNonNull(obj, defaultObj), Optional.ofNullable(obj).orElse(defaultObj));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T first, T second) {
-      return requireNonNullElse(first, second);
+    T after(T obj, T defaultObj) {
+      return requireNonNullElse(obj, defaultObj);
     }
   }
 
@@ -78,14 +78,14 @@ final class NullRules {
   // an NPE.
   static final class RequireNonNullElseGet<T, S extends T> {
     @BeforeTemplate
-    T before(T object, Supplier<S> supplier) {
-      return Optional.ofNullable(object).orElseGet(supplier);
+    T before(T obj, Supplier<S> supplier) {
+      return Optional.ofNullable(obj).orElseGet(supplier);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T object, Supplier<S> supplier) {
-      return requireNonNullElseGet(object, supplier);
+    T after(T obj, Supplier<S> supplier) {
+      return requireNonNullElseGet(obj, supplier);
     }
   }
 

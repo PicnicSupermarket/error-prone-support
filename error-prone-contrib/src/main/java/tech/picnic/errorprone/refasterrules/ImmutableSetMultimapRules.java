@@ -61,13 +61,13 @@ final class ImmutableSetMultimapRules {
   // variants.
   static final class ImmutableSetMultimapOf2<K, V> {
     @BeforeTemplate
-    ImmutableSetMultimap<K, V> before(K key, V value) {
-      return ImmutableSetMultimap.<K, V>builder().put(key, value).build();
+    ImmutableSetMultimap<K, V> before(K k1, V v1) {
+      return ImmutableSetMultimap.<K, V>builder().put(k1, v1).build();
     }
 
     @AfterTemplate
-    ImmutableSetMultimap<K, V> after(K key, V value) {
-      return ImmutableSetMultimap.of(key, value);
+    ImmutableSetMultimap<K, V> after(K k1, V v1) {
+      return ImmutableSetMultimap.of(k1, v1);
     }
   }
 
@@ -97,29 +97,29 @@ final class ImmutableSetMultimapRules {
   static final class ImmutableSetMultimapCopyOf<
       K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
-    ImmutableSetMultimap<K, V> before(Multimap<K2, V2> iterable) {
+    ImmutableSetMultimap<K, V> before(Multimap<K2, V2> entries) {
       return Refaster.anyOf(
-          ImmutableSetMultimap.copyOf(iterable.entries()),
-          ImmutableSetMultimap.<K, V>builder().putAll(iterable).build());
+          ImmutableSetMultimap.copyOf(entries.entries()),
+          ImmutableSetMultimap.<K, V>builder().putAll(entries).build());
     }
 
     @BeforeTemplate
-    ImmutableSetMultimap<K, V> before(Iterable<E> iterable) {
+    ImmutableSetMultimap<K, V> before(Iterable<E> entries) {
       return Refaster.anyOf(
-          ImmutableSetMultimap.<K, V>builder().putAll(iterable).build(),
-          Streams.stream(iterable)
+          ImmutableSetMultimap.<K, V>builder().putAll(entries).build(),
+          Streams.stream(entries)
               .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @BeforeTemplate
-    ImmutableSetMultimap<K, V> before(Collection<E> iterable) {
-      return iterable.stream()
+    ImmutableSetMultimap<K, V> before(Collection<E> entries) {
+      return entries.stream()
           .collect(toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableSetMultimap<K, V> after(Iterable<E> iterable) {
-      return ImmutableSetMultimap.copyOf(iterable);
+    ImmutableSetMultimap<K, V> after(Iterable<E> entries) {
+      return ImmutableSetMultimap.copyOf(entries);
     }
   }
 
@@ -158,16 +158,16 @@ final class ImmutableSetMultimapRules {
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);
 
     @BeforeTemplate
-    ImmutableSetMultimap<K, V2> before(Multimap<K, V1> multimap) {
-      return multimap.entries().stream()
+    ImmutableSetMultimap<K, V2> before(Multimap<K, V1> fromMultimap) {
+      return fromMultimap.entries().stream()
           .collect(
               toImmutableSetMultimap(Map.Entry::getKey, e -> valueTransformation(e.getValue())));
     }
 
     @AfterTemplate
-    ImmutableSetMultimap<K, V2> after(Multimap<K, V1> multimap) {
+    ImmutableSetMultimap<K, V2> after(Multimap<K, V1> fromMultimap) {
       return ImmutableSetMultimap.copyOf(
-          Multimaps.transformValues(multimap, e -> valueTransformation(e)));
+          Multimaps.transformValues(fromMultimap, e -> valueTransformation(e)));
     }
   }
 
@@ -179,43 +179,42 @@ final class ImmutableSetMultimapRules {
       K, S, V1 extends S, T extends V2, V2> {
     // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.
     @BeforeTemplate
-    ImmutableSetMultimap<K, V2> before(Multimap<K, V1> multimap, Function<S, T> transformation) {
-      return Refaster.anyOf(multimap.asMap(), Multimaps.asMap(multimap)).entrySet().stream()
+    ImmutableSetMultimap<K, V2> before(Multimap<K, V1> fromMultimap, Function<S, T> function) {
+      return Refaster.anyOf(fromMultimap.asMap(), Multimaps.asMap(fromMultimap)).entrySet().stream()
           .collect(
               flatteningToImmutableSetMultimap(
-                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
+                  Map.Entry::getKey, e -> e.getValue().stream().map(function)));
+    }
+
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(ListMultimap<K, V1> fromMultimap, Function<S, T> function) {
+      return Multimaps.asMap(fromMultimap).entrySet().stream()
+          .collect(
+              flatteningToImmutableSetMultimap(
+                  Map.Entry::getKey, e -> e.getValue().stream().map(function)));
+    }
+
+    @BeforeTemplate
+    ImmutableSetMultimap<K, V2> before(SetMultimap<K, V1> fromMultimap, Function<S, T> function) {
+      return Multimaps.asMap(fromMultimap).entrySet().stream()
+          .collect(
+              flatteningToImmutableSetMultimap(
+                  Map.Entry::getKey, e -> e.getValue().stream().map(function)));
     }
 
     @BeforeTemplate
     ImmutableSetMultimap<K, V2> before(
-        ListMultimap<K, V1> multimap, Function<S, T> transformation) {
-      return Multimaps.asMap(multimap).entrySet().stream()
+        SortedSetMultimap<K, V1> fromMultimap, Function<S, T> function) {
+      return Multimaps.asMap(fromMultimap).entrySet().stream()
           .collect(
               flatteningToImmutableSetMultimap(
-                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
-    }
-
-    @BeforeTemplate
-    ImmutableSetMultimap<K, V2> before(SetMultimap<K, V1> multimap, Function<S, T> transformation) {
-      return Multimaps.asMap(multimap).entrySet().stream()
-          .collect(
-              flatteningToImmutableSetMultimap(
-                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
-    }
-
-    @BeforeTemplate
-    ImmutableSetMultimap<K, V2> before(
-        SortedSetMultimap<K, V1> multimap, Function<S, T> transformation) {
-      return Multimaps.asMap(multimap).entrySet().stream()
-          .collect(
-              flatteningToImmutableSetMultimap(
-                  Map.Entry::getKey, e -> e.getValue().stream().map(transformation)));
+                  Map.Entry::getKey, e -> e.getValue().stream().map(function)));
     }
 
     @AfterTemplate
     ImmutableSetMultimap<K, V2> after(
-        Multimap<K, V1> multimap, com.google.common.base.Function<S, T> transformation) {
-      return ImmutableSetMultimap.copyOf(Multimaps.transformValues(multimap, transformation));
+        Multimap<K, V1> fromMultimap, com.google.common.base.Function<S, T> function) {
+      return ImmutableSetMultimap.copyOf(Multimaps.transformValues(fromMultimap, function));
     }
   }
 

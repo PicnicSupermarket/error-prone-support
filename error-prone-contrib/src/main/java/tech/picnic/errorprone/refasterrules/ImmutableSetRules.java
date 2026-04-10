@@ -48,34 +48,34 @@ final class ImmutableSetRules {
    */
   static final class ImmutableSetCopyOf<T> {
     @BeforeTemplate
-    ImmutableSet<T> before(T[] iterable) {
+    ImmutableSet<T> before(T[] elements) {
       return Refaster.anyOf(
-          ImmutableSet.<T>builder().add(iterable).build(),
-          Arrays.stream(iterable).collect(toImmutableSet()));
+          ImmutableSet.<T>builder().add(elements).build(),
+          Arrays.stream(elements).collect(toImmutableSet()));
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Iterator<T> iterable) {
+    ImmutableSet<T> before(Iterator<T> elements) {
       return Refaster.anyOf(
-          ImmutableSet.<T>builder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableSet()));
+          ImmutableSet.<T>builder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableSet()));
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Iterable<T> iterable) {
+    ImmutableSet<T> before(Iterable<T> elements) {
       return Refaster.anyOf(
-          ImmutableSet.<T>builder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableSet()));
+          ImmutableSet.<T>builder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableSet()));
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Collection<T> iterable) {
-      return iterable.stream().collect(toImmutableSet());
+    ImmutableSet<T> before(Collection<T> elements) {
+      return elements.stream().collect(toImmutableSet());
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Iterable<T> iterable) {
-      return ImmutableSet.copyOf(iterable);
+    ImmutableSet<T> after(Iterable<T> elements) {
+      return ImmutableSet.copyOf(elements);
     }
   }
 
@@ -100,13 +100,13 @@ final class ImmutableSetRules {
   /** Prefer {@link SetView#immutableCopy()} over more verbose alternatives. */
   static final class SetViewImmutableCopy<T> {
     @BeforeTemplate
-    ImmutableSet<T> before(SetView<T> set) {
-      return ImmutableSet.copyOf(set);
+    ImmutableSet<T> before(SetView<T> elements) {
+      return ImmutableSet.copyOf(elements);
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(SetView<T> set) {
-      return set.immutableCopy();
+    ImmutableSet<T> after(SetView<T> elements) {
+      return elements.immutableCopy();
     }
   }
 
@@ -237,15 +237,15 @@ final class ImmutableSetRules {
    */
   static final class SetsDifferenceMapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
-    ImmutableSet<T> before(Set<T> set, Map<K, V> map) {
-      return set.stream()
+    ImmutableSet<T> before(Set<T> set1, Map<K, V> map) {
+      return set1.stream()
           .filter(Refaster.anyOf(not(map::containsKey), e -> !map.containsKey(e)))
           .collect(toImmutableSet());
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Set<T> set, Map<K, V> map) {
-      return Sets.difference(set, map.keySet()).immutableCopy();
+    ImmutableSet<T> after(Set<T> set1, Map<K, V> map) {
+      return Sets.difference(set1, map.keySet()).immutableCopy();
     }
   }
 
@@ -255,15 +255,15 @@ final class ImmutableSetRules {
    */
   static final class SetsDifferenceMultimapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
-    ImmutableSet<T> before(Set<T> set, Multimap<K, V> multimap) {
-      return set.stream()
+    ImmutableSet<T> before(Set<T> set1, Multimap<K, V> multimap) {
+      return set1.stream()
           .filter(Refaster.anyOf(not(multimap::containsKey), e -> !multimap.containsKey(e)))
           .collect(toImmutableSet());
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Set<T> set, Multimap<K, V> multimap) {
-      return Sets.difference(set, multimap.keySet()).immutableCopy();
+    ImmutableSet<T> after(Set<T> set1, Multimap<K, V> multimap) {
+      return Sets.difference(set1, multimap.keySet()).immutableCopy();
     }
   }
 
@@ -288,13 +288,13 @@ final class ImmutableSetRules {
    */
   static final class SetsIntersectionMapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
-    ImmutableSet<T> before(Set<T> set, Map<K, V> map) {
-      return set.stream().filter(map::containsKey).collect(toImmutableSet());
+    ImmutableSet<T> before(Set<T> set1, Map<K, V> map) {
+      return set1.stream().filter(map::containsKey).collect(toImmutableSet());
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Set<T> set, Map<K, V> map) {
-      return Sets.intersection(set, map.keySet()).immutableCopy();
+    ImmutableSet<T> after(Set<T> set1, Map<K, V> map) {
+      return Sets.intersection(set1, map.keySet()).immutableCopy();
     }
   }
 
@@ -304,13 +304,13 @@ final class ImmutableSetRules {
    */
   static final class SetsIntersectionMultimapKeySetImmutableCopy<T, K, V> {
     @BeforeTemplate
-    ImmutableSet<T> before(Set<T> set, Multimap<K, V> multimap) {
-      return set.stream().filter(multimap::containsKey).collect(toImmutableSet());
+    ImmutableSet<T> before(Set<T> set1, Multimap<K, V> multimap) {
+      return set1.stream().filter(multimap::containsKey).collect(toImmutableSet());
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Set<T> set, Multimap<K, V> multimap) {
-      return Sets.intersection(set, multimap.keySet()).immutableCopy();
+    ImmutableSet<T> after(Set<T> set1, Multimap<K, V> multimap) {
+      return Sets.intersection(set1, multimap.keySet()).immutableCopy();
     }
   }
 

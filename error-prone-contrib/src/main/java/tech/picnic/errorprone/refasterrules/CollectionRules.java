@@ -59,19 +59,19 @@ final class CollectionRules {
       "StreamFindAnyIsEmpty" /* This is a more specific template. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    boolean before(Collection<T> collection) {
+    boolean before(Collection<T> iterable) {
       return Refaster.anyOf(
-          collection.size() == 0,
-          collection.size() <= 0,
-          collection.size() < 1,
-          Iterables.isEmpty(collection),
-          collection.stream().findAny().isEmpty(),
-          collection.stream().findFirst().isEmpty());
+          iterable.size() == 0,
+          iterable.size() <= 0,
+          iterable.size() < 1,
+          Iterables.isEmpty(iterable),
+          iterable.stream().findAny().isEmpty(),
+          iterable.stream().findFirst().isEmpty());
     }
 
     @BeforeTemplate
-    boolean before(ImmutableCollection<T> collection) {
-      return collection.asList().isEmpty();
+    boolean before(ImmutableCollection<T> iterable) {
+      return iterable.asList().isEmpty();
     }
 
     // XXX: Consider introducing similar templates for other `SetView` methods that derive a
@@ -86,32 +86,32 @@ final class CollectionRules {
     // `IsEmpty` matcher implementation. (Note that `equals()` and `hashCode()` may need special
     // handling, as they depend on the collection type produced.)
     @BeforeTemplate
-    boolean before(SetView<T> collection) {
-      return collection.immutableCopy().isEmpty();
+    boolean before(SetView<T> iterable) {
+      return iterable.immutableCopy().isEmpty();
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(Collection<T> collection) {
-      return collection.isEmpty();
+    boolean after(Collection<T> iterable) {
+      return iterable.isEmpty();
     }
   }
 
   /** Prefer {@link Collection#size()} over non-JDK or more verbose alternatives. */
   static final class CollectionSize<T> {
     @BeforeTemplate
-    int before(Collection<T> collection) {
-      return Iterables.size(collection);
+    int before(Collection<T> iterable) {
+      return Iterables.size(iterable);
     }
 
     @BeforeTemplate
-    int before(ImmutableCollection<T> collection) {
-      return collection.asList().size();
+    int before(ImmutableCollection<T> iterable) {
+      return iterable.asList().size();
     }
 
     @AfterTemplate
-    int after(Collection<T> collection) {
-      return collection.size();
+    int after(Collection<T> iterable) {
+      return iterable.size();
     }
   }
 
@@ -134,26 +134,26 @@ final class CollectionRules {
    */
   static final class Disjoint<T> {
     @BeforeTemplate
-    boolean before(Set<T> collection1, Set<T> collection2) {
-      return Sets.intersection(collection1, collection2).isEmpty();
+    boolean before(Set<T> c1, Set<T> c2) {
+      return Sets.intersection(c1, c2).isEmpty();
     }
 
     // XXX: Other copy operations could be elided too, but these are the most common ones. If we
     // ever introduce a generic "makes a copy" stand-in, use it here.
     @BeforeTemplate
-    boolean before(Collection<T> collection1, Collection<T> collection2) {
+    boolean before(Collection<T> c1, Collection<T> c2) {
       return Refaster.anyOf(
-          collection1.stream().noneMatch(collection2::contains),
-          disjoint(ImmutableSet.copyOf(collection1), collection2),
-          disjoint(new HashSet<>(collection1), collection2),
-          disjoint(collection1, ImmutableSet.copyOf(collection2)),
-          disjoint(collection1, new HashSet<>(collection2)));
+          c1.stream().noneMatch(c2::contains),
+          disjoint(ImmutableSet.copyOf(c1), c2),
+          disjoint(new HashSet<>(c1), c2),
+          disjoint(c1, ImmutableSet.copyOf(c2)),
+          disjoint(c1, new HashSet<>(c2)));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    boolean after(Collection<T> collection1, Collection<T> collection2) {
-      return disjoint(collection1, collection2);
+    boolean after(Collection<T> c1, Collection<T> c2) {
+      return disjoint(c1, c2);
     }
   }
 
@@ -283,26 +283,26 @@ final class CollectionRules {
       "NonApiType" /* Matching against `List` would unnecessarily constrain the rule. */)
   static final class NewArrayList<T> {
     @BeforeTemplate
-    ArrayList<T> before(Collection<T> collection) {
-      return Lists.newArrayList(collection);
+    ArrayList<T> before(Collection<T> elements) {
+      return Lists.newArrayList(elements);
     }
 
     @AfterTemplate
-    ArrayList<T> after(Collection<T> collection) {
-      return new ArrayList<>(collection);
+    ArrayList<T> after(Collection<T> elements) {
+      return new ArrayList<>(elements);
     }
   }
 
   /** Prefer {@link ImmutableCollection#asList()} over more verbose alternatives. */
   static final class ImmutableCollectionAsList<T> {
     @BeforeTemplate
-    ImmutableList<T> before(ImmutableCollection<T> collection) {
-      return ImmutableList.copyOf(collection);
+    ImmutableList<T> before(ImmutableCollection<T> elements) {
+      return ImmutableList.copyOf(elements);
     }
 
     @AfterTemplate
-    ImmutableList<T> after(ImmutableCollection<T> collection) {
-      return collection.asList();
+    ImmutableList<T> after(ImmutableCollection<T> elements) {
+      return elements.asList();
     }
   }
 
@@ -322,13 +322,13 @@ final class CollectionRules {
   /** Prefer {@link ImmutableCollection#contains(Object)} over more verbose alternatives. */
   static final class ImmutableCollectionContains<T, S> {
     @BeforeTemplate
-    boolean before(ImmutableCollection<T> collection, S elem) {
-      return collection.asList().contains(elem);
+    boolean before(ImmutableCollection<T> collection, S object) {
+      return collection.asList().contains(object);
     }
 
     @AfterTemplate
-    boolean after(ImmutableCollection<T> collection, S elem) {
-      return collection.contains(elem);
+    boolean after(ImmutableCollection<T> collection, S object) {
+      return collection.contains(object);
     }
   }
 
@@ -397,13 +397,13 @@ final class CollectionRules {
   /** Prefer {@link ImmutableCollection#toArray(Object[])} over more verbose alternatives. */
   static final class ImmutableCollectionToArrayObject<T, S> {
     @BeforeTemplate
-    S[] before(ImmutableCollection<T> collection, S[] array) {
-      return collection.asList().toArray(array);
+    S[] before(ImmutableCollection<T> collection, S[] other) {
+      return collection.asList().toArray(other);
     }
 
     @AfterTemplate
-    S[] after(ImmutableCollection<T> collection, S[] array) {
-      return collection.toArray(array);
+    S[] after(ImmutableCollection<T> collection, S[] other) {
+      return collection.toArray(other);
     }
   }
 
@@ -520,13 +520,13 @@ final class CollectionRules {
   /** Prefer {@link Collection#forEach(Consumer)} over less efficient alternatives. */
   static final class CollectionForEach<S, T extends S> {
     @BeforeTemplate
-    void before(Collection<T> collection, Consumer<S> consumer) {
-      collection.stream().forEach(consumer);
+    void before(Collection<T> collection, Consumer<S> action) {
+      collection.stream().forEach(action);
     }
 
     @AfterTemplate
-    void after(Collection<T> collection, Consumer<S> consumer) {
-      collection.forEach(consumer);
+    void after(Collection<T> collection, Consumer<S> action) {
+      collection.forEach(action);
     }
   }
 
@@ -585,31 +585,31 @@ final class CollectionRules {
   /** Prefer {@link List#addFirst(Object)} over less idiomatic alternatives. */
   static final class ListAddFirst<T> {
     @BeforeTemplate
-    void before(List<T> list, T element) {
-      list.add(0, element);
+    void before(List<T> list, T e) {
+      list.add(0, e);
     }
 
     @AfterTemplate
-    void after(List<T> list, T element) {
-      list.addFirst(element);
+    void after(List<T> list, T e) {
+      list.addFirst(e);
     }
   }
 
   /** Prefer {@link List#add(Object)} over less idiomatic or more verbose alternatives. */
   static final class ListAdd<T> {
     @BeforeTemplate
-    void before(List<T> list, T element) {
-      list.addLast(element);
+    void before(List<T> list, T e) {
+      list.addLast(e);
     }
 
     @BeforeTemplate
-    void before2(List<T> list, T element) {
-      list.add(list.size(), element);
+    void before2(List<T> list, T e) {
+      list.add(list.size(), e);
     }
 
     @AfterTemplate
-    void after(List<T> list, T element) {
-      list.add(element);
+    void after(List<T> list, T e) {
+      list.add(e);
     }
   }
 

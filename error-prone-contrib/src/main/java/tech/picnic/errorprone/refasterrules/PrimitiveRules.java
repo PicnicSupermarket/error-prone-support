@@ -173,13 +173,13 @@ final class PrimitiveRules {
   // `ArithmeticException`.
   static final class MathToIntExact {
     @BeforeTemplate
-    int before(long l) {
-      return Ints.checkedCast(l);
+    int before(long value) {
+      return Ints.checkedCast(value);
     }
 
     @AfterTemplate
-    int after(long l) {
-      return Math.toIntExact(l);
+    int after(long value) {
+      return Math.toIntExact(value);
     }
   }
 
@@ -292,28 +292,28 @@ final class PrimitiveRules {
   /** Prefer {@code Long.signum(i) > 0} over less idiomatic alternatives. */
   static final class LongSignumGreaterThanZero {
     @BeforeTemplate
-    boolean before(long l) {
-      return Refaster.anyOf(Long.signum(l) == 1, Long.signum(l) >= 1);
+    boolean before(long i) {
+      return Refaster.anyOf(Long.signum(i) == 1, Long.signum(i) >= 1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(long l) {
-      return Long.signum(l) > 0;
+    boolean after(long i) {
+      return Long.signum(i) > 0;
     }
   }
 
   /** Prefer {@code Long.signum(i) < 0} over less idiomatic alternatives. */
   static final class LongSignumLessThanZero {
     @BeforeTemplate
-    boolean before(long l) {
-      return Refaster.anyOf(Long.signum(l) == -1, Long.signum(l) <= -1);
+    boolean before(long i) {
+      return Refaster.anyOf(Long.signum(i) == -1, Long.signum(i) <= -1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(long l) {
-      return Long.signum(l) < 0;
+    boolean after(long i) {
+      return Long.signum(i) < 0;
     }
   }
 
@@ -346,106 +346,104 @@ final class PrimitiveRules {
   /** Prefer {@link Integer#divideUnsigned(int, int)} over non-JDK alternatives. */
   static final class IntegerDivideUnsigned {
     @BeforeTemplate
-    int before(int x, int y) {
-      return UnsignedInts.divide(x, y);
+    int before(int dividend, int divisor) {
+      return UnsignedInts.divide(dividend, divisor);
     }
 
     @AfterTemplate
-    int after(int x, int y) {
-      return Integer.divideUnsigned(x, y);
+    int after(int dividend, int divisor) {
+      return Integer.divideUnsigned(dividend, divisor);
     }
   }
 
   /** Prefer {@link Long#divideUnsigned(long, long)} over non-JDK alternatives. */
   static final class LongDivideUnsigned {
     @BeforeTemplate
-    long before(long x, long y) {
-      return UnsignedLongs.divide(x, y);
+    long before(long dividend, long divisor) {
+      return UnsignedLongs.divide(dividend, divisor);
     }
 
     @AfterTemplate
-    long after(long x, long y) {
-      return Long.divideUnsigned(x, y);
+    long after(long dividend, long divisor) {
+      return Long.divideUnsigned(dividend, divisor);
     }
   }
 
   /** Prefer {@link Integer#remainderUnsigned(int, int)} over non-JDK alternatives. */
   static final class IntegerRemainderUnsigned {
     @BeforeTemplate
-    int before(int x, int y) {
-      return UnsignedInts.remainder(x, y);
+    int before(int dividend, int divisor) {
+      return UnsignedInts.remainder(dividend, divisor);
     }
 
     @AfterTemplate
-    int after(int x, int y) {
-      return Integer.remainderUnsigned(x, y);
+    int after(int dividend, int divisor) {
+      return Integer.remainderUnsigned(dividend, divisor);
     }
   }
 
   /** Prefer {@link Long#remainderUnsigned(long, long)} over non-JDK alternatives. */
   static final class LongRemainderUnsigned {
     @BeforeTemplate
-    long before(long x, long y) {
-      return UnsignedLongs.remainder(x, y);
+    long before(long dividend, long divisor) {
+      return UnsignedLongs.remainder(dividend, divisor);
     }
 
     @AfterTemplate
-    long after(long x, long y) {
-      return Long.remainderUnsigned(x, y);
+    long after(long dividend, long divisor) {
+      return Long.remainderUnsigned(dividend, divisor);
     }
   }
 
   /** Prefer {@link Integer#parseUnsignedInt(String)} over non-JDK or more verbose alternatives. */
   static final class IntegerParseUnsignedInt {
     @BeforeTemplate
-    int before(String string) {
-      return Refaster.anyOf(
-          UnsignedInts.parseUnsignedInt(string), Integer.parseUnsignedInt(string, 10));
+    int before(String s) {
+      return Refaster.anyOf(UnsignedInts.parseUnsignedInt(s), Integer.parseUnsignedInt(s, 10));
     }
 
     @AfterTemplate
-    int after(String string) {
-      return Integer.parseUnsignedInt(string);
+    int after(String s) {
+      return Integer.parseUnsignedInt(s);
     }
   }
 
   /** Prefer {@link Long#parseUnsignedLong(String)} over non-JDK or more verbose alternatives. */
   static final class LongParseUnsignedLong {
     @BeforeTemplate
-    long before(String string) {
-      return Refaster.anyOf(
-          UnsignedLongs.parseUnsignedLong(string), Long.parseUnsignedLong(string, 10));
+    long before(String s) {
+      return Refaster.anyOf(UnsignedLongs.parseUnsignedLong(s), Long.parseUnsignedLong(s, 10));
     }
 
     @AfterTemplate
-    long after(String string) {
-      return Long.parseUnsignedLong(string);
+    long after(String s) {
+      return Long.parseUnsignedLong(s);
     }
   }
 
   /** Prefer {@link Integer#parseUnsignedInt(String, int)} over non-JDK alternatives. */
   static final class IntegerParseUnsignedIntWithInt {
     @BeforeTemplate
-    int before(String string, int radix) {
-      return UnsignedInts.parseUnsignedInt(string, radix);
+    int before(String s, int radix) {
+      return UnsignedInts.parseUnsignedInt(s, radix);
     }
 
     @AfterTemplate
-    int after(String string, int radix) {
-      return Integer.parseUnsignedInt(string, radix);
+    int after(String s, int radix) {
+      return Integer.parseUnsignedInt(s, radix);
     }
   }
 
   /** Prefer {@link Long#parseUnsignedLong(String, int)} over non-JDK alternatives. */
   static final class LongParseUnsignedLongWithInt {
     @BeforeTemplate
-    long before(String string, int radix) {
-      return UnsignedLongs.parseUnsignedLong(string, radix);
+    long before(String s, int radix) {
+      return UnsignedLongs.parseUnsignedLong(s, radix);
     }
 
     @AfterTemplate
-    long after(String string, int radix) {
-      return Long.parseUnsignedLong(string, radix);
+    long after(String s, int radix) {
+      return Long.parseUnsignedLong(s, radix);
     }
   }
 

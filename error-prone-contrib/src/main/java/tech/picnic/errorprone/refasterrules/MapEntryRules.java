@@ -33,14 +33,14 @@ final class MapEntryRules {
    */
   static final class MapEntry<K, V> {
     @BeforeTemplate
-    Map.Entry<K, V> before(K key, V value) {
+    Map.Entry<K, V> before(K k, V v) {
       return Refaster.anyOf(
-          Maps.immutableEntry(key, value), new AbstractMap.SimpleImmutableEntry<>(key, value));
+          Maps.immutableEntry(k, v), new AbstractMap.SimpleImmutableEntry<>(k, v));
     }
 
     @AfterTemplate
-    Map.Entry<K, V> after(K key, V value) {
-      return Map.entry(key, value);
+    Map.Entry<K, V> after(K k, V v) {
+      return Map.entry(k, v);
     }
   }
 

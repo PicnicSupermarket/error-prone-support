@@ -45,17 +45,17 @@ final class ValidRules {
     abstract void doAfterAdd(E element);
 
     @BeforeTemplate
-    void before(Set<E> set, E elem) {
-      if (!set.contains(elem)) {
-        set.add(elem);
-        doAfterAdd(elem);
+    void before(Set<E> set, E element) {
+      if (!set.contains(element)) {
+        set.add(element);
+        doAfterAdd(element);
       }
     }
 
     @AfterTemplate
-    void after(Set<E> set, E elem) {
-      if (set.add(elem)) {
-        doAfterAdd(elem);
+    void after(Set<E> set, E element) {
+      if (set.add(element)) {
+        doAfterAdd(element);
       }
     }
   }

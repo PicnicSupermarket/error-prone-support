@@ -46,13 +46,13 @@ final class RandomGeneratorRules {
   // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextDoublePlus {
     @BeforeTemplate
-    double before(RandomGenerator random, double a, double b) {
-      return a + random.nextDouble(b);
+    double before(RandomGenerator random, double origin, double bound) {
+      return origin + random.nextDouble(bound);
     }
 
     @AfterTemplate
-    double after(RandomGenerator random, double a, double b) {
-      return random.nextDouble(a, a + b);
+    double after(RandomGenerator random, double origin, double bound) {
+      return random.nextDouble(origin, origin + bound);
     }
   }
 
@@ -82,13 +82,13 @@ final class RandomGeneratorRules {
   // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextIntPlus {
     @BeforeTemplate
-    int before(RandomGenerator random, int a, int b) {
-      return a + random.nextInt(b);
+    int before(RandomGenerator random, int origin, int bound) {
+      return origin + random.nextInt(bound);
     }
 
     @AfterTemplate
-    int after(RandomGenerator random, int a, int b) {
-      return random.nextInt(a, a + b);
+    int after(RandomGenerator random, int origin, int bound) {
+      return random.nextInt(origin, origin + bound);
     }
   }
 
@@ -134,13 +134,13 @@ final class RandomGeneratorRules {
   // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextLongPlus {
     @BeforeTemplate
-    long before(RandomGenerator random, long a, long b) {
-      return a + random.nextLong(b);
+    long before(RandomGenerator random, long origin, long bound) {
+      return origin + random.nextLong(bound);
     }
 
     @AfterTemplate
-    long after(RandomGenerator random, long a, long b) {
-      return random.nextLong(a, a + b);
+    long after(RandomGenerator random, long origin, long bound) {
+      return random.nextLong(origin, origin + bound);
     }
   }
 }

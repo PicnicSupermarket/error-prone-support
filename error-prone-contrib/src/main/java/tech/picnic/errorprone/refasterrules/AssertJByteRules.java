@@ -17,29 +17,30 @@ final class AssertJByteRules {
   /** Prefer {@link AbstractByteAssert#isEqualTo(byte)} over more contrived alternatives. */
   static final class AbstractByteAssertIsEqualTo {
     @BeforeTemplate
-    AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte n) {
+    AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte expected) {
       return Refaster.anyOf(
-          byteAssert.isCloseTo(n, offset((byte) 0)), byteAssert.isCloseTo(n, withPercentage(0)));
+          byteAssert.isCloseTo(expected, offset((byte) 0)),
+          byteAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractByteAssert<?> after(AbstractByteAssert<?> byteAssert, byte n) {
-      return byteAssert.isEqualTo(n);
+    AbstractByteAssert<?> after(AbstractByteAssert<?> byteAssert, byte expected) {
+      return byteAssert.isEqualTo(expected);
     }
   }
 
   /** Prefer {@link AbstractByteAssert#isNotEqualTo(byte)} over more contrived alternatives. */
   static final class AbstractByteAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte n) {
+    AbstractByteAssert<?> before(AbstractByteAssert<?> byteAssert, byte other) {
       return Refaster.anyOf(
-          byteAssert.isNotCloseTo(n, offset((byte) 0)),
-          byteAssert.isNotCloseTo(n, withPercentage(0)));
+          byteAssert.isNotCloseTo(other, offset((byte) 0)),
+          byteAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractByteAssert<?> after(AbstractByteAssert<?> byteAssert, byte n) {
-      return byteAssert.isNotEqualTo(n);
+    AbstractByteAssert<?> after(AbstractByteAssert<?> byteAssert, byte other) {
+      return byteAssert.isNotEqualTo(other);
     }
   }
 

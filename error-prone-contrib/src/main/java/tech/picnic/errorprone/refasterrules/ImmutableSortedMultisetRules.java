@@ -27,13 +27,13 @@ final class ImmutableSortedMultisetRules {
    */
   static final class ImmutableSortedMultisetOrderedBy<T> {
     @BeforeTemplate
-    ImmutableSortedMultiset.Builder<T> before(Comparator<T> cmp) {
-      return new ImmutableSortedMultiset.Builder<>(cmp);
+    ImmutableSortedMultiset.Builder<T> before(Comparator<T> comparator) {
+      return new ImmutableSortedMultiset.Builder<>(comparator);
     }
 
     @AfterTemplate
-    ImmutableSortedMultiset.Builder<T> after(Comparator<T> cmp) {
-      return ImmutableSortedMultiset.orderedBy(cmp);
+    ImmutableSortedMultiset.Builder<T> after(Comparator<T> comparator) {
+      return ImmutableSortedMultiset.orderedBy(comparator);
     }
   }
 
@@ -88,36 +88,36 @@ final class ImmutableSortedMultisetRules {
   // `reverseOrder`.) Worth the hassle?
   static final class ImmutableSortedMultisetCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate
-    ImmutableSortedMultiset<T> before(T[] iterable) {
+    ImmutableSortedMultiset<T> before(T[] elements) {
       return Refaster.anyOf(
-          ImmutableSortedMultiset.<T>naturalOrder().add(iterable).build(),
-          Arrays.stream(iterable).collect(toImmutableSortedMultiset(naturalOrder())));
+          ImmutableSortedMultiset.<T>naturalOrder().add(elements).build(),
+          Arrays.stream(elements).collect(toImmutableSortedMultiset(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSortedMultiset<T> before(Iterator<T> iterable) {
+    ImmutableSortedMultiset<T> before(Iterator<T> elements) {
       return Refaster.anyOf(
-          ImmutableSortedMultiset.copyOf(naturalOrder(), iterable),
-          ImmutableSortedMultiset.<T>naturalOrder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableSortedMultiset(naturalOrder())));
+          ImmutableSortedMultiset.copyOf(naturalOrder(), elements),
+          ImmutableSortedMultiset.<T>naturalOrder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableSortedMultiset(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSortedMultiset<T> before(Iterable<T> iterable) {
+    ImmutableSortedMultiset<T> before(Iterable<T> elements) {
       return Refaster.anyOf(
-          ImmutableSortedMultiset.copyOf(naturalOrder(), iterable),
-          ImmutableSortedMultiset.<T>naturalOrder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableSortedMultiset(naturalOrder())));
+          ImmutableSortedMultiset.copyOf(naturalOrder(), elements),
+          ImmutableSortedMultiset.<T>naturalOrder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableSortedMultiset(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSortedMultiset<T> before(Collection<T> iterable) {
-      return iterable.stream().collect(toImmutableSortedMultiset(naturalOrder()));
+    ImmutableSortedMultiset<T> before(Collection<T> elements) {
+      return elements.stream().collect(toImmutableSortedMultiset(naturalOrder()));
     }
 
     @AfterTemplate
-    ImmutableSortedMultiset<T> after(Iterable<T> iterable) {
-      return ImmutableSortedMultiset.copyOf(iterable);
+    ImmutableSortedMultiset<T> after(Iterable<T> elements) {
+      return ImmutableSortedMultiset.copyOf(elements);
     }
   }
 

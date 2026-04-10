@@ -32,29 +32,30 @@ final class EqualityRules {
     // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
-    boolean before(T a, T b) {
-      return Refaster.anyOf(a.equals(b), Objects.equals(a, b), a.ordinal() == b.ordinal());
+    boolean before(T a, T other) {
+      return Refaster.anyOf(
+          a.equals(other), Objects.equals(a, other), a.ordinal() == other.ordinal());
     }
 
     @AfterTemplate
     @AlsoNegation
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
-    boolean after(T a, T b) {
-      return a == b;
+    boolean after(T a, T other) {
+      return a == other;
     }
   }
 
   /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
   static final class EqualTo<T extends Enum<T>> {
     @BeforeTemplate
-    Predicate<T> before(T e) {
-      return Refaster.anyOf(isEqual(e), e::equals);
+    Predicate<T> before(T targetRef) {
+      return Refaster.anyOf(isEqual(targetRef), targetRef::equals);
     }
 
     @AfterTemplate
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
-    Predicate<T> after(T e) {
-      return v -> v == e;
+    Predicate<T> after(T targetRef) {
+      return v -> v == targetRef;
     }
   }
 
@@ -169,29 +170,29 @@ final class EqualityRules {
   /** Prefer {@link Object#equals(Object)} over more contrived alternatives. */
   static final class TEqualsWithObject<T, S> {
     @BeforeTemplate
-    boolean before(T value1, S value2) {
+    boolean before(T value, S obj) {
       return Refaster.anyOf(
-          Optional.of(value1).equals(Optional.of(value2)),
-          Optional.of(value1).equals(Optional.ofNullable(value2)),
-          Optional.ofNullable(value2).equals(Optional.of(value1)));
+          Optional.of(value).equals(Optional.of(obj)),
+          Optional.of(value).equals(Optional.ofNullable(obj)),
+          Optional.ofNullable(obj).equals(Optional.of(value)));
     }
 
     @AfterTemplate
-    boolean after(T value1, S value2) {
-      return value1.equals(value2);
+    boolean after(T value, S obj) {
+      return value.equals(obj);
     }
   }
 
   /** Prefer {@link Objects#equals(Object, Object)} over more contrived alternatives. */
   static final class ObjectsEquals<T, S> {
     @BeforeTemplate
-    boolean before(T value1, S value2) {
-      return Optional.ofNullable(value1).equals(Optional.ofNullable(value2));
+    boolean before(T a, S b) {
+      return Optional.ofNullable(a).equals(Optional.ofNullable(b));
     }
 
     @AfterTemplate
-    boolean after(T value1, S value2) {
-      return Objects.equals(value1, value2);
+    boolean after(T a, S b) {
+      return Objects.equals(a, b);
     }
   }
 }

@@ -77,28 +77,28 @@ final class BigDecimalRules {
   static final class BigDecimalValueOf {
     @BeforeTemplate
     @SuppressWarnings("java:S2111" /* This violation will be rewritten. */)
-    BigDecimal before(double value) {
-      return new BigDecimal(value);
+    BigDecimal before(double val) {
+      return new BigDecimal(val);
     }
 
     @AfterTemplate
-    BigDecimal after(double value) {
-      return BigDecimal.valueOf(value);
+    BigDecimal after(double val) {
+      return BigDecimal.valueOf(val);
     }
   }
 
   /** Prefer a {@link BigDecimal#signum()} comparison to 0 over less explicit alternatives. */
   static final class BigDecimalSignumEqualToZero {
     @BeforeTemplate
-    boolean before(BigDecimal value) {
+    boolean before(BigDecimal val) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) == 0, BigDecimal.ZERO.compareTo(value) == 0);
+          val.compareTo(BigDecimal.ZERO) == 0, BigDecimal.ZERO.compareTo(val) == 0);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(BigDecimal value) {
-      return value.signum() == 0;
+    boolean after(BigDecimal val) {
+      return val.signum() == 0;
     }
   }
 
@@ -108,18 +108,18 @@ final class BigDecimalRules {
    */
   static final class BigDecimalSignumGreaterThanZero {
     @BeforeTemplate
-    boolean before(BigDecimal value) {
+    boolean before(BigDecimal val) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) > 0,
-          BigDecimal.ZERO.compareTo(value) < 0,
-          value.signum() == 1,
-          value.signum() >= 1);
+          val.compareTo(BigDecimal.ZERO) > 0,
+          BigDecimal.ZERO.compareTo(val) < 0,
+          val.signum() == 1,
+          val.signum() >= 1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(BigDecimal value) {
-      return value.signum() > 0;
+    boolean after(BigDecimal val) {
+      return val.signum() > 0;
     }
   }
 
@@ -129,18 +129,18 @@ final class BigDecimalRules {
    */
   static final class BigDecimalSignumLessThanZero {
     @BeforeTemplate
-    boolean before(BigDecimal value) {
+    boolean before(BigDecimal val) {
       return Refaster.anyOf(
-          value.compareTo(BigDecimal.ZERO) < 0,
-          BigDecimal.ZERO.compareTo(value) > 0,
-          value.signum() == -1,
-          value.signum() <= -1);
+          val.compareTo(BigDecimal.ZERO) < 0,
+          BigDecimal.ZERO.compareTo(val) > 0,
+          val.signum() == -1,
+          val.signum() <= -1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(BigDecimal value) {
-      return value.signum() < 0;
+    boolean after(BigDecimal val) {
+      return val.signum() < 0;
     }
   }
 }

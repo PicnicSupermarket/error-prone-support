@@ -17,28 +17,30 @@ final class AssertJLongRules {
   /** Prefer {@link AbstractLongAssert#isEqualTo(long)} over more contrived alternatives. */
   static final class AbstractLongAssertIsEqualTo {
     @BeforeTemplate
-    AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
+    AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long expected) {
       return Refaster.anyOf(
-          longAssert.isCloseTo(n, offset(0L)), longAssert.isCloseTo(n, withPercentage(0)));
+          longAssert.isCloseTo(expected, offset(0L)),
+          longAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractLongAssert<?> after(AbstractLongAssert<?> longAssert, long n) {
-      return longAssert.isEqualTo(n);
+    AbstractLongAssert<?> after(AbstractLongAssert<?> longAssert, long expected) {
+      return longAssert.isEqualTo(expected);
     }
   }
 
   /** Prefer {@link AbstractLongAssert#isNotEqualTo(long)} over more contrived alternatives. */
   static final class AbstractLongAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long n) {
+    AbstractLongAssert<?> before(AbstractLongAssert<?> longAssert, long other) {
       return Refaster.anyOf(
-          longAssert.isNotCloseTo(n, offset(0L)), longAssert.isNotCloseTo(n, withPercentage(0)));
+          longAssert.isNotCloseTo(other, offset(0L)),
+          longAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractLongAssert<?> after(AbstractLongAssert<?> longAssert, long n) {
-      return longAssert.isNotEqualTo(n);
+    AbstractLongAssert<?> after(AbstractLongAssert<?> longAssert, long other) {
+      return longAssert.isNotEqualTo(other);
     }
   }
 

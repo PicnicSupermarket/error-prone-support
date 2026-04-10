@@ -29,14 +29,14 @@ final class AssortedRules {
   /** Prefer {@link Objects#checkIndex(int, int)} over non-JDK alternatives. */
   static final class CheckIndexExpression {
     @BeforeTemplate
-    int before(int index, int size) {
-      return checkElementIndex(index, size);
+    int before(int index, int length) {
+      return checkElementIndex(index, length);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    int after(int index, int size) {
-      return checkIndex(index, size);
+    int after(int index, int length) {
+      return checkIndex(index, length);
     }
   }
 
@@ -48,16 +48,16 @@ final class AssortedRules {
    */
   static final class CheckIndexBlock {
     @BeforeTemplate
-    void before(int index, int size) {
-      if (index < 0 || index >= size) {
+    void before(int index, int length) {
+      if (index < 0 || index >= length) {
         throw new IndexOutOfBoundsException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(int index, int size) {
-      checkIndex(index, size);
+    void after(int index, int length) {
+      checkIndex(index, length);
     }
   }
 
@@ -125,15 +125,14 @@ final class AssortedRules {
   /** Prefer {@link Splitter#splitToStream(CharSequence)} over less efficient alternatives. */
   static final class SplitterSplitToStream {
     @BeforeTemplate
-    Stream<String> before(Splitter splitter, CharSequence charSequence) {
+    Stream<String> before(Splitter splitter, CharSequence sequence) {
       return Refaster.anyOf(
-          Streams.stream(splitter.split(charSequence)),
-          splitter.splitToList(charSequence).stream());
+          Streams.stream(splitter.split(sequence)), splitter.splitToList(sequence).stream());
     }
 
     @AfterTemplate
-    Stream<String> after(Splitter splitter, CharSequence charSequence) {
-      return splitter.splitToStream(charSequence);
+    Stream<String> after(Splitter splitter, CharSequence sequence) {
+      return splitter.splitToStream(sequence);
     }
   }
 

@@ -117,13 +117,13 @@ final class FileRules {
   /** Prefer {@link Files#readString(Path, Charset)} over more contrived alternatives. */
   static final class FilesReadStringWithCharset {
     @BeforeTemplate
-    String before(Path path, Charset charset) throws IOException {
-      return new String(Files.readAllBytes(path), charset);
+    String before(Path path, Charset cs) throws IOException {
+      return new String(Files.readAllBytes(path), cs);
     }
 
     @AfterTemplate
-    String after(Path path, Charset charset) throws IOException {
-      return Files.readString(path, charset);
+    String after(Path path, Charset cs) throws IOException {
+      return Files.readString(path, cs);
     }
   }
 
@@ -233,13 +233,13 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
-    FileInputStream before(String path) throws FileNotFoundException {
-      return new FileInputStream(path);
+    FileInputStream before(String first) throws FileNotFoundException {
+      return new FileInputStream(first);
     }
 
     @AfterTemplate
-    InputStream after(String path) throws IOException {
-      return Files.newInputStream(Path.of(path));
+    InputStream after(String first) throws IOException {
+      return Files.newInputStream(Path.of(first));
     }
   }
 
@@ -267,13 +267,13 @@ final class FileRules {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
-    FileOutputStream before(String path) throws FileNotFoundException {
-      return new FileOutputStream(path);
+    FileOutputStream before(String first) throws FileNotFoundException {
+      return new FileOutputStream(first);
     }
 
     @AfterTemplate
-    OutputStream after(String path) throws IOException {
-      return Files.newOutputStream(Path.of(path));
+    OutputStream after(String first) throws IOException {
+      return Files.newOutputStream(Path.of(first));
     }
   }
 
@@ -323,13 +323,13 @@ final class FileRules {
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
   static final class FilesNewBufferedReaderWithCharset {
     @BeforeTemplate
-    BufferedReader before(Path path, Charset charset) throws IOException {
-      return new BufferedReader(new InputStreamReader(Files.newInputStream(path), charset));
+    BufferedReader before(Path path, Charset cs) throws IOException {
+      return new BufferedReader(new InputStreamReader(Files.newInputStream(path), cs));
     }
 
     @AfterTemplate
-    BufferedReader after(Path path, Charset charset) throws IOException {
-      return Files.newBufferedReader(path, charset);
+    BufferedReader after(Path path, Charset cs) throws IOException {
+      return Files.newBufferedReader(path, cs);
     }
   }
 }

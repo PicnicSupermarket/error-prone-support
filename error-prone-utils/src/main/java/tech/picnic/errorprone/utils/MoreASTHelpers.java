@@ -2,9 +2,13 @@ package tech.picnic.errorprone.utils;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static java.util.Comparator.comparing;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.LambdaExpressionTree;
@@ -21,6 +25,13 @@ import org.jspecify.annotations.Nullable;
  * <p>These methods are additions to the ones found in {@link ASTHelpers}.
  */
 public final class MoreASTHelpers {
+  private static final Matcher<Tree> BEFORE_TEMPLATE =
+      hasAnnotation("com.google.errorprone.refaster.annotation.BeforeTemplate");
+  private static final Matcher<Tree> BEFORE_OR_AFTER_TEMPLATE =
+      anyOf(
+          BEFORE_TEMPLATE,
+          hasAnnotation("com.google.errorprone.refaster.annotation.AfterTemplate"));
+
   private MoreASTHelpers() {}
 
   /**
@@ -123,5 +134,25 @@ public final class MoreASTHelpers {
    */
   public static boolean isStringTyped(Tree tree, VisitorState state) {
     return ASTHelpers.isSameType(ASTHelpers.getType(tree), state.getSymtab().stringType, state);
+  }
+
+  /**
+   * Returns the Refaster template methods of the given class, ordered by priority:
+   * {@code @AfterTemplate} methods first, then {@code @BeforeTemplate} methods, with ties broken by
+   * descending parameter count.
+   *
+   * @param tree The class tree to inspect.
+   * @param state The {@link VisitorState} describing the context in which the given tree was found.
+   * @return The {@link MethodTree}s of the template methods, in priority order.
+   */
+  public static ImmutableList<MethodTree> getRefasterTemplateMethods(
+      ClassTree tree, VisitorState state) {
+    return tree.getMembers().stream()
+        .filter(m -> BEFORE_OR_AFTER_TEMPLATE.matches(m, state))
+        .map(MethodTree.class::cast)
+        .sorted(
+            comparing((MethodTree m) -> BEFORE_TEMPLATE.matches(m, state))
+                .thenComparingInt(m -> -m.getParameters().size()))
+        .collect(toImmutableList());
   }
 }

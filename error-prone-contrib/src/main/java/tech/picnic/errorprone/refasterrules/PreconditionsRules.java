@@ -40,16 +40,16 @@ final class PreconditionsRules {
   /** Prefer {@link Preconditions#checkArgument(boolean, Object)} over more verbose alternatives. */
   static final class CheckArgumentNotWithString {
     @BeforeTemplate
-    void before(boolean condition, String message) {
+    void before(boolean condition, String errorMessage) {
       if (condition) {
-        throw new IllegalArgumentException(message);
+        throw new IllegalArgumentException(errorMessage);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      checkArgument(!condition, message);
+    void after(boolean condition, String errorMessage) {
+      checkArgument(!condition, errorMessage);
     }
   }
 
@@ -62,30 +62,30 @@ final class PreconditionsRules {
    */
   static final class CheckElementIndex {
     @BeforeTemplate
-    void before(int index, int size, String message) {
+    void before(int index, int size, String desc) {
       if (index < 0 || index >= size) {
-        throw new IndexOutOfBoundsException(message);
+        throw new IndexOutOfBoundsException(desc);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(int index, int size, String message) {
-      checkElementIndex(index, size, message);
+    void after(int index, int size, String desc) {
+      checkElementIndex(index, size, desc);
     }
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over non-JDK alternatives. */
   static final class RequireNonNullExpression<T> {
     @BeforeTemplate
-    T before(T object) {
-      return checkNotNull(object);
+    T before(T obj) {
+      return checkNotNull(obj);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T object) {
-      return requireNonNull(object);
+    T after(T obj) {
+      return requireNonNull(obj);
     }
   }
 
@@ -99,30 +99,30 @@ final class PreconditionsRules {
       "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    void before(T object) {
-      if (object == null) {
+    void before(T obj) {
+      if (obj == null) {
         throw new NullPointerException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(T object) {
-      requireNonNull(object);
+    void after(T obj) {
+      requireNonNull(obj);
     }
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over non-JDK alternatives. */
   static final class RequireNonNullWithStringExpression<T> {
     @BeforeTemplate
-    T before(T object, String message) {
-      return checkNotNull(object, message);
+    T before(T obj, String message) {
+      return checkNotNull(obj, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T object, String message) {
-      return requireNonNull(object, message);
+    T after(T obj, String message) {
+      return requireNonNull(obj, message);
     }
   }
 
@@ -136,16 +136,16 @@ final class PreconditionsRules {
       "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    void before(T object, String message) {
-      if (object == null) {
+    void before(T obj, String message) {
+      if (obj == null) {
         throw new NullPointerException(message);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(T object, String message) {
-      requireNonNull(object, message);
+    void after(T obj, String message) {
+      requireNonNull(obj, message);
     }
   }
 
@@ -174,16 +174,16 @@ final class PreconditionsRules {
    */
   static final class CheckPositionIndexWithString {
     @BeforeTemplate
-    void before(int index, int size, String message) {
+    void before(int index, int size, String desc) {
       if (index < 0 || index > size) {
-        throw new IndexOutOfBoundsException(message);
+        throw new IndexOutOfBoundsException(desc);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(int index, int size, String message) {
-      checkPositionIndex(index, size, message);
+    void after(int index, int size, String desc) {
+      checkPositionIndex(index, size, desc);
     }
   }
 
@@ -206,16 +206,16 @@ final class PreconditionsRules {
   /** Prefer {@link Preconditions#checkState(boolean, Object)} over more verbose alternatives. */
   static final class CheckStateNotWithString {
     @BeforeTemplate
-    void before(boolean condition, String message) {
+    void before(boolean condition, String errorMessage) {
       if (condition) {
-        throw new IllegalStateException(message);
+        throw new IllegalStateException(errorMessage);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      checkState(!condition, message);
+    void after(boolean condition, String errorMessage) {
+      checkState(!condition, errorMessage);
     }
   }
 }

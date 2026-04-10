@@ -31,15 +31,17 @@ final class AssertJBigDecimalRules {
    */
   static final class AbstractBigDecimalAssertIsEqualByComparingTo {
     @BeforeTemplate
-    AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
       return Refaster.anyOf(
-          bigDecimalAssert.isCloseTo(n, offset(BigDecimal.ZERO)),
-          bigDecimalAssert.isCloseTo(n, withPercentage(0)));
+          bigDecimalAssert.isCloseTo(other, offset(BigDecimal.ZERO)),
+          bigDecimalAssert.isCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
-      return bigDecimalAssert.isEqualByComparingTo(n);
+    AbstractBigDecimalAssert<?> after(
+        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
+      return bigDecimalAssert.isEqualByComparingTo(other);
     }
   }
 
@@ -49,15 +51,17 @@ final class AssertJBigDecimalRules {
    */
   static final class AbstractBigDecimalAssertIsNotEqualByComparingTo {
     @BeforeTemplate
-    AbstractBigDecimalAssert<?> before(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
+    AbstractBigDecimalAssert<?> before(
+        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
       return Refaster.anyOf(
-          bigDecimalAssert.isNotCloseTo(n, offset(BigDecimal.ZERO)),
-          bigDecimalAssert.isNotCloseTo(n, withPercentage(0)));
+          bigDecimalAssert.isNotCloseTo(other, offset(BigDecimal.ZERO)),
+          bigDecimalAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal n) {
-      return bigDecimalAssert.isNotEqualByComparingTo(n);
+    AbstractBigDecimalAssert<?> after(
+        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
+      return bigDecimalAssert.isNotEqualByComparingTo(other);
     }
   }
 }

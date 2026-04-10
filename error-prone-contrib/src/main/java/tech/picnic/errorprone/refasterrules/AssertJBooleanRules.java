@@ -18,13 +18,13 @@ final class AssertJBooleanRules {
   /** Prefer {@link AbstractBooleanAssert#isEqualTo(Object)} over more contrived alternatives. */
   static final class AbstractBooleanAssertIsEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert, boolean other) {
-      return boolAssert.isNotEqualTo(!other);
+    AbstractBooleanAssert<?> before(AbstractBooleanAssert<?> boolAssert, boolean expected) {
+      return boolAssert.isNotEqualTo(!expected);
     }
 
     @AfterTemplate
-    AbstractBooleanAssert<?> after(AbstractBooleanAssert<?> boolAssert, boolean other) {
-      return boolAssert.isEqualTo(other);
+    AbstractBooleanAssert<?> after(AbstractBooleanAssert<?> boolAssert, boolean expected) {
+      return boolAssert.isEqualTo(expected);
     }
   }
 
@@ -57,14 +57,14 @@ final class AssertJBooleanRules {
   /** Prefer {@code assertThat(b).isTrue()} over more contrived alternatives. */
   static final class AssertThatIsTrue {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean b) {
-      return assertThat(!b).isFalse();
+    AbstractBooleanAssert<?> before(boolean actual) {
+      return assertThat(!actual).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean b) {
-      return assertThat(b).isTrue();
+    AbstractBooleanAssert<?> after(boolean actual) {
+      return assertThat(actual).isTrue();
     }
   }
 
@@ -84,14 +84,14 @@ final class AssertJBooleanRules {
   /** Prefer {@code assertThat(b).isFalse()} over more contrived alternatives. */
   static final class AssertThatIsFalse {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean b) {
-      return assertThat(!b).isTrue();
+    AbstractBooleanAssert<?> before(boolean actual) {
+      return assertThat(!actual).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean b) {
-      return assertThat(b).isFalse();
+    AbstractBooleanAssert<?> after(boolean actual) {
+      return assertThat(actual).isFalse();
     }
   }
 }

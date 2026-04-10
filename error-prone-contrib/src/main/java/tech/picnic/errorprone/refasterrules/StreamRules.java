@@ -117,17 +117,17 @@ final class StreamRules {
     @BeforeTemplate
     @SuppressWarnings(
         "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */)
-    Stream<T> before(T object) {
+    Stream<T> before(T t) {
       return Refaster.anyOf(
-          Stream.of(object).filter(Objects::nonNull),
-          Optional.ofNullable(object).stream(),
-          object != null ? Stream.of(object) : Stream.empty(),
-          object == null ? Stream.empty() : Stream.of(object));
+          Stream.of(t).filter(Objects::nonNull),
+          Optional.ofNullable(t).stream(),
+          t != null ? Stream.of(t) : Stream.empty(),
+          t == null ? Stream.empty() : Stream.of(t));
     }
 
     @AfterTemplate
-    Stream<T> after(T object) {
-      return Stream.ofNullable(object);
+    Stream<T> after(T t) {
+      return Stream.ofNullable(t);
     }
   }
 
@@ -161,13 +161,13 @@ final class StreamRules {
   /** Prefer {@link Stream#concat(Stream, Stream)} over non-JDK alternatives. */
   static final class StreamConcat<T> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream1, Stream<T> stream2) {
-      return Streams.concat(stream1, stream2);
+    Stream<T> before(Stream<T> a, Stream<T> b) {
+      return Streams.concat(a, b);
     }
 
     @AfterTemplate
-    Stream<T> after(Stream<T> stream1, Stream<T> stream2) {
-      return Stream.concat(stream1, stream2);
+    Stream<T> after(Stream<T> a, Stream<T> b) {
+      return Stream.concat(a, b);
     }
   }
 
@@ -301,14 +301,14 @@ final class StreamRules {
   // latter uses a stable sort operation, while the former breaks ties arbitrarily.
   static final class StreamCollectLeastStream<S, T extends S> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, int n, Comparator<S> cmp) {
-      return stream.sorted(cmp).limit(n);
+    Stream<T> before(Stream<T> stream, int k, Comparator<S> comparator) {
+      return stream.sorted(comparator).limit(k);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Stream<T> after(Stream<T> stream, int n, Comparator<S> cmp) {
-      return stream.collect(least(n, cmp)).stream();
+    Stream<T> after(Stream<T> stream, int k, Comparator<S> comparator) {
+      return stream.collect(least(k, comparator)).stream();
     }
   }
 
@@ -317,14 +317,14 @@ final class StreamRules {
   // latter uses a stable sort operation, while the former breaks ties arbitrarily.
   static final class StreamCollectLeastNaturalOrderStream<T extends Comparable<? super T>> {
     @BeforeTemplate
-    Stream<T> before(Stream<T> stream, int n) {
-      return stream.sorted().limit(n);
+    Stream<T> before(Stream<T> stream, int k) {
+      return stream.sorted().limit(k);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Stream<T> after(Stream<T> stream, int n) {
-      return stream.collect(least(n, naturalOrder())).stream();
+    Stream<T> after(Stream<T> stream, int k) {
+      return stream.collect(least(k, naturalOrder())).stream();
     }
   }
 
@@ -336,13 +336,13 @@ final class StreamRules {
   // an NPE if the first element is `null`, while the latter yields an empty `Optional`.
   static final class StreamFindFirstMap<T2, T extends T2, S> {
     @BeforeTemplate
-    Optional<S> before(Stream<T> stream, Function<T2, S> function) {
-      return stream.map(function).findFirst();
+    Optional<S> before(Stream<T> stream, Function<T2, S> mapper) {
+      return stream.map(mapper).findFirst();
     }
 
     @AfterTemplate
-    Optional<S> after(Stream<T> stream, Function<T2, S> function) {
-      return stream.findFirst().map(function);
+    Optional<S> after(Stream<T> stream, Function<T2, S> mapper) {
+      return stream.findFirst().map(mapper);
     }
   }
 
@@ -353,19 +353,19 @@ final class StreamRules {
   @PossibleSourceIncompatibility
   static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
     @BeforeTemplate
-    Boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> collector) {
+    Boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> downstream) {
       return Refaster.anyOf(
           stream.count() == 0,
           stream.count() <= 0,
           stream.count() < 1,
           stream.findFirst().isEmpty(),
-          stream.collect(collector).isEmpty(),
-          stream.collect(collectingAndThen(collector, C::isEmpty)));
+          stream.collect(downstream).isEmpty(),
+          stream.collect(collectingAndThen(downstream, C::isEmpty)));
     }
 
     @BeforeTemplate
-    Boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> collector) {
-      return stream.collect(collectingAndThen(collector, M::isEmpty));
+    Boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> downstream) {
+      return stream.collect(collectingAndThen(downstream, M::isEmpty));
     }
 
     @AfterTemplate
@@ -425,14 +425,16 @@ final class StreamRules {
   static final class StreamMin<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    Optional<T> before(Stream<T> stream, Comparator<S> cmp) {
+    Optional<T> before(Stream<T> stream, Comparator<S> comparator) {
       return Refaster.anyOf(
-          stream.max(cmp.reversed()), stream.sorted(cmp).findFirst(), stream.collect(minBy(cmp)));
+          stream.max(comparator.reversed()),
+          stream.sorted(comparator).findFirst(),
+          stream.collect(minBy(comparator)));
     }
 
     @AfterTemplate
-    Optional<T> after(Stream<T> stream, Comparator<S> cmp) {
-      return stream.min(cmp);
+    Optional<T> after(Stream<T> stream, Comparator<S> comparator) {
+      return stream.min(comparator);
     }
   }
 
@@ -454,16 +456,16 @@ final class StreamRules {
   static final class StreamMax<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    Optional<T> before(Stream<T> stream, Comparator<S> cmp) {
+    Optional<T> before(Stream<T> stream, Comparator<S> comparator) {
       return Refaster.anyOf(
-          stream.min(cmp.reversed()),
-          Streams.findLast(stream.sorted(cmp)),
-          stream.collect(maxBy(cmp)));
+          stream.min(comparator.reversed()),
+          Streams.findLast(stream.sorted(comparator)),
+          stream.collect(maxBy(comparator)));
     }
 
     @AfterTemplate
-    Optional<T> after(Stream<T> stream, Comparator<S> cmp) {
-      return stream.max(cmp);
+    Optional<T> after(Stream<T> stream, Comparator<S> comparator) {
+      return stream.max(comparator);
     }
   }
 
@@ -485,11 +487,11 @@ final class StreamRules {
   static final class StreamNoneMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
-    boolean before(Stream<T> stream, Predicate<S> predicate) {
+    boolean before(Stream<T> stream, Predicate<S> target) {
       return Refaster.anyOf(
-          !stream.anyMatch(predicate),
-          stream.allMatch(Refaster.anyOf(not(predicate), predicate.negate())),
-          stream.filter(predicate).findAny().isEmpty());
+          !stream.anyMatch(target),
+          stream.allMatch(Refaster.anyOf(not(target), target.negate())),
+          stream.filter(target).findAny().isEmpty());
     }
 
     // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
@@ -497,13 +499,13 @@ final class StreamRules {
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> predicate) {
-      return stream.map(predicate).noneMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> target) {
+      return stream.map(target).noneMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<S> predicate) {
-      return stream.noneMatch(predicate);
+    boolean after(Stream<T> stream, Predicate<S> target) {
+      return stream.noneMatch(target);
     }
   }
 
@@ -550,8 +552,8 @@ final class StreamRules {
   /** Prefer {@link Stream#allMatch(Predicate)} over more contrived alternatives. */
   static final class StreamAllMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
-    boolean before(Stream<T> stream, Predicate<S> predicate) {
-      return stream.noneMatch(Refaster.anyOf(not(predicate), predicate.negate()));
+    boolean before(Stream<T> stream, Predicate<S> target) {
+      return stream.noneMatch(Refaster.anyOf(not(target), target.negate()));
     }
 
     // XXX: Consider extending `@Matches(IsIdentityOperation.class)` such that it can replace this
@@ -559,13 +561,13 @@ final class StreamRules {
     @BeforeTemplate
     boolean before2(
         Stream<T> stream,
-        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> predicate) {
-      return stream.map(predicate).allMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
+        @Matches(IsLambdaExpressionOrMethodReference.class) Function<S, Boolean> target) {
+      return stream.map(target).allMatch(Refaster.anyOf(Boolean::booleanValue, b -> b));
     }
 
     @AfterTemplate
-    boolean after(Stream<T> stream, Predicate<S> predicate) {
-      return stream.allMatch(predicate);
+    boolean after(Stream<T> stream, Predicate<S> target) {
+      return stream.allMatch(target);
     }
   }
 
@@ -715,13 +717,13 @@ final class StreamRules {
   static final class StreamReduce<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    Optional<T> before(Stream<T> stream, BinaryOperator<T> accumulator) {
-      return stream.collect(reducing(accumulator));
+    Optional<T> before(Stream<T> stream, BinaryOperator<T> op) {
+      return stream.collect(reducing(op));
     }
 
     @AfterTemplate
-    Optional<T> after(Stream<T> stream, BinaryOperator<T> accumulator) {
-      return stream.reduce(accumulator);
+    Optional<T> after(Stream<T> stream, BinaryOperator<T> op) {
+      return stream.reduce(op);
     }
   }
 
@@ -729,26 +731,26 @@ final class StreamRules {
   static final class StreamReduceWithObject<T> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    T before(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
-      return stream.collect(reducing(identity, accumulator));
+    T before(Stream<T> stream, T identity, BinaryOperator<T> op) {
+      return stream.collect(reducing(identity, op));
     }
 
     @AfterTemplate
-    T after(Stream<T> stream, T identity, BinaryOperator<T> accumulator) {
-      return stream.reduce(identity, accumulator);
+    T after(Stream<T> stream, T identity, BinaryOperator<T> op) {
+      return stream.reduce(identity, op);
     }
   }
 
   /** Prefer {@link Stream#filter(Predicate)} over more contrived alternatives. */
   static final class StreamFilterCollect<S, T extends S, R> {
     @BeforeTemplate
-    R before(Stream<T> stream, Predicate<S> predicate, Collector<S, ?, R> collector) {
-      return stream.collect(filtering(predicate, collector));
+    R before(Stream<T> stream, Predicate<S> predicate, Collector<S, ?, R> downstream) {
+      return stream.collect(filtering(predicate, downstream));
     }
 
     @AfterTemplate
-    R after(Stream<T> stream, Predicate<S> predicate, Collector<S, ?, R> collector) {
-      return stream.filter(predicate).collect(collector);
+    R after(Stream<T> stream, Predicate<S> predicate, Collector<S, ?, R> downstream) {
+      return stream.filter(predicate).collect(downstream);
     }
   }
 
@@ -756,13 +758,13 @@ final class StreamRules {
   static final class StreamMapCollect<S, T extends S, U, R> {
     @BeforeTemplate
     @SuppressWarnings("java:S4266" /* This violation will be rewritten. */)
-    R before(Stream<T> stream, Function<S, U> mapper, Collector<U, ?, R> collector) {
-      return stream.collect(mapping(mapper, collector));
+    R before(Stream<T> stream, Function<S, U> mapper, Collector<U, ?, R> downstream) {
+      return stream.collect(mapping(mapper, downstream));
     }
 
     @AfterTemplate
-    R after(Stream<T> stream, Function<S, U> mapper, Collector<U, ?, R> collector) {
-      return stream.map(mapper).collect(collector);
+    R after(Stream<T> stream, Function<S, U> mapper, Collector<U, ?, R> downstream) {
+      return stream.map(mapper).collect(downstream);
     }
   }
 
@@ -772,16 +774,16 @@ final class StreamRules {
     R before(
         Stream<T> stream,
         Function<S, ? extends Stream<? extends U>> mapper,
-        Collector<U, ?, R> collector) {
-      return stream.collect(flatMapping(mapper, collector));
+        Collector<U, ?, R> downstream) {
+      return stream.collect(flatMapping(mapper, downstream));
     }
 
     @AfterTemplate
     R after(
         Stream<T> stream,
         Function<S, ? extends Stream<? extends U>> mapper,
-        Collector<U, ?, R> collector) {
-      return stream.flatMap(mapper).collect(collector);
+        Collector<U, ?, R> downstream) {
+      return stream.flatMap(mapper).collect(downstream);
     }
   }
 
@@ -789,15 +791,15 @@ final class StreamRules {
   static final class StreamsConcat<T> {
     @BeforeTemplate
     Stream<T> before(
-        @Repeated Stream<T> stream,
+        @Repeated Stream<T> streams,
         @Matches(IsIdentityOperation.class)
             Function<? super Stream<T>, ? extends Stream<? extends T>> mapper) {
-      return Stream.of(Refaster.asVarargs(stream)).flatMap(mapper);
+      return Stream.of(Refaster.asVarargs(streams)).flatMap(mapper);
     }
 
     @AfterTemplate
-    Stream<T> after(@Repeated Stream<T> stream) {
-      return Streams.concat(Refaster.asVarargs(stream));
+    Stream<T> after(@Repeated Stream<T> streams) {
+      return Streams.concat(Refaster.asVarargs(streams));
     }
   }
 
@@ -834,13 +836,13 @@ final class StreamRules {
   // XXX: Generalize this and similar rules using an Error Prone check.
   static final class StreamOf1<T> {
     @BeforeTemplate
-    Stream<T> before(T e1) {
-      return ImmutableList.of(e1).stream();
+    Stream<T> before(T t) {
+      return ImmutableList.of(t).stream();
     }
 
     @AfterTemplate
-    Stream<T> after(T e1) {
-      return Stream.of(e1);
+    Stream<T> after(T t) {
+      return Stream.of(t);
     }
   }
 
@@ -929,13 +931,13 @@ final class StreamRules {
   /** Prefer {@link Collections#nCopies(int, Object)} over more contrived alternatives. */
   static final class CollectionsNCopiesStream<T> {
     @BeforeTemplate
-    Stream<T> before(int n, @NotMatches(RequiresComputation.class) T element) {
-      return Stream.generate(() -> element).limit(n);
+    Stream<T> before(int n, @NotMatches(RequiresComputation.class) T o) {
+      return Stream.generate(() -> o).limit(n);
     }
 
     @AfterTemplate
-    Stream<T> after(int n, T element) {
-      return Collections.nCopies(n, element).stream();
+    Stream<T> after(int n, T o) {
+      return Collections.nCopies(n, o).stream();
     }
   }
 }

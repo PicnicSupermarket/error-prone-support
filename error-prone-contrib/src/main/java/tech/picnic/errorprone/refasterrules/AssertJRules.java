@@ -111,14 +111,14 @@ final class AssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatHasValueOptionalDouble {
     @BeforeTemplate
-    AbstractDoubleAssert<?> before(OptionalDouble optional, double expected) {
-      return assertThat(optional.getAsDouble()).isEqualTo(expected);
+    AbstractDoubleAssert<?> before(OptionalDouble actual, double expectedValue) {
+      return assertThat(actual.getAsDouble()).isEqualTo(expectedValue);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    OptionalDoubleAssert after(OptionalDouble optional, double expected) {
-      return assertThat(optional).hasValue(expected);
+    OptionalDoubleAssert after(OptionalDouble actual, double expectedValue) {
+      return assertThat(actual).hasValue(expectedValue);
     }
   }
 
@@ -132,14 +132,14 @@ final class AssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatHasValueOptionalInt {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(OptionalInt optional, int expected) {
-      return assertThat(optional.getAsInt()).isEqualTo(expected);
+    AbstractIntegerAssert<?> before(OptionalInt actual, int expectedValue) {
+      return assertThat(actual.getAsInt()).isEqualTo(expectedValue);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    OptionalIntAssert after(OptionalInt optional, int expected) {
-      return assertThat(optional).hasValue(expected);
+    OptionalIntAssert after(OptionalInt actual, int expectedValue) {
+      return assertThat(actual).hasValue(expectedValue);
     }
   }
 
@@ -153,14 +153,14 @@ final class AssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatHasValueOptionalLong {
     @BeforeTemplate
-    AbstractLongAssert<?> before(OptionalLong optional, long expected) {
-      return assertThat(optional.getAsLong()).isEqualTo(expected);
+    AbstractLongAssert<?> before(OptionalLong actual, long expectedValue) {
+      return assertThat(actual.getAsLong()).isEqualTo(expectedValue);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    OptionalLongAssert after(OptionalLong optional, long expected) {
-      return assertThat(optional).hasValue(expected);
+    OptionalLongAssert after(OptionalLong actual, long expectedValue) {
+      return assertThat(actual).hasValue(expectedValue);
     }
   }
 
@@ -227,15 +227,15 @@ final class AssertJRules {
   static final class AssertThatContainsExactlySet<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> before(
-        Set<S> set, T element) {
-      return assertThat(set).containsOnly(element);
+        Set<S> actual, T element) {
+      return assertThat(actual).containsOnly(element);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> after(
-        Set<S> set, T element) {
-      return assertThat(set).containsExactly(element);
+        Set<S> actual, T element) {
+      return assertThat(actual).containsExactly(element);
     }
   }
 
@@ -248,14 +248,14 @@ final class AssertJRules {
    */
   static final class AssertThatContainsExactlyElementsOfList<S, T extends S> {
     @BeforeTemplate
-    ListAssert<S> before(List<S> list1, Iterable<T> list2) {
-      return assertThat(list1).isEqualTo(list2);
+    ListAssert<S> before(List<S> actual, Iterable<T> iterable) {
+      return assertThat(actual).isEqualTo(iterable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(List<S> list1, Iterable<T> list2) {
-      return assertThat(list1).containsExactlyElementsOf(list2);
+    ListAssert<S> after(List<S> actual, Iterable<T> iterable) {
+      return assertThat(actual).containsExactlyElementsOf(iterable);
     }
   }
 
@@ -274,17 +274,17 @@ final class AssertJRules {
             Collection<? extends S>,
             S,
             ObjectAssert<S>>
-        before(Set<S> set1, Iterable<T> set2) {
+        before(Set<S> actual, Iterable<T> iterable) {
       return Refaster.anyOf(
-          assertThat(set1).isEqualTo(set2),
-          assertThat(set1).containsExactlyInAnyOrderElementsOf(set2));
+          assertThat(actual).isEqualTo(iterable),
+          assertThat(actual).containsExactlyInAnyOrderElementsOf(iterable));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> after(
-        Set<S> set1, Iterable<T> set2) {
-      return assertThat(set1).hasSameElementsAs(set2);
+        Set<S> actual, Iterable<T> iterable) {
+      return assertThat(actual).hasSameElementsAs(iterable);
     }
   }
 
@@ -299,15 +299,15 @@ final class AssertJRules {
   static final class AssertThatContainsExactlyInAnyOrderElementsOfMultiset<S, T extends S> {
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> before(
-        Multiset<S> multiset1, Iterable<T> multiset2) {
-      return assertThat(multiset1).isEqualTo(multiset2);
+        Multiset<S> actual, Iterable<T> values) {
+      return assertThat(actual).isEqualTo(values);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractCollectionAssert<?, Collection<? extends S>, S, ObjectAssert<S>> after(
-        Multiset<S> multiset1, Iterable<T> multiset2) {
-      return assertThat(multiset1).containsExactlyInAnyOrderElementsOf(multiset2);
+        Multiset<S> actual, Iterable<T> values) {
+      return assertThat(actual).containsExactlyInAnyOrderElementsOf(values);
     }
   }
 
@@ -321,14 +321,14 @@ final class AssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatContainsEntry<K, V> {
     @BeforeTemplate
-    ObjectAssert<V> before(Map<K, V> map, K key, V value) {
-      return assertThat(map.get(key)).isEqualTo(value);
+    ObjectAssert<V> before(Map<K, V> actual, K key, V value) {
+      return assertThat(actual.get(key)).isEqualTo(value);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    MapAssert<K, V> after(Map<K, V> map, K key, V value) {
-      return assertThat(map).containsEntry(key, value);
+    MapAssert<K, V> after(Map<K, V> actual, K key, V value) {
+      return assertThat(actual).containsEntry(key, value);
     }
   }
 
@@ -342,28 +342,28 @@ final class AssertJRules {
   static final class AssertThatContainsAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyElementsOf(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyElementsOf(iterable);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
+        Stream<S> actual,
         Iterable<U> iterable,
         Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyElementsOf(iterable);
+      return assertThat(actual.collect(collector)).containsAnyElementsOf(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyElementsOf(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyElementsOf(iterable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).containsAnyElementsOf(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> iterable) {
+      return assertThat(actual).containsAnyElementsOf(iterable);
     }
   }
 
@@ -373,26 +373,26 @@ final class AssertJRules {
   static final class AssertThatContainsAnyOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyOf(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyOf(array);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyOf(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyOf(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyOf(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyOf(array);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).containsAnyOf(array);
+    ListAssert<S> after(Stream<S> actual, U[] array) {
+      return assertThat(actual).containsAnyOf(array);
     }
   }
 
@@ -403,30 +403,28 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyOf(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
-        @Repeated U elements,
-        Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyOf(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsAnyOf" /* Varargs converted to array. */)
     ListAssert<T> before3(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAnyOf(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAnyOf(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsAnyOf(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).containsAnyOf(Refaster.asVarargs(values));
     }
   }
 
@@ -436,28 +434,28 @@ final class AssertJRules {
   static final class AssertThatContainsAll<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAll(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAll(iterable);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
+        Stream<S> actual,
         Iterable<U> iterable,
         Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAll(iterable);
+      return assertThat(actual.collect(collector)).containsAll(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsAll(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsAll(iterable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).containsAll(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> iterable) {
+      return assertThat(actual).containsAll(iterable);
     }
   }
 
@@ -467,26 +465,26 @@ final class AssertJRules {
   static final class AssertThatContains<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).contains(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).contains(array);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).contains(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).contains(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).contains(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).contains(array);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).contains(array);
+    ListAssert<S> after(Stream<S> actual, U[] array) {
+      return assertThat(actual).contains(array);
     }
   }
 
@@ -497,30 +495,28 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).contains(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
-        @Repeated U elements,
-        Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).contains(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContains" /* Varargs converted to array. */)
     ListAssert<T> before3(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).contains(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).contains(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).contains(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).contains(Refaster.asVarargs(values));
     }
   }
 
@@ -532,14 +528,14 @@ final class AssertJRules {
   static final class AssertThatContainsExactlyElementsOfStream<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactlyElementsOf(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactlyElementsOf(iterable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).containsExactlyElementsOf(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> iterable) {
+      return assertThat(actual).containsExactlyElementsOf(iterable);
     }
   }
 
@@ -549,14 +545,14 @@ final class AssertJRules {
   static final class AssertThatContainsExactlyStream<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactly(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactly(array);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).containsExactly(array);
+    ListAssert<S> after(Stream<S> actual, U[] array) {
+      return assertThat(actual).containsExactly(array);
     }
   }
 
@@ -567,14 +563,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsExactlyStream" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactly(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactly(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsExactly(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).containsExactly(Refaster.asVarargs(values));
     }
   }
 
@@ -588,20 +584,20 @@ final class AssertJRules {
       S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactlyInAnyOrderElementsOf(iterable);
+        Stream<S> actual, Iterable<U> values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactlyInAnyOrderElementsOf(values);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Multiset<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactlyInAnyOrderElementsOf(iterable);
+        Stream<S> actual, Iterable<U> values, Collector<S, ?, ? extends Multiset<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactlyInAnyOrderElementsOf(values);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).containsExactlyInAnyOrderElementsOf(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> values) {
+      return assertThat(actual).containsExactlyInAnyOrderElementsOf(values);
     }
   }
 
@@ -613,20 +609,20 @@ final class AssertJRules {
   static final class AssertThatContainsExactlyInAnyOrder<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactlyInAnyOrder(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactlyInAnyOrder(array);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Multiset<T>> collector) {
-      return assertThat(stream.collect(collector)).containsExactlyInAnyOrder(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Multiset<T>> collector) {
+      return assertThat(actual.collect(collector)).containsExactlyInAnyOrder(array);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).containsExactlyInAnyOrder(array);
+    ListAssert<S> after(Stream<S> actual, U[] array) {
+      return assertThat(actual).containsExactlyInAnyOrder(array);
     }
   }
 
@@ -639,23 +635,23 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsExactlyInAnyOrder" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector))
-          .containsExactlyInAnyOrder(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector))
+          .containsExactlyInAnyOrder(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsExactlyInAnyOrder" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Multiset<T>> collector) {
-      return assertThat(stream.collect(collector))
-          .containsExactlyInAnyOrder(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Multiset<T>> collector) {
+      return assertThat(actual.collect(collector))
+          .containsExactlyInAnyOrder(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsExactlyInAnyOrder(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).containsExactlyInAnyOrder(Refaster.asVarargs(values));
     }
   }
 
@@ -665,20 +661,20 @@ final class AssertJRules {
   static final class AssertThatContainsSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsSequence(iterable);
+        Stream<S> actual, Iterable<U> sequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsSequence(sequence);
     }
 
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsSequence(iterable);
+        Stream<S> actual, U[] sequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsSequence(sequence);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).containsSequence(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> sequence) {
+      return assertThat(actual).containsSequence(sequence);
     }
   }
 
@@ -689,14 +685,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsSequence" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsSequence(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U sequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsSequence(Refaster.asVarargs(sequence));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsSequence(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U sequence) {
+      return assertThat(actual).containsSequence(Refaster.asVarargs(sequence));
     }
   }
 
@@ -706,20 +702,20 @@ final class AssertJRules {
   static final class AssertThatContainsSubsequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsSubsequence(iterable);
+        Stream<S> actual, Iterable<U> subsequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsSubsequence(subsequence);
     }
 
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsSubsequence(iterable);
+        Stream<S> actual, U[] subsequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsSubsequence(subsequence);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).containsSubsequence(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> subsequence) {
+      return assertThat(actual).containsSubsequence(subsequence);
     }
   }
 
@@ -730,15 +726,15 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsSubsequence" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector))
-          .containsSubsequence(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U subsequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector))
+          .containsSubsequence(Refaster.asVarargs(subsequence));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsSubsequence(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U subsequence) {
+      return assertThat(actual).containsSubsequence(Refaster.asVarargs(subsequence));
     }
   }
 
@@ -751,28 +747,28 @@ final class AssertJRules {
   static final class AssertThatDoesNotContainAnyElementsOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContainAnyElementsOf(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContainAnyElementsOf(iterable);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
+        Stream<S> actual,
         Iterable<U> iterable,
         Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContainAnyElementsOf(iterable);
+      return assertThat(actual.collect(collector)).doesNotContainAnyElementsOf(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContainAnyElementsOf(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContainAnyElementsOf(iterable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).doesNotContainAnyElementsOf(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> iterable) {
+      return assertThat(actual).doesNotContainAnyElementsOf(iterable);
     }
   }
 
@@ -782,26 +778,26 @@ final class AssertJRules {
   static final class AssertThatDoesNotContain<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContain(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContain(array);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContain(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContain(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContain(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContain(array);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).doesNotContain(array);
+    ListAssert<S> after(Stream<S> actual, U[] array) {
+      return assertThat(actual).doesNotContain(array);
     }
   }
 
@@ -812,30 +808,28 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContain(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
-        @Repeated U elements,
-        Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContain(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatDoesNotContain" /* Varargs converted to array. */)
     ListAssert<T> before3(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContain(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContain(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).doesNotContain(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).doesNotContain(Refaster.asVarargs(values));
     }
   }
 
@@ -847,20 +841,20 @@ final class AssertJRules {
   static final class AssertThatDoesNotContainSequence<S, T extends S, U extends T> {
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContainSequence(iterable);
+        Stream<S> actual, Iterable<U> sequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContainSequence(sequence);
     }
 
     @BeforeTemplate
     ListAssert<T> before(
-        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).doesNotContainSequence(iterable);
+        Stream<S> actual, U[] sequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).doesNotContainSequence(sequence);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).doesNotContainSequence(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> sequence) {
+      return assertThat(actual).doesNotContainSequence(sequence);
     }
   }
 
@@ -873,15 +867,15 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatDoesNotContainSequence" /* Varargs converted to array. */)
     ListAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector))
-          .doesNotContainSequence(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U sequence, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector))
+          .doesNotContainSequence(Refaster.asVarargs(sequence));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).doesNotContainSequence(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U sequence) {
+      return assertThat(actual).doesNotContainSequence(Refaster.asVarargs(sequence));
     }
   }
 
@@ -891,28 +885,28 @@ final class AssertJRules {
   static final class AssertThatHasSameElementsAsStream<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).hasSameElementsAs(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).hasSameElementsAs(iterable);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
+        Stream<S> actual,
         Iterable<U> iterable,
         Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).hasSameElementsAs(iterable);
+      return assertThat(actual.collect(collector)).hasSameElementsAs(iterable);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).hasSameElementsAs(iterable);
+        Stream<S> actual, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).hasSameElementsAs(iterable);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, Iterable<U> iterable) {
-      return assertThat(stream).hasSameElementsAs(iterable);
+    ListAssert<S> after(Stream<S> actual, Iterable<U> iterable) {
+      return assertThat(actual).hasSameElementsAs(iterable);
     }
   }
 
@@ -922,26 +916,26 @@ final class AssertJRules {
   static final class AssertThatContainsOnly<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).containsOnly(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).containsOnly(array);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).containsOnly(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).containsOnly(array);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, U[] array, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsOnly(array);
+        Stream<S> actual, U[] array, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsOnly(array);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] array) {
-      return assertThat(stream).containsOnly(array);
+    ListAssert<S> after(Stream<S> actual, U[] array) {
+      return assertThat(actual).containsOnly(array);
     }
   }
 
@@ -952,30 +946,28 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).containsOnly(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
-        @Repeated U elements,
-        Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).containsOnly(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatContainsOnly" /* Varargs converted to array. */)
     ListAssert<T> before3(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).containsOnly(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).containsOnly(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).containsOnly(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).containsOnly(Refaster.asVarargs(values));
     }
   }
 
@@ -985,46 +977,44 @@ final class AssertJRules {
   static final class AssertThatIsSubsetOf<S, T extends S, U extends T> {
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(iterable);
+        Stream<S> actual, Iterable<U> values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(values);
     }
 
     @BeforeTemplate
     IterableAssert<T> before(
-        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(iterable);
+        Stream<S> actual, U[] values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(values);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
-        Iterable<U> iterable,
-        Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(iterable);
+        Stream<S> actual, Iterable<U> values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(values);
     }
 
     @BeforeTemplate
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(iterable);
+        Stream<S> actual, U[] values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(values);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, Iterable<U> iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(iterable);
+        Stream<S> actual, Iterable<U> values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(values);
     }
 
     @BeforeTemplate
     ListAssert<T> before3(
-        Stream<S> stream, U[] iterable, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(iterable);
+        Stream<S> actual, U[] values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(values);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, U[] iterable) {
-      return assertThat(stream).isSubsetOf(iterable);
+    ListAssert<S> after(Stream<S> actual, U[] values) {
+      return assertThat(actual).isSubsetOf(values);
     }
   }
 
@@ -1035,30 +1025,28 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)
     IterableAssert<T> before(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends Iterable<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Iterable<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)
     AbstractCollectionAssert<?, Collection<? extends T>, T, ObjectAssert<T>> before2(
-        Stream<S> stream,
-        @Repeated U elements,
-        Collector<S, ?, ? extends Collection<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends Collection<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(Refaster.asVarargs(values));
     }
 
     @BeforeTemplate
     @SuppressWarnings("AssertThatIsSubsetOf" /* Varargs converted to array. */)
     ListAssert<T> before3(
-        Stream<S> stream, @Repeated U elements, Collector<S, ?, ? extends List<T>> collector) {
-      return assertThat(stream.collect(collector)).isSubsetOf(Refaster.asVarargs(elements));
+        Stream<S> actual, @Repeated U values, Collector<S, ?, ? extends List<T>> collector) {
+      return assertThat(actual.collect(collector)).isSubsetOf(Refaster.asVarargs(values));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<S> after(Stream<S> stream, @Repeated U elements) {
-      return assertThat(stream).isSubsetOf(Refaster.asVarargs(elements));
+    ListAssert<S> after(Stream<S> actual, @Repeated U values) {
+      return assertThat(actual).isSubsetOf(Refaster.asVarargs(values));
     }
   }
 
@@ -1069,28 +1057,28 @@ final class AssertJRules {
   /** Prefer {@code assertThat(predicate).accepts(object)} over less explicit alternatives. */
   static final class AssertThatAccepts<T> {
     @BeforeTemplate
-    void before(Predicate<T> predicate, T object) {
-      assertThat(predicate.test(object)).isTrue();
+    void before(Predicate<T> actual, T object) {
+      assertThat(actual.test(object)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Predicate<T> predicate, T object) {
-      assertThat(predicate).accepts(object);
+    void after(Predicate<T> actual, T object) {
+      assertThat(actual).accepts(object);
     }
   }
 
   /** Prefer {@code assertThat(predicate).rejects(object)} over less explicit alternatives. */
   static final class AssertThatRejects<T> {
     @BeforeTemplate
-    void before(Predicate<T> predicate, T object) {
-      assertThat(predicate.test(object)).isFalse();
+    void before(Predicate<T> actual, T object) {
+      assertThat(actual.test(object)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Predicate<T> predicate, T object) {
-      assertThat(predicate).rejects(object);
+    void after(Predicate<T> actual, T object) {
+      assertThat(actual).rejects(object);
     }
   }
 }

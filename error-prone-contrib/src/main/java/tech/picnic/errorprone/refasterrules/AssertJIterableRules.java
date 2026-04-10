@@ -27,19 +27,19 @@ final class AssertJIterableRules {
   /** Prefer {@code assertThat(iterable).isEmpty()} over more contrived alternatives. */
   static final class AssertThatIsEmpty<E> {
     @BeforeTemplate
-    void before(Iterable<E> iterable) {
-      assertThat(iterable.iterator()).isExhausted();
+    void before(Iterable<E> actual) {
+      assertThat(actual.iterator()).isExhausted();
     }
 
     @BeforeTemplate
-    void before(Collection<E> iterable) {
-      assertThat(iterable.isEmpty()).isTrue();
+    void before(Collection<E> actual) {
+      assertThat(actual.isEmpty()).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(Iterable<E> iterable) {
-      assertThat(iterable).isEmpty();
+    void after(Iterable<E> actual) {
+      assertThat(actual).isEmpty();
     }
   }
 
@@ -47,39 +47,39 @@ final class AssertJIterableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatIsNotEmpty<E> {
     @BeforeTemplate
-    IteratorAssert<E> before(Iterable<E> iterable) {
-      return assertThat(iterable.iterator()).hasNext();
+    IteratorAssert<E> before(Iterable<E> actual) {
+      return assertThat(actual.iterator()).hasNext();
     }
 
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Collection<E> iterable) {
-      return assertThat(iterable.isEmpty()).isFalse();
+    AbstractBooleanAssert<?> before(Collection<E> actual) {
+      return assertThat(actual.isEmpty()).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<E> after(Iterable<E> iterable) {
-      return assertThat(iterable).isNotEmpty();
+    IterableAssert<E> after(Iterable<E> actual) {
+      return assertThat(actual).isNotEmpty();
     }
   }
 
   /** Prefer {@code assertThat(iterable).size()} over non-JDK or more contrived alternatives. */
   static final class AssertThatSize<E> {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(Iterable<E> iterable) {
-      return assertThat(Iterables.size(iterable));
+    AbstractIntegerAssert<?> before(Iterable<E> actual) {
+      return assertThat(Iterables.size(actual));
     }
 
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(Collection<E> iterable) {
-      return assertThat(iterable.size());
+    AbstractIntegerAssert<?> before(Collection<E> actual) {
+      return assertThat(actual.size());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractIterableSizeAssert<IterableAssert<E>, Iterable<? extends E>, E, ObjectAssert<E>> after(
-        Iterable<E> iterable) {
-      return assertThat(iterable).size();
+        Iterable<E> actual) {
+      return assertThat(actual).size();
     }
   }
 
@@ -87,14 +87,14 @@ final class AssertJIterableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatContains<E> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
-      return assertThat(iterable.contains(element)).isTrue();
+    AbstractBooleanAssert<?> before(Collection<E> actual, E element) {
+      return assertThat(actual.contains(element)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<E> after(Iterable<E> iterable, E element) {
-      return assertThat(iterable).contains(element);
+    IterableAssert<E> after(Iterable<E> actual, E element) {
+      return assertThat(actual).contains(element);
     }
   }
 
@@ -104,14 +104,14 @@ final class AssertJIterableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatDoesNotContain<E> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
-      return assertThat(iterable.contains(element)).isFalse();
+    AbstractBooleanAssert<?> before(Collection<E> actual, E element) {
+      return assertThat(actual.contains(element)).isFalse();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<E> after(Iterable<E> iterable, E element) {
-      return assertThat(iterable).doesNotContain(element);
+    IterableAssert<E> after(Iterable<E> actual, E element) {
+      return assertThat(actual).doesNotContain(element);
     }
   }
 
@@ -121,14 +121,14 @@ final class AssertJIterableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatContainsAll<E> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Collection<E> iterable, Collection<? extends E> elements) {
-      return assertThat(iterable.containsAll(elements)).isTrue();
+    AbstractBooleanAssert<?> before(Collection<E> actual, Collection<? extends E> iterable) {
+      return assertThat(actual.containsAll(iterable)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<E> after(Iterable<E> iterable, Collection<? extends E> elements) {
-      return assertThat(iterable).containsAll(elements);
+    IterableAssert<E> after(Iterable<E> actual, Collection<? extends E> iterable) {
+      return assertThat(actual).containsAll(iterable);
     }
   }
 
@@ -141,14 +141,14 @@ final class AssertJIterableRules {
   @PossibleSourceIncompatibility
   static final class AssertThatContainsExactly<S, E extends S> {
     @BeforeTemplate
-    ObjectAssert<S> before(Iterable<S> iterable, E element) {
-      return assertThat(Iterables.getOnlyElement(iterable)).isEqualTo(element);
+    ObjectAssert<S> before(Iterable<S> actual, E expected) {
+      return assertThat(Iterables.getOnlyElement(actual)).isEqualTo(expected);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    IterableAssert<S> after(Iterable<S> iterable, E element) {
-      return assertThat(iterable).containsExactly(element);
+    IterableAssert<S> after(Iterable<S> actual, E expected) {
+      return assertThat(actual).containsExactly(expected);
     }
   }
 }

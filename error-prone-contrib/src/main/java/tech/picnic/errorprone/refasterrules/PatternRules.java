@@ -37,13 +37,13 @@ final class PatternRules {
   @PossibleSourceIncompatibility
   static final class PatternCompileAsPredicate {
     @BeforeTemplate
-    com.google.common.base.Predicate<CharSequence> before(String pattern) {
-      return containsPattern(pattern);
+    com.google.common.base.Predicate<CharSequence> before(String regex) {
+      return containsPattern(regex);
     }
 
     @AfterTemplate
-    Predicate<String> after(String pattern) {
-      return Pattern.compile(pattern).asPredicate();
+    Predicate<String> after(String regex) {
+      return Pattern.compile(regex).asPredicate();
     }
   }
 }

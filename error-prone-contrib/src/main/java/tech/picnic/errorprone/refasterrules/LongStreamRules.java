@@ -23,13 +23,13 @@ final class LongStreamRules {
   /** Prefer {@link LongStream#range(long, long)} over more verbose alternatives. */
   static final class LongStreamRange {
     @BeforeTemplate
-    LongStream before(long from, long to) {
-      return LongStream.rangeClosed(from, to - 1);
+    LongStream before(long startInclusive, long endExclusive) {
+      return LongStream.rangeClosed(startInclusive, endExclusive - 1);
     }
 
     @AfterTemplate
-    LongStream after(long from, long to) {
-      return LongStream.range(from, to);
+    LongStream after(long startInclusive, long endExclusive) {
+      return LongStream.range(startInclusive, endExclusive);
     }
   }
 
@@ -50,13 +50,13 @@ final class LongStreamRules {
   /** Prefer {@link LongStream#concat(LongStream, LongStream)} over non-JDK alternatives. */
   static final class LongStreamConcat {
     @BeforeTemplate
-    LongStream before(LongStream stream1, LongStream stream2) {
-      return Streams.concat(stream1, stream2);
+    LongStream before(LongStream a, LongStream b) {
+      return Streams.concat(a, b);
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream1, LongStream stream2) {
-      return LongStream.concat(stream1, stream2);
+    LongStream after(LongStream a, LongStream b) {
+      return LongStream.concat(a, b);
     }
   }
 

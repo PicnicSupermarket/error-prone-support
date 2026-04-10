@@ -147,13 +147,13 @@ final class AssertJFileRules {
   @PossibleSourceIncompatibility
   static final class AssertThatHasFileName {
     @BeforeTemplate
-    AbstractStringAssert<?> before(File actual, String fileName) {
-      return assertThat(actual.getName()).isEqualTo(fileName);
+    AbstractStringAssert<?> before(File actual, String expected) {
+      return assertThat(actual.getName()).isEqualTo(expected);
     }
 
     @AfterTemplate
-    AbstractFileAssert<?> after(File actual, String fileName) {
-      return assertThat(actual).hasFileName(fileName);
+    AbstractFileAssert<?> after(File actual, String expected) {
+      return assertThat(actual).hasFileName(expected);
     }
   }
 
@@ -205,14 +205,14 @@ final class AssertJFileRules {
   @PossibleSourceIncompatibility
   static final class AssertThatHasExtension {
     @BeforeTemplate
-    AbstractStringAssert<?> before(File actual, String expectedExtension) {
+    AbstractStringAssert<?> before(File actual, String expected) {
       return assertThat(Refaster.anyOf(actual.getName(), actual.toString()))
-          .endsWith(Refaster.anyOf('.' + expectedExtension, "." + expectedExtension));
+          .endsWith(Refaster.anyOf('.' + expected, "." + expected));
     }
 
     @AfterTemplate
-    AbstractFileAssert<?> after(File actual, String expectedExtension) {
-      return assertThat(actual).hasExtension(expectedExtension);
+    AbstractFileAssert<?> after(File actual, String expected) {
+      return assertThat(actual).hasExtension(expected);
     }
   }
 }

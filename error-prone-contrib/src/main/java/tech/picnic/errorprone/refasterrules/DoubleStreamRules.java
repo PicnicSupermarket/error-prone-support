@@ -37,13 +37,13 @@ final class DoubleStreamRules {
   /** Prefer {@link DoubleStream#concat(DoubleStream, DoubleStream)} over non-JDK alternatives. */
   static final class DoubleStreamConcat {
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream1, DoubleStream stream2) {
-      return Streams.concat(stream1, stream2);
+    DoubleStream before(DoubleStream a, DoubleStream b) {
+      return Streams.concat(a, b);
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream1, DoubleStream stream2) {
-      return DoubleStream.concat(stream1, stream2);
+    DoubleStream after(DoubleStream a, DoubleStream b) {
+      return DoubleStream.concat(a, b);
     }
   }
 

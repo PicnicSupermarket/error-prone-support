@@ -47,13 +47,13 @@ final class OptionalRules {
     // parentheses around the null check, but that's currently not the case. Try to fix that.
     @BeforeTemplate
     @SuppressWarnings("RefasterEmitCommentBeforeOptionalOfFilterNot" /* Special case. */)
-    Optional<T> before(@Nullable T object) {
-      return object == null ? Optional.empty() : Optional.of(object);
+    Optional<T> before(@Nullable T value) {
+      return value == null ? Optional.empty() : Optional.of(value);
     }
 
     @AfterTemplate
-    Optional<T> after(T object) {
-      return Optional.ofNullable(object);
+    Optional<T> after(T value) {
+      return Optional.ofNullable(value);
     }
   }
 
@@ -133,14 +133,14 @@ final class OptionalRules {
   /** Prefer {@code Streams.stream(iterator).findFirst()} over more contrived alternatives. */
   static final class StreamsStreamFindFirst<T> {
     @BeforeTemplate
-    Optional<T> before(Iterator<T> it) {
-      return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
+    Optional<T> before(Iterator<T> iterator) {
+      return iterator.hasNext() ? Optional.of(iterator.next()) : Optional.empty();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Optional<T> after(Iterator<T> it) {
-      return Streams.stream(it).findFirst();
+    Optional<T> after(Iterator<T> iterator) {
+      return Streams.stream(iterator).findFirst();
     }
   }
 
@@ -153,14 +153,14 @@ final class OptionalRules {
     abstract boolean test(T value);
 
     @BeforeTemplate
-    Optional<T> before(T input) {
-      return test(input) ? Optional.of(input) : Optional.empty();
+    Optional<T> before(T value) {
+      return test(value) ? Optional.of(value) : Optional.empty();
     }
 
     @AfterTemplate
-    Optional<T> after(T input) {
+    Optional<T> after(T value) {
       return Refaster.emitCommentBefore(
-          "Or Optional.ofNullable (can't auto-infer).", Optional.of(input).filter(v -> test(v)));
+          "Or Optional.ofNullable (can't auto-infer).", Optional.of(value).filter(v -> test(v)));
     }
   }
 
@@ -173,14 +173,14 @@ final class OptionalRules {
     abstract boolean test(T value);
 
     @BeforeTemplate
-    Optional<T> before(T input) {
-      return test(input) ? Optional.empty() : Optional.of(input);
+    Optional<T> before(T value) {
+      return test(value) ? Optional.empty() : Optional.of(value);
     }
 
     @AfterTemplate
-    Optional<T> after(T input) {
+    Optional<T> after(T value) {
       return Refaster.emitCommentBefore(
-          "Or Optional.ofNullable (can't auto-infer).", Optional.of(input).filter(v -> !test(v)));
+          "Or Optional.ofNullable (can't auto-infer).", Optional.of(value).filter(v -> !test(v)));
     }
   }
 
@@ -255,13 +255,13 @@ final class OptionalRules {
   // replaced with a Refaster rule.
   static final class OptionalOrElse<T> {
     @BeforeTemplate
-    T before(Optional<T> optional, @NotMatches(RequiresComputation.class) T value) {
-      return optional.orElseGet(() -> value);
+    T before(Optional<T> optional, @NotMatches(RequiresComputation.class) T other) {
+      return optional.orElseGet(() -> other);
     }
 
     @AfterTemplate
-    T after(Optional<T> optional, T value) {
-      return optional.orElse(value);
+    T after(Optional<T> optional, T other) {
+      return optional.orElse(other);
     }
   }
 
@@ -340,13 +340,13 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Optional<V> before(Optional<T> optional, Function<U, V> function) {
-      return optional.flatMap(v -> toOptionalFunction(v).map(function));
+    Optional<V> before(Optional<T> optional, Function<U, V> mapper) {
+      return optional.flatMap(v -> toOptionalFunction(v).map(mapper));
     }
 
     @AfterTemplate
-    Optional<V> after(Optional<T> optional, Function<U, V> function) {
-      return optional.flatMap(v -> toOptionalFunction(v)).map(function);
+    Optional<V> after(Optional<T> optional, Function<U, V> mapper) {
+      return optional.flatMap(v -> toOptionalFunction(v)).map(mapper);
     }
   }
 
@@ -356,13 +356,13 @@ final class OptionalRules {
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    Optional<R> before(Optional<T> optional, Function<? super S, Optional<? extends R>> function) {
-      return optional.flatMap(v -> toOptionalFunction(v).flatMap(function));
+    Optional<R> before(Optional<T> optional, Function<? super S, Optional<? extends R>> mapper) {
+      return optional.flatMap(v -> toOptionalFunction(v).flatMap(mapper));
     }
 
     @AfterTemplate
-    Optional<R> after(Optional<T> optional, Function<? super S, Optional<? extends R>> function) {
-      return optional.flatMap(v -> toOptionalFunction(v)).flatMap(function);
+    Optional<R> after(Optional<T> optional, Function<? super S, Optional<? extends R>> mapper) {
+      return optional.flatMap(v -> toOptionalFunction(v)).flatMap(mapper);
     }
   }
 
@@ -375,22 +375,22 @@ final class OptionalRules {
       "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    Optional<T> before(Optional<T> optional1, Optional<T> optional2) {
+    Optional<T> before(Optional<T> optional1, Optional<T> other) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.
       // XXX: Note that rewriting the first, third and fourth variant will introduce a compilation
       // error if `optional2` is not effectively final. Review whether a `@Matcher` can be used to
       // avoid this.
       return Refaster.anyOf(
-          optional1.map(Optional::of).orElse(optional2),
-          optional1.map(Optional::of).orElseGet(() -> optional2),
-          Stream.of(optional1, optional2).flatMap(Optional::stream).findFirst(),
-          optional1.isPresent() ? optional1 : optional2);
+          optional1.map(Optional::of).orElse(other),
+          optional1.map(Optional::of).orElseGet(() -> other),
+          Stream.of(optional1, other).flatMap(Optional::stream).findFirst(),
+          optional1.isPresent() ? optional1 : other);
     }
 
     @AfterTemplate
-    Optional<T> after(Optional<T> optional1, Optional<T> optional2) {
-      return optional1.or(() -> optional2);
+    Optional<T> after(Optional<T> optional1, Optional<T> other) {
+      return optional1.or(() -> other);
     }
   }
 
@@ -437,13 +437,13 @@ final class OptionalRules {
   // dropped in favour of `StreamMapFirst` and `OptionalIdentity`.
   static final class OptionalMapWithFunction<W, S extends W, T, V extends T> {
     @BeforeTemplate
-    Optional<V> before(Optional<S> optional, Function<W, V> function) {
-      return optional.stream().map(function).findAny();
+    Optional<V> before(Optional<S> optional, Function<W, V> mapper) {
+      return optional.stream().map(mapper).findAny();
     }
 
     @AfterTemplate
-    Optional<V> after(Optional<S> optional, Function<W, V> function) {
-      return optional.map(function);
+    Optional<V> after(Optional<S> optional, Function<W, V> mapper) {
+      return optional.map(mapper);
     }
   }
 

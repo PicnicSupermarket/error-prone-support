@@ -21,14 +21,14 @@ final class JUnitRules {
       "RefasterRuleName" /* Derived name `Arguments` clashes with the imported type. */)
   static final class ArgumentsEnumeration<T> {
     @BeforeTemplate
-    Arguments before(@Repeated T objects) {
-      return Arguments.of(objects);
+    Arguments before(@Repeated T arguments) {
+      return Arguments.of(arguments);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Arguments after(@Repeated T objects) {
-      return arguments(objects);
+    Arguments after(@Repeated T arguments) {
+      return arguments(arguments);
     }
   }
 }

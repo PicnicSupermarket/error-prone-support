@@ -17,28 +17,30 @@ final class AssertJIntegerRules {
   /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over more contrived alternatives. */
   static final class AbstractIntegerAssertIsEqualTo {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int expected) {
       return Refaster.anyOf(
-          intAssert.isCloseTo(n, offset(0)), intAssert.isCloseTo(n, withPercentage(0)));
+          intAssert.isCloseTo(expected, offset(0)),
+          intAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int n) {
-      return intAssert.isEqualTo(n);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int expected) {
+      return intAssert.isEqualTo(expected);
     }
   }
 
   /** Prefer {@link AbstractIntegerAssert#isNotEqualTo(int)} over more contrived alternatives. */
   static final class AbstractIntegerAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int n) {
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int other) {
       return Refaster.anyOf(
-          intAssert.isNotCloseTo(n, offset(0)), intAssert.isNotCloseTo(n, withPercentage(0)));
+          intAssert.isNotCloseTo(other, offset(0)),
+          intAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int n) {
-      return intAssert.isNotEqualTo(n);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int other) {
+      return intAssert.isNotEqualTo(other);
     }
   }
 

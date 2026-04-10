@@ -128,14 +128,14 @@ final class StringRules {
   /** Prefer {@link Strings#isNullOrEmpty(String)} over more verbose alternatives. */
   static final class StringsIsNullOrEmpty {
     @BeforeTemplate
-    boolean before(@Nullable String str) {
-      return str == null || str.isEmpty();
+    boolean before(@Nullable String string) {
+      return string == null || string.isEmpty();
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(String str) {
-      return Strings.isNullOrEmpty(str);
+    boolean after(String string) {
+      return Strings.isNullOrEmpty(string);
     }
   }
 
@@ -166,15 +166,15 @@ final class StringRules {
   // XXX: This is a special case of `RefasterEmitCommentBeforeOptionalOfFilterNot`.
   static final class OptionalOfNullableFilterNotStringIsEmpty {
     @BeforeTemplate
-    Optional<String> before(String str) {
-      return Strings.isNullOrEmpty(str)
+    Optional<String> before(String value) {
+      return Strings.isNullOrEmpty(value)
           ? Optional.empty()
-          : Refaster.anyOf(Optional.of(str), Optional.ofNullable(str));
+          : Refaster.anyOf(Optional.of(value), Optional.ofNullable(value));
     }
 
     @AfterTemplate
-    Optional<String> after(String str) {
-      return Optional.ofNullable(str).filter(not(String::isEmpty));
+    Optional<String> after(String value) {
+      return Optional.ofNullable(value).filter(not(String::isEmpty));
     }
   }
 
@@ -239,13 +239,13 @@ final class StringRules {
   /** Prefer {@link String#valueOf(Object)} over more contrived alternatives. */
   static final class StringValueOfWithObject {
     @BeforeTemplate
-    String before(Object object) {
-      return Objects.toString(object);
+    String before(Object obj) {
+      return Objects.toString(obj);
     }
 
     @AfterTemplate
-    String after(Object object) {
-      return String.valueOf(object);
+    String after(Object obj) {
+      return String.valueOf(obj);
     }
   }
 
@@ -294,26 +294,26 @@ final class StringRules {
   /** Prefer {@link String#substring(int)} over more verbose alternatives. */
   static final class StringSubstring {
     @BeforeTemplate
-    String before(String str, int index) {
-      return str.substring(index, str.length());
+    String before(String str, int beginIndex) {
+      return str.substring(beginIndex, str.length());
     }
 
     @AfterTemplate
-    String after(String str, int index) {
-      return str.substring(index);
+    String after(String str, int beginIndex) {
+      return str.substring(beginIndex);
     }
   }
 
   /** Prefer {@link Utf8#encodedLength(CharSequence)} over less efficient alternatives. */
   static final class Utf8EncodedLength {
     @BeforeTemplate
-    int before(String str) {
-      return str.getBytes(UTF_8).length;
+    int before(String sequence) {
+      return sequence.getBytes(UTF_8).length;
     }
 
     @AfterTemplate
-    int after(String str) {
-      return Utf8.encodedLength(str);
+    int after(String sequence) {
+      return Utf8.encodedLength(sequence);
     }
   }
 
@@ -348,26 +348,26 @@ final class StringRules {
   static final class MathMaxNegativeOneStringIndexOfMinusString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, String substring, int fromIndex) {
-      return string.substring(fromIndex).indexOf(substring);
+    int before(String string, String str, int fromIndex) {
+      return string.substring(fromIndex).indexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int fromIndex) {
-      return Math.max(-1, string.indexOf(substring, fromIndex) - fromIndex);
+    int after(String string, String str, int fromIndex) {
+      return Math.max(-1, string.indexOf(str, fromIndex) - fromIndex);
     }
   }
 
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
   static final class MathMaxNegativeOneStringIndexOfMinusStringWithInt {
     @BeforeTemplate
-    int before(String string, String substring, int beginIndex, int endIndex) {
-      return string.substring(beginIndex, endIndex).indexOf(substring);
+    int before(String string, String str, int beginIndex, int endIndex) {
+      return string.substring(beginIndex, endIndex).indexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int beginIndex, int endIndex) {
-      return Math.max(-1, string.indexOf(substring, beginIndex, endIndex) - beginIndex);
+    int after(String string, String str, int beginIndex, int endIndex) {
+      return Math.max(-1, string.indexOf(str, beginIndex, endIndex) - beginIndex);
     }
   }
 
@@ -375,13 +375,13 @@ final class StringRules {
   static final class MathMaxNegativeOneStringLastIndexOfMinusInt {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, int ch, int fromIndex) {
-      return string.substring(fromIndex).lastIndexOf(ch);
+    int before(String string, int ch, int beginIndex) {
+      return string.substring(beginIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int fromIndex) {
-      return Math.max(-1, string.lastIndexOf(ch) - fromIndex);
+    int after(String string, int ch, int beginIndex) {
+      return Math.max(-1, string.lastIndexOf(ch) - beginIndex);
     }
   }
 
@@ -389,26 +389,26 @@ final class StringRules {
   static final class MathMaxNegativeOneStringLastIndexOfMinusString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, String substring, int fromIndex) {
-      return string.substring(fromIndex).lastIndexOf(substring);
+    int before(String string, String str, int beginIndex) {
+      return string.substring(beginIndex).lastIndexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int fromIndex) {
-      return Math.max(-1, string.lastIndexOf(substring) - fromIndex);
+    int after(String string, String str, int beginIndex) {
+      return Math.max(-1, string.lastIndexOf(str) - beginIndex);
     }
   }
 
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
   static final class StringLastIndexOfMinusOneInt {
     @BeforeTemplate
-    int before(String string, int ch, int fromIndex) {
-      return string.substring(0, fromIndex).lastIndexOf(ch);
+    int before(String string, int ch, int endIndex) {
+      return string.substring(0, endIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int fromIndex) {
-      return string.lastIndexOf(ch, fromIndex - 1);
+    int after(String string, int ch, int endIndex) {
+      return string.lastIndexOf(ch, endIndex - 1);
     }
   }
 
@@ -421,13 +421,13 @@ final class StringRules {
    */
   static final class StringLastIndexOfMinusOneString {
     @BeforeTemplate
-    int before(String string, String substring, int fromIndex) {
-      return string.substring(0, fromIndex).lastIndexOf(substring);
+    int before(String string, String str, int endIndex) {
+      return string.substring(0, endIndex).lastIndexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int fromIndex) {
-      return string.lastIndexOf(substring, fromIndex - 1);
+    int after(String string, String str, int endIndex) {
+      return string.lastIndexOf(str, endIndex - 1);
     }
   }
 
@@ -435,13 +435,13 @@ final class StringRules {
   static final class StringStartsWith {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    boolean before(String string, String prefix, int fromIndex) {
-      return string.substring(fromIndex).startsWith(prefix);
+    boolean before(String string, String prefix, int toffset) {
+      return string.substring(toffset).startsWith(prefix);
     }
 
     @AfterTemplate
-    boolean after(String string, String prefix, int fromIndex) {
-      return string.startsWith(prefix, fromIndex);
+    boolean after(String string, String prefix, int toffset) {
+      return string.startsWith(prefix, toffset);
     }
   }
 

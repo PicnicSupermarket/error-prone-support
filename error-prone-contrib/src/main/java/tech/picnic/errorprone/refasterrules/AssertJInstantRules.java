@@ -83,15 +83,15 @@ final class AssertJInstantRules {
    */
   static final class AssertThatIsBetween {
     @BeforeTemplate
-    AbstractInstantAssert<?> before(Instant actual, Instant start, Instant end) {
+    AbstractInstantAssert<?> before(Instant actual, Instant startInclusive, Instant endInclusive) {
       return Refaster.anyOf(
-          assertThat(actual).isAfterOrEqualTo(start).isBeforeOrEqualTo(end),
-          assertThat(actual).isBeforeOrEqualTo(end).isAfterOrEqualTo(start));
+          assertThat(actual).isAfterOrEqualTo(startInclusive).isBeforeOrEqualTo(endInclusive),
+          assertThat(actual).isBeforeOrEqualTo(endInclusive).isAfterOrEqualTo(startInclusive));
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant actual, Instant start, Instant end) {
-      return assertThat(actual).isBetween(start, end);
+    AbstractInstantAssert<?> after(Instant actual, Instant startInclusive, Instant endInclusive) {
+      return assertThat(actual).isBetween(startInclusive, endInclusive);
     }
   }
 
@@ -101,15 +101,15 @@ final class AssertJInstantRules {
    */
   static final class AssertThatIsStrictlyBetween {
     @BeforeTemplate
-    AbstractInstantAssert<?> before(Instant actual, Instant start, Instant end) {
+    AbstractInstantAssert<?> before(Instant actual, Instant startExclusive, Instant endExclusive) {
       return Refaster.anyOf(
-          assertThat(actual).isAfter(start).isBefore(end),
-          assertThat(actual).isBefore(end).isAfter(start));
+          assertThat(actual).isAfter(startExclusive).isBefore(endExclusive),
+          assertThat(actual).isBefore(endExclusive).isAfter(startExclusive));
     }
 
     @AfterTemplate
-    AbstractInstantAssert<?> after(Instant actual, Instant start, Instant end) {
-      return assertThat(actual).isStrictlyBetween(start, end);
+    AbstractInstantAssert<?> after(Instant actual, Instant startExclusive, Instant endExclusive) {
+      return assertThat(actual).isStrictlyBetween(startExclusive, endExclusive);
     }
   }
 }

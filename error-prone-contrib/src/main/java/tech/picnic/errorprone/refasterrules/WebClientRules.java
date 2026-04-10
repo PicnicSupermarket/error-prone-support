@@ -33,19 +33,19 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class RequestBodySpecBodyValue<T> {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T value) {
-      return requestBodySpec.body(fromValue(value));
+    RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T body) {
+      return requestBodySpec.body(fromValue(body));
     }
 
     @BeforeTemplate
     WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestBodySpec requestBodySpec, T value) {
-      return requestBodySpec.body(fromValue(value));
+        WebTestClient.RequestBodySpec requestBodySpec, T body) {
+      return requestBodySpec.body(fromValue(body));
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(RequestBodySpec requestBodySpec, T value) {
-      return requestBodySpec.bodyValue(value);
+    RequestHeadersSpec<?> after(RequestBodySpec requestBodySpec, T body) {
+      return requestBodySpec.bodyValue(body);
     }
   }
 
@@ -173,29 +173,25 @@ final class WebClientRules {
     @BeforeTemplate
     @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     RequestHeadersSpec<?> before(
-        RequestHeadersUriSpec<S> requestHeadersUriSpec,
-        String path,
-        @Repeated Object uriVariables) {
+        RequestHeadersUriSpec<S> requestHeadersUriSpec, String uri, @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(uriVariables)));
+          uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
     }
 
     @BeforeTemplate
     @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     WebTestClient.RequestHeadersSpec<?> before(
         WebTestClient.RequestHeadersUriSpec<T> requestHeadersUriSpec,
-        String path,
+        String uri,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(uriVariables)));
+          uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
     }
 
     @AfterTemplate
     S after(
-        RequestHeadersUriSpec<S> requestHeadersUriSpec,
-        String path,
-        @Repeated Object uriVariables) {
-      return requestHeadersUriSpec.uri(path, Refaster.asVarargs(uriVariables));
+        RequestHeadersUriSpec<S> requestHeadersUriSpec, String uri, @Repeated Object uriVariables) {
+      return requestHeadersUriSpec.uri(uri, Refaster.asVarargs(uriVariables));
     }
   }
 }

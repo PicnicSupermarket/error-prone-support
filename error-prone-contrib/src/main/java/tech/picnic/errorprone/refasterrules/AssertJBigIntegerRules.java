@@ -20,30 +20,34 @@ final class AssertJBigIntegerRules {
   /** Prefer {@code isEqualTo(n)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsEqualTo {
     @BeforeTemplate
-    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger n) {
+    AbstractBigIntegerAssert<?> before(
+        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger expected) {
       return Refaster.anyOf(
-          bigIntegerAssert.isCloseTo(n, offset(BigInteger.ZERO)),
-          bigIntegerAssert.isCloseTo(n, withPercentage(0)));
+          bigIntegerAssert.isCloseTo(expected, offset(BigInteger.ZERO)),
+          bigIntegerAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger n) {
-      return bigIntegerAssert.isEqualTo(n);
+    AbstractBigIntegerAssert<?> after(
+        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger expected) {
+      return bigIntegerAssert.isEqualTo(expected);
     }
   }
 
   /** Prefer {@code isNotEqualTo(n)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger n) {
+    AbstractBigIntegerAssert<?> before(
+        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger other) {
       return Refaster.anyOf(
-          bigIntegerAssert.isNotCloseTo(n, offset(BigInteger.ZERO)),
-          bigIntegerAssert.isNotCloseTo(n, withPercentage(0)));
+          bigIntegerAssert.isNotCloseTo(other, offset(BigInteger.ZERO)),
+          bigIntegerAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger n) {
-      return bigIntegerAssert.isNotEqualTo(n);
+    AbstractBigIntegerAssert<?> after(
+        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger other) {
+      return bigIntegerAssert.isNotEqualTo(other);
     }
   }
 

@@ -37,18 +37,18 @@ final class ImmutableEnumSetRules {
    */
   static final class SetsImmutableEnumSetIterable<T extends Enum<T>> {
     @BeforeTemplate
-    ImmutableSet<T> before(Iterable<T> iterable) {
-      return ImmutableSet.copyOf(iterable);
+    ImmutableSet<T> before(Iterable<T> elements) {
+      return ImmutableSet.copyOf(elements);
     }
 
     @BeforeTemplate
-    ImmutableSet<T> before(Collection<T> iterable) {
-      return ImmutableSet.copyOf(iterable);
+    ImmutableSet<T> before(Collection<T> elements) {
+      return ImmutableSet.copyOf(elements);
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(Iterable<T> iterable) {
-      return Sets.immutableEnumSet(iterable);
+    ImmutableSet<T> after(Iterable<T> elements) {
+      return Sets.immutableEnumSet(elements);
     }
   }
 
@@ -61,13 +61,13 @@ final class ImmutableEnumSetRules {
    */
   static final class SetsImmutableEnumSetArraysAsList<T extends Enum<T>> {
     @BeforeTemplate
-    ImmutableSet<T> before(T[] array) {
-      return ImmutableSet.copyOf(array);
+    ImmutableSet<T> before(T[] elements) {
+      return ImmutableSet.copyOf(elements);
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(T[] array) {
-      return Sets.immutableEnumSet(Arrays.asList(array));
+    ImmutableSet<T> after(T[] elements) {
+      return Sets.immutableEnumSet(Arrays.asList(elements));
     }
   }
 
@@ -75,14 +75,14 @@ final class ImmutableEnumSetRules {
   static final class SetsImmutableEnumSet1<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
-    ImmutableSet<T> before(T e1) {
-      return Refaster.anyOf(ImmutableSet.of(e1), ImmutableSet.copyOf(EnumSet.of(e1)));
+    ImmutableSet<T> before(T anElement) {
+      return Refaster.anyOf(ImmutableSet.of(anElement), ImmutableSet.copyOf(EnumSet.of(anElement)));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ImmutableSet<T> after(T e1) {
-      return Sets.immutableEnumSet(e1);
+    ImmutableSet<T> after(T anElement) {
+      return Sets.immutableEnumSet(anElement);
     }
   }
 
@@ -96,14 +96,15 @@ final class ImmutableEnumSetRules {
   static final class SetsImmutableEnumSet2<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
-    ImmutableSet<T> before(T e1, T e2) {
-      return Refaster.anyOf(ImmutableSet.of(e1, e2), ImmutableSet.copyOf(EnumSet.of(e1, e2)));
+    ImmutableSet<T> before(T anElement, T e2) {
+      return Refaster.anyOf(
+          ImmutableSet.of(anElement, e2), ImmutableSet.copyOf(EnumSet.of(anElement, e2)));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ImmutableSet<T> after(T e1, T e2) {
-      return Sets.immutableEnumSet(e1, e2);
+    ImmutableSet<T> after(T anElement, T e2) {
+      return Sets.immutableEnumSet(anElement, e2);
     }
   }
 
@@ -117,15 +118,15 @@ final class ImmutableEnumSetRules {
   static final class SetsImmutableEnumSet3<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
-    ImmutableSet<T> before(T e1, T e2, T e3) {
+    ImmutableSet<T> before(T anElement, T e2, T e3) {
       return Refaster.anyOf(
-          ImmutableSet.of(e1, e2, e3), ImmutableSet.copyOf(EnumSet.of(e1, e2, e3)));
+          ImmutableSet.of(anElement, e2, e3), ImmutableSet.copyOf(EnumSet.of(anElement, e2, e3)));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ImmutableSet<T> after(T e1, T e2, T e3) {
-      return Sets.immutableEnumSet(e1, e2, e3);
+    ImmutableSet<T> after(T anElement, T e2, T e3) {
+      return Sets.immutableEnumSet(anElement, e2, e3);
     }
   }
 
@@ -139,15 +140,16 @@ final class ImmutableEnumSetRules {
   static final class SetsImmutableEnumSet4<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
-    ImmutableSet<T> before(T e1, T e2, T e3, T e4) {
+    ImmutableSet<T> before(T anElement, T e2, T e3, T e4) {
       return Refaster.anyOf(
-          ImmutableSet.of(e1, e2, e3, e4), ImmutableSet.copyOf(EnumSet.of(e1, e2, e3, e4)));
+          ImmutableSet.of(anElement, e2, e3, e4),
+          ImmutableSet.copyOf(EnumSet.of(anElement, e2, e3, e4)));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ImmutableSet<T> after(T e1, T e2, T e3, T e4) {
-      return Sets.immutableEnumSet(e1, e2, e3, e4);
+    ImmutableSet<T> after(T anElement, T e2, T e3, T e4) {
+      return Sets.immutableEnumSet(anElement, e2, e3, e4);
     }
   }
 
@@ -161,15 +163,16 @@ final class ImmutableEnumSetRules {
   static final class SetsImmutableEnumSet5<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
-    ImmutableSet<T> before(T e1, T e2, T e3, T e4, T e5) {
+    ImmutableSet<T> before(T anElement, T e2, T e3, T e4, T e5) {
       return Refaster.anyOf(
-          ImmutableSet.of(e1, e2, e3, e4, e5), ImmutableSet.copyOf(EnumSet.of(e1, e2, e3, e4, e5)));
+          ImmutableSet.of(anElement, e2, e3, e4, e5),
+          ImmutableSet.copyOf(EnumSet.of(anElement, e2, e3, e4, e5)));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5) {
-      return Sets.immutableEnumSet(e1, e2, e3, e4, e5);
+    ImmutableSet<T> after(T anElement, T e2, T e3, T e4, T e5) {
+      return Sets.immutableEnumSet(anElement, e2, e3, e4, e5);
     }
   }
 
@@ -182,14 +185,14 @@ final class ImmutableEnumSetRules {
    */
   static final class SetsImmutableEnumSet6<T extends Enum<T>> {
     @BeforeTemplate
-    ImmutableSet<T> before(T e1, T e2, T e3, T e4, T e5, T e6) {
-      return ImmutableSet.of(e1, e2, e3, e4, e5, e6);
+    ImmutableSet<T> before(T anElement, T e2, T e3, T e4, T e5, T e6) {
+      return ImmutableSet.of(anElement, e2, e3, e4, e5, e6);
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6) {
-      return Sets.immutableEnumSet(e1, e2, e3, e4, e5, e6);
+    ImmutableSet<T> after(T anElement, T e2, T e3, T e4, T e5, T e6) {
+      return Sets.immutableEnumSet(anElement, e2, e3, e4, e5, e6);
     }
   }
 
@@ -197,13 +200,13 @@ final class ImmutableEnumSetRules {
   static final class SetsImmutableEnumSetVarargs<T extends Enum<T>> {
     @BeforeTemplate
     @SuppressWarnings("SetsImmutableEnumSetIterable" /* This is a more specific template. */)
-    ImmutableSet<T> before(T e1, @Repeated T elements) {
-      return ImmutableSet.copyOf(EnumSet.of(e1, Refaster.asVarargs(elements)));
+    ImmutableSet<T> before(T anElement, @Repeated T otherElements) {
+      return ImmutableSet.copyOf(EnumSet.of(anElement, Refaster.asVarargs(otherElements)));
     }
 
     @AfterTemplate
-    ImmutableSet<T> after(T e1, @Repeated T elements) {
-      return Sets.immutableEnumSet(e1, Refaster.asVarargs(elements));
+    ImmutableSet<T> after(T anElement, @Repeated T otherElements) {
+      return Sets.immutableEnumSet(anElement, Refaster.asVarargs(otherElements));
     }
   }
 

@@ -81,19 +81,19 @@ final class BugCheckerRules {
   /** Prefer {@link Name#contentEquals(CharSequence)} over more verbose alternatives. */
   static final class NameContentEquals {
     @BeforeTemplate
-    boolean before(Name name, CharSequence string) {
+    boolean before(Name name, CharSequence anObject) {
       return Refaster.anyOf(
-          name.toString().equals(string.toString()), string.toString().equals(name.toString()));
+          name.toString().equals(anObject.toString()), anObject.toString().equals(name.toString()));
     }
 
     @BeforeTemplate
-    boolean before(Name name, String string) {
-      return Refaster.anyOf(name.toString().equals(string), string.equals(name.toString()));
+    boolean before(Name name, String anObject) {
+      return Refaster.anyOf(name.toString().equals(anObject), anObject.equals(name.toString()));
     }
 
     @AfterTemplate
-    boolean after(Name name, CharSequence string) {
-      return name.contentEquals(string);
+    boolean after(Name name, CharSequence anObject) {
+      return name.contentEquals(anObject);
     }
   }
 

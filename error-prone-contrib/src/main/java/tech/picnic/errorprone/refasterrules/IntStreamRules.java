@@ -23,13 +23,13 @@ final class IntStreamRules {
   /** Prefer {@link IntStream#range(int, int)} over more verbose alternatives. */
   static final class IntStreamRange {
     @BeforeTemplate
-    IntStream before(int from, int to) {
-      return IntStream.rangeClosed(from, to - 1);
+    IntStream before(int startInclusive, int endExclusive) {
+      return IntStream.rangeClosed(startInclusive, endExclusive - 1);
     }
 
     @AfterTemplate
-    IntStream after(int from, int to) {
-      return IntStream.range(from, to);
+    IntStream after(int startInclusive, int endExclusive) {
+      return IntStream.range(startInclusive, endExclusive);
     }
   }
 
@@ -50,13 +50,13 @@ final class IntStreamRules {
   /** Prefer {@link IntStream#concat(IntStream, IntStream)} over non-JDK alternatives. */
   static final class IntStreamConcat {
     @BeforeTemplate
-    IntStream before(IntStream stream1, IntStream stream2) {
-      return Streams.concat(stream1, stream2);
+    IntStream before(IntStream a, IntStream b) {
+      return Streams.concat(a, b);
     }
 
     @AfterTemplate
-    IntStream after(IntStream stream1, IntStream stream2) {
-      return IntStream.concat(stream1, stream2);
+    IntStream after(IntStream a, IntStream b) {
+      return IntStream.concat(a, b);
     }
   }
 
