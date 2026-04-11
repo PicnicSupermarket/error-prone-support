@@ -1021,6 +1021,14 @@
                             <goals>
                                 <goal>compile</goal>
                             </goals>
+                            <!-- This goal runs *after* the `test-compile`
+                            phase, so that its custom output directory doesn't
+                            replace the default output directory on the
+                            annotation processor classpath when the self-check
+                            profile is active. Because that would prevent
+                            `error-prone-contrib` from flagging issues with its
+                            own test source code. -->
+                            <phase>process-test-classes</phase>
                             <configuration>
                                 <compilerArgs combine.self="override">
                                     <!-- This step only recompiles code, so
