@@ -254,6 +254,11 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /**
+   * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over {@link
+   * ObjectEnumerableAssert#containsExactlyElementsOf(Iterable)} with {@link
+   * Arrays#asList(Object[])}.
+   */
   static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
     @BeforeTemplate
     @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
@@ -268,6 +273,11 @@ final class AssertJEnumerableRules {
     }
   }
 
+  /**
+   * Prefer {@link ObjectEnumerableAssert#containsExactlyInAnyOrder(Object[])} over {@link
+   * ObjectEnumerableAssert#containsExactlyInAnyOrderElementsOf(Iterable)} with {@link
+   * Arrays#asList(Object[])}.
+   */
   static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
     @BeforeTemplate
     @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)

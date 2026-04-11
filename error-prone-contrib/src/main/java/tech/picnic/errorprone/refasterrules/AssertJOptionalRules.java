@@ -118,6 +118,10 @@ final class AssertJOptionalRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractOptionalAssert#hasValueSatisfying(Consumer)} over extracting the value
+   * and applying assertions to it.
+   */
   static final class AbstractOptionalAssertHasValueSatisfying<T> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(
