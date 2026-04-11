@@ -5,6 +5,7 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
+import java.util.Arrays;
 import java.util.Collection;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractIterableAssert;
@@ -250,6 +251,44 @@ final class AssertJEnumerableRules {
     @AfterTemplate
     EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<E> iterable) {
       return enumAssert.hasSameSizeAs(iterable);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over {@link
+   * ObjectEnumerableAssert#containsExactlyElementsOf(Iterable)} with {@link
+   * Arrays#asList(Object[])}.
+   */
+  static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
+    @BeforeTemplate
+    @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
+    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyElementsOf(Arrays.asList(array));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactly(array);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectEnumerableAssert#containsExactlyInAnyOrder(Object[])} over {@link
+   * ObjectEnumerableAssert#containsExactlyInAnyOrderElementsOf(Iterable)} with {@link
+   * Arrays#asList(Object[])}.
+   */
+  static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
+    @BeforeTemplate
+    @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
+    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
+      return enumAssert.containsExactlyInAnyOrder(array);
     }
   }
 }

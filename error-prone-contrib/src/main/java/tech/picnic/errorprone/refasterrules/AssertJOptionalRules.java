@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractObjectAssert;
@@ -114,6 +115,24 @@ final class AssertJOptionalRules {
     @AfterTemplate
     AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
       return optionalAssert.containsSame(value);
+    }
+  }
+
+  /**
+   * Prefer {@link AbstractOptionalAssert#hasValueSatisfying(Consumer)} over extracting the value
+   * and applying assertions to it.
+   */
+  static final class AbstractOptionalAssertHasValueSatisfying<T> {
+    @BeforeTemplate
+    AbstractAssert<?, ?> before(
+        AbstractOptionalAssert<?, T> optionalAssert, Consumer<T> requirements) {
+      return optionalAssert.get().satisfies(requirements);
+    }
+
+    @AfterTemplate
+    AbstractOptionalAssert<?, T> after(
+        AbstractOptionalAssert<?, T> optionalAssert, Consumer<T> requirements) {
+      return optionalAssert.hasValueSatisfying(requirements);
     }
   }
 
