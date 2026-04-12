@@ -661,14 +661,9 @@ final class ReactorRules {
           mono.switchIfEmpty(Mono.empty()), mono.flux().next(), mono.flux().singleOrEmpty());
     }
 
-    // XXX: Consider filing a SonarCloud issue for the S2637 false positive.
     @BeforeTemplate
-    @SuppressWarnings({
-      "java:S2637" /* False positive: result is never `null`. */,
-      "java:S4968" /* Result may be `Mono<Void>`. */,
-      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
-    })
-    Mono<? extends @Nullable Void> before2(Mono<@Nullable Void> mono) {
+    @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
+    Mono<Void> before2(Mono<Void> mono) {
       return Refaster.anyOf(mono.ignoreElement(), mono.then());
     }
 
