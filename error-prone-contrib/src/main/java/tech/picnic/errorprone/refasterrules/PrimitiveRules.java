@@ -262,7 +262,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Integer.signum(i) > 0} over less idiomatic alternatives. */
-  static final class IntegerSignumGreaterThanZero {
+  static final class IntegerSignumIsPositive {
     @BeforeTemplate
     boolean before(int i) {
       return Refaster.anyOf(Integer.signum(i) == 1, Integer.signum(i) >= 1);
@@ -276,7 +276,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Integer.signum(i) < 0} over less idiomatic alternatives. */
-  static final class IntegerSignumLessThanZero {
+  static final class IntegerSignumIsNegative {
     @BeforeTemplate
     boolean before(int i) {
       return Refaster.anyOf(Integer.signum(i) == -1, Integer.signum(i) <= -1);
@@ -290,7 +290,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Long.signum(i) > 0} over less idiomatic alternatives. */
-  static final class LongSignumGreaterThanZero {
+  static final class LongSignumIsPositive {
     @BeforeTemplate
     boolean before(long i) {
       return Refaster.anyOf(Long.signum(i) == 1, Long.signum(i) >= 1);
@@ -304,7 +304,7 @@ final class PrimitiveRules {
   }
 
   /** Prefer {@code Long.signum(i) < 0} over less idiomatic alternatives. */
-  static final class LongSignumLessThanZero {
+  static final class LongSignumIsNegative {
     @BeforeTemplate
     boolean before(long i) {
       return Refaster.anyOf(Long.signum(i) == -1, Long.signum(i) <= -1);

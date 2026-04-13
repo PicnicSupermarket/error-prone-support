@@ -106,7 +106,7 @@ final class BigDecimalRules {
    * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less clear
    * alternatives.
    */
-  static final class BigDecimalSignumGreaterThanZero {
+  static final class BigDecimalSignumIsPositive {
     @BeforeTemplate
     boolean before(BigDecimal val) {
       return Refaster.anyOf(
@@ -127,7 +127,7 @@ final class BigDecimalRules {
    * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less clear
    * alternatives.
    */
-  static final class BigDecimalSignumLessThanZero {
+  static final class BigDecimalSignumIsNegative {
     @BeforeTemplate
     boolean before(BigDecimal val) {
       return Refaster.anyOf(

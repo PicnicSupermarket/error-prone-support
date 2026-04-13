@@ -95,7 +95,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>naturalOrder().thenComparing(identity()));
   }
 
-  ImmutableSet<Integer> testTCompareTo() {
+  ImmutableSet<Integer> testComparableCompareTo() {
     return ImmutableSet.of(
         Comparator.<String>naturalOrder().compare("foo", "bar"),
         Comparator.<String>reverseOrder().compare("baz", "qux"));
@@ -225,13 +225,13 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return minBy(reverseOrder());
   }
 
-  ImmutableSet<Boolean> testECompareToLessThanZero() {
+  ImmutableSet<Boolean> testEnumIsLessThan() {
     return ImmutableSet.of(
         RoundingMode.UP.ordinal() < RoundingMode.DOWN.ordinal(),
         RoundingMode.UP.ordinal() >= RoundingMode.DOWN.ordinal());
   }
 
-  ImmutableSet<Boolean> testECompareToLessThanOrEqualToZero() {
+  ImmutableSet<Boolean> testEnumIsLessThanOrEqualTo() {
     return ImmutableSet.of(
         RoundingMode.UP.ordinal() <= RoundingMode.DOWN.ordinal(),
         RoundingMode.UP.ordinal() > RoundingMode.DOWN.ordinal());

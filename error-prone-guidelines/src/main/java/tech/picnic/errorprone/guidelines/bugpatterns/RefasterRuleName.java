@@ -59,8 +59,10 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.ArrayType;
+import com.sun.tools.javac.code.Type.IntersectionClassType;
 import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.TypeTag;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -138,6 +140,26 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
       ImmutableMap.of(
           Tree.Kind.LOGICAL_COMPLEMENT, "Not",
           Tree.Kind.UNARY_MINUS, "Negate");
+
+  /**
+   * Token-sequence normalizations applied inside {@link NameDerivationScanner#scan} on each
+   * subtree's local fragment buffer. Each entry maps a sequence of consecutive tokens (as produced
+   * by the AST scanner for that subtree) to a single replacement token. Prefix and suffix matches
+   * are checked in declaration order.
+   */
+  private static final ImmutableMap<ImmutableList<String>, String> NAME_NORMALIZATIONS =
+      ImmutableMap.<ImmutableList<String>, String>builder()
+          .put(ImmutableList.of("CompareTo", "GreaterThan", "Zero"), "IsGreaterThan")
+          .put(
+              ImmutableList.of("CompareTo", "GreaterThanOrEqualTo", "Zero"),
+              "IsGreaterThanOrEqualTo")
+          .put(ImmutableList.of("CompareTo", "LessThan", "Zero"), "IsLessThan")
+          .put(ImmutableList.of("CompareTo", "LessThanOrEqualTo", "Zero"), "IsLessThanOrEqualTo")
+          .put(ImmutableList.of("GreaterThan", "Zero"), "IsPositive")
+          .put(ImmutableList.of("GreaterThanOrEqualTo", "Zero"), "IsNonPositive")
+          .put(ImmutableList.of("LessThan", "Zero"), "IsNegative")
+          .put(ImmutableList.of("LessThanOrEqualTo", "Zero"), "IsNonPositive")
+          .buildOrThrow();
 
   /** Instantiates a new {@link RefasterRuleName} instance. */
   public RefasterRuleName() {}
@@ -693,6 +715,19 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
       case ArrayType arrayType -> getDisambiguatingTypeName(arrayType.getComponentType());
       case TypeVar typeVar when typeVar.getUpperBound() != null ->
           getDisambiguatingTypeName(typeVar.getUpperBound());
+      case IntersectionClassType intersectionType -> {
+        /*
+         * For a multi-bound type variable (e.g. `A extends Assert<...> &
+         * EnumerableAssert<...>`), prefer the first explicitly-listed bound. When all bounds are
+         * interfaces, the synthetic supertype is `Object`, so fall back to the first interface
+         * bound instead.
+         */
+        Type superType = intersectionType.supertype_field;
+        yield superType != null
+                && !superType.tsym.getQualifiedName().contentEquals(Object.class.getCanonicalName())
+            ? getDisambiguatingTypeName(superType)
+            : getDisambiguatingTypeName((Type) intersectionType.getBounds().getFirst());
+      }
       default -> capitalize(type.tsym.getSimpleName().toString());
     };
   }
@@ -750,6 +785,36 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
     NameDerivationScanner(Set<VarSymbol> parameterSymbols, Set<Symbol> placeholderSymbols) {
       this.parameterSymbols = ImmutableSet.copyOf(parameterSymbols);
       this.placeholderSymbols = ImmutableSet.copyOf(placeholderSymbols);
+    }
+
+    @Override
+    public @Nullable Void scan(@Nullable Tree tree, Consumer<String> sink) {
+      if (tree == null) {
+        return null;
+      }
+      List<String> local = new ArrayList<>();
+      tree.accept(this, local::add);
+      /* Apply prefix normalizations. */
+      for (Map.Entry<ImmutableList<String>, String> e : NAME_NORMALIZATIONS.entrySet()) {
+        ImmutableList<String> pattern = e.getKey();
+        if (local.size() >= pattern.size() && local.subList(0, pattern.size()).equals(pattern)) {
+          local.subList(0, pattern.size()).clear();
+          local.addFirst(e.getValue());
+          break;
+        }
+      }
+      /* Apply suffix normalizations. */
+      for (Map.Entry<ImmutableList<String>, String> e : NAME_NORMALIZATIONS.entrySet()) {
+        ImmutableList<String> pattern = e.getKey();
+        int start = local.size() - pattern.size();
+        if (start >= 0 && local.subList(start, local.size()).equals(pattern)) {
+          local.subList(start, local.size()).clear();
+          local.add(e.getValue());
+          break;
+        }
+      }
+      local.forEach(sink);
+      return null;
     }
 
     private boolean isSkippableVariable(Symbol sym) {
@@ -833,7 +898,7 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
       Symbol exprSym = ASTHelpers.getSymbol(expr);
       if (exprSym instanceof VarSymbol varSym && isSkippableVariable(varSym)) {
         /* Expression is a parameter reference; emit the parameter's type name. */
-        sink.accept(capitalize(varSym.type.tsym.getSimpleName().toString()));
+        sink.accept(getDisambiguatingTypeName(varSym.type));
       } else {
         scan(expr, sink);
       }
@@ -959,7 +1024,7 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
       ExpressionTree qualifierExpr = tree.getQualifierExpression();
       Symbol qualifierSym = ASTHelpers.getSymbol(qualifierExpr);
       if (qualifierSym instanceof VarSymbol varSym && isSkippableVariable(varSym)) {
-        sink.accept(capitalize(varSym.type.tsym.getSimpleName().toString()));
+        sink.accept(getDisambiguatingTypeName(varSym.type));
       } else {
         scan(qualifierExpr, sink);
       }

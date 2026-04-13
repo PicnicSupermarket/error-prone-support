@@ -136,7 +136,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Doubles.BYTES;
   }
 
-  ImmutableSet<Boolean> testIntegerSignumGreaterThanZero() {
+  ImmutableSet<Boolean> testIntegerSignumIsPositive() {
     return ImmutableSet.of(
         Integer.signum(1) == 1,
         Integer.signum(2) >= 1,
@@ -144,7 +144,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Integer.signum(4) < 1);
   }
 
-  ImmutableSet<Boolean> testIntegerSignumLessThanZero() {
+  ImmutableSet<Boolean> testIntegerSignumIsNegative() {
     return ImmutableSet.of(
         Integer.signum(1) == -1,
         Integer.signum(2) <= -1,
@@ -152,12 +152,12 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Integer.signum(4) > -1);
   }
 
-  ImmutableSet<Boolean> testLongSignumGreaterThanZero() {
+  ImmutableSet<Boolean> testLongSignumIsPositive() {
     return ImmutableSet.of(
         Long.signum(1L) == 1, Long.signum(2L) >= 1, Long.signum(3L) != 1, Long.signum(4L) < 1);
   }
 
-  ImmutableSet<Boolean> testLongSignumLessThanZero() {
+  ImmutableSet<Boolean> testLongSignumIsNegative() {
     return ImmutableSet.of(
         Long.signum(1L) == -1, Long.signum(2L) <= -1, Long.signum(3L) != -1, Long.signum(4L) > -1);
   }

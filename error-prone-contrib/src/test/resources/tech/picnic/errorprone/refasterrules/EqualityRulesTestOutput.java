@@ -32,7 +32,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(v -> v == RoundingMode.DOWN, v -> v == RoundingMode.UP);
   }
 
-  boolean testTEquals() {
+  boolean testObjectEquals() {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch("bar"::equals);
@@ -76,7 +76,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return v -> !v.isEmpty();
   }
 
-  ImmutableSet<Boolean> testTEqualsWithObject() {
+  ImmutableSet<Boolean> testObjectEqualsWithObject() {
     return ImmutableSet.of("foo".equals("bar"), "baz".equals("qux"), "corge".equals("quux"));
   }
 

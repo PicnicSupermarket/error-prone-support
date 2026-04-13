@@ -65,7 +65,7 @@ final class EqualityRules {
   // XXX: Alternatively, the rule should be replaced with a plugin that also identifies cases where
   // the arguments are swapped but simplification is possible anyway, by virtue of `v` being
   // non-null.
-  static final class TEquals<T> {
+  static final class ObjectEquals<T> {
     @BeforeTemplate
     Predicate<T> before(T v) {
       return e -> v.equals(e);
@@ -168,7 +168,7 @@ final class EqualityRules {
   }
 
   /** Prefer {@link Object#equals(Object)} over more contrived alternatives. */
-  static final class TEqualsWithObject<T, S> {
+  static final class ObjectEqualsWithObject<T, S> {
     @BeforeTemplate
     boolean before(T value, S obj) {
       return Refaster.anyOf(

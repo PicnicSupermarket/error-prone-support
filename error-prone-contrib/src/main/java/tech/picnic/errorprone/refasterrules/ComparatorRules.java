@@ -252,7 +252,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparable#compareTo(Object)} over more verbose alternatives. */
-  static final class TCompareTo<T extends Comparable<? super T>> {
+  static final class ComparableCompareTo<T extends Comparable<? super T>> {
     @BeforeTemplate
     int before(T value1, T value2) {
       return Refaster.anyOf(
@@ -610,7 +610,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Enum#compareTo(Enum)} over less explicit alternatives. */
-  static final class ECompareToLessThanZero<E extends Enum<E>> {
+  static final class EnumIsLessThan<E extends Enum<E>> {
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(E value1, E o) {
@@ -625,7 +625,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Enum#compareTo(Enum)} over less explicit alternatives. */
-  static final class ECompareToLessThanOrEqualToZero<E extends Enum<E>> {
+  static final class EnumIsLessThanOrEqualTo<E extends Enum<E>> {
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
     boolean before(E value1, E o) {

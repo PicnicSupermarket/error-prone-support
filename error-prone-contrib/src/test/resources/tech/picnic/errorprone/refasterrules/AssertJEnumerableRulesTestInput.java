@@ -35,7 +35,7 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     assertThat(ImmutableSet.of(18)).size().isNotPositive();
   }
 
-  void testAIsEmpty() {
+  void testAssertIsEmpty() {
     assertThat(ImmutableSet.of(1)).isEqualTo(ImmutableSet.of(0));
     assertThat(ImmutableSet.of(2)).isEqualTo(ImmutableSet.of());
   }

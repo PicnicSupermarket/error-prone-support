@@ -62,7 +62,7 @@ final class AssertJEnumerableRules {
   /** Prefer {@link EnumerableAssert#isEmpty()} over more contrived alternatives. */
   // XXX: This rule assumes that the rewritten assertion aims to compare the contents of two
   // iterables, rather than other semantics (such as `Set` vs. `List`).
-  static final class AIsEmpty<
+  static final class AssertIsEmpty<
       E, A extends Assert<?, ? extends Iterable<? extends E>> & EnumerableAssert<?, E>> {
     @BeforeTemplate
     void before(A enumAssert, @Matches(IsEmpty.class) Iterable<?> expected) {

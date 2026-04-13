@@ -88,7 +88,7 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>naturalOrder().thenComparing(naturalOrder()));
   }
 
-  ImmutableSet<Integer> testTCompareTo() {
+  ImmutableSet<Integer> testComparableCompareTo() {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
@@ -210,13 +210,13 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return maxBy(naturalOrder());
   }
 
-  ImmutableSet<Boolean> testECompareToLessThanZero() {
+  ImmutableSet<Boolean> testEnumIsLessThan() {
     return ImmutableSet.of(
         RoundingMode.UP.compareTo(RoundingMode.DOWN) < 0,
         RoundingMode.UP.compareTo(RoundingMode.DOWN) >= 0);
   }
 
-  ImmutableSet<Boolean> testECompareToLessThanOrEqualToZero() {
+  ImmutableSet<Boolean> testEnumIsLessThanOrEqualTo() {
     return ImmutableSet.of(
         RoundingMode.UP.compareTo(RoundingMode.DOWN) <= 0,
         RoundingMode.UP.compareTo(RoundingMode.DOWN) > 0);

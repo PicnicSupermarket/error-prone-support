@@ -33,7 +33,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.valueOf(4).signum() != 0);
   }
 
-  ImmutableSet<Boolean> testBigDecimalSignumGreaterThanZero() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsPositive() {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).signum() > 0,
         BigDecimal.valueOf(2).signum() > 0,
@@ -45,7 +45,7 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
         BigDecimal.valueOf(8).signum() <= 0);
   }
 
-  ImmutableSet<Boolean> testBigDecimalSignumLessThanZero() {
+  ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).signum() < 0,
         BigDecimal.valueOf(2).signum() < 0,
