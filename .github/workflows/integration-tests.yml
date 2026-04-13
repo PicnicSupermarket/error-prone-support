@@ -3,15 +3,12 @@
 # The tests run in the following scenarios:
 # - Any time code is pushed to the default branch.
 # - When a user leaves a pull request comment containing the string
-#   `/integration-test`.
+#   `/integration-test [name...]`. If no integration test names are specified,
+#   all tests are executed.
 #
 # XXX: Review whether the build matrix should also vary JDK or OS versions.
 # XXX: Have the integration test scripts select the JDK version to use, rather
 # than having this workflow set the same `JAVA_HOME` override for all.
-# XXX: Support `/integration-test [name...]` comment syntax to specify the
-# subset of integration tests to run.
-# See this example of a dynamic build matrix:
-# https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object
 name: Run integration tests
 on:
   issue_comment:
@@ -22,49 +19,98 @@ permissions:
   contents: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
+  CHECKOUT_REF: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
 jobs:
-  acknowledge-request:
+  matrix:
+    name: Determine integration test matrix
+    if: ${{ github.event_name == 'push' || (github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')) }}
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            github.com:443
+      - name: Check out integration tests
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
+          sparse-checkout: integration-tests
+      - name: Determine integration tests to run
+        id: set-matrix
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+            const allTests = fs.readdirSync('integration-tests')
+              .filter(f => f.endsWith('.sh') && f !== 'run-integration-test.sh')
+              .map(f => f.slice(0, -3));
+
+            const comment = context.payload.comment?.body;
+            if (comment) {
+              const match = comment.match(/\/integration-test\s+(.*)/);
+              if (match) {
+                const requested = match[1].split(/[\s,]+/).map(s => s.trim());
+                const valid = requested.filter(t => allTests.includes(t)).sort();
+                if (valid.length > 0) {
+                  core.setOutput('matrix', JSON.stringify(valid));
+                  return;
+                }
+              }
+            }
+
+            core.setOutput('matrix', JSON.stringify(allTests));
+  acknowledge:
     name: Acknowledge request
-    # Only run this job if it is a PR comment containing the command.
-    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test') }}
+    needs: [ matrix ]
+    if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write
     outputs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
     steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            api.github.com:443
       - name: Post comment with workflow link
         id: post-comment
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          MATRIX: ${{ needs.matrix.outputs.matrix }}
         with:
           script: |
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const tests = JSON.parse(process.env.MATRIX);
 
             const response = await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `[Integration tests](${runUrl}) started. :rocket:`
+              body: `[Integration tests](${runUrl}) for **${tests.join(', ')}** started. :rocket:`
             });
 
             core.setOutput('commentId', response.data.id);
-  run-integration-tests:
+  test:
     name: Integration test
-    # On push events `acknowledge-request` is skipped; `always()` ensures this
+    # On push events the `acknowledge` job is skipped; `always()` ensures this
     # job still runs in that case.
-    needs: [ acknowledge-request ]
-    if: ${{ always() && (!github.event.issue.pull_request || contains(github.event.comment.body, '/integration-test')) }}
+    needs: [ matrix, acknowledge ]
+    if: ${{ always() && needs.matrix.result == 'success' }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        integration-test:
-          - checkstyle
-          - metrics
-          - prometheus-java-client
+        integration-test: ${{ fromJson(needs.matrix.outputs.matrix) }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           # We can't use `disable-sudo-and-containers` here, as some
           # integration test projects have unit tests that start Docker
@@ -90,7 +136,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
         with:
-          checkout-ref: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
+          checkout-ref: ${{ env.CHECKOUT_REF }}
           java-version: |
             21.0.10
             25.0.2
@@ -99,33 +145,43 @@ jobs:
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Run integration test
-        run: xvfb-run "./integration-tests/${{ matrix.integration-test }}.sh" "${{ runner.temp }}/artifacts"
+        run: xvfb-run "./integration-tests/${INTEGRATION_TEST}.sh" "${{ runner.temp }}/artifacts"
         env:
-          JAVA_HOME: "${{ env.JAVA_HOME_21_X64 }}"
+          INTEGRATION_TEST: ${{ matrix.integration-test }}
+          JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
       - name: Upload artifacts on failure
         if: ${{ failure() }}
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: "integration-test-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
-  report-outcome:
+  report:
     name: Report integration test result
-    needs: [ acknowledge-request, run-integration-tests ]
+    needs: [ acknowledge, test ]
     # Using `always()` ensures that this job runs even if previous jobs failed
     # or were cancelled.
-    if: ${{ always() && github.event.issue.pull_request && needs.acknowledge-request.outputs.comment_id }}
+    if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write
     steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            api.github.com:443
       - name: Update comment with results
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          COMMENT_ID: ${{ needs.acknowledge.outputs.comment_id }}
+          CONCLUSION: ${{ needs.test.result }}
         with:
           script: |
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-            const conclusion = '${{ needs.run-integration-tests.result }}';
+            const conclusion = process.env.CONCLUSION;
 
             let [statusEmoji, message] = (() => {
               switch (conclusion) {
@@ -141,6 +197,6 @@ jobs:
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              comment_id: ${{ needs.acknowledge-request.outputs.comment_id }},
+              comment_id: Number(process.env.COMMENT_ID),
               body: `[Integration tests](${runUrl}) completed. ${statusEmoji} ${conclusion.toUpperCase()}: ${message}`
             });

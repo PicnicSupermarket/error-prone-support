@@ -259,59 +259,59 @@ final class PrimitiveRules {
     }
   }
 
-  /** Prefer an {@link Integer#signum(int)} comparison to 1 over less clear alternatives. */
+  /** Prefer an {@link Integer#signum(int)} comparison to 0 over less idiomatic alternatives. */
   static final class IntegerSignumIsPositive {
     @BeforeTemplate
     boolean before(int i) {
-      return Refaster.anyOf(Integer.signum(i) > 0, Integer.signum(i) >= 1);
+      return Refaster.anyOf(Integer.signum(i) == 1, Integer.signum(i) >= 1);
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(int i) {
-      return Integer.signum(i) == 1;
+      return Integer.signum(i) > 0;
     }
   }
 
-  /** Prefer an {@link Integer#signum(int)} comparison to -1 over less clear alternatives. */
+  /** Prefer an {@link Integer#signum(int)} comparison to 0 over less idiomatic alternatives. */
   static final class IntegerSignumIsNegative {
     @BeforeTemplate
     boolean before(int i) {
-      return Refaster.anyOf(Integer.signum(i) < 0, Integer.signum(i) <= -1);
+      return Refaster.anyOf(Integer.signum(i) == -1, Integer.signum(i) <= -1);
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(int i) {
-      return Integer.signum(i) == -1;
+      return Integer.signum(i) < 0;
     }
   }
 
-  /** Prefer an {@link Long#signum(long)} comparison to 1 over less clear alternatives. */
+  /** Prefer an {@link Long#signum(long)} comparison to 0 over less idiomatic alternatives. */
   static final class LongSignumIsPositive {
     @BeforeTemplate
     boolean before(long l) {
-      return Refaster.anyOf(Long.signum(l) > 0, Long.signum(l) >= 1);
+      return Refaster.anyOf(Long.signum(l) == 1, Long.signum(l) >= 1);
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(long l) {
-      return Long.signum(l) == 1;
+      return Long.signum(l) > 0;
     }
   }
 
-  /** Prefer an {@link Long#signum(long)} comparison to -1 over less clear alternatives. */
+  /** Prefer an {@link Long#signum(long)} comparison to 0 over less idiomatic alternatives. */
   static final class LongSignumIsNegative {
     @BeforeTemplate
     boolean before(long l) {
-      return Refaster.anyOf(Long.signum(l) < 0, Long.signum(l) <= -1);
+      return Refaster.anyOf(Long.signum(l) == -1, Long.signum(l) <= -1);
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(long l) {
-      return Long.signum(l) == -1;
+      return Long.signum(l) < 0;
     }
   }
 

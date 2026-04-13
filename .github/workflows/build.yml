@@ -21,10 +21,14 @@ jobs:
         os: [ ubuntu-24.04, macos-15, windows-2025 ]
         build-jdk: [ 25.0.2 ]
         target-jdk: [ 21.0.10 ]
+        include:
+          - os: ubuntu-24.04
+            build-jdk: 26
+            target-jdk: 21.0.10
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -66,7 +70,7 @@ jobs:
     environment: maven-deploy
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >

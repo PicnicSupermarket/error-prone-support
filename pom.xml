@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.28.1-SNAPSHOT</version>
+    <version>0.29.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -127,7 +127,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2026-01-09T13:44:24Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-04-13T09:17:15Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -341,7 +341,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.13.1</version>
+                <version>0.13.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -355,7 +355,7 @@
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.16</version>
+                <version>2025.0.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -372,7 +372,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.46</version>
+                <version>2.2.47</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -463,7 +463,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.6.4</version>
+                <version>5.6.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -473,6 +473,11 @@
                 <version>3.28.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -508,7 +513,7 @@
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.1.1</version>
+                <version>3.1.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1021,6 +1026,14 @@
                             <goals>
                                 <goal>compile</goal>
                             </goals>
+                            <!-- This goal runs *after* the `test-compile`
+                            phase, so that its custom output directory doesn't
+                            replace the default output directory on the
+                            annotation processor classpath when the self-check
+                            profile is active. Because that would prevent
+                            `error-prone-contrib` from flagging issues with its
+                            own test source code. -->
+                            <phase>process-test-classes</phase>
                             <configuration>
                                 <compilerArgs combine.self="override">
                                     <!-- This step only recompiles code, so
@@ -1887,13 +1900,10 @@
                                     <groupId>com.jakewharton.nopen</groupId>
                                     <artifactId>nopen-checker</artifactId>
                                 </path>
-                                <!-- XXX: Re-enable NullAway once compatible
-                                with Error Prone 2.49.0. See
-                                https://github.com/uber/NullAway/issues/1511.
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                </path>-->
+                                </path>
                                 <path>
                                     <groupId>jp.skypencil.errorprone.slf4j</groupId>
                                     <artifactId>errorprone-slf4j</artifactId>

@@ -97,7 +97,7 @@ final class BigDecimalRules {
   }
 
   /**
-   * Prefer a {@link BigDecimal#signum()} comparison to 1 over more contrived or less clear
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over more contrived or less idiomatic
    * alternatives.
    */
   static final class BigDecimalSignumIsPositive {
@@ -106,19 +106,19 @@ final class BigDecimalRules {
       return Refaster.anyOf(
           value.compareTo(BigDecimal.ZERO) > 0,
           BigDecimal.ZERO.compareTo(value) < 0,
-          value.signum() > 0,
+          value.signum() == 1,
           value.signum() >= 1);
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(BigDecimal value) {
-      return value.signum() == 1;
+      return value.signum() > 0;
     }
   }
 
   /**
-   * Prefer a {@link BigDecimal#signum()} comparison to -1 over more contrived or less clear
+   * Prefer a {@link BigDecimal#signum()} comparison to -1 over more contrived or less idiomatic
    * alternatives.
    */
   static final class BigDecimalSignumIsNegative {
@@ -127,14 +127,14 @@ final class BigDecimalRules {
       return Refaster.anyOf(
           value.compareTo(BigDecimal.ZERO) < 0,
           BigDecimal.ZERO.compareTo(value) > 0,
-          value.signum() < 0,
+          value.signum() == -1,
           value.signum() <= -1);
     }
 
     @AfterTemplate
     @AlsoNegation
     boolean after(BigDecimal value) {
-      return value.signum() == -1;
+      return value.signum() < 0;
     }
   }
 }
