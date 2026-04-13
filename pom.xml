@@ -341,7 +341,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.13.1</version>
+                <version>0.13.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1887,13 +1887,10 @@
                                     <groupId>com.jakewharton.nopen</groupId>
                                     <artifactId>nopen-checker</artifactId>
                                 </path>
-                                <!-- XXX: Re-enable NullAway once compatible
-                                with Error Prone 2.49.0. See
-                                https://github.com/uber/NullAway/issues/1511.
                                 <path>
                                     <groupId>com.uber.nullaway</groupId>
                                     <artifactId>nullaway</artifactId>
-                                </path>-->
+                                </path>
                                 <path>
                                     <groupId>jp.skypencil.errorprone.slf4j</groupId>
                                     <artifactId>errorprone-slf4j</artifactId>
