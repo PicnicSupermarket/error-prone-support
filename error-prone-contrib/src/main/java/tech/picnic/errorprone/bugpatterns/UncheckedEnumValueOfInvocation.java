@@ -58,14 +58,7 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
     }
 
     Type enumType = ASTHelpers.getReceiverType(tree);
-    /* Defensive: receiver type resolution and argument count are not guaranteed under incremental
-     * compilation or for non-standard `valueOf` overloads. */
-    if (enumType == null || tree.getArguments().isEmpty()) {
-      return Description.NO_MATCH;
-    }
-
     ExpressionTree nameArgument = tree.getArguments().getLast();
-
     if (!MoreASTHelpers.isStringTyped(nameArgument, state)) {
       return buildDescription(tree)
           .setMessage(
