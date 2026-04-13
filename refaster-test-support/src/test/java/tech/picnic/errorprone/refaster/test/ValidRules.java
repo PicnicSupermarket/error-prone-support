@@ -17,13 +17,13 @@ final class ValidRules {
 
   static final class StringIsEmpty2 {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.toCharArray().length == 0;
+    boolean before(String str) {
+      return str.toCharArray().length == 0;
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.isEmpty();
+    boolean after(String str) {
+      return str.isEmpty();
     }
   }
 

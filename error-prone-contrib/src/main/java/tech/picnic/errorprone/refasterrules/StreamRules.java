@@ -396,8 +396,8 @@ final class StreamRules {
   // have side-effects.
   static final class StreamFindFirst<T> {
     @BeforeTemplate
-    Optional<T> before(Stream<T> stream, long limit) {
-      return Refaster.anyOf(stream.limit(limit).findFirst(), stream.limit(limit).findAny());
+    Optional<T> before(Stream<T> stream, long l) {
+      return Refaster.anyOf(stream.limit(l).findFirst(), stream.limit(l).findAny());
     }
 
     @AfterTemplate
@@ -793,8 +793,8 @@ final class StreamRules {
     Stream<T> before(
         @Repeated Stream<T> streams,
         @Matches(IsIdentityOperation.class)
-            Function<? super Stream<T>, ? extends Stream<? extends T>> mapper) {
-      return Stream.of(Refaster.asVarargs(streams)).flatMap(mapper);
+            Function<? super Stream<T>, ? extends Stream<? extends T>> function) {
+      return Stream.of(Refaster.asVarargs(streams)).flatMap(function);
     }
 
     @AfterTemplate

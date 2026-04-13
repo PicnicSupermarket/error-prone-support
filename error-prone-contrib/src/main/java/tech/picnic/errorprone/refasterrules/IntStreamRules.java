@@ -98,13 +98,13 @@ final class IntStreamRules {
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
 
     @BeforeTemplate
-    IntStream before(IntStream stream, IntUnaryOperator function) {
-      return stream.flatMap(v -> toIntStreamFunction(v).map(function));
+    IntStream before(IntStream stream, IntUnaryOperator operator) {
+      return stream.flatMap(v -> toIntStreamFunction(v).map(operator));
     }
 
     @AfterTemplate
-    IntStream after(IntStream stream, IntUnaryOperator function) {
-      return stream.flatMap(v -> toIntStreamFunction(v)).map(function);
+    IntStream after(IntStream stream, IntUnaryOperator operator) {
+      return stream.flatMap(v -> toIntStreamFunction(v)).map(operator);
     }
   }
 
@@ -114,13 +114,13 @@ final class IntStreamRules {
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    IntStream before(Stream<T> stream, IntUnaryOperator function) {
-      return stream.flatMapToInt(v -> toIntStreamFunction(v).map(function));
+    IntStream before(Stream<T> stream, IntUnaryOperator operator) {
+      return stream.flatMapToInt(v -> toIntStreamFunction(v).map(operator));
     }
 
     @AfterTemplate
-    IntStream after(Stream<T> stream, IntUnaryOperator function) {
-      return stream.flatMapToInt(v -> toIntStreamFunction(v)).map(function);
+    IntStream after(Stream<T> stream, IntUnaryOperator operator) {
+      return stream.flatMapToInt(v -> toIntStreamFunction(v)).map(operator);
     }
   }
 

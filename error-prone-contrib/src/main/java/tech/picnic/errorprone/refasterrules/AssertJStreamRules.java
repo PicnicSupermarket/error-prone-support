@@ -44,8 +44,8 @@ final class AssertJStreamRules {
     }
 
     @BeforeTemplate
-    void before4(Stream<T> actual, IntFunction<S[]> generator) {
-      assertThat(actual.toArray(generator)).isEmpty();
+    void before4(Stream<T> actual, IntFunction<S[]> function) {
+      assertThat(actual.toArray(function)).isEmpty();
     }
 
     @BeforeTemplate
@@ -101,8 +101,8 @@ final class AssertJStreamRules {
     }
 
     @BeforeTemplate
-    void before5(Stream<T> actual, IntFunction<S[]> generator) {
-      assertThat(actual.toArray(generator)).isNotEmpty();
+    void before5(Stream<T> actual, IntFunction<S[]> function) {
+      assertThat(actual.toArray(function)).isNotEmpty();
     }
 
     @BeforeTemplate

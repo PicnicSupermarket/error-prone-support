@@ -24,13 +24,13 @@ final class RandomGeneratorRules {
    */
   static final class RandomGeneratorNextDouble {
     @BeforeTemplate
-    double before(RandomGenerator random, double bound) {
-      return Refaster.anyOf(random.nextDouble() * bound, bound * random.nextDouble());
+    double before(RandomGenerator generator, double bound) {
+      return Refaster.anyOf(generator.nextDouble() * bound, bound * generator.nextDouble());
     }
 
     @AfterTemplate
-    double after(RandomGenerator random, double bound) {
-      return random.nextDouble(bound);
+    double after(RandomGenerator generator, double bound) {
+      return generator.nextDouble(bound);
     }
   }
 
@@ -46,13 +46,13 @@ final class RandomGeneratorRules {
   // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextDoublePlus {
     @BeforeTemplate
-    double before(RandomGenerator random, double origin, double bound) {
-      return origin + random.nextDouble(bound);
+    double before(RandomGenerator generator, double origin, double bound) {
+      return origin + generator.nextDouble(bound);
     }
 
     @AfterTemplate
-    double after(RandomGenerator random, double origin, double bound) {
-      return random.nextDouble(origin, origin + bound);
+    double after(RandomGenerator generator, double origin, double bound) {
+      return generator.nextDouble(origin, origin + bound);
     }
   }
 
@@ -60,14 +60,14 @@ final class RandomGeneratorRules {
   static final class RandomGeneratorNextInt {
     @BeforeTemplate
     @SuppressWarnings("RandomGeneratorNextLong" /* This is a more specific template. */)
-    int before(RandomGenerator random, int bound) {
+    int before(RandomGenerator generator, int bound) {
       return Refaster.anyOf(
-          (int) random.nextDouble(bound), (int) Math.round(random.nextDouble(bound)));
+          (int) generator.nextDouble(bound), (int) Math.round(generator.nextDouble(bound)));
     }
 
     @AfterTemplate
-    int after(RandomGenerator random, int bound) {
-      return random.nextInt(bound);
+    int after(RandomGenerator generator, int bound) {
+      return generator.nextInt(bound);
     }
   }
 
@@ -82,13 +82,13 @@ final class RandomGeneratorRules {
   // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextIntPlus {
     @BeforeTemplate
-    int before(RandomGenerator random, int origin, int bound) {
-      return origin + random.nextInt(bound);
+    int before(RandomGenerator generator, int origin, int bound) {
+      return origin + generator.nextInt(bound);
     }
 
     @AfterTemplate
-    int after(RandomGenerator random, int origin, int bound) {
-      return random.nextInt(origin, origin + bound);
+    int after(RandomGenerator generator, int origin, int bound) {
+      return generator.nextInt(origin, origin + bound);
     }
   }
 
@@ -108,17 +108,17 @@ final class RandomGeneratorRules {
       "LongDoubleConversion" /* This violation will be rewritten. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    long before(RandomGenerator random, long bound) {
+    long before(RandomGenerator generator, long bound) {
       return Refaster.anyOf(
-          (long) random.nextDouble((double) bound),
-          Math.round(random.nextDouble((double) bound)),
-          (long) random.nextDouble(bound),
-          Math.round(random.nextDouble(bound)));
+          (long) generator.nextDouble((double) bound),
+          Math.round(generator.nextDouble((double) bound)),
+          (long) generator.nextDouble(bound),
+          Math.round(generator.nextDouble(bound)));
     }
 
     @AfterTemplate
-    long after(RandomGenerator random, long bound) {
-      return random.nextLong(bound);
+    long after(RandomGenerator generator, long bound) {
+      return generator.nextLong(bound);
     }
   }
 
@@ -134,13 +134,13 @@ final class RandomGeneratorRules {
   // code, but only in situations that are likely unintended.
   static final class RandomGeneratorNextLongPlus {
     @BeforeTemplate
-    long before(RandomGenerator random, long origin, long bound) {
-      return origin + random.nextLong(bound);
+    long before(RandomGenerator generator, long origin, long bound) {
+      return origin + generator.nextLong(bound);
     }
 
     @AfterTemplate
-    long after(RandomGenerator random, long origin, long bound) {
-      return random.nextLong(origin, origin + bound);
+    long after(RandomGenerator generator, long origin, long bound) {
+      return generator.nextLong(origin, origin + bound);
     }
   }
 }

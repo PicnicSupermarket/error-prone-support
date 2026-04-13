@@ -21,16 +21,16 @@ final class AssertJBigIntegerRules {
   static final class AbstractBigIntegerAssertIsEqualTo {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(
-        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger expected) {
+        AbstractBigIntegerAssert<?> integerAssert, BigInteger expected) {
       return Refaster.anyOf(
-          bigIntegerAssert.isCloseTo(expected, offset(BigInteger.ZERO)),
-          bigIntegerAssert.isCloseTo(expected, withPercentage(0)));
+          integerAssert.isCloseTo(expected, offset(BigInteger.ZERO)),
+          integerAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
     AbstractBigIntegerAssert<?> after(
-        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger expected) {
-      return bigIntegerAssert.isEqualTo(expected);
+        AbstractBigIntegerAssert<?> integerAssert, BigInteger expected) {
+      return integerAssert.isEqualTo(expected);
     }
   }
 
@@ -38,64 +38,63 @@ final class AssertJBigIntegerRules {
   static final class AbstractBigIntegerAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(
-        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger other) {
+        AbstractBigIntegerAssert<?> integerAssert, BigInteger other) {
       return Refaster.anyOf(
-          bigIntegerAssert.isNotCloseTo(other, offset(BigInteger.ZERO)),
-          bigIntegerAssert.isNotCloseTo(other, withPercentage(0)));
+          integerAssert.isNotCloseTo(other, offset(BigInteger.ZERO)),
+          integerAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigIntegerAssert<?> after(
-        AbstractBigIntegerAssert<?> bigIntegerAssert, BigInteger other) {
-      return bigIntegerAssert.isNotEqualTo(other);
+    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> integerAssert, BigInteger other) {
+      return integerAssert.isNotEqualTo(other);
     }
   }
 
   /** Prefer {@code isEqualTo(0)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsEqualToZero {
     @BeforeTemplate
-    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
+    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> integerAssert) {
       return Refaster.anyOf(
-          bigIntegerAssert.isZero(),
-          bigIntegerAssert.isEqualTo(0L),
-          bigIntegerAssert.isEqualTo(BigInteger.ZERO));
+          integerAssert.isZero(),
+          integerAssert.isEqualTo(0L),
+          integerAssert.isEqualTo(BigInteger.ZERO));
     }
 
     @AfterTemplate
-    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> bigIntegerAssert) {
-      return bigIntegerAssert.isEqualTo(0);
+    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> integerAssert) {
+      return integerAssert.isEqualTo(0);
     }
   }
 
   /** Prefer {@code isNotEqualTo(0)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsNotEqualToZero {
     @BeforeTemplate
-    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
+    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> integerAssert) {
       return Refaster.anyOf(
-          bigIntegerAssert.isNotZero(),
-          bigIntegerAssert.isNotEqualTo(0L),
-          bigIntegerAssert.isNotEqualTo(BigInteger.ZERO));
+          integerAssert.isNotZero(),
+          integerAssert.isNotEqualTo(0L),
+          integerAssert.isNotEqualTo(BigInteger.ZERO));
     }
 
     @AfterTemplate
-    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> bigIntegerAssert) {
-      return bigIntegerAssert.isNotEqualTo(0);
+    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> integerAssert) {
+      return integerAssert.isNotEqualTo(0);
     }
   }
 
   /** Prefer {@code isEqualTo(1)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsEqualToOne {
     @BeforeTemplate
-    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> bigIntegerAssert) {
+    AbstractBigIntegerAssert<?> before(AbstractBigIntegerAssert<?> integerAssert) {
       return Refaster.anyOf(
-          bigIntegerAssert.isOne(),
-          bigIntegerAssert.isEqualTo(1L),
-          bigIntegerAssert.isEqualTo(BigInteger.ONE));
+          integerAssert.isOne(),
+          integerAssert.isEqualTo(1L),
+          integerAssert.isEqualTo(BigInteger.ONE));
     }
 
     @AfterTemplate
-    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> bigIntegerAssert) {
-      return bigIntegerAssert.isEqualTo(1);
+    AbstractBigIntegerAssert<?> after(AbstractBigIntegerAssert<?> integerAssert) {
+      return integerAssert.isEqualTo(1);
     }
   }
 }

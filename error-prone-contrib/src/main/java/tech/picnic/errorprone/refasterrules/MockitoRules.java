@@ -50,13 +50,13 @@ final class MockitoRules {
   /** Prefer {@link InvocationOnMock#getArgument(int)} over more verbose alternatives. */
   static final class InvocationOnMockGetArgument {
     @BeforeTemplate
-    Object before(InvocationOnMock invocation, int i) {
-      return invocation.getArguments()[i];
+    Object before(InvocationOnMock mock, int i) {
+      return mock.getArguments()[i];
     }
 
     @AfterTemplate
-    Object after(InvocationOnMock invocation, int i) {
-      return invocation.getArgument(i);
+    Object after(InvocationOnMock mock, int i) {
+      return mock.getArgument(i);
     }
   }
 
@@ -64,14 +64,13 @@ final class MockitoRules {
   static final class InvocationOnMockGetArgumentObject<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Cast is presumed safe in matched context. */)
-    T before(InvocationOnMock invocation, int i) {
-      return Refaster.anyOf(
-          invocation.getArgument(i, Refaster.<T>clazz()), (T) invocation.getArgument(i));
+    T before(InvocationOnMock mock, int i) {
+      return Refaster.anyOf(mock.getArgument(i, Refaster.<T>clazz()), (T) mock.getArgument(i));
     }
 
     @AfterTemplate
-    T after(InvocationOnMock invocation, int i) {
-      return invocation.<T>getArgument(i);
+    T after(InvocationOnMock mock, int i) {
+      return mock.<T>getArgument(i);
     }
   }
 }

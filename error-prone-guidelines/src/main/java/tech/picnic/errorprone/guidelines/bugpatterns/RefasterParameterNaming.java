@@ -9,12 +9,14 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
+import com.google.errorprone.annotations.Var;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
@@ -33,23 +35,40 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
+import com.sun.tools.javac.code.Type;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import javax.lang.model.SourceVersion;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /**
- * A {@link BugChecker} that flags Refaster template parameters with names that do not match the
- * method parameter they are passed to.
+ * A {@link BugChecker} that flags Refaster template parameters with names that do not match their
+ * intended semantics.
  *
- * <p>Parameter names are derived from the first method invocation in which the parameter appears as
- * an argument, considering template methods in priority order ({@code @AfterTemplate} first, then
- * {@code @BeforeTemplate}, with ties broken by descending parameter count).
+ * <p>Parameter names are derived through two strategies, applied in order:
+ *
+ * <ol>
+ *   <li>From the first method invocation in which the parameter appears as an argument, considering
+ *       template methods in priority order ({@code @AfterTemplate} first, then
+ *       {@code @BeforeTemplate}, with ties broken by descending parameter count).
+ *   <li>As a fallback, from the parameter's type: array types yield {@code array}; primitive types
+ *       yield their first letter (e.g. {@code int} yields {@code i}); other types yield the last
+ *       CamelCase word of the simple type name, lowercased, with well-known shorthands applied
+ *       (e.g. {@code ImmutableList} yields {@code list}, {@code String} yields {@code str}, {@code
+ *       Comparator} yields {@code cmp}). If the resulting name is a Java keyword, the two preceding
+ *       CamelCase words are combined instead (e.g. {@code OptionalInt} yields {@code optionalInt}).
+ * </ol>
+ *
+ * <p>When multiple parameters would receive the same derived name, numeric suffixes are appended to
+ * disambiguate (e.g. {@code list1}, {@code list2}).
  */
 // XXX: Fully review this class.
 @AutoService(BugChecker.class)
@@ -69,6 +88,9 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
   private static final Matcher<Tree> REPEATED_ANNOTATION =
       hasAnnotation(Repeated.class.getCanonicalName());
   private static final Pattern SYNTHETIC_PARAMETER_NAME = Pattern.compile("arg\\d+");
+  private static final Pattern CAMEL_CASE_SPLIT = Pattern.compile("(?<=[a-z])(?=[A-Z])");
+  private static final ImmutableMap<String, String> TYPE_NAME_SHORTHANDS =
+      ImmutableMap.of("comparator", "cmp", "string", "str");
 
   /** Instantiates a new {@link RefasterParameterNaming} instance. */
   public RefasterParameterNaming() {}
@@ -76,6 +98,8 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> methods = MoreASTHelpers.getRefasterTemplateMethods(tree, state);
+    // XXX: The early return here is a fast path: `deriveParameterRenames` also returns an empty
+    // map when `methods` is empty, so the result is the same either way.
     if (methods.isEmpty()) {
       return Description.NO_MATCH;
     }
@@ -106,11 +130,15 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     for (MethodTree method : methods) {
       for (VariableTree param : method.getParameters()) {
         String paramName = param.getName().toString();
+        // XXX: The dedup check here is a fast path: `deriveName` is deterministic, so processing
+        // the same parameter name twice would yield the same derived name, resulting in the same
+        // `put` on the `LinkedHashMap`.
         if (!processedParams.add(paramName)) {
           continue;
         }
 
         deriveName(paramName, methods, repeatedParams, state)
+            .or(() -> deriveNameFromType(param))
             .ifPresent(derivedName -> renames.put(paramName, derivedName));
       }
     }
@@ -118,27 +146,91 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     /* Remove renames where the derived name matches the current name. */
     renames.entrySet().removeIf(e -> e.getKey().equals(e.getValue()));
 
-    // XXX: Instead of dropping colliding renames unconditionally, per parameter we could collect
-    // additional eligible renames, and then retain the first non-colliding option. But perhaps this
-    // is too much.
-    removeCollidingRenames(renames, processedParams);
+    resolveConflictsWithSuffix(renames, processedParams);
+
+    /* Remove any no-op renames that suffix resolution may have introduced. */
+    renames.entrySet().removeIf(e -> e.getKey().equals(e.getValue()));
 
     return ImmutableMap.copyOf(renames);
   }
 
-  private static void removeCollidingRenames(Map<String, String> renames, Set<String> allParams) {
-    Set<String> retainedNames = new LinkedHashSet<>(allParams);
-    renames.forEach((oldName, newName) -> retainedNames.remove(oldName));
-    renames
-        .entrySet()
-        .removeIf(
-            e -> {
-              if (!retainedNames.add(e.getValue())) {
-                retainedNames.add(e.getKey());
-                return true;
-              }
-              return false;
-            });
+  private static void resolveConflictsWithSuffix(
+      Map<String, String> renames, Set<String> allParams) {
+    /* Names of params that keep their current name (not being renamed). */
+    Set<String> fixedNames = new LinkedHashSet<>(allParams);
+    fixedNames.removeAll(renames.keySet());
+
+    /* Group renames by target name, preserving parameter order. */
+    Map<String, List<String>> byTarget = new LinkedHashMap<>();
+    renames.forEach((from, to) -> byTarget.computeIfAbsent(to, k -> new ArrayList<>()).add(from));
+
+    Set<String> occupiedNames = new LinkedHashSet<>(fixedNames);
+    for (Map.Entry<String, List<String>> entry : byTarget.entrySet()) {
+      String target = entry.getKey();
+      List<String> sources = entry.getValue();
+      if (sources.size() == 1 && !occupiedNames.contains(target)) {
+        occupiedNames.add(target);
+      } else {
+        @Var int counter = 1;
+        for (String source : sources) {
+          @Var String candidate;
+          do {
+            candidate = target + counter++;
+          } while (occupiedNames.contains(candidate));
+          occupiedNames.add(candidate);
+          renames.put(source, candidate);
+        }
+      }
+    }
+  }
+
+  private static Optional<String> deriveNameFromType(VariableTree param) {
+    Type type = ASTHelpers.getType(param);
+    // XXX: `ASTHelpers.getType` returns null only for error or synthetic nodes, which never appear
+    // in valid Refaster templates, so this guard is not observable in tests.
+    if (type == null) {
+      return Optional.empty();
+    }
+
+    // XXX: `ArrayType.tsym.getSimpleName()` returns "Array", which the CamelCase logic below
+    // would also map to "array". The explicit check is retained for clarity of intent.
+    if (type instanceof Type.ArrayType) {
+      return Optional.of("array");
+    }
+
+    if (type instanceof Type.TypeVar) {
+      return Optional.empty();
+    }
+
+    String simpleName = type.tsym.getSimpleName().toString();
+    // XXX: `simpleName` is empty only for anonymous or synthetic types, which do not appear as
+    // Refaster template parameter types, so this guard is not observable in tests.
+    if (simpleName.isEmpty()) {
+      return Optional.empty();
+    }
+
+    if (type.isPrimitive()) {
+      return Optional.of(String.valueOf(simpleName.charAt(0)));
+    }
+
+    List<String> parts = Splitter.on(CAMEL_CASE_SPLIT).splitToList(simpleName);
+    String base = parts.getLast().toLowerCase(Locale.ROOT);
+    String name = TYPE_NAME_SHORTHANDS.getOrDefault(base, base);
+
+    if (!SourceVersion.isKeyword(name)) {
+      return Optional.of(name);
+    }
+
+    if (parts.size() >= 2) {
+      String fallback = parts.get(parts.size() - 2).toLowerCase(Locale.ROOT) + parts.getLast();
+      // XXX: No real Java class with two or more CamelCase parts has a keyword as its two-part
+      // fallback (e.g., "fooInt"), so this guard is not observable in tests.
+      if (!SourceVersion.isKeyword(fallback)) {
+        return Optional.of(fallback);
+      }
+    }
+
+    return Optional.empty();
   }
 
   private static Optional<String> deriveName(
@@ -152,6 +244,10 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
             @Override
             public @Nullable String visitMethodInvocation(
                 MethodInvocationTree node, @Nullable Void unused) {
+              // XXX: When the Refaster check is removed, Refaster methods are treated as regular
+              // methods. Their formal parameter names are either synthetic (filtered by
+              // `SYNTHETIC_PARAMETER_NAME`) or have names that wouldn't change the outcome for
+              // parameters in practice, so the result is the same either way.
               if (REFASTER_METHOD.matches(node, state)) {
                 return super.visitMethodInvocation(node, null);
               }
@@ -176,6 +272,10 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
                 int varargsIdx = sym.params().size() - 1;
                 for (int i = varargsIdx; i < args.size(); i++) {
                   Optional<String> name = unwrapParameterName(args.get(i), state);
+                  // XXX: When the condition's clauses are mutated, tests observe the same result:
+                  // the `name.equals(paramName)` clause is equivalent to being inside the matching
+                  // outer loop iteration; `repeatedParams.contains` is guarded by callers that
+                  // already produce the same varargs formal name via the non-varargs loop path.
                   if (name.isPresent()
                       && name.orElseThrow().equals(paramName)
                       && repeatedParams.contains(paramName)) {

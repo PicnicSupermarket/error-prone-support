@@ -17,69 +17,69 @@ final class AssertJIntegerRules {
   /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over more contrived alternatives. */
   static final class AbstractIntegerAssertIsEqualTo {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int expected) {
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> integerAssert, int expected) {
       return Refaster.anyOf(
-          intAssert.isCloseTo(expected, offset(0)),
-          intAssert.isCloseTo(expected, withPercentage(0)));
+          integerAssert.isCloseTo(expected, offset(0)),
+          integerAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int expected) {
-      return intAssert.isEqualTo(expected);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> integerAssert, int expected) {
+      return integerAssert.isEqualTo(expected);
     }
   }
 
   /** Prefer {@link AbstractIntegerAssert#isNotEqualTo(int)} over more contrived alternatives. */
   static final class AbstractIntegerAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert, int other) {
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> integerAssert, int other) {
       return Refaster.anyOf(
-          intAssert.isNotCloseTo(other, offset(0)),
-          intAssert.isNotCloseTo(other, withPercentage(0)));
+          integerAssert.isNotCloseTo(other, offset(0)),
+          integerAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert, int other) {
-      return intAssert.isNotEqualTo(other);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> integerAssert, int other) {
+      return integerAssert.isNotEqualTo(other);
     }
   }
 
   /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over less explicit alternatives. */
   static final class AbstractIntegerAssertIsEqualToZero {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isZero();
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> integerAssert) {
+      return integerAssert.isZero();
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isEqualTo(0);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> integerAssert) {
+      return integerAssert.isEqualTo(0);
     }
   }
 
   /** Prefer {@link AbstractIntegerAssert#isNotEqualTo(int)} over less explicit alternatives. */
   static final class AbstractIntegerAssertIsNotEqualToZero {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNotZero();
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> integerAssert) {
+      return integerAssert.isNotZero();
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isNotEqualTo(0);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> integerAssert) {
+      return integerAssert.isNotEqualTo(0);
     }
   }
 
   /** Prefer {@link AbstractIntegerAssert#isEqualTo(int)} over less explicit alternatives. */
   static final class AbstractIntegerAssertIsEqualToOne {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isOne();
+    AbstractIntegerAssert<?> before(AbstractIntegerAssert<?> integerAssert) {
+      return integerAssert.isOne();
     }
 
     @AfterTemplate
-    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> intAssert) {
-      return intAssert.isEqualTo(1);
+    AbstractIntegerAssert<?> after(AbstractIntegerAssert<?> integerAssert) {
+      return integerAssert.isEqualTo(1);
     }
   }
 }

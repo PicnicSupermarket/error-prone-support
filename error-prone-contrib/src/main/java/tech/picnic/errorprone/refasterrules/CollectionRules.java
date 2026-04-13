@@ -173,29 +173,29 @@ final class CollectionRules {
   /** Prefer {@link Collection#addAll(Collection)} over more verbose alternatives. */
   static final class CollectionAddAllBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> addTo, Collection<S> elementsToAdd) {
-      elementsToAdd.forEach(addTo::add);
+    void before(Collection<T> collection1, Collection<S> collection2) {
+      collection2.forEach(collection1::add);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> addTo, Collection<S> elementsToAdd) {
-      for (T element : elementsToAdd) {
-        addTo.add(element);
+    void before2(Collection<T> collection1, Collection<S> collection2) {
+      for (T element : collection2) {
+        collection1.add(element);
       }
     }
 
     // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
     // that this is supported out of the box.
     @BeforeTemplate
-    void before3(Collection<T> addTo, Collection<S> elementsToAdd) {
-      for (S element : elementsToAdd) {
-        addTo.add(element);
+    void before3(Collection<T> collection1, Collection<S> collection2) {
+      for (S element : collection2) {
+        collection1.add(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> addTo, Collection<S> elementsToAdd) {
-      addTo.addAll(elementsToAdd);
+    void after(Collection<T> collection1, Collection<S> collection2) {
+      collection1.addAll(collection2);
     }
   }
 
@@ -215,14 +215,14 @@ final class CollectionRules {
   /** Prefer {@link Collection#removeAll(Collection)} over more verbose alternatives. */
   static final class CollectionRemoveAllBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      elementsToRemove.forEach(removeFrom::remove);
+    void before(Collection<T> collection1, Collection<S> collection2) {
+      collection2.forEach(collection1::remove);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      for (T element : elementsToRemove) {
-        removeFrom.remove(element);
+    void before2(Collection<T> collection1, Collection<S> collection2) {
+      for (T element : collection2) {
+        collection1.remove(element);
       }
     }
 
@@ -230,15 +230,15 @@ final class CollectionRules {
     // that this is supported out of the box. After doing so, also drop the `S extends T` type
     // constraint; ideally this check applies to any `S`.
     @BeforeTemplate
-    void before3(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      for (S element : elementsToRemove) {
-        removeFrom.remove(element);
+    void before3(Collection<T> collection1, Collection<S> collection2) {
+      for (S element : collection2) {
+        collection1.remove(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      removeFrom.removeAll(elementsToRemove);
+    void after(Collection<T> collection1, Collection<S> collection2) {
+      collection1.removeAll(collection2);
     }
   }
 
@@ -378,9 +378,8 @@ final class CollectionRules {
   /** Prefer {@link Collection#toArray()} over less efficient or more verbose alternatives. */
   static final class CollectionToArray<T> {
     @BeforeTemplate
-    Object[] before(Collection<T> collection, int size) {
-      return Refaster.anyOf(
-          collection.toArray(new Object[size]), collection.toArray(Object[]::new));
+    Object[] before(Collection<T> collection, int i) {
+      return Refaster.anyOf(collection.toArray(new Object[i]), collection.toArray(Object[]::new));
     }
 
     @BeforeTemplate

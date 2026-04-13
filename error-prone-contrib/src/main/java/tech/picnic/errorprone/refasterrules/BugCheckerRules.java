@@ -45,14 +45,14 @@ final class BugCheckerRules {
   static final class BugCheckerRefactoringTestHelperAddInputLinesExpectUnchanged {
     @BeforeTemplate
     BugCheckerRefactoringTestHelper before(
-        BugCheckerRefactoringTestHelper helper, String path, String source) {
-      return helper.addInputLines(path, source).addOutputLines(path, source);
+        BugCheckerRefactoringTestHelper helper, String path, String str) {
+      return helper.addInputLines(path, str).addOutputLines(path, str);
     }
 
     @AfterTemplate
     BugCheckerRefactoringTestHelper after(
-        BugCheckerRefactoringTestHelper helper, String path, String source) {
-      return helper.addInputLines(path, source).expectUnchanged();
+        BugCheckerRefactoringTestHelper helper, String path, String str) {
+      return helper.addInputLines(path, str).expectUnchanged();
     }
   }
 

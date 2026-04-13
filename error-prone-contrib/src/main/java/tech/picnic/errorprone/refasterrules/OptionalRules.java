@@ -375,22 +375,22 @@ final class OptionalRules {
       "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    Optional<T> before(Optional<T> optional1, Optional<T> other) {
+    Optional<T> before(Optional<T> optional, Optional<T> other) {
       // XXX: Note that rewriting the first and third variant will change the code's behavior if
       // `optional2` has side-effects.
       // XXX: Note that rewriting the first, third and fourth variant will introduce a compilation
       // error if `optional2` is not effectively final. Review whether a `@Matcher` can be used to
       // avoid this.
       return Refaster.anyOf(
-          optional1.map(Optional::of).orElse(other),
-          optional1.map(Optional::of).orElseGet(() -> other),
-          Stream.of(optional1, other).flatMap(Optional::stream).findFirst(),
-          optional1.isPresent() ? optional1 : other);
+          optional.map(Optional::of).orElse(other),
+          optional.map(Optional::of).orElseGet(() -> other),
+          Stream.of(optional, other).flatMap(Optional::stream).findFirst(),
+          optional.isPresent() ? optional : other);
     }
 
     @AfterTemplate
-    Optional<T> after(Optional<T> optional1, Optional<T> other) {
-      return optional1.or(() -> other);
+    Optional<T> after(Optional<T> optional, Optional<T> other) {
+      return optional.or(() -> other);
     }
   }
 
@@ -398,7 +398,7 @@ final class OptionalRules {
   static final class OptionalIdentity<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("NestedOptionals")
-    Optional<T> before(Optional<T> optional, Comparator<S> comparator) {
+    Optional<T> before(Optional<T> optional, Comparator<S> cmp) {
       return Refaster.anyOf(
           optional.or(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
           optional
@@ -406,8 +406,8 @@ final class OptionalRules {
               .orElseGet(Refaster.anyOf(() -> Optional.empty(), Optional::empty)),
           optional.stream().findFirst(),
           optional.stream().findAny(),
-          optional.stream().min(comparator),
-          optional.stream().max(comparator));
+          optional.stream().min(cmp),
+          optional.stream().max(cmp));
     }
 
     @AfterTemplate

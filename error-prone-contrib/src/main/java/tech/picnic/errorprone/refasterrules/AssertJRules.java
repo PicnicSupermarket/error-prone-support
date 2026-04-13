@@ -172,17 +172,17 @@ final class AssertJRules {
   static final class ObjectEnumerableAssertContains<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> enumerableAssert, T element) {
       return Refaster.anyOf(
-          iterAssert.containsAnyOf(element),
-          iterAssert.containsSequence(element),
-          iterAssert.containsSubsequence(element));
+          enumerableAssert.containsAnyOf(element),
+          enumerableAssert.containsSequence(element),
+          enumerableAssert.containsSubsequence(element));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.contains(element);
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> enumerableAssert, T element) {
+      return enumerableAssert.contains(element);
     }
   }
 
@@ -193,14 +193,14 @@ final class AssertJRules {
   static final class ObjectEnumerableAssertDoesNotContain<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.doesNotContainSequence(element);
+    ObjectEnumerableAssert<?, S> before(ObjectEnumerableAssert<?, S> enumerableAssert, T element) {
+      return enumerableAssert.doesNotContainSequence(element);
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.doesNotContain(element);
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> enumerableAssert, T element) {
+      return enumerableAssert.doesNotContain(element);
     }
   }
 
@@ -212,14 +212,14 @@ final class AssertJRules {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     ObjectEnumerableAssert<?, S> before(
-        ObjectEnumerableAssert<?, S> iterAssert, @NotMatches(IsArray.class) T element) {
-      return iterAssert.containsExactlyInAnyOrder(element);
+        ObjectEnumerableAssert<?, S> enumerableAssert, @NotMatches(IsArray.class) T element) {
+      return enumerableAssert.containsExactlyInAnyOrder(element);
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> iterAssert, T element) {
-      return iterAssert.containsExactly(element);
+    ObjectEnumerableAssert<?, S> after(ObjectEnumerableAssert<?, S> enumerableAssert, T element) {
+      return enumerableAssert.containsExactly(element);
     }
   }
 

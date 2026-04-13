@@ -85,13 +85,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoubleUnaryOperator function) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v).map(function));
+    DoubleStream before(DoubleStream stream, DoubleUnaryOperator operator) {
+      return stream.flatMap(v -> toDoubleStreamFunction(v).map(operator));
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoubleUnaryOperator function) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v)).map(function);
+    DoubleStream after(DoubleStream stream, DoubleUnaryOperator operator) {
+      return stream.flatMap(v -> toDoubleStreamFunction(v)).map(operator);
     }
   }
 
@@ -101,13 +101,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    DoubleStream before(Stream<T> stream, DoubleUnaryOperator function) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).map(function));
+    DoubleStream before(Stream<T> stream, DoubleUnaryOperator operator) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).map(operator));
     }
 
     @AfterTemplate
-    DoubleStream after(Stream<T> stream, DoubleUnaryOperator function) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).map(function);
+    DoubleStream after(Stream<T> stream, DoubleUnaryOperator operator) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).map(operator);
     }
   }
 

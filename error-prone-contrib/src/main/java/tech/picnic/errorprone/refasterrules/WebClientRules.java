@@ -33,19 +33,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class RequestBodySpecBodyValue<T> {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T body) {
-      return requestBodySpec.body(fromValue(body));
+    RequestHeadersSpec<?> before(RequestBodySpec spec, T body) {
+      return spec.body(fromValue(body));
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestBodySpec requestBodySpec, T body) {
-      return requestBodySpec.body(fromValue(body));
+    WebTestClient.RequestHeadersSpec<?> before(WebTestClient.RequestBodySpec spec, T body) {
+      return spec.body(fromValue(body));
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(RequestBodySpec requestBodySpec, T body) {
-      return requestBodySpec.bodyValue(body);
+    RequestHeadersSpec<?> after(RequestBodySpec spec, T body) {
+      return spec.bodyValue(body);
     }
   }
 
@@ -53,18 +52,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientGet {
     @BeforeTemplate
-    RequestBodyUriSpec before(WebClient webClient) {
-      return webClient.method(GET);
+    RequestBodyUriSpec before(WebClient client) {
+      return client.method(GET);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
-      return webClient.method(GET);
+    WebTestClient.RequestBodyUriSpec before(WebTestClient client) {
+      return client.method(GET);
     }
 
     @AfterTemplate
-    RequestHeadersUriSpec<?> after(WebClient webClient) {
-      return webClient.get();
+    RequestHeadersUriSpec<?> after(WebClient client) {
+      return client.get();
     }
   }
 
@@ -72,18 +71,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientHead {
     @BeforeTemplate
-    RequestBodyUriSpec before(WebClient webClient) {
-      return webClient.method(HEAD);
+    RequestBodyUriSpec before(WebClient client) {
+      return client.method(HEAD);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
-      return webClient.method(HEAD);
+    WebTestClient.RequestBodyUriSpec before(WebTestClient client) {
+      return client.method(HEAD);
     }
 
     @AfterTemplate
-    RequestHeadersUriSpec<?> after(WebClient webClient) {
-      return webClient.head();
+    RequestHeadersUriSpec<?> after(WebClient client) {
+      return client.head();
     }
   }
 
@@ -91,18 +90,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientOptions {
     @BeforeTemplate
-    RequestBodyUriSpec before(WebClient webClient) {
-      return webClient.method(OPTIONS);
+    RequestBodyUriSpec before(WebClient client) {
+      return client.method(OPTIONS);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
-      return webClient.method(OPTIONS);
+    WebTestClient.RequestBodyUriSpec before(WebTestClient client) {
+      return client.method(OPTIONS);
     }
 
     @AfterTemplate
-    RequestHeadersUriSpec<?> after(WebClient webClient) {
-      return webClient.options();
+    RequestHeadersUriSpec<?> after(WebClient client) {
+      return client.options();
     }
   }
 
@@ -110,18 +109,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientPatch {
     @BeforeTemplate
-    RequestBodyUriSpec before(WebClient webClient) {
-      return webClient.method(PATCH);
+    RequestBodyUriSpec before(WebClient client) {
+      return client.method(PATCH);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
-      return webClient.method(PATCH);
+    WebTestClient.RequestBodyUriSpec before(WebTestClient client) {
+      return client.method(PATCH);
     }
 
     @AfterTemplate
-    RequestBodyUriSpec after(WebClient webClient) {
-      return webClient.patch();
+    RequestBodyUriSpec after(WebClient client) {
+      return client.patch();
     }
   }
 
@@ -129,18 +128,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientPost {
     @BeforeTemplate
-    RequestBodyUriSpec before(WebClient webClient) {
-      return webClient.method(POST);
+    RequestBodyUriSpec before(WebClient client) {
+      return client.method(POST);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
-      return webClient.method(POST);
+    WebTestClient.RequestBodyUriSpec before(WebTestClient client) {
+      return client.method(POST);
     }
 
     @AfterTemplate
-    RequestBodyUriSpec after(WebClient webClient) {
-      return webClient.post();
+    RequestBodyUriSpec after(WebClient client) {
+      return client.post();
     }
   }
 
@@ -148,18 +147,18 @@ final class WebClientRules {
   @PossibleSourceIncompatibility
   static final class WebClientPut {
     @BeforeTemplate
-    RequestBodyUriSpec before(WebClient webClient) {
-      return webClient.method(PUT);
+    RequestBodyUriSpec before(WebClient client) {
+      return client.method(PUT);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
-      return webClient.method(PUT);
+    WebTestClient.RequestBodyUriSpec before(WebTestClient client) {
+      return client.method(PUT);
     }
 
     @AfterTemplate
-    RequestBodyUriSpec after(WebClient webClient) {
-      return webClient.put();
+    RequestBodyUriSpec after(WebClient client) {
+      return client.put();
     }
   }
 
@@ -173,25 +172,20 @@ final class WebClientRules {
     @BeforeTemplate
     @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     RequestHeadersSpec<?> before(
-        RequestHeadersUriSpec<S> requestHeadersUriSpec, String uri, @Repeated Object uriVariables) {
-      return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
+        RequestHeadersUriSpec<S> spec, String uri, @Repeated Object uriVariables) {
+      return spec.uri(uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
     }
 
     @BeforeTemplate
     @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestHeadersUriSpec<T> requestHeadersUriSpec,
-        String uri,
-        @Repeated Object uriVariables) {
-      return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
+        WebTestClient.RequestHeadersUriSpec<T> spec, String uri, @Repeated Object uriVariables) {
+      return spec.uri(uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
     }
 
     @AfterTemplate
-    S after(
-        RequestHeadersUriSpec<S> requestHeadersUriSpec, String uri, @Repeated Object uriVariables) {
-      return requestHeadersUriSpec.uri(uri, Refaster.asVarargs(uriVariables));
+    S after(RequestHeadersUriSpec<S> spec, String uri, @Repeated Object uriVariables) {
+      return spec.uri(uri, Refaster.asVarargs(uriVariables));
     }
   }
 }

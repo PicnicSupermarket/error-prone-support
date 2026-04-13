@@ -544,7 +544,7 @@ final class ReactorRules {
         Comparator<? super T> comparator,
         @Matches(IsEmpty.class) T[] array,
         @Matches(IsEmpty.class) Iterable<T> it,
-        @Matches(IsEmpty.class) Stream<T> emptyStream) {
+        @Matches(IsEmpty.class) Stream<T> stream) {
       return Refaster.anyOf(
           Flux.zip(combinator),
           Flux.zip(combinator, prefetch),
@@ -566,7 +566,7 @@ final class ReactorRules {
           Flux.mergeSequentialDelayError(prefetch),
           Flux.fromArray(array),
           Flux.fromIterable(it),
-          Flux.fromStream(() -> emptyStream));
+          Flux.fromStream(() -> stream));
     }
 
     @BeforeTemplate
@@ -887,12 +887,12 @@ final class ReactorRules {
         Flux<T> flux,
         Function<? super T, ? extends P> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
+            Function<? super P, ? extends Publisher<? extends S>> mapper1) {
       return Refaster.anyOf(
           flux.concatMap(mapper, 0),
           flux.flatMap(mapper, 1),
           flux.flatMapSequential(mapper, 1),
-          flux.map(mapper).concatMap(identityOperation));
+          flux.map(mapper).concatMap(mapper1));
     }
 
     @AfterTemplate
@@ -910,11 +910,11 @@ final class ReactorRules {
         Function<? super T, ? extends P> mapper,
         int prefetch,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
+            Function<? super P, ? extends Publisher<? extends S>> mapper1) {
       return Refaster.anyOf(
           flux.flatMap(mapper, 1, prefetch),
           flux.flatMapSequential(mapper, 1, prefetch),
-          flux.map(mapper).concatMap(identityOperation, prefetch));
+          flux.map(mapper).concatMap(mapper1, prefetch));
     }
 
     @AfterTemplate
@@ -935,10 +935,9 @@ final class ReactorRules {
         Mono<T> mono,
         Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
+            Function<? super I, ? extends Iterable<? extends S>> mapper1) {
       return Refaster.anyOf(
-          mono.map(mapper).flatMapIterable(identityOperation),
-          mono.flux().concatMapIterable(mapper));
+          mono.map(mapper).flatMapIterable(mapper1), mono.flux().concatMapIterable(mapper));
     }
 
     @AfterTemplate
@@ -974,9 +973,9 @@ final class ReactorRules {
         Flux<T> flux,
         Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
+            Function<? super I, ? extends Iterable<? extends S>> mapper1) {
       return Refaster.anyOf(
-          flux.flatMapIterable(mapper), flux.map(mapper).concatMapIterable(identityOperation));
+          flux.flatMapIterable(mapper), flux.map(mapper).concatMapIterable(mapper1));
     }
 
     @AfterTemplate
@@ -996,10 +995,10 @@ final class ReactorRules {
         Function<? super T, I> mapper,
         int prefetch,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
+            Function<? super I, ? extends Iterable<? extends S>> mapper1) {
       return Refaster.anyOf(
           flux.flatMapIterable(mapper, prefetch),
-          flux.map(mapper).concatMapIterable(identityOperation, prefetch));
+          flux.map(mapper).concatMapIterable(mapper1, prefetch));
     }
 
     @AfterTemplate
@@ -1361,13 +1360,13 @@ final class ReactorRules {
    */
   static final class MonoThenFlux<T, S> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono1, Mono<S> other) {
-      return mono1.thenMany(other);
+    Flux<S> before(Mono<T> mono, Mono<S> other) {
+      return mono.thenMany(other);
     }
 
     @AfterTemplate
-    Flux<S> after(Mono<T> mono1, Mono<S> other) {
-      return mono1.then(other).flux();
+    Flux<S> after(Mono<T> mono, Mono<S> other) {
+      return mono.then(other).flux();
     }
   }
 
@@ -1390,19 +1389,19 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class MonoThenWithMono<T, S> {
     @BeforeTemplate
-    Mono<S> before(Mono<T> mono1, Mono<S> other) {
-      return Refaster.anyOf(mono1.ignoreElement().then(other), mono1.flux().then(other));
+    Mono<S> before(Mono<T> mono, Mono<S> other) {
+      return Refaster.anyOf(mono.ignoreElement().then(other), mono.flux().then(other));
     }
 
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> before2(Mono<T> mono1, Mono<Void> other) {
-      return mono1.thenEmpty(other);
+    Mono<Void> before2(Mono<T> mono, Mono<Void> other) {
+      return mono.thenEmpty(other);
     }
 
     @AfterTemplate
-    Mono<S> after(Mono<T> mono1, Mono<S> other) {
-      return mono1.then(other);
+    Mono<S> after(Mono<T> mono, Mono<S> other) {
+      return mono.then(other);
     }
   }
 
@@ -1509,8 +1508,8 @@ final class ReactorRules {
         Mono<S> mono,
         Function<? super S, ? extends P> transformer,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Mono<? extends T>> identityOperation) {
-      return mono.map(transformer).flatMap(identityOperation);
+            Function<? super P, ? extends Mono<? extends T>> transformer1) {
+      return mono.map(transformer).flatMap(transformer1);
     }
 
     @AfterTemplate
@@ -1527,12 +1526,12 @@ final class ReactorRules {
         Mono<S> mono,
         Function<? super S, P> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Publisher<? extends T>> identityOperation,
+            Function<? super P, ? extends Publisher<? extends T>> mapper1,
         int prefetch,
         boolean delayUntilEnd,
         int concurrency) {
       return Refaster.anyOf(
-          mono.map(mapper).flatMapMany(identityOperation),
+          mono.map(mapper).flatMapMany(mapper1),
           mono.flux().concatMap(mapper),
           mono.flux().concatMap(mapper, prefetch),
           mono.flux().concatMapDelayError(mapper),
@@ -1690,15 +1689,15 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Mono<T> mono,
-        Consumer<? super Throwable> onThrowable,
+        Consumer<? super Throwable> onError1,
         Class<E> exceptionType,
         Consumer<? super E> onError,
         Predicate<? super Throwable> predicate) {
       return Refaster.anyOf(
           mono.onErrorResume(e -> Mono.empty()),
-          mono.onErrorComplete().doOnError(onThrowable),
+          mono.onErrorComplete().doOnError(onError1),
           mono.onErrorComplete().doOnError(exceptionType, onError),
-          mono.onErrorComplete().doOnError(predicate, onThrowable));
+          mono.onErrorComplete().doOnError(predicate, onError1));
     }
 
     @AfterTemplate
@@ -1715,15 +1714,15 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<T> before(
         Flux<T> flux,
-        Consumer<? super Throwable> onThrowable,
+        Consumer<? super Throwable> onError1,
         Class<E> exceptionType,
         Consumer<? super E> onError,
         Predicate<? super Throwable> predicate) {
       return Refaster.anyOf(
           flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty())),
-          flux.onErrorComplete().doOnError(onThrowable),
+          flux.onErrorComplete().doOnError(onError1),
           flux.onErrorComplete().doOnError(exceptionType, onError),
-          flux.onErrorComplete().doOnError(predicate, onThrowable));
+          flux.onErrorComplete().doOnError(predicate, onError1));
     }
 
     @AfterTemplate
@@ -2388,13 +2387,13 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class StepVerifierVerify {
     @BeforeTemplate
-    StepVerifier.Assertions before(StepVerifier stepVerifier) {
-      return stepVerifier.verifyThenAssertThat();
+    StepVerifier.Assertions before(StepVerifier verifier) {
+      return verifier.verifyThenAssertThat();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier stepVerifier) {
-      return stepVerifier.verify();
+    Duration after(StepVerifier verifier) {
+      return verifier.verify();
     }
   }
 
@@ -2405,26 +2404,26 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class StepVerifierVerifyWithDuration {
     @BeforeTemplate
-    StepVerifier.Assertions before(StepVerifier stepVerifier, Duration duration) {
-      return stepVerifier.verifyThenAssertThat(duration);
+    StepVerifier.Assertions before(StepVerifier verifier, Duration duration) {
+      return verifier.verifyThenAssertThat(duration);
     }
 
     @AfterTemplate
-    Duration after(StepVerifier stepVerifier, Duration duration) {
-      return stepVerifier.verify(duration);
+    Duration after(StepVerifier verifier, Duration duration) {
+      return verifier.verify(duration);
     }
   }
 
   /** Prefer invoking {@link StepVerifier#verifyLater()} once over multiple invocations. */
   static final class StepVerifierVerifyLater {
     @BeforeTemplate
-    StepVerifier before(StepVerifier stepVerifier) {
-      return stepVerifier.verifyLater().verifyLater();
+    StepVerifier before(StepVerifier verifier) {
+      return verifier.verifyLater().verifyLater();
     }
 
     @AfterTemplate
-    StepVerifier after(StepVerifier stepVerifier) {
-      return stepVerifier.verifyLater();
+    StepVerifier after(StepVerifier verifier) {
+      return verifier.verifyLater();
     }
   }
 
@@ -2592,13 +2591,13 @@ final class ReactorRules {
    */
   static final class LastStepVerifyErrorMessage {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, String message) {
-      return step.expectErrorMessage(message).verify();
+    Duration before(StepVerifier.LastStep step, String str) {
+      return step.expectErrorMessage(str).verify();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, String message) {
-      return step.verifyErrorMessage(message);
+    Duration after(StepVerifier.LastStep step, String str) {
+      return step.verifyErrorMessage(str);
     }
   }
 

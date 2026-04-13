@@ -98,13 +98,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    LongStream before(LongStream stream, LongUnaryOperator function) {
-      return stream.flatMap(v -> toLongStreamFunction(v).map(function));
+    LongStream before(LongStream stream, LongUnaryOperator operator) {
+      return stream.flatMap(v -> toLongStreamFunction(v).map(operator));
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongUnaryOperator function) {
-      return stream.flatMap(v -> toLongStreamFunction(v)).map(function);
+    LongStream after(LongStream stream, LongUnaryOperator operator) {
+      return stream.flatMap(v -> toLongStreamFunction(v)).map(operator);
     }
   }
 
@@ -114,13 +114,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    LongStream before(Stream<T> stream, LongUnaryOperator function) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v).map(function));
+    LongStream before(Stream<T> stream, LongUnaryOperator operator) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v).map(operator));
     }
 
     @AfterTemplate
-    LongStream after(Stream<T> stream, LongUnaryOperator function) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v)).map(function);
+    LongStream after(Stream<T> stream, LongUnaryOperator operator) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v)).map(operator);
     }
   }
 

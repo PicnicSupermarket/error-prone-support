@@ -12,25 +12,25 @@ final class PartialTestMatchRules {
 
   static final class StringEquals {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.toCharArray().length == 0;
+    boolean before(String str) {
+      return str.toCharArray().length == 0;
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.equals("");
+    boolean after(String str) {
+      return str.equals("");
     }
   }
 
   static final class StringIsEmpty {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.equals("");
+    boolean before(String str) {
+      return str.equals("");
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.isEmpty();
+    boolean after(String str) {
+      return str.isEmpty();
     }
   }
 }

@@ -52,30 +52,30 @@ final class Jackson3Rules {
   /** Prefer {@link ObjectMapper#valueToTree(Object)} over less efficient alternatives. */
   static final class ObjectMapperValueToTree {
     @BeforeTemplate
-    JsonNode before(ObjectMapper objectMapper, Object fromValue) {
+    JsonNode before(ObjectMapper mapper, Object fromValue) {
       return Refaster.anyOf(
-          objectMapper.readTree(objectMapper.writeValueAsBytes(fromValue)),
-          objectMapper.readTree(objectMapper.writeValueAsString(fromValue)));
+          mapper.readTree(mapper.writeValueAsBytes(fromValue)),
+          mapper.readTree(mapper.writeValueAsString(fromValue)));
     }
 
     @AfterTemplate
-    JsonNode after(ObjectMapper objectMapper, Object fromValue) {
-      return objectMapper.valueToTree(fromValue);
+    JsonNode after(ObjectMapper mapper, Object fromValue) {
+      return mapper.valueToTree(fromValue);
     }
   }
 
   /** Prefer {@link ObjectMapper#convertValue(Object, Class)} over less efficient alternatives. */
   static final class ObjectMapperConvertValueClass<T> {
     @BeforeTemplate
-    T before(ObjectMapper objectMapper, Object fromValue, Class<T> toValueType) {
+    T before(ObjectMapper mapper, Object fromValue, Class<T> toValueType) {
       return Refaster.anyOf(
-          objectMapper.readValue(objectMapper.writeValueAsBytes(fromValue), toValueType),
-          objectMapper.readValue(objectMapper.writeValueAsString(fromValue), toValueType));
+          mapper.readValue(mapper.writeValueAsBytes(fromValue), toValueType),
+          mapper.readValue(mapper.writeValueAsString(fromValue), toValueType));
     }
 
     @AfterTemplate
-    T after(ObjectMapper objectMapper, Object fromValue, Class<T> toValueType) {
-      return objectMapper.convertValue(fromValue, toValueType);
+    T after(ObjectMapper mapper, Object fromValue, Class<T> toValueType) {
+      return mapper.convertValue(fromValue, toValueType);
     }
   }
 
@@ -84,15 +84,15 @@ final class Jackson3Rules {
    */
   static final class ObjectMapperConvertValueJavaType<T> {
     @BeforeTemplate
-    T before(ObjectMapper objectMapper, Object fromValue, JavaType toValueType) {
+    T before(ObjectMapper mapper, Object fromValue, JavaType toValueType) {
       return Refaster.anyOf(
-          objectMapper.readValue(objectMapper.writeValueAsBytes(fromValue), toValueType),
-          objectMapper.readValue(objectMapper.writeValueAsString(fromValue), toValueType));
+          mapper.readValue(mapper.writeValueAsBytes(fromValue), toValueType),
+          mapper.readValue(mapper.writeValueAsString(fromValue), toValueType));
     }
 
     @AfterTemplate
-    T after(ObjectMapper objectMapper, Object fromValue, JavaType toValueType) {
-      return objectMapper.convertValue(fromValue, toValueType);
+    T after(ObjectMapper mapper, Object fromValue, JavaType toValueType) {
+      return mapper.convertValue(fromValue, toValueType);
     }
   }
 
@@ -102,15 +102,15 @@ final class Jackson3Rules {
    */
   static final class ObjectMapperConvertValueTypeReference<T> {
     @BeforeTemplate
-    T before(ObjectMapper objectMapper, Object fromValue, TypeReference<T> toValueTypeRef) {
+    T before(ObjectMapper mapper, Object fromValue, TypeReference<T> toValueTypeRef) {
       return Refaster.anyOf(
-          objectMapper.readValue(objectMapper.writeValueAsBytes(fromValue), toValueTypeRef),
-          objectMapper.readValue(objectMapper.writeValueAsString(fromValue), toValueTypeRef));
+          mapper.readValue(mapper.writeValueAsBytes(fromValue), toValueTypeRef),
+          mapper.readValue(mapper.writeValueAsString(fromValue), toValueTypeRef));
     }
 
     @AfterTemplate
-    T after(ObjectMapper objectMapper, Object fromValue, TypeReference<T> toValueTypeRef) {
-      return objectMapper.convertValue(fromValue, toValueTypeRef);
+    T after(ObjectMapper mapper, Object fromValue, TypeReference<T> toValueTypeRef) {
+      return mapper.convertValue(fromValue, toValueTypeRef);
     }
   }
 }

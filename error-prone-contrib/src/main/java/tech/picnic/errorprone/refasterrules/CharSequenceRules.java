@@ -17,15 +17,14 @@ final class CharSequenceRules {
   static final class CharSequenceIsEmpty {
     @BeforeTemplate
     @SuppressWarnings("java:S7158" /* This violation will be rewritten. */)
-    boolean before(CharSequence charSequence) {
-      return Refaster.anyOf(
-          charSequence.length() == 0, charSequence.length() <= 0, charSequence.length() < 1);
+    boolean before(CharSequence sequence) {
+      return Refaster.anyOf(sequence.length() == 0, sequence.length() <= 0, sequence.length() < 1);
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(CharSequence charSequence) {
-      return charSequence.isEmpty();
+    boolean after(CharSequence sequence) {
+      return sequence.isEmpty();
     }
   }
 }

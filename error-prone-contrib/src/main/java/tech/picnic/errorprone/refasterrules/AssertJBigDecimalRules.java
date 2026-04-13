@@ -32,16 +32,15 @@ final class AssertJBigDecimalRules {
   static final class AbstractBigDecimalAssertIsEqualByComparingTo {
     @BeforeTemplate
     AbstractBigDecimalAssert<?> before(
-        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
+        AbstractBigDecimalAssert<?> decimalAssert, BigDecimal other) {
       return Refaster.anyOf(
-          bigDecimalAssert.isCloseTo(other, offset(BigDecimal.ZERO)),
-          bigDecimalAssert.isCloseTo(other, withPercentage(0)));
+          decimalAssert.isCloseTo(other, offset(BigDecimal.ZERO)),
+          decimalAssert.isCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigDecimalAssert<?> after(
-        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
-      return bigDecimalAssert.isEqualByComparingTo(other);
+    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> decimalAssert, BigDecimal other) {
+      return decimalAssert.isEqualByComparingTo(other);
     }
   }
 
@@ -52,16 +51,15 @@ final class AssertJBigDecimalRules {
   static final class AbstractBigDecimalAssertIsNotEqualByComparingTo {
     @BeforeTemplate
     AbstractBigDecimalAssert<?> before(
-        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
+        AbstractBigDecimalAssert<?> decimalAssert, BigDecimal other) {
       return Refaster.anyOf(
-          bigDecimalAssert.isNotCloseTo(other, offset(BigDecimal.ZERO)),
-          bigDecimalAssert.isNotCloseTo(other, withPercentage(0)));
+          decimalAssert.isNotCloseTo(other, offset(BigDecimal.ZERO)),
+          decimalAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractBigDecimalAssert<?> after(
-        AbstractBigDecimalAssert<?> bigDecimalAssert, BigDecimal other) {
-      return bigDecimalAssert.isNotEqualByComparingTo(other);
+    AbstractBigDecimalAssert<?> after(AbstractBigDecimalAssert<?> decimalAssert, BigDecimal other) {
+      return decimalAssert.isNotEqualByComparingTo(other);
     }
   }
 }
