@@ -35,7 +35,7 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Avoid passing unchecked arguments to `Enum#valueOf`",
+    summary = "Avoid passing unvalidated arguments to `Enum#valueOf`",
     link = BUG_PATTERNS_BASE_URL + "UncheckedEnumValueOfInvocation",
     linkType = CUSTOM,
     severity = WARNING,
