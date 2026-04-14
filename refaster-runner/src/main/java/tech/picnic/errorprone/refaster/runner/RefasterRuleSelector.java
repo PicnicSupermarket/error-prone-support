@@ -43,11 +43,11 @@ import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
  *
  * <pre>{@code
  * <root>
- *    ├── A
- *    │   └── B
- *    │       └── C -- T1
- *    └── B         -- T2
- *        └── D     -- T3
+ *    +-- A
+ *    |   +-- B
+ *    |       +-- C -- T1
+ *    +-- B         -- T2
+ *        +-- D     -- T3
  * }</pre>
  *
  * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a node
