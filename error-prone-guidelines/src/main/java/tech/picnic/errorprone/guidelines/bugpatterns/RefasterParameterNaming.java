@@ -113,6 +113,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
   private static ImmutableMap<String, String> deriveParameterRenames(
       ImmutableList<MethodTree> methods, VisitorState state) {
     Set<String> processedParams = new LinkedHashSet<>();
+    Map<String, VariableTree> paramTrees = new LinkedHashMap<>();
     Map<String, String> renames = new LinkedHashMap<>();
 
     ImmutableSet<String> repeatedParams =
@@ -122,25 +123,32 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
             .map(p -> p.getName().toString())
             .collect(toImmutableSet());
 
-    // XXX: We now scan the method definitions (though in the common case only the first
-    // `@AfterTemplate`) once for each parameter. The alternative is to iterate over the method
-    // definitions once, in order, and to inspect `IdentifierTree`s rather than
-    // `MethodInvocationTree`s. This would make it easier to plug in additional naming strategies
-    // later.
     for (MethodTree method : methods) {
       for (VariableTree param : method.getParameters()) {
         String paramName = param.getName().toString();
-        // XXX: The dedup check here is a fast path: `deriveName` is deterministic, so processing
-        // the same parameter name twice would yield the same derived name, resulting in the same
-        // `put` on the `LinkedHashMap`.
-        if (!processedParams.add(paramName)) {
-          continue;
+        if (processedParams.add(paramName)) {
+          paramTrees.put(paramName, param);
         }
-
-        deriveName(paramName, methods, repeatedParams, state)
-            .or(() -> deriveNameFromType(param))
-            .ifPresent(derivedName -> renames.put(paramName, derivedName));
       }
+    }
+
+    Set<String> unresolved = new LinkedHashSet<>(processedParams);
+    for (MethodTree method : methods) {
+      if (unresolved.isEmpty()) {
+        break;
+      }
+      ImmutableMap<String, String> found =
+          scanMethodForInvocationNames(
+              method, ImmutableSet.copyOf(unresolved), repeatedParams, state);
+      for (Map.Entry<String, String> e : found.entrySet()) {
+        renames.put(e.getKey(), e.getValue());
+        unresolved.remove(e.getKey());
+      }
+    }
+
+    for (String paramName : unresolved) {
+      deriveNameFromType(paramTrees.get(paramName))
+          .ifPresent(name -> renames.put(paramName, name));
     }
 
     /* Remove renames where the derived name matches the current name. */
@@ -233,76 +241,57 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     return Optional.empty();
   }
 
-  private static Optional<String> deriveName(
-      String paramName,
-      ImmutableList<MethodTree> methods,
+  private static ImmutableMap<String, String> scanMethodForInvocationNames(
+      MethodTree method,
+      ImmutableSet<String> paramNames,
       ImmutableSet<String> repeatedParams,
       VisitorState state) {
-    for (MethodTree method : methods) {
-      String result =
-          new TreeScanner<@Nullable String, @Nullable Void>() {
-            @Override
-            public @Nullable String visitMethodInvocation(
-                MethodInvocationTree node, @Nullable Void unused) {
-              // XXX: When the Refaster check is removed, Refaster methods are treated as regular
-              // methods. Their formal parameter names are either synthetic (filtered by
-              // `SYNTHETIC_PARAMETER_NAME`) or have names that wouldn't change the outcome for
-              // parameters in practice, so the result is the same either way.
-              if (REFASTER_METHOD.matches(node, state)) {
-                return super.visitMethodInvocation(node, null);
-              }
+    Map<String, String> result = new LinkedHashMap<>();
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitMethodInvocation(
+          MethodInvocationTree node, @Nullable Void unused) {
+        // XXX: When the Refaster check is removed, Refaster methods are treated as regular
+        // methods. Their formal parameter names are either synthetic (filtered by
+        // `SYNTHETIC_PARAMETER_NAME`) or have names that wouldn't change the outcome for
+        // parameters in practice, so the result is the same either way.
+        if (REFASTER_METHOD.matches(node, state)) {
+          return super.visitMethodInvocation(node, null);
+        }
 
-              MethodSymbol sym = ASTHelpers.getSymbol(node);
-              // XXX: If the parameter is non-`@Repeated`, we could do a poor-man's version of
-              // making the parameter name singular by dropping a trailing `s`, if any.
-              int nonVarargsCount = sym.isVarArgs() ? sym.params().size() - 1 : sym.params().size();
+        MethodSymbol sym = ASTHelpers.getSymbol(node);
+        List<? extends ExpressionTree> args = node.getArguments();
+        int nonVarargsCount = sym.isVarArgs() ? sym.params().size() - 1 : sym.params().size();
 
-              List<? extends ExpressionTree> args = node.getArguments();
-              for (int i = 0; i < nonVarargsCount; i++) {
-                Optional<String> name = unwrapParameterName(args.get(i), state);
-                if (name.isPresent() && name.orElseThrow().equals(paramName)) {
-                  String formalName = sym.params().get(i).name.toString();
-                  if (!SYNTHETIC_PARAMETER_NAME.matcher(formalName).matches()) {
-                    return formalName;
-                  }
-                }
-              }
-
-              if (sym.isVarArgs()) {
-                int varargsIdx = sym.params().size() - 1;
-                for (int i = varargsIdx; i < args.size(); i++) {
-                  Optional<String> name = unwrapParameterName(args.get(i), state);
-                  // XXX: When the condition's clauses are mutated, tests observe the same result:
-                  // the `name.equals(paramName)` clause is equivalent to being inside the matching
-                  // outer loop iteration; `repeatedParams.contains` is guarded by callers that
-                  // already produce the same varargs formal name via the non-varargs loop path.
-                  if (name.isPresent()
-                      && name.orElseThrow().equals(paramName)
-                      && repeatedParams.contains(paramName)) {
-                    // XXX: This logic is repeated above; extract.
-                    String formalName = sym.params().get(varargsIdx).name.toString();
-                    if (!SYNTHETIC_PARAMETER_NAME.matcher(formalName).matches()) {
-                      return formalName;
-                    }
-                  }
-                }
-              }
-
-              return super.visitMethodInvocation(node, null);
+        for (int i = 0; i < nonVarargsCount; i++) {
+          Optional<String> name = unwrapParameterName(args.get(i), state);
+          if (name.isPresent() && paramNames.contains(name.orElseThrow())) {
+            String formalName = sym.params().get(i).name.toString();
+            if (!SYNTHETIC_PARAMETER_NAME.matcher(formalName).matches()) {
+              result.putIfAbsent(name.orElseThrow(), formalName);
             }
+          }
+        }
 
-            @Override
-            public @Nullable String reduce(@Nullable String next, @Nullable String current) {
-              return current != null ? current : next;
+        if (sym.isVarArgs()) {
+          int varargsIdx = sym.params().size() - 1;
+          String formalName = sym.params().get(varargsIdx).name.toString();
+          if (!SYNTHETIC_PARAMETER_NAME.matcher(formalName).matches()) {
+            for (int i = varargsIdx; i < args.size(); i++) {
+              Optional<String> name = unwrapParameterName(args.get(i), state);
+              if (name.isPresent()
+                  && paramNames.contains(name.orElseThrow())
+                  && repeatedParams.contains(name.orElseThrow())) {
+                result.putIfAbsent(name.orElseThrow(), formalName);
+              }
             }
-          }.scan(method.getBody(), null);
+          }
+        }
 
-      if (result != null) {
-        return Optional.of(result);
+        return super.visitMethodInvocation(node, null);
       }
-    }
-
-    return Optional.empty();
+    }.scan(method.getBody(), null);
+    return ImmutableMap.copyOf(result);
   }
 
   // XXX: Review method and parameter name.
