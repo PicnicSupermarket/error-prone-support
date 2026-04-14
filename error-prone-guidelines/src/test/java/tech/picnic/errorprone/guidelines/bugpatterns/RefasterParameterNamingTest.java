@@ -4,7 +4,6 @@ import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-// XXX: Fully review this class.
 final class RefasterParameterNamingTest {
   @Test
   void identification() {

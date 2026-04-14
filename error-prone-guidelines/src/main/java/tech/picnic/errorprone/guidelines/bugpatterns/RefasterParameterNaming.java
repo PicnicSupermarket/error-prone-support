@@ -56,24 +56,38 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  * A {@link BugChecker} that flags Refaster template parameters with names that do not match their
  * intended semantics.
  *
- * <p>Parameter names are derived through two strategies, applied in order:
+ * <p>Parameter names are derived through the following strategies, applied in order:
  *
  * <ol>
- *   <li>From the first method invocation in which the parameter appears as an argument, considering
- *       template methods in priority order ({@code @AfterTemplate} first, then
- *       {@code @BeforeTemplate}, with ties broken by descending parameter count).
+ *   <li>From the context in which the parameter appears in template method bodies, considering
+ *       template methods in priority order ({@code @AfterTemplate} first, then {@code
+ *       @BeforeTemplate}, with ties broken by descending parameter count). Supported contexts are:
+ *       <ul>
+ *         <li>As a method invocation argument: the formal parameter name from the invoked method is
+ *             used.
+ *         <li>As a {@code new T[param]} array dimension expression: the name {@code size} is used.
+ *         <li>As an {@code if (param)} or {@code if (!param)} condition: the name {@code condition}
+ *             is used.
+ *       </ul>
+ *   <li>If the parameter carries a {@code @Matches} annotation, the derived name is prefixed with
+ *       {@code identity} (for {@code @Matches(IsIdentityOperation.class)}) or {@code empty} (for
+ *       {@code @Matches(IsEmpty.class)}), with the first letter of the base name capitalised (e.g.
+ *       a {@code Function} parameter annotated with {@code @Matches(IsIdentityOperation.class)}
+ *       yields {@code identityFunction}).
  *   <li>As a fallback, from the parameter's type: array types yield {@code array}; primitive types
- *       yield their first letter (e.g. {@code int} yields {@code i}); other types yield the last
- *       CamelCase word of the simple type name, lowercased, with well-known shorthands applied
- *       (e.g. {@code ImmutableList} yields {@code list}, {@code String} yields {@code str}, {@code
- *       Comparator} yields {@code cmp}). If the resulting name is a Java keyword, the two preceding
- *       CamelCase words are combined instead (e.g. {@code OptionalInt} yields {@code optionalInt}).
+ *       yield their first letter (e.g. {@code int} yields {@code i}); other types yield the simple
+ *       type name with the first letter lowercased, after stripping a leading {@code Abstract} or
+ *       {@code Immutable} prefix (e.g. {@code ImmutableList} yields {@code list}, {@code
+ *       AbstractBigDecimalAssert} yields {@code bigDecimalAssert}, {@code OptionalInt} yields
+ *       {@code optionalInt}). Well-known shorthands are applied after prefix stripping (e.g.
+ *       {@code String} yields {@code str}, {@code Comparator} yields {@code cmp}, {@code
+ *       StringBuilder} yields {@code sb}). If the resulting name is a Java keyword, the check
+ *       falls back to the un-stripped name, and if that is also a keyword, no rename is suggested.
  * </ol>
  *
  * <p>When multiple parameters would receive the same derived name, numeric suffixes are appended to
  * disambiguate (e.g. {@code list1}, {@code list2}).
  */
-// XXX: Fully review this class.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
@@ -319,7 +333,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
         int nonVarargsCount = sym.isVarArgs() ? sym.params().size() - 1 : sym.params().size();
 
         for (int i = 0; i < nonVarargsCount; i++) {
-          Optional<String> name = unwrapParameterName(args.get(i), state);
+          Optional<String> name = extractParameterName(args.get(i), state);
           if (name.isPresent() && paramNames.contains(name.orElseThrow())) {
             String formalName = sym.params().get(i).name.toString();
             if (!SYNTHETIC_PARAMETER_NAME.matcher(formalName).matches()) {
@@ -333,7 +347,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
           String formalName = sym.params().get(varargsIdx).name.toString();
           if (!SYNTHETIC_PARAMETER_NAME.matcher(formalName).matches()) {
             for (int i = varargsIdx; i < args.size(); i++) {
-              Optional<String> name = unwrapParameterName(args.get(i), state);
+              Optional<String> name = extractParameterName(args.get(i), state);
               if (name.isPresent()
                   && paramNames.contains(name.orElseThrow())
                   && repeatedParams.contains(name.orElseThrow())) {
@@ -382,13 +396,12 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
         : expr;
   }
 
-  // XXX: Review method and parameter name.
-  // XXX: In fact, change to `isIdentifier(ExpressionTree tree, String expectedName, VisitorState
+  // XXX: Consider changing to `isIdentifier(ExpressionTree tree, String expectedName, VisitorState
   // state)`.
-  private static Optional<String> unwrapParameterName(ExpressionTree arg, VisitorState state) {
+  private static Optional<String> extractParameterName(ExpressionTree arg, VisitorState state) {
     return arg instanceof MethodInvocationTree invocation
             && REFASTER_AS_VARARGS.matches(invocation, state)
-        ? unwrapParameterName(Iterables.getOnlyElement(invocation.getArguments()), state)
+        ? extractParameterName(Iterables.getOnlyElement(invocation.getArguments()), state)
         : arg instanceof IdentifierTree id
             ? Optional.of(id.getName().toString())
             : Optional.empty();
