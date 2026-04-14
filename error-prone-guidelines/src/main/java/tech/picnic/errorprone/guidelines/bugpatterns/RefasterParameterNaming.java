@@ -29,9 +29,12 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.IfTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
+import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
@@ -138,7 +141,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
         break;
       }
       ImmutableMap<String, String> found =
-          scanMethodForInvocationNames(
+          scanMethodForNames(
               method, ImmutableSet.copyOf(unresolved), repeatedParams, state);
       for (Map.Entry<String, String> e : found.entrySet()) {
         renames.put(e.getKey(), e.getValue());
@@ -241,7 +244,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     return Optional.empty();
   }
 
-  private static ImmutableMap<String, String> scanMethodForInvocationNames(
+  private static ImmutableMap<String, String> scanMethodForNames(
       MethodTree method,
       ImmutableSet<String> paramNames,
       ImmutableSet<String> repeatedParams,
@@ -290,8 +293,41 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
 
         return super.visitMethodInvocation(node, null);
       }
+
+      @Override
+      public @Nullable Void visitNewArray(NewArrayTree node, @Nullable Void unused) {
+        for (ExpressionTree dim : node.getDimensions()) {
+          if (dim instanceof IdentifierTree id) {
+            String paramName = id.getName().toString();
+            if (paramNames.contains(paramName) && !repeatedParams.contains(paramName)) {
+              result.putIfAbsent(paramName, "size");
+            }
+          }
+        }
+        return super.visitNewArray(node, null);
+      }
+
+      @Override
+      public @Nullable Void visitIf(IfTree node, @Nullable Void unused) {
+        ExpressionTree cond =
+            stripLogicalComplement(ASTHelpers.stripParentheses(node.getCondition()));
+        if (cond instanceof IdentifierTree id) {
+          String paramName = id.getName().toString();
+          if (paramNames.contains(paramName) && !repeatedParams.contains(paramName)) {
+            result.putIfAbsent(paramName, "condition");
+          }
+        }
+        return super.visitIf(node, null);
+      }
     }.scan(method.getBody(), null);
     return ImmutableMap.copyOf(result);
+  }
+
+  private static ExpressionTree stripLogicalComplement(ExpressionTree expr) {
+    return expr instanceof UnaryTree unary
+            && unary.getKind() == com.sun.source.tree.Tree.Kind.LOGICAL_COMPLEMENT
+        ? unary.getExpression()
+        : expr;
   }
 
   // XXX: Review method and parameter name.
