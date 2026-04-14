@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static java.util.Collections.disjoint;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableList;
@@ -7,6 +8,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +39,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(7).isEmpty(),
         ImmutableSet.of(8).isEmpty(),
         ImmutableSet.of(9).isEmpty(),
-        ImmutableSet.of(10).isEmpty());
+        ImmutableSet.of(10).isEmpty(),
+        Sets.intersection(ImmutableSet.of(11), ImmutableSet.of(12)).isEmpty());
   }
 
   ImmutableSet<Integer> testCollectionSize() {
@@ -46,6 +49,16 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testCollectionContains() {
     return ImmutableSet.of("foo").contains("bar");
+  }
+
+  ImmutableSet<Boolean> testCollectionsDisjoint() {
+    return ImmutableSet.of(
+        disjoint(ImmutableSet.of(1), ImmutableSet.of(2)),
+        disjoint(ImmutableSet.of(3), ImmutableSet.of(4)),
+        disjoint(ImmutableList.of(5), ImmutableList.of(6)),
+        disjoint(ImmutableList.of(7), ImmutableList.of(8)),
+        disjoint(ImmutableList.of(9), ImmutableList.of(10)),
+        disjoint(ImmutableList.of(11), ImmutableList.of(12)));
   }
 
   boolean testCollectionAddAllToCollectionExpression() {

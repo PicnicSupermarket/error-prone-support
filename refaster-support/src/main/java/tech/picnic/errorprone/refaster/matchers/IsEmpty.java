@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.refaster.matchers;
 
 import static com.google.common.base.Verify.verify;
-import static com.google.errorprone.matchers.FieldMatchers.staticField;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.argumentCount;
@@ -12,6 +11,7 @@ import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.receiverOfInvocation;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.symbolMatcher;
+import static com.google.errorprone.matchers.field.FieldMatchers.staticField;
 import static com.google.errorprone.predicates.TypePredicates.anyOf;
 import static com.google.errorprone.predicates.TypePredicates.isArray;
 import static com.google.errorprone.predicates.TypePredicates.isDescendantOfAny;
@@ -139,10 +139,9 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                   .withNameMatching(EMPTY_INSTANCE_FACTORY_METHOD_PATTERN)));
 
   private static final Matcher<ExpressionTree> EMPTY_INSTANCE_CONSTANT =
-      anyOf(
-          staticField(Collections.class.getCanonicalName(), "EMPTY_LIST"),
-          staticField(Collections.class.getCanonicalName(), "EMPTY_MAP"),
-          staticField(Collections.class.getCanonicalName(), "EMPTY_SET"));
+      staticField()
+          .onClass(Collections.class.getCanonicalName())
+          .namedAnyOf("EMPTY_LIST", "EMPTY_MAP", "EMPTY_SET");
 
   /**
    * A matcher of operations on empty container expressions that yield (another) empty instance.

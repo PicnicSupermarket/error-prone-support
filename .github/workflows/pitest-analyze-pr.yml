@@ -2,7 +2,7 @@
 # uploads the results. The associated PR is subsequently updated by the
 # `pitest-update-pr.yml` workflow. See https://blog.pitest.org/oss-pitest-pr/
 # for details.
-name: Mutation testing
+name: Run mutation tests
 on:
   pull_request:
 permissions:
@@ -14,10 +14,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443
@@ -26,12 +25,12 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
+        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
         with:
           checkout-fetch-depth: 2
-          java-version: 25
+          java-version: 25.0.2
           java-distribution: temurin
-          maven-version: 3.9.12
+          maven-version: 3.9.14
       - name: Run Pitest
         # By running with features `+GIT(from[HEAD~1]), +gitci`, Pitest only
         # analyzes lines changed in the associated pull request, as GitHub
@@ -42,7 +41,7 @@ jobs:
       - name: Aggregate Pitest reports
         run: mvn pitest-git:aggregate -DkilledEmoji=":tada:" -DmutantEmoji=":zombie:" -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under [_Files changed_](${{ github.event.number }}/files)."
       - name: Upload Pitest reports as artifact
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pitest-reports
           path: ./target/pit-reports-ci

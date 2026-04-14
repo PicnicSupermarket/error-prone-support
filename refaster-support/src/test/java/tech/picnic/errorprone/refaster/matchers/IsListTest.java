@@ -48,13 +48,10 @@ final class IsListTest {
 
   /** A {@link BugChecker} that simply delegates to {@link IsList}. */
   @BugPattern(summary = "Flags expressions matched by `IsList`", severity = ERROR)
-  public static final class MatcherTestChecker extends AbstractMatcherTestChecker {
+  private static final class MatcherTestChecker extends AbstractMatcherTestChecker {
     private static final long serialVersionUID = 1L;
 
-    // XXX: This is a false positive reported by Checkstyle. See
-    // https://github.com/checkstyle/checkstyle/issues/10161#issuecomment-1242732120.
-    @SuppressWarnings("RedundantModifier")
-    public MatcherTestChecker() {
+    private MatcherTestChecker() {
       super(new IsList());
     }
   }

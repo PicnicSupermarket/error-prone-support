@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableList;
@@ -9,6 +10,7 @@ import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -50,11 +52,25 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<ImmutableList<String>> testImmutableListSortedCopyOfWithCustomComparator() {
     return ImmutableSet.of(
         ImmutableSet.of("foo").stream()
-            .sorted(Comparator.comparing(String::length))
+            .sorted(comparing(String::length))
             .collect(toImmutableList()),
         Streams.stream(ImmutableSet.of("bar")::iterator)
-            .sorted(Comparator.comparing(String::isEmpty))
+            .sorted(comparing(String::isEmpty))
             .collect(toImmutableList()));
+  }
+
+  ImmutableSet<Iterator<Integer>> testImmutableListSortedCopyOfIterator() {
+    return ImmutableSet.of(
+        ImmutableSet.of(1).stream().sorted().iterator(),
+        Streams.stream(ImmutableSet.of(2)::iterator).sorted().iterator());
+  }
+
+  ImmutableSet<Iterator<String>> testImmutableListSortedCopyOfIteratorWithComparator() {
+    return ImmutableSet.of(
+        ImmutableSet.of("foo").stream().sorted(comparing(String::length)).iterator(),
+        Streams.stream(ImmutableSet.of("bar")::iterator)
+            .sorted(comparing(String::isEmpty))
+            .iterator());
   }
 
   ImmutableList<Integer> testStreamToDistinctImmutableList() {

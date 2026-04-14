@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.28.1-SNAPSHOT</version>
+    <version>0.29.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -127,7 +127,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2026-01-09T13:44:24Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-04-13T09:17:15Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -190,10 +190,10 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.47.0</version.error-prone-orig>
+        <version.error-prone-orig>2.49.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
         <version.jmh>1.37</version.jmh>
-        <version.maven>3.9.12</version.maven>
+        <version.maven>3.9.14</version.maven>
         <!-- XXX: Consider providing our own implementation with similar
         functionality, and designing it such that JMH classes would not need to
         be annotated `@Open`. -->
@@ -251,7 +251,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.21.1</version>
+                <version>2.21.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -319,7 +319,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.34.1</version>
+                <version>1.35.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -351,21 +351,21 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.13.1</version>
+                <version>0.13.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.16.3</version>
+                <version>1.16.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.15</version>
+                <version>2025.0.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -382,7 +382,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.43</version>
+                <version>2.2.47</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -412,7 +412,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.5</version>
+                <version>1.18.8</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -447,7 +447,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.11</version>
+                <version>3.21.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -466,14 +466,14 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
-                <version>5.21.0</version>
+                <version>5.23.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.6.4</version>
+                <version>5.6.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -490,9 +490,14 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.24.0</version>
+                <version>3.28.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -504,19 +509,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>7.0.5</version>
+                <version>7.0.6</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.0.3</version>
+                <version>4.0.5</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>7.0.3</version>
+                <version>7.0.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -528,7 +533,7 @@
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -662,7 +667,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>9.0.2</version>
+                    <version>10.0.0</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -761,6 +766,7 @@
                                     </module>
                                     <module name="EmptyStatement" />
                                     <module name="FinalClass" />
+                                    <module name="GoogleNonConstantFieldName" />
                                     <module name="HiddenField">
                                         <property name="ignoreConstructorParameter" value="true" />
                                         <property name="ignoreSetter" value="true" />
@@ -863,6 +869,9 @@
                                         <property name="regexp" value="true" />
                                     </module>
                                     <module name="IllegalCatch" />
+                                    <module name="IllegalSymbol">
+                                        <property name="symbolCodes" value="0x0080-0x10FFFF" />
+                                    </module>
                                     <module name="IllegalThrows" />
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
@@ -906,6 +915,7 @@
                                         but (currently) doesn't warn about
                                         JavaDoc-only imports. -->
                                     </module>
+                                    <module name="UseEnhancedSwitch" />
                                     <module name="VisibilityModifier" />
                                     <module name="WhenShouldBeUsed" />
                                 </module>
@@ -929,7 +939,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.2.0</version>
+                            <version>13.4.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1043,6 +1053,14 @@
                             <goals>
                                 <goal>compile</goal>
                             </goals>
+                            <!-- This goal runs *after* the `test-compile`
+                            phase, so that its custom output directory doesn't
+                            replace the default output directory on the
+                            annotation processor classpath when the self-check
+                            profile is active. Because that would prevent
+                            `error-prone-contrib` from flagging issues with its
+                            own test source code. -->
+                            <phase>process-test-classes</phase>
                             <configuration>
                                 <compilerArgs combine.self="override">
                                     <!-- This step only recompiles code, so
@@ -1163,6 +1181,7 @@
                             <requireJavaVersion>
                                 <version>25</version>
                             </requireJavaVersion>
+                            <requireManagedDeps />
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
                             </requireMatchingCoordinates>
@@ -1178,7 +1197,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.11.0</version>
+                            <version>1.12.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1334,7 +1353,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <delimiters>
                             <delimiter>@</delimiter>
@@ -1551,7 +1570,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1594,7 +1613,7 @@
                 <plugin>
                     <groupId>org.kordamp.maven</groupId>
                     <artifactId>pomchecker-maven-plugin</artifactId>
-                    <version>1.14.0</version>
+                    <version>1.15.0</version>
                     <configuration>
                         <failOnError>false</failOnError>
                         <release>false</release>
@@ -1612,7 +1631,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.22.1</version>
+                    <version>1.23.0</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->
@@ -1623,6 +1642,11 @@
                             <mutator>EXTENDED</mutator>
                             <mutator>STRONGER</mutator>
                         </mutators>
+                        <!-- XXX: Look into using Reviewdog to post comments
+                        for surviving mutants; this may replace the
+                        `pitest-{analyze,update}-pr.yml` GitHub actions
+                        workflows. -->
+                        <outputFormats>CSV,HTML</outputFormats>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->

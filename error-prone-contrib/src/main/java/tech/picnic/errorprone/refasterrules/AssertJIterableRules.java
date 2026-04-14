@@ -9,9 +9,12 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractIntegerAssert;
+import org.assertj.core.api.AbstractIterableAssert;
 import org.assertj.core.api.IterableAssert;
 import org.assertj.core.api.ObjectAssert;
+import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to AssertJ assertions over {@link Iterable}s. */
@@ -70,6 +73,52 @@ final class AssertJIterableRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     AbstractIntegerAssert<?> after(Iterable<E> iterable) {
       return assertThat(iterable).size();
+    }
+  }
+
+  /** Prefer {@link ObjectEnumerableAssert#contains(Object[])} over less explicit alternatives. */
+  static final class AssertThatContains<E> {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
+      return assertThat(iterable.contains(element)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E element) {
+      return assertThat(iterable).contains(element);
+    }
+  }
+
+  /**
+   * Prefer {@link ObjectEnumerableAssert#doesNotContain(Object[])} over less explicit alternatives.
+   */
+  static final class AssertThatDoesNotContain<E> {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(Collection<E> iterable, E element) {
+      return assertThat(iterable.contains(element)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, E element) {
+      return assertThat(iterable).doesNotContain(element);
+    }
+  }
+
+  /**
+   * Prefer {@link AbstractIterableAssert#containsAll(Iterable)} over less explicit alternatives.
+   */
+  static final class AssertThatContainsAll<E> {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(Collection<E> iterable, Collection<? extends E> elements) {
+      return assertThat(iterable.containsAll(elements)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    IterableAssert<E> after(Iterable<E> iterable, Collection<? extends E> elements) {
+      return assertThat(iterable).containsAll(elements);
     }
   }
 

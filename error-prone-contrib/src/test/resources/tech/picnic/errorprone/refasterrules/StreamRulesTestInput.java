@@ -1,9 +1,11 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.least;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
@@ -59,6 +61,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
         filtering(null, null),
         flatMapping(null, null),
         identity(),
+        least(1, null),
         mapping(null, null),
         maxBy(null),
         minBy(null),
@@ -124,6 +127,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length()).flatMap(Stream::of));
   }
 
+  Stream<Integer> testStreamSorted() {
+    return Stream.of(1).sorted(naturalOrder());
+  }
+
   Stream<Integer> testStreamFilterSorted() {
     return Stream.of(1).sorted().filter(i -> i % 2 == 0);
   }
@@ -138,6 +145,14 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamDistinctSortedWithComparator() {
     return Stream.of(1).sorted(reverseOrder()).distinct();
+  }
+
+  Stream<Integer> testStreamCollectLeastStream() {
+    return Stream.of(1).sorted(reverseOrder()).limit(2);
+  }
+
+  Stream<Integer> testStreamCollectLeastNaturalOrderStream() {
+    return Stream.of(1).sorted().limit(2);
   }
 
   ImmutableSet<Optional<Integer>> testStreamMapFirst() {
@@ -165,6 +180,10 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   boolean testStreamFindAnyIsPresent() {
     return Stream.of(1).findFirst().isPresent();
+  }
+
+  ImmutableSet<Optional<Integer>> testStreamFindFirst() {
+    return ImmutableSet.of(Stream.of(1).limit(2).findFirst(), Stream.of(3).limit(4).findAny());
   }
 
   Stream<Integer> testStreamMapFilter() {

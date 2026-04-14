@@ -1,0 +1,59 @@
+name: Assign milestone to dependency upgrade PR
+on:
+  pull_request_target:
+    types: [ labeled ]
+permissions:
+  contents: read
+jobs:
+  assign-milestone:
+    if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null }}
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            api.github.com:443
+      - name: Assign first upcoming milestone
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const milestones = (await github.rest.issues.listMilestones({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            })).data;
+
+            if (milestones.length === 0) {
+              core.warning('No open milestones found.');
+              return;
+            }
+
+            const parseVersion = (title) => title.split('.').map(Number);
+            const compareVersions = (a, b) => {
+              const va = parseVersion(a);
+              const vb = parseVersion(b);
+              for (let i = 0; i < Math.max(va.length, vb.length); i++) {
+                const diff = (va[i] ?? 0) - (vb[i] ?? 0);
+                if (diff !== 0) {
+                  return diff;
+                }
+              }
+              return 0;
+            };
+            const milestone = milestones.reduce((a, b) => compareVersions(a.title, b.title) <= 0 ? a : b);
+            core.info(`Assigning milestone "${milestone.title}" to PR #${context.issue.number}.`);
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              milestone: milestone.number,
+            });

@@ -170,7 +170,8 @@ final class MoreASTHelpersTest {
    * VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  public static final class FindMethodsTestChecker extends BugChecker implements MethodTreeMatcher {
+  private static final class FindMethodsTestChecker extends BugChecker
+      implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -188,7 +189,7 @@ final class MoreASTHelpersTest {
    * MoreASTHelpers#methodExistsInEnclosingClass(CharSequence, VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  public static final class MethodExistsTestChecker extends BugChecker
+  private static final class MethodExistsTestChecker extends BugChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -207,7 +208,7 @@ final class MoreASTHelpersTest {
    * MoreASTHelpers#findMethodExitedOnReturn(VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  public static final class FindMethodReturnTestChecker extends BugChecker
+  private static final class FindMethodReturnTestChecker extends BugChecker
       implements ExpressionStatementTreeMatcher, ReturnTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -233,7 +234,8 @@ final class MoreASTHelpersTest {
    * VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  public static final class AreSameTypeTestChecker extends BugChecker implements MethodTreeMatcher {
+  private static final class AreSameTypeTestChecker extends BugChecker
+      implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
@@ -252,7 +254,7 @@ final class MoreASTHelpersTest {
    * VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  public static final class IsStringTypedTestChecker extends BugChecker
+  private static final class IsStringTypedTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher, VariableTreeMatcher {
     private static final long serialVersionUID = 1L;
 

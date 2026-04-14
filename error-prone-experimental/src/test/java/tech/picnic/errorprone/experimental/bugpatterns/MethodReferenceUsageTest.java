@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.experimental.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -426,6 +425,6 @@ final class MethodReferenceUsageTest {
             "    return 0;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

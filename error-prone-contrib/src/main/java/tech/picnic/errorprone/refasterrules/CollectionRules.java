@@ -1,11 +1,16 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.disjoint;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -13,9 +18,12 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.Repeated;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
@@ -65,6 +73,22 @@ final class CollectionRules {
       return collection.asList().isEmpty();
     }
 
+    // XXX: Consider introducing similar templates for other `SetView` methods that derive a
+    // stateless object from a `SetView`: `isEmpty()`, `size()`, `contains()`, `containsAll()`,
+    // `equals()` and `hashCode()`, as well as the `toArray` overloads.
+    // XXX: Consider introducing similar templates for other methods that create an immutable copy
+    // of a collection, such as `ImmutableList.copyOf`, `ImmutableSet.copyOf` and
+    // `ImmutableMap.copyOf`.
+    // XXX: Instead of introducing many Refaster rules to cover the Cartesian product of the above
+    // suggestions, consider writing an `UnnecessaryCollectionCopy` Error Prone check that
+    // simplifies all such expressions. Some logic for such a rule may be extracted from the
+    // `IsEmpty` matcher implementation. (Note that `equals()` and `hashCode()` may need special
+    // handling, as they depend on the collection type produced.)
+    @BeforeTemplate
+    boolean before(SetView<T> collection) {
+      return collection.immutableCopy().isEmpty();
+    }
+
     @AfterTemplate
     @AlsoNegation
     boolean after(Collection<T> collection) {
@@ -100,6 +124,35 @@ final class CollectionRules {
     @AfterTemplate
     boolean after(Collection<T> collection, S value) {
       return collection.contains(value);
+    }
+  }
+
+  /**
+   * Prefer {@link Collections#disjoint(Collection, Collection)} over non-JDK or less efficient
+   * alternatives.
+   */
+  static final class CollectionsDisjoint<T> {
+    @BeforeTemplate
+    boolean before(Set<T> collection1, Set<T> collection2) {
+      return Sets.intersection(collection1, collection2).isEmpty();
+    }
+
+    // XXX: Other copy operations could be elided too, but these are the most common ones. If we
+    // ever introduce a generic "makes a copy" stand-in, use it here.
+    @BeforeTemplate
+    boolean before(Collection<T> collection1, Collection<T> collection2) {
+      return Refaster.anyOf(
+          collection1.stream().noneMatch(collection2::contains),
+          disjoint(ImmutableSet.copyOf(collection1), collection2),
+          disjoint(new HashSet<>(collection1), collection2),
+          disjoint(collection1, ImmutableSet.copyOf(collection2)),
+          disjoint(collection1, new HashSet<>(collection2)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    boolean after(Collection<T> collection1, Collection<T> collection2) {
+      return disjoint(collection1, collection2);
     }
   }
 

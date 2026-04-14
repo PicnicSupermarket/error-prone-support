@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.common.collect.Comparators.least;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.reverseOrder;
@@ -20,6 +21,7 @@ import static java.util.stream.Collectors.summingDouble;
 import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.summingLong;
 
+import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -113,7 +115,11 @@ final class StreamRules {
 
   /** Prefer {@link Stream#ofNullable(Object)} over more contrived alternatives. */
   static final class StreamOfNullable<T extends @Nullable Object> {
+    // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
+    // annotations.
     @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */)
     Stream<T> before(T object) {
       return Refaster.anyOf(
           Stream.of(object).filter(Objects::nonNull),
@@ -220,6 +226,19 @@ final class StreamRules {
     }
   }
 
+  /** Prefer {@link Stream#sorted()} over more contrived alternatives. */
+  static final class StreamSorted<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream) {
+      return stream.sorted(naturalOrder());
+    }
+
+    @AfterTemplate
+    Stream<T> after(Stream<T> stream) {
+      return stream.sorted();
+    }
+  }
+
   /**
    * Apply {@link Stream#filter(Predicate)} before {@link Stream#sorted()} to reduce the number of
    * elements to sort.
@@ -287,6 +306,46 @@ final class StreamRules {
   }
 
   /**
+   * Prefer {@link Comparators#least(int, Comparator)} over alternatives that require space
+   * proportional to the size of the input stream, rather than space proportional to the result
+   * stream.
+   */
+  // XXX: For ordered streams the replacement code is not equivalent to the original code, as the
+  // latter uses a stable sort operation, while the former breaks ties arbitrarily.
+  static final class StreamCollectLeastStream<S, T extends S> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, int n, Comparator<S> comparator) {
+      return stream.sorted(comparator).limit(n);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Stream<T> after(Stream<T> stream, int n, Comparator<S> comparator) {
+      return stream.collect(least(n, comparator)).stream();
+    }
+  }
+
+  /**
+   * Prefer {@link Comparators#least(int, Comparator)} over alternatives that require space
+   * proportional to the size of the input stream, rather than space proportional to the result
+   * stream.
+   */
+  // XXX: For ordered streams the replacement code is not equivalent to the original code, as the
+  // latter uses a stable sort operation, while the former breaks ties arbitrarily.
+  static final class StreamCollectLeastNaturalOrderStream<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    Stream<T> before(Stream<T> stream, int n) {
+      return stream.sorted().limit(n);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Stream<T> after(Stream<T> stream, int n) {
+      return stream.collect(least(n, naturalOrder())).stream();
+    }
+  }
+
+  /**
    * Where possible, clarify that a mapping operation will be applied only to a single stream
    * element.
    */
@@ -348,6 +407,21 @@ final class StreamRules {
     @AfterTemplate
     boolean after(Stream<T> stream) {
       return stream.findAny().isPresent();
+    }
+  }
+
+  /** Prefer {@link Stream#findFirst()} over more contrived alternatives. */
+  // XXX: By dropping `.limit(n)` for any `n`, this rule assumes that consuming the stream does not
+  // have side-effects.
+  static final class StreamFindFirst<T> {
+    @BeforeTemplate
+    Optional<T> before(Stream<T> stream, long limit) {
+      return Refaster.anyOf(stream.limit(limit).findFirst(), stream.limit(limit).findAny());
+    }
+
+    @AfterTemplate
+    Optional<T> after(Stream<T> stream) {
+      return stream.findFirst();
     }
   }
 

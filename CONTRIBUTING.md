@@ -76,6 +76,57 @@ Some pointers:
 - Please restrict the scope of a pull request to a single feature or fix. Don't
   sneak in unrelated changes; instead just open more than one pull request 😉.
 
+## 🔧 Development guide
+
+This section describes the project's architecture, development patterns, and
+testing conventions.
+
+### Project module overview
+
+- `error-prone-contrib`: Contains the main bug checkers and Refaster rules.
+- `error-prone-experimental`: Contains experimental bug checkers.
+- `error-prone-guidelines`: Contains bug checkers that enforce project-specific
+  guidelines checks.
+- `error-prone-utils`: Contains shared utilities (`MoreASTHelpers`,
+  `SourceCode`, `Documentation`, etc.)
+- `refaster-compiler`: Contains a custom Refaster rule compiler.
+- `refaster-runner`: Contains a Bug Checker that applies Refaster rules found
+  on the classpath.
+- `refaster-support`: Contains custom annotations and parameter matchers for
+  Refaster rules.
+- `refaster-test-support`: Contains testing utilities for Refaster rules.
+- `documentation-support`: Contains documentation generation helpers.
+
+### `BugChecker` development
+
+Bug checkers live in `error-prone-contrib`, `error-prone-experimental`, and
+`error-prone-guidelines`. External contributors will generally want to improve
+or introduce checkers in `error-prone-contrib`. See
+[`.github/instructions/bug-checkers.instructions.md`][bug-checkers] for the
+conventions covering checker implementation, testing, and advanced patterns.
+
+### Refaster rule development
+
+Refaster rules live in
+`error-prone-contrib/src/main/java/tech/picnic/errorprone/refasterrules/`. See
+[`.github/instructions/refaster-rules.instructions.md`][refaster-rules] for the
+conventions covering rule implementation, testing, and advanced patterns.
+
+### Testing conventions
+
+See [`.github/instructions/testing.instructions.md`][testing] for detailed
+testing conventions, including patterns for bug checker tests, Refaster rule
+tests, utility/matcher tests, and mutation testing requirements.
+
+### Code style and key utilities
+
+See [`.github/instructions/java-style.instructions.md`][java-style] for
+detailed code style conventions and a list of key utilities from the
+`error-prone-utils` module.
+
+[bug-checkers]: .github/instructions/bug-checkers.instructions.md
+[java-style]: .github/instructions/java-style.instructions.md
+[documentation-java]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java
 [error-prone-criteria]: https://errorprone.info/docs/criteria
 [error-prone-support-developing]: https://github.com/PicnicSupermarket/error-prone-support/tree/master#-developing-error-prone-support
 [error-prone-support-full-build]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-full-build.sh
@@ -83,3 +134,6 @@ Some pointers:
 [error-prone-support-mutation-tests]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/run-branch-mutation-tests.sh
 [error-prone-support-patch]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/apply-error-prone-suggestions.sh
 [error-prone-support-pulls]: https://github.com/PicnicSupermarket/error-prone-support/pulls
+[refaster-rules]: .github/instructions/refaster-rules.instructions.md
+[refaster-rules-test]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-contrib/src/test/java/tech/picnic/errorprone/refasterrules/RefasterRulesTest.java
+[testing]: .github/instructions/testing.instructions.md

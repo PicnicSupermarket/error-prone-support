@@ -10,7 +10,7 @@
 # build against the `1.0-HEAD-SNAPSHOT` version published to the Sonatype
 # snapshot repository. This would enable advance notification of upcoming
 # incompatibilities.
-name: Error Prone compatibility check
+name: Check Error Prone compatibility
 on:
   push:
     branches: [ master ]
@@ -25,10 +25,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443
@@ -36,11 +35,11 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
+        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
         with:
-          java-version: 25
+          java-version: 25.0.2
           java-distribution: temurin
-          maven-version: 3.9.12
+          maven-version: 3.9.14
       - name: Quickly build and install project
         run: mvn install -Dverification.skip
       - name: Build and test project with self-check against the latest Error Prone release

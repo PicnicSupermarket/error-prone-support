@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static org.junit.jupiter.api.condition.JRE.JAVA_21;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
@@ -282,6 +281,6 @@ final class ExplicitArgumentEnumerationTest {
             "    ImmutableSetMultimap.<String, Integer>builder().putAll(\"foo\", 2);",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

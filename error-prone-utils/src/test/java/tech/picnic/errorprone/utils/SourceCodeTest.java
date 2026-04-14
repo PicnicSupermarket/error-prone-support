@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -84,7 +83,7 @@ final class SourceCodeTest {
             "    return \"foo\\\"bar\\'baz\\bqux\" /* \"foo\\\"bar'baz\\bqux\" */;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -158,7 +157,7 @@ final class SourceCodeTest {
             "    void m() {}",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -227,7 +226,7 @@ final class SourceCodeTest {
             "    void middleMethod() {}",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -259,7 +258,7 @@ final class SourceCodeTest {
             "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ /*f*/ 1 /*g*/, /*h*/ 2 /*i*/ /*j*/}};",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -292,7 +291,7 @@ final class SourceCodeTest {
             "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ 1, 2 /*j*/}};",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -326,7 +325,7 @@ final class SourceCodeTest {
             "    Stream.of(\"a\", \"b\", \"c\");",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   /**
@@ -334,7 +333,7 @@ final class SourceCodeTest {
    * VisitorState)} to string literals.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class ToStringConstantExpressionTestChecker extends BugChecker
+  private static final class ToStringConstantExpressionTestChecker extends BugChecker
       implements LiteralTreeMatcher, VariableTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -363,7 +362,7 @@ final class SourceCodeTest {
    * {@value DELETION_MARKER}.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class DeleteWithTrailingWhitespaceTestChecker extends BugChecker
+  private static final class DeleteWithTrailingWhitespaceTestChecker extends BugChecker
       implements AnnotationTreeMatcher, MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final String DELETION_MARKER = "ToBeDeleted";
@@ -394,7 +393,7 @@ final class SourceCodeTest {
    * invocations.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class UnwrapMethodInvocationTestChecker extends BugChecker
+  private static final class UnwrapMethodInvocationTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -410,7 +409,7 @@ final class SourceCodeTest {
    * VisitorState)} to all method invocations.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker
+  private static final class UnwrapMethodInvocationDroppingWhitespaceAndCommentsTestChecker
       extends BugChecker implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -427,7 +426,7 @@ final class SourceCodeTest {
    * lexicographically.
    */
   @BugPattern(severity = ERROR, summary = "Interacts with `SourceCode` for testing purposes")
-  public static final class SortTreesTestChecker extends BugChecker
+  private static final class SortTreesTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
 

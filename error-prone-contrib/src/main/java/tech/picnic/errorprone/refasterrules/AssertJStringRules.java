@@ -123,6 +123,68 @@ final class AssertJStringRules {
     }
   }
 
+  /**
+   * Prefer {@link AbstractStringAssert#isEqualToIgnoringCase(CharSequence)} over less explicit
+   * alternatives.
+   */
+  static final class AssertThatIsEqualToIgnoringCase {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String other) {
+      return assertThat(string.equalsIgnoreCase(other)).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String other) {
+      return assertThat(string).isEqualToIgnoringCase(other);
+    }
+  }
+
+  /**
+   * Prefer {@link AbstractStringAssert#isNotEqualToIgnoringCase(CharSequence)} over less explicit
+   * alternatives.
+   */
+  static final class AssertThatIsNotEqualToIgnoringCase {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string, String other) {
+      return assertThat(string.equalsIgnoreCase(other)).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string, String other) {
+      return assertThat(string).isNotEqualToIgnoringCase(other);
+    }
+  }
+
+  /** Prefer {@link AbstractStringAssert#isBlank()} over less explicit alternatives. */
+  static final class AssertThatIsBlank {
+    @BeforeTemplate
+    void before(String string) {
+      assertThat(string.isBlank()).isTrue();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    void after(String string) {
+      assertThat(string).isBlank();
+    }
+  }
+
+  /** Prefer {@link AbstractStringAssert#isNotBlank()} over less explicit alternatives. */
+  static final class AssertThatIsNotBlank {
+    @BeforeTemplate
+    AbstractBooleanAssert<?> before(String string) {
+      return assertThat(string.isBlank()).isFalse();
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    AbstractStringAssert<?> after(String string) {
+      return assertThat(string).isNotBlank();
+    }
+  }
+
   static final class AssertThatMatches {
     @BeforeTemplate
     AbstractAssert<?, ?> before(String string, String regex) {

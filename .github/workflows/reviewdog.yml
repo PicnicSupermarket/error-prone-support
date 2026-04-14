@@ -13,10 +13,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@a90bcbc6539c36a85cdfeb73f7e2f433735f215b # v2.15.0
+        uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
           disable-sudo-and-containers: true
-          egress-policy: block
           allowed-endpoints: >
             api.adoptium.net:443
             api.github.com:443
@@ -29,11 +28,11 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@6c4e9964d4ecb8f1026310cd8618791fd51a8016 # v1.19.0
+        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
         with:
-          java-version: 25
+          java-version: 25.0.2
           java-distribution: temurin
-          maven-version: 3.9.12
+          maven-version: 3.9.14
       - name: Set up Reviewdog
         uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
