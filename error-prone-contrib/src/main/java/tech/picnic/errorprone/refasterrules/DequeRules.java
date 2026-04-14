@@ -116,13 +116,13 @@ final class DequeRules {
   /** Prefer {@link Deque#removeFirstOccurrence(Object)} over less explicit alternatives. */
   static final class DequeRemoveFirstOccurrence<T> {
     @BeforeTemplate
-    boolean before(Deque<T> deque, Object element) {
-      return deque.remove(element);
+    boolean before(Deque<T> deque, Object object) {
+      return deque.remove(object);
     }
 
     @AfterTemplate
-    boolean after(Deque<T> deque, Object element) {
-      return deque.removeFirstOccurrence(element);
+    boolean after(Deque<T> deque, Object object) {
+      return deque.removeFirstOccurrence(object);
     }
   }
 

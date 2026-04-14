@@ -24,38 +24,39 @@ final class AssertJEnumerableRules {
   /** Prefer {@link EnumerableAssert#isEmpty()} over more contrived alternatives. */
   static final class EnumerableAssertIsEmpty<E> {
     @BeforeTemplate
-    void before(EnumerableAssert<?, E> enumAssert, @Matches(IsEmpty.class) Iterable<?> other) {
+    void before(
+        EnumerableAssert<?, E> enumerableAssert, @Matches(IsEmpty.class) Iterable<?> emptyOther) {
       Refaster.anyOf(
-          enumAssert.hasSize(0),
-          enumAssert.hasSizeLessThanOrEqualTo(0),
-          enumAssert.hasSizeLessThan(1),
-          enumAssert.hasSameSizeAs(other));
+          enumerableAssert.hasSize(0),
+          enumerableAssert.hasSizeLessThanOrEqualTo(0),
+          enumerableAssert.hasSizeLessThan(1),
+          enumerableAssert.hasSameSizeAs(emptyOther));
     }
 
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     void before(
-        ObjectEnumerableAssert<?, E> enumAssert,
-        @Matches(IsEmpty.class) Iterable<? extends E> other) {
+        ObjectEnumerableAssert<?, E> enumerableAssert,
+        @Matches(IsEmpty.class) Iterable<? extends E> emptyOther) {
       Refaster.anyOf(
-          enumAssert.containsExactlyElementsOf(other),
-          enumAssert.containsExactlyInAnyOrderElementsOf(other),
-          enumAssert.hasSameElementsAs(other),
-          enumAssert.isSubsetOf(other),
-          enumAssert.containsExactly(),
-          enumAssert.containsExactlyInAnyOrder(),
-          enumAssert.containsOnly(),
-          enumAssert.isSubsetOf());
+          enumerableAssert.containsExactlyElementsOf(emptyOther),
+          enumerableAssert.containsExactlyInAnyOrderElementsOf(emptyOther),
+          enumerableAssert.hasSameElementsAs(emptyOther),
+          enumerableAssert.isSubsetOf(emptyOther),
+          enumerableAssert.containsExactly(),
+          enumerableAssert.containsExactlyInAnyOrder(),
+          enumerableAssert.containsOnly(),
+          enumerableAssert.isSubsetOf());
     }
 
     @BeforeTemplate
-    void before(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
-      enumAssert.size().isNotPositive();
+    void before(AbstractIterableAssert<?, ?, E, ?> enumerableAssert) {
+      enumerableAssert.size().isNotPositive();
     }
 
     @AfterTemplate
-    void after(EnumerableAssert<?, E> enumAssert) {
-      enumAssert.isEmpty();
+    void after(EnumerableAssert<?, E> enumerableAssert) {
+      enumerableAssert.isEmpty();
     }
   }
 
@@ -65,8 +66,8 @@ final class AssertJEnumerableRules {
   static final class AssertIsEmpty<
       E, A extends Assert<?, ? extends Iterable<? extends E>> & EnumerableAssert<?, E>> {
     @BeforeTemplate
-    void before(A enumAssert, @Matches(IsEmpty.class) Iterable<?> expected) {
-      enumAssert.isEqualTo(expected);
+    void before(A enumAssert, @Matches(IsEmpty.class) Iterable<?> emptyExpected) {
+      enumAssert.isEqualTo(emptyExpected);
     }
 
     @AfterTemplate
@@ -79,16 +80,16 @@ final class AssertJEnumerableRules {
   @PossibleSourceIncompatibility
   static final class EnumerableAssertIsNotEmpty<E> {
     @BeforeTemplate
-    EnumerableAssert<?, E> before(EnumerableAssert<?, E> enumAssert) {
+    EnumerableAssert<?, E> before(EnumerableAssert<?, E> enumerableAssert) {
       return Refaster.anyOf(
-          enumAssert.hasSizeGreaterThan(0), enumAssert.hasSizeGreaterThanOrEqualTo(1));
+          enumerableAssert.hasSizeGreaterThan(0), enumerableAssert.hasSizeGreaterThanOrEqualTo(1));
     }
 
     @BeforeTemplate
-    AbstractIterableAssert<?, ?, E, ?> before(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
+    AbstractIterableAssert<?, ?, E, ?> before(AbstractIterableAssert<?, ?, E, ?> enumerableAssert) {
       return Refaster.anyOf(
-          enumAssert.size().isNotEqualTo(0).returnToIterable(),
-          enumAssert.size().isPositive().returnToIterable());
+          enumerableAssert.size().isNotEqualTo(0).returnToIterable(),
+          enumerableAssert.size().isPositive().returnToIterable());
     }
 
     @BeforeTemplate
@@ -102,13 +103,14 @@ final class AssertJEnumerableRules {
             ? extends Iterable<? extends E>,
             E,
             ? extends AbstractAssert<? extends AbstractAssert<?, E>, E>>
-        before2(AbstractIterableAssert<?, ?, E, ?> enumAssert) {
-      return Refaster.anyOf(enumAssert.size().isNotEqualTo(0), enumAssert.size().isPositive());
+        before2(AbstractIterableAssert<?, ?, E, ?> enumerableAssert) {
+      return Refaster.anyOf(
+          enumerableAssert.size().isNotEqualTo(0), enumerableAssert.size().isPositive());
     }
 
     @AfterTemplate
-    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert) {
-      return enumAssert.isNotEmpty();
+    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumerableAssert) {
+      return enumerableAssert.isNotEmpty();
     }
   }
 
@@ -117,21 +119,21 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertHasSize<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int expected) {
-      return enumAssert.size().isEqualTo(expected).returnToIterable();
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int expected) {
+      return enumerableAssert.size().isEqualTo(expected).returnToIterable();
     }
 
     // XXX: If this template matches, then the expression's return type changes incompatibly.
     // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
     AbstractIterableSizeAssert<?, ?, E, ?> before2(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int expected) {
-      return enumAssert.size().isEqualTo(expected);
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int expected) {
+      return enumerableAssert.size().isEqualTo(expected);
     }
 
     @AfterTemplate
-    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int expected) {
-      return enumAssert.hasSize(expected);
+    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumerableAssert, int expected) {
+      return enumerableAssert.hasSize(expected);
     }
   }
 
@@ -140,21 +142,21 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertHasSizeLessThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isLessThan(boundary).returnToIterable();
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isLessThan(boundary).returnToIterable();
     }
 
     // XXX: If this template matches, then the expression's return type changes incompatibly.
     // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
     AbstractIterableSizeAssert<?, ?, E, ?> before2(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isLessThan(boundary);
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isLessThan(boundary);
     }
 
     @AfterTemplate
-    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int boundary) {
-      return enumAssert.hasSizeLessThan(boundary);
+    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumerableAssert, int boundary) {
+      return enumerableAssert.hasSizeLessThan(boundary);
     }
   }
 
@@ -165,21 +167,21 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertHasSizeLessThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isLessThanOrEqualTo(boundary).returnToIterable();
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isLessThanOrEqualTo(boundary).returnToIterable();
     }
 
     // XXX: If this template matches, then the expression's return type changes incompatibly.
     // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
     AbstractIterableSizeAssert<?, ?, E, ?> before2(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isLessThanOrEqualTo(boundary);
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isLessThanOrEqualTo(boundary);
     }
 
     @AfterTemplate
-    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int boundary) {
-      return enumAssert.hasSizeLessThanOrEqualTo(boundary);
+    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumerableAssert, int boundary) {
+      return enumerableAssert.hasSizeLessThanOrEqualTo(boundary);
     }
   }
 
@@ -188,21 +190,21 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertHasSizeGreaterThan<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isGreaterThan(boundary).returnToIterable();
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isGreaterThan(boundary).returnToIterable();
     }
 
     // XXX: If this template matches, then the expression's return type changes incompatibly.
     // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
     AbstractIterableSizeAssert<?, ?, E, ?> before2(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isGreaterThan(boundary);
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isGreaterThan(boundary);
     }
 
     @AfterTemplate
-    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int boundary) {
-      return enumAssert.hasSizeGreaterThan(boundary);
+    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumerableAssert, int boundary) {
+      return enumerableAssert.hasSizeGreaterThan(boundary);
     }
   }
 
@@ -214,21 +216,21 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertHasSizeGreaterThanOrEqualTo<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isGreaterThanOrEqualTo(boundary).returnToIterable();
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isGreaterThanOrEqualTo(boundary).returnToIterable();
     }
 
     // XXX: If this template matches, then the expression's return type changes incompatibly.
     // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
     AbstractIterableSizeAssert<?, ?, E, ?> before2(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int boundary) {
-      return enumAssert.size().isGreaterThanOrEqualTo(boundary);
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert, int boundary) {
+      return enumerableAssert.size().isGreaterThanOrEqualTo(boundary);
     }
 
     @AfterTemplate
-    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumAssert, int boundary) {
-      return enumAssert.hasSizeGreaterThanOrEqualTo(boundary);
+    EnumerableAssert<?, E> after(EnumerableAssert<?, E> enumerableAssert, int boundary) {
+      return enumerableAssert.hasSizeGreaterThanOrEqualTo(boundary);
     }
   }
 
@@ -237,50 +239,54 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertHasSizeBetween<E> {
     @BeforeTemplate
     AbstractIterableAssert<?, ?, E, ?> before(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int lowerBoundary, int higherBoundary) {
-      return enumAssert.size().isBetween(lowerBoundary, higherBoundary).returnToIterable();
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert,
+        int lowerBoundary,
+        int higherBoundary) {
+      return enumerableAssert.size().isBetween(lowerBoundary, higherBoundary).returnToIterable();
     }
 
     // XXX: If this template matches, then the expression's return type changes incompatibly.
     // Consider moving this template to a separate block (statement) rule.
     @BeforeTemplate
     AbstractIterableSizeAssert<?, ?, E, ?> before2(
-        AbstractIterableAssert<?, ?, E, ?> enumAssert, int lowerBoundary, int higherBoundary) {
-      return enumAssert.size().isBetween(lowerBoundary, higherBoundary);
+        AbstractIterableAssert<?, ?, E, ?> enumerableAssert,
+        int lowerBoundary,
+        int higherBoundary) {
+      return enumerableAssert.size().isBetween(lowerBoundary, higherBoundary);
     }
 
     @AfterTemplate
     EnumerableAssert<?, E> after(
-        EnumerableAssert<?, E> enumAssert, int lowerBoundary, int higherBoundary) {
-      return enumAssert.hasSizeBetween(lowerBoundary, higherBoundary);
+        EnumerableAssert<?, E> enumerableAssert, int lowerBoundary, int higherBoundary) {
+      return enumerableAssert.hasSizeBetween(lowerBoundary, higherBoundary);
     }
   }
 
   /** Prefer {@link EnumerableAssert#hasSameSizeAs(Iterable)} over more verbose alternatives. */
   static final class EnumerableAssertHasSameSizeAs<S, E> {
     @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Iterable<E> other) {
-      return enumAssert.hasSize(Iterables.size(other));
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumerableAssert, Iterable<E> other) {
+      return enumerableAssert.hasSize(Iterables.size(other));
     }
 
     @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, Collection<E> other) {
-      return enumAssert.hasSize(other.size());
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumerableAssert, Collection<E> other) {
+      return enumerableAssert.hasSize(other.size());
     }
 
     @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, E[] other) {
-      return enumAssert.hasSize(other.length);
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumerableAssert, E[] other) {
+      return enumerableAssert.hasSize(other.length);
     }
 
     @BeforeTemplate
-    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumAssert, CharSequence other) {
-      return enumAssert.hasSize(other.length());
+    EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumerableAssert, CharSequence other) {
+      return enumerableAssert.hasSize(other.length());
     }
 
     @AfterTemplate
-    EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<E> other) {
-      return enumAssert.hasSameSizeAs(other);
+    EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumerableAssert, Iterable<E> other) {
+      return enumerableAssert.hasSameSizeAs(other);
     }
   }
 }

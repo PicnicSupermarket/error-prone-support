@@ -26,13 +26,13 @@ final class PrimitiveRules {
   static final class LessThan {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a >= b);
+    boolean before(double d1, double d2) {
+      return !(d1 >= d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a < b;
+    boolean after(double d1, double d2) {
+      return d1 < d2;
     }
   }
 
@@ -40,13 +40,13 @@ final class PrimitiveRules {
   static final class LessThanOrEqualTo {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a > b);
+    boolean before(double d1, double d2) {
+      return !(d1 > d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a <= b;
+    boolean after(double d1, double d2) {
+      return d1 <= d2;
     }
   }
 
@@ -54,13 +54,13 @@ final class PrimitiveRules {
   static final class GreaterThan {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a <= b);
+    boolean before(double d1, double d2) {
+      return !(d1 <= d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a > b;
+    boolean after(double d1, double d2) {
+      return d1 > d2;
     }
   }
 
@@ -68,13 +68,13 @@ final class PrimitiveRules {
   static final class GreaterThanOrEqualTo {
     @BeforeTemplate
     @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-    boolean before(double a, double b) {
-      return !(a < b);
+    boolean before(double d1, double d2) {
+      return !(d1 < d2);
     }
 
     @AfterTemplate
-    boolean after(double a, double b) {
-      return a >= b;
+    boolean after(double d1, double d2) {
+      return d1 >= d2;
     }
   }
 

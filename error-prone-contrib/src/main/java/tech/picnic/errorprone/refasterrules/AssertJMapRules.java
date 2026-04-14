@@ -30,15 +30,15 @@ final class AssertJMapRules {
     @BeforeTemplate
     void before(
         AbstractMapAssert<?, ?, K, V> mapAssert,
-        @Matches(IsEmpty.class) Map<M, N> map,
-        @Matches(IsEmpty.class) Map<?, ?> other,
-        @Matches(IsEmpty.class) Iterable<T> keys) {
+        @Matches(IsEmpty.class) Map<M, N> emptyMap,
+        @Matches(IsEmpty.class) Map<?, ?> emptyOther,
+        @Matches(IsEmpty.class) Iterable<T> emptyKeys) {
       Refaster.anyOf(
-          mapAssert.containsExactlyEntriesOf(map),
-          mapAssert.containsExactlyInAnyOrderEntriesOf(map),
-          mapAssert.hasSameSizeAs(other),
-          mapAssert.isEqualTo(other),
-          mapAssert.containsOnlyKeys(keys),
+          mapAssert.containsExactlyEntriesOf(emptyMap),
+          mapAssert.containsExactlyInAnyOrderEntriesOf(emptyMap),
+          mapAssert.hasSameSizeAs(emptyOther),
+          mapAssert.isEqualTo(emptyOther),
+          mapAssert.containsOnlyKeys(emptyKeys),
           mapAssert.containsExactly(),
           mapAssert.containsOnly(),
           mapAssert.containsOnlyKeys());
@@ -77,8 +77,8 @@ final class AssertJMapRules {
   static final class AbstractMapAssertIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(
-        AbstractMapAssert<?, ?, K, V> mapAssert, @Matches(IsEmpty.class) Map<?, ?> other) {
-      return mapAssert.isNotEqualTo(other);
+        AbstractMapAssert<?, ?, K, V> mapAssert, @Matches(IsEmpty.class) Map<?, ?> emptyOther) {
+      return mapAssert.isNotEqualTo(emptyOther);
     }
 
     @AfterTemplate

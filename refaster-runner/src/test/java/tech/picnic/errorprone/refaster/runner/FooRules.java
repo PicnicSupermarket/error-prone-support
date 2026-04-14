@@ -18,13 +18,13 @@ final class FooRules {
   /** A simple rule for testing purposes, lacking any custom annotations. */
   static final class StringOfSizeZeroRule {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.toCharArray().length == 0;
+    boolean before(String str) {
+      return str.toCharArray().length == 0;
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.isEmpty();
+    boolean after(String str) {
+      return str.isEmpty();
     }
   }
 
@@ -34,13 +34,13 @@ final class FooRules {
    */
   static final class StringOfSizeZeroVerboseRule {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.toCharArray().length == 0;
+    boolean before(String str) {
+      return str.toCharArray().length == 0;
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.length() + 1 == 1;
+    boolean after(String str) {
+      return str.length() + 1 == 1;
     }
   }
 
@@ -50,13 +50,13 @@ final class FooRules {
   @Severity(WARNING)
   static final class StringOfSizeOneRule {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.toCharArray().length == 1;
+    boolean before(String str) {
+      return str.toCharArray().length == 1;
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.length() == 1;
+    boolean after(String str) {
+      return str.length() == 1;
     }
   }
 
@@ -70,13 +70,13 @@ final class FooRules {
     /** A simple rule for testing purposes, inheriting custom annotations. */
     static final class StringOfSizeTwoRule {
       @BeforeTemplate
-      boolean before(String string) {
-        return string.toCharArray().length == 2;
+      boolean before(String str) {
+        return str.toCharArray().length == 2;
       }
 
       @AfterTemplate
-      boolean after(String string) {
-        return string.length() == 2;
+      boolean after(String str) {
+        return str.length() == 2;
       }
     }
 
@@ -86,13 +86,13 @@ final class FooRules {
     @Severity(SUGGESTION)
     static final class StringOfSizeThreeRule {
       @BeforeTemplate
-      boolean before(String string) {
-        return string.toCharArray().length == 3;
+      boolean before(String str) {
+        return str.toCharArray().length == 3;
       }
 
       @AfterTemplate
-      boolean after(String string) {
-        return string.length() == 3;
+      boolean after(String str) {
+        return str.length() == 3;
       }
     }
   }

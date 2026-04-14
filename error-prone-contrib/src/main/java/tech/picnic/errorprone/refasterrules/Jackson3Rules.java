@@ -18,34 +18,34 @@ final class Jackson3Rules {
   /** Prefer {@link JsonNode#optional(int)} over more contrived alternatives. */
   static final class JsonNodeOptionalInt {
     @BeforeTemplate
-    Optional<JsonNode> before(JsonNode node, int index) {
+    Optional<JsonNode> before(JsonNode jsonNode, int index) {
       return Refaster.anyOf(
-          node.get(index).asOptional(),
-          node.path(index).asOptional(),
-          Optional.of(node.get(index)),
-          Optional.ofNullable(node.get(index)));
+          jsonNode.get(index).asOptional(),
+          jsonNode.path(index).asOptional(),
+          Optional.of(jsonNode.get(index)),
+          Optional.ofNullable(jsonNode.get(index)));
     }
 
     @AfterTemplate
-    Optional<JsonNode> after(JsonNode node, int index) {
-      return node.optional(index);
+    Optional<JsonNode> after(JsonNode jsonNode, int index) {
+      return jsonNode.optional(index);
     }
   }
 
   /** Prefer {@link JsonNode#optional(String)} over more contrived alternatives. */
   static final class JsonNodeOptionalString {
     @BeforeTemplate
-    Optional<JsonNode> before(JsonNode node, String propertyName) {
+    Optional<JsonNode> before(JsonNode jsonNode, String propertyName) {
       return Refaster.anyOf(
-          node.get(propertyName).asOptional(),
-          node.path(propertyName).asOptional(),
-          Optional.of(node.get(propertyName)),
-          Optional.ofNullable(node.get(propertyName)));
+          jsonNode.get(propertyName).asOptional(),
+          jsonNode.path(propertyName).asOptional(),
+          Optional.of(jsonNode.get(propertyName)),
+          Optional.ofNullable(jsonNode.get(propertyName)));
     }
 
     @AfterTemplate
-    Optional<JsonNode> after(JsonNode node, String propertyName) {
-      return node.optional(propertyName);
+    Optional<JsonNode> after(JsonNode jsonNode, String propertyName) {
+      return jsonNode.optional(propertyName);
     }
   }
 

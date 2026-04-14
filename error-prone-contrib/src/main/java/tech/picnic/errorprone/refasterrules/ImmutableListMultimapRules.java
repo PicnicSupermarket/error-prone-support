@@ -179,24 +179,26 @@ final class ImmutableListMultimapRules {
     ImmutableListMultimap<K, V> before(
         Iterable<V> values,
         Function<S, K2> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
-      return Streams.stream(values).collect(toImmutableListMultimap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, V2> identityValueFunction) {
+      return Streams.stream(values)
+          .collect(toImmutableListMultimap(keyFunction, identityValueFunction));
     }
 
     @BeforeTemplate
     ImmutableListMultimap<K, V> before(
         Collection<V> values,
         Function<S, K2> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
-      return values.stream().collect(toImmutableListMultimap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, V2> identityValueFunction) {
+      return values.stream().collect(toImmutableListMultimap(keyFunction, identityValueFunction));
     }
 
     @BeforeTemplate
     ImmutableListMultimap<K, V> before(
         Iterator<V> values,
         Function<S, K2> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
-      return Streams.stream(values).collect(toImmutableListMultimap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, V2> identityValueFunction) {
+      return Streams.stream(values)
+          .collect(toImmutableListMultimap(keyFunction, identityValueFunction));
     }
 
     @AfterTemplate

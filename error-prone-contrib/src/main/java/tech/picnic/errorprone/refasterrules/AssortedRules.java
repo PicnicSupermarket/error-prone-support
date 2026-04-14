@@ -84,13 +84,13 @@ final class AssortedRules {
   static final class Or {
     @BeforeTemplate
     @SuppressWarnings("java:S2589" /* This violation will be rewritten. */)
-    boolean before(boolean firstTest, boolean secondTest) {
-      return firstTest || (!firstTest && secondTest);
+    boolean before(boolean b1, boolean b2) {
+      return b1 || (!b1 && b2);
     }
 
     @AfterTemplate
-    boolean after(boolean firstTest, boolean secondTest) {
-      return firstTest || secondTest;
+    boolean after(boolean b1, boolean b2) {
+      return b1 || b2;
     }
   }
 

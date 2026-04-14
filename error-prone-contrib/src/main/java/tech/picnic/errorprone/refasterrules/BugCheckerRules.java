@@ -23,15 +23,18 @@ final class BugCheckerRules {
   /** Prefer the {@link BugCheckerRefactoringTestHelper} as-is over more verbose alternatives. */
   static final class BugCheckerRefactoringTestHelperIdentity {
     @BeforeTemplate
-    BugCheckerRefactoringTestHelper before(BugCheckerRefactoringTestHelper helper) {
+    BugCheckerRefactoringTestHelper before(
+        BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper) {
       return Refaster.anyOf(
-          helper.setFixChooser(FixChoosers.FIRST), helper.setImportOrder("static-first"));
+          bugCheckerRefactoringTestHelper.setFixChooser(FixChoosers.FIRST),
+          bugCheckerRefactoringTestHelper.setImportOrder("static-first"));
     }
 
     @AfterTemplate
     @CanIgnoreReturnValue
-    BugCheckerRefactoringTestHelper after(BugCheckerRefactoringTestHelper helper) {
-      return helper;
+    BugCheckerRefactoringTestHelper after(
+        BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper) {
+      return bugCheckerRefactoringTestHelper;
     }
   }
 
@@ -45,14 +48,14 @@ final class BugCheckerRules {
   static final class BugCheckerRefactoringTestHelperAddInputLinesExpectUnchanged {
     @BeforeTemplate
     BugCheckerRefactoringTestHelper before(
-        BugCheckerRefactoringTestHelper helper, String path, String source) {
-      return helper.addInputLines(path, source).addOutputLines(path, source);
+        BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper, String path, String str) {
+      return bugCheckerRefactoringTestHelper.addInputLines(path, str).addOutputLines(path, str);
     }
 
     @AfterTemplate
     BugCheckerRefactoringTestHelper after(
-        BugCheckerRefactoringTestHelper helper, String path, String source) {
-      return helper.addInputLines(path, source).expectUnchanged();
+        BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper, String path, String str) {
+      return bugCheckerRefactoringTestHelper.addInputLines(path, str).expectUnchanged();
     }
   }
 

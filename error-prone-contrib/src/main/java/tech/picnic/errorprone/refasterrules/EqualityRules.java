@@ -98,25 +98,25 @@ final class EqualityRules {
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
   static final class NotEqualTo {
     @BeforeTemplate
-    boolean before(boolean a, boolean b) {
-      return Refaster.anyOf(!(a == b), a ? !b : b);
+    boolean before(boolean b1, boolean b) {
+      return Refaster.anyOf(!(b1 == b), b1 ? !b : b);
     }
 
     @BeforeTemplate
     @SuppressWarnings(
         "java:S1244" /* The equality check is fragile, but may be seen in the wild. */)
-    boolean before(double a, double b) {
-      return !(a == b);
+    boolean before(double b1, double b) {
+      return !(b1 == b);
     }
 
     @BeforeTemplate
-    boolean before(Object a, Object b) {
-      return !(a == b);
+    boolean before(Object b1, Object b) {
+      return !(b1 == b);
     }
 
     @AfterTemplate
-    boolean after(boolean a, boolean b) {
-      return a != b;
+    boolean after(boolean b1, boolean b) {
+      return b1 != b;
     }
   }
 
@@ -129,25 +129,25 @@ final class EqualityRules {
   })
   static final class EqualToWithBoolean {
     @BeforeTemplate
-    boolean before(boolean a, boolean b) {
-      return Refaster.anyOf(!(a != b), a ? b : !b);
+    boolean before(boolean b1, boolean b) {
+      return Refaster.anyOf(!(b1 != b), b1 ? b : !b);
     }
 
     @BeforeTemplate
     @SuppressWarnings(
         "java:S1244" /* The inequality check is fragile, but may be seen in the wild. */)
-    boolean before(double a, double b) {
-      return !(a != b);
+    boolean before(double b1, double b) {
+      return !(b1 != b);
     }
 
     @BeforeTemplate
-    boolean before(Object a, Object b) {
-      return !(a != b);
+    boolean before(Object b1, Object b) {
+      return !(b1 != b);
     }
 
     @AfterTemplate
-    boolean after(boolean a, boolean b) {
-      return a == b;
+    boolean after(boolean b1, boolean b) {
+      return b1 == b;
     }
   }
 

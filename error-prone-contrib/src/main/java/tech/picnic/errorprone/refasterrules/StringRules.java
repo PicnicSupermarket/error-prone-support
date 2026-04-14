@@ -321,26 +321,26 @@ final class StringRules {
   static final class MathMaxNegativeOneStringIndexOfMinusInt {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, int ch, int fromIndex) {
-      return string.substring(fromIndex).indexOf(ch);
+    int before(String str, int ch, int fromIndex) {
+      return str.substring(fromIndex).indexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int fromIndex) {
-      return Math.max(-1, string.indexOf(ch, fromIndex) - fromIndex);
+    int after(String str, int ch, int fromIndex) {
+      return Math.max(-1, str.indexOf(ch, fromIndex) - fromIndex);
     }
   }
 
   /** Prefer {@link String#indexOf(int, int, int)} over less efficient alternatives. */
   static final class MathMaxNegativeOneStringIndexOfMinusIntWithInt {
     @BeforeTemplate
-    int before(String string, int ch, int beginIndex, int endIndex) {
-      return string.substring(beginIndex, endIndex).indexOf(ch);
+    int before(String str, int ch, int beginIndex, int endIndex) {
+      return str.substring(beginIndex, endIndex).indexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int beginIndex, int endIndex) {
-      return Math.max(-1, string.indexOf(ch, beginIndex, endIndex) - beginIndex);
+    int after(String str, int ch, int beginIndex, int endIndex) {
+      return Math.max(-1, str.indexOf(ch, beginIndex, endIndex) - beginIndex);
     }
   }
 
@@ -348,26 +348,26 @@ final class StringRules {
   static final class MathMaxNegativeOneStringIndexOfMinusString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, String str, int fromIndex) {
-      return string.substring(fromIndex).indexOf(str);
+    int before(String str1, String str, int fromIndex) {
+      return str1.substring(fromIndex).indexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String str, int fromIndex) {
-      return Math.max(-1, string.indexOf(str, fromIndex) - fromIndex);
+    int after(String str1, String str, int fromIndex) {
+      return Math.max(-1, str1.indexOf(str, fromIndex) - fromIndex);
     }
   }
 
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
   static final class MathMaxNegativeOneStringIndexOfMinusStringWithInt {
     @BeforeTemplate
-    int before(String string, String str, int beginIndex, int endIndex) {
-      return string.substring(beginIndex, endIndex).indexOf(str);
+    int before(String str1, String str, int beginIndex, int endIndex) {
+      return str1.substring(beginIndex, endIndex).indexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String str, int beginIndex, int endIndex) {
-      return Math.max(-1, string.indexOf(str, beginIndex, endIndex) - beginIndex);
+    int after(String str1, String str, int beginIndex, int endIndex) {
+      return Math.max(-1, str1.indexOf(str, beginIndex, endIndex) - beginIndex);
     }
   }
 
@@ -375,13 +375,13 @@ final class StringRules {
   static final class MathMaxNegativeOneStringLastIndexOfMinusInt {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, int ch, int beginIndex) {
-      return string.substring(beginIndex).lastIndexOf(ch);
+    int before(String str, int ch, int beginIndex) {
+      return str.substring(beginIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int beginIndex) {
-      return Math.max(-1, string.lastIndexOf(ch) - beginIndex);
+    int after(String str, int ch, int beginIndex) {
+      return Math.max(-1, str.lastIndexOf(ch) - beginIndex);
     }
   }
 
@@ -389,26 +389,26 @@ final class StringRules {
   static final class MathMaxNegativeOneStringLastIndexOfMinusString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, String str, int beginIndex) {
-      return string.substring(beginIndex).lastIndexOf(str);
+    int before(String str1, String str, int beginIndex) {
+      return str1.substring(beginIndex).lastIndexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String str, int beginIndex) {
-      return Math.max(-1, string.lastIndexOf(str) - beginIndex);
+    int after(String str1, String str, int beginIndex) {
+      return Math.max(-1, str1.lastIndexOf(str) - beginIndex);
     }
   }
 
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
   static final class StringLastIndexOfMinusOneInt {
     @BeforeTemplate
-    int before(String string, int ch, int endIndex) {
-      return string.substring(0, endIndex).lastIndexOf(ch);
+    int before(String str, int ch, int endIndex) {
+      return str.substring(0, endIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int endIndex) {
-      return string.lastIndexOf(ch, endIndex - 1);
+    int after(String str, int ch, int endIndex) {
+      return str.lastIndexOf(ch, endIndex - 1);
     }
   }
 
@@ -421,13 +421,13 @@ final class StringRules {
    */
   static final class StringLastIndexOfMinusOneString {
     @BeforeTemplate
-    int before(String string, String str, int endIndex) {
-      return string.substring(0, endIndex).lastIndexOf(str);
+    int before(String str1, String str, int endIndex) {
+      return str1.substring(0, endIndex).lastIndexOf(str);
     }
 
     @AfterTemplate
-    int after(String string, String str, int endIndex) {
-      return string.lastIndexOf(str, endIndex - 1);
+    int after(String str1, String str, int endIndex) {
+      return str1.lastIndexOf(str, endIndex - 1);
     }
   }
 
@@ -435,13 +435,13 @@ final class StringRules {
   static final class StringStartsWith {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    boolean before(String string, String prefix, int toffset) {
-      return string.substring(toffset).startsWith(prefix);
+    boolean before(String str, String prefix, int toffset) {
+      return str.substring(toffset).startsWith(prefix);
     }
 
     @AfterTemplate
-    boolean after(String string, String prefix, int toffset) {
-      return string.startsWith(prefix, toffset);
+    boolean after(String str, String prefix, int toffset) {
+      return str.startsWith(prefix, toffset);
     }
   }
 

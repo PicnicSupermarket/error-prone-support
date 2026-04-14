@@ -173,29 +173,29 @@ final class CollectionRules {
   /** Prefer {@link Collection#addAll(Collection)} over more verbose alternatives. */
   static final class CollectionAddAllBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> addTo, Collection<S> elementsToAdd) {
-      elementsToAdd.forEach(addTo::add);
+    void before(Collection<T> collection1, Collection<S> collection2) {
+      collection2.forEach(collection1::add);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> addTo, Collection<S> elementsToAdd) {
-      for (T element : elementsToAdd) {
-        addTo.add(element);
+    void before2(Collection<T> collection1, Collection<S> collection2) {
+      for (T element : collection2) {
+        collection1.add(element);
       }
     }
 
     // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
     // that this is supported out of the box.
     @BeforeTemplate
-    void before3(Collection<T> addTo, Collection<S> elementsToAdd) {
-      for (S element : elementsToAdd) {
-        addTo.add(element);
+    void before3(Collection<T> collection1, Collection<S> collection2) {
+      for (S element : collection2) {
+        collection1.add(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> addTo, Collection<S> elementsToAdd) {
-      addTo.addAll(elementsToAdd);
+    void after(Collection<T> collection1, Collection<S> collection2) {
+      collection1.addAll(collection2);
     }
   }
 
@@ -215,14 +215,14 @@ final class CollectionRules {
   /** Prefer {@link Collection#removeAll(Collection)} over more verbose alternatives. */
   static final class CollectionRemoveAllBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      elementsToRemove.forEach(removeFrom::remove);
+    void before(Collection<T> collection1, Collection<S> collection2) {
+      collection2.forEach(collection1::remove);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      for (T element : elementsToRemove) {
-        removeFrom.remove(element);
+    void before2(Collection<T> collection1, Collection<S> collection2) {
+      for (T element : collection2) {
+        collection1.remove(element);
       }
     }
 
@@ -230,15 +230,15 @@ final class CollectionRules {
     // that this is supported out of the box. After doing so, also drop the `S extends T` type
     // constraint; ideally this check applies to any `S`.
     @BeforeTemplate
-    void before3(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      for (S element : elementsToRemove) {
-        removeFrom.remove(element);
+    void before3(Collection<T> collection1, Collection<S> collection2) {
+      for (S element : collection2) {
+        collection1.remove(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      removeFrom.removeAll(elementsToRemove);
+    void after(Collection<T> collection1, Collection<S> collection2) {
+      collection1.removeAll(collection2);
     }
   }
 
@@ -488,15 +488,16 @@ final class CollectionRules {
   /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
   static final class OptionalOfNullableNavigableSetPollFirst<T> {
     @BeforeTemplate
-    Optional<T> before(NavigableSet<T> set) {
-      return set.isEmpty()
+    Optional<T> before(NavigableSet<T> navigableSet) {
+      return navigableSet.isEmpty()
           ? Optional.empty()
-          : Refaster.anyOf(Optional.of(set.pollFirst()), Optional.ofNullable(set.pollFirst()));
+          : Refaster.anyOf(
+              Optional.of(navigableSet.pollFirst()), Optional.ofNullable(navigableSet.pollFirst()));
     }
 
     @AfterTemplate
-    Optional<T> after(NavigableSet<T> set) {
-      return Optional.ofNullable(set.pollFirst());
+    Optional<T> after(NavigableSet<T> navigableSet) {
+      return Optional.ofNullable(navigableSet.pollFirst());
     }
   }
 
@@ -546,18 +547,18 @@ final class CollectionRules {
   /** Prefer {@link SequencedCollection#getFirst()} over less idiomatic alternatives. */
   static final class SequencedCollectionGetFirst<T> {
     @BeforeTemplate
-    T before(SequencedCollection<T> collection) {
-      return collection.iterator().next();
+    T before(SequencedCollection<T> sequencedCollection) {
+      return sequencedCollection.iterator().next();
     }
 
     @BeforeTemplate
-    T before(List<T> collection) {
-      return collection.get(0);
+    T before(List<T> sequencedCollection) {
+      return sequencedCollection.get(0);
     }
 
     @AfterTemplate
-    T after(SequencedCollection<T> collection) {
-      return collection.getFirst();
+    T after(SequencedCollection<T> sequencedCollection) {
+      return sequencedCollection.getFirst();
     }
   }
 
@@ -566,19 +567,20 @@ final class CollectionRules {
    */
   static final class SequencedCollectionGetLast<T> {
     @BeforeTemplate
-    T before(SequencedCollection<T> collection) {
+    T before(SequencedCollection<T> sequencedCollection) {
       return Refaster.anyOf(
-          collection.reversed().getFirst(), Streams.findLast(collection.stream()).orElseThrow());
+          sequencedCollection.reversed().getFirst(),
+          Streams.findLast(sequencedCollection.stream()).orElseThrow());
     }
 
     @BeforeTemplate
-    T before(List<T> collection) {
-      return collection.get(collection.size() - 1);
+    T before(List<T> sequencedCollection) {
+      return sequencedCollection.get(sequencedCollection.size() - 1);
     }
 
     @AfterTemplate
-    T after(SequencedCollection<T> collection) {
-      return collection.getLast();
+    T after(SequencedCollection<T> sequencedCollection) {
+      return sequencedCollection.getLast();
     }
   }
 
@@ -652,26 +654,26 @@ final class CollectionRules {
   /** Prefer {@link SortedSet#first()} over less idiomatic alternatives. */
   static final class SortedSetFirst<T> {
     @BeforeTemplate
-    T before(SortedSet<T> set) {
-      return set.getFirst();
+    T before(SortedSet<T> sortedSet) {
+      return sortedSet.getFirst();
     }
 
     @AfterTemplate
-    T after(SortedSet<T> set) {
-      return set.first();
+    T after(SortedSet<T> sortedSet) {
+      return sortedSet.first();
     }
   }
 
   /** Prefer {@link SortedSet#last()} over less idiomatic alternatives. */
   static final class SortedSetLast<T> {
     @BeforeTemplate
-    T before(SortedSet<T> set) {
-      return set.getLast();
+    T before(SortedSet<T> sortedSet) {
+      return sortedSet.getLast();
     }
 
     @AfterTemplate
-    T after(SortedSet<T> set) {
-      return set.last();
+    T after(SortedSet<T> sortedSet) {
+      return sortedSet.last();
     }
   }
 

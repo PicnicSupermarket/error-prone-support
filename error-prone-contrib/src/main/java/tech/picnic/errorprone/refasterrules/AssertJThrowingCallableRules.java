@@ -942,18 +942,18 @@ final class AssertJThrowingCallableRules {
   static final class AbstractThrowableAssertHasMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
         String message,
         @Repeated Object parameters) {
-      return abstractThrowableAssert.hasMessage(message.formatted(parameters));
+      return throwableAssert.hasMessage(message.formatted(parameters));
     }
 
     @AfterTemplate
     AbstractThrowableAssert<?, ? extends Throwable> after(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
         String message,
         @Repeated Object parameters) {
-      return abstractThrowableAssert.hasMessage(message, parameters);
+      return throwableAssert.hasMessage(message, parameters);
     }
   }
 
@@ -966,18 +966,18 @@ final class AssertJThrowingCallableRules {
   static final class AbstractThrowableAssertWithFailMessage {
     @BeforeTemplate
     AbstractThrowableAssert<?, ? extends Throwable> before(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
         String newErrorMessage,
         @Repeated Object args) {
-      return abstractThrowableAssert.withFailMessage(newErrorMessage.formatted(args));
+      return throwableAssert.withFailMessage(newErrorMessage.formatted(args));
     }
 
     @AfterTemplate
     AbstractThrowableAssert<?, ? extends Throwable> after(
-        AbstractThrowableAssert<?, ? extends Throwable> abstractThrowableAssert,
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert,
         String newErrorMessage,
         @Repeated Object args) {
-      return abstractThrowableAssert.withFailMessage(newErrorMessage, args);
+      return throwableAssert.withFailMessage(newErrorMessage, args);
     }
   }
 

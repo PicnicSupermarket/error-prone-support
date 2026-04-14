@@ -272,28 +272,28 @@ final class TimeRules {
   /** Prefer {@link Instant#isBefore(Instant)} over less explicit alternatives. */
   static final class InstantIsBefore {
     @BeforeTemplate
-    boolean before(Instant a, Instant otherInstant) {
-      return a.compareTo(otherInstant) < 0;
+    boolean before(Instant instant, Instant otherInstant) {
+      return instant.compareTo(otherInstant) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(Instant a, Instant otherInstant) {
-      return a.isBefore(otherInstant);
+    boolean after(Instant instant, Instant otherInstant) {
+      return instant.isBefore(otherInstant);
     }
   }
 
   /** Prefer {@link Instant#isAfter(Instant)} over less explicit alternatives. */
   static final class InstantIsAfter {
     @BeforeTemplate
-    boolean before(Instant a, Instant otherInstant) {
-      return a.compareTo(otherInstant) > 0;
+    boolean before(Instant instant, Instant otherInstant) {
+      return instant.compareTo(otherInstant) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(Instant a, Instant otherInstant) {
-      return a.isAfter(otherInstant);
+    boolean after(Instant instant, Instant otherInstant) {
+      return instant.isAfter(otherInstant);
     }
   }
 
@@ -332,28 +332,28 @@ final class TimeRules {
   /** Prefer {@link ChronoLocalDate#isBefore(ChronoLocalDate)} over less explicit alternatives. */
   static final class ChronoLocalDateIsBefore {
     @BeforeTemplate
-    boolean before(ChronoLocalDate a, ChronoLocalDate other) {
-      return a.compareTo(other) < 0;
+    boolean before(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDate a, ChronoLocalDate other) {
-      return a.isBefore(other);
+    boolean after(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.isBefore(other);
     }
   }
 
   /** Prefer {@link ChronoLocalDate#isAfter(ChronoLocalDate)} over less explicit alternatives. */
   static final class ChronoLocalDateIsAfter {
     @BeforeTemplate
-    boolean before(ChronoLocalDate a, ChronoLocalDate other) {
-      return a.compareTo(other) > 0;
+    boolean before(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDate a, ChronoLocalDate other) {
-      return a.isAfter(other);
+    boolean after(ChronoLocalDate chronoLocalDate, ChronoLocalDate other) {
+      return chronoLocalDate.isAfter(other);
     }
   }
 
@@ -363,14 +363,14 @@ final class TimeRules {
    */
   static final class ChronoLocalDateTimeIsBefore {
     @BeforeTemplate
-    boolean before(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> other) {
-      return a.compareTo(other) < 0;
+    boolean before(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> other) {
-      return a.isBefore(other);
+    boolean after(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.isBefore(other);
     }
   }
 
@@ -380,14 +380,14 @@ final class TimeRules {
    */
   static final class ChronoLocalDateTimeIsAfter {
     @BeforeTemplate
-    boolean before(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> other) {
-      return a.compareTo(other) > 0;
+    boolean before(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoLocalDateTime<?> a, ChronoLocalDateTime<?> other) {
-      return a.isAfter(other);
+    boolean after(ChronoLocalDateTime<?> chronoLocalDateTime, ChronoLocalDateTime<?> other) {
+      return chronoLocalDateTime.isAfter(other);
     }
   }
 
@@ -397,14 +397,14 @@ final class TimeRules {
    */
   static final class ChronoZonedDateTimeIsBefore {
     @BeforeTemplate
-    boolean before(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> other) {
-      return a.compareTo(other) < 0;
+    boolean before(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> other) {
-      return a.isBefore(other);
+    boolean after(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.isBefore(other);
     }
   }
 
@@ -414,42 +414,42 @@ final class TimeRules {
    */
   static final class ChronoZonedDateTimeIsAfter {
     @BeforeTemplate
-    boolean before(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> other) {
-      return a.compareTo(other) > 0;
+    boolean before(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(ChronoZonedDateTime<?> a, ChronoZonedDateTime<?> other) {
-      return a.isAfter(other);
+    boolean after(ChronoZonedDateTime<?> chronoZonedDateTime, ChronoZonedDateTime<?> other) {
+      return chronoZonedDateTime.isAfter(other);
     }
   }
 
   /** Prefer {@link OffsetDateTime#isBefore(OffsetDateTime)} over less explicit alternatives. */
   static final class OffsetDateTimeIsBefore {
     @BeforeTemplate
-    boolean before(OffsetDateTime a, OffsetDateTime other) {
-      return a.compareTo(other) < 0;
+    boolean before(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.compareTo(other) < 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(OffsetDateTime a, OffsetDateTime other) {
-      return a.isBefore(other);
+    boolean after(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.isBefore(other);
     }
   }
 
   /** Prefer {@link OffsetDateTime#isAfter(OffsetDateTime)} over less explicit alternatives. */
   static final class OffsetDateTimeIsAfter {
     @BeforeTemplate
-    boolean before(OffsetDateTime a, OffsetDateTime other) {
-      return a.compareTo(other) > 0;
+    boolean before(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.compareTo(other) > 0;
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(OffsetDateTime a, OffsetDateTime other) {
-      return a.isAfter(other);
+    boolean after(OffsetDateTime offsetDateTime, OffsetDateTime other) {
+      return offsetDateTime.isAfter(other);
     }
   }
 

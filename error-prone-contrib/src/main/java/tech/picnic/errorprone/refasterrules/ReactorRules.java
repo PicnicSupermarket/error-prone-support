@@ -542,8 +542,8 @@ final class ReactorRules {
         Function<? super Object[], ? extends T> combinator,
         int prefetch,
         Comparator<? super T> comparator,
-        @Matches(IsEmpty.class) T[] array,
-        @Matches(IsEmpty.class) Iterable<T> it,
+        @Matches(IsEmpty.class) T[] emptyArray,
+        @Matches(IsEmpty.class) Iterable<T> emptyIt,
         @Matches(IsEmpty.class) Stream<T> emptyStream) {
       return Refaster.anyOf(
           Flux.zip(combinator),
@@ -564,8 +564,8 @@ final class ReactorRules {
           Flux.mergeSequential(),
           Flux.mergeSequential(prefetch),
           Flux.mergeSequentialDelayError(prefetch),
-          Flux.fromArray(array),
-          Flux.fromIterable(it),
+          Flux.fromArray(emptyArray),
+          Flux.fromIterable(emptyIt),
           Flux.fromStream(() -> emptyStream));
     }
 
@@ -887,12 +887,12 @@ final class ReactorRules {
         Flux<T> flux,
         Function<? super T, ? extends P> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
+            Function<? super P, ? extends Publisher<? extends S>> identityMapper) {
       return Refaster.anyOf(
           flux.concatMap(mapper, 0),
           flux.flatMap(mapper, 1),
           flux.flatMapSequential(mapper, 1),
-          flux.map(mapper).concatMap(identityOperation));
+          flux.map(mapper).concatMap(identityMapper));
     }
 
     @AfterTemplate
@@ -910,11 +910,11 @@ final class ReactorRules {
         Function<? super T, ? extends P> mapper,
         int prefetch,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Publisher<? extends S>> identityOperation) {
+            Function<? super P, ? extends Publisher<? extends S>> identityMapper) {
       return Refaster.anyOf(
           flux.flatMap(mapper, 1, prefetch),
           flux.flatMapSequential(mapper, 1, prefetch),
-          flux.map(mapper).concatMap(identityOperation, prefetch));
+          flux.map(mapper).concatMap(identityMapper, prefetch));
     }
 
     @AfterTemplate
@@ -935,10 +935,9 @@ final class ReactorRules {
         Mono<T> mono,
         Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
+            Function<? super I, ? extends Iterable<? extends S>> identityMapper) {
       return Refaster.anyOf(
-          mono.map(mapper).flatMapIterable(identityOperation),
-          mono.flux().concatMapIterable(mapper));
+          mono.map(mapper).flatMapIterable(identityMapper), mono.flux().concatMapIterable(mapper));
     }
 
     @AfterTemplate
@@ -974,9 +973,9 @@ final class ReactorRules {
         Flux<T> flux,
         Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
+            Function<? super I, ? extends Iterable<? extends S>> identityMapper) {
       return Refaster.anyOf(
-          flux.flatMapIterable(mapper), flux.map(mapper).concatMapIterable(identityOperation));
+          flux.flatMapIterable(mapper), flux.map(mapper).concatMapIterable(identityMapper));
     }
 
     @AfterTemplate
@@ -996,10 +995,10 @@ final class ReactorRules {
         Function<? super T, I> mapper,
         int prefetch,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityOperation) {
+            Function<? super I, ? extends Iterable<? extends S>> identityMapper) {
       return Refaster.anyOf(
           flux.flatMapIterable(mapper, prefetch),
-          flux.map(mapper).concatMapIterable(identityOperation, prefetch));
+          flux.map(mapper).concatMapIterable(identityMapper, prefetch));
     }
 
     @AfterTemplate
@@ -1361,13 +1360,13 @@ final class ReactorRules {
    */
   static final class MonoThenFlux<T, S> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono1, Mono<S> other) {
-      return mono1.thenMany(other);
+    Flux<S> before(Mono<T> mono, Mono<S> other) {
+      return mono.thenMany(other);
     }
 
     @AfterTemplate
-    Flux<S> after(Mono<T> mono1, Mono<S> other) {
-      return mono1.then(other).flux();
+    Flux<S> after(Mono<T> mono, Mono<S> other) {
+      return mono.then(other).flux();
     }
   }
 
@@ -1390,19 +1389,19 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class MonoThenWithMono<T, S> {
     @BeforeTemplate
-    Mono<S> before(Mono<T> mono1, Mono<S> other) {
-      return Refaster.anyOf(mono1.ignoreElement().then(other), mono1.flux().then(other));
+    Mono<S> before(Mono<T> mono, Mono<S> other) {
+      return Refaster.anyOf(mono.ignoreElement().then(other), mono.flux().then(other));
     }
 
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
-    Mono<Void> before2(Mono<T> mono1, Mono<Void> other) {
-      return mono1.thenEmpty(other);
+    Mono<Void> before2(Mono<T> mono, Mono<Void> other) {
+      return mono.thenEmpty(other);
     }
 
     @AfterTemplate
-    Mono<S> after(Mono<T> mono1, Mono<S> other) {
-      return mono1.then(other);
+    Mono<S> after(Mono<T> mono, Mono<S> other) {
+      return mono.then(other);
     }
   }
 
@@ -1509,8 +1508,8 @@ final class ReactorRules {
         Mono<S> mono,
         Function<? super S, ? extends P> transformer,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Mono<? extends T>> identityOperation) {
-      return mono.map(transformer).flatMap(identityOperation);
+            Function<? super P, ? extends Mono<? extends T>> identityTransformer) {
+      return mono.map(transformer).flatMap(identityTransformer);
     }
 
     @AfterTemplate
@@ -1527,12 +1526,12 @@ final class ReactorRules {
         Mono<S> mono,
         Function<? super S, P> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super P, ? extends Publisher<? extends T>> identityOperation,
+            Function<? super P, ? extends Publisher<? extends T>> identityMapper,
         int prefetch,
         boolean delayUntilEnd,
         int concurrency) {
       return Refaster.anyOf(
-          mono.map(mapper).flatMapMany(identityOperation),
+          mono.map(mapper).flatMapMany(identityMapper),
           mono.flux().concatMap(mapper),
           mono.flux().concatMap(mapper, prefetch),
           mono.flux().concatMapDelayError(mapper),
@@ -1690,15 +1689,15 @@ final class ReactorRules {
     @BeforeTemplate
     Mono<T> before(
         Mono<T> mono,
-        Consumer<? super Throwable> onThrowable,
+        Consumer<? super Throwable> onError1,
         Class<E> exceptionType,
         Consumer<? super E> onError,
         Predicate<? super Throwable> predicate) {
       return Refaster.anyOf(
           mono.onErrorResume(e -> Mono.empty()),
-          mono.onErrorComplete().doOnError(onThrowable),
+          mono.onErrorComplete().doOnError(onError1),
           mono.onErrorComplete().doOnError(exceptionType, onError),
-          mono.onErrorComplete().doOnError(predicate, onThrowable));
+          mono.onErrorComplete().doOnError(predicate, onError1));
     }
 
     @AfterTemplate
@@ -1715,15 +1714,15 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<T> before(
         Flux<T> flux,
-        Consumer<? super Throwable> onThrowable,
+        Consumer<? super Throwable> onError1,
         Class<E> exceptionType,
         Consumer<? super E> onError,
         Predicate<? super Throwable> predicate) {
       return Refaster.anyOf(
           flux.onErrorResume(e -> Refaster.anyOf(Mono.empty(), Flux.empty())),
-          flux.onErrorComplete().doOnError(onThrowable),
+          flux.onErrorComplete().doOnError(onError1),
           flux.onErrorComplete().doOnError(exceptionType, onError),
-          flux.onErrorComplete().doOnError(predicate, onThrowable));
+          flux.onErrorComplete().doOnError(predicate, onError1));
     }
 
     @AfterTemplate
@@ -2174,8 +2173,8 @@ final class ReactorRules {
   // `Context.of(k, v)` and likewise for multi-pair overloads.
   static final class ContextEmpty {
     @BeforeTemplate
-    Context before(@Matches(IsEmpty.class) Map<?, ?> map) {
-      return Context.of(map);
+    Context before(@Matches(IsEmpty.class) Map<?, ?> emptyMap) {
+      return Context.of(emptyMap);
     }
 
     @AfterTemplate
@@ -2200,85 +2199,85 @@ final class ReactorRules {
   /** Prefer {@link PublisherProbe#assertWasSubscribed()} over more verbose alternatives. */
   static final class PublisherProbeAssertWasSubscribed<T> {
     @BeforeTemplate
-    void before(PublisherProbe<T> probe) {
+    void before(PublisherProbe<T> publisherProbe) {
       Refaster.anyOf(
-          assertThat(probe.wasSubscribed()).isTrue(),
-          assertThat(probe.subscribeCount()).isNotNegative(),
-          assertThat(probe.subscribeCount()).isNotEqualTo(0),
-          assertThat(probe.subscribeCount()).isPositive());
+          assertThat(publisherProbe.wasSubscribed()).isTrue(),
+          assertThat(publisherProbe.subscribeCount()).isNotNegative(),
+          assertThat(publisherProbe.subscribeCount()).isNotEqualTo(0),
+          assertThat(publisherProbe.subscribeCount()).isPositive());
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe) {
-      probe.assertWasSubscribed();
+    void after(PublisherProbe<T> publisherProbe) {
+      publisherProbe.assertWasSubscribed();
     }
   }
 
   /** Prefer {@link PublisherProbe#assertWasNotSubscribed()} over more verbose alternatives. */
   static final class PublisherProbeAssertWasNotSubscribed<T> {
     @BeforeTemplate
-    void before(PublisherProbe<T> probe) {
+    void before(PublisherProbe<T> publisherProbe) {
       Refaster.anyOf(
-          assertThat(probe.wasSubscribed()).isFalse(),
-          assertThat(probe.subscribeCount()).isEqualTo(0),
-          assertThat(probe.subscribeCount()).isNotPositive());
+          assertThat(publisherProbe.wasSubscribed()).isFalse(),
+          assertThat(publisherProbe.subscribeCount()).isEqualTo(0),
+          assertThat(publisherProbe.subscribeCount()).isNotPositive());
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe) {
-      probe.assertWasNotSubscribed();
+    void after(PublisherProbe<T> publisherProbe) {
+      publisherProbe.assertWasNotSubscribed();
     }
   }
 
   /** Prefer {@link PublisherProbe#assertWasCancelled()} over more verbose alternatives. */
   static final class PublisherProbeAssertWasCancelled<T> {
     @BeforeTemplate
-    void before(PublisherProbe<T> probe) {
-      assertThat(probe.wasCancelled()).isTrue();
+    void before(PublisherProbe<T> publisherProbe) {
+      assertThat(publisherProbe.wasCancelled()).isTrue();
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe) {
-      probe.assertWasCancelled();
+    void after(PublisherProbe<T> publisherProbe) {
+      publisherProbe.assertWasCancelled();
     }
   }
 
   /** Prefer {@link PublisherProbe#assertWasNotCancelled()} over more verbose alternatives. */
   static final class PublisherProbeAssertWasNotCancelled<T> {
     @BeforeTemplate
-    void before(PublisherProbe<T> probe) {
-      assertThat(probe.wasCancelled()).isFalse();
+    void before(PublisherProbe<T> publisherProbe) {
+      assertThat(publisherProbe.wasCancelled()).isFalse();
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe) {
-      probe.assertWasNotCancelled();
+    void after(PublisherProbe<T> publisherProbe) {
+      publisherProbe.assertWasNotCancelled();
     }
   }
 
   /** Prefer {@link PublisherProbe#assertWasRequested()} over more verbose alternatives. */
   static final class PublisherProbeAssertWasRequested<T> {
     @BeforeTemplate
-    void before(PublisherProbe<T> probe) {
-      assertThat(probe.wasRequested()).isTrue();
+    void before(PublisherProbe<T> publisherProbe) {
+      assertThat(publisherProbe.wasRequested()).isTrue();
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe) {
-      probe.assertWasRequested();
+    void after(PublisherProbe<T> publisherProbe) {
+      publisherProbe.assertWasRequested();
     }
   }
 
   /** Prefer {@link PublisherProbe#assertWasNotRequested()} over more verbose alternatives. */
   static final class PublisherProbeAssertWasNotRequested<T> {
     @BeforeTemplate
-    void before(PublisherProbe<T> probe) {
-      assertThat(probe.wasRequested()).isFalse();
+    void before(PublisherProbe<T> publisherProbe) {
+      assertThat(publisherProbe.wasRequested()).isFalse();
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe) {
-      probe.assertWasNotRequested();
+    void after(PublisherProbe<T> publisherProbe) {
+      publisherProbe.assertWasNotRequested();
     }
   }
 
@@ -2289,17 +2288,17 @@ final class ReactorRules {
   static final class AssertThatPublisherProbeWasSubscribedIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
-    void before(PublisherProbe<T> probe, boolean expected) {
+    void before(PublisherProbe<T> publisherProbe, boolean expected) {
       if (expected) {
-        probe.assertWasSubscribed();
+        publisherProbe.assertWasSubscribed();
       } else {
-        probe.assertWasNotSubscribed();
+        publisherProbe.assertWasNotSubscribed();
       }
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe, boolean expected) {
-      assertThat(probe.wasSubscribed()).isEqualTo(expected);
+    void after(PublisherProbe<T> publisherProbe, boolean expected) {
+      assertThat(publisherProbe.wasSubscribed()).isEqualTo(expected);
     }
   }
 
@@ -2310,17 +2309,17 @@ final class ReactorRules {
   static final class AssertThatPublisherProbeWasCancelledIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
-    void before(PublisherProbe<T> probe, boolean expected) {
+    void before(PublisherProbe<T> publisherProbe, boolean expected) {
       if (expected) {
-        probe.assertWasCancelled();
+        publisherProbe.assertWasCancelled();
       } else {
-        probe.assertWasNotCancelled();
+        publisherProbe.assertWasNotCancelled();
       }
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe, boolean expected) {
-      assertThat(probe.wasCancelled()).isEqualTo(expected);
+    void after(PublisherProbe<T> publisherProbe, boolean expected) {
+      assertThat(publisherProbe.wasCancelled()).isEqualTo(expected);
     }
   }
 
@@ -2331,17 +2330,17 @@ final class ReactorRules {
   static final class AssertThatPublisherProbeWasRequestedIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
-    void before(PublisherProbe<T> probe, boolean expected) {
+    void before(PublisherProbe<T> publisherProbe, boolean expected) {
       if (expected) {
-        probe.assertWasRequested();
+        publisherProbe.assertWasRequested();
       } else {
-        probe.assertWasNotRequested();
+        publisherProbe.assertWasNotRequested();
       }
     }
 
     @AfterTemplate
-    void after(PublisherProbe<T> probe, boolean expected) {
-      assertThat(probe.wasRequested()).isEqualTo(expected);
+    void after(PublisherProbe<T> publisherProbe, boolean expected) {
+      assertThat(publisherProbe.wasRequested()).isEqualTo(expected);
     }
   }
 
@@ -2433,9 +2432,9 @@ final class ReactorRules {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     StepVerifier.Step<T> before(
-        StepVerifier.Step<T> step, @Matches(IsEmpty.class) Iterable<? extends T> iterable) {
+        StepVerifier.Step<T> step, @Matches(IsEmpty.class) Iterable<? extends T> emptyIterable) {
       return Refaster.anyOf(
-          step.expectNext(), step.expectNextCount(0), step.expectNextSequence(iterable));
+          step.expectNext(), step.expectNextCount(0), step.expectNextSequence(emptyIterable));
     }
 
     @AfterTemplate
@@ -2483,42 +2482,42 @@ final class ReactorRules {
   /** Prefer {@link StepVerifier.LastStep#verifyComplete()} over more verbose alternatives. */
   static final class LastStepVerifyComplete {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step) {
-      return step.expectComplete().verify();
+    Duration before(StepVerifier.LastStep lastStep) {
+      return lastStep.expectComplete().verify();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step) {
-      return step.verifyComplete();
+    Duration after(StepVerifier.LastStep lastStep) {
+      return lastStep.verifyComplete();
     }
   }
 
   /** Prefer {@link StepVerifier.LastStep#verifyError()} over more verbose alternatives. */
   static final class LastStepVerifyError {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step) {
-      return step.expectError().verify();
+    Duration before(StepVerifier.LastStep lastStep) {
+      return lastStep.expectError().verify();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step) {
-      return step.verifyError();
+    Duration after(StepVerifier.LastStep lastStep) {
+      return lastStep.verifyError();
     }
   }
 
   /** Prefer {@link StepVerifier.LastStep#verifyError(Class)} over more verbose alternatives. */
   static final class LastStepVerifyErrorWithClass<T extends Throwable> {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, Class<T> type) {
+    Duration before(StepVerifier.LastStep lastStep, Class<T> type) {
       return Refaster.anyOf(
-          step.expectError(type).verify(),
-          step.verifyErrorMatches(type::isInstance),
-          step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(type)));
+          lastStep.expectError(type).verify(),
+          lastStep.verifyErrorMatches(type::isInstance),
+          lastStep.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(type)));
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, Class<T> type) {
-      return step.verifyError(type);
+    Duration after(StepVerifier.LastStep lastStep, Class<T> type) {
+      return lastStep.verifyError(type);
     }
   }
 
@@ -2529,19 +2528,20 @@ final class ReactorRules {
   @PossibleSourceIncompatibility
   static final class LastStepVerifyErrorMatches {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
-      return step.expectErrorMatches(predicate).verify();
+    Duration before(StepVerifier.LastStep lastStep, Predicate<Throwable> predicate) {
+      return lastStep.expectErrorMatches(predicate).verify();
     }
 
     @BeforeTemplate
     @SuppressWarnings("StepVerifierVerify" /* This is a more specific template. */)
-    StepVerifier.Assertions before2(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
-      return step.expectError().verifyThenAssertThat().hasOperatorErrorMatching(predicate);
+    StepVerifier.Assertions before2(
+        StepVerifier.LastStep lastStep, Predicate<Throwable> predicate) {
+      return lastStep.expectError().verifyThenAssertThat().hasOperatorErrorMatching(predicate);
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, Predicate<Throwable> predicate) {
-      return step.verifyErrorMatches(predicate);
+    Duration after(StepVerifier.LastStep lastStep, Predicate<Throwable> predicate) {
+      return lastStep.verifyErrorMatches(predicate);
     }
   }
 
@@ -2551,13 +2551,13 @@ final class ReactorRules {
    */
   static final class LastStepVerifyErrorSatisfies {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, Consumer<Throwable> consumer) {
-      return step.expectErrorSatisfies(consumer).verify();
+    Duration before(StepVerifier.LastStep lastStep, Consumer<Throwable> consumer) {
+      return lastStep.expectErrorSatisfies(consumer).verify();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, Consumer<Throwable> consumer) {
-      return step.verifyErrorSatisfies(consumer);
+    Duration after(StepVerifier.LastStep lastStep, Consumer<Throwable> consumer) {
+      return lastStep.verifyErrorSatisfies(consumer);
     }
   }
 
@@ -2570,20 +2570,22 @@ final class ReactorRules {
       T extends Throwable> {
     @BeforeTemplate
     @SuppressWarnings("StepVerifierVerify" /* This is a more specific template. */)
-    StepVerifier.Assertions before(StepVerifier.LastStep step, Class<T> type, String message) {
+    StepVerifier.Assertions before(StepVerifier.LastStep lastStep, Class<T> type, String message) {
       return Refaster.anyOf(
-          step.expectError()
+          lastStep
+              .expectError()
               .verifyThenAssertThat()
               .hasOperatorErrorOfType(type)
               .hasOperatorErrorWithMessage(message),
-          step.expectError(type).verifyThenAssertThat().hasOperatorErrorWithMessage(message),
-          step.expectErrorMessage(message).verifyThenAssertThat().hasOperatorErrorOfType(type));
+          lastStep.expectError(type).verifyThenAssertThat().hasOperatorErrorWithMessage(message),
+          lastStep.expectErrorMessage(message).verifyThenAssertThat().hasOperatorErrorOfType(type));
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Duration after(StepVerifier.LastStep step, Class<T> type, String message) {
-      return step.verifyErrorSatisfies(t -> assertThat(t).isInstanceOf(type).hasMessage(message));
+    Duration after(StepVerifier.LastStep lastStep, Class<T> type, String message) {
+      return lastStep.verifyErrorSatisfies(
+          t -> assertThat(t).isInstanceOf(type).hasMessage(message));
     }
   }
 
@@ -2592,13 +2594,13 @@ final class ReactorRules {
    */
   static final class LastStepVerifyErrorMessage {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, String message) {
-      return step.expectErrorMessage(message).verify();
+    Duration before(StepVerifier.LastStep lastStep, String str) {
+      return lastStep.expectErrorMessage(str).verify();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, String message) {
-      return step.verifyErrorMessage(message);
+    Duration after(StepVerifier.LastStep lastStep, String str) {
+      return lastStep.verifyErrorMessage(str);
     }
   }
 
@@ -2607,13 +2609,13 @@ final class ReactorRules {
    */
   static final class LastStepVerifyTimeout {
     @BeforeTemplate
-    Duration before(StepVerifier.LastStep step, Duration duration) {
-      return step.expectTimeout(duration).verify();
+    Duration before(StepVerifier.LastStep lastStep, Duration duration) {
+      return lastStep.expectTimeout(duration).verify();
     }
 
     @AfterTemplate
-    Duration after(StepVerifier.LastStep step, Duration duration) {
-      return step.verifyTimeout(duration);
+    Duration after(StepVerifier.LastStep lastStep, Duration duration) {
+      return lastStep.verifyTimeout(duration);
     }
   }
 
@@ -2661,13 +2663,13 @@ final class ReactorRules {
    */
   static final class MonoFromFutureAsyncLoadingCacheGetTrue<K, V> {
     @BeforeTemplate
-    Mono<V> before(AsyncLoadingCache<K, V> cache, K key) {
-      return Mono.fromFuture(() -> cache.get(key));
+    Mono<V> before(AsyncLoadingCache<K, V> asyncLoadingCache, K key) {
+      return Mono.fromFuture(() -> asyncLoadingCache.get(key));
     }
 
     @AfterTemplate
-    Mono<V> after(AsyncLoadingCache<K, V> cache, K key) {
-      return Mono.fromFuture(() -> cache.get(key), /* suppressCancel= */ true);
+    Mono<V> after(AsyncLoadingCache<K, V> asyncLoadingCache, K key) {
+      return Mono.fromFuture(() -> asyncLoadingCache.get(key), /* suppressCancel= */ true);
     }
   }
 
@@ -2680,13 +2682,13 @@ final class ReactorRules {
    */
   static final class MonoFromFutureAsyncLoadingCacheGetAllTrue<K1, K2 extends K1, V> {
     @BeforeTemplate
-    Mono<Map<K1, V>> before(AsyncLoadingCache<K1, V> cache, Iterable<K2> keys) {
-      return Mono.fromFuture(() -> cache.getAll(keys));
+    Mono<Map<K1, V>> before(AsyncLoadingCache<K1, V> asyncLoadingCache, Iterable<K2> keys) {
+      return Mono.fromFuture(() -> asyncLoadingCache.getAll(keys));
     }
 
     @AfterTemplate
-    Mono<Map<K1, V>> after(AsyncLoadingCache<K1, V> cache, Iterable<K2> keys) {
-      return Mono.fromFuture(() -> cache.getAll(keys), /* suppressCancel= */ true);
+    Mono<Map<K1, V>> after(AsyncLoadingCache<K1, V> asyncLoadingCache, Iterable<K2> keys) {
+      return Mono.fromFuture(() -> asyncLoadingCache.getAll(keys), /* suppressCancel= */ true);
     }
   }
 
