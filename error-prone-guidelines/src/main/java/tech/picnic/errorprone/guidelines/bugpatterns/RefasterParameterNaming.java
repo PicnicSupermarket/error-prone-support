@@ -201,7 +201,9 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     for (Map.Entry<String, List<String>> entry : byTarget.entrySet()) {
       String target = entry.getKey();
       List<String> sources = entry.getValue();
-      if (sources.size() == 1 && !occupiedNames.contains(target)) {
+      boolean inNumberedFamily =
+          occupiedNames.stream().anyMatch(n -> n.matches(Pattern.quote(target) + "\\d+"));
+      if (sources.size() == 1 && !occupiedNames.contains(target) && !inNumberedFamily) {
         occupiedNames.add(target);
       } else {
         @Var int counter = 1;
