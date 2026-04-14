@@ -25,6 +25,8 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.util.ASTHelpers;
+import com.sun.source.tree.AnnotationTree;
+import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
@@ -157,6 +159,23 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
           .ifPresent(name -> renames.put(paramName, name));
     }
 
+    /* Apply name prefix implied by @Matches annotations (check all template methods). */
+    Map<String, String> matchesPrefixes = new LinkedHashMap<>();
+    for (MethodTree method : methods) {
+      for (VariableTree param : method.getParameters()) {
+        String paramName = param.getName().toString();
+        if (!matchesPrefixes.containsKey(paramName)) {
+          getMatchesPrefix(param).ifPresent(prefix -> matchesPrefixes.put(paramName, prefix));
+        }
+      }
+    }
+    for (Map.Entry<String, String> entry : matchesPrefixes.entrySet()) {
+      String paramName = entry.getKey();
+      String prefix = entry.getValue();
+      String base = renames.getOrDefault(paramName, paramName);
+      renames.put(paramName, prefix + Character.toUpperCase(base.charAt(0)) + base.substring(1));
+    }
+
     /* Remove renames where the derived name matches the current name. */
     renames.entrySet().removeIf(e -> e.getKey().equals(e.getValue()));
 
@@ -246,6 +265,33 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
       }
     }
     return simpleName;
+  }
+
+  /**
+   * Returns the name prefix implied by a {@code @Matches} annotation on the given parameter, if
+   * any. Specifically, {@code @Matches(IsIdentityOperation.class)} yields {@code "identity"} and
+   * {@code @Matches(IsEmpty.class)} yields {@code "empty"}.
+   */
+  private static Optional<String> getMatchesPrefix(VariableTree param) {
+    for (AnnotationTree ann : param.getModifiers().getAnnotations()) {
+      String annType = ann.getAnnotationType().toString();
+      if (!annType.equals("Matches") && !annType.endsWith(".Matches")) {
+        continue;
+      }
+      for (ExpressionTree arg : ann.getArguments()) {
+        String argSrc =
+            arg instanceof AssignmentTree assign
+                ? assign.getExpression().toString()
+                : arg.toString();
+        if (argSrc.contains("IsIdentityOperation")) {
+          return Optional.of("identity");
+        }
+        if (argSrc.contains("IsEmpty")) {
+          return Optional.of("empty");
+        }
+      }
+    }
+    return Optional.empty();
   }
 
   private static ImmutableMap<String, String> scanMethodForNames(
