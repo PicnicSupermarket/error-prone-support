@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -52,6 +53,7 @@ import java.util.regex.Pattern;
 import javax.lang.model.SourceVersion;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
+import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags Refaster template parameters with names that do not match their
@@ -90,6 +92,7 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  * <p>When multiple parameters would receive the same derived name, numeric suffixes are appended to
  * disambiguate (e.g. {@code list1}, {@code list2}).
  */
+// XXX: Fully review this class.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
@@ -170,7 +173,9 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     }
 
     for (String paramName : unresolved) {
-      deriveNameFromType(paramTrees.get(paramName)).ifPresent(name -> renames.put(paramName, name));
+      // XXX: Deal with `requireNonNull`.
+      deriveNameFromType(requireNonNull(paramTrees.get(paramName)))
+          .ifPresent(name -> renames.put(paramName, name));
     }
 
     /* Apply name prefix implied by @Matches annotations (check all template methods). */
@@ -179,7 +184,8 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
       for (VariableTree param : method.getParameters()) {
         String paramName = param.getName().toString();
         if (!matchesPrefixes.containsKey(paramName)) {
-          getMatchesPrefix(param).ifPresent(prefix -> matchesPrefixes.put(paramName, prefix));
+          getMatchesPrefix(param, state)
+              .ifPresent(prefix -> matchesPrefixes.put(paramName, prefix));
         }
       }
     }
@@ -288,17 +294,17 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
    * any. Specifically, {@code @Matches(IsIdentityOperation.class)} yields {@code "identity"} and
    * {@code @Matches(IsEmpty.class)} yields {@code "empty"}.
    */
-  private static Optional<String> getMatchesPrefix(VariableTree param) {
+  private static Optional<String> getMatchesPrefix(VariableTree param, VisitorState state) {
     for (AnnotationTree ann : param.getModifiers().getAnnotations()) {
-      String annType = ann.getAnnotationType().toString();
+      String annType = SourceCode.treeToString(ann.getAnnotationType(), state);
       if (!annType.equals("Matches") && !annType.endsWith(".Matches")) {
         continue;
       }
       for (ExpressionTree arg : ann.getArguments()) {
         String argSrc =
             arg instanceof AssignmentTree assign
-                ? assign.getExpression().toString()
-                : arg.toString();
+                ? SourceCode.treeToString(assign.getExpression(), state)
+                : SourceCode.treeToString(arg, state);
         if (argSrc.contains("IsIdentityOperation")) {
           return Optional.of("identity");
         }
