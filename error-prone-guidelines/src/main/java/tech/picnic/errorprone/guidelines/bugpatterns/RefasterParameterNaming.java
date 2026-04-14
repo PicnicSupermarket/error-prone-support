@@ -9,7 +9,6 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -43,7 +42,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -91,9 +89,14 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
   private static final Matcher<Tree> REPEATED_ANNOTATION =
       hasAnnotation(Repeated.class.getCanonicalName());
   private static final Pattern SYNTHETIC_PARAMETER_NAME = Pattern.compile("arg\\d+");
-  private static final Pattern CAMEL_CASE_SPLIT = Pattern.compile("(?<=[a-z])(?=[A-Z])");
+  private static final ImmutableList<String> STRIPPED_TYPE_PREFIXES =
+      ImmutableList.of("Abstract", "Immutable");
   private static final ImmutableMap<String, String> TYPE_NAME_SHORTHANDS =
-      ImmutableMap.of("comparator", "cmp", "string", "str");
+      ImmutableMap.of(
+          "comparator", "cmp",
+          "invocationOnMock", "invocation",
+          "string", "str",
+          "stringBuilder", "sb");
 
   /** Instantiates a new {@link RefasterParameterNaming} instance. */
   public RefasterParameterNaming() {}
@@ -203,8 +206,8 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
       return Optional.empty();
     }
 
-    // XXX: `ArrayType.tsym.getSimpleName()` returns "Array", which the CamelCase logic below
-    // would also map to "array". The explicit check is retained for clarity of intent.
+    // XXX: `ArrayType.tsym.getSimpleName()` returns "Array", which the logic below would also map
+    // to "array". The explicit check is retained for clarity of intent.
     if (type instanceof Type.ArrayType) {
       return Optional.of("array");
     }
@@ -224,24 +227,25 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
       return Optional.of(String.valueOf(simpleName.charAt(0)));
     }
 
-    List<String> parts = Splitter.on(CAMEL_CASE_SPLIT).splitToList(simpleName);
-    String base = parts.getLast().toLowerCase(Locale.ROOT);
-    String name = TYPE_NAME_SHORTHANDS.getOrDefault(base, base);
-
-    if (!SourceVersion.isKeyword(name)) {
-      return Optional.of(name);
-    }
-
-    if (parts.size() >= 2) {
-      String fallback = parts.get(parts.size() - 2).toLowerCase(Locale.ROOT) + parts.getLast();
-      // XXX: No real Java class with two or more CamelCase parts has a keyword as its two-part
-      // fallback (e.g., "fooInt"), so this guard is not observable in tests.
-      if (!SourceVersion.isKeyword(fallback)) {
-        return Optional.of(fallback);
+    // Try the prefix-stripped name first; fall back to the full name.
+    for (String candidate : ImmutableList.of(stripTypePrefix(simpleName), simpleName)) {
+      String base = Character.toLowerCase(candidate.charAt(0)) + candidate.substring(1);
+      String name = TYPE_NAME_SHORTHANDS.getOrDefault(base, base);
+      if (!SourceVersion.isKeyword(name)) {
+        return Optional.of(name);
       }
     }
 
     return Optional.empty();
+  }
+
+  private static String stripTypePrefix(String simpleName) {
+    for (String prefix : STRIPPED_TYPE_PREFIXES) {
+      if (simpleName.startsWith(prefix) && simpleName.length() > prefix.length()) {
+        return simpleName.substring(prefix.length());
+      }
+    }
+    return simpleName;
   }
 
   private static ImmutableMap<String, String> scanMethodForNames(
