@@ -36,14 +36,14 @@ final class LongStreamRules {
   /** Prefer the {@link LongStream} as-is over more contrived alternatives. */
   static final class LongStreamIdentity {
     @BeforeTemplate
-    LongStream before(LongStream stream) {
-      return Streams.concat(stream);
+    LongStream before(LongStream longStream) {
+      return Streams.concat(longStream);
     }
 
     @AfterTemplate
     @CanIgnoreReturnValue
-    LongStream after(LongStream stream) {
-      return stream;
+    LongStream after(LongStream longStream) {
+      return longStream;
     }
   }
 
@@ -66,13 +66,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    LongStream before(LongStream stream, LongPredicate predicate) {
-      return stream.flatMap(v -> toLongStreamFunction(v).filter(predicate));
+    LongStream before(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.flatMap(v -> toLongStreamFunction(v).filter(longPredicate));
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongPredicate predicate) {
-      return stream.flatMap(v -> toLongStreamFunction(v)).filter(predicate);
+    LongStream after(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.flatMap(v -> toLongStreamFunction(v)).filter(longPredicate);
     }
   }
 
@@ -82,13 +82,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    LongStream before(Stream<T> stream, LongPredicate predicate) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v).filter(predicate));
+    LongStream before(Stream<T> stream, LongPredicate longPredicate) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v).filter(longPredicate));
     }
 
     @AfterTemplate
-    LongStream after(Stream<T> stream, LongPredicate predicate) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v)).filter(predicate);
+    LongStream after(Stream<T> stream, LongPredicate longPredicate) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v)).filter(longPredicate);
     }
   }
 
@@ -98,13 +98,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    LongStream before(LongStream stream, LongUnaryOperator operator) {
-      return stream.flatMap(v -> toLongStreamFunction(v).map(operator));
+    LongStream before(LongStream longStream, LongUnaryOperator longUnaryOperator) {
+      return longStream.flatMap(v -> toLongStreamFunction(v).map(longUnaryOperator));
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongUnaryOperator operator) {
-      return stream.flatMap(v -> toLongStreamFunction(v)).map(operator);
+    LongStream after(LongStream longStream, LongUnaryOperator longUnaryOperator) {
+      return longStream.flatMap(v -> toLongStreamFunction(v)).map(longUnaryOperator);
     }
   }
 
@@ -114,13 +114,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    LongStream before(Stream<T> stream, LongUnaryOperator operator) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v).map(operator));
+    LongStream before(Stream<T> stream, LongUnaryOperator longUnaryOperator) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v).map(longUnaryOperator));
     }
 
     @AfterTemplate
-    LongStream after(Stream<T> stream, LongUnaryOperator operator) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v)).map(operator);
+    LongStream after(Stream<T> stream, LongUnaryOperator longUnaryOperator) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v)).map(longUnaryOperator);
     }
   }
 
@@ -130,13 +130,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    LongStream before(LongStream stream, LongFunction<S> function) {
-      return stream.flatMap(v -> toLongStreamFunction(v).flatMap(function));
+    LongStream before(LongStream longStream, LongFunction<S> longFunction) {
+      return longStream.flatMap(v -> toLongStreamFunction(v).flatMap(longFunction));
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongFunction<S> function) {
-      return stream.flatMap(v -> toLongStreamFunction(v)).flatMap(function);
+    LongStream after(LongStream longStream, LongFunction<S> longFunction) {
+      return longStream.flatMap(v -> toLongStreamFunction(v)).flatMap(longFunction);
     }
   }
 
@@ -146,13 +146,13 @@ final class LongStreamRules {
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    LongStream before(Stream<T> stream, LongFunction<S> function) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v).flatMap(function));
+    LongStream before(Stream<T> stream, LongFunction<S> longFunction) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v).flatMap(longFunction));
     }
 
     @AfterTemplate
-    LongStream after(Stream<T> stream, LongFunction<S> function) {
-      return stream.flatMapToLong(v -> toLongStreamFunction(v)).flatMap(function);
+    LongStream after(Stream<T> stream, LongFunction<S> longFunction) {
+      return stream.flatMapToLong(v -> toLongStreamFunction(v)).flatMap(longFunction);
     }
   }
 
@@ -162,76 +162,76 @@ final class LongStreamRules {
    */
   static final class LongStreamFilterSorted {
     @BeforeTemplate
-    LongStream before(LongStream stream, LongPredicate predicate) {
-      return stream.sorted().filter(predicate);
+    LongStream before(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.sorted().filter(longPredicate);
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongPredicate predicate) {
-      return stream.filter(predicate).sorted();
+    LongStream after(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.filter(longPredicate).sorted();
     }
   }
 
   /** Prefer {@link LongStream#findAny()} over less efficient alternatives. */
   static final class LongStreamFindAnyIsEmpty {
     @BeforeTemplate
-    boolean before(LongStream stream) {
+    boolean before(LongStream longStream) {
       return Refaster.anyOf(
-          stream.count() == 0,
-          stream.count() <= 0,
-          stream.count() < 1,
-          stream.findFirst().isEmpty());
+          longStream.count() == 0,
+          longStream.count() <= 0,
+          longStream.count() < 1,
+          longStream.findFirst().isEmpty());
     }
 
     @AfterTemplate
-    boolean after(LongStream stream) {
-      return stream.findAny().isEmpty();
+    boolean after(LongStream longStream) {
+      return longStream.findAny().isEmpty();
     }
   }
 
   /** Prefer {@link LongStream#findAny()} over less efficient alternatives. */
   static final class LongStreamFindAnyIsPresent {
     @BeforeTemplate
-    boolean before(LongStream stream) {
+    boolean before(LongStream longStream) {
       return Refaster.anyOf(
-          stream.count() != 0,
-          stream.count() > 0,
-          stream.count() >= 1,
-          stream.findFirst().isPresent());
+          longStream.count() != 0,
+          longStream.count() > 0,
+          longStream.count() >= 1,
+          longStream.findFirst().isPresent());
     }
 
     @AfterTemplate
-    boolean after(LongStream stream) {
-      return stream.findAny().isPresent();
+    boolean after(LongStream longStream) {
+      return longStream.findAny().isPresent();
     }
   }
 
   /** Prefer {@link LongStream#min()} over less efficient alternatives. */
   static final class LongStreamMin {
     @BeforeTemplate
-    OptionalLong before(LongStream stream) {
-      return stream.sorted().findFirst();
+    OptionalLong before(LongStream longStream) {
+      return longStream.sorted().findFirst();
     }
 
     @AfterTemplate
-    OptionalLong after(LongStream stream) {
-      return stream.min();
+    OptionalLong after(LongStream longStream) {
+      return longStream.min();
     }
   }
 
   /** Prefer {@link LongStream#noneMatch(LongPredicate)} over more contrived alternatives. */
   static final class LongStreamNoneMatchWithLongPredicate {
     @BeforeTemplate
-    boolean before(LongStream stream, LongPredicate predicate) {
+    boolean before(LongStream longStream, LongPredicate longPredicate) {
       return Refaster.anyOf(
-          !stream.anyMatch(predicate),
-          stream.allMatch(predicate.negate()),
-          stream.filter(predicate).findAny().isEmpty());
+          !longStream.anyMatch(longPredicate),
+          longStream.allMatch(longPredicate.negate()),
+          longStream.filter(longPredicate).findAny().isEmpty());
     }
 
     @AfterTemplate
-    boolean after(LongStream stream, LongPredicate predicate) {
-      return stream.noneMatch(predicate);
+    boolean after(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.noneMatch(longPredicate);
     }
   }
 
@@ -241,13 +241,13 @@ final class LongStreamRules {
     abstract boolean test(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    boolean before(LongStream stream) {
-      return stream.allMatch(e -> !test(e));
+    boolean before(LongStream longStream) {
+      return longStream.allMatch(e -> !test(e));
     }
 
     @AfterTemplate
-    boolean after(LongStream stream) {
-      return stream.noneMatch(e -> test(e));
+    boolean after(LongStream longStream) {
+      return longStream.noneMatch(e -> test(e));
     }
   }
 
@@ -255,27 +255,28 @@ final class LongStreamRules {
   static final class LongStreamAnyMatch {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
-    boolean before(LongStream stream, LongPredicate predicate) {
+    boolean before(LongStream longStream, LongPredicate longPredicate) {
       return Refaster.anyOf(
-          !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
+          !longStream.noneMatch(longPredicate),
+          longStream.filter(longPredicate).findAny().isPresent());
     }
 
     @AfterTemplate
-    boolean after(LongStream stream, LongPredicate predicate) {
-      return stream.anyMatch(predicate);
+    boolean after(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.anyMatch(longPredicate);
     }
   }
 
   /** Prefer {@link LongStream#allMatch(LongPredicate)} over more contrived alternatives. */
   static final class LongStreamAllMatchWithLongPredicate {
     @BeforeTemplate
-    boolean before(LongStream stream, LongPredicate predicate) {
-      return stream.noneMatch(predicate.negate());
+    boolean before(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.noneMatch(longPredicate.negate());
     }
 
     @AfterTemplate
-    boolean after(LongStream stream, LongPredicate predicate) {
-      return stream.allMatch(predicate);
+    boolean after(LongStream longStream, LongPredicate longPredicate) {
+      return longStream.allMatch(longPredicate);
     }
   }
 
@@ -285,26 +286,26 @@ final class LongStreamRules {
     abstract boolean test(@MayOptionallyUse long element);
 
     @BeforeTemplate
-    boolean before(LongStream stream) {
-      return stream.noneMatch(e -> !test(e));
+    boolean before(LongStream longStream) {
+      return longStream.noneMatch(e -> !test(e));
     }
 
     @AfterTemplate
-    boolean after(LongStream stream) {
-      return stream.allMatch(e -> test(e));
+    boolean after(LongStream longStream) {
+      return longStream.allMatch(e -> test(e));
     }
   }
 
   /** Prefer {@link LongStream#takeWhile(LongPredicate)} over more verbose alternatives. */
   static final class LongStreamTakeWhile {
     @BeforeTemplate
-    LongStream before(LongStream stream, LongPredicate predicate) {
-      return stream.takeWhile(predicate).filter(predicate);
+    LongStream before(LongStream longStream, LongPredicate predicate) {
+      return longStream.takeWhile(predicate).filter(predicate);
     }
 
     @AfterTemplate
-    LongStream after(LongStream stream, LongPredicate predicate) {
-      return stream.takeWhile(predicate);
+    LongStream after(LongStream longStream, LongPredicate predicate) {
+      return longStream.takeWhile(predicate);
     }
   }
 }

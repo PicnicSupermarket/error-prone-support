@@ -25,24 +25,24 @@ final class AssertJEnumerableRules {
   static final class EnumerableAssertIsEmpty<E> {
     @BeforeTemplate
     void before(
-        EnumerableAssert<?, E> enumerableAssert, @Matches(IsEmpty.class) Iterable<?> other) {
+        EnumerableAssert<?, E> enumerableAssert, @Matches(IsEmpty.class) Iterable<?> emptyOther) {
       Refaster.anyOf(
           enumerableAssert.hasSize(0),
           enumerableAssert.hasSizeLessThanOrEqualTo(0),
           enumerableAssert.hasSizeLessThan(1),
-          enumerableAssert.hasSameSizeAs(other));
+          enumerableAssert.hasSameSizeAs(emptyOther));
     }
 
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
     void before(
         ObjectEnumerableAssert<?, E> enumerableAssert,
-        @Matches(IsEmpty.class) Iterable<? extends E> other) {
+        @Matches(IsEmpty.class) Iterable<? extends E> emptyOther) {
       Refaster.anyOf(
-          enumerableAssert.containsExactlyElementsOf(other),
-          enumerableAssert.containsExactlyInAnyOrderElementsOf(other),
-          enumerableAssert.hasSameElementsAs(other),
-          enumerableAssert.isSubsetOf(other),
+          enumerableAssert.containsExactlyElementsOf(emptyOther),
+          enumerableAssert.containsExactlyInAnyOrderElementsOf(emptyOther),
+          enumerableAssert.hasSameElementsAs(emptyOther),
+          enumerableAssert.isSubsetOf(emptyOther),
           enumerableAssert.containsExactly(),
           enumerableAssert.containsExactlyInAnyOrder(),
           enumerableAssert.containsOnly(),
@@ -66,8 +66,8 @@ final class AssertJEnumerableRules {
   static final class AssertIsEmpty<
       E, A extends Assert<?, ? extends Iterable<? extends E>> & EnumerableAssert<?, E>> {
     @BeforeTemplate
-    void before(A enumAssert, @Matches(IsEmpty.class) Iterable<?> expected) {
-      enumAssert.isEqualTo(expected);
+    void before(A enumAssert, @Matches(IsEmpty.class) Iterable<?> emptyExpected) {
+      enumAssert.isEqualTo(emptyExpected);
     }
 
     @AfterTemplate

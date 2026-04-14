@@ -19,13 +19,15 @@ final class SpringTestRules {
   static final class BodyContentSpecJsonJsonCompareModeLenient {
     @BeforeTemplate
     @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
-    BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
-      return Refaster.anyOf(spec.json(expectedJson), spec.json(expectedJson, /* strict= */ false));
+    BodyContentSpec before(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return Refaster.anyOf(
+          bodyContentSpec.json(expectedJson),
+          bodyContentSpec.json(expectedJson, /* strict= */ false));
     }
 
     @AfterTemplate
-    BodyContentSpec after(BodyContentSpec spec, String expectedJson) {
-      return spec.json(expectedJson, JsonCompareMode.LENIENT);
+    BodyContentSpec after(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return bodyContentSpec.json(expectedJson, JsonCompareMode.LENIENT);
     }
   }
 
@@ -36,13 +38,13 @@ final class SpringTestRules {
   static final class BodyContentSpecJsonJsonCompareModeStrict {
     @BeforeTemplate
     @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
-    BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
-      return spec.json(expectedJson, /* strict= */ true);
+    BodyContentSpec before(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return bodyContentSpec.json(expectedJson, /* strict= */ true);
     }
 
     @AfterTemplate
-    BodyContentSpec after(BodyContentSpec spec, String expectedJson) {
-      return spec.json(expectedJson, JsonCompareMode.STRICT);
+    BodyContentSpec after(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return bodyContentSpec.json(expectedJson, JsonCompareMode.STRICT);
     }
   }
 }

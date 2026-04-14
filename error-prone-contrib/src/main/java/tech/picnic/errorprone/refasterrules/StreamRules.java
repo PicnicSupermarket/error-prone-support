@@ -91,17 +91,17 @@ final class StreamRules {
   static final class StreamEmpty<T> {
     @BeforeTemplate
     Stream<T> before(
-        @Matches(IsEmpty.class) Collection<T> collection,
-        @Matches(IsEmpty.class) Iterable<T> iterable,
-        @Matches(IsEmpty.class) Iterator<T> iterator,
-        @Matches(IsEmpty.class) T[] array) {
+        @Matches(IsEmpty.class) Collection<T> emptyCollection,
+        @Matches(IsEmpty.class) Iterable<T> emptyIterable,
+        @Matches(IsEmpty.class) Iterator<T> emptyIterator,
+        @Matches(IsEmpty.class) T[] emptyArray) {
       return Refaster.anyOf(
           Stream.of(),
           Optional.<T>empty().stream(),
-          collection.stream(),
-          Streams.stream(iterable),
-          Streams.stream(iterator),
-          Arrays.stream(array));
+          emptyCollection.stream(),
+          Streams.stream(emptyIterable),
+          Streams.stream(emptyIterator),
+          Arrays.stream(emptyArray));
     }
 
     @AfterTemplate
@@ -793,8 +793,8 @@ final class StreamRules {
     Stream<T> before(
         @Repeated Stream<T> streams,
         @Matches(IsIdentityOperation.class)
-            Function<? super Stream<T>, ? extends Stream<? extends T>> function) {
-      return Stream.of(Refaster.asVarargs(streams)).flatMap(function);
+            Function<? super Stream<T>, ? extends Stream<? extends T>> identityFunction) {
+      return Stream.of(Refaster.asVarargs(streams)).flatMap(identityFunction);
     }
 
     @AfterTemplate

@@ -83,24 +83,24 @@ final class ImmutableMapRules {
     ImmutableMap<K, V> before(
         Iterator<K> keys,
         Function<S, V2> valueFunction,
-        @Matches(IsIdentityOperation.class) Function<S, K2> keyFunction) {
-      return Streams.stream(keys).collect(toImmutableMap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, K2> identityKeyFunction) {
+      return Streams.stream(keys).collect(toImmutableMap(identityKeyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterable<K> keys,
         Function<S, V2> valueFunction,
-        @Matches(IsIdentityOperation.class) Function<S, K2> keyFunction) {
-      return Streams.stream(keys).collect(toImmutableMap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, K2> identityKeyFunction) {
+      return Streams.stream(keys).collect(toImmutableMap(identityKeyFunction, valueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Collection<K> keys,
         Function<S, V2> valueFunction,
-        @Matches(IsIdentityOperation.class) Function<S, K2> keyFunction) {
-      return keys.stream().collect(toImmutableMap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, K2> identityKeyFunction) {
+      return keys.stream().collect(toImmutableMap(identityKeyFunction, valueFunction));
     }
 
     @BeforeTemplate
@@ -178,24 +178,24 @@ final class ImmutableMapRules {
     ImmutableMap<K, V> before(
         Iterator<V> values,
         Function<S, K2> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
-      return Streams.stream(values).collect(toImmutableMap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, V2> identityValueFunction) {
+      return Streams.stream(values).collect(toImmutableMap(keyFunction, identityValueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Iterable<V> values,
         Function<S, K2> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
-      return Streams.stream(values).collect(toImmutableMap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, V2> identityValueFunction) {
+      return Streams.stream(values).collect(toImmutableMap(keyFunction, identityValueFunction));
     }
 
     @BeforeTemplate
     ImmutableMap<K, V> before(
         Collection<V> values,
         Function<S, K2> keyFunction,
-        @Matches(IsIdentityOperation.class) Function<S, V2> valueFunction) {
-      return values.stream().collect(toImmutableMap(keyFunction, valueFunction));
+        @Matches(IsIdentityOperation.class) Function<S, V2> identityValueFunction) {
+      return values.stream().collect(toImmutableMap(keyFunction, identityValueFunction));
     }
 
     @AfterTemplate

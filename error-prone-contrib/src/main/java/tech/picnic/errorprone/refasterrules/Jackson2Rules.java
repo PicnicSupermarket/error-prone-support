@@ -19,64 +19,64 @@ final class Jackson2Rules {
   /** Prefer {@link JsonNode#optional(int)} over more contrived alternatives. */
   static final class JsonNodeOptionalInt {
     @BeforeTemplate
-    Optional<JsonNode> before(JsonNode node, int index) {
+    Optional<JsonNode> before(JsonNode jsonNode, int index) {
       return Refaster.anyOf(
-          node.get(index).asOptional(),
-          node.path(index).asOptional(),
-          Optional.of(node.get(index)),
-          Optional.ofNullable(node.get(index)));
+          jsonNode.get(index).asOptional(),
+          jsonNode.path(index).asOptional(),
+          Optional.of(jsonNode.get(index)),
+          Optional.ofNullable(jsonNode.get(index)));
     }
 
     @AfterTemplate
-    Optional<JsonNode> after(JsonNode node, int index) {
-      return node.optional(index);
+    Optional<JsonNode> after(JsonNode jsonNode, int index) {
+      return jsonNode.optional(index);
     }
   }
 
   /** Prefer {@link JsonNode#optional(String)} over more contrived alternatives. */
   static final class JsonNodeOptionalString {
     @BeforeTemplate
-    Optional<JsonNode> before(JsonNode node, String propertyName) {
+    Optional<JsonNode> before(JsonNode jsonNode, String propertyName) {
       return Refaster.anyOf(
-          node.get(propertyName).asOptional(),
-          node.path(propertyName).asOptional(),
-          Optional.of(node.get(propertyName)),
-          Optional.ofNullable(node.get(propertyName)));
+          jsonNode.get(propertyName).asOptional(),
+          jsonNode.path(propertyName).asOptional(),
+          Optional.of(jsonNode.get(propertyName)),
+          Optional.ofNullable(jsonNode.get(propertyName)));
     }
 
     @AfterTemplate
-    Optional<JsonNode> after(JsonNode node, String propertyName) {
-      return node.optional(propertyName);
+    Optional<JsonNode> after(JsonNode jsonNode, String propertyName) {
+      return jsonNode.optional(propertyName);
     }
   }
 
   /** Prefer {@link ObjectMapper#valueToTree(Object)} over less efficient alternatives. */
   static final class ObjectMapperValueToTree {
     @BeforeTemplate
-    JsonNode before(ObjectMapper mapper, Object fromValue) throws IOException {
+    JsonNode before(ObjectMapper objectMapper, Object fromValue) throws IOException {
       return Refaster.anyOf(
-          mapper.readTree(mapper.writeValueAsBytes(fromValue)),
-          mapper.readTree(mapper.writeValueAsString(fromValue)));
+          objectMapper.readTree(objectMapper.writeValueAsBytes(fromValue)),
+          objectMapper.readTree(objectMapper.writeValueAsString(fromValue)));
     }
 
     @AfterTemplate
-    JsonNode after(ObjectMapper mapper, Object fromValue) {
-      return mapper.valueToTree(fromValue);
+    JsonNode after(ObjectMapper objectMapper, Object fromValue) {
+      return objectMapper.valueToTree(fromValue);
     }
   }
 
   /** Prefer {@link ObjectMapper#convertValue(Object, Class)} over less efficient alternatives. */
   static final class ObjectMapperConvertValueClass<T> {
     @BeforeTemplate
-    T before(ObjectMapper mapper, Object fromValue, Class<T> toValueType) throws IOException {
+    T before(ObjectMapper objectMapper, Object fromValue, Class<T> toValueType) throws IOException {
       return Refaster.anyOf(
-          mapper.readValue(mapper.writeValueAsBytes(fromValue), toValueType),
-          mapper.readValue(mapper.writeValueAsString(fromValue), toValueType));
+          objectMapper.readValue(objectMapper.writeValueAsBytes(fromValue), toValueType),
+          objectMapper.readValue(objectMapper.writeValueAsString(fromValue), toValueType));
     }
 
     @AfterTemplate
-    T after(ObjectMapper mapper, Object fromValue, Class<T> toValueType) {
-      return mapper.convertValue(fromValue, toValueType);
+    T after(ObjectMapper objectMapper, Object fromValue, Class<T> toValueType) {
+      return objectMapper.convertValue(fromValue, toValueType);
     }
   }
 
@@ -85,15 +85,15 @@ final class Jackson2Rules {
    */
   static final class ObjectMapperConvertValueJavaType<T> {
     @BeforeTemplate
-    T before(ObjectMapper mapper, Object fromValue, JavaType toValueType) throws IOException {
+    T before(ObjectMapper objectMapper, Object fromValue, JavaType toValueType) throws IOException {
       return Refaster.anyOf(
-          mapper.readValue(mapper.writeValueAsBytes(fromValue), toValueType),
-          mapper.readValue(mapper.writeValueAsString(fromValue), toValueType));
+          objectMapper.readValue(objectMapper.writeValueAsBytes(fromValue), toValueType),
+          objectMapper.readValue(objectMapper.writeValueAsString(fromValue), toValueType));
     }
 
     @AfterTemplate
-    T after(ObjectMapper mapper, Object fromValue, JavaType toValueType) {
-      return mapper.convertValue(fromValue, toValueType);
+    T after(ObjectMapper objectMapper, Object fromValue, JavaType toValueType) {
+      return objectMapper.convertValue(fromValue, toValueType);
     }
   }
 
@@ -103,16 +103,16 @@ final class Jackson2Rules {
    */
   static final class ObjectMapperConvertValueTypeReference<T> {
     @BeforeTemplate
-    T before(ObjectMapper mapper, Object fromValue, TypeReference<T> toValueTypeRef)
+    T before(ObjectMapper objectMapper, Object fromValue, TypeReference<T> toValueTypeRef)
         throws IOException {
       return Refaster.anyOf(
-          mapper.readValue(mapper.writeValueAsBytes(fromValue), toValueTypeRef),
-          mapper.readValue(mapper.writeValueAsString(fromValue), toValueTypeRef));
+          objectMapper.readValue(objectMapper.writeValueAsBytes(fromValue), toValueTypeRef),
+          objectMapper.readValue(objectMapper.writeValueAsString(fromValue), toValueTypeRef));
     }
 
     @AfterTemplate
-    T after(ObjectMapper mapper, Object fromValue, TypeReference<T> toValueTypeRef) {
-      return mapper.convertValue(fromValue, toValueTypeRef);
+    T after(ObjectMapper objectMapper, Object fromValue, TypeReference<T> toValueTypeRef) {
+      return objectMapper.convertValue(fromValue, toValueTypeRef);
     }
   }
 }

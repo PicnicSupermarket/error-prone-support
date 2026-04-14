@@ -55,10 +55,11 @@ final class ComparatorRules {
     // XXX: Ideally `? super T` would also be replaced by a class-level type parameter, but Java
     // does not allow a type variable to be followed by other bounds.
     @BeforeTemplate
-    Comparator<T> before(@Matches(IsIdentityOperation.class) Function<? super T, U> keyExtractor) {
+    Comparator<T> before(
+        @Matches(IsIdentityOperation.class) Function<? super T, U> identityKeyExtractor) {
       return Refaster.anyOf(
           T::compareTo,
-          comparing(keyExtractor),
+          comparing(identityKeyExtractor),
           Collections.<T>reverseOrder(reverseOrder()),
           Comparator.<T>reverseOrder().reversed());
     }
@@ -96,8 +97,8 @@ final class ComparatorRules {
     @BeforeTemplate
     Comparator<T> before(
         Comparator<T> keyComparator,
-        @Matches(IsIdentityOperation.class) Function<S, U> keyExtractor) {
-      return comparing(keyExtractor, keyComparator);
+        @Matches(IsIdentityOperation.class) Function<S, U> identityKeyExtractor) {
+      return comparing(identityKeyExtractor, keyComparator);
     }
 
     @AfterTemplate
@@ -240,8 +241,8 @@ final class ComparatorRules {
     @BeforeTemplate
     Comparator<T> before(
         Comparator<T> cmp,
-        @Matches(IsIdentityOperation.class) Function<? super T, U> keyExtractor) {
-      return cmp.thenComparing(keyExtractor);
+        @Matches(IsIdentityOperation.class) Function<? super T, U> identityKeyExtractor) {
+      return cmp.thenComparing(identityKeyExtractor);
     }
 
     @AfterTemplate

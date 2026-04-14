@@ -23,14 +23,14 @@ final class DoubleStreamRules {
   /** Prefer using {@link DoubleStream}s as-is over more contrived alternatives. */
   static final class DoubleStreamIdentity {
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream) {
-      return Streams.concat(stream);
+    DoubleStream before(DoubleStream doubleStream) {
+      return Streams.concat(doubleStream);
     }
 
     @AfterTemplate
     @CanIgnoreReturnValue
-    DoubleStream after(DoubleStream stream) {
-      return stream;
+    DoubleStream after(DoubleStream doubleStream) {
+      return doubleStream;
     }
   }
 
@@ -53,13 +53,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoublePredicate predicate) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v).filter(predicate));
+    DoubleStream before(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.flatMap(v -> toDoubleStreamFunction(v).filter(doublePredicate));
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v)).filter(predicate);
+    DoubleStream after(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.flatMap(v -> toDoubleStreamFunction(v)).filter(doublePredicate);
     }
   }
 
@@ -69,13 +69,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    DoubleStream before(Stream<T> stream, DoublePredicate predicate) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).filter(predicate));
+    DoubleStream before(Stream<T> stream, DoublePredicate doublePredicate) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).filter(doublePredicate));
     }
 
     @AfterTemplate
-    DoubleStream after(Stream<T> stream, DoublePredicate predicate) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).filter(predicate);
+    DoubleStream after(Stream<T> stream, DoublePredicate doublePredicate) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).filter(doublePredicate);
     }
   }
 
@@ -85,13 +85,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoubleUnaryOperator operator) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v).map(operator));
+    DoubleStream before(DoubleStream doubleStream, DoubleUnaryOperator doubleUnaryOperator) {
+      return doubleStream.flatMap(v -> toDoubleStreamFunction(v).map(doubleUnaryOperator));
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoubleUnaryOperator operator) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v)).map(operator);
+    DoubleStream after(DoubleStream doubleStream, DoubleUnaryOperator doubleUnaryOperator) {
+      return doubleStream.flatMap(v -> toDoubleStreamFunction(v)).map(doubleUnaryOperator);
     }
   }
 
@@ -101,13 +101,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    DoubleStream before(Stream<T> stream, DoubleUnaryOperator operator) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).map(operator));
+    DoubleStream before(Stream<T> stream, DoubleUnaryOperator doubleUnaryOperator) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).map(doubleUnaryOperator));
     }
 
     @AfterTemplate
-    DoubleStream after(Stream<T> stream, DoubleUnaryOperator operator) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).map(operator);
+    DoubleStream after(Stream<T> stream, DoubleUnaryOperator doubleUnaryOperator) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).map(doubleUnaryOperator);
     }
   }
 
@@ -117,13 +117,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoubleFunction<S> function) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v).flatMap(function));
+    DoubleStream before(DoubleStream doubleStream, DoubleFunction<S> doubleFunction) {
+      return doubleStream.flatMap(v -> toDoubleStreamFunction(v).flatMap(doubleFunction));
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoubleFunction<S> function) {
-      return stream.flatMap(v -> toDoubleStreamFunction(v)).flatMap(function);
+    DoubleStream after(DoubleStream doubleStream, DoubleFunction<S> doubleFunction) {
+      return doubleStream.flatMap(v -> toDoubleStreamFunction(v)).flatMap(doubleFunction);
     }
   }
 
@@ -133,13 +133,13 @@ final class DoubleStreamRules {
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
 
     @BeforeTemplate
-    DoubleStream before(Stream<T> stream, DoubleFunction<S> function) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).flatMap(function));
+    DoubleStream before(Stream<T> stream, DoubleFunction<S> doubleFunction) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v).flatMap(doubleFunction));
     }
 
     @AfterTemplate
-    DoubleStream after(Stream<T> stream, DoubleFunction<S> function) {
-      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).flatMap(function);
+    DoubleStream after(Stream<T> stream, DoubleFunction<S> doubleFunction) {
+      return stream.flatMapToDouble(v -> toDoubleStreamFunction(v)).flatMap(doubleFunction);
     }
   }
 
@@ -149,76 +149,76 @@ final class DoubleStreamRules {
    */
   static final class DoubleStreamFilterSorted {
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoublePredicate predicate) {
-      return stream.sorted().filter(predicate);
+    DoubleStream before(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.sorted().filter(doublePredicate);
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.filter(predicate).sorted();
+    DoubleStream after(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.filter(doublePredicate).sorted();
     }
   }
 
   /** Prefer {@link DoubleStream#findAny()} over less efficient alternatives. */
   static final class DoubleStreamFindAnyIsEmpty {
     @BeforeTemplate
-    boolean before(DoubleStream stream) {
+    boolean before(DoubleStream doubleStream) {
       return Refaster.anyOf(
-          stream.count() == 0,
-          stream.count() <= 0,
-          stream.count() < 1,
-          stream.findFirst().isEmpty());
+          doubleStream.count() == 0,
+          doubleStream.count() <= 0,
+          doubleStream.count() < 1,
+          doubleStream.findFirst().isEmpty());
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream) {
-      return stream.findAny().isEmpty();
+    boolean after(DoubleStream doubleStream) {
+      return doubleStream.findAny().isEmpty();
     }
   }
 
   /** Prefer {@link DoubleStream#findAny()} over less efficient alternatives. */
   static final class DoubleStreamFindAnyIsPresent {
     @BeforeTemplate
-    boolean before(DoubleStream stream) {
+    boolean before(DoubleStream doubleStream) {
       return Refaster.anyOf(
-          stream.count() != 0,
-          stream.count() > 0,
-          stream.count() >= 1,
-          stream.findFirst().isPresent());
+          doubleStream.count() != 0,
+          doubleStream.count() > 0,
+          doubleStream.count() >= 1,
+          doubleStream.findFirst().isPresent());
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream) {
-      return stream.findAny().isPresent();
+    boolean after(DoubleStream doubleStream) {
+      return doubleStream.findAny().isPresent();
     }
   }
 
   /** Prefer {@link DoubleStream#min()} over less efficient alternatives. */
   static final class DoubleStreamMin {
     @BeforeTemplate
-    OptionalDouble before(DoubleStream stream) {
-      return stream.sorted().findFirst();
+    OptionalDouble before(DoubleStream doubleStream) {
+      return doubleStream.sorted().findFirst();
     }
 
     @AfterTemplate
-    OptionalDouble after(DoubleStream stream) {
-      return stream.min();
+    OptionalDouble after(DoubleStream doubleStream) {
+      return doubleStream.min();
     }
   }
 
   /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over more contrived alternatives. */
   static final class DoubleStreamNoneMatchWithDoublePredicate {
     @BeforeTemplate
-    boolean before(DoubleStream stream, DoublePredicate predicate) {
+    boolean before(DoubleStream doubleStream, DoublePredicate doublePredicate) {
       return Refaster.anyOf(
-          !stream.anyMatch(predicate),
-          stream.allMatch(predicate.negate()),
-          stream.filter(predicate).findAny().isEmpty());
+          !doubleStream.anyMatch(doublePredicate),
+          doubleStream.allMatch(doublePredicate.negate()),
+          doubleStream.filter(doublePredicate).findAny().isEmpty());
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.noneMatch(predicate);
+    boolean after(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.noneMatch(doublePredicate);
     }
   }
 
@@ -228,13 +228,13 @@ final class DoubleStreamRules {
     abstract boolean test(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    boolean before(DoubleStream stream) {
-      return stream.allMatch(e -> !test(e));
+    boolean before(DoubleStream doubleStream) {
+      return doubleStream.allMatch(e -> !test(e));
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream) {
-      return stream.noneMatch(e -> test(e));
+    boolean after(DoubleStream doubleStream) {
+      return doubleStream.noneMatch(e -> test(e));
     }
   }
 
@@ -242,27 +242,28 @@ final class DoubleStreamRules {
   static final class DoubleStreamAnyMatch {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
-    boolean before(DoubleStream stream, DoublePredicate predicate) {
+    boolean before(DoubleStream doubleStream, DoublePredicate doublePredicate) {
       return Refaster.anyOf(
-          !stream.noneMatch(predicate), stream.filter(predicate).findAny().isPresent());
+          !doubleStream.noneMatch(doublePredicate),
+          doubleStream.filter(doublePredicate).findAny().isPresent());
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.anyMatch(predicate);
+    boolean after(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.anyMatch(doublePredicate);
     }
   }
 
   /** Prefer {@link DoubleStream#allMatch(DoublePredicate)} over more contrived alternatives. */
   static final class DoubleStreamAllMatchWithDoublePredicate {
     @BeforeTemplate
-    boolean before(DoubleStream stream, DoublePredicate predicate) {
-      return stream.noneMatch(predicate.negate());
+    boolean before(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.noneMatch(doublePredicate.negate());
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.allMatch(predicate);
+    boolean after(DoubleStream doubleStream, DoublePredicate doublePredicate) {
+      return doubleStream.allMatch(doublePredicate);
     }
   }
 
@@ -272,26 +273,26 @@ final class DoubleStreamRules {
     abstract boolean test(@MayOptionallyUse double element);
 
     @BeforeTemplate
-    boolean before(DoubleStream stream) {
-      return stream.noneMatch(e -> !test(e));
+    boolean before(DoubleStream doubleStream) {
+      return doubleStream.noneMatch(e -> !test(e));
     }
 
     @AfterTemplate
-    boolean after(DoubleStream stream) {
-      return stream.allMatch(e -> test(e));
+    boolean after(DoubleStream doubleStream) {
+      return doubleStream.allMatch(e -> test(e));
     }
   }
 
   /** Prefer {@link DoubleStream#takeWhile(DoublePredicate)} over more verbose alternatives. */
   static final class DoubleStreamTakeWhile {
     @BeforeTemplate
-    DoubleStream before(DoubleStream stream, DoublePredicate predicate) {
-      return stream.takeWhile(predicate).filter(predicate);
+    DoubleStream before(DoubleStream doubleStream, DoublePredicate predicate) {
+      return doubleStream.takeWhile(predicate).filter(predicate);
     }
 
     @AfterTemplate
-    DoubleStream after(DoubleStream stream, DoublePredicate predicate) {
-      return stream.takeWhile(predicate);
+    DoubleStream after(DoubleStream doubleStream, DoublePredicate predicate) {
+      return doubleStream.takeWhile(predicate);
     }
   }
 }

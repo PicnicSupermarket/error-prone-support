@@ -35,6 +35,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
@@ -60,8 +61,9 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  *
  * <ol>
  *   <li>From the context in which the parameter appears in template method bodies, considering
- *       template methods in priority order ({@code @AfterTemplate} first, then {@code
- *       @BeforeTemplate}, with ties broken by descending parameter count). Supported contexts are:
+ *       template methods in priority order ({@code @AfterTemplate} first, then
+ *       {@code @BeforeTemplate}, with ties broken by descending parameter count). Supported
+ *       contexts are:
  *       <ul>
  *         <li>As a method invocation argument: the formal parameter name from the invoked method is
  *             used.
@@ -79,10 +81,10 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  *       type name with the first letter lowercased, after stripping a leading {@code Abstract} or
  *       {@code Immutable} prefix (e.g. {@code ImmutableList} yields {@code list}, {@code
  *       AbstractBigDecimalAssert} yields {@code bigDecimalAssert}, {@code OptionalInt} yields
- *       {@code optionalInt}). Well-known shorthands are applied after prefix stripping (e.g.
- *       {@code String} yields {@code str}, {@code Comparator} yields {@code cmp}, {@code
- *       StringBuilder} yields {@code sb}). If the resulting name is a Java keyword, the check
- *       falls back to the un-stripped name, and if that is also a keyword, no rename is suggested.
+ *       {@code optionalInt}). Well-known shorthands are applied after prefix stripping (e.g. {@code
+ *       String} yields {@code str}, {@code Comparator} yields {@code cmp}, {@code StringBuilder}
+ *       yields {@code sb}). If the resulting name is a Java keyword, the check falls back to the
+ *       un-stripped name, and if that is also a keyword, no rename is suggested.
  * </ol>
  *
  * <p>When multiple parameters would receive the same derived name, numeric suffixes are appended to
@@ -160,8 +162,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
         break;
       }
       ImmutableMap<String, String> found =
-          scanMethodForNames(
-              method, ImmutableSet.copyOf(unresolved), repeatedParams, state);
+          scanMethodForNames(method, ImmutableSet.copyOf(unresolved), repeatedParams, state);
       for (Map.Entry<String, String> e : found.entrySet()) {
         renames.put(e.getKey(), e.getValue());
         unresolved.remove(e.getKey());
@@ -169,8 +170,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
     }
 
     for (String paramName : unresolved) {
-      deriveNameFromType(paramTrees.get(paramName))
-          .ifPresent(name -> renames.put(paramName, name));
+      deriveNameFromType(paramTrees.get(paramName)).ifPresent(name -> renames.put(paramName, name));
     }
 
     /* Apply name prefix implied by @Matches annotations (check all template methods). */
@@ -390,8 +390,7 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
   }
 
   private static ExpressionTree stripLogicalComplement(ExpressionTree expr) {
-    return expr instanceof UnaryTree unary
-            && unary.getKind() == com.sun.source.tree.Tree.Kind.LOGICAL_COMPLEMENT
+    return expr instanceof UnaryTree unary && unary.getKind() == Kind.LOGICAL_COMPLEMENT
         ? unary.getExpression()
         : expr;
   }

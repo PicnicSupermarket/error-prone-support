@@ -24,32 +24,32 @@ final class PreconditionsRules {
   /** Prefer {@link Preconditions#checkArgument(boolean)} over more verbose alternatives. */
   static final class CheckArgumentNot {
     @BeforeTemplate
-    void before(boolean b) {
-      if (b) {
+    void before(boolean condition) {
+      if (condition) {
         throw new IllegalArgumentException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean b) {
-      checkArgument(!b);
+    void after(boolean condition) {
+      checkArgument(!condition);
     }
   }
 
   /** Prefer {@link Preconditions#checkArgument(boolean, Object)} over more verbose alternatives. */
   static final class CheckArgumentNotWithString {
     @BeforeTemplate
-    void before(boolean b, String errorMessage) {
-      if (b) {
+    void before(boolean condition, String errorMessage) {
+      if (condition) {
         throw new IllegalArgumentException(errorMessage);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean b, String errorMessage) {
-      checkArgument(!b, errorMessage);
+    void after(boolean condition, String errorMessage) {
+      checkArgument(!condition, errorMessage);
     }
   }
 
@@ -190,32 +190,32 @@ final class PreconditionsRules {
   /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
   static final class CheckStateNot {
     @BeforeTemplate
-    void before(boolean b) {
-      if (b) {
+    void before(boolean condition) {
+      if (condition) {
         throw new IllegalStateException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean b) {
-      checkState(!b);
+    void after(boolean condition) {
+      checkState(!condition);
     }
   }
 
   /** Prefer {@link Preconditions#checkState(boolean, Object)} over more verbose alternatives. */
   static final class CheckStateNotWithString {
     @BeforeTemplate
-    void before(boolean b, String errorMessage) {
-      if (b) {
+    void before(boolean condition, String errorMessage) {
+      if (condition) {
         throw new IllegalStateException(errorMessage);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean b, String errorMessage) {
-      checkState(!b, errorMessage);
+    void after(boolean condition, String errorMessage) {
+      checkState(!condition, errorMessage);
     }
   }
 }
