@@ -152,6 +152,20 @@ Multiple fine-grained items make agent execution more predictable: agents can
 process each item independently and less capable models are less likely to
 conflate unrelated requirements into a single pass.
 
+## Add `<!-- check: -->` annotations to every new section
+<!-- check: New sections carry a `<!-- check: -->` annotation, or the heading is self-evidently verifiable -->
+
+Whenever you add a new section to an instruction file, annotate it
+immediately. An unannotated heading is a silent defect: for `##` headings the
+item is silently dropped from the checklist; for `###` and deeper the raw
+heading text is used, which may be poorly worded or ambiguous. The only
+acceptable reasons to omit a `<!-- check: -->` annotation are:
+
+- The heading text is self-evidently verifiable as a checklist item ("Verify:
+  [heading text]" makes immediate sense without additional context).
+- The section contains only context or background, in which case use
+  `<!-- check: skip -->`.
+
 ## `review.instructions.md` is auto-generated
 
 Do not edit `review.instructions.md` manually. It is derived from the `<!--

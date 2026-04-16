@@ -1,0 +1,27 @@
+{
+  "action": "labeled",
+  "label": {
+    "name": "dependencies"
+  },
+  "pull_request": {
+    "number": 1,
+    "milestone": null,
+    "head": {
+      "ref": "test-branch",
+      "repo": {
+        "full_name": "PicnicSupermarket/error-prone-support"
+      }
+    },
+    "base": {
+      "ref": "master"
+    }
+  },
+  "repository": {
+    "default_branch": "master",
+    "full_name": "PicnicSupermarket/error-prone-support",
+    "name": "error-prone-support",
+    "owner": {
+      "login": "PicnicSupermarket"
+    }
+  }
+}
