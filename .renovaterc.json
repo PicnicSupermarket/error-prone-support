@@ -15,6 +15,18 @@
         "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
       ],
       "datasourceTemplate": "maven"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.actrc$/"
+      ],
+      "matchStrings": [
+        "catthehacker/ubuntu:(?<currentValue>act-24\\.04-\\d+)@(?<currentDigest>sha256:[a-f0-9]+)"
+      ],
+      "datasourceTemplate": "docker",
+      "packageNameTemplate": "catthehacker/ubuntu",
+      "versioningTemplate": "regex:^act-24\\.04-(?<major>\\d{4})(?<minor>\\d{2})(?<patch>\\d{2})$"
     }
   ],
   "packageRules": [
@@ -24,6 +36,12 @@
         "/^org\\.springframework\\.boot:spring-boot[a-z-]*$/"
       ],
       "separateMinorPatch": true
+    },
+    {
+      "matchPackageNames": [
+        "catthehacker/ubuntu"
+      ],
+      "schedule": "every 4 weeks on Monday"
     },
     {
       "matchPackageNames": [

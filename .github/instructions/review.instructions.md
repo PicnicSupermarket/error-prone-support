@@ -149,6 +149,11 @@ the files you modified.
 - [ ] Job names are short, lowercase identifiers (e.g., `build`, `validate`)
 - [ ] Step names use imperative form (e.g., "Install Harden-Runner")
 
+### Test workflows locally with `act`
+
+- [ ] Harden-runner steps carry `if: ${{ !env.ACT }}`
+- [ ] Deploy/publish jobs carry `if: ${{ !env.ACT && <existing condition> }}`
+
 ### YAML formatting
 
 - [ ] Bracket arrays use whitespace padding (`[ a, b ]`)
@@ -171,6 +176,10 @@ the files you modified.
 ### Bias towards multiple check annotations
 
 - [ ] Sections with multiple verifiable requirements list multiple `check:` annotations
+
+### Add `<!-- check: -->` annotations to every new section
+
+- [ ] New sections carry a `<!-- check:
 
 ## Java Style Conventions (`java-style.instructions.md`)
 

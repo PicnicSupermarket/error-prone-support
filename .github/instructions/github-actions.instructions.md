@@ -218,6 +218,38 @@ For workflows that build Java code:
 
 - Use `paths:` trigger filters when a workflow only applies to specific files.
 
+## Test workflows locally with `act`
+<!-- check: Harden-runner steps carry `if: ${{ !env.ACT }}` -->
+<!-- check: Deploy/publish jobs carry `if: ${{ !env.ACT && <existing condition> }}` -->
+
+All workflows support local execution using [`act`][act], which avoids the CI
+round-trip. `act` sets `ACT=true` in every job's environment automatically.
+
+Every `step-security/harden-runner` step must carry an `if:` guard so that
+`harden-runner` does not enforce `egress-policy: block` inside act's Docker
+container (which would prevent Maven and JDK downloads):
+
+```yaml
+- name: Install Harden-Runner
+  if: ${{ !env.ACT }}
+  uses: step-security/harden-runner@... # vX.Y.Z
+  with:
+    ...
+```
+
+For jobs that deploy or publish (Maven Central, GitHub Pages), extend the
+existing `if:` condition so that deployments do not happen during local runs:
+
+```yaml
+deploy:
+  if: ${{ !env.ACT && github.ref == github.event.repository.default_branch }}
+```
+
+Use `./run-act.sh <workflow>` to run a workflow locally; see `AGENTS.md` for
+the list of workflow names. Event payloads are in `.github/act/events/`.
+
+[act]: https://nektosact.com
+
 ## YAML formatting
 
 - 2-space indentation.

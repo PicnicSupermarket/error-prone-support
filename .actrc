@@ -1,0 +1,5 @@
+--platform ubuntu-24.04=catthehacker/ubuntu:act-24.04-20260415@sha256:f58445a786d6ad7460b450e104a1589527e9c3a3fd2b4445367d06d1edc75454
+--artifact-server-path /tmp/act-artifacts
+--secret GITHUB_TOKEN
+--secret SONAR_TOKEN
+--secret OPENAI_API_KEY
