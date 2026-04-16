@@ -4,7 +4,8 @@ on:
     paths:
       - '.github/workflows/**'
   push:
-    branches: [ master ]
+    # XXX: Uncomment.
+    # branches: [ master ]
     paths:
       - '.github/workflows/**'
 permissions:
@@ -14,15 +15,27 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        if: ${{ !env.ACT }}
         uses: step-security/harden-runner@f808768d1510423e83855289c910610ca9b43176 # v2.17.0
         with:
-          disable-sudo-and-containers: true
+          # We can't use `disable-sudo-and-containers` here, as `actionlint`
+          # runs inside a Docker container.
+          disable-sudo: true
           allowed-endpoints: >
-            api.github.com:443
             github.com:443
-            release-assets.githubusercontent.com:443
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Run actionlint
         uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
+        # XXX: Consider direct Reviewdog integration. But maybe we should move
+        # to a setup where validation jobs fail independently, attach the
+        # failures as artifacts (SARIF), and then a separate Reviewdog
+        # integration posts the results? Review pros and cons.
+        # uses: reviewdog/action-actionlint@6fb7acc99f4a1008869fa8a0f09cfca740837d9d # v1.72.0
+        # with:
+        #   level: warning
+        #   # XXX: Job doesn't fail with this one.
+        #   # reporter: github-pr-review
+        #   filter_mode: nofilter
+        #   fail_level: any
+        # XXX: Also install `yamllint`?
+        # XXX: Or should we use super-linter?
