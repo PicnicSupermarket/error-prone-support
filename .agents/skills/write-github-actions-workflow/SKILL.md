@@ -11,9 +11,7 @@ description: >
 Use this skill for requests to add or change files in `.github/workflows/*`.
 
 * Read [`.github/instructions/github-actions.instructions.md`][github-actions]
-  for the full conventions. Pay particular attention to the local testing
-  section: every `step-security/harden-runner` step requires
-  `if: ${{ !env.ACT }}`.
+  for the full conventions.
 * After implementation, review your changes against the applicable sections of
   [`.github/instructions/review.instructions.md`][review].
 * Finally, follow the workflow in [`AGENT.md`][agent-md].
