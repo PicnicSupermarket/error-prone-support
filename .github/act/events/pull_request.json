@@ -1,0 +1,27 @@
+{
+  "action": "opened",
+  "number": 1,
+  "pull_request": {
+    "number": 1,
+    "title": "Test PR",
+    "head": {
+      "ref": "test-branch",
+      "sha": "0000000000000000000000000000000000000001",
+      "repo": {
+        "full_name": "PicnicSupermarket/error-prone-support"
+      }
+    },
+    "base": {
+      "ref": "master",
+      "sha": "0000000000000000000000000000000000000002"
+    }
+  },
+  "repository": {
+    "default_branch": "master",
+    "full_name": "PicnicSupermarket/error-prone-support",
+    "name": "error-prone-support",
+    "owner": {
+      "login": "PicnicSupermarket"
+    }
+  }
+}
