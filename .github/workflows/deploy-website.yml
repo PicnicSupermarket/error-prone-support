@@ -65,7 +65,7 @@ jobs:
         with:
           path: ./website/_site
   deploy:
-    if: ${{ !env.ACT && github.ref == 'refs/heads/website' }}
+    if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:
       id-token: write
@@ -83,5 +83,6 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
       - name: Deploy to GitHub Pages
+        if: ${{ !env.ACT }}
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

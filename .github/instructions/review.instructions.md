@@ -152,7 +152,7 @@ the files you modified.
 ### Test workflows locally with `act`
 
 - [ ] Harden-runner steps carry `if: ${{ !env.ACT }}`
-- [ ] Deploy/publish jobs carry `if: ${{ !env.ACT && <existing condition> }}`
+- [ ] Deploy/publish steps carry `if: ${{ !env.ACT }}` (not job-level: `env` context unavailable there)
 
 ### YAML formatting
 
@@ -176,10 +176,6 @@ the files you modified.
 ### Bias towards multiple check annotations
 
 - [ ] Sections with multiple verifiable requirements list multiple `check:` annotations
-
-### Add `<!-- check: -->` annotations to every new section
-
-- [ ] New sections carry a `<!-- check:
 
 ## Java Style Conventions (`java-style.instructions.md`)
 

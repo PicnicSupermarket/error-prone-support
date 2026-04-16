@@ -4,10 +4,15 @@
 # selects the workflow; any remaining arguments are forwarded to `act`.
 #
 # Requires `act` to be installed. See https://nektosact.com for details.
-# Credentials for external services are read from environment variables;
-# see AGENTS.md for the list of variables and their purpose.
+# Credentials for external services are read from environment variables; see
+# `AGENTS.md` for the list of variables and their purpose.
 
 set -e -u -o pipefail
+
+if ! command -v act >/dev/null 2>&1; then
+  echo 'This script requires `act`; please install it.'
+  exit 1
+fi
 
 SCRIPT_DIR="$(dirname "${0}")"
 EVENTS_DIR="${SCRIPT_DIR}/.github/act/events"
@@ -17,21 +22,21 @@ if [ "${#}" -lt 1 ]; then
 Usage: ./run-act.sh <workflow> [<act-flags...>]
 
 Available workflows:
-  validate-workflows          push                → validate-workflows.yml
-  build                       push                → build.yml
-  error-prone-compat          push                → error-prone-compat.yml
-  sonarcloud                  push                → sonarcloud.yml
-  validate-review-checklist   push                → validate-review-checklist.yml
-  pitest-analyze              pull_request        → pitest-analyze-pr.yml
-  pitest-update               workflow_run        → pitest-update-pr.yml
-  reviewdog                   pull_request        → reviewdog.yml
-  suggest-commit-message      pull_request        → suggest-commit-message.yml
-  assign-milestone            pull_request_target → assign-milestone.yml
-  integration-tests           issue_comment       → integration-tests.yml
-  codeql                      pull_request        → codeql.yml
-  openssf-scorecard           pull_request        → openssf-scorecard.yml
-  deploy-website              pull_request        → deploy-website.yml
-  default-branch-health-gate  pull_request        → default-branch-health-gate.yml
+  validate-workflows          push                 validate-workflows.yml
+  build                       push                 build.yml
+  error-prone-compat          push                 error-prone-compat.yml
+  sonarcloud                  push                 sonarcloud.yml
+  validate-review-checklist   push                 validate-review-checklist.yml
+  pitest-analyze              pull_request         pitest-analyze-pr.yml
+  pitest-update               workflow_run         pitest-update-pr.yml
+  reviewdog                   pull_request         reviewdog.yml
+  suggest-commit-message      pull_request         suggest-commit-message.yml
+  assign-milestone            pull_request_target  assign-milestone.yml
+  integration-tests           issue_comment        integration-tests.yml
+  codeql                      pull_request         codeql.yml
+  openssf-scorecard           pull_request         openssf-scorecard.yml
+  deploy-website              pull_request         deploy-website.yml
+  default-branch-health-gate  pull_request         default-branch-health-gate.yml
 EOF
   exit 1
 fi
@@ -132,7 +137,7 @@ case "${workflow}" in
       "${@}"
     ;;
   *)
-    printf 'Unknown workflow: %s\n' "${workflow}" >&2
+    echo "Unknown workflow: ${workflow}" >&2
     exit 1
     ;;
 esac

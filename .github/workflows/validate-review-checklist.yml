@@ -34,7 +34,7 @@ jobs:
       - name: Check for drift
         run: |
           if ! git diff --exit-code .github/instructions/review.instructions.md; then
-            echo 'ERROR: `review.instructions.md` is out of sync with the source instruction files.'
-            echo 'Run `./generate-review-checklist.sh` and commit the result.'
+            echo 'ERROR: File review.instructions.md is out of sync with the source instruction files.'
+            echo 'Run ./generate-review-checklist.sh and commit the result.'
             exit 1
           fi
