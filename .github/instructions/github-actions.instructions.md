@@ -220,7 +220,7 @@ For workflows that build Java code:
 
 ## Test workflows locally with `act`
 <!-- check: Harden-runner steps carry `if: ${{ !env.ACT }}` -->
-<!-- check: Deploy/publish jobs carry `if: ${{ !env.ACT && <existing condition> }}` -->
+<!-- check: Deploy/publish steps carry `if: ${{ !env.ACT }}` (not job-level: `env` context unavailable there) -->
 
 All workflows support local execution using [`act`][act], which avoids the CI
 round-trip. `act` sets `ACT=true` in every job's environment automatically.
@@ -237,18 +237,26 @@ container (which would prevent Maven and JDK downloads):
     ...
 ```
 
-For jobs that deploy or publish (Maven Central, GitHub Pages), extend the
-existing `if:` condition so that deployments do not happen during local runs:
+Add `if: ${{ !env.ACT }}` also to any job that has an externally visible
+side-effect, such a deployment (e.g. to Maven Central) or publish operation
+(e.g. to GitHub Pages). Do **not** add this guard it at the job level: the
+`env` context is unavailable in job-level `if:` conditions, which causes GitHub
+Actions to error.
 
 ```yaml
 deploy:
-  if: ${{ !env.ACT && github.ref == github.event.repository.default_branch }}
+  if: ${{ github.ref == github.event.repository.default_branch }}
+  steps:
+    - name: Install Harden-Runner
+      if: ${{ !env.ACT }}
+      ...
+    - name: Build and deploy
+      if: ${{ !env.ACT }}
+      ...
 ```
 
 Use `./run-act.sh <workflow>` to run a workflow locally; see `AGENTS.md` for
 the list of workflow names. Event payloads are in `.github/act/events/`.
-
-[act]: https://nektosact.com
 
 ## YAML formatting
 
@@ -279,3 +287,5 @@ branches: [master]
 branches:
   - master
 ```
+
+[act]: https://nektosact.com

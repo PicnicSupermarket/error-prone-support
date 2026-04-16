@@ -159,7 +159,9 @@ jobs:
           name: "integration-test-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
-        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+        run: |
+          # shellcheck disable=SC2016 # `project.groupId` is not a shell var.
+          mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   report:
     name: Report integration test result
     needs: [ acknowledge, test ]
