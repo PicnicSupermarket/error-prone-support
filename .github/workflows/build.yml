@@ -28,6 +28,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Harden-Runner
+        if: ${{ !env.ACT }}
         uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
         with:
           disable-sudo-and-containers: true
@@ -64,12 +65,13 @@ jobs:
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   deploy:
-    if: ${{ github.ref == github.event.repository.default_branch }}
+    if: ${{ !env.ACT && github.ref == github.event.repository.default_branch }}
     needs: build
     runs-on: ubuntu-24.04
     environment: maven-deploy
     steps:
       - name: Install Harden-Runner
+        if: ${{ !env.ACT }}
         uses: step-security/harden-runner@ab7a9404c0f3da075243ca237b5fac12c98deaa5 # v2.19.3
         with:
           disable-sudo-and-containers: true
