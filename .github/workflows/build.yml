@@ -63,9 +63,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Remove installed project artifacts
-        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+        run: |
+          # shellcheck disable=SC2016 # `project.groupId` is not a shell var.
+          mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   deploy:
-    if: ${{ !env.ACT && github.ref == github.event.repository.default_branch }}
+    if: ${{ github.ref == github.event.repository.default_branch }}
     needs: build
     runs-on: ubuntu-24.04
     environment: maven-deploy
@@ -88,6 +90,7 @@ jobs:
           java-distribution: temurin
           maven-version: 3.9.14
       - name: Build and deploy
+        if: ${{ !env.ACT }}
         run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
         env:
           MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
