@@ -1,0 +1,21 @@
+{
+  "action": "created",
+  "comment": {
+    "body": "/integration-test",
+    "id": 1
+  },
+  "issue": {
+    "number": 1,
+    "pull_request": {
+      "url": "https://api.github.com/repos/PicnicSupermarket/error-prone-support/pulls/1"
+    }
+  },
+  "repository": {
+    "default_branch": "master",
+    "full_name": "PicnicSupermarket/error-prone-support",
+    "name": "error-prone-support",
+    "owner": {
+      "login": "PicnicSupermarket"
+    }
+  }
+}
