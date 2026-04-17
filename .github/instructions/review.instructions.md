@@ -113,6 +113,7 @@ the files you modified.
 - [ ] `step-security/harden-runner` is the first step of every job
 - [ ] `disable-sudo-and-containers: true` (or `disable-sudo: true` if incompatible)
 - [ ] `egress-policy` is omitted (defaults to `block`; use `audit` only while developing)
+- [ ] No `if:` guard on `step-security/harden-runner` steps
 
 ### Declare least-privilege permissions
 
@@ -151,7 +152,6 @@ the files you modified.
 
 ### Test workflows locally with `act`
 
-- [ ] Harden-runner steps carry `if: ${{ !env.ACT }}`
 - [ ] Deploy/publish steps carry `if: ${{ !env.ACT }}` (not job-level: `env` context unavailable there)
 
 ### YAML formatting
