@@ -28,7 +28,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Harden-Runner
-        if: ${{ !env.ACT }}
         uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
         with:
           disable-sudo-and-containers: true
@@ -73,7 +72,6 @@ jobs:
     environment: maven-deploy
     steps:
       - name: Install Harden-Runner
-        if: ${{ !env.ACT }}
         uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
         with:
           disable-sudo-and-containers: true
