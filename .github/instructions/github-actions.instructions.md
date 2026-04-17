@@ -45,6 +45,7 @@ to its most recent release.
 <!-- check: `step-security/harden-runner` is the first step of every job -->
 <!-- check: `disable-sudo-and-containers: true` (or `disable-sudo: true` if incompatible) -->
 <!-- check: `egress-policy` is omitted (defaults to `block`; use `audit` only while developing) -->
+<!-- check: No `if:` guard on `step-security/harden-runner` steps -->
 
 The first step of every job must be `step-security/harden-runner`.
 
@@ -219,37 +220,29 @@ For workflows that build Java code:
 - Use `paths:` trigger filters when a workflow only applies to specific files.
 
 ## Test workflows locally with `act`
-<!-- check: Harden-runner steps carry `if: ${{ !env.ACT }}` -->
 <!-- check: Deploy/publish steps carry `if: ${{ !env.ACT }}` (not job-level: `env` context unavailable there) -->
 
 All workflows support local execution using [`act`][act], which avoids the CI
 round-trip. `act` sets `ACT=true` in every job's environment automatically.
 
-Every `step-security/harden-runner` step must carry an `if:` guard so that
-`harden-runner` does not enforce `egress-policy: block` inside act's Docker
-container (which would prevent Maven and JDK downloads):
+`act` runs each job inside an unprivileged Docker container. Inside such a
+container, `step-security/harden-runner` cannot install its eBPF hooks and
+therefore runs as a no-op — it does not enforce `egress-policy: block`. No
+`if: ${{ !env.ACT }}` guard is needed on Harden-Runner steps.
 
-```yaml
-- name: Install Harden-Runner
-  if: ${{ !env.ACT }}
-  uses: step-security/harden-runner@... # vX.Y.Z
-  with:
-    ...
-```
-
-Add `if: ${{ !env.ACT }}` also to any job that has an externally visible
-side-effect, such a deployment (e.g. to Maven Central) or publish operation
-(e.g. to GitHub Pages). Do **not** add this guard it at the job level: the
-`env` context is unavailable in job-level `if:` conditions, which causes GitHub
-Actions to error.
+Add `if: ${{ !env.ACT }}` to steps that have an externally visible side-effect,
+such as a deployment (e.g. to Maven Central) or publish operation (e.g. to
+GitHub Pages). Do **not** add this guard at the job level: the `env` context is
+unavailable in job-level `if:` conditions, which causes GitHub Actions to error.
 
 ```yaml
 deploy:
   if: ${{ github.ref == github.event.repository.default_branch }}
   steps:
     - name: Install Harden-Runner
-      if: ${{ !env.ACT }}
-      ...
+      uses: step-security/harden-runner@... # vX.Y.Z
+      with:
+        ...
     - name: Build and deploy
       if: ${{ !env.ACT }}
       ...
