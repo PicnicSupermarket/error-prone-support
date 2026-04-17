@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 
 import com.google.common.collect.ImmutableMap;
@@ -9,9 +10,13 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -152,6 +157,50 @@ final class ImmutableSortedMapRules {
     ImmutableSortedMap<K, V> after(
         Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return ImmutableSortedMap.copyOf(iterable);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedMap#toImmutableSortedMap(Function, Function)} over more verbose
+   * alternatives.
+   */
+  static final class ToImmutableSortedMap<
+      K1 extends Comparable<? super K1>, K2 extends K1, V1, V2 extends V1, T1, T2 extends T1> {
+    @BeforeTemplate
+    Collector<T2, ?, ImmutableSortedMap<K1, V1>> before(
+        Function<T1, K2> keyFunction, Function<T1, V2> valueFunction) {
+      return toImmutableSortedMap(naturalOrder(), keyFunction, valueFunction);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T2, ?, ImmutableSortedMap<K1, V1>> after(
+        Function<T1, K2> keyFunction, Function<T1, V2> valueFunction) {
+      return toImmutableSortedMap(keyFunction, valueFunction);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSortedMap#toImmutableSortedMap(Function, Function, BinaryOperator)} over
+   * more verbose alternatives.
+   */
+  static final class ToImmutableSortedMapWithBinaryOperator<
+      K1 extends Comparable<? super K1>, K2 extends K1, V1, V2 extends V1, T1, T2 extends T1> {
+    @BeforeTemplate
+    Collector<T2, ?, ImmutableSortedMap<K1, V1>> before(
+        Function<T1, K2> keyFunction,
+        Function<T1, V2> valueFunction,
+        BinaryOperator<V1> mergeFunction) {
+      return toImmutableSortedMap(naturalOrder(), keyFunction, valueFunction, mergeFunction);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    Collector<T2, ?, ImmutableSortedMap<K1, V1>> after(
+        Function<T1, K2> keyFunction,
+        Function<T1, V2> valueFunction,
+        BinaryOperator<V1> mergeFunction) {
+      return toImmutableSortedMap(keyFunction, valueFunction, mergeFunction);
     }
   }
 }
