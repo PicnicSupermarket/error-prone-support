@@ -24,6 +24,19 @@ jobs:
             github.com:443
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Validate workflow coverage in run-act.sh
+        run: |
+          missing=()
+          for f in .github/workflows/*.yml; do
+            filename="$(basename "${f}")"
+            if ! grep -qF ".github/workflows/${filename}" run-act.sh; then
+              missing+=("${filename}")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            printf 'Workflow not covered by run-act.sh: %s\n' "${missing[@]}" >&2
+            exit 1
+          fi
       - name: Run actionlint
         uses: rhysd/actionlint@914e7df21a07ef503a81201c76d2b11c789d3fca # v1.7.12
         # XXX: Consider direct Reviewdog integration. But maybe we should move
