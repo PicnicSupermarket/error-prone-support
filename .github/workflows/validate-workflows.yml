@@ -24,7 +24,7 @@ jobs:
             github.com:443
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Validate workflow coverage in run-act.sh
+      - name: Validate workflow coverage in `run-act.sh`
         run: |
           missing=()
           for f in .github/workflows/*.yml; do
@@ -34,7 +34,7 @@ jobs:
             fi
           done
           if [ "${#missing[@]}" -gt 0 ]; then
-            printf 'Workflow not covered by run-act.sh: %s\n' "${missing[@]}" >&2
+            echo "Workflow not covered by run-act.sh: ${missing[@]}" >&2
             exit 1
           fi
       - name: Run actionlint

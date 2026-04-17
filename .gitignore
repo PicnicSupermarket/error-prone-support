@@ -13,6 +13,3 @@ target
 
 # The Git repositories checked out by the integration test framework.
 integration-tests/.repos
-
-# Local `act` secrets file (use environment variables instead; see AGENTS.md).
-.secrets
