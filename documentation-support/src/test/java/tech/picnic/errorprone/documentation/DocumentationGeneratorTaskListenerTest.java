@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.attribute.AclEntryPermission.ADD_SUBDIRECTORY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assumptions.assumeThat;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 import com.google.auto.service.AutoService;
@@ -22,7 +23,6 @@ import java.nio.file.Path;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclFileAttributeView;
 import java.util.Optional;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -51,9 +51,12 @@ final class DocumentationGeneratorTaskListenerTest {
   @DisabledOnOs(WINDOWS)
   @Test
   void readOnlyFileSystemNonWindows(@TempDir Path outputDirectory) {
-    outputDirectory.toFile().setWritable(false);
-    Assumptions.assumeTrue(
-        !outputDirectory.toFile().canWrite(), "Directory still writable (e.g. running as root)");
+    assertThat(outputDirectory.toFile().setWritable(false))
+        .describedAs("Failed to make test directory unwritable")
+        .isTrue();
+    assumeThat(outputDirectory.toFile().canWrite())
+        .withFailMessage("Directory still writable (may be running as root)")
+        .isFalse();
 
     readOnlyFileSystemFailsToWrite(outputDirectory.resolve("nonexistent"));
   }
