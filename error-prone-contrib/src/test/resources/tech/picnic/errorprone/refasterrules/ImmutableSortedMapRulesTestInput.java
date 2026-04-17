@@ -44,7 +44,7 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
     return ImmutableSet.of(
         ImmutableSortedMap.<String, Integer>naturalOrder().put(Map.entry("foo", 1)).buildOrThrow(),
         Stream.of(Map.entry("foo", 1))
-            .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+            .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
   ImmutableSet<ImmutableSortedMap<String, Integer>> testIterableToImmutableSortedMap() {
@@ -58,9 +58,9 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
             .putAll(ImmutableSortedMap.of("foo", 1).entrySet())
             .buildOrThrow(),
         ImmutableSortedMap.of("foo", 1).entrySet().stream()
-            .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)),
+            .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)),
         Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
-            .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+            .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
   Collector<Integer, ?, ImmutableSortedMap<String, Double>> testToImmutableSortedMap() {
