@@ -34,7 +34,7 @@ jobs:
             fi
           done
           if [ "${#missing[@]}" -gt 0 ]; then
-            echo "Workflow not covered by run-act.sh: ${missing[@]}" >&2
+            echo "Workflow not covered by run-act.sh: ${missing[*]}" >&2
             exit 1
           fi
       - name: Run actionlint
