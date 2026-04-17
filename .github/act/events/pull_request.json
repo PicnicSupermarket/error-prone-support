@@ -5,15 +5,15 @@
     "number": 1,
     "title": "Test PR",
     "head": {
-      "ref": "test-branch",
-      "sha": "0000000000000000000000000000000000000001",
+      "ref": "sschroevers/introduce-gha-act-integration",
+      "sha": "29d3c18cb2f5ff6c6edcd9b5b58da57a2ac2bb08",
       "repo": {
         "full_name": "PicnicSupermarket/error-prone-support"
       }
     },
     "base": {
       "ref": "master",
-      "sha": "0000000000000000000000000000000000000002"
+      "sha": "d3bfb2c66ac82ac26c7aa2bd59763e5be3d8d214"
     }
   },
   "repository": {
