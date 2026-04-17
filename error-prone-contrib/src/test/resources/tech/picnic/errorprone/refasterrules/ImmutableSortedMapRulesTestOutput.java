@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -16,7 +17,7 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null, null));
+        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null));
   }
 
   ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapBuilder() {
@@ -53,5 +54,14 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
         ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1).entrySet()),
         ImmutableSortedMap.copyOf(ImmutableSortedMap.of("foo", 1).entrySet()),
         ImmutableSortedMap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+  }
+
+  Collector<Integer, ?, ImmutableSortedMap<String, Double>> testToImmutableSortedMap() {
+    return toImmutableSortedMap(String::valueOf, Double::valueOf);
+  }
+
+  Collector<Integer, ?, ImmutableSortedMap<String, Double>>
+      testToImmutableSortedMapWithBinaryOperator() {
+    return toImmutableSortedMap(String::valueOf, Double::valueOf, Double::sum);
   }
 }
