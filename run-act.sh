@@ -27,11 +27,10 @@ REPO_ROOT="$(git -C "${SCRIPT_DIR}" rev-parse --show-toplevel)"
 
 # Redirect GitHub checkouts to the local repository. This allows workflows to
 # run against unpushed commits: `actions/checkout` inside composite actions
-# (e.g. `s4u/setup-maven-action`) fetches `GITHUB_SHA` from the GitHub
-# remote, which fails if the commit has not been pushed. By rewriting the URL
-# to a bind-mounted local path, the fetch succeeds regardless.
-declare -a COMMON_ARGS
-COMMON_ARGS=(
+# (e.g. `s4u/setup-maven-action`) fetches `GITHUB_SHA` from the GitHub remote,
+# which fails if the commit has not been pushed. By rewriting the URL to a
+# bind-mounted local path, the fetch succeeds regardless.
+ACT+=(
   --container-options "-v ${REPO_ROOT}:/tmp/local-repo"
   --env "GIT_CONFIG_COUNT=2"
   --env "GIT_CONFIG_KEY_0=url.file:///tmp/local-repo.insteadOf"
@@ -72,7 +71,6 @@ case "${workflow}" in
     "${ACT[@]}" pull_request_target \
       -W '.github/workflows/assign-milestone.yml' \
       --eventpath "${EVENTS_DIR}/pull_request_target.labeled.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   build)
@@ -80,98 +78,84 @@ case "${workflow}" in
       -W '.github/workflows/build.yml' \
       --eventpath "${EVENTS_DIR}/push.json" \
       --matrix os:ubuntu-24.04 \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   codeql)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/codeql.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   default-branch-health-gate)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/default-branch-health-gate.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   deploy-website)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/deploy-website.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   error-prone-compat)
     "${ACT[@]}" push \
       -W '.github/workflows/error-prone-compat.yml' \
       --eventpath "${EVENTS_DIR}/push.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   integration-tests)
     "${ACT[@]}" issue_comment \
       -W '.github/workflows/integration-tests.yml' \
       --eventpath "${EVENTS_DIR}/issue_comment.created.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   openssf-scorecard)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/openssf-scorecard.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   pitest-analyze)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/pitest-analyze-pr.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   pitest-update)
     "${ACT[@]}" workflow_run \
       -W '.github/workflows/pitest-update-pr.yml' \
       --eventpath "${EVENTS_DIR}/workflow_run.completed.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   reviewdog)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/reviewdog.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   sonarcloud)
     "${ACT[@]}" push \
       -W '.github/workflows/sonarcloud.yml' \
       --eventpath "${EVENTS_DIR}/push.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   suggest-commit-message)
     "${ACT[@]}" pull_request \
       -W '.github/workflows/suggest-commit-message.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   validate-review-checklist)
     "${ACT[@]}" push \
       -W '.github/workflows/validate-review-checklist.yml' \
       --eventpath "${EVENTS_DIR}/push.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   validate-workflows)
     "${ACT[@]}" push \
       -W '.github/workflows/validate-workflows.yml' \
       --eventpath "${EVENTS_DIR}/push.json" \
-      "${COMMON_ARGS[@]}" \
       "${@}"
     ;;
   *)
