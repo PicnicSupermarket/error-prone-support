@@ -111,9 +111,7 @@ final class ImmutableSortedMapRules {
     ImmutableSortedMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
       return Refaster.anyOf(
           ImmutableSortedMap.<K, V>naturalOrder().put(entry).buildOrThrow(),
-          Stream.of(entry)
-              .collect(
-                  toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+          Stream.of(entry).collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @AfterTemplate
@@ -141,16 +139,14 @@ final class ImmutableSortedMapRules {
           ImmutableSortedMap.copyOf(iterable, naturalOrder()),
           ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).buildOrThrow(),
           Streams.stream(iterable)
-              .collect(
-                  toImmutableSortedMap(
-                      Comparator.<K>naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+              .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @BeforeTemplate
     ImmutableSortedMap<K, V> before(
         Collection<? extends Map.Entry<? extends K, ? extends V>> iterable) {
       return iterable.stream()
-          .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue));
+          .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
