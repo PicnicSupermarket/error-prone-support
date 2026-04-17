@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclFileAttributeView;
 import java.util.Optional;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -50,9 +51,9 @@ final class DocumentationGeneratorTaskListenerTest {
   @DisabledOnOs(WINDOWS)
   @Test
   void readOnlyFileSystemNonWindows(@TempDir Path outputDirectory) {
-    assertThat(outputDirectory.toFile().setWritable(false))
-        .describedAs("Failed to make test directory unwritable")
-        .isTrue();
+    outputDirectory.toFile().setWritable(false);
+    Assumptions.assumeTrue(
+        !outputDirectory.toFile().canWrite(), "Directory still writable (e.g. running as root)");
 
     readOnlyFileSystemFailsToWrite(outputDirectory.resolve("nonexistent"));
   }
