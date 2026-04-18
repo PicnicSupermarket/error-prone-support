@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableList}s. */
 @OnlineDocumentation
@@ -45,6 +46,7 @@ final class ImmutableListRules {
    * Prefer {@link ImmutableList#copyOf(Iterable)} and variants over less efficient or more
    * contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableListCopyOf<T> {
     @BeforeTemplate
     ImmutableList<T> before(T[] elements) {
@@ -96,6 +98,7 @@ final class ImmutableListRules {
    * Prefer {@link ImmutableList#sortedCopyOf(Iterable)} over more verbose or less efficient
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableListSortedCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableList<T> before(Iterable<T> elements) {
@@ -119,6 +122,7 @@ final class ImmutableListRules {
    * Prefer {@link ImmutableList#sortedCopyOf(Comparator, Iterable)} over less efficient
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableListSortedCopyOfWithComparator<S, T extends S> {
     @BeforeTemplate
     ImmutableList<T> before(Comparator<S> comparator, Iterable<T> elements) {

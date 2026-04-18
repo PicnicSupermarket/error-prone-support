@@ -132,9 +132,9 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
    * of each of the corresponding {@code @BeforeTemplate} parameter types.
    *
    * <p>Correspondence is determined by parameter name, consistent with how Refaster binds template
-   * variables. For each {@code @AfterTemplate} parameter named {@code n}, every {@code
-   * @BeforeTemplate} parameter also named {@code n} must have a type that is a subtype of the
-   * after-template parameter's type. Parameters that have no same-named counterpart in a given
+   * variables. For each {@code @AfterTemplate} parameter named {@code n}, every
+   * {@code @BeforeTemplate} parameter also named {@code n} must have a type that is a subtype of
+   * the after-template parameter's type. Parameters that have no same-named counterpart in a given
    * before-method are skipped for that method.
    */
   private static boolean hasCompatibleParameterTypes(
@@ -147,7 +147,9 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
         for (MethodTree beforeMethod : beforeMethods) {
           for (VariableTree beforeParam : beforeMethod.getParameters()) {
             if (beforeParam.getName().contentEquals(afterParam.getName())) {
-              if (!state.getTypes().isSubtype(ASTHelpers.getSymbol(beforeParam).type, afterParamType)) {
+              if (!state
+                  .getTypes()
+                  .isSubtype(ASTHelpers.getSymbol(beforeParam).type, afterParamType)) {
                 return false;
               }
               break;

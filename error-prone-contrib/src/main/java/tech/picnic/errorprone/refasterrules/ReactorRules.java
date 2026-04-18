@@ -76,6 +76,7 @@ final class ReactorRules {
    * Prefer {@link Mono#fromSupplier(Supplier)} over {@link Mono#fromCallable(Callable)} where
    * feasible.
    */
+  @PossibleSourceIncompatibility
   static final class MonoFromSupplier<T> {
     @BeforeTemplate
     Mono<T> before(@NotMatches(ThrowsCheckedException.class) Callable<? extends T> supplier) {
@@ -730,6 +731,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#using(Callable, Function)} over more contrived alternatives. */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @PossibleSourceIncompatibility
   static final class MonoUsing<D extends AutoCloseable, T> {
     @BeforeTemplate
     Mono<T> before(
@@ -752,6 +754,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#using(Callable, Function, boolean)} over more contrived alternatives. */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @PossibleSourceIncompatibility
   static final class MonoUsingWithBoolean<D extends AutoCloseable, T> {
     @BeforeTemplate
     Mono<T> before(
@@ -776,6 +779,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#using(Callable, Function, Consumer)} over more contrived alternatives. */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @PossibleSourceIncompatibility
   static final class MonoUsingWithConsumer<D, T> {
     @BeforeTemplate
     Mono<T> before(
@@ -803,6 +807,7 @@ final class ReactorRules {
    */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @PossibleSourceIncompatibility
   static final class MonoUsingWithConsumerAndBoolean<D, T> {
     @BeforeTemplate
     Mono<T> before(
@@ -831,6 +836,7 @@ final class ReactorRules {
    */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @PossibleSourceIncompatibility
   static final class MonoUsingWhen<D, T> {
     @BeforeTemplate
     Mono<T> before(
@@ -858,6 +864,7 @@ final class ReactorRules {
    */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @PossibleSourceIncompatibility
   static final class MonoUsingWhenWithBiFunctionAndFunction<D, T> {
     @BeforeTemplate
     Mono<T> before(
@@ -1311,6 +1318,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#then()} over vacuously invoking {@link Flux#ignoreElements()}. */
+  @PossibleSourceIncompatibility
   static final class FluxThen<T> {
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
@@ -1543,6 +1551,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class MonoFlatMapMany<S, T, P extends Publisher<? extends T>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")

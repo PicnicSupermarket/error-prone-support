@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link String}s. */
 @OnlineDocumentation
@@ -198,6 +199,7 @@ final class StringRules {
   // XXX: Joiner.on(char) isn't rewritten. Add separate rule?
   // XXX: Joiner#join(@Nullable Object first, @Nullable Object second, Object... rest) isn't
   // rewritten.
+  @PossibleSourceIncompatibility
   static final class StringJoin<T extends CharSequence> {
     @BeforeTemplate
     String before(String delimiter, T[] elements) {

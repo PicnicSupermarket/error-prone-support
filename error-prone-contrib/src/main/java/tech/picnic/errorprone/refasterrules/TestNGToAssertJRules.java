@@ -37,6 +37,7 @@ import org.assertj.core.data.Offset;
 import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 
@@ -325,6 +326,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isEqualTo(Object)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
@@ -510,6 +512,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isEqualTo(Object)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   @SuppressWarnings("java:S1448" /* Each variant requires a separate `@BeforeTemplate` method. */)
   static final class AssertThatWithFailMessageIsEqualTo {
     @BeforeTemplate
@@ -755,6 +758,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatContainsExactly {
     @BeforeTemplate
     void before(boolean[] actual, boolean[] expected) {
@@ -809,6 +813,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@code assertThat(...).containsExactly(...)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatWithFailMessageContainsExactly {
     @BeforeTemplate
     void before(boolean[] actual, String newErrorMessage, boolean[] expected) {
@@ -1097,6 +1102,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNotEqualTo(Object)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     void before(boolean actual, boolean other) {
@@ -1166,6 +1172,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@link AbstractAssert#isNotEqualTo(Object)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatWithFailMessageIsNotEqualTo {
     @BeforeTemplate
     void before(boolean actual, String newErrorMessage, boolean other) {
@@ -1301,6 +1308,7 @@ final class TestNGToAssertJRules {
   /**
    * Prefer {@link Assertions#assertThatThrownBy(ThrowingCallable)} over non-AssertJ alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownBy {
     @BeforeTemplate
     void before(
@@ -1316,6 +1324,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(

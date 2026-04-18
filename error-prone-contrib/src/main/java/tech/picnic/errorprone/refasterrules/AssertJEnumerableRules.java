@@ -263,6 +263,7 @@ final class AssertJEnumerableRules {
   }
 
   /** Prefer {@link EnumerableAssert#hasSameSizeAs(Iterable)} over more verbose alternatives. */
+  @PossibleSourceIncompatibility
   static final class EnumerableAssertHasSameSizeAs<S, E> {
     @BeforeTemplate
     EnumerableAssert<?, S> before(EnumerableAssert<?, S> enumerableAssert, Iterable<E> other) {

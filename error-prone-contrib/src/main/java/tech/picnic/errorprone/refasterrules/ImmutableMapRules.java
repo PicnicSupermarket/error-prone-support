@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableMap}s. */
@@ -78,6 +79,7 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class MapsToMap<S, K extends S, V, V2 extends V, K2 extends K> {
     @BeforeTemplate
     ImmutableMap<K, V> before(
@@ -119,6 +121,7 @@ final class ImmutableMapRules {
    * Prefer {@link ImmutableMap#copyOf(Iterable)} over imprecisely typed or more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableMapCopyOf<
       K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
@@ -173,6 +176,7 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class MapsUniqueIndex<S, K, V extends S, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableMap<K, V> before(

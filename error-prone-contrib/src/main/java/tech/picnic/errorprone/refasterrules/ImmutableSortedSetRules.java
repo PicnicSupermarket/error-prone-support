@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSortedSet}s. */
 @OnlineDocumentation
@@ -82,6 +83,7 @@ final class ImmutableSortedSetRules {
    */
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
+  @PossibleSourceIncompatibility
   static final class ImmutableSortedSetCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(T[] elements) {

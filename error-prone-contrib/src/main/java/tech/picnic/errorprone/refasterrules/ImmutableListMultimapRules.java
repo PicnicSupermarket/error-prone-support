@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableListMultimap}s. */
@@ -112,6 +113,7 @@ final class ImmutableListMultimapRules {
    * Prefer {@link ImmutableListMultimap#copyOf(Iterable)} over less efficient or more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableListMultimapCopyOf<
       K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
@@ -174,6 +176,7 @@ final class ImmutableListMultimapRules {
    * Prefer {@link Multimaps#index(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class MultimapsIndex<S, K, V extends S, K2 extends K, V2 extends V> {
     @BeforeTemplate
     ImmutableListMultimap<K, V> before(
@@ -234,6 +237,7 @@ final class ImmutableListMultimapRules {
    * Prefer an immutable copy of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableListMultimapCopyOfMultimapsTransformValuesWithFunction<
       S, K, V1 extends S, V2, T extends V2> {
     // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.

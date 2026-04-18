@@ -490,6 +490,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamNoneMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
@@ -532,6 +533,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#anyMatch(Predicate)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamAnyMatch<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S4034" /* This violation will be rewritten. */)
@@ -556,6 +558,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#allMatch(Predicate)} over more contrived alternatives. */
+  @PossibleSourceIncompatibility
   static final class StreamAllMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
     boolean before(Stream<T> stream, Predicate<S> target) {
