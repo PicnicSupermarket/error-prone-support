@@ -29,6 +29,7 @@ import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -38,12 +39,17 @@ import tech.picnic.errorprone.utils.SourceCode;
  * if it identifies at least one scenario in which application of the rule could yield uncompilable
  * code.
  *
- * <p>Currently, a Refaster rule is possibly source-incompatible if an {@link AfterTemplate} return
- * type is not a subtype of every {@link BeforeTemplate} return type, meaning that the replacement
- * may break compilation at call sites that depend on the narrower type.
+ * <p>Currently, a Refaster rule is possibly source-incompatible if:
+ *
+ * <ul>
+ *   <li>an {@link AfterTemplate} return type is not a subtype of every {@link BeforeTemplate}
+ *       return type, meaning that the replacement may break compilation at call sites that depend
+ *       on the narrower type, or
+ *   <li>an {@link AfterTemplate} parameter type is not a supertype of every corresponding {@link
+ *       BeforeTemplate} parameter type, meaning that the replacement may break compilation at
+ *       argument positions that previously accepted a broader type.
+ * </ul>
  */
-// XXX: Extend this check to also consider parameter types, which can similarly be a source of
-// incompatibility.
 // XXX: As-is, this rule relies on the return types declared by template methods. The
 // `RefasterReturnType` check ensures that such return types are as specific as possible, but we
 // could further reduce false-negatives by instead analyzing the return expressions of template
@@ -79,6 +85,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
     return hasCompatibleReturnTypes(beforeMethods, afterMethods, state)
+            && hasCompatibleParameterTypes(beforeMethods, afterMethods, state)
         ? dropAnnotationIfPresent(tree, state)
         : addAnnotationIfAbsent(tree, state);
   }
@@ -111,6 +118,39 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
         Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
         if (!state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
           return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Tells whether all given {@code @AfterTemplate} methods have parameter types that are supertypes
+   * of each of the corresponding {@code @BeforeTemplate} parameter types.
+   *
+   * <p>Correspondence is determined by parameter name, consistent with how Refaster binds template
+   * variables. For each {@code @AfterTemplate} parameter named {@code n}, every {@code
+   * @BeforeTemplate} parameter also named {@code n} must have a type that is a subtype of the
+   * after-template parameter's type. Parameters that have no same-named counterpart in a given
+   * before-method are skipped for that method.
+   */
+  private static boolean hasCompatibleParameterTypes(
+      ImmutableList<MethodTree> beforeMethods,
+      ImmutableList<MethodTree> afterMethods,
+      VisitorState state) {
+    for (MethodTree afterMethod : afterMethods) {
+      for (VariableTree afterParam : afterMethod.getParameters()) {
+        Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
+        for (MethodTree beforeMethod : beforeMethods) {
+          for (VariableTree beforeParam : beforeMethod.getParameters()) {
+            if (beforeParam.getName().contentEquals(afterParam.getName())) {
+              if (!state.getTypes().isSubtype(ASTHelpers.getSymbol(beforeParam).type, afterParamType)) {
+                return false;
+              }
+              break;
+            }
+          }
         }
       }
     }
