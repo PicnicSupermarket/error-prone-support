@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.function.Supplier;
 import org.assertj.core.api.AbstractAssert;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.annotation.TypeMigration;
+import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 
 /**
  * Refaster rules that replace JUnit APIs with AssertJ equivalents.
@@ -42,11 +44,6 @@ import tech.picnic.errorprone.refaster.annotation.TypeMigration;
  */
 // XXX: The `AssertThat*Array*ContainsExactly*` rules assume that `expected` and `actual` are not
 // both `null`.
-// XXX: Introduce a `@Matcher` on `Executable` and `ThrowingSupplier` expressions, such that they
-// are only matched if they are also compatible with the `ThrowingCallable` functional interface.
-// When implementing such a matcher, note that expressions with a non-void return type such as
-// `() -> toString()` match both `ThrowingSupplier` and `ThrowingCallable`, but `() -> "constant"`
-// is only compatible with the former.
 @OnlineDocumentation
 @TypeMigration(
     of = Assertions.class,
@@ -1111,7 +1108,9 @@ final class JUnitToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsExactlyInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable shouldRaiseThrowable, Class<T> type) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseThrowable,
+        Class<T> type) {
       assertThrowsExactly(type, shouldRaiseThrowable);
     }
 
@@ -1129,7 +1128,10 @@ final class JUnitToAssertJRules {
   static final class AssertThatThrownByWithFailMessageIsExactlyInstanceOfString<
       T extends Throwable> {
     @BeforeTemplate
-    void before(Executable shouldRaiseThrowable, String newErrorMessage, Class<T> type) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseThrowable,
+        String newErrorMessage,
+        Class<T> type) {
       assertThrowsExactly(type, shouldRaiseThrowable, newErrorMessage);
     }
 
@@ -1152,7 +1154,9 @@ final class JUnitToAssertJRules {
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
     void before(
-        Executable shouldRaiseThrowable, Supplier<@Nullable String> supplier, Class<T> type) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseThrowable,
+        Supplier<@Nullable String> supplier,
+        Class<T> type) {
       assertThrowsExactly(type, shouldRaiseThrowable, supplier);
     }
 
@@ -1168,7 +1172,9 @@ final class JUnitToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable shouldRaiseThrowable, Class<T> type) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseThrowable,
+        Class<T> type) {
       assertThrows(type, shouldRaiseThrowable);
     }
 
@@ -1183,7 +1189,10 @@ final class JUnitToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatThrownByWithFailMessageIsInstanceOfString<T extends Throwable> {
     @BeforeTemplate
-    void before(Executable shouldRaiseThrowable, String newErrorMessage, Class<T> type) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseThrowable,
+        String newErrorMessage,
+        Class<T> type) {
       assertThrows(type, shouldRaiseThrowable, newErrorMessage);
     }
 
@@ -1201,7 +1210,9 @@ final class JUnitToAssertJRules {
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
     void before(
-        Executable shouldRaiseThrowable, Supplier<@Nullable String> supplier, Class<T> type) {
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseThrowable,
+        Supplier<@Nullable String> supplier,
+        Class<T> type) {
       assertThrows(type, shouldRaiseThrowable, supplier);
     }
 
@@ -1219,12 +1230,15 @@ final class JUnitToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatCodeDoesNotThrowAnyException {
     @BeforeTemplate
-    void before(Executable shouldRaiseOrNotThrowable) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseOrNotThrowable) {
       assertDoesNotThrow(shouldRaiseOrNotThrowable);
     }
 
     @BeforeTemplate
-    void before(ThrowingSupplier<?> shouldRaiseOrNotThrowable) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class)
+            ThrowingSupplier<?> shouldRaiseOrNotThrowable) {
       assertDoesNotThrow(shouldRaiseOrNotThrowable);
     }
 
@@ -1241,12 +1255,17 @@ final class JUnitToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatCodeWithFailMessageDoesNotThrowAnyExceptionString {
     @BeforeTemplate
-    void before(Executable shouldRaiseOrNotThrowable, String newErrorMessage) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseOrNotThrowable,
+        String newErrorMessage) {
       assertDoesNotThrow(shouldRaiseOrNotThrowable, newErrorMessage);
     }
 
     @BeforeTemplate
-    void before(ThrowingSupplier<?> shouldRaiseOrNotThrowable, String newErrorMessage) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class)
+            ThrowingSupplier<?> shouldRaiseOrNotThrowable,
+        String newErrorMessage) {
       assertDoesNotThrow(shouldRaiseOrNotThrowable, newErrorMessage);
     }
 
@@ -1267,7 +1286,9 @@ final class JUnitToAssertJRules {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
-    void before(Executable shouldRaiseOrNotThrowable, Supplier<@Nullable String> supplier) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) Executable shouldRaiseOrNotThrowable,
+        Supplier<@Nullable String> supplier) {
       assertDoesNotThrow(shouldRaiseOrNotThrowable, supplier);
     }
 
@@ -1275,7 +1296,9 @@ final class JUnitToAssertJRules {
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
     @SuppressWarnings("java:S4449" /* SonarCloud thinks that `supplier` itself is `@Nullable`. */)
     void before(
-        ThrowingSupplier<?> shouldRaiseOrNotThrowable, Supplier<@Nullable String> supplier) {
+        @Matches(IsLambdaExpressionOrMethodReference.class)
+            ThrowingSupplier<?> shouldRaiseOrNotThrowable,
+        Supplier<@Nullable String> supplier) {
       assertDoesNotThrow(shouldRaiseOrNotThrowable, supplier);
     }
 

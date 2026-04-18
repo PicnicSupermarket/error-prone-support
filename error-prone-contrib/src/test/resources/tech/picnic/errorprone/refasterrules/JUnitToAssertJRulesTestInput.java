@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
@@ -257,41 +259,53 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatThrownByIsExactlyInstanceOf() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null);
     assertThrowsExactly(IllegalStateException.class, () -> {});
   }
 
   void testAssertThatThrownByWithFailMessageIsExactlyInstanceOfString() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null, "foo");
     assertThrowsExactly(IllegalStateException.class, () -> {}, "foo");
   }
 
   void testAssertThatThrownByWithFailMessageIsExactlyInstanceOfSupplier() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null, () -> "foo");
     assertThrowsExactly(IllegalStateException.class, () -> {}, () -> "foo");
   }
 
   void testAssertThatThrownByIsInstanceOf() {
+    assertThrows(IllegalStateException.class, (Executable) null);
     assertThrows(IllegalStateException.class, () -> {});
   }
 
   void testAssertThatThrownByWithFailMessageIsInstanceOfString() {
+    assertThrows(IllegalStateException.class, (Executable) null, "foo");
     assertThrows(IllegalStateException.class, () -> {}, "foo");
   }
 
   void testAssertThatThrownByWithFailMessageIsInstanceOfSupplier() {
+    assertThrows(IllegalStateException.class, (Executable) null, () -> "foo");
     assertThrows(IllegalStateException.class, () -> {}, () -> "foo");
   }
 
   void testAssertThatCodeDoesNotThrowAnyException() {
+    assertDoesNotThrow((Executable) null);
     assertDoesNotThrow(() -> {});
+    assertDoesNotThrow((ThrowingSupplier<String>) null);
     assertDoesNotThrow(() -> toString());
   }
 
   void testAssertThatCodeWithFailMessageDoesNotThrowAnyExceptionString() {
+    assertDoesNotThrow((Executable) null);
     assertDoesNotThrow(() -> {}, "foo");
+    assertDoesNotThrow((ThrowingSupplier<String>) null, "bar");
     assertDoesNotThrow(() -> toString(), "bar");
   }
 
   void testAssertThatCodeWithFailMessageDoesNotThrowAnyExceptionSupplier() {
+    assertDoesNotThrow((Executable) null, () -> "foo");
     assertDoesNotThrow(() -> {}, () -> "foo");
+    assertDoesNotThrow((ThrowingSupplier<String>) null, () -> "bar");
     assertDoesNotThrow(() -> toString(), () -> "bar");
   }
 

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.DoNotCall;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.testng.Assert.ThrowingRunnable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.annotation.TypeMigration;
+import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 
 /**
  * Refaster rules that replace TestNG APIs with AssertJ equivalents.
@@ -1309,7 +1311,8 @@ final class TestNGToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatThrownBy {
     @BeforeTemplate
-    void before(ThrowingRunnable shouldRaiseThrowable) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) ThrowingRunnable shouldRaiseThrowable) {
       assertThrows(shouldRaiseThrowable);
     }
 
@@ -1324,7 +1327,9 @@ final class TestNGToAssertJRules {
   @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
-    void before(ThrowingRunnable shouldRaiseThrowable, Class<T> type) {
+    void before(
+        @Matches(IsLambdaExpressionOrMethodReference.class) ThrowingRunnable shouldRaiseThrowable,
+        Class<T> type) {
       assertThrows(type, shouldRaiseThrowable);
     }
 

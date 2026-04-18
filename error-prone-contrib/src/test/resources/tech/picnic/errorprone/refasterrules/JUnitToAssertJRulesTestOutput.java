@@ -18,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
@@ -272,47 +274,59 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatThrownByIsExactlyInstanceOf() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null);
     assertThatThrownBy(() -> {}).isExactlyInstanceOf(IllegalStateException.class);
   }
 
   void testAssertThatThrownByWithFailMessageIsExactlyInstanceOfString() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null, "foo");
     assertThatThrownBy(() -> {})
         .withFailMessage("foo")
         .isExactlyInstanceOf(IllegalStateException.class);
   }
 
   void testAssertThatThrownByWithFailMessageIsExactlyInstanceOfSupplier() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null, () -> "foo");
     assertThatThrownBy(() -> {})
         .withFailMessage(() -> "foo")
         .isExactlyInstanceOf(IllegalStateException.class);
   }
 
   void testAssertThatThrownByIsInstanceOf() {
+    assertThrows(IllegalStateException.class, (Executable) null);
     assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class);
   }
 
   void testAssertThatThrownByWithFailMessageIsInstanceOfString() {
+    assertThrows(IllegalStateException.class, (Executable) null, "foo");
     assertThatThrownBy(() -> {}).withFailMessage("foo").isInstanceOf(IllegalStateException.class);
   }
 
   void testAssertThatThrownByWithFailMessageIsInstanceOfSupplier() {
+    assertThrows(IllegalStateException.class, (Executable) null, () -> "foo");
     assertThatThrownBy(() -> {})
         .withFailMessage(() -> "foo")
         .isInstanceOf(IllegalStateException.class);
   }
 
   void testAssertThatCodeDoesNotThrowAnyException() {
+    assertDoesNotThrow((Executable) null);
     assertThatCode(() -> {}).doesNotThrowAnyException();
+    assertDoesNotThrow((ThrowingSupplier<String>) null);
     assertThatCode(() -> toString()).doesNotThrowAnyException();
   }
 
   void testAssertThatCodeWithFailMessageDoesNotThrowAnyExceptionString() {
+    assertDoesNotThrow((Executable) null);
     assertThatCode(() -> {}).withFailMessage("foo").doesNotThrowAnyException();
+    assertDoesNotThrow((ThrowingSupplier<String>) null, "bar");
     assertThatCode(() -> toString()).withFailMessage("bar").doesNotThrowAnyException();
   }
 
   void testAssertThatCodeWithFailMessageDoesNotThrowAnyExceptionSupplier() {
+    assertDoesNotThrow((Executable) null, () -> "foo");
     assertThatCode(() -> {}).withFailMessage(() -> "foo").doesNotThrowAnyException();
+    assertDoesNotThrow((ThrowingSupplier<String>) null, () -> "bar");
     assertThatCode(() -> toString()).withFailMessage(() -> "bar").doesNotThrowAnyException();
   }
 

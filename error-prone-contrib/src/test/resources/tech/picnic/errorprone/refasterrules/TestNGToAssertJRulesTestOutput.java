@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.ArrayList;
+import org.testng.Assert.ThrowingRunnable;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
@@ -342,10 +343,12 @@ final class TestNGToAssertJRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testAssertThatThrownBy() {
+    assertThrows((ThrowingRunnable) null);
     assertThatThrownBy(() -> {});
   }
 
   void testAssertThatThrownByIsInstanceOf() {
+    assertThrows(IllegalStateException.class, (ThrowingRunnable) null);
     assertThatThrownBy(() -> {}).isInstanceOf(IllegalStateException.class);
   }
 }
