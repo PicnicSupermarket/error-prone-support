@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSet}s. */
 @OnlineDocumentation
@@ -46,6 +47,7 @@ final class ImmutableSetRules {
    * Prefer {@link ImmutableSet#copyOf(Iterable)} and variants over less efficient or more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableSetCopyOf<T> {
     @BeforeTemplate
     ImmutableSet<T> before(T[] elements) {

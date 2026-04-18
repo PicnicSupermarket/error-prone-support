@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractFloatAssert;
 import org.assertj.core.data.Offset;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@code float}s. */
 @OnlineDocumentation
@@ -18,6 +19,7 @@ final class AssertJFloatRules {
   /**
    * Prefer {@link AbstractFloatAssert#isCloseTo(float, Offset)} over less explicit alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AbstractFloatAssertIsCloseTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(

@@ -9,6 +9,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import org.assertj.core.api.AbstractDoubleAssert;
 import org.assertj.core.data.Offset;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@code double}s. */
 @OnlineDocumentation
@@ -18,6 +19,7 @@ final class AssertJDoubleRules {
   /**
    * Prefer {@link AbstractDoubleAssert#isCloseTo(double, Offset)} over less explicit alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AbstractDoubleAssertIsCloseTo {
     @BeforeTemplate
     AbstractDoubleAssert<?> before(

@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSetMultimap}s. */
 @OnlineDocumentation
@@ -94,6 +95,7 @@ final class ImmutableSetMultimapRules {
    * Prefer {@link ImmutableSetMultimap#copyOf(Iterable)} over less efficient or more contrived
    * alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableSetMultimapCopyOf<
       K, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
@@ -175,6 +177,7 @@ final class ImmutableSetMultimapRules {
    * Prefer an immutable copy of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over more contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableSetMultimapCopyOfMultimapsTransformValuesWithFunction<
       K, S, V1 extends S, T extends V2, V2> {
     // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.

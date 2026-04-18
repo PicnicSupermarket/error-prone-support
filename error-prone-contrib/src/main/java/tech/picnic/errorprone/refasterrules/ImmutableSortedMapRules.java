@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSortedMap}s. */
 @OnlineDocumentation
@@ -121,6 +122,7 @@ final class ImmutableSortedMapRules {
    */
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
+  @PossibleSourceIncompatibility
   static final class ImmutableSortedMapCopyOf<
       K extends Comparable<? super K>, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate

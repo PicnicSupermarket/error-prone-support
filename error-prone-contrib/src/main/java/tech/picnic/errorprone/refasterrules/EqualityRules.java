@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with (in)equalities. */
 @OnlineDocumentation
@@ -95,6 +96,7 @@ final class EqualityRules {
   /** Prefer {@code !=} over more contrived alternatives. */
   // XXX: Replacing `a ? !b : b` with `a != b` changes semantics if both `a` and `b` are boxed
   // booleans.
+  @PossibleSourceIncompatibility
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
   static final class NotEqualTo {
     @BeforeTemplate
@@ -123,6 +125,7 @@ final class EqualityRules {
   /** Prefer {@code ==} over more contrived alternatives. */
   // XXX: Replacing `a ? b : !b` with `a == b` changes semantics if both `a` and `b` are boxed
   // booleans.
+  @PossibleSourceIncompatibility
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
   static final class EqualToWithBoolean {
     @BeforeTemplate

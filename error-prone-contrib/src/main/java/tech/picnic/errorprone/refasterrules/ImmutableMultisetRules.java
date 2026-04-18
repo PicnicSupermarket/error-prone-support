@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableMultiset}s. */
 @OnlineDocumentation
@@ -52,6 +53,7 @@ final class ImmutableMultisetRules {
    * Prefer {@link ImmutableMultiset#copyOf(Iterable)} and variants over less efficient or more
    * contrived alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class ImmutableMultisetCopyOf<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before(T[] elements) {
