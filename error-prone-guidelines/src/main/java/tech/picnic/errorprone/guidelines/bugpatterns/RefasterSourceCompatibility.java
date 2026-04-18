@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -12,6 +13,7 @@ import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -31,23 +33,24 @@ import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Types;
+import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that suggests that Refaster rules have the {@link
- * tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility} annotation if and only
- * if it identifies at least one scenario in which application of the rule could yield uncompilable
- * code.
+ * PossibleSourceIncompatibility} annotation if and only if it identifies at least one scenario in
+ * which application of the rule could yield uncompilable code.
  *
  * <p>Currently, a Refaster rule is possibly source-incompatible if:
  *
  * <ul>
- *   <li>an {@link AfterTemplate} return type is not a subtype of every {@link BeforeTemplate}
- *       return type, meaning that the replacement may break compilation at call sites that depend
- *       on the narrower type, or
  *   <li>an {@link AfterTemplate} parameter type is not a supertype of every corresponding {@link
  *       BeforeTemplate} parameter type, meaning that the replacement may break compilation at
- *       argument positions that previously accepted a broader type.
+ *       parameter locations that previously accepted a broader type, or
+ *   <li>an {@link AfterTemplate} return type is not a subtype of every {@link BeforeTemplate}
+ *       return type, meaning that the replacement may break compilation at call sites that depend
+ *       on the narrower type.
  * </ul>
  */
 // XXX: As-is, this rule relies on the return types declared by template methods. The
@@ -79,15 +82,13 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
     if (beforeMethods.isEmpty()) {
-      // XXX: Removing this guard does not change observable behavior: if `beforeMethods` is empty,
-      // both compatibility checks vacuously return `true`, yielding the same result. This guard is
-      // retained as a performance optimization.
+      /* Fast path: this is not a Refaster rule. */
       return dropAnnotationIfPresent(tree, state);
     }
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
-    return hasCompatibleReturnTypes(beforeMethods, afterMethods, state)
-            && hasCompatibleParameterTypes(beforeMethods, afterMethods, state)
+    return hasCompatibleParameterTypes(beforeMethods, afterMethods, state)
+            && hasCompatibleReturnTypes(beforeMethods, afterMethods, state)
         ? dropAnnotationIfPresent(tree, state)
         : addAnnotationIfAbsent(tree, state);
   }
@@ -98,6 +99,35 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
         .filter(member -> matcher.matches(member, state))
         .map(MethodTree.class::cast)
         .collect(toImmutableList());
+  }
+
+  /**
+   * Tells whether all given {@code @AfterTemplate} methods have parameter types that are supertypes
+   * of each of the corresponding {@code @BeforeTemplate} parameter types.
+   */
+  private static boolean hasCompatibleParameterTypes(
+      ImmutableList<MethodTree> beforeMethods,
+      ImmutableList<MethodTree> afterMethods,
+      VisitorState state) {
+    ImmutableSetMultimap<String, Type> beforeTypes =
+        beforeMethods.stream()
+            .flatMap(m -> m.getParameters().stream())
+            .collect(
+                toImmutableSetMultimap(
+                    p -> p.getName().toString(), p -> ASTHelpers.getSymbol(p).type));
+
+    Types types = state.getTypes();
+    for (MethodTree afterMethod : afterMethods) {
+      for (VariableTree afterParam : afterMethod.getParameters()) {
+        Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
+        if (!beforeTypes.get(afterParam.getName().toString()).stream()
+            .allMatch(type -> types.isSubtype(type, afterParamType))) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -120,41 +150,6 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
         Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
         if (!state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
           return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Tells whether all given {@code @AfterTemplate} methods have parameter types that are supertypes
-   * of each of the corresponding {@code @BeforeTemplate} parameter types.
-   *
-   * <p>Correspondence is determined by parameter name, consistent with how Refaster binds template
-   * variables. For each {@code @AfterTemplate} parameter named {@code n}, every
-   * {@code @BeforeTemplate} parameter also named {@code n} must have a type that is a subtype of
-   * the after-template parameter's type. Parameters that have no same-named counterpart in a given
-   * before-method are skipped for that method.
-   */
-  private static boolean hasCompatibleParameterTypes(
-      ImmutableList<MethodTree> beforeMethods,
-      ImmutableList<MethodTree> afterMethods,
-      VisitorState state) {
-    for (MethodTree afterMethod : afterMethods) {
-      for (VariableTree afterParam : afterMethod.getParameters()) {
-        Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
-        for (MethodTree beforeMethod : beforeMethods) {
-          for (VariableTree beforeParam : beforeMethod.getParameters()) {
-            if (beforeParam.getName().contentEquals(afterParam.getName())) {
-              if (!state
-                  .getTypes()
-                  .isSubtype(ASTHelpers.getSymbol(beforeParam).type, afterParamType)) {
-                return false;
-              }
-              break;
-            }
-          }
         }
       }
     }
