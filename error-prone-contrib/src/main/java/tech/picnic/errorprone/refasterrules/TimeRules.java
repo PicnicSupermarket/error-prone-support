@@ -24,7 +24,6 @@ import java.time.chrono.ChronoZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
-import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with time. */
 @OnlineDocumentation
@@ -624,7 +623,6 @@ final class TimeRules {
   // introducing an Error Prone check instead.
 
   /** Prefer {@link LocalDate#plusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDatePlusDays {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int daysToAdd) {
@@ -643,7 +641,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#plusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDatePlusWeeks {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int weeksToAdd) {
@@ -662,7 +659,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#plusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDatePlusMonths {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int monthsToAdd) {
@@ -681,7 +677,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#plusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDatePlusYears {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int yearsToAdd) {
@@ -700,7 +695,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#minusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateMinusDays {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int daysToSubtract) {
@@ -719,7 +713,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#minusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateMinusWeeks {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int weeksToSubtract) {
@@ -738,7 +731,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#minusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateMinusMonths {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int monthsToSubtract) {
@@ -757,7 +749,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDate#minusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateMinusYears {
     @BeforeTemplate
     LocalDate before(LocalDate localDate, int yearsToSubtract) {
@@ -776,7 +767,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#plusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimePlusNanos {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int nanosToAdd) {
@@ -795,7 +785,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#plusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimePlusSeconds {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int secondstoAdd) {
@@ -814,7 +803,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#plusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimePlusMinutes {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int minutesToAdd) {
@@ -833,7 +821,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#plusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimePlusHours {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int hoursToAdd) {
@@ -852,7 +839,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#minusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimeMinusNanos {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int nanosToSubtract) {
@@ -871,7 +857,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#minusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimeMinusSeconds {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int secondsToSubtract) {
@@ -890,7 +875,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#minusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimeMinusMinutes {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int minutesToSubtract) {
@@ -909,7 +893,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalTime#minusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalTimeMinusHours {
     @BeforeTemplate
     LocalTime before(LocalTime localTime, int hoursToSubtract) {
@@ -928,7 +911,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#plusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimePlusNanos {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int nanos) {
@@ -947,7 +929,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#plusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimePlusSeconds {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int seconds) {
@@ -966,7 +947,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#plusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimePlusMinutes {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int minutes) {
@@ -985,7 +965,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#plusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimePlusHours {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int hours) {
@@ -1004,7 +983,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#minusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimeMinusNanos {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int nanos) {
@@ -1023,7 +1001,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#minusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimeMinusSeconds {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int seconds) {
@@ -1042,7 +1019,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#minusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimeMinusMinutes {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int minutes) {
@@ -1061,7 +1037,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetTime#minusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetTimeMinusHours {
     @BeforeTemplate
     OffsetTime before(OffsetTime offsetTime, int hours) {
@@ -1080,7 +1055,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusNanos {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int nanos) {
@@ -1099,7 +1073,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusSeconds {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int seconds) {
@@ -1118,7 +1091,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusMinutes {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int minutes) {
@@ -1137,7 +1109,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusHours {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int hours) {
@@ -1156,7 +1127,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusDays {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int days) {
@@ -1175,7 +1145,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusWeeks {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int weeks) {
@@ -1194,7 +1163,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusMonths {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int months) {
@@ -1213,7 +1181,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#plusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimePlusYears {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int years) {
@@ -1232,7 +1199,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusNanos {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int nanos) {
@@ -1251,7 +1217,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusSeconds {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int seconds) {
@@ -1270,7 +1235,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusMinutes {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int minutes) {
@@ -1289,7 +1253,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusHours {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int hours) {
@@ -1308,7 +1271,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusDays {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int days) {
@@ -1327,7 +1289,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusWeeks {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int weeks) {
@@ -1346,7 +1307,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusMonths {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int months) {
@@ -1365,7 +1325,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link LocalDateTime#minusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class LocalDateTimeMinusYears {
     @BeforeTemplate
     LocalDateTime before(LocalDateTime localDateTime, int years) {
@@ -1384,7 +1343,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusNanos {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int nanos) {
@@ -1403,7 +1361,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusSeconds {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int seconds) {
@@ -1422,7 +1379,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusMinutes {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int minutes) {
@@ -1441,7 +1397,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusHours {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int hours) {
@@ -1460,7 +1415,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusDays {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int days) {
@@ -1479,7 +1433,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusWeeks {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int weeks) {
@@ -1498,7 +1451,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusMonths {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int months) {
@@ -1517,7 +1469,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#plusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimePlusYears {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int years) {
@@ -1536,7 +1487,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusNanos {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int nanos) {
@@ -1555,7 +1505,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusSeconds {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int seconds) {
@@ -1574,7 +1523,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusMinutes {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int minutes) {
@@ -1593,7 +1541,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusHours {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int hours) {
@@ -1612,7 +1559,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusDays {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int days) {
@@ -1631,7 +1577,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusWeeks {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int weeks) {
@@ -1650,7 +1595,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusMonths {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int months) {
@@ -1669,7 +1613,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link OffsetDateTime#minusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class OffsetDateTimeMinusYears {
     @BeforeTemplate
     OffsetDateTime before(OffsetDateTime offsetDateTime, int years) {
@@ -1688,7 +1631,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusNanos {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int nanos) {
@@ -1707,7 +1649,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusSeconds {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int seconds) {
@@ -1726,7 +1667,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusMinutes {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int minutes) {
@@ -1745,7 +1685,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusHours {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int hours) {
@@ -1764,7 +1703,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusDays {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int days) {
@@ -1783,7 +1721,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusWeeks {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int weeks) {
@@ -1802,7 +1739,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusMonths {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int months) {
@@ -1821,7 +1757,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#plusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimePlusYears {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int years) {
@@ -1840,7 +1775,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusNanos(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusNanos {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int nanos) {
@@ -1859,7 +1793,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusSeconds(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusSeconds {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int seconds) {
@@ -1878,7 +1811,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusMinutes(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusMinutes {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int minutes) {
@@ -1897,7 +1829,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusHours(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusHours {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int hours) {
@@ -1916,7 +1847,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusDays(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusDays {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int days) {
@@ -1935,7 +1865,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusWeeks(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusWeeks {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int weeks) {
@@ -1954,7 +1883,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusMonths(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusMonths {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int months) {
@@ -1973,7 +1901,6 @@ final class TimeRules {
   }
 
   /** Prefer {@link ZonedDateTime#minusYears(long)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class ZonedDateTimeMinusYears {
     @BeforeTemplate
     ZonedDateTime before(ZonedDateTime zonedDateTime, int years) {

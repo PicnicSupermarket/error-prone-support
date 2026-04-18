@@ -76,7 +76,8 @@ final class ReactorRules {
    * Prefer {@link Mono#fromSupplier(Supplier)} over {@link Mono#fromCallable(Callable)} where
    * feasible.
    */
-  @PossibleSourceIncompatibility
+  @SuppressWarnings(
+      "RefasterSourceCompatibility" /* `@NotMatches` guard prevents incompatibility. */)
   static final class MonoFromSupplier<T> {
     @BeforeTemplate
     Mono<T> before(@NotMatches(ThrowsCheckedException.class) Callable<? extends T> supplier) {

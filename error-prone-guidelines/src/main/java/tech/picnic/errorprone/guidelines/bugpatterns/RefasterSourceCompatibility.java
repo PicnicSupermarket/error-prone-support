@@ -53,10 +53,19 @@ import tech.picnic.errorprone.utils.SourceCode;
  *       on the narrower type.
  * </ul>
  */
-// XXX: As-is, this rule relies on the return types declared by template methods. The
+// XXX: As-is, this check relies on the return types declared by template methods. The
 // `RefasterReturnType` check ensures that such return types are as specific as possible, but we
 // could further reduce false-negatives by instead analyzing the return expressions of template
 // methods to infer more specific non-denotable return types.
+// XXX: As-is, this check unconditionally flags incompatible functional parameters. We may be more
+// refined if we consider `@Matches(IsLambdaExpressionOrMethodReference.class)`. See
+// `JUnitToAssertJRules` and `TestNGToAssertJRules` for examples involving
+// `Executable`/`ThrowingSupplier`/`ThrowingCallable` and `ThrowingRunnable`/`ThrowingCallable`,
+// respectively. (Though there's nuance here involving
+// `@(Not)Matches(ThrowsCheckedException.class)`; see the `MonoFromSupplier` rule.)
+// XXX: As-is, this check is too strict when it claims that `Mono<T>` is not a supertype of
+// `Mono<Void>`, despite `T` being an unconstrained class-level type parameter. See `FluxThen` for
+// an example. Try to do beter.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
