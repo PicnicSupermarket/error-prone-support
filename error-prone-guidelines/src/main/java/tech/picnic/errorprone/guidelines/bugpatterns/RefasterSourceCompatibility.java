@@ -32,8 +32,14 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -57,15 +63,15 @@ import tech.picnic.errorprone.utils.SourceCode;
 // `RefasterReturnType` check ensures that such return types are as specific as possible, but we
 // could further reduce false-negatives by instead analyzing the return expressions of template
 // methods to infer more specific non-denotable return types.
+// XXX: As-is, this check does not account for type variable substitution in wildcard bounds (e.g.
+// `List<? extends T>` vs. `List<? extends Void>`). Extend `inferTypeVarMappings` to recurse into
+// wildcard bounds if cases arise in practice.
 // XXX: As-is, this check unconditionally flags incompatible functional parameters. We may be more
 // refined if we consider `@Matches(IsLambdaExpressionOrMethodReference.class)`. See
 // `JUnitToAssertJRules` and `TestNGToAssertJRules` for examples involving
 // `Executable`/`ThrowingSupplier`/`ThrowingCallable` and `ThrowingRunnable`/`ThrowingCallable`,
 // respectively. (Though there's nuance here involving
 // `@(Not)Matches(ThrowsCheckedException.class)`; see the `MonoFromSupplier` rule.)
-// XXX: As-is, this check is too strict when it claims that `Mono<T>` is not a supertype of
-// `Mono<Void>`, despite `T` being an unconstrained class-level type parameter. See `FluxThen` for
-// an example. Try to do beter.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
@@ -96,8 +102,9 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     }
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
-    return hasCompatibleParameterTypes(beforeMethods, afterMethods, state)
-            && hasCompatibleReturnTypes(beforeMethods, afterMethods, state)
+    Symbol classSymbol = ASTHelpers.getSymbol(tree);
+    return hasCompatibleParameterTypes(beforeMethods, afterMethods, classSymbol, state)
+            && hasCompatibleReturnTypes(beforeMethods, afterMethods, classSymbol, state)
         ? dropAnnotationIfPresent(tree, state)
         : addAnnotationIfAbsent(tree, state);
   }
@@ -113,10 +120,16 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   /**
    * Tells whether all given {@code @AfterTemplate} methods have parameter types that are supertypes
    * of each of the corresponding {@code @BeforeTemplate} parameter types.
+   *
+   * <p>A before-template parameter type is considered compatible with an after-template parameter
+   * type if the former is a subtype of the latter, accounting for the fact that unconstrained
+   * class-level type variables in the after-template parameter type can be substituted with the
+   * concrete types from the before-template parameter type.
    */
   private static boolean hasCompatibleParameterTypes(
       ImmutableList<MethodTree> beforeMethods,
       ImmutableList<MethodTree> afterMethods,
+      Symbol classSymbol,
       VisitorState state) {
     ImmutableSetMultimap<String, Type> beforeTypes =
         beforeMethods.stream()
@@ -130,7 +143,12 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       for (VariableTree afterParam : afterMethod.getParameters()) {
         Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
         if (!beforeTypes.get(afterParam.getName().toString()).stream()
-            .allMatch(type -> types.isSubtype(type, afterParamType))) {
+            .allMatch(
+                beforeType ->
+                    types.isSubtype(beforeType, afterParamType)
+                        || substituteClassTypeVars(afterParamType, beforeType, classSymbol, types)
+                            .filter(t -> types.isSubtype(beforeType, t))
+                            .isPresent())) {
           return false;
         }
       }
@@ -143,6 +161,11 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
    * Tells whether all given {@code @AfterTemplate} methods have a return type that is a subtype of
    * each of the given {@code @BeforeTemplate} methods.
    *
+   * <p>A return type is considered compatible if the after-template return type is a subtype of the
+   * before-template return type, accounting for the fact that unconstrained class-level type
+   * variables in the after-template return type can be substituted with the concrete types from the
+   * before-template return type.
+   *
    * @implNote Note that this method does not need to implement custom logic to handle {@code void}
    *     return types (associated with "block templates"): Refaster rules cannot combine {@code
    *     void} after-templates with non-{@code void} before-templates, and while the reverse is
@@ -152,17 +175,100 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   private static boolean hasCompatibleReturnTypes(
       ImmutableList<MethodTree> beforeMethods,
       ImmutableList<MethodTree> afterMethods,
+      Symbol classSymbol,
       VisitorState state) {
+    Types types = state.getTypes();
     for (MethodTree afterMethod : afterMethods) {
       Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
       for (MethodTree beforeMethod : beforeMethods) {
         Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
-        if (!state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
+        if (!types.isSubtype(afterReturnType, beforeReturnType)
+            && substituteClassTypeVars(afterReturnType, beforeReturnType, classSymbol, types)
+                .filter(t -> types.isSubtype(t, beforeReturnType))
+                .isEmpty()) {
           return false;
         }
       }
     }
 
+    return true;
+  }
+
+  /**
+   * Attempts to substitute class-level type variables in {@code afterType} with corresponding types
+   * inferred from {@code referenceType}, returning an {@link Optional} containing the substituted
+   * type, or an empty {@link Optional} if no valid substitution can be found.
+   */
+  private static Optional<Type> substituteClassTypeVars(
+      Type afterType, Type referenceType, Symbol classSymbol, Types types) {
+    Map<TypeVar, Type> substitution = new LinkedHashMap<>();
+    // XXX: Mutations of this guard are unkillable: with `EQUAL_IF` (always `Optional.empty()`),
+    // no test detects the absence of substitution when the initial `isSubtype` check already
+    // passes; with `EQUAL_ELSE` (always computing `subst`), the empty `from`/`to` lists leave
+    // `afterType` unchanged, which already failed the `isSubtype` check.
+    if (!inferTypeVarMappings(afterType, referenceType, classSymbol, substitution, types)
+        || substitution.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(
+        types.subst(
+            afterType, List.<Type>from(substitution.keySet()), List.from(substitution.values())));
+  }
+
+  /**
+   * Recursively walks {@code afterType} and {@code referenceType} in tandem to collect mappings
+   * from class-level type variables in {@code afterType} to corresponding concrete types in {@code
+   * referenceType}. Returns {@code false} if a contradiction is encountered (e.g., a type variable
+   * would need to map to two different types, or its bounds are violated).
+   */
+  private static boolean inferTypeVarMappings(
+      Type afterType,
+      Type referenceType,
+      Symbol classSymbol,
+      Map<TypeVar, Type> substitution,
+      Types types) {
+    if (afterType instanceof TypeVar tv && tv.tsym.owner.equals(classSymbol)) {
+      /*
+       * `afterType` is directly a class-level type variable. Reject mappings to other type
+       * variables: substituting one type variable for another does not yield a concrete type, and
+       * can mask incompatibilities (e.g. `Flux<T>` vs. `Flux<S>` in a class with both `T` and
+       * `S` as type parameters).
+       */
+      if (referenceType instanceof TypeVar) {
+        return false;
+      }
+      Type existing = substitution.get(tv);
+      if (existing != null) {
+        // XXX: Swapping these arguments is unkillable because `isSameType` is symmetric.
+        return types.isSameType(existing, referenceType);
+      }
+      if (!types.isSubtype(referenceType, tv.getUpperBound())) {
+        /* `referenceType` does not satisfy the type variable's upper bound. */
+        return false;
+      }
+      substitution.put(tv, referenceType);
+      return true;
+    }
+
+    /* Recurse into the type arguments of both types. */
+    List<Type> afterArgs = afterType.getTypeArguments();
+    List<Type> refArgs = referenceType.getTypeArguments();
+    // XXX: Skipping this guard is unkillable: if `afterArgs` is empty (a non-parameterized type
+    // with no TypeVar), there is nothing to substitute, so `afterType` is returned unchanged, and
+    // the outer `isSubtype` check already failed it. A size mismatch likewise prevents meaningful
+    // substitution, and the outer check catches any remaining incompatibility.
+    if (afterArgs.isEmpty() || afterArgs.size() != refArgs.size()) {
+      return false;
+    }
+    for (int i = 0; i < afterArgs.size(); i++) {
+      // XXX: Returning `true` on failure is unkillable: a partial/inconsistent substitution
+      // produces an incorrect type from `types.subst()`, which the outer `isSubtype` check
+      // then rejects, yielding the same final outcome.
+      if (!inferTypeVarMappings(
+          afterArgs.get(i), refArgs.get(i), classSymbol, substitution, types)) {
+        return false;
+      }
+    }
     return true;
   }
 
