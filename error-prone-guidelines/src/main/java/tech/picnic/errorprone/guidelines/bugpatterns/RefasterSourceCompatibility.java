@@ -79,7 +79,9 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
     if (beforeMethods.isEmpty()) {
-      /* Fast path: this is not a Refaster rule. */
+      // XXX: Removing this guard does not change observable behavior: if `beforeMethods` is empty,
+      // both compatibility checks vacuously return `true`, yielding the same result. This guard is
+      // retained as a performance optimization.
       return dropAnnotationIfPresent(tree, state);
     }
 
