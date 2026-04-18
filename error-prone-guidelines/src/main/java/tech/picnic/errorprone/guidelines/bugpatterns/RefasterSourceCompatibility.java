@@ -201,6 +201,10 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   private static Optional<Type> substituteClassTypeVars(
       Type afterType, Type referenceType, Symbol classSymbol, Types types) {
     Map<TypeVar, Type> substitution = new LinkedHashMap<>();
+    // XXX: Mutations of this guard are unkillable: with `EQUAL_IF` (always `Optional.empty()`),
+    // no test detects the absence of substitution when the initial `isSubtype` check already
+    // passes; with `EQUAL_ELSE` (always computing `subst`), the empty `from`/`to` lists leave
+    // `afterType` unchanged, which already failed the `isSubtype` check.
     if (!inferTypeVarMappings(afterType, referenceType, classSymbol, substitution, types)
         || substitution.isEmpty()) {
       return Optional.empty();
@@ -236,6 +240,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       }
       Type existing = substitution.get(tv);
       if (existing != null) {
+        // XXX: Swapping these arguments is unkillable because `isSameType` is symmetric.
         return types.isSameType(existing, referenceType);
       }
       if (!types.isSubtype(referenceType, tv.getUpperBound())) {
@@ -249,10 +254,17 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     /* Recurse into the type arguments of both types. */
     com.sun.tools.javac.util.List<Type> afterArgs = afterType.getTypeArguments();
     com.sun.tools.javac.util.List<Type> refArgs = referenceType.getTypeArguments();
+    // XXX: Skipping this guard is unkillable: if `afterArgs` is empty (a non-parameterized type
+    // with no TypeVar), there is nothing to substitute, so `afterType` is returned unchanged, and
+    // the outer `isSubtype` check already failed it. A size mismatch likewise prevents meaningful
+    // substitution, and the outer check catches any remaining incompatibility.
     if (afterArgs.isEmpty() || afterArgs.size() != refArgs.size()) {
       return false;
     }
     for (int i = 0; i < afterArgs.size(); i++) {
+      // XXX: Returning `true` on failure is unkillable: a partial/inconsistent substitution
+      // produces an incorrect type from `types.subst()`, which the outer `isSubtype` check
+      // then rejects, yielding the same final outcome.
       if (!inferTypeVarMappings(
           afterArgs.get(i), refArgs.get(i), classSymbol, substitution, types)) {
         return false;
