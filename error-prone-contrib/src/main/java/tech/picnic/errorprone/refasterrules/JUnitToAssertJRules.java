@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
-import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
 
@@ -1105,7 +1104,6 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatThrownBy(...).isExactlyInstanceOf(...)} over non-AssertJ alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsExactlyInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(
@@ -1124,7 +1122,6 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatThrownBy(...).isExactlyInstanceOf(...)} over non-AssertJ alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatThrownByWithFailMessageIsExactlyInstanceOfString<
       T extends Throwable> {
     @BeforeTemplate
@@ -1147,7 +1144,6 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatThrownBy(...).isExactlyInstanceOf(...)} over non-AssertJ alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatThrownByWithFailMessageIsExactlyInstanceOfSupplier<
       T extends Throwable> {
     @BeforeTemplate
@@ -1169,7 +1165,6 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
-  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(
@@ -1186,7 +1181,6 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
-  @PossibleSourceIncompatibility
   static final class AssertThatThrownByWithFailMessageIsInstanceOfString<T extends Throwable> {
     @BeforeTemplate
     void before(
@@ -1204,7 +1198,6 @@ final class JUnitToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
-  @PossibleSourceIncompatibility
   static final class AssertThatThrownByWithFailMessageIsInstanceOfSupplier<T extends Throwable> {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.
@@ -1227,7 +1220,6 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatCode(...).doesNotThrowAnyException()} over non-AssertJ alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatCodeDoesNotThrowAnyException {
     @BeforeTemplate
     void before(
@@ -1252,7 +1244,6 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatCode(...).doesNotThrowAnyException()} over non-AssertJ alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatCodeWithFailMessageDoesNotThrowAnyExceptionString {
     @BeforeTemplate
     void before(
@@ -1281,7 +1272,6 @@ final class JUnitToAssertJRules {
   /**
    * Prefer {@code assertThatCode(...).doesNotThrowAnyException()} over non-AssertJ alternatives.
    */
-  @PossibleSourceIncompatibility
   static final class AssertThatCodeWithFailMessageDoesNotThrowAnyExceptionSupplier {
     @BeforeTemplate
     // XXX: Drop this suppression once the SonarCloud false positive is resolved.

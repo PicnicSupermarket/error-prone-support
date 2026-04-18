@@ -36,6 +36,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -146,8 +147,8 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
                 beforeType ->
                     types.isSubtype(beforeType, afterParamType)
                         || substituteClassTypeVars(afterParamType, beforeType, classSymbol, types)
-                            .map(t -> types.isSubtype(beforeType, t))
-                            .orElse(false))) {
+                            .filter(t -> types.isSubtype(beforeType, t))
+                            .isPresent())) {
           return false;
         }
       }
@@ -194,9 +195,9 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   }
 
   /**
-   * Attempts to substitute class-level type variables in {@code afterType} with corresponding
-   * types inferred from {@code referenceType}, returning an {@link Optional} containing the
-   * substituted type, or an empty {@link Optional} if no valid substitution can be found.
+   * Attempts to substitute class-level type variables in {@code afterType} with corresponding types
+   * inferred from {@code referenceType}, returning an {@link Optional} containing the substituted
+   * type, or an empty {@link Optional} if no valid substitution can be found.
    */
   private static Optional<Type> substituteClassTypeVars(
       Type afterType, Type referenceType, Symbol classSymbol, Types types) {
@@ -211,9 +212,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     }
     return Optional.of(
         types.subst(
-            afterType,
-            com.sun.tools.javac.util.List.<Type>from(substitution.keySet()),
-            com.sun.tools.javac.util.List.from(substitution.values())));
+            afterType, List.<Type>from(substitution.keySet()), List.from(substitution.values())));
   }
 
   /**
@@ -252,8 +251,8 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     }
 
     /* Recurse into the type arguments of both types. */
-    com.sun.tools.javac.util.List<Type> afterArgs = afterType.getTypeArguments();
-    com.sun.tools.javac.util.List<Type> refArgs = referenceType.getTypeArguments();
+    List<Type> afterArgs = afterType.getTypeArguments();
+    List<Type> refArgs = referenceType.getTypeArguments();
     // XXX: Skipping this guard is unkillable: if `afterArgs` is empty (a non-parameterized type
     // with no TypeVar), there is nothing to substitute, so `afterType` is returned unchanged, and
     // the outer `isSubtype` check already failed it. A size mismatch likewise prevents meaningful
