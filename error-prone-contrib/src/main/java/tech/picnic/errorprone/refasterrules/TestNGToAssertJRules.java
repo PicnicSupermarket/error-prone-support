@@ -1308,6 +1308,7 @@ final class TestNGToAssertJRules {
   /**
    * Prefer {@link Assertions#assertThatThrownBy(ThrowingCallable)} over non-AssertJ alternatives.
    */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownBy {
     @BeforeTemplate
     void before(
@@ -1323,6 +1324,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
+  @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate
     void before(
