@@ -38,7 +38,7 @@ import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.Types;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.jspecify.annotations.Nullable;
+import java.util.Optional;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -143,14 +143,11 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
         Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
         if (!beforeTypes.get(afterParam.getName().toString()).stream()
             .allMatch(
-                beforeType -> {
-                  if (types.isSubtype(beforeType, afterParamType)) {
-                    return true;
-                  }
-                  @Nullable Type substituted =
-                      substituteClassTypeVars(afterParamType, beforeType, classSymbol, types);
-                  return substituted != null && types.isSubtype(beforeType, substituted);
-                })) {
+                beforeType ->
+                    types.isSubtype(beforeType, afterParamType)
+                        || substituteClassTypeVars(afterParamType, beforeType, classSymbol, types)
+                            .map(t -> types.isSubtype(beforeType, t))
+                            .orElse(false))) {
           return false;
         }
       }
@@ -184,12 +181,11 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
       for (MethodTree beforeMethod : beforeMethods) {
         Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
-        if (!types.isSubtype(afterReturnType, beforeReturnType)) {
-          @Nullable Type substituted =
-              substituteClassTypeVars(afterReturnType, beforeReturnType, classSymbol, types);
-          if (substituted == null || !types.isSubtype(substituted, beforeReturnType)) {
-            return false;
-          }
+        if (!types.isSubtype(afterReturnType, beforeReturnType)
+            && substituteClassTypeVars(afterReturnType, beforeReturnType, classSymbol, types)
+                .filter(t -> types.isSubtype(t, beforeReturnType))
+                .isEmpty()) {
+          return false;
         }
       }
     }
@@ -199,22 +195,21 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
 
   /**
    * Attempts to substitute class-level type variables in {@code afterType} with corresponding
-   * types inferred from {@code referenceType}, returning the substituted type, or {@code null} if
-   * no valid substitution can be found.
+   * types inferred from {@code referenceType}, returning an {@link Optional} containing the
+   * substituted type, or an empty {@link Optional} if no valid substitution can be found.
    */
-  private static @Nullable Type substituteClassTypeVars(
+  private static Optional<Type> substituteClassTypeVars(
       Type afterType, Type referenceType, Symbol classSymbol, Types types) {
     Map<TypeVar, Type> substitution = new LinkedHashMap<>();
     if (!inferTypeVarMappings(afterType, referenceType, classSymbol, substitution, types)
         || substitution.isEmpty()) {
-      return null;
+      return Optional.empty();
     }
-    com.sun.tools.javac.util.List<Type> from =
-        com.sun.tools.javac.util.List.from(
-            ImmutableList.<Type>copyOf(substitution.keySet()));
-    com.sun.tools.javac.util.List<Type> to =
-        com.sun.tools.javac.util.List.from(ImmutableList.copyOf(substitution.values()));
-    return types.subst(afterType, from, to);
+    return Optional.of(
+        types.subst(
+            afterType,
+            com.sun.tools.javac.util.List.<Type>from(substitution.keySet()),
+            com.sun.tools.javac.util.List.from(substitution.values())));
   }
 
   /**
@@ -258,7 +253,8 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       return false;
     }
     for (int i = 0; i < afterArgs.size(); i++) {
-      if (!inferTypeVarMappings(afterArgs.get(i), refArgs.get(i), classSymbol, substitution, types)) {
+      if (!inferTypeVarMappings(
+          afterArgs.get(i), refArgs.get(i), classSymbol, substitution, types)) {
         return false;
       }
     }
