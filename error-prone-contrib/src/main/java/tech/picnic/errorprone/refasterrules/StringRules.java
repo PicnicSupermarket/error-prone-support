@@ -31,10 +31,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class StringRules {
   private StringRules() {}
 
-  /**
-   * Avoid unnecessary creation of new empty {@link String} objects; use the empty string literal
-   * instead.
-   */
+  /** Prefer {@code ""} over less efficient or less explicit alternatives. */
   static final class EmptyString {
     @BeforeTemplate
     @SuppressWarnings("java:S2129" /* This violation will be rewritten. */)
@@ -53,7 +50,7 @@ final class StringRules {
     }
   }
 
-  /** Avoid unnecessary creation of new {@link String} objects. */
+  /** Prefer using {@link String}s as-is over less efficient alternatives. */
   // XXX: Once `IdentityConversion` supports flagging constructor invocations, use that bug pattern
   // instead of this Refaster rule.
   static final class StringIdentity {
@@ -69,13 +66,13 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#isEmpty()} over alternatives that consult the string's length. */
+  /** Prefer {@link String#isEmpty()} over less explicit alternatives. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below. The `CharSequenceIsEmpty` rule then suffices. (This rule exists so that e.g. projects
   // that target JDK 11 can disable `CharSequenceIsEmpty` without losing a valuable rule.)
   // XXX: Look into a more general approach to supporting different Java language levels, such as
   // rule selection based on some annotation, or a separate Maven module.
-  static final class StringIsEmpty {
+  static final class StringIsEmptyWithString {
     @BeforeTemplate
     @SuppressWarnings({
       "CharSequenceIsEmpty" /* This is a more specific template. */,
@@ -93,13 +90,13 @@ final class StringRules {
     }
   }
 
-  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  /** Prefer {@link String#isEmpty()} over more verbose alternatives. */
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
   // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
   // to introduce a rule that suggests `String::isEmpty` where possible.
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
   // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
-  static final class StringIsEmptyPredicate {
+  static final class StringIsEmpty {
     @BeforeTemplate
     Predicate<String> before() {
       return s -> s.isEmpty();
@@ -111,11 +108,11 @@ final class StringRules {
     }
   }
 
-  /** Prefer a method reference to {@link String#isEmpty()} over the equivalent lambda function. */
+  /** Prefer {@code not(String::isEmpty)} over less idiomatic alternatives. */
   // XXX: Now that we build with JDK 15+, this rule can be generalized to cover all `CharSequence`
   // subtypes. However, `CharSequence::isEmpty` isn't as nice as `String::isEmpty`, so we might want
   // to introduce a rule that suggests `String::isEmpty` where possible.
-  static final class StringIsNotEmptyPredicate {
+  static final class NotStringIsEmpty {
     @BeforeTemplate
     Predicate<String> before() {
       return s -> !s.isEmpty();
@@ -128,23 +125,27 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link Strings#isNullOrEmpty(String)} over the more verbose alternative. */
-  static final class StringIsNullOrEmpty {
+  /** Prefer {@link Strings#isNullOrEmpty(String)} over more verbose alternatives. */
+  static final class StringsIsNullOrEmpty {
     @BeforeTemplate
-    boolean before(@Nullable String str) {
-      return str == null || str.isEmpty();
+    boolean before(@Nullable String string) {
+      return string == null || string.isEmpty();
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(String str) {
-      return Strings.isNullOrEmpty(str);
+    boolean after(String string) {
+      return Strings.isNullOrEmpty(string);
     }
   }
 
-  /** Prefer {@link String#isBlank()} over less efficient alternatives. */
-  // XXX: Note that this rule changes semantics, as `isBlank()` considers whitespace characters
-  // beyond U+0020, while `trim()` does not.
+  /**
+   * Prefer {@link String#isBlank()} over less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the behavior for strings containing
+   * whitespace characters beyond U+0020, as {@link String#isBlank()} considers those, while {@link
+   * String#trim()} does not.
+   */
   static final class StringIsBlank {
     @BeforeTemplate
     boolean before(String str) {
@@ -158,23 +159,27 @@ final class StringRules {
     }
   }
 
-  /** Don't use the ternary operator to create an optionally-absent string. */
-  // XXX: This is a special case of `TernaryOperatorOptionalNegativeFiltering`.
-  static final class OptionalNonEmptyString {
+  /**
+   * Prefer {@code Optional.ofNullable(str).filter(not(String::isEmpty))} over more contrived
+   * alternatives.
+   */
+  // XXX: This is a special case of `RefasterEmitCommentBeforeOptionalOfFilterNot`.
+  static final class OptionalOfNullableFilterNotStringIsEmpty {
     @BeforeTemplate
-    Optional<String> before(String str) {
-      return Strings.isNullOrEmpty(str)
+    Optional<String> before(String value) {
+      return Strings.isNullOrEmpty(value)
           ? Optional.empty()
-          : Refaster.anyOf(Optional.of(str), Optional.ofNullable(str));
+          : Refaster.anyOf(Optional.of(value), Optional.ofNullable(value));
     }
 
     @AfterTemplate
-    Optional<String> after(String str) {
-      return Optional.ofNullable(str).filter(not(String::isEmpty));
+    Optional<String> after(String value) {
+      return Optional.ofNullable(value).filter(not(String::isEmpty));
     }
   }
 
-  static final class FilterEmptyString {
+  /** Prefer {@link Optional#filter(Predicate)} over non-JDK alternatives. */
+  static final class OptionalFilterNotStringIsEmpty {
     @BeforeTemplate
     Optional<String> before(Optional<String> optional) {
       return optional.map(Strings::emptyToNull);
@@ -187,37 +192,39 @@ final class StringRules {
     }
   }
 
-  /** Prefer {@link String#join(CharSequence, Iterable)} and variants over the Guava alternative. */
+  /**
+   * Prefer {@link String#join(CharSequence, Iterable)} over non-JDK or more contrived alternatives.
+   */
   // XXX: Joiner.on(char) isn't rewritten. Add separate rule?
   // XXX: Joiner#join(@Nullable Object first, @Nullable Object second, Object... rest) isn't
   // rewritten.
-  static final class JoinStrings {
+  static final class StringJoin<T extends CharSequence> {
     @BeforeTemplate
-    String before(String delimiter, CharSequence[] elements) {
+    String before(String delimiter, T[] elements) {
       return Refaster.anyOf(
           Joiner.on(delimiter).join(elements), Arrays.stream(elements).collect(joining(delimiter)));
     }
 
     @BeforeTemplate
-    String before(String delimiter, Iterable<? extends CharSequence> elements) {
+    String before(String delimiter, Iterable<T> elements) {
       return Refaster.anyOf(
           Joiner.on(delimiter).join(elements),
           Streams.stream(elements).collect(joining(delimiter)));
     }
 
     @BeforeTemplate
-    String before(CharSequence delimiter, Collection<? extends CharSequence> elements) {
+    String before(CharSequence delimiter, Collection<T> elements) {
       return elements.stream().collect(joining(delimiter));
     }
 
     @AfterTemplate
-    String after(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
+    String after(CharSequence delimiter, Iterable<T> elements) {
       return String.join(delimiter, elements);
     }
   }
 
   /** Prefer {@link String#join(CharSequence, CharSequence...)} over less efficient alternatives. */
-  static final class StringJoinDelimiterVarargs {
+  static final class StringJoinVarargs {
     @BeforeTemplate
     String before(CharSequence delimiter, @Repeated CharSequence elements) {
       return Stream.of(Refaster.asVarargs(elements)).collect(joining(delimiter));
@@ -229,27 +236,21 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct invocation of {@link String#valueOf(Object)} over the indirection introduced by
-   * {@link Objects#toString(Object)}.
-   */
-  static final class StringValueOf {
+  /** Prefer {@link String#valueOf(Object)} over more contrived alternatives. */
+  static final class StringValueOfWithObject {
     @BeforeTemplate
-    String before(Object object) {
-      return Objects.toString(object);
+    String before(Object obj) {
+      return Objects.toString(obj);
     }
 
     @AfterTemplate
-    String after(Object object) {
-      return String.valueOf(object);
+    String after(Object obj) {
+      return String.valueOf(obj);
     }
   }
 
-  /**
-   * Prefer direct invocation of {@link String#String(char[], int, int)} over the indirection
-   * introduced by alternatives.
-   */
-  static final class NewStringFromCharArraySubSequence {
+  /** Prefer {@link String#String(char[], int, int)} over more contrived alternatives. */
+  static final class NewString3 {
     @BeforeTemplate
     String before(char[] data, int offset, int count) {
       return Refaster.anyOf(
@@ -262,11 +263,8 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct invocation of {@link String#String(char[])} over the indirection introduced by
-   * alternatives.
-   */
-  static final class NewStringFromCharArray {
+  /** Prefer {@link String#String(char[])} over more contrived alternatives. */
+  static final class NewString1 {
     @BeforeTemplate
     String before(char[] data) {
       return Refaster.anyOf(String.valueOf(data), new String(data, 0, data.length));
@@ -278,13 +276,10 @@ final class StringRules {
     }
   }
 
-  /**
-   * Prefer direct delegation to {@link String#valueOf(Object)} over the indirection introduced by
-   * {@link Objects#toString(Object)}.
-   */
+  /** Prefer {@link String#valueOf(Object)} over more contrived alternatives. */
   // XXX: This rule is analogous to `StringValueOf` above. Arguably this is its generalization.
   // If/when Refaster is extended to understand this, delete the rule above.
-  static final class StringValueOfMethodReference {
+  static final class StringValueOf {
     @BeforeTemplate
     Function<Object, String> before() {
       return Objects::toString;
@@ -296,139 +291,143 @@ final class StringRules {
     }
   }
 
-  /** Don't unnecessarily use the two-argument {@link String#substring(int, int)}. */
-  static final class SubstringRemainder {
+  /** Prefer {@link String#substring(int)} over more verbose alternatives. */
+  static final class StringSubstring {
     @BeforeTemplate
-    String before(String str, int index) {
-      return str.substring(index, str.length());
+    String before(String str, int beginIndex) {
+      return str.substring(beginIndex, str.length());
     }
 
     @AfterTemplate
-    String after(String str, int index) {
-      return str.substring(index);
+    String after(String str, int beginIndex) {
+      return str.substring(beginIndex);
     }
   }
 
   /** Prefer {@link Utf8#encodedLength(CharSequence)} over less efficient alternatives. */
   static final class Utf8EncodedLength {
     @BeforeTemplate
-    int before(String str) {
-      return str.getBytes(UTF_8).length;
+    int before(String sequence) {
+      return sequence.getBytes(UTF_8).length;
     }
 
     @AfterTemplate
-    int after(String str) {
-      return Utf8.encodedLength(str);
+    int after(String sequence) {
+      return Utf8.encodedLength(sequence);
     }
   }
 
   /** Prefer {@link String#indexOf(int, int)} over less efficient alternatives. */
-  static final class StringIndexOfCharFromIndex {
+  static final class MathMaxNegativeOneStringIndexOfMinusInt {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, int ch, int fromIndex) {
-      return string.substring(fromIndex).indexOf(ch);
+    int before(String str, int ch, int fromIndex) {
+      return str.substring(fromIndex).indexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int fromIndex) {
-      return Math.max(-1, string.indexOf(ch, fromIndex) - fromIndex);
+    int after(String str, int ch, int fromIndex) {
+      return Math.max(-1, str.indexOf(ch, fromIndex) - fromIndex);
     }
   }
 
   /** Prefer {@link String#indexOf(int, int, int)} over less efficient alternatives. */
-  static final class StringIndexOfCharBetweenIndices {
+  static final class MathMaxNegativeOneStringIndexOfMinusIntWithInt {
     @BeforeTemplate
-    int before(String string, int ch, int beginIndex, int endIndex) {
-      return string.substring(beginIndex, endIndex).indexOf(ch);
+    int before(String str, int ch, int beginIndex, int endIndex) {
+      return str.substring(beginIndex, endIndex).indexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int beginIndex, int endIndex) {
-      return Math.max(-1, string.indexOf(ch, beginIndex, endIndex) - beginIndex);
+    int after(String str, int ch, int beginIndex, int endIndex) {
+      return Math.max(-1, str.indexOf(ch, beginIndex, endIndex) - beginIndex);
     }
   }
 
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
-  static final class StringIndexOfStringFromIndex {
+  static final class MathMaxNegativeOneStringIndexOfMinusString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, String substring, int fromIndex) {
-      return string.substring(fromIndex).indexOf(substring);
+    int before(String str1, String str2, int fromIndex) {
+      return str1.substring(fromIndex).indexOf(str2);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int fromIndex) {
-      return Math.max(-1, string.indexOf(substring, fromIndex) - fromIndex);
+    int after(String str1, String str2, int fromIndex) {
+      return Math.max(-1, str1.indexOf(str2, fromIndex) - fromIndex);
     }
   }
 
   /** Prefer {@link String#indexOf(String, int)} over less efficient alternatives. */
-  static final class StringIndexOfStringBetweenIndices {
+  static final class MathMaxNegativeOneStringIndexOfMinusStringWithInt {
     @BeforeTemplate
-    int before(String string, String substring, int beginIndex, int endIndex) {
-      return string.substring(beginIndex, endIndex).indexOf(substring);
+    int before(String str1, String str2, int beginIndex, int endIndex) {
+      return str1.substring(beginIndex, endIndex).indexOf(str2);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int beginIndex, int endIndex) {
-      return Math.max(-1, string.indexOf(substring, beginIndex, endIndex) - beginIndex);
+    int after(String str1, String str2, int beginIndex, int endIndex) {
+      return Math.max(-1, str1.indexOf(str2, beginIndex, endIndex) - beginIndex);
     }
   }
 
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
-  static final class StringLastIndexOfChar {
+  static final class MathMaxNegativeOneStringLastIndexOfMinusInt {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, int ch, int fromIndex) {
-      return string.substring(fromIndex).lastIndexOf(ch);
+    int before(String str, int ch, int beginIndex) {
+      return str.substring(beginIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int fromIndex) {
-      return Math.max(-1, string.lastIndexOf(ch) - fromIndex);
+    int after(String str, int ch, int beginIndex) {
+      return Math.max(-1, str.lastIndexOf(ch) - beginIndex);
     }
   }
 
   /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
-  static final class StringLastIndexOfString {
+  static final class MathMaxNegativeOneStringLastIndexOfMinusString {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    int before(String string, String substring, int fromIndex) {
-      return string.substring(fromIndex).lastIndexOf(substring);
+    int before(String str1, String str2, int beginIndex) {
+      return str1.substring(beginIndex).lastIndexOf(str2);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int fromIndex) {
-      return Math.max(-1, string.lastIndexOf(substring) - fromIndex);
+    int after(String str1, String str2, int beginIndex) {
+      return Math.max(-1, str1.lastIndexOf(str2) - beginIndex);
     }
   }
 
   /** Prefer {@link String#lastIndexOf(int, int)} over less efficient alternatives. */
-  static final class StringLastIndexOfCharWithIndex {
+  static final class StringLastIndexOfMinusOneInt {
     @BeforeTemplate
-    int before(String string, int ch, int fromIndex) {
-      return string.substring(0, fromIndex).lastIndexOf(ch);
+    int before(String str, int ch, int fromIndex) {
+      return str.substring(0, fromIndex).lastIndexOf(ch);
     }
 
     @AfterTemplate
-    int after(String string, int ch, int fromIndex) {
-      return string.lastIndexOf(ch, fromIndex - 1);
+    int after(String str, int ch, int fromIndex) {
+      return str.lastIndexOf(ch, fromIndex - 1);
     }
   }
 
-  /** Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives. */
-  // XXX: The replacement expression isn't fully equivalent: in case `substring` is empty, then
-  // the replacement yields `fromIndex - 1` rather than `fromIndex`.
-  static final class StringLastIndexOfStringWithIndex {
+  /**
+   * Prefer {@link String#lastIndexOf(String, int)} over less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> when {@code str2} is empty, this rewrite changes the result: the
+   * original expression returns {@code fromIndex}, while the replacement returns {@code fromIndex -
+   * 1}.
+   */
+  static final class StringLastIndexOfMinusOneString {
     @BeforeTemplate
-    int before(String string, String substring, int fromIndex) {
-      return string.substring(0, fromIndex).lastIndexOf(substring);
+    int before(String str1, String str2, int fromIndex) {
+      return str1.substring(0, fromIndex).lastIndexOf(str2);
     }
 
     @AfterTemplate
-    int after(String string, String substring, int fromIndex) {
-      return string.lastIndexOf(substring, fromIndex - 1);
+    int after(String str1, String str2, int fromIndex) {
+      return str1.lastIndexOf(str2, fromIndex - 1);
     }
   }
 
@@ -436,22 +435,18 @@ final class StringRules {
   static final class StringStartsWith {
     @BeforeTemplate
     @SuppressWarnings("java:S4635" /* This violation will be rewritten. */)
-    boolean before(String string, String prefix, int fromIndex) {
-      return string.substring(fromIndex).startsWith(prefix);
+    boolean before(String str, String prefix, int toffset) {
+      return str.substring(toffset).startsWith(prefix);
     }
 
     @AfterTemplate
-    boolean after(String string, String prefix, int fromIndex) {
-      return string.startsWith(prefix, fromIndex);
+    boolean after(String str, String prefix, int toffset) {
+      return str.startsWith(prefix, toffset);
     }
   }
 
-  /**
-   * Prefer {@link String#formatted(Object...)} over {@link String#format(String, Object...)}, as
-   * the former works more nicely with text blocks, while the latter does not appear advantageous in
-   * any circumstance (assuming one targets JDK 15+).
-   */
-  static final class StringFormatted {
+  /** Prefer {@link String#formatted(Object...)} over less idiomatic alternatives. */
+  static final class Formatted {
     @BeforeTemplate
     @FormatMethod
     String before(String format, @Repeated Object args) {
