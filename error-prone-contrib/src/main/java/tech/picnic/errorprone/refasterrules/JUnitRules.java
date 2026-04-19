@@ -15,7 +15,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class JUnitRules {
   private JUnitRules() {}
 
-  /** Prefer {@link Arguments#arguments} over less idiomatic alternatives. */
+  /** Prefer {@link Arguments#arguments(Object...)} over less idiomatic alternatives. */
   // XXX: Update `RefasterRuleName` so that this suppression can be dropped.
   @SuppressWarnings(
       "RefasterRuleName" /* Derived name `Arguments` clashes with the imported type. */)

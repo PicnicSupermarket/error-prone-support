@@ -38,7 +38,7 @@ final class ClassRules {
     }
   }
 
-  /** Prefer {@link Class#isInstance(Object)} method references over more verbose alternatives. */
+  /** Prefer {@code Refaster.<T>clazz()::isInstance} over more verbose alternatives. */
   static final class ClassIsInstance<T, S> {
     @BeforeTemplate
     Predicate<S> before() {
@@ -51,7 +51,7 @@ final class ClassRules {
     }
   }
 
-  /** Prefer {@link Class#isInstance(Object)} method references over more verbose alternatives. */
+  /** Prefer {@code clazz::isInstance} over more verbose alternatives. */
   // XXX: Drop this rule once the `MethodReferenceUsage` rule is enabled by default.
   static final class ClassIsInstanceWithClass<T, S> {
     @BeforeTemplate
@@ -65,7 +65,7 @@ final class ClassRules {
     }
   }
 
-  /** Prefer {@link Class#cast(Object)} method references over more verbose alternatives. */
+  /** Prefer {@code clazz::cast} over more verbose alternatives. */
   // XXX: Drop this rule once the `MethodReferenceUsage` rule is enabled by default.
   static final class ClassCast<T, S, U extends S> {
     @BeforeTemplate

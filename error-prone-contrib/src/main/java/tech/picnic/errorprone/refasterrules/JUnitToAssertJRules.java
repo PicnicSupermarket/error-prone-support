@@ -44,6 +44,12 @@ import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodRefere
  */
 // XXX: The `AssertThat*Array*ContainsExactly*` rules assume that `expected` and `actual` are not
 // both `null`.
+// XXX: The `ThrowingSupplier`-typed before-templates below should additionally require that the
+// matched expression is void-compatible (i.e., also satisfies the `ThrowingCallable` functional
+// interface). Without this constraint, a lambda like `() -> "constant"` can match the
+// `ThrowingSupplier<?>` before-template, yet fail to compile as `ThrowingCallable` in the
+// after-template. The `@Matches(IsLambdaExpressionOrMethodReference.class)` annotation added to
+// these templates does not address this; a dedicated matcher is still needed.
 @OnlineDocumentation
 @TypeMigration(
     of = Assertions.class,

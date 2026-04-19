@@ -103,7 +103,7 @@ final class BigDecimalRules {
   }
 
   /**
-   * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less clear
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less explicit
    * alternatives.
    */
   static final class BigDecimalSignumIsPositive {
@@ -124,7 +124,7 @@ final class BigDecimalRules {
   }
 
   /**
-   * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less clear
+   * Prefer a {@link BigDecimal#signum()} comparison to 0 over less efficient or less explicit
    * alternatives.
    */
   static final class BigDecimalSignumIsNegative {

@@ -250,6 +250,10 @@ final class AssertJRules {
 
   /**
    * Prefer {@link ListAssert#containsExactlyElementsOf(Iterable)} over less explicit alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if {@code iterable} is not a {@link
+   * List}: {@link List#equals(Object)} returns {@code false} for non-{@code List} iterables, while
+   * {@link ListAssert#containsExactlyElementsOf(Iterable)} accepts any {@link Iterable}.
    */
   static final class AssertThatContainsExactlyElementsOfList<S, T extends S> {
     @BeforeTemplate
@@ -271,6 +275,11 @@ final class AssertJRules {
   /**
    * Prefer {@link AbstractCollectionAssert#hasSameElementsAs(Iterable)} over less explicit or more
    * contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code iterable} contains
+   * duplicates: {@link AbstractCollectionAssert#containsExactlyInAnyOrderElementsOf(Iterable)} is
+   * then guaranteed to fail, while {@link AbstractCollectionAssert#hasSameElementsAs(Iterable)} may
+   * not.
    */
   static final class AssertThatHasSameElementsAsSet<S, T extends S> {
     @BeforeTemplate
@@ -300,6 +309,11 @@ final class AssertJRules {
   /**
    * Prefer {@link AbstractCollectionAssert#containsExactlyInAnyOrderElementsOf(Iterable)} over less
    * explicit alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if {@code values} is not a {@link
+   * Multiset}: {@link Multiset#equals} returns {@code false} for non-{@code Multiset} iterables,
+   * while {@link AbstractCollectionAssert#containsExactlyInAnyOrderElementsOf(Iterable)} accepts
+   * any {@link Iterable}.
    */
   static final class AssertThatContainsExactlyInAnyOrderElementsOfMultiset<S, T extends S> {
     @BeforeTemplate
@@ -320,7 +334,14 @@ final class AssertJRules {
   // Map
   //
 
-  /** Prefer {@link MapAssert#containsEntry(Object, Object)} over more contrived alternatives. */
+  /**
+   * Prefer {@link MapAssert#containsEntry(Object, Object)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code value} is {@code null}
+   * and {@code key} is absent from the map: the original code passes (as {@link Map#get} returns
+   * {@code null} for absent keys), while {@link MapAssert#containsEntry(Object, Object)} requires
+   * the key to be explicitly present.
+   */
   // XXX: To match in all cases there'll need to be a `@BeforeTemplate` variant for each
   // `assertThat` overload. Consider defining a `BugChecker` instead.
   @PossibleSourceIncompatibility

@@ -64,7 +64,13 @@ final class AssertJObjectRules {
     }
   }
 
-  /** Prefer {@link ObjectAssert#isEqualTo(Object)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ObjectAssert#isEqualTo(Object)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if {@code actual} is {@code null}:
+   * the original code throws a {@link NullPointerException}, while the replacement handles the
+   * comparison gracefully.
+   */
   @PossibleSourceIncompatibility
   static final class AssertThatIsEqualTo<S, T> {
     @BeforeTemplate
@@ -79,7 +85,13 @@ final class AssertJObjectRules {
     }
   }
 
-  /** Prefer {@link ObjectAssert#isNotEqualTo(Object)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ObjectAssert#isNotEqualTo(Object)} over more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if {@code actual} is {@code null}:
+   * the original code throws a {@link NullPointerException}, while the replacement handles the
+   * comparison gracefully.
+   */
   @PossibleSourceIncompatibility
   static final class AssertThatIsNotEqualTo<S, T> {
     @BeforeTemplate

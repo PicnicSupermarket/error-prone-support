@@ -18,7 +18,13 @@ import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 final class MapRules {
   private MapRules() {}
 
-  /** Prefer {@link EnumMap} over less efficient alternatives. */
+  /**
+   * Prefer {@link EnumMap} over less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if null keys are used: {@link
+   * HashMap} permits them, while {@link EnumMap} throws a {@link NullPointerException}.
+   * Additionally, {@link EnumMap} iterates in enum-declaration order rather than insertion order.
+   */
   // XXX: We could add a rule for `new EnumMap(Map<K, ? extends V> m)`, but that constructor does
   // not allow an empty non-EnumMap to be provided.
   @PossibleSourceIncompatibility
@@ -119,7 +125,7 @@ final class MapRules {
     }
   }
 
-  /** Prefer {@link Map#keySet()} over more contrived alternatives. */
+  /** Prefer {@code map.keySet().stream()} over more contrived alternatives. */
   static final class MapKeySetStream<K, V> {
     @BeforeTemplate
     Stream<K> before(Map<K, V> map) {
@@ -132,7 +138,7 @@ final class MapRules {
     }
   }
 
-  /** Prefer {@link Map#values()} over more contrived alternatives. */
+  /** Prefer {@code map.values().stream()} over more contrived alternatives. */
   static final class MapValuesStream<K, V> {
     @BeforeTemplate
     Stream<V> before(Map<K, V> map) {
