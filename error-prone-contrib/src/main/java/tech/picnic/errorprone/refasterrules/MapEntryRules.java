@@ -28,7 +28,7 @@ final class MapEntryRules {
    * <p><strong>Warning:</strong> while both {@link Maps#immutableEntry(Object, Object)} and {@link
    * AbstractMap.SimpleImmutableEntry} allow {@code null} keys and values, the preferred {@link
    * Map#entry(Object, Object)} variant does not. Moreover, the {@link Map.Entry} instances produced
-   * by the former approaches is {@link java.io.Serializable}, while this does not hold for the
+   * by the former approaches are {@link java.io.Serializable}, while this does not hold for the
    * object returned by the preferred approach.
    */
   static final class MapEntry<K, V> {

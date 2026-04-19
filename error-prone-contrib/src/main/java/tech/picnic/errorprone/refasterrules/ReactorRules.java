@@ -102,6 +102,10 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if the source can emit or propagate
+   * a {@link TimeoutException}: the original code suppresses any such signal, while the replacement
+   * only handles the one emitted by the {@code timeout} operator itself.
    */
   static final class MonoTimeoutMonoEmptyDuration<T> {
     @BeforeTemplate
@@ -117,6 +121,10 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if the source can emit or propagate
+   * a {@link TimeoutException}: the original code suppresses any such signal, while the replacement
+   * only handles the one emitted by the {@code timeout} operator itself.
    */
   static final class MonoTimeoutMonoJustDuration<T> {
     @BeforeTemplate
@@ -132,6 +140,10 @@ final class ReactorRules {
 
   /**
    * Prefer {@link Mono#timeout(Duration, Mono)} over more contrived or less efficient alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if the source can emit or propagate
+   * a {@link TimeoutException}: the original code suppresses any such signal, while the replacement
+   * only handles the one emitted by the {@code timeout} operator itself.
    */
   static final class MonoTimeoutDuration<T> {
     @BeforeTemplate
@@ -148,6 +160,10 @@ final class ReactorRules {
   /**
    * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less efficient
    * alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if the source can emit or propagate
+   * a {@link TimeoutException}: the original code suppresses any such signal, while the replacement
+   * only handles the one emitted by the {@code timeout} operator itself.
    */
   static final class MonoTimeoutMonoEmptyPublisher<T, S> {
     @BeforeTemplate
@@ -164,6 +180,10 @@ final class ReactorRules {
   /**
    * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less efficient
    * alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if the source can emit or propagate
+   * a {@link TimeoutException}: the original code suppresses any such signal, while the replacement
+   * only handles the one emitted by the {@code timeout} operator itself.
    */
   static final class MonoTimeoutMonoJustPublisher<T, S> {
     @BeforeTemplate
@@ -180,6 +200,10 @@ final class ReactorRules {
   /**
    * Prefer {@link Mono#timeout(Publisher, Mono)} over more contrived or less efficient
    * alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior if the source can emit or propagate
+   * a {@link TimeoutException}: the original code suppresses any such signal, while the replacement
+   * only handles the one emitted by the {@code timeout} operator itself.
    */
   static final class MonoTimeoutPublisher<T, S> {
     @BeforeTemplate
@@ -635,7 +659,7 @@ final class ReactorRules {
 
     @AfterTemplate
     Flux<T> after(@Repeated T data) {
-      return Flux.just(data);
+      return Flux.just(Refaster.asVarargs(data));
     }
   }
 
@@ -2088,8 +2112,7 @@ final class ReactorRules {
    * Prefer {@link MathFlux#min(Publisher, Comparator)} over less efficient or more verbose
    * alternatives.
    */
-  static final class FluxTransformMathFluxMinSingleOrEmptyWithComparator<
-      T extends Comparable<? super T>> {
+  static final class FluxTransformMathFluxMinSingleOrEmptyWithComparator<T> {
     @BeforeTemplate
     Mono<T> before(Flux<T> flux, Comparator<? super T> comparator) {
       return Refaster.anyOf(
@@ -2119,8 +2142,7 @@ final class ReactorRules {
    * Prefer {@link MathFlux#max(Publisher, Comparator)} over less efficient or more verbose
    * alternatives.
    */
-  static final class FluxTransformMathFluxMaxSingleOrEmptyWithComparator<
-      T extends Comparable<? super T>> {
+  static final class FluxTransformMathFluxMaxSingleOrEmptyWithComparator<T> {
     @BeforeTemplate
     Mono<T> before(Flux<T> flux, Comparator<? super T> comparator) {
       return Refaster.anyOf(

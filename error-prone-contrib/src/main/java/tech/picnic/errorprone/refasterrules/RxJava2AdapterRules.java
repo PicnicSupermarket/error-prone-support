@@ -20,7 +20,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class RxJava2AdapterRules {
   private RxJava2AdapterRules() {}
 
-  /** Prefer {@link RxJava2Adapter#completableToMono} over less idiomatic alternatives. */
+  /**
+   * Prefer {@link RxJava2Adapter#completableToMono(Completable)} over less idiomatic alternatives.
+   */
   static final class CompletableAsRxJava2AdapterCompletableToMono {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
@@ -36,7 +38,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#flowableToFlux} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#flowableToFlux(Flowable)} over less idiomatic alternatives. */
   static final class FlowableAsRxJava2AdapterFlowableToFlux<T> {
     @BeforeTemplate
     Flux<T> before(Flowable<T> source) {
@@ -54,7 +56,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#fluxToFlowable} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#fluxToFlowable(Flux)} over less idiomatic alternatives. */
   static final class FluxAsRxJava2AdapterFluxToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Flux<T> source) {
@@ -70,7 +72,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#fluxToObservable} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#fluxToObservable(Flux)} over less idiomatic alternatives. */
   static final class FluxAsRxJava2AdapterFluxToObservable<T> {
     @BeforeTemplate
     Observable<T> before(Flux<T> publisher) {
@@ -86,7 +88,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#maybeToMono} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#maybeToMono(Maybe)} over less idiomatic alternatives. */
   static final class MaybeAsRxJava2AdapterMaybeToMono<T> {
     @BeforeTemplate
     Mono<T> before(Maybe<T> source) {
@@ -100,7 +102,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#monoToCompletable} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#monoToCompletable(Mono)} over less idiomatic alternatives. */
   static final class MonoAsRxJava2AdapterMonoToCompletable<T> {
     @BeforeTemplate
     Completable before(Mono<T> publisher) {
@@ -116,7 +118,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#monoToFlowable} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#monoToFlowable(Mono)} over less idiomatic alternatives. */
   static final class MonoAsRxJava2AdapterMonoToFlowable<T> {
     @BeforeTemplate
     Flowable<T> before(Mono<T> source) {
@@ -132,7 +134,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#monoToMaybe} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#monoToMaybe(Mono)} over less idiomatic alternatives. */
   static final class MonoAsRxJava2AdapterMonoToMaybe<T> {
     @BeforeTemplate
     Maybe<T> before(Mono<T> source) {
@@ -145,7 +147,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#monoToSingle} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#monoToSingle(Mono)} over less idiomatic alternatives. */
   static final class MonoAsRxJava2AdapterMonoToSingle<T> {
     @BeforeTemplate
     Single<T> before(Mono<T> publisher) {
@@ -163,7 +165,7 @@ final class RxJava2AdapterRules {
 
   /**
    * Prefer chaining {@link Observable#toFlowable(BackpressureStrategy)} with {@link
-   * RxJava2Adapter#flowableToFlux} over less idiomatic alternatives.
+   * RxJava2Adapter#flowableToFlux(Flowable)} over less idiomatic alternatives.
    */
   static final class ObservableToFlowableAsRxJava2AdapterFlowableToFlux<T> {
     @BeforeTemplate
@@ -180,7 +182,7 @@ final class RxJava2AdapterRules {
     }
   }
 
-  /** Prefer {@link RxJava2Adapter#singleToMono} over less idiomatic alternatives. */
+  /** Prefer {@link RxJava2Adapter#singleToMono(Single)} over less idiomatic alternatives. */
   static final class SingleAsRxJava2AdapterSingleToMono<T> {
     @BeforeTemplate
     Mono<T> before(Single<T> source) {

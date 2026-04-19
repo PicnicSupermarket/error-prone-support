@@ -103,7 +103,6 @@ final class ComparatorRules {
 
     @AfterTemplate
     @CanIgnoreReturnValue
-    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Comparator<T> after(Comparator<T> keyComparator) {
       return keyComparator;
     }
