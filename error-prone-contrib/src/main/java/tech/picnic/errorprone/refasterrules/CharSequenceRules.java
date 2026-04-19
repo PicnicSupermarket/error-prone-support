@@ -11,10 +11,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class CharSequenceRules {
   private CharSequenceRules() {}
 
-  /**
-   * Prefer {@link CharSequence#isEmpty()} over alternatives that consult the char sequence's
-   * length.
-   */
+  /** Prefer {@link CharSequence#isEmpty()} over less explicit alternatives. */
   // XXX: Drop this rule once we (and OpenRewrite) no longer support projects targeting Java 14 or
   // below.
   static final class CharSequenceIsEmpty {

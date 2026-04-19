@@ -7,23 +7,23 @@ import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
+  AbstractAssert<?, ?> testAssertThatIsInstanceOfClass() {
+    return assertThat("foo").isInstanceOf(String.class);
+  }
+
   AbstractAssert<?, ?> testAssertThatIsInstanceOf() {
     return assertThat("foo").isInstanceOf(String.class);
   }
 
-  AbstractAssert<?, ?> testAssertThatIsInstanceOf2() {
-    return assertThat("foo").isInstanceOf(String.class);
-  }
-
-  AbstractAssert<?, ?> testAssertThatIsNotInstanceOf() {
+  AbstractAssert<?, ?> testAssertThatIsNotInstanceOfClass() {
     return assertThat("foo").isNotInstanceOf(String.class);
   }
 
-  AbstractAssert<?, ?> testAssertThatIsIsEqualTo() {
+  AbstractAssert<?, ?> testAssertThatIsEqualTo() {
     return assertThat("foo").isEqualTo("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatIsIsNotEqualTo() {
+  AbstractAssert<?, ?> testAssertThatIsNotEqualTo() {
     return assertThat("foo").isNotEqualTo("bar");
   }
 

@@ -14,47 +14,47 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
-  IntStream testIntStreamClosedOpenRange() {
+  IntStream testIntStreamRange() {
     return IntStream.rangeClosed(0, 42 - 1);
   }
 
-  IntStream testConcatOneIntStream() {
+  IntStream testIntStreamIdentity() {
     return Streams.concat(IntStream.of(1));
   }
 
-  IntStream testConcatTwoIntStreams() {
+  IntStream testIntStreamConcat() {
     return Streams.concat(IntStream.of(1), IntStream.of(2));
   }
 
-  IntStream testFilterOuterIntStreamAfterFlatMap() {
+  IntStream testIntStreamFlatMapFilter() {
     return IntStream.of(1).flatMap(v -> IntStream.of(v * v).filter(n -> n > 1));
   }
 
-  IntStream testFilterOuterStreamAfterFlatMapToInt() {
+  IntStream testStreamFlatMapToIntFilter() {
     return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v).filter(n -> n > 1));
   }
 
-  IntStream testMapOuterIntStreamAfterFlatMap() {
+  IntStream testIntStreamFlatMapMap() {
     return IntStream.of(1).flatMap(v -> IntStream.of(v * v).map(n -> n * 1));
   }
 
-  IntStream testMapOuterStreamAfterFlatMapToInt() {
+  IntStream testStreamFlatMapToIntMap() {
     return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v).map(n -> n * 1));
   }
 
-  IntStream testFlatMapOuterIntStreamAfterFlatMap() {
+  IntStream testIntStreamFlatMapFlatMap() {
     return IntStream.of(1).flatMap(v -> IntStream.of(v * v).flatMap(IntStream::of));
   }
 
-  IntStream testFlatMapOuterStreamAfterFlatMapToInt() {
+  IntStream testStreamFlatMapToIntFlatMap() {
     return Stream.of(1).flatMapToInt(v -> IntStream.of(v * v).flatMap(IntStream::of));
   }
 
   IntStream testIntStreamFilterSorted() {
-    return IntStream.of(1, 4, 3, 2).sorted().filter(i -> i % 2 == 0);
+    return IntStream.of(1).sorted().filter(i -> i > 0);
   }
 
-  ImmutableSet<Boolean> testIntStreamIsEmpty() {
+  ImmutableSet<Boolean> testIntStreamFindAnyIsEmpty() {
     return ImmutableSet.of(
         IntStream.of(1).count() == 0,
         IntStream.of(2).count() <= 0,
@@ -62,7 +62,7 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
         IntStream.of(4).findFirst().isEmpty());
   }
 
-  ImmutableSet<Boolean> testIntStreamIsNotEmpty() {
+  ImmutableSet<Boolean> testIntStreamFindAnyIsPresent() {
     return ImmutableSet.of(
         IntStream.of(1).count() != 0,
         IntStream.of(2).count() > 0,
@@ -74,7 +74,7 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
     return IntStream.of(1).sorted().findFirst();
   }
 
-  ImmutableSet<Boolean> testIntStreamNoneMatch() {
+  ImmutableSet<Boolean> testIntStreamNoneMatchWithIntPredicate() {
     IntPredicate pred = i -> i > 0;
     return ImmutableSet.of(
         !IntStream.of(1).anyMatch(n -> n > 1),
@@ -82,7 +82,7 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
         IntStream.of(3).filter(pred).findAny().isEmpty());
   }
 
-  boolean testIntStreamNoneMatch2() {
+  boolean testIntStreamNoneMatch() {
     return IntStream.of(1).allMatch(n -> !(n > 1));
   }
 
@@ -92,16 +92,16 @@ final class IntStreamRulesTest implements RefasterRuleCollectionTestCase {
         IntStream.of(2).filter(n -> n > 2).findAny().isPresent());
   }
 
-  boolean testIntStreamAllMatch() {
+  boolean testIntStreamAllMatchWithIntPredicate() {
     IntPredicate pred = i -> i > 0;
     return IntStream.of(1).noneMatch(pred.negate());
   }
 
-  boolean testIntStreamAllMatch2() {
+  boolean testIntStreamAllMatch() {
     return IntStream.of(1).noneMatch(n -> !(n > 1));
   }
 
   IntStream testIntStreamTakeWhile() {
-    return IntStream.of(1, 2, 3).takeWhile(i -> i < 2).filter(i -> i < 2);
+    return IntStream.of(1).takeWhile(i -> i > 0).filter(i -> i > 0);
   }
 }

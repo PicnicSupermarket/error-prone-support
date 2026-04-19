@@ -51,7 +51,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo").stream().anyMatch("bar"::equals);
   }
 
-  ImmutableSet<Boolean> testCollectionsDisjoint() {
+  ImmutableSet<Boolean> testDisjoint() {
     return ImmutableSet.of(
         Sets.intersection(ImmutableSet.of(1), ImmutableSet.of(2)).isEmpty(),
         ImmutableSet.of(3).stream().noneMatch(ImmutableSet.of(4)::contains),
@@ -61,11 +61,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         disjoint(ImmutableList.of(11), new HashSet<>(ImmutableList.of(12))));
   }
 
-  boolean testCollectionAddAllToCollectionExpression() {
+  boolean testCollectionAddAllExpression() {
     return Iterables.addAll(new ArrayList<>(), ImmutableSet.of("foo"));
   }
 
-  void testCollectionAddAllToCollectionBlock() {
+  void testCollectionAddAllBlock() {
     ImmutableSet.of("foo").forEach(new ArrayList<>()::add);
     for (Number element : ImmutableSet.of(1)) {
       new ArrayList<Number>().add(element);
@@ -75,11 +75,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  boolean testCollectionRemoveAllFromCollectionExpression() {
+  boolean testCollectionRemoveAllExpression() {
     return Iterables.removeAll(new ArrayList<>(), ImmutableSet.of("foo"));
   }
 
-  void testCollectionRemoveAllFromCollectionBlock() {
+  void testCollectionRemoveAllBlock() {
     ImmutableSet.of("foo").forEach(new HashSet<>()::remove);
     for (Number element : ImmutableList.of(1)) {
       new HashSet<Number>().remove(element);
@@ -93,20 +93,20 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1).stream().distinct();
   }
 
-  Set<Integer> testSetOfVarargs() {
+  Set<Integer> testSetOf() {
     return Stream.of(1, 2).collect(toUnmodifiableSet());
   }
 
-  ArrayList<String> testNewArrayListFromCollection() {
+  ArrayList<String> testNewArrayList() {
     return Lists.newArrayList(ImmutableList.of("foo"));
-  }
-
-  Stream<Integer> testImmutableCollectionStream() {
-    return ImmutableSet.of(1).asList().stream();
   }
 
   ImmutableList<Integer> testImmutableCollectionAsList() {
     return ImmutableList.copyOf(ImmutableSet.of(1));
+  }
+
+  Stream<Integer> testImmutableCollectionStream() {
+    return ImmutableSet.of(1).asList().stream();
   }
 
   boolean testImmutableCollectionContains() {
@@ -132,11 +132,11 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(3).asList().toArray());
   }
 
-  Integer[] testImmutableCollectionToArrayWithArray() {
+  Integer[] testImmutableCollectionToArrayObject() {
     return ImmutableSet.of(1).asList().toArray(new Integer[0]);
   }
 
-  Integer[] testImmutableCollectionToArrayWithGenerator() {
+  Integer[] testImmutableCollectionToArrayIntFunction() {
     return ImmutableSet.of(1).asList().toArray(Integer[]::new);
   }
 
@@ -145,30 +145,30 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSet.of(1).stream().iterator(), ImmutableSet.of(2).asList().iterator());
   }
 
-  ImmutableSet<Optional<Integer>> testOptionalFirstCollectionElement() {
+  ImmutableSet<Optional<Integer>> testCollectionStreamFindFirst() {
     return ImmutableSet.of(
-        ImmutableSet.of(0).stream().findAny(),
-        ImmutableSet.of(1).isEmpty()
+        ImmutableSet.of(1).stream().findAny(),
+        ImmutableSet.of(2).isEmpty()
             ? Optional.empty()
-            : Optional.of(ImmutableSet.of(1).iterator().next()),
-        ImmutableList.of(2).isEmpty()
+            : Optional.of(ImmutableSet.of(2).iterator().next()),
+        ImmutableList.of(3).isEmpty()
             ? Optional.empty()
-            : Optional.of(ImmutableList.of(2).getFirst()),
-        ImmutableSortedSet.of(3).isEmpty()
+            : Optional.of(ImmutableList.of(3).getFirst()),
+        ImmutableSortedSet.of(4).isEmpty()
             ? Optional.empty()
-            : Optional.of(ImmutableSortedSet.of(3).first()),
-        !ImmutableSet.of(1).isEmpty()
-            ? Optional.of(ImmutableSet.of(1).iterator().next())
+            : Optional.of(ImmutableSortedSet.of(4).first()),
+        !ImmutableSet.of(5).isEmpty()
+            ? Optional.of(ImmutableSet.of(5).iterator().next())
             : Optional.empty(),
-        !ImmutableList.of(2).isEmpty()
-            ? Optional.of(ImmutableList.of(2).getFirst())
+        !ImmutableList.of(6).isEmpty()
+            ? Optional.of(ImmutableList.of(6).getFirst())
             : Optional.empty(),
-        !ImmutableSortedSet.of(3).isEmpty()
-            ? Optional.of(ImmutableSortedSet.of(3).first())
+        !ImmutableSortedSet.of(7).isEmpty()
+            ? Optional.of(ImmutableSortedSet.of(7).first())
             : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testOptionalFirstQueueElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableQueuePeek() {
     return ImmutableSet.of(
         new LinkedList<String>().stream().findFirst(),
         new LinkedList<String>().isEmpty()
@@ -185,7 +185,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testRemoveOptionalFirstNavigableSetElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableNavigableSetPollFirst() {
     return ImmutableSet.of(
         new TreeSet<String>().isEmpty()
             ? Optional.empty()
@@ -201,7 +201,7 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
             : Optional.empty());
   }
 
-  ImmutableSet<Optional<String>> testRemoveOptionalFirstQueueElement() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableQueuePoll() {
     return ImmutableSet.of(
         new LinkedList<String>().isEmpty()
             ? Optional.empty()
@@ -254,8 +254,8 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testListAdd() {
-    new ArrayList<String>(0).addLast("bar");
-    new ArrayList<String>(1).add(new ArrayList<String>(1).size(), "qux");
+    new ArrayList<String>(0).addLast("foo");
+    new ArrayList<String>(1).add(new ArrayList<String>(1).size(), "bar");
   }
 
   String testListRemoveFirst() {
