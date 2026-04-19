@@ -177,20 +177,17 @@ final class AssertJStreamRules {
     }
   }
 
-  /**
-   * Prefer {@link ListAssert#allMatch(Predicate)} over asserting a {@link
-   * Stream#allMatch(Predicate)} result.
-   */
-  static final class AssertThatAllMatch<T> {
+  /** Prefer {@link ListAssert#allMatch(Predicate)} over more contrived alternatives. */
+  static final class AssertThatAllMatch<S, T extends S> {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(Stream<T> stream, Predicate<? super T> predicate) {
-      return assertThat(stream.allMatch(predicate)).isTrue();
+    AbstractBooleanAssert<?> before(Stream<T> actual, Predicate<S> predicate) {
+      return assertThat(actual.allMatch(predicate)).isTrue();
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    ListAssert<T> after(Stream<T> stream, Predicate<? super T> predicate) {
-      return assertThat(stream).allMatch(predicate);
+    ListAssert<T> after(Stream<T> actual, Predicate<S> predicate) {
+      return assertThat(actual).allMatch(predicate);
     }
   }
 

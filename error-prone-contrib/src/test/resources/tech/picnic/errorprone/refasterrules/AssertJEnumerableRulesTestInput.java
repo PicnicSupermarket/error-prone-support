@@ -96,14 +96,12 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
         assertThat("qux").hasSize("quux".length()));
   }
 
-  ObjectEnumerableAssert<?, Integer> testObjectEnumerableContainsExactlyFromArraysAsList() {
-    return assertThat(ImmutableSet.of(1, 2))
-        .containsExactlyElementsOf(Arrays.asList(1));
+  ObjectEnumerableAssert<?, Integer> testObjectEnumerableAssertContainsExactly() {
+    return assertThat(ImmutableSet.of(1)).containsExactlyElementsOf(Arrays.asList(2));
   }
 
-  ObjectEnumerableAssert<?, Integer>
-      testObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList() {
+  ObjectEnumerableAssert<?, Integer> testObjectEnumerableAssertContainsExactlyInAnyOrder() {
     return assertThat(ImmutableSet.of(1))
-        .containsExactlyInAnyOrderElementsOf(Arrays.asList(new Integer[] {1, 2}));
+        .containsExactlyInAnyOrderElementsOf(Arrays.asList(new Integer[0]));
   }
 }

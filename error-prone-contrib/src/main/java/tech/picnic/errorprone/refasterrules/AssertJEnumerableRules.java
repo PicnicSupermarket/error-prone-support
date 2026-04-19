@@ -255,40 +255,45 @@ final class AssertJEnumerableRules {
   }
 
   /**
-   * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over {@link
-   * ObjectEnumerableAssert#containsExactlyElementsOf(Iterable)} with {@link
-   * Arrays#asList(Object[])}.
+   * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over more verbose alternatives.
    */
-  static final class ObjectEnumerableContainsExactlyFromArraysAsList<E> {
+  // XXX: This rule is redundant thanks to the `ExplicitArgumentEnumeration` check. It's retained
+  // for use with OpenRewrite.
+  static final class ObjectEnumerableAssertContainsExactly<E> {
     @BeforeTemplate
     @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
-    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactlyElementsOf(Arrays.asList(array));
+    ObjectEnumerableAssert<?, E> before(
+        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
+      return objectEnumerableAssert.containsExactlyElementsOf(Arrays.asList(array));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactly(array);
+    ObjectEnumerableAssert<?, E> after(
+        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
+      return objectEnumerableAssert.containsExactly(array);
     }
   }
 
   /**
-   * Prefer {@link ObjectEnumerableAssert#containsExactlyInAnyOrder(Object[])} over {@link
-   * ObjectEnumerableAssert#containsExactlyInAnyOrderElementsOf(Iterable)} with {@link
-   * Arrays#asList(Object[])}.
+   * Prefer {@link ObjectEnumerableAssert#containsExactlyInAnyOrder(Object[])} over more verbose
+   * alternatives.
    */
-  static final class ObjectEnumerableContainsExactlyInAnyOrderFromArraysAsList<E> {
+  // XXX: This rule is redundant thanks to the `ExplicitArgumentEnumeration` check. It's retained
+  // for use with OpenRewrite.
+  static final class ObjectEnumerableAssertContainsExactlyInAnyOrder<E> {
     @BeforeTemplate
     @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
-    ObjectEnumerableAssert<?, E> before(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
+    ObjectEnumerableAssert<?, E> before(
+        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
+      return objectEnumerableAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
     }
 
     @AfterTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, E> after(ObjectEnumerableAssert<?, E> enumAssert, E[] array) {
-      return enumAssert.containsExactlyInAnyOrder(array);
+    ObjectEnumerableAssert<?, E> after(
+        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
+      return objectEnumerableAssert.containsExactlyInAnyOrder(array);
     }
   }
 }
