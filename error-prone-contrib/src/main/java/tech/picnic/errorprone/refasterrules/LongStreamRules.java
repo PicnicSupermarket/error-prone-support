@@ -20,7 +20,13 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class LongStreamRules {
   private LongStreamRules() {}
 
-  /** Prefer {@link LongStream#range(long, long)} over more verbose alternatives. */
+  /**
+   * Prefer {@link LongStream#range(long, long)} over more verbose alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code endExclusive} equals
+   * {@link Long#MIN_VALUE}: the subtraction {@code endExclusive - 1} overflows to {@link
+   * Long#MAX_VALUE}, producing a semantically different stream.
+   */
   static final class LongStreamRange {
     @BeforeTemplate
     LongStream before(long startInclusive, long endExclusive) {

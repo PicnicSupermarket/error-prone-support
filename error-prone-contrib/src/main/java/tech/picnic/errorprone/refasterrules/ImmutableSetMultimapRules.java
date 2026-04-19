@@ -176,7 +176,7 @@ final class ImmutableSetMultimapRules {
    * com.google.common.base.Function)} over more contrived alternatives.
    */
   static final class ImmutableSetMultimapCopyOfMultimapsTransformValuesWithFunction<
-      K, S, V1 extends S, T extends V2, V2> {
+      K, S, V1 extends S, V2, T extends V2> {
     // XXX: Drop the `Refaster.anyOf` if we decide to rewrite one to the other.
     @BeforeTemplate
     ImmutableSetMultimap<K, V2> before(Multimap<K, V1> fromMultimap, Function<S, T> function) {

@@ -17,7 +17,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJBigIntegerRules {
   private AssertJBigIntegerRules() {}
 
-  /** Prefer {@code isEqualTo(n)} over more contrived alternatives. */
+  /** Prefer {@link AbstractBigIntegerAssert#isEqualTo(Object)} over more contrived alternatives. */
   static final class AbstractBigIntegerAssertIsEqualTo {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(
@@ -34,7 +34,9 @@ final class AssertJBigIntegerRules {
     }
   }
 
-  /** Prefer {@code isNotEqualTo(n)} over more contrived alternatives. */
+  /**
+   * Prefer {@link AbstractBigIntegerAssert#isNotEqualTo(Object)} over more contrived alternatives.
+   */
   static final class AbstractBigIntegerAssertIsNotEqualTo {
     @BeforeTemplate
     AbstractBigIntegerAssert<?> before(

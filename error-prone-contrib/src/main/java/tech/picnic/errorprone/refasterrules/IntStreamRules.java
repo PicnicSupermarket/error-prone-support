@@ -20,7 +20,13 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class IntStreamRules {
   private IntStreamRules() {}
 
-  /** Prefer {@link IntStream#range(int, int)} over more verbose alternatives. */
+  /**
+   * Prefer {@link IntStream#range(int, int)} over more verbose alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code endExclusive} equals
+   * {@link Integer#MIN_VALUE}: the subtraction {@code endExclusive - 1} overflows to {@link
+   * Integer#MAX_VALUE}, producing a semantically different stream.
+   */
   static final class IntStreamRange {
     @BeforeTemplate
     IntStream before(int startInclusive, int endExclusive) {
