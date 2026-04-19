@@ -53,8 +53,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   AbstractAssert<?, ?> testAbstractOptionalAssertHasValueSatisfying() {
-    Consumer<Integer> consumer = value -> assertThat(value).isEqualTo(1);
-    return assertThat(Optional.of(1)).get().satisfies(consumer);
+    return assertThat(Optional.of(1)).get().satisfies(n -> n > 0);
   }
 
   AbstractAssert<?, ?> testAssertThatOptionalHasValueMatching() {
