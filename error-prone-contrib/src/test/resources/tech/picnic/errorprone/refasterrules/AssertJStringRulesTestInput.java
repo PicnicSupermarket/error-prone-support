@@ -17,35 +17,35 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Files.class);
   }
 
-  void testAbstractStringAssertStringIsEmpty() {
+  void testAbstractStringAssertIsEmpty() {
     assertThat("foo").isEqualTo("");
   }
 
-  AbstractStringAssert<?> testAbstractStringAssertStringIsNotEmpty() {
+  AbstractStringAssert<?> testAbstractStringAssertIsNotEmpty() {
     return assertThat("foo").isNotEqualTo("");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringStartsWith() {
+  AbstractAssert<?, ?> testAssertThatStartsWith() {
     return assertThat("foo".startsWith("bar")).isTrue();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringDoesNotStartWith() {
+  AbstractAssert<?, ?> testAssertThatDoesNotStartWith() {
     return assertThat("foo".startsWith("bar")).isFalse();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringEndsWith() {
+  AbstractAssert<?, ?> testAssertThatEndsWith() {
     return assertThat("foo".endsWith("bar")).isTrue();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringDoesNotEndWith() {
+  AbstractAssert<?, ?> testAssertThatDoesNotEndWith() {
     return assertThat("foo".endsWith("bar")).isFalse();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringContains() {
+  AbstractAssert<?, ?> testAssertThatContains() {
     return assertThat("foo".contains("bar")).isTrue();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringDoesNotContain() {
+  AbstractAssert<?, ?> testAssertThatDoesNotContain() {
     return assertThat("foo".contains("bar")).isFalse();
   }
 
@@ -66,18 +66,18 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   AbstractAssert<?, ?> testAssertThatMatches() {
-    return assertThat("foo".matches(".*")).isTrue();
+    return assertThat("foo".matches("bar")).isTrue();
   }
 
   AbstractAssert<?, ?> testAssertThatDoesNotMatch() {
-    return assertThat("foo".matches(".*")).isFalse();
+    return assertThat("foo".matches("bar")).isFalse();
   }
 
-  AbstractStringAssert<?> testAssertThatPathContent() throws IOException {
+  AbstractStringAssert<?> testAssertThatContent() throws IOException {
     return assertThat(Files.readString(Paths.get(""), Charset.defaultCharset()));
   }
 
-  AbstractStringAssert<?> testAssertThatPathContentUtf8() throws IOException {
+  AbstractStringAssert<?> testAssertThatContentUtf8() throws IOException {
     return assertThat(Files.readString(Paths.get("")));
   }
 }

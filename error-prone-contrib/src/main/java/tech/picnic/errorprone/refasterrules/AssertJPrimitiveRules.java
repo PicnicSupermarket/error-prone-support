@@ -22,53 +22,46 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJPrimitiveRules {
   private AssertJPrimitiveRules() {}
 
+  /** Prefer {@code isEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractByteAssert<?> before(byte actual, byte expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractCharacterAssert<?> before(char actual, char expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractShortAssert<?> before(short actual, short expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractIntegerAssert<?> before(int actual, int expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractLongAssert<?> before(long actual, long expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractFloatAssert<?> before(float actual, float expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @BeforeTemplate
     AbstractDoubleAssert<?> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isSameAs(expected), assertThat(actual).isSameAs(expected));
+      return assertThat(actual).isSameAs(expected);
     }
 
     @AfterTemplate
@@ -78,115 +71,112 @@ final class AssertJPrimitiveRules {
     }
   }
 
+  /** Prefer {@code isNotEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractBooleanAssert<?> before(boolean actual, boolean other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractByteAssert<?> before(byte actual, byte expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractByteAssert<?> before(byte actual, byte other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractCharacterAssert<?> before(char actual, char expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractCharacterAssert<?> before(char actual, char other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractShortAssert<?> before(short actual, short expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractShortAssert<?> before(short actual, short other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(int actual, int expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractIntegerAssert<?> before(int actual, int other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractLongAssert<?> before(long actual, long expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractLongAssert<?> before(long actual, long other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractFloatAssert<?> before(float actual, float expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractFloatAssert<?> before(float actual, float other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @BeforeTemplate
-    AbstractDoubleAssert<? extends AbstractDoubleAssert<?>> before(double actual, double expected) {
-      return Refaster.anyOf(
-          assertThat(actual).isNotSameAs(expected), assertThat(actual).isNotSameAs(expected));
+    AbstractDoubleAssert<?> before(double actual, double other) {
+      return assertThat(actual).isNotSameAs(other);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractBooleanAssert<?> after(boolean actual, boolean expected) {
-      return assertThat(actual).isNotEqualTo(expected);
+    AbstractBooleanAssert<?> after(boolean actual, boolean other) {
+      return assertThat(actual).isNotEqualTo(other);
     }
   }
 
+  /** Prefer {@code isLessThan} over less idiomatic alternatives. */
   static final class AssertThatIsLessThan {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual < expected).isTrue(), assertThat(actual >= expected).isFalse());
+          assertThat(actual < other).isTrue(), assertThat(actual >= other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isLessThan(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isLessThan(other);
     }
   }
 
+  /** Prefer {@code isLessThanOrEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual <= expected).isTrue(), assertThat(actual > expected).isFalse());
+          assertThat(actual <= other).isTrue(), assertThat(actual > other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isLessThanOrEqualTo(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isLessThanOrEqualTo(other);
     }
   }
 
+  /** Prefer {@code isGreaterThan} over less idiomatic alternatives. */
   static final class AssertThatIsGreaterThan {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual > expected).isTrue(), assertThat(actual <= expected).isFalse());
+          assertThat(actual > other).isTrue(), assertThat(actual <= other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isGreaterThan(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isGreaterThan(other);
     }
   }
 
+  /** Prefer {@code isGreaterThanOrEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
-    AbstractBooleanAssert<?> before(double actual, double expected) {
+    AbstractBooleanAssert<?> before(double actual, double other) {
       return Refaster.anyOf(
-          assertThat(actual >= expected).isTrue(), assertThat(actual < expected).isFalse());
+          assertThat(actual >= other).isTrue(), assertThat(actual < other).isFalse());
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    AbstractDoubleAssert<?> after(double actual, double expected) {
-      return assertThat(actual).isGreaterThanOrEqualTo(expected);
+    AbstractDoubleAssert<?> after(double actual, double other) {
+      return assertThat(actual).isGreaterThanOrEqualTo(other);
     }
   }
 }

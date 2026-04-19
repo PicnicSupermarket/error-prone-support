@@ -14,34 +14,38 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJShortRules {
   private AssertJShortRules() {}
 
+  /** Prefer {@link AbstractShortAssert#isEqualTo(short)} over less explicit alternatives. */
   static final class AbstractShortAssertIsEqualTo {
     @BeforeTemplate
-    AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short n) {
+    AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short expected) {
       return Refaster.anyOf(
-          shortAssert.isCloseTo(n, offset((short) 0)), shortAssert.isCloseTo(n, withPercentage(0)));
+          shortAssert.isCloseTo(expected, offset((short) 0)),
+          shortAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractShortAssert<?> after(AbstractShortAssert<?> shortAssert, short n) {
-      return shortAssert.isEqualTo(n);
+    AbstractShortAssert<?> after(AbstractShortAssert<?> shortAssert, short expected) {
+      return shortAssert.isEqualTo(expected);
     }
   }
 
+  /** Prefer {@link AbstractShortAssert#isNotEqualTo(short)} over less explicit alternatives. */
   static final class AbstractShortAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short n) {
+    AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert, short other) {
       return Refaster.anyOf(
-          shortAssert.isNotCloseTo(n, offset((short) 0)),
-          shortAssert.isNotCloseTo(n, withPercentage(0)));
+          shortAssert.isNotCloseTo(other, offset((short) 0)),
+          shortAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractShortAssert<?> after(AbstractShortAssert<?> shortAssert, short n) {
-      return shortAssert.isNotEqualTo(n);
+    AbstractShortAssert<?> after(AbstractShortAssert<?> shortAssert, short other) {
+      return shortAssert.isNotEqualTo(other);
     }
   }
 
-  static final class AbstractShortAssertIsZero {
+  /** Prefer {@link AbstractShortAssert#isEqualTo(short)} over less explicit alternatives. */
+  static final class AbstractShortAssertIsEqualToZero {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isZero();
@@ -53,7 +57,8 @@ final class AssertJShortRules {
     }
   }
 
-  static final class AbstractShortAssertIsNotZero {
+  /** Prefer {@link AbstractShortAssert#isNotEqualTo(short)} over less explicit alternatives. */
+  static final class AbstractShortAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isNotZero();
@@ -65,7 +70,8 @@ final class AssertJShortRules {
     }
   }
 
-  static final class AbstractShortAssertIsOne {
+  /** Prefer {@link AbstractShortAssert#isEqualTo(short)} over less explicit alternatives. */
+  static final class AbstractShortAssertIsEqualToOne {
     @BeforeTemplate
     AbstractShortAssert<?> before(AbstractShortAssert<?> shortAssert) {
       return shortAssert.isOne();

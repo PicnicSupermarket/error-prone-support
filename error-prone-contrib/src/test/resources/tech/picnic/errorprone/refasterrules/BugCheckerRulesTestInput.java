@@ -31,14 +31,16 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
         .addOutputLines("A.java", "class A {}");
   }
 
-  ImmutableSet<String> testConstantsFormat() {
+  ImmutableSet<String> testSourceCodeToStringConstantExpression() {
     return ImmutableSet.of(Constants.format("foo"), "\"%s\"".formatted(Convert.quote("bar")));
   }
 
   ImmutableSet<Boolean> testNameContentEquals() {
     return ImmutableSet.of(
         ((Name) null).toString().equals("foo".subSequence(0, 1).toString()),
-        ((com.sun.tools.javac.util.Name) null).toString().equals("bar"));
+        "bar".subSequence(0, 1).toString().equals(((Name) null).toString()),
+        ((com.sun.tools.javac.util.Name) null).toString().equals("bar"),
+        "qux".equals(((com.sun.tools.javac.util.Name) null).toString()));
   }
 
   int testASTHelpersGetStartPosition() {

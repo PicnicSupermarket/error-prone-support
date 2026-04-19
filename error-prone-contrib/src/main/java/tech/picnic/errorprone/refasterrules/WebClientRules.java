@@ -12,8 +12,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
-import java.util.function.Function;
-import org.springframework.http.HttpMethod;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
@@ -31,91 +29,79 @@ final class WebClientRules {
   private WebClientRules() {}
 
   /** Prefer {@link RequestBodySpec#bodyValue(Object)} over more contrived alternatives. */
-  static final class BodyValue<T> {
+  static final class RequestBodySpecBodyValue<T> {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T value) {
-      return requestBodySpec.body(fromValue(value));
+    RequestHeadersSpec<?> before(RequestBodySpec requestBodySpec, T body) {
+      return requestBodySpec.body(fromValue(body));
     }
 
     @BeforeTemplate
     WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestBodySpec requestBodySpec, T value) {
-      return requestBodySpec.body(fromValue(value));
+        WebTestClient.RequestBodySpec requestBodySpec, T body) {
+      return requestBodySpec.body(fromValue(body));
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(RequestBodySpec requestBodySpec, T value) {
-      return requestBodySpec.bodyValue(value);
+    RequestHeadersSpec<?> after(RequestBodySpec requestBodySpec, T body) {
+      return requestBodySpec.bodyValue(body);
     }
   }
 
-  /**
-   * Prefer {@link WebClient#get()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#GET}.
-   */
+  /** Prefer {@link WebClient#get()} over less idiomatic alternatives. */
   static final class WebClientGet {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(GET);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(GET);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.get();
     }
   }
 
-  /**
-   * Prefer {@link WebClient#head()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#HEAD}.
-   */
+  /** Prefer {@link WebClient#head()} over less idiomatic alternatives. */
   static final class WebClientHead {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(HEAD);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(HEAD);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.head();
     }
   }
 
-  /**
-   * Prefer {@link WebClient#options()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#OPTIONS}.
-   */
+  /** Prefer {@link WebClient#options()} over less idiomatic alternatives. */
   static final class WebClientOptions {
     @BeforeTemplate
-    RequestHeadersSpec<?> before(WebClient webClient) {
+    RequestBodyUriSpec before(WebClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @BeforeTemplate
-    WebTestClient.RequestHeadersSpec<?> before(WebTestClient webClient) {
+    WebTestClient.RequestBodyUriSpec before(WebTestClient webClient) {
       return webClient.method(OPTIONS);
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(WebClient webClient) {
+    RequestHeadersUriSpec<?> after(WebClient webClient) {
       return webClient.options();
     }
   }
 
-  /**
-   * Prefer {@link WebClient#patch()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PATCH}.
-   */
+  /** Prefer {@link WebClient#patch()} over less idiomatic alternatives. */
   static final class WebClientPatch {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -133,10 +119,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#post()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#POST}.
-   */
+  /** Prefer {@link WebClient#post()} over less idiomatic alternatives. */
   static final class WebClientPost {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -154,10 +137,7 @@ final class WebClientRules {
     }
   }
 
-  /**
-   * Prefer {@link WebClient#put()} over {@link WebClient#method(HttpMethod)} with {@link
-   * HttpMethod#PUT}.
-   */
+  /** Prefer {@link WebClient#put()} over less idiomatic alternatives. */
   static final class WebClientPut {
     @BeforeTemplate
     RequestBodyUriSpec before(WebClient webClient) {
@@ -175,32 +155,34 @@ final class WebClientRules {
     }
   }
 
-  /** Don't unnecessarily use {@link RequestHeadersUriSpec#uri(Function)}. */
-  static final class RequestHeadersUriSpecUri {
+  /**
+   * Prefer {@link RequestHeadersUriSpec#uri(String, Object...)} over more contrived alternatives.
+   */
+  // XXX: Resolve the `RefasterReturnType` warning suppressions by splitting this rule.
+  static final class RequestHeadersUriSpecUri<
+      S extends RequestHeadersSpec<S>, T extends WebTestClient.RequestHeadersSpec<T>> {
     @BeforeTemplate
+    @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     RequestHeadersSpec<?> before(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec,
-        String path,
-        @Repeated Object uriVariables) {
+        RequestHeadersUriSpec<S> requestHeadersUriSpec, String uri, @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(uriVariables)));
+          uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
     }
 
     @BeforeTemplate
+    @SuppressWarnings("RefasterReturnType" /* Generic return type influences matching. */)
     WebTestClient.RequestHeadersSpec<?> before(
-        WebTestClient.RequestHeadersUriSpec<?> requestHeadersUriSpec,
-        String path,
+        WebTestClient.RequestHeadersUriSpec<T> requestHeadersUriSpec,
+        String uri,
         @Repeated Object uriVariables) {
       return requestHeadersUriSpec.uri(
-          uriBuilder -> uriBuilder.path(path).build(Refaster.asVarargs(uriVariables)));
+          uriBuilder -> uriBuilder.path(uri).build(Refaster.asVarargs(uriVariables)));
     }
 
     @AfterTemplate
-    RequestHeadersSpec<?> after(
-        RequestHeadersUriSpec<?> requestHeadersUriSpec,
-        String path,
-        @Repeated Object uriVariables) {
-      return requestHeadersUriSpec.uri(path, Refaster.asVarargs(uriVariables));
+    S after(
+        RequestHeadersUriSpec<S> requestHeadersUriSpec, String uri, @Repeated Object uriVariables) {
+      return requestHeadersUriSpec.uri(uri, Refaster.asVarargs(uriVariables));
     }
   }
 }

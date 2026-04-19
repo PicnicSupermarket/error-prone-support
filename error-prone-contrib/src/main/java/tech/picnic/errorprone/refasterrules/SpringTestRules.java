@@ -13,35 +13,38 @@ final class SpringTestRules {
   private SpringTestRules() {}
 
   /**
-   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} over alternatives that implicitly
-   * perform a {@link JsonCompareMode#LENIENT lenient} comparison or are deprecated.
+   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} with lenient mode over deprecated
+   * alternatives.
    */
-  static final class BodyContentSpecJsonLenient {
+  static final class BodyContentSpecJsonJsonCompareModeLenient {
     @BeforeTemplate
-    @SuppressWarnings("deprecation" /* This deprecated method invocation will be rewritten. */)
-    BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
-      return Refaster.anyOf(spec.json(expectedJson), spec.json(expectedJson, /* strict= */ false));
+    @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
+    BodyContentSpec before(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return Refaster.anyOf(
+          bodyContentSpec.json(expectedJson),
+          bodyContentSpec.json(expectedJson, /* strict= */ false));
     }
 
     @AfterTemplate
-    BodyContentSpec after(BodyContentSpec spec, String expectedJson) {
-      return spec.json(expectedJson, JsonCompareMode.LENIENT);
+    BodyContentSpec after(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return bodyContentSpec.json(expectedJson, JsonCompareMode.LENIENT);
     }
   }
 
   /**
-   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} over the deprecated alternative.
+   * Prefer {@link BodyContentSpec#json(String, JsonCompareMode)} with strict mode over deprecated
+   * alternatives.
    */
-  static final class BodyContentSpecJsonStrict {
+  static final class BodyContentSpecJsonJsonCompareModeStrict {
     @BeforeTemplate
-    @SuppressWarnings("deprecation" /* This deprecated method invocation will be rewritten. */)
-    BodyContentSpec before(BodyContentSpec spec, String expectedJson) {
-      return spec.json(expectedJson, /* strict= */ true);
+    @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
+    BodyContentSpec before(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return bodyContentSpec.json(expectedJson, /* strict= */ true);
     }
 
     @AfterTemplate
-    BodyContentSpec after(BodyContentSpec spec, String expectedJson) {
-      return spec.json(expectedJson, JsonCompareMode.STRICT);
+    BodyContentSpec after(BodyContentSpec bodyContentSpec, String expectedJson) {
+      return bodyContentSpec.json(expectedJson, JsonCompareMode.STRICT);
     }
   }
 }
