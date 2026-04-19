@@ -38,6 +38,10 @@ function patch() {
   new_diff="$(git diff)"
 
   if [ "${current_diff}" != "${new_diff}" ]; then
+    # Refaster rules may have been renamed; re-install to prevent rules from
+    # modifying themselves.
+    mvn clean install -DskipTests -Dverification.skip
+
     patch "${new_diff}"
   fi
 }
