@@ -4,16 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import java.util.Arrays;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.EnumerableAssert;
-import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Arrays.class, Iterables.class);
+    return ImmutableSet.of(Iterables.class);
   }
 
   void testEnumerableAssertIsEmpty() {
@@ -94,14 +92,5 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
         assertThat("bar").hasSize(ImmutableSet.of(2).size()),
         assertThat("baz").hasSize(new Integer[0].length),
         assertThat("qux").hasSize("quux".length()));
-  }
-
-  ObjectEnumerableAssert<?, Integer> testObjectEnumerableAssertContainsExactly() {
-    return assertThat(ImmutableSet.of(1)).containsExactlyElementsOf(Arrays.asList(2));
-  }
-
-  ObjectEnumerableAssert<?, Integer> testObjectEnumerableAssertContainsExactlyInAnyOrder() {
-    return assertThat(ImmutableSet.of(1))
-        .containsExactlyInAnyOrderElementsOf(Arrays.asList(new Integer[0]));
   }
 }

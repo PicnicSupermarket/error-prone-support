@@ -5,7 +5,6 @@ import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Matches;
-import java.util.Arrays;
 import java.util.Collection;
 import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractIterableAssert;
@@ -251,49 +250,6 @@ final class AssertJEnumerableRules {
     @AfterTemplate
     EnumerableAssert<?, S> after(EnumerableAssert<?, S> enumAssert, Iterable<E> iterable) {
       return enumAssert.hasSameSizeAs(iterable);
-    }
-  }
-
-  /**
-   * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over more verbose alternatives.
-   */
-  // XXX: This rule is redundant thanks to the `ExplicitArgumentEnumeration` check. It's retained
-  // for use with OpenRewrite.
-  static final class ObjectEnumerableAssertContainsExactly<E> {
-    @BeforeTemplate
-    @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
-    ObjectEnumerableAssert<?, E> before(
-        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
-      return objectEnumerableAssert.containsExactlyElementsOf(Arrays.asList(array));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, E> after(
-        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
-      return objectEnumerableAssert.containsExactly(array);
-    }
-  }
-
-  /**
-   * Prefer {@link ObjectEnumerableAssert#containsExactlyInAnyOrder(Object[])} over more verbose
-   * alternatives.
-   */
-  // XXX: This rule is redundant thanks to the `ExplicitArgumentEnumeration` check. It's retained
-  // for use with OpenRewrite.
-  static final class ObjectEnumerableAssertContainsExactlyInAnyOrder<E> {
-    @BeforeTemplate
-    @SuppressWarnings("ExplicitArgumentEnumeration" /* This is the pattern we're rewriting. */)
-    ObjectEnumerableAssert<?, E> before(
-        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
-      return objectEnumerableAssert.containsExactlyInAnyOrderElementsOf(Arrays.asList(array));
-    }
-
-    @AfterTemplate
-    @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
-    ObjectEnumerableAssert<?, E> after(
-        ObjectEnumerableAssert<?, E> objectEnumerableAssert, E[] array) {
-      return objectEnumerableAssert.containsExactlyInAnyOrder(array);
     }
   }
 }
