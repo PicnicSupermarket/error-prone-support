@@ -3,7 +3,10 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.OptionalAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -49,6 +52,13 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         assertThat(Optional.of(1)).get().isSameAs(1),
         assertThat(Optional.of(2)).isPresent().isSameAs(2));
+  }
+
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractOptionalAssertHasValueSatisfying() {
+    return ImmutableSet.of(
+        assertThat(Optional.of(Path.of("foo"))).get().satisfies((Consumer<Path>) Object::toString),
+        assertThat(Optional.of(Path.of("baz"))).get().satisfies(Files::readString),
+        assertThat(Optional.of(Path.of("bar"))).get().satisfies(Object::toString));
   }
 
   AbstractAssert<?, ?> testAssertThatOptionalHasValueMatching() {
