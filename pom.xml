@@ -1214,6 +1214,7 @@
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
+                                <Automatic-Module-Name>${jpms.module-name}</Automatic-Module-Name>
                                 <Implementation-Title>${project.name}</Implementation-Title>
                                 <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                 <Implementation-Version>${project.version}.${build.number}.${git.commit.id}</Implementation-Version>
@@ -1270,13 +1271,13 @@
                     <version>3.12.0</version>
                     <configuration>
                         <additionalJOptions>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.code=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.main=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.model=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.parser=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.tree=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.util=${jpms.module-name}</additionalJOption>
                         </additionalJOptions>
                         <!-- All relevant doclint checks are performed during
                         the compilation phase; no need to recheck during
@@ -1384,6 +1385,39 @@
                             <java.security.egd>file:/dev/./urandom</java.security.egd>
                         </systemPropertyVariables>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.6.1</version>
+                    <executions>
+                        <execution>
+                            <id>derive-jpms-module-name-base</id>
+                            <goals>
+                                <goal>regex-property</goal>
+                            </goals>
+                            <configuration>
+                                <failIfNoMatch>false</failIfNoMatch>
+                                <name>jpms.module-name.base</name>
+                                <regex>^(?:error-prone-)?(.*?)(?:-support)?$</regex>
+                                <replacement>tech.picnic.errorprone.$1</replacement>
+                                <value>${project.artifactId}</value>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>derive-jpms-module-name</id>
+                            <goals>
+                                <goal>regex-property</goal>
+                            </goals>
+                            <configuration>
+                                <failIfNoMatch>false</failIfNoMatch>
+                                <name>jpms.module-name</name>
+                                <regex>-</regex>
+                                <replacement>.</replacement>
+                                <value>${jpms.module-name.base}</value>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1677,6 +1711,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
