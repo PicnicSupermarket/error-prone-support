@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import static java.util.Collections.newSetFromMap;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableCollection;
@@ -69,7 +70,6 @@ final class RefasterRuleSelector {
   /**
    * Instantiates a new {@link RefasterRuleSelector} backed by the given {@link CodeTransformer}s.
    */
-  @SuppressWarnings("NullAway" /* XXX: Inspect this. */)
   static RefasterRuleSelector create(ImmutableCollection<CodeTransformer> refasterRules) {
     // XXX: Instead of performing the indexing every time rules are loaded, consider collecting the
     // identifiers after rule compilation, and storing them on the `CodeTransformer`s using a custom
@@ -78,7 +78,9 @@ final class RefasterRuleSelector {
     Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> ruleIdentifiersByTransformer =
         indexRuleIdentifiers(refasterRules);
     return new RefasterRuleSelector(
-        Node.create(ruleIdentifiersByTransformer.keySet(), ruleIdentifiersByTransformer::get));
+        Node.create(
+            ruleIdentifiersByTransformer.keySet(),
+            t -> requireNonNull(ruleIdentifiersByTransformer.get(t))));
   }
 
   /**
