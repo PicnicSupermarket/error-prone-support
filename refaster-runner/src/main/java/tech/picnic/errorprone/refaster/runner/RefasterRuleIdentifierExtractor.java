@@ -235,7 +235,7 @@ final class RefasterRuleIdentifierExtractor {
 
     private static void registerOperator(
         ExpressionTree node, List<Set<String>> identifierCombinations) {
-      String id = TreeKindUtil.treeKindToString(node.getKind());
+      String id = TreeKindStringifier.treeKindToString(node.getKind());
       identifierCombinations.forEach(ids -> ids.add(id));
     }
 

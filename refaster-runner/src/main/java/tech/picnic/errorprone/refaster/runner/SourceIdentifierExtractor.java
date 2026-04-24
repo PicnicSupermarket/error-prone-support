@@ -138,6 +138,6 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
   }
 
   private static void registerOperator(ExpressionTree node, Set<String> identifiers) {
-    identifiers.add(TreeKindUtil.treeKindToString(node.getKind()));
+    identifiers.add(TreeKindStringifier.treeKindToString(node.getKind()));
   }
 }

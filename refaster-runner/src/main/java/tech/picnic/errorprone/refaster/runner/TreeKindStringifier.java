@@ -2,9 +2,8 @@ package tech.picnic.errorprone.refaster.runner;
 
 import com.sun.source.tree.Tree;
 
-// XXX: Consider a better name, without `Util`.
-final class TreeKindUtil {
-  private TreeKindUtil() {}
+final class TreeKindStringifier {
+  private TreeKindStringifier() {}
 
   /**
    * Returns a unique string representation of the given {@link Tree.Kind}.
