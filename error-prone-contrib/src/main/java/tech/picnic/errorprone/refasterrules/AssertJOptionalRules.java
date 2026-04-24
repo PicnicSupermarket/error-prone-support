@@ -6,15 +6,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.NotMatches;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.AbstractOptionalAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
+import org.assertj.core.api.ThrowingConsumer;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
 /** Refaster rules related to AssertJ assertions over {@link Optional}s. */
 @OnlineDocumentation
@@ -114,6 +118,31 @@ final class AssertJOptionalRules {
     @AfterTemplate
     AbstractOptionalAssert<?, T> after(AbstractOptionalAssert<?, T> optionalAssert, T value) {
       return optionalAssert.containsSame(value);
+    }
+  }
+
+  /**
+   * Prefer {@link AbstractOptionalAssert#hasValueSatisfying(Consumer)} over less idiomatic
+   * alternatives.
+   */
+  static final class AbstractOptionalAssertHasValueSatisfying<T> {
+    @BeforeTemplate
+    AbstractObjectAssert<?, T> before(
+        AbstractOptionalAssert<?, T> optionalAssert, Consumer<T> requirement) {
+      return optionalAssert.get().satisfies(requirement);
+    }
+
+    @BeforeTemplate
+    AbstractObjectAssert<?, T> before(
+        AbstractOptionalAssert<?, T> optionalAssert,
+        @NotMatches(ThrowsCheckedException.class) ThrowingConsumer<T> requirement) {
+      return optionalAssert.get().satisfies(requirement);
+    }
+
+    @AfterTemplate
+    AbstractOptionalAssert<?, T> after(
+        AbstractOptionalAssert<?, T> optionalAssert, Consumer<T> requirement) {
+      return optionalAssert.hasValueSatisfying(requirement);
     }
   }
 

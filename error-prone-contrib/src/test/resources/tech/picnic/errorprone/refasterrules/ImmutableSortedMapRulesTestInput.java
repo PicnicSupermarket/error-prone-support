@@ -9,6 +9,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -16,7 +17,7 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null, null));
+        Stream.class, Streams.class, naturalOrder(), toImmutableSortedMap(null, null));
   }
 
   ImmutableSortedMap.Builder<String, Integer> testImmutableSortedMapBuilder() {
@@ -43,7 +44,7 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
     return ImmutableSet.of(
         ImmutableSortedMap.<String, Integer>naturalOrder().put(Map.entry("foo", 1)).buildOrThrow(),
         Stream.of(Map.entry("foo", 1))
-            .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+            .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
   ImmutableSet<ImmutableSortedMap<String, Integer>> testIterableToImmutableSortedMap() {
@@ -57,8 +58,17 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
             .putAll(ImmutableSortedMap.of("foo", 1).entrySet())
             .buildOrThrow(),
         ImmutableSortedMap.of("foo", 1).entrySet().stream()
-            .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)),
+            .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)),
         Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
-            .collect(toImmutableSortedMap(naturalOrder(), Map.Entry::getKey, Map.Entry::getValue)));
+            .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
+  }
+
+  Collector<Integer, ?, ImmutableSortedMap<String, Double>> testToImmutableSortedMap() {
+    return toImmutableSortedMap(naturalOrder(), String::valueOf, Double::valueOf);
+  }
+
+  Collector<Integer, ?, ImmutableSortedMap<String, Double>>
+      testToImmutableSortedMapWithBinaryOperator() {
+    return toImmutableSortedMap(naturalOrder(), String::valueOf, Double::valueOf, Double::sum);
   }
 }

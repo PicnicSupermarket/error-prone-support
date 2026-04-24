@@ -53,7 +53,6 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // `Arrays.asList()` and `Arrays.asList(singleElement)`, maybe other obviously-varargs cases.
 // XXX: Can we better handle Multimaps?
 // XXX: For the stream overloads, there are also other assertions we can simplify.
-// XXX: assertThat(stream.anyMatch(pred)).isTrue() -> simplify.
 // XXX: For the generated code, go up to at least 8.
 // XXX: Try to fix Refaster so that the `assertThat(Comparable)` overload is matched.
 // XXX: Look for `.test()` expressions and see which AssertJ/RxJava combos can be written nicer.
@@ -70,7 +69,6 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // XXX: The `assertThat` rules currently don't handle the case where there's a `failMessage`. Decide
 // what to do with that.
 // XXX: Also cater for `hasSameElementsAs(Sets.newHashSet(...))` and variants?
-// XXX: Rewrite `.containsExactlyElementsOf(Arrays.asList(array))` and variants.
 // XXX: Right now we use and import `Offset.offset` and `Percentage.withPercentage`. Use the AssertJ
 // methods instead. (Also in the TestNG migration.)
 //      ^ Also for `Tuple`!
@@ -90,8 +88,6 @@ import tech.picnic.errorprone.refaster.matchers.IsArray;
 // operations are not available...
 // XXX: Write plugin that identifies repeated `assertThat(someProp.xxx)` calls and bundles these
 // somehow.
-// XXX: `abstractOptionalAssert.get().satisfies(pred)` ->
-// `abstractOptionalAssert.hasValueSatisfying(pred)`.
 // XXX: `assertThat(ImmutableList.sortedCopyOf(cmp, values)).somethingExactOrder` -> just compare
 // "in any order".
 // XXX: Turns out a lot of this is also covered by https://github.com/palantir/assertj-automation.
