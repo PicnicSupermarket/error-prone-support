@@ -621,6 +621,7 @@
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
+                            <bundledSignature>jdk-reflection</bundledSignature>
                             <bundledSignature>jdk-system-out</bundledSignature>
                             <!-- Other bundles are available but currently not
                             enabled:
@@ -630,10 +631,6 @@
                             - jdk-deprecated: we compile with `-Xlint:all`,
                               which causes the build to fail when _any_
                               deprecated method is called.
-                            - jdk-reflection: this bundle should probably be
-                              enabled, but currently
-                              `java.lang.reflect.AccessibleObject#setAccessible`
-                              is still called in various places.
                             - jdk-non-portable: the Error Prone integration
                               crucially relies on some of these APIs.
                             - jdk-unsafe: see
@@ -643,6 +640,13 @@
                             possible to resolve issue #119 linked above. See
                             https://github.com/google/error-prone/issues/632. -->
                         </bundledSignatures>
+                        <!-- `RefasterIntrospection` uses
+                        `AccessibleObject#setAccessible` to reach package-private
+                        Refaster types; that reflection is intentional, so skip
+                        the `jdk-reflection` check for this class only. -->
+                        <excludes>
+                            <exclude>tech/picnic/errorprone/refaster/runner/RefasterRuleIdentifierExtractor$RefasterIntrospection.class</exclude>
+                        </excludes>
                         <!-- The plugin tries to load all supertypes of any
                         class it analyzes. Some of those types may be absent
                         from the compilation classpath, because the module that

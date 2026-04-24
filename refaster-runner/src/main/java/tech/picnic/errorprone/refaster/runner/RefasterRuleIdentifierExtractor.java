@@ -30,7 +30,12 @@ import java.util.List;
 import java.util.Set;
 import org.jspecify.annotations.Nullable;
 
-/** Extracts identifiers from {@link RefasterRule} templates. */
+/**
+ * Extracts identifiers from {@link RefasterRule} templates.
+ *
+ * <p>The set of identifier categories collected here must stay in sync with those collected by
+ * {@link SourceIdentifierExtractor}; see that class's Javadoc for the invariant.
+ */
 // XXX: This class should either be renamed, or not be a static utility class.
 final class RefasterRuleIdentifierExtractor {
   private RefasterRuleIdentifierExtractor() {}
@@ -39,7 +44,7 @@ final class RefasterRuleIdentifierExtractor {
    * Extracts identifiers from a {@link RefasterRule}'s before templates.
    *
    * @param refasterRule The {@link RefasterRule} from which to extract identifiers.
-   * @return A set of identifier sets, one for each possible branch in the templates.F
+   * @return A set of identifier sets, one for each possible branch in the templates.
    */
   static ImmutableSet<ImmutableSet<String>> extractIdentifiers(RefasterRule<?, ?> refasterRule) {
     ImmutableSet.Builder<ImmutableSet<String>> results = ImmutableSet.builder();

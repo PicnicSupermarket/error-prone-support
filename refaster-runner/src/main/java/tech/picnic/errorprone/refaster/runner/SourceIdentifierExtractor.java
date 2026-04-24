@@ -24,6 +24,12 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>This class scans a Javac {@link Tree} and collects all identifiers that are relevant for
  * matching Refaster rules.
+ *
+ * <p>The set of identifier categories collected here must stay in sync with those collected by
+ * {@link RefasterRuleIdentifierExtractor}: the optimization is sound only when the source-side
+ * extractor is a superset of what any rule-side extractor may emit. Whenever one side starts
+ * recognizing a new construct (e.g. a new operator {@link com.sun.source.tree.Tree.Kind Kind} or
+ * syntactic element), the other side must be updated as well.
  */
 // XXX: Extend to also extract literals, as well as syntactic constructs such as `if` and `new`.
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {

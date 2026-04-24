@@ -81,7 +81,7 @@ final class NodeTest {
   }
 
   @Test
-  void collectReachableValuesWithEmptyChildren() {
+  void collectReachableValuesWithValueAtRoot() {
     Node<Integer> tree = Node.create(ImmutableSet.of(1), v -> ImmutableSet.of(ImmutableSet.of()));
 
     List<Integer> result = new ArrayList<>();

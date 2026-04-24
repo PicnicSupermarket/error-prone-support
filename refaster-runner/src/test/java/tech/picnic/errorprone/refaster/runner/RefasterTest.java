@@ -208,6 +208,7 @@ final class RefasterTest {
     };
   }
 
+  @ParameterizedTest
   @ValueSource(booleans = {false, true})
   void replacement(boolean disableOptimizedRefaster) {
     BugCheckerRefactoringTestHelper.newInstance(Refaster.class, getClass())

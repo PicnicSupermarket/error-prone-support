@@ -33,21 +33,21 @@ import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
  *   <li>Extract all identifiers from the {@link CompilationUnitTree} and sort them
  *       lexicographically.
  *   <li>Traverse the tree based on the identifiers from the {@link CompilationUnitTree}. Every node
- *       can contain Refaster templates. Once a node is we found a candidate Refaster template that
- *       might match some code and will therefore be added to the list of candidates.
+ *       can contain Refaster templates. Once a node is reached, we found a candidate Refaster
+ *       template that might match some code and will therefore be added to the list of candidates.
  * </ol>
  *
  * <p>This is an example to explain the algorithm. Consider the templates with identifiers; {@code
- * T1 = [A, B, C]}, {@code T2 = [B]}, and {@code T3 = [B, D]}. This will result in the following
+ * R1 = [A, B, C]}, {@code R2 = [B]}, and {@code R3 = [B, D]}. This will result in the following
  * tree structure:
  *
  * <pre>{@code
  * <root>
  *    +-- A
  *    |   +-- B
- *    |       +-- C -- T1
- *    +-- B         -- T2
- *        +-- D     -- T3
+ *    |       +-- C -- R1
+ *    +-- B         -- R2
+ *        +-- D     -- R3
  * }</pre>
  *
  * <p>The tree is traversed based on the identifiers in the {@link CompilationUnitTree}. When a node
@@ -56,7 +56,7 @@ import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
  *
  * <p>Since the identifiers are sorted, we can skip parts of the {@link Node tree} while we are
  * traversing it. Instead of trying to match all Refaster templates against every expression in a
- * {@link CompilationUnitTree} we now only matching a subset of the templates that at least have a
+ * {@link CompilationUnitTree} we now only match a subset of the templates that at least have a
  * chance of matching. As a result, the performance of Refaster increases significantly.
  */
 final class RefasterRuleSelector {

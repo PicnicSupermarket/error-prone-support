@@ -237,11 +237,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
         .collect(toImmutableList());
   }
 
-  private static final class OptimizedCodeTransformer implements CodeTransformer {
-    private final RefasterRuleSelector ruleSelector;
-
-    OptimizedCodeTransformer(ImmutableCollection<CodeTransformer> refasterRules) {
-      this.ruleSelector = RefasterRuleSelector.create(refasterRules);
+  private record OptimizedCodeTransformer(RefasterRuleSelector ruleSelector)
+      implements CodeTransformer {
+    private OptimizedCodeTransformer(ImmutableCollection<CodeTransformer> ruleSelector) {
+      this(RefasterRuleSelector.create(ruleSelector));
     }
 
     @Override
@@ -255,6 +254,10 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
     @Override
     public ImmutableClassToInstanceMap<Annotation> annotations() {
+      /*
+       * Callers that need the annotations of a matched rule read them off the wrapped
+       * `CodeTransformer` directly; this wrapper contributes none of its own.
+       */
       return ImmutableClassToInstanceMap.of();
     }
   }
