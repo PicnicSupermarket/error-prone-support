@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -13,7 +13,7 @@ import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -32,14 +32,15 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
-import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.ClassType;
 import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.code.Types.AdaptFailure;
 import com.sun.tools.javac.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import com.sun.tools.javac.util.ListBuffer;
+import java.util.Iterator;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -63,9 +64,6 @@ import tech.picnic.errorprone.utils.SourceCode;
 // `RefasterReturnType` check ensures that such return types are as specific as possible, but we
 // could further reduce false-negatives by instead analyzing the return expressions of template
 // methods to infer more specific non-denotable return types.
-// XXX: As-is, this check does not account for type variable substitution in wildcard bounds (e.g.
-// `List<? extends T>` vs. `List<? extends Void>`). Extend `inferTypeVarMappings` to recurse into
-// wildcard bounds if cases arise in practice.
 // XXX: As-is, this check unconditionally flags incompatible functional parameters. We may be more
 // refined if we consider `@Matches(IsLambdaExpressionOrMethodReference.class)`. See
 // `JUnitToAssertJRules` and `TestNGToAssertJRules` for examples involving
@@ -102,9 +100,7 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     }
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
-    Symbol classSymbol = ASTHelpers.getSymbol(tree);
-    return hasCompatibleParameterTypes(beforeMethods, afterMethods, classSymbol, state)
-            && hasCompatibleReturnTypes(beforeMethods, afterMethods, classSymbol, state)
+    return isCompatible(beforeMethods, afterMethods, state)
         ? dropAnnotationIfPresent(tree, state)
         : addAnnotationIfAbsent(tree, state);
   }
@@ -118,154 +114,110 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   }
 
   /**
-   * Tells whether all given {@link AfterTemplate} methods have parameter types that are compatible
-   * with each of the corresponding {@link BeforeTemplate} parameter types.
-   *
-   * <p>A {@link BeforeTemplate} parameter type is considered compatible with an {@link
-   * AfterTemplate} parameter type if the former is a subtype of the latter, accounting for the fact
-   * that unconstrained class-level type variables in the after-template parameter type can be
-   * substituted with the concrete types from the before-template parameter type.
+   * Tells whether every pair of {@link BeforeTemplate} and {@link AfterTemplate} methods admits a
+   * single substitution of the class-level type variables that simultaneously makes each
+   * before-parameter a subtype of the corresponding (by name) after-parameter and the
+   * after-return-type a subtype of the before-return-type.
    */
-  private static boolean hasCompatibleParameterTypes(
+  private static boolean isCompatible(
       ImmutableList<MethodTree> beforeMethods,
       ImmutableList<MethodTree> afterMethods,
-      Symbol classSymbol,
       VisitorState state) {
-    ImmutableSetMultimap<String, Type> beforeTypes =
-        beforeMethods.stream()
-            .flatMap(m -> m.getParameters().stream())
+    Types types = state.getTypes();
+    TypeSymbol carrier = state.getSymtab().objectType.tsym;
+    for (MethodTree beforeMethod : beforeMethods) {
+      for (MethodTree afterMethod : afterMethods) {
+        if (!isCompatible(beforeMethod, afterMethod, carrier, types)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Tells whether one before/after pair admits such a substitution.
+   *
+   * <p>The matched parameter pairs and the return-type pair are packaged into a synthetic n-ary
+   * {@link ClassType} carrier and fed through a single {@link Types#adapt} invocation, which throws
+   * {@link AdaptFailure} if a class-level type variable would have to map to two different types
+   * within this pair.
+   */
+  private static boolean isCompatible(
+      MethodTree beforeMethod, MethodTree afterMethod, TypeSymbol carrier, Types types) {
+    ImmutableMap<String, Type> beforeParamsByName =
+        beforeMethod.getParameters().stream()
             .collect(
-                toImmutableSetMultimap(
-                    p -> p.getName().toString(), p -> ASTHelpers.getSymbol(p).type));
+                toImmutableMap(p -> p.getName().toString(), p -> ASTHelpers.getSymbol(p).type));
 
-    Types types = state.getTypes();
-    for (MethodTree afterMethod : afterMethods) {
-      for (VariableTree afterParam : afterMethod.getParameters()) {
-        Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
-        if (!beforeTypes.get(afterParam.getName().toString()).stream()
-            .allMatch(
-                beforeType ->
-                    types.isSubtype(beforeType, afterParamType)
-                        || substituteClassTypeVars(afterParamType, beforeType, classSymbol, types)
-                            .filter(t -> types.isSubtype(beforeType, t))
-                            .isPresent())) {
-          return false;
-        }
+    ImmutableList.Builder<Type> afterTupleBuilder = ImmutableList.builder();
+    ImmutableList.Builder<Type> beforeTupleBuilder = ImmutableList.builder();
+    for (VariableTree afterParam : afterMethod.getParameters()) {
+      Type matchedBefore = beforeParamsByName.get(afterParam.getName().toString());
+      if (matchedBefore != null) {
+        afterTupleBuilder.add(ASTHelpers.getSymbol(afterParam).type);
+        beforeTupleBuilder.add(matchedBefore);
       }
     }
+    afterTupleBuilder.add(ASTHelpers.getSymbol(afterMethod).getReturnType());
+    beforeTupleBuilder.add(ASTHelpers.getSymbol(beforeMethod).getReturnType());
 
-    return true;
-  }
+    ImmutableList<Type> afterTuple = afterTupleBuilder.build();
+    ImmutableList<Type> beforeTuple = beforeTupleBuilder.build();
 
-  /**
-   * Tells whether all given {@code @AfterTemplate} methods have a return type that is a subtype of
-   * each of the given {@code @BeforeTemplate} methods.
-   *
-   * <p>A return type is considered compatible if the after-template return type is a subtype of the
-   * before-template return type, accounting for the fact that unconstrained class-level type
-   * variables in the after-template return type can be substituted with the concrete types from the
-   * before-template return type.
-   *
-   * @implNote Note that this method does not need to implement custom logic to handle {@code void}
-   *     return types (associated with "block templates"): Refaster rules cannot combine {@code
-   *     void} after-templates with non-{@code void} before-templates, and while the reverse is
-   *     supported, it is not in general safe to replace a sequence of statements with a {@code
-   *     return} statement.
-   */
-  private static boolean hasCompatibleReturnTypes(
-      ImmutableList<MethodTree> beforeMethods,
-      ImmutableList<MethodTree> afterMethods,
-      Symbol classSymbol,
-      VisitorState state) {
-    Types types = state.getTypes();
-    for (MethodTree afterMethod : afterMethods) {
-      Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
-      for (MethodTree beforeMethod : beforeMethods) {
-        Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
-        if (!types.isSubtype(afterReturnType, beforeReturnType)
-            && substituteClassTypeVars(afterReturnType, beforeReturnType, classSymbol, types)
-                .filter(t -> types.isSubtype(t, beforeReturnType))
-                .isEmpty()) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Attempts to substitute class-level type variables in {@code afterType} with corresponding types
-   * inferred from {@code referenceType}, returning an {@link Optional} containing the substituted
-   * type, or an empty {@link Optional} if no valid substitution can be found.
-   */
-  private static Optional<Type> substituteClassTypeVars(
-      Type afterType, Type referenceType, Symbol classSymbol, Types types) {
-    Map<TypeVar, Type> substitution = new LinkedHashMap<>();
-    // XXX: Mutations of this guard are unkillable: with `EQUAL_IF` (always `Optional.empty()`),
-    // no test detects the absence of substitution when the initial `isSubtype` check already
-    // passes; with `EQUAL_ELSE` (always computing `subst`), the empty `from`/`to` lists leave
-    // `afterType` unchanged, which already failed the `isSubtype` check.
-    if (!inferTypeVarMappings(afterType, referenceType, classSymbol, substitution, types)
-        || substitution.isEmpty()) {
-      return Optional.empty();
-    }
-    return Optional.of(
-        types.subst(
-            afterType, List.<Type>from(substitution.keySet()), List.from(substitution.values())));
-  }
-
-  /**
-   * Recursively walks {@code afterType} and {@code referenceType} in tandem to collect mappings
-   * from class-level type variables in {@code afterType} to corresponding concrete types in {@code
-   * referenceType}. Returns {@code false} if a contradiction is encountered (e.g., a type variable
-   * would need to map to two different types, or its bounds are violated).
-   */
-  private static boolean inferTypeVarMappings(
-      Type afterType,
-      Type referenceType,
-      Symbol classSymbol,
-      Map<TypeVar, Type> substitution,
-      Types types) {
-    if (afterType instanceof TypeVar tv && tv.tsym.owner.equals(classSymbol)) {
-      /*
-       * `afterType` is directly a class-level type variable. Reject mappings to other type
-       * variables: substituting one type variable for another does not yield a concrete type, and
-       * can mask incompatibilities (e.g. `Flux<T>` vs. `Flux<S>` in a class with both `T` and
-       * `S` as type parameters).
-       */
-      if (referenceType instanceof TypeVar) {
-        return false;
-      }
-      Type existing = substitution.get(tv);
-      if (existing != null) {
-        // XXX: Swapping these arguments is unkillable because `isSameType` is symmetric.
-        return types.isSameType(existing, referenceType);
-      }
-      if (!types.isSubtype(referenceType, tv.getUpperBound())) {
-        /* `referenceType` does not satisfy the type variable's upper bound. */
-        return false;
-      }
-      substitution.put(tv, referenceType);
-      return true;
-    }
-
-    /* Recurse into the type arguments of both types. */
-    List<Type> afterArgs = afterType.getTypeArguments();
-    List<Type> refArgs = referenceType.getTypeArguments();
-    // XXX: Skipping this guard is unkillable: if `afterArgs` is empty (a non-parameterized type
-    // with no TypeVar), there is nothing to substitute, so `afterType` is returned unchanged, and
-    // the outer `isSubtype` check already failed it. A size mismatch likewise prevents meaningful
-    // substitution, and the outer check catches any remaining incompatibility.
-    if (afterArgs.isEmpty() || afterArgs.size() != refArgs.size()) {
+    ListBuffer<Type> from = new ListBuffer<>();
+    ListBuffer<Type> to = new ListBuffer<>();
+    try {
+      types.adapt(
+          new ClassType(Type.noType, List.from(afterTuple), carrier),
+          new ClassType(Type.noType, List.from(beforeTuple), carrier),
+          from,
+          to);
+    } catch (AdaptFailure e) {
+      /* The before-method forces conflicting bindings of a class-level type variable. */
       return false;
     }
-    for (int i = 0; i < afterArgs.size(); i++) {
-      // XXX: Returning `true` on failure is unkillable: a partial/inconsistent substitution
-      // produces an incorrect type from `types.subst()`, which the outer `isSubtype` check
-      // then rejects, yielding the same final outcome.
-      if (!inferTypeVarMappings(
-          afterArgs.get(i), refArgs.get(i), classSymbol, substitution, types)) {
+    List<Type> fromList = from.toList();
+    List<Type> toList = to.toList();
+
+    if (!areBindingsValid(fromList, toList, types)) {
+      return false;
+    }
+
+    /*
+     * After substitution, each before-parameter must be a subtype of the corresponding
+     * after-parameter (contravariant), and the after-return-type must be a subtype of the
+     * before-return-type (covariant).
+     */
+    int returnIndex = afterTuple.size() - 1;
+    for (int i = 0; i < returnIndex; i++) {
+      if (!types.isSubtype(beforeTuple.get(i), types.subst(afterTuple.get(i), fromList, toList))) {
+        return false;
+      }
+    }
+    return types.isSubtype(
+        types.subst(afterTuple.get(returnIndex), fromList, toList), beforeTuple.get(returnIndex));
+  }
+
+  /**
+   * Rejects substitutions that map a class-level type variable to a <em>different</em> type
+   * variable, or that violate a type variable's declared upper bound. {@link Types#adapt} does not
+   * verify either constraint itself; identity bindings, where the same type variable appears on
+   * both sides, are accepted as no-ops.
+   */
+  private static boolean areBindingsValid(List<Type> fromList, List<Type> toList, Types types) {
+    Iterator<Type> fromIt = fromList.iterator();
+    Iterator<Type> toIt = toList.iterator();
+    while (fromIt.hasNext()) {
+      TypeVar tv = (TypeVar) fromIt.next();
+      Type val = toIt.next();
+      if (val instanceof TypeVar valVar) {
+        if (!valVar.tsym.equals(tv.tsym)) {
+          /* Substituting one type variable for another does not yield a concrete type. */
+          return false;
+        }
+        /* Identity binding; trivially satisfies the upper bound. */
+      } else if (!types.isSubtype(val, tv.getUpperBound())) {
         return false;
       }
     }
