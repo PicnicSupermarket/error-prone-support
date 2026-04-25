@@ -1524,7 +1524,6 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class MonoFlatMapMany<S, T, P extends Publisher<? extends T>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
