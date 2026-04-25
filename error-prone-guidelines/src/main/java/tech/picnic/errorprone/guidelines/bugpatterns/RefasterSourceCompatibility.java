@@ -191,6 +191,10 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     if (isDirectlyCompatible(afterTuple, beforeTuple, returnIndex, types)) {
       return true;
     }
+    // XXX: Mutations of this guard are unkillable: dropping the early return falls through to
+    // `Types#adapt` with no class-level type variables to bind, which produces empty
+    // `from`/`to` lists. The slot verification with empty substitution yields the same verdict
+    // as the fast path that just failed.
     if (!hasClassTypeVars) {
       return false;
     }
@@ -219,6 +223,11 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
      * after-parameter (contravariant), and the after-return-type must be a subtype of the
      * before-return-type (covariant).
      */
+    // XXX: Mutating the loop bound from `<` to `<=` is unkillable: the extra iteration would
+    // apply the contravariant subtype check to the return-type slot, but for every test case
+    // that reaches this loop, the substituted after-return-type either equals the
+    // before-return-type (so both directions pass) or is rejected by the explicit covariant
+    // check on the next line.
     for (int i = 0; i < returnIndex; i++) {
       if (!types.isSubtype(beforeTuple.get(i), types.subst(afterTuple.get(i), fromList, toList))) {
         return false;
@@ -254,6 +263,10 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
       TypeVar tv = (TypeVar) fromIt.next();
       Type val = toIt.next();
       if (val instanceof TypeVar valVar) {
+        // XXX: Mutating this guard to always execute the body is unkillable: identity bindings
+        // (`T -> T`, the only `valVar.tsym.equals(tv.tsym)` case here) can only arise when the
+        // same type variable appears on both sides, and such cases are caught by the fast-path
+        // direct subtype check before reaching this method.
         if (!valVar.tsym.equals(tv.tsym)) {
           /* Substituting one type variable for another does not yield a concrete type. */
           return false;
