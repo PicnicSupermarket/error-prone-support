@@ -471,6 +471,18 @@ final class RefasterSourceCompatibilityTest {
             "      list.isEmpty();",
             "    }",
             "  }",
+            "",
+            "  class MultipleAfterParamTypeVarConflictingBindings<T> {",
+            "    @BeforeTemplate",
+            "    boolean before2(List<Integer> list1, List<String> list2) {",
+            "      return list1.isEmpty() && list2.isEmpty();",
+            "    }",
+            "",
+            "    @AfterTemplate",
+            "    boolean after(List<T> list1, List<T> list2) {",
+            "        return list1.isEmpty() && list2.isEmpty();",
+            "    }",
+            "  }",
             "}")
         .doTest();
   }

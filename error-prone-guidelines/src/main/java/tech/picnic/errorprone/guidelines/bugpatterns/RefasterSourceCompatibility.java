@@ -118,13 +118,13 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   }
 
   /**
-   * Tells whether all given {@code @AfterTemplate} methods have parameter types that are supertypes
-   * of each of the corresponding {@code @BeforeTemplate} parameter types.
+   * Tells whether all given {@link AfterTemplate} methods have parameter types that are compatible
+   * with each of the corresponding {@link BeforeTemplate} parameter types.
    *
-   * <p>A before-template parameter type is considered compatible with an after-template parameter
-   * type if the former is a subtype of the latter, accounting for the fact that unconstrained
-   * class-level type variables in the after-template parameter type can be substituted with the
-   * concrete types from the before-template parameter type.
+   * <p>A {@link BeforeTemplate} parameter type is considered compatible with an {@link
+   * AfterTemplate} parameter type if the former is a subtype of the latter, accounting for the fact
+   * that unconstrained class-level type variables in the after-template parameter type can be
+   * substituted with the concrete types from the before-template parameter type.
    */
   private static boolean hasCompatibleParameterTypes(
       ImmutableList<MethodTree> beforeMethods,
