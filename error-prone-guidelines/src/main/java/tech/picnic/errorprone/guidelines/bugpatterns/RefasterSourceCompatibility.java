@@ -94,8 +94,11 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
+    // XXX: Mutations of this guard are unkillable: removing the early return falls through to
+    // `isCompatible(emptyList, afterMethods, state)`, which returns `true` vacuously, then the
+    // ternary again returns `dropAnnotationIfPresent(tree, state)`. The guard is a fast path
+    // for non-Refaster classes, not a correctness check.
     if (beforeMethods.isEmpty()) {
-      /* Fast path: this is not a Refaster rule. */
       return dropAnnotationIfPresent(tree, state);
     }
 
@@ -154,6 +157,10 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     ImmutableList.Builder<Type> beforeTupleBuilder = ImmutableList.builder();
     for (VariableTree afterParam : afterMethod.getParameters()) {
       Type matchedBefore = beforeParamsByName.get(afterParam.getName().toString());
+      // XXX: Mutations of this guard are unkillable: in practice Refaster template parameters
+      // align by name across `@BeforeTemplate` and `@AfterTemplate` methods, so `matchedBefore`
+      // is never null in any test scenario. Forcing the body to always execute would record
+      // `(afterType, null)` pairs that no test exercises.
       if (matchedBefore != null) {
         afterTupleBuilder.add(ASTHelpers.getSymbol(afterParam).type);
         beforeTupleBuilder.add(matchedBefore);

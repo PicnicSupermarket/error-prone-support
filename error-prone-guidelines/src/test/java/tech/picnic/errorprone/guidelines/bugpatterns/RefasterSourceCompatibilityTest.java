@@ -493,7 +493,7 @@ final class RefasterSourceCompatibilityTest {
             "",
             "    @AfterTemplate",
             "    boolean after(List<T> list1, List<T> list2) {",
-            "        return list1.isEmpty() && list2.isEmpty();",
+            "      return list1.isEmpty() && list2.isEmpty();",
             "    }",
             "  }",
             "}")
