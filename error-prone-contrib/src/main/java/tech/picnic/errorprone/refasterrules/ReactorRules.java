@@ -684,7 +684,6 @@ final class ReactorRules {
   /**
    * Prefer using {@link Mono}s as-is over less efficient transformations to equivalent instances.
    */
-  @PossibleSourceIncompatibility
   static final class MonoIdentity<T> {
     @BeforeTemplate
     Mono<T> before(Mono<T> mono) {
@@ -1319,7 +1318,6 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#then()} over vacuously invoking {@link Flux#ignoreElements()}. */
-  @PossibleSourceIncompatibility
   static final class FluxThen<T> {
     @BeforeTemplate
     @SuppressWarnings("VoidMissingNullable" /* Suggestion is incompatible with Reactor API. */)
@@ -1419,7 +1417,6 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#then(Mono)} over applying vacuous operations first. */
-  @PossibleSourceIncompatibility
   static final class MonoThenWithMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono, Mono<S> other) {
@@ -1439,7 +1436,6 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#then(Mono)} over vacuously invoking {@link Flux#ignoreElements()}. */
-  @PossibleSourceIncompatibility
   static final class FluxThenWithMono<T, S> {
     @BeforeTemplate
     Mono<S> before(Flux<T> flux, Mono<S> other) {
@@ -1552,7 +1548,6 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
-  @PossibleSourceIncompatibility
   static final class MonoFlatMapMany<S, T, P extends Publisher<? extends T>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
