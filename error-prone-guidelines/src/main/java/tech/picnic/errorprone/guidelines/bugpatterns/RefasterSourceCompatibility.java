@@ -32,6 +32,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.ClassType;
@@ -103,7 +104,8 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     }
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
-    return isCompatible(beforeMethods, afterMethods, state)
+    Symbol classSymbol = ASTHelpers.getSymbol(tree);
+    return isCompatible(beforeMethods, afterMethods, classSymbol, state)
         ? dropAnnotationIfPresent(tree, state)
         : addAnnotationIfAbsent(tree, state);
   }
@@ -125,12 +127,14 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   private static boolean isCompatible(
       ImmutableList<MethodTree> beforeMethods,
       ImmutableList<MethodTree> afterMethods,
+      Symbol classSymbol,
       VisitorState state) {
     Types types = state.getTypes();
+    boolean hasClassTypeVars = classSymbol.type.getTypeArguments().nonEmpty();
     TypeSymbol carrier = state.getSymtab().objectType.tsym;
     for (MethodTree beforeMethod : beforeMethods) {
       for (MethodTree afterMethod : afterMethods) {
-        if (!isCompatible(beforeMethod, afterMethod, carrier, types)) {
+        if (!isCompatible(beforeMethod, afterMethod, hasClassTypeVars, carrier, types)) {
           return false;
         }
       }
@@ -141,13 +145,18 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   /**
    * Tells whether one before/after pair admits such a substitution.
    *
-   * <p>The matched parameter pairs and the return-type pair are packaged into a synthetic n-ary
-   * {@link ClassType} carrier and fed through a single {@link Types#adapt} invocation, which throws
-   * {@link AdaptFailure} if a class-level type variable would have to map to two different types
-   * within this pair.
+   * <p>First attempts direct subtype checks on the original types. If those fail and the rule's
+   * class declares type variables, packages the matched parameter pairs and the return-type pair
+   * into a synthetic n-ary {@link ClassType} carrier and feeds them through a single {@link
+   * Types#adapt} invocation, which throws {@link AdaptFailure} if a class-level type variable would
+   * have to map to two different types within this pair.
    */
   private static boolean isCompatible(
-      MethodTree beforeMethod, MethodTree afterMethod, TypeSymbol carrier, Types types) {
+      MethodTree beforeMethod,
+      MethodTree afterMethod,
+      boolean hasClassTypeVars,
+      TypeSymbol carrier,
+      Types types) {
     ImmutableMap<String, Type> beforeParamsByName =
         beforeMethod.getParameters().stream()
             .collect(
@@ -171,6 +180,20 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
 
     ImmutableList<Type> afterTuple = afterTupleBuilder.build();
     ImmutableList<Type> beforeTuple = beforeTupleBuilder.build();
+    int returnIndex = afterTuple.size() - 1;
+
+    /*
+     * Fast path: direct subtype checks. If all hold, the rule is compatible without needing any
+     * substitution. This bypasses {@link Types#adapt} and the subsequent {@link Types#subst},
+     * both of which structurally walk types and can lose reflexivity of {@link Types#isSubtype}
+     * on F-bounded wildcards such as `AbstractBigDecimalAssert<?>` and `Enum<?>`.
+     */
+    if (isDirectlyCompatible(afterTuple, beforeTuple, returnIndex, types)) {
+      return true;
+    }
+    if (!hasClassTypeVars) {
+      return false;
+    }
 
     ListBuffer<Type> from = new ListBuffer<>();
     ListBuffer<Type> to = new ListBuffer<>();
@@ -196,7 +219,6 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
      * after-parameter (contravariant), and the after-return-type must be a subtype of the
      * before-return-type (covariant).
      */
-    int returnIndex = afterTuple.size() - 1;
     for (int i = 0; i < returnIndex; i++) {
       if (!types.isSubtype(beforeTuple.get(i), types.subst(afterTuple.get(i), fromList, toList))) {
         return false;
@@ -204,6 +226,19 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
     }
     return types.isSubtype(
         types.subst(afterTuple.get(returnIndex), fromList, toList), beforeTuple.get(returnIndex));
+  }
+
+  private static boolean isDirectlyCompatible(
+      ImmutableList<Type> afterTuple,
+      ImmutableList<Type> beforeTuple,
+      int returnIndex,
+      Types types) {
+    for (int i = 0; i < returnIndex; i++) {
+      if (!types.isSubtype(beforeTuple.get(i), afterTuple.get(i))) {
+        return false;
+      }
+    }
+    return types.isSubtype(afterTuple.get(returnIndex), beforeTuple.get(returnIndex));
   }
 
   /**
