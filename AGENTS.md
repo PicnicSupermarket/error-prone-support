@@ -71,21 +71,14 @@ Replace the module (`-pl`) and test class (`-Dtest=`) as needed.
 Run GitHub Actions workflows locally using [`act`][act]:
 
 ```sh
-# Run a specific workflow (replace <workflow> with a name from the list below).
+# Run a specific workflow (run `./run-act.sh --help` for available workflows).
 ./run-act.sh <workflow>
 ```
-
-Available workflow names: `validate-workflows`, `build`, `error-prone-compat`,
-`sonarcloud`, `validate-review-checklist`, `pitest-analyze`, `pitest-update`,
-`reviewdog`, `suggest-commit-message`, `assign-milestone`, `integration-tests`,
-`codeql`, `openssf-scorecard`, `deploy-website`, `default-branch-health-gate`.
 
 Workflows that call external APIs read credentials from environment variables:
 `GITHUB_TOKEN` (GitHub API), `SONAR_TOKEN` (SonarCloud), `OPENAI_API_KEY`
 (OpenAI). With absent or empty values, API calls fail gracefully but workflow
 structure is still exercised.
-
-[act]: https://nektosact.com
 
 ## Workflow
 
@@ -200,6 +193,7 @@ When creating a pull request, follow
 [`.github/instructions/pull-request.instructions.md`][pull-request] for title,
 label, milestone, reviewer, and description conventions.
 
+[act]: https://nektosact.com
 [agents]: .github/instructions/agents.instructions.md
 [bug-checkers]: .github/instructions/bug-checkers.instructions.md
 [commit-message]: .github/instructions/commit-message.instructions.md
