@@ -39,14 +39,15 @@ ACT+=(
   --env "GIT_CONFIG_VALUE_1=always"
 )
 
-if [ "${#}" -lt 1 ]; then
-  cat >&2 << 'EOF'
+function print_usage() {
+  cat << 'EOF'
 Usage: ./run-act.sh <workflow> [<act-flags...>]
 
 Available workflows:
   assign-milestone            pull_request_target  assign-milestone.yml
   build                       push                 build.yml
   codeql                      pull_request         codeql.yml
+  copilot-setup-steps         workflow_dispatch    copilot-setup-steps.yml
   default-branch-health-gate  pull_request         default-branch-health-gate.yml
   deploy-website              pull_request         deploy-website.yml
   error-prone-compat          push                 error-prone-compat.yml
@@ -60,7 +61,16 @@ Available workflows:
   validate-review-checklist   push                 validate-review-checklist.yml
   validate-workflows          push                 validate-workflows.yml
 EOF
+}
+
+if [ "${#}" -lt 1 ]; then
+  print_usage >&2
   exit 1
+fi
+
+if [ "${1}" = '--help' ]; then
+  print_usage
+  exit
 fi
 
 workflow="${1}"
@@ -84,6 +94,11 @@ case "${workflow}" in
     "${ACT[@]}" pull_request \
       -W '.github/workflows/codeql.yml' \
       --eventpath "${EVENTS_DIR}/pull_request.json" \
+      "${@}"
+    ;;
+  copilot-setup-steps)
+    "${ACT[@]}" workflow_dispatch \
+      -W '.github/workflows/copilot-setup-steps.yml' \
       "${@}"
     ;;
   default-branch-health-gate)

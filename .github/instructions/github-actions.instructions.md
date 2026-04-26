@@ -227,7 +227,7 @@ round-trip. `act` sets `ACT=true` in every job's environment automatically.
 
 `act` runs each job inside an unprivileged Docker container. Inside such a
 container, `step-security/harden-runner` cannot install its eBPF hooks and
-therefore runs as a no-op — it does not enforce `egress-policy: block`. No
+therefore runs as a no-op; it does not enforce `egress-policy: block`. No
 `if: ${{ !env.ACT }}` guard is needed on Harden-Runner steps.
 
 Add `if: ${{ !env.ACT }}` to steps that have an externally visible side-effect,
@@ -250,6 +250,21 @@ deploy:
 
 Use `./run-act.sh <workflow>` to run a workflow locally; see `AGENTS.md` for
 the list of workflow names. Event payloads are in `.github/act/events/`.
+
+### Register every new workflow in `run-act.sh`
+<!-- check: New workflow is registered in `run-act.sh` and verified locally with `./run-act.sh <workflow>` -->
+
+Every new workflow file must be registered in `run-act.sh` before it is
+merged. After adding the workflow file:
+
+1. Add a case for the workflow name to the `case` statement in `run-act.sh`,
+   choosing the most natural event trigger and event payload from
+   `.github/act/events/`. Use `workflow_dispatch` when the workflow only
+   triggers on `workflow_dispatch` or on `push`/`pull_request` to a specific
+   path, since `act` does not evaluate path filters.
+2. Add a matching entry to the usage table at the top of the `case` statement.
+3. Run `./run-act.sh <workflow>` to verify the workflow passes locally.
+4. Update the workflow name list in `AGENTS.md`.
 
 ## YAML formatting
 
