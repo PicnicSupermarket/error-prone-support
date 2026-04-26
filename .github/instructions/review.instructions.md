@@ -153,6 +153,7 @@ the files you modified.
 ### Test workflows locally with `act`
 
 - [ ] Deploy/publish steps carry `if: ${{ !env.ACT }}` (not job-level: `env` context unavailable there)
+- [ ] New workflow is registered in `run-act.sh` and verified locally with `./run-act.sh <workflow>`
 
 ### YAML formatting
 
