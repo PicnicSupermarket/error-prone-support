@@ -1,0 +1,36 @@
+name: Set up Copilot environment
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/copilot-setup-steps.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/copilot-setup-steps.yml'
+permissions:
+  contents: read
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            api.adoptium.net:443
+            github.com:443
+            maven.pkg.github.com:443
+            objects.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        with:
+          java-version: |
+            21.0.10
+            25.0.2
+          java-distribution: temurin
+          maven-version: 3.9.14
