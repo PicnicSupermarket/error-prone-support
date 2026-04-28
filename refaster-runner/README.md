@@ -5,10 +5,11 @@ Prone][error-prone] `BugChecker`.
 
 ## What does this module do?
 
-The `Refaster` bug checker scans the classpath for `.refaster` files,
-deserializes them into `CodeTransformer` instances, and applies them during
-compilation. When multiple rules propose overlapping replacements for the same
-region of code, a conflict-resolution step selects a single match.
+The `Refaster` bug checker scans the classpath for `.refaster` files
+(serialized [Refaster][refaster] templates), deserializes them into
+`CodeTransformer` instances, and applies them during compilation. When
+multiple rules propose overlapping replacements for the same region of code,
+a conflict-resolution step selects a single match.
 
 Two compiler flags tune this behavior:
 
@@ -31,7 +32,8 @@ turn the optimization off).
 
 ### How it works
 
-The algorithm runs in three steps.
+The algorithm runs in three steps; `RefasterRuleSelector` is the entry
+point that wires them together.
 
 1. **Indexing rules at load time**
    (`RefasterRuleIdentifierExtractor`, `Node.Builder`).
@@ -41,14 +43,16 @@ The algorithm runs in three steps.
      contributes `isEmpty` and `String`), static-field names, and the
      operator or assignment symbols (`&&`, `==`, `+=`, ...) produced by
      `TreeKindStringifier`.
+   - Each set is sorted lexicographically and inserted into an
+     immutable prefix tree (`Node`). The order is arbitrary but must
+     be shared with the source-identifier extraction in step 3; that
+     is what enables the single-pass traversal. Within a rule,
+     shorter paths are inserted first, so a longer path is dropped
+     when a strict prefix already leads to the same rule.
    - `Refaster.anyOf(a, b, c)` is treated as a disjunction: the
      extractor emits one identifier set per branch, so a single rule
      may occupy multiple paths in the tree. Reaching any one of them
      during traversal suffices to select the rule.
-   - Each set is sorted lexicographically and inserted into an
-     immutable prefix tree (`Node`). Within a rule, shorter paths are
-     inserted first, so a longer path is dropped when a strict prefix
-     already leads to the same rule.
 2. **Extracting identifiers from the source file**
    (`SourceIdentifierExtractor`).
    - For each compilation unit, the extractor scans the abstract
@@ -96,8 +100,7 @@ applied.
 Selection is the only change introduced by the optimization: the
 candidate rules are then matched and fixed exactly as in the
 unoptimized path, and overlapping replacements are resolved by
-`Refaster#applyMatches` as usual. See `RefasterRuleSelector` for the
-entry point.
+`Refaster#applyMatches` as usual.
 
 [error-prone]: https://errorprone.info
 [refaster]: https://errorprone.info/docs/refaster
