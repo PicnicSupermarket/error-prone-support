@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -19,8 +17,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Booleans.class,
-        Bytes.class,
         Chars.class,
         Doubles.class,
         Floats.class,
@@ -112,7 +108,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Doubles.constrainToRange(1.0, 2.0, 3.0));
   }
 
-  int testLongToIntExact() {
+  int testMathToIntExact() {
     return Ints.checkedCast(Long.MAX_VALUE);
   }
 
@@ -170,7 +166,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return UnsignedInts.compare(1, 2);
   }
 
-  long testLongCompareUnsigned() {
+  int testLongCompareUnsigned() {
     return UnsignedLongs.compare(1, 2);
   }
 
@@ -198,11 +194,11 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(UnsignedLongs.parseUnsignedLong("1"), Long.parseUnsignedLong("2", 10));
   }
 
-  int testIntegerParseUnsignedIntWithRadix() {
+  int testIntegerParseUnsignedIntWithInt() {
     return UnsignedInts.parseUnsignedInt("1", 2);
   }
 
-  long testLongParseUnsignedLongWithRadix() {
+  long testLongParseUnsignedLongWithInt() {
     return UnsignedLongs.parseUnsignedLong("1", 2);
   }
 
@@ -214,23 +210,23 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(UnsignedLongs.toString(1), Long.toUnsignedString(2, 10));
   }
 
-  String testIntegerToUnsignedStringWithRadix() {
+  String testIntegerToUnsignedStringWithInt() {
     return UnsignedInts.toString(1, 2);
   }
 
-  String testLongToUnsignedStringWithRadix() {
+  String testLongToUnsignedStringWithInt() {
     return UnsignedLongs.toString(1, 2);
   }
 
-  Comparator<byte[]> testArraysCompareUnsignedBytes() {
+  Comparator<byte[]> testArraysCompareUnsignedByte() {
     return UnsignedBytes.lexicographicalComparator();
   }
 
-  Comparator<int[]> testArraysCompareUnsignedInts() {
+  Comparator<int[]> testArraysCompareUnsignedInt() {
     return UnsignedInts.lexicographicalComparator();
   }
 
-  Comparator<long[]> testArraysCompareUnsignedLongs() {
+  Comparator<long[]> testArraysCompareUnsignedLong() {
     return UnsignedLongs.lexicographicalComparator();
   }
 }

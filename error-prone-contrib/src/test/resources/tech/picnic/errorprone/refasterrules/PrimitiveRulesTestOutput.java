@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -20,8 +18,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Booleans.class,
-        Bytes.class,
         Chars.class,
         Doubles.class,
         Floats.class,
@@ -113,7 +109,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         Math.clamp(1.0, 2.0, 3.0));
   }
 
-  int testLongToIntExact() {
+  int testMathToIntExact() {
     return Math.toIntExact(Long.MAX_VALUE);
   }
 
@@ -171,7 +167,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return Integer.compareUnsigned(1, 2);
   }
 
-  long testLongCompareUnsigned() {
+  int testLongCompareUnsigned() {
     return Long.compareUnsigned(1, 2);
   }
 
@@ -199,11 +195,11 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Long.parseUnsignedLong("1"), Long.parseUnsignedLong("2"));
   }
 
-  int testIntegerParseUnsignedIntWithRadix() {
+  int testIntegerParseUnsignedIntWithInt() {
     return Integer.parseUnsignedInt("1", 2);
   }
 
-  long testLongParseUnsignedLongWithRadix() {
+  long testLongParseUnsignedLongWithInt() {
     return Long.parseUnsignedLong("1", 2);
   }
 
@@ -215,23 +211,23 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Long.toUnsignedString(1), Long.toUnsignedString(2));
   }
 
-  String testIntegerToUnsignedStringWithRadix() {
+  String testIntegerToUnsignedStringWithInt() {
     return Integer.toUnsignedString(1, 2);
   }
 
-  String testLongToUnsignedStringWithRadix() {
+  String testLongToUnsignedStringWithInt() {
     return Long.toUnsignedString(1, 2);
   }
 
-  Comparator<byte[]> testArraysCompareUnsignedBytes() {
+  Comparator<byte[]> testArraysCompareUnsignedByte() {
     return Arrays::compareUnsigned;
   }
 
-  Comparator<int[]> testArraysCompareUnsignedInts() {
+  Comparator<int[]> testArraysCompareUnsignedInt() {
     return Arrays::compareUnsigned;
   }
 
-  Comparator<long[]> testArraysCompareUnsignedLongs() {
+  Comparator<long[]> testArraysCompareUnsignedLong() {
     return Arrays::compareUnsigned;
   }
 }

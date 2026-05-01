@@ -11,97 +11,79 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class AssertJNumberRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsPositive() {
     return ImmutableSet.of(
-        assertThat((byte) 0).isPositive(),
-        assertThat((byte) 0).isPositive(),
-        assertThat((short) 0).isPositive(),
-        assertThat((short) 0).isPositive(),
-        assertThat(0).isPositive(),
-        assertThat(0).isPositive(),
-        assertThat(0L).isPositive(),
-        assertThat(0L).isPositive(),
-        assertThat(0.0f).isPositive(),
-        assertThat(0.0).isPositive(),
-        assertThat(BigInteger.ZERO).isPositive(),
-        assertThat(BigInteger.ZERO).isPositive(),
-        assertThat(BigDecimal.ZERO).isPositive());
+        assertThat((byte) 1).isPositive(),
+        assertThat((byte) 2).isPositive(),
+        assertThat((short) 1).isPositive(),
+        assertThat((short) 2).isPositive(),
+        assertThat(1).isPositive(),
+        assertThat(2).isPositive(),
+        assertThat(1L).isPositive(),
+        assertThat(2L).isPositive(),
+        assertThat(1.0f).isPositive(),
+        assertThat(1.0).isPositive(),
+        assertThat(BigInteger.ONE).isPositive(),
+        assertThat(BigInteger.TWO).isPositive(),
+        assertThat(BigDecimal.ONE).isPositive());
   }
 
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotPositive() {
     return ImmutableSet.of(
-        assertThat((byte) 0).isNotPositive(),
-        assertThat((byte) 0).isNotPositive(),
-        assertThat((short) 0).isNotPositive(),
-        assertThat((short) 0).isNotPositive(),
-        assertThat(0).isNotPositive(),
-        assertThat(0).isNotPositive(),
-        assertThat(0L).isNotPositive(),
-        assertThat(0L).isNotPositive(),
-        assertThat(0.0f).isNotPositive(),
-        assertThat(0.0).isNotPositive(),
-        assertThat(BigInteger.ZERO).isNotPositive(),
-        assertThat(BigInteger.ZERO).isNotPositive(),
-        assertThat(BigDecimal.ZERO).isNotPositive());
+        assertThat((byte) 1).isNotPositive(),
+        assertThat((byte) 2).isNotPositive(),
+        assertThat((short) 1).isNotPositive(),
+        assertThat((short) 2).isNotPositive(),
+        assertThat(1).isNotPositive(),
+        assertThat(2).isNotPositive(),
+        assertThat(1L).isNotPositive(),
+        assertThat(2L).isNotPositive(),
+        assertThat(1.0f).isNotPositive(),
+        assertThat(1.0).isNotPositive(),
+        assertThat(BigInteger.ONE).isNotPositive(),
+        assertThat(BigInteger.TWO).isNotPositive(),
+        assertThat(BigDecimal.ONE).isNotPositive());
   }
 
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNegative() {
     return ImmutableSet.of(
-        assertThat((byte) 0).isNegative(),
-        assertThat((byte) 0).isNegative(),
-        assertThat((short) 0).isNegative(),
-        assertThat((short) 0).isNegative(),
-        assertThat(0).isNegative(),
-        assertThat(0).isNegative(),
-        assertThat(0L).isNegative(),
-        assertThat(0L).isNegative(),
-        assertThat(0.0f).isNegative(),
-        assertThat(0.0).isNegative(),
-        assertThat(BigInteger.ZERO).isNegative(),
-        assertThat(BigInteger.ZERO).isNegative(),
-        assertThat(BigDecimal.ZERO).isNegative());
+        assertThat((byte) -1).isNegative(),
+        assertThat((byte) -2).isNegative(),
+        assertThat((short) -1).isNegative(),
+        assertThat((short) -2).isNegative(),
+        assertThat(-1).isNegative(),
+        assertThat(-2).isNegative(),
+        assertThat(-1L).isNegative(),
+        assertThat(-2L).isNegative(),
+        assertThat(-1.0f).isNegative(),
+        assertThat(-1.0).isNegative(),
+        assertThat(BigInteger.valueOf(-1)).isNegative(),
+        assertThat(BigInteger.valueOf(-2)).isNegative(),
+        assertThat(BigDecimal.valueOf(-1)).isNegative());
   }
 
   ImmutableSet<NumberAssert<?, ?>> testNumberAssertIsNotNegative() {
     return ImmutableSet.of(
-        assertThat((byte) 0).isNotNegative(),
-        assertThat((byte) 0).isNotNegative(),
-        assertThat((short) 0).isNotNegative(),
-        assertThat((short) 0).isNotNegative(),
-        assertThat(0).isNotNegative(),
-        assertThat(0).isNotNegative(),
-        assertThat(0L).isNotNegative(),
-        assertThat(0L).isNotNegative(),
-        assertThat(0.0f).isNotNegative(),
-        assertThat(0.0).isNotNegative(),
-        assertThat(BigInteger.ZERO).isNotNegative(),
-        assertThat(BigInteger.ZERO).isNotNegative(),
-        assertThat(BigDecimal.ZERO).isNotNegative());
+        assertThat((byte) 1).isNotNegative(),
+        assertThat((byte) 2).isNotNegative(),
+        assertThat((short) 1).isNotNegative(),
+        assertThat((short) 2).isNotNegative(),
+        assertThat(1).isNotNegative(),
+        assertThat(2).isNotNegative(),
+        assertThat(1L).isNotNegative(),
+        assertThat(2L).isNotNegative(),
+        assertThat(1.0f).isNotNegative(),
+        assertThat(1.0).isNotNegative(),
+        assertThat(BigInteger.ONE).isNotNegative(),
+        assertThat(BigInteger.TWO).isNotNegative(),
+        assertThat(BigDecimal.ONE).isNotNegative());
   }
 
   ImmutableSet<NumberAssert<?, ?>> testAssertThatIsOdd() {
     return ImmutableSet.of(
-        assertThat((byte) 1).isOdd(),
-        assertThat(Byte.valueOf((byte) 1)).isOdd(),
-        assertThat((char) 1 % 2).isEqualTo(1),
-        assertThat(Character.valueOf((char) 1) % 2).isEqualTo(1),
-        assertThat((short) 1).isOdd(),
-        assertThat(Short.valueOf((short) 1)).isOdd(),
-        assertThat(1).isOdd(),
-        assertThat(Integer.valueOf(1)).isOdd(),
-        assertThat(1L).isOdd(),
-        assertThat(Long.valueOf(1)).isOdd());
+        assertThat((char) 1 % 2).isEqualTo(1), assertThat(1).isOdd(), assertThat(1L).isOdd());
   }
 
   ImmutableSet<NumberAssert<?, ?>> testAssertThatIsEven() {
     return ImmutableSet.of(
-        assertThat((byte) 1).isEven(),
-        assertThat(Byte.valueOf((byte) 1)).isEven(),
-        assertThat((char) 1 % 2).isEqualTo(0),
-        assertThat(Character.valueOf((char) 1) % 2).isEqualTo(0),
-        assertThat((short) 1).isEven(),
-        assertThat(Short.valueOf((short) 1)).isEven(),
-        assertThat(1).isEven(),
-        assertThat(Integer.valueOf(1)).isEven(),
-        assertThat(1L).isEven(),
-        assertThat(Long.valueOf(1)).isEven());
+        assertThat((char) 1 % 2).isEqualTo(0), assertThat(1).isEven(), assertThat(1L).isEven());
   }
 }

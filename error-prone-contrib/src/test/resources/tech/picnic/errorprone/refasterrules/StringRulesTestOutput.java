@@ -34,7 +34,7 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return "foo";
   }
 
-  ImmutableSet<Boolean> testStringIsEmpty() {
+  ImmutableSet<Boolean> testStringIsEmptyWithString() {
     return ImmutableSet.of(
         "foo".isEmpty(),
         "bar".isEmpty(),
@@ -44,24 +44,24 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         !"corge".isEmpty());
   }
 
-  boolean testStringIsEmptyPredicate() {
+  boolean testStringIsEmpty() {
     return Stream.of("foo").anyMatch(String::isEmpty);
   }
 
-  boolean testStringIsNotEmptyPredicate() {
+  boolean testNotStringIsEmpty() {
     return Stream.of("foo").anyMatch(not(String::isEmpty));
   }
 
-  ImmutableSet<Boolean> testStringIsNullOrEmpty() {
+  ImmutableSet<Boolean> testStringsIsNullOrEmpty() {
     return ImmutableSet.of(
         Strings.isNullOrEmpty(getClass().getName()), !Strings.isNullOrEmpty(getClass().getName()));
   }
 
-  boolean testStringIsBlank() {
-    return "foo".isBlank();
+  ImmutableSet<Boolean> testStringIsBlank() {
+    return ImmutableSet.of("foo".isBlank(), !"foo".isBlank());
   }
 
-  ImmutableSet<Optional<String>> testOptionalNonEmptyString() {
+  ImmutableSet<Optional<String>> testOptionalOfNullableFilterNotStringIsEmpty() {
     return ImmutableSet.of(
         Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)),
         Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)),
@@ -69,11 +69,11 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         Optional.ofNullable(toString()).filter(Predicate.not(String::isEmpty)));
   }
 
-  Optional<String> testFilterEmptyString() {
+  Optional<String> testOptionalFilterNotStringIsEmpty() {
     return Optional.of("foo").filter(not(String::isEmpty));
   }
 
-  ImmutableSet<String> testJoinStrings() {
+  ImmutableSet<String> testStringJoin() {
     return ImmutableSet.of(
         String.join("a", new String[] {"foo", "bar"}),
         String.join("b", new CharSequence[] {"foo", "bar"}),
@@ -83,29 +83,29 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
         String.join("f", ImmutableList.of("foo", "bar")));
   }
 
-  String testStringJoinDelimiterVarargs() {
+  String testStringJoinVarargs() {
     return String.join(",", "foo", "bar");
   }
 
-  String testStringValueOf() {
+  String testStringValueOfWithObject() {
     return String.valueOf("foo");
   }
 
-  ImmutableSet<String> testNewStringFromCharArraySubSequence() {
+  ImmutableSet<String> testNewString3() {
     return ImmutableSet.of(
         new String(new char[] {'f', 'o', 'o'}, 0, 1), new String(new char[] {'b', 'a', 'r'}, 2, 3));
   }
 
-  ImmutableSet<String> testNewStringFromCharArray() {
+  ImmutableSet<String> testNewString1() {
     return ImmutableSet.of(
         new String(new char[] {'f', 'o', 'o'}), new String(new char[] {'b', 'a', 'r'}));
   }
 
-  Function<Object, String> testStringValueOfMethodReference() {
+  Function<Object, String> testStringValueOf() {
     return String::valueOf;
   }
 
-  String testSubstringRemainder() {
+  String testStringSubstring() {
     return "foo".substring(1);
   }
 
@@ -113,35 +113,35 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return Utf8.encodedLength("foo");
   }
 
-  int testStringIndexOfCharFromIndex() {
+  int testMathMaxNegativeOneStringIndexOfMinusInt() {
     return Math.max(-1, "foo".indexOf('a', 1) - 1);
   }
 
-  int testStringIndexOfCharBetweenIndices() {
+  int testMathMaxNegativeOneStringIndexOfMinusIntWithInt() {
     return Math.max(-1, "foo".indexOf('a', 1, 2) - 1);
   }
 
-  int testStringIndexOfStringFromIndex() {
+  int testMathMaxNegativeOneStringIndexOfMinusString() {
     return Math.max(-1, "foo".indexOf("bar", 1) - 1);
   }
 
-  int testStringIndexOfStringBetweenIndices() {
+  int testMathMaxNegativeOneStringIndexOfMinusStringWithInt() {
     return Math.max(-1, "foo".indexOf("bar", 1, 2) - 1);
   }
 
-  int testStringLastIndexOfChar() {
+  int testMathMaxNegativeOneStringLastIndexOfMinusInt() {
     return Math.max(-1, "foo".lastIndexOf('a') - 1);
   }
 
-  int testStringLastIndexOfString() {
+  int testMathMaxNegativeOneStringLastIndexOfMinusString() {
     return Math.max(-1, "foo".lastIndexOf("bar") - 1);
   }
 
-  int testStringLastIndexOfCharWithIndex() {
+  int testStringLastIndexOfMinusOneInt() {
     return "foo".lastIndexOf('a', 2 - 1);
   }
 
-  int testStringLastIndexOfStringWithIndex() {
+  int testStringLastIndexOfMinusOneString() {
     return "foo".lastIndexOf("bar", 2 - 1);
   }
 
@@ -149,7 +149,7 @@ final class StringRulesTest implements RefasterRuleCollectionTestCase {
     return "foo".startsWith("bar", 1);
   }
 
-  ImmutableSet<String> testStringFormatted() {
+  ImmutableSet<String> testFormatted() {
     return ImmutableSet.of(
         ("Constant").formatted(),
         ("Number: %d").formatted(42),

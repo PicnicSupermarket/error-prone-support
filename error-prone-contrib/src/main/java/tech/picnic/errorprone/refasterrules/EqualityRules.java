@@ -20,9 +20,9 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class EqualityRules {
   private EqualityRules() {}
 
-  /** Prefer reference-based equality for enums. */
+  /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
   // Primitive value comparisons are not matched, because Error Prone flags those out of the box.
-  static final class EnumReferenceEquality<T extends Enum<T>> {
+  static final class EqualToWithEnum<T extends Enum<T>> {
     /**
      * Enums can be compared by reference. It is safe to do so even in the face of refactorings,
      * because if the type is ever converted to a non-enum, then Error-Prone will complain about any
@@ -32,39 +32,40 @@ final class EqualityRules {
     // work around the issue by selecting the "largest replacements". See the `Refaster` check.
     @BeforeTemplate
     @SuppressWarnings("EnumOrdinal" /* This violation will be rewritten. */)
-    boolean before(T a, T b) {
-      return Refaster.anyOf(a.equals(b), Objects.equals(a, b), a.ordinal() == b.ordinal());
+    boolean before(T a, T other) {
+      return Refaster.anyOf(
+          a.equals(other), Objects.equals(a, other), a.ordinal() == other.ordinal());
     }
 
     @AfterTemplate
     @AlsoNegation
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
-    boolean after(T a, T b) {
-      return a == b;
+    boolean after(T a, T other) {
+      return a == other;
     }
   }
 
-  /** Prefer reference-based equality for enums. */
-  static final class EnumReferenceEqualityLambda<T extends Enum<T>> {
+  /** Prefer enum {@code ==} comparison over less idiomatic alternatives. */
+  static final class EqualTo<T extends Enum<T>> {
     @BeforeTemplate
-    Predicate<T> before(T e) {
-      return Refaster.anyOf(isEqual(e), e::equals);
+    Predicate<T> before(T targetRef) {
+      return Refaster.anyOf(isEqual(targetRef), targetRef::equals);
     }
 
     @AfterTemplate
     @SuppressWarnings("java:S1698" /* Reference comparison is valid for enums. */)
-    Predicate<T> after(T e) {
-      return v -> v == e;
+    Predicate<T> after(T targetRef) {
+      return v -> v == targetRef;
     }
   }
 
-  /** Prefer {@link Object#equals(Object)} over the equivalent lambda function. */
+  /** Prefer {@link Object#equals(Object)} method references over more verbose alternatives. */
   // XXX: As it stands, this rule is a special case of what `MethodReferenceUsage` tries to achieve.
   // If/when `MethodReferenceUsage` becomes production ready, we should simply drop this check.
   // XXX: Alternatively, the rule should be replaced with a plugin that also identifies cases where
   // the arguments are swapped but simplification is possible anyway, by virtue of `v` being
   // non-null.
-  static final class EqualsPredicate<T> {
+  static final class ObjectEquals<T> {
     @BeforeTemplate
     Predicate<T> before(T v) {
       return e -> v.equals(e);
@@ -76,8 +77,8 @@ final class EqualityRules {
     }
   }
 
-  /** Avoid double negations; this is not Javascript. */
-  static final class DoubleNegation {
+  /** Prefer using the boolean expression as-is over more contrived alternatives. */
+  static final class BooleanIdentity {
     @BeforeTemplate
     @SuppressWarnings("java:S2761" /* This violation will be rewritten. */)
     boolean before(boolean b) {
@@ -91,73 +92,64 @@ final class EqualityRules {
     }
   }
 
-  /**
-   * Don't negate an equality test or use the ternary operator to compare two booleans; directly
-   * test for inequality instead.
-   */
+  /** Prefer {@code !=} over more contrived alternatives. */
   // XXX: Replacing `a ? !b : b` with `a != b` changes semantics if both `a` and `b` are boxed
   // booleans.
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-  static final class Negation {
+  static final class NotEqualTo {
     @BeforeTemplate
-    boolean before(boolean a, boolean b) {
-      return Refaster.anyOf(!(a == b), a ? !b : b);
+    boolean before(boolean b1, boolean b2) {
+      return Refaster.anyOf(!(b1 == b2), b1 ? !b2 : b2);
     }
 
     @BeforeTemplate
     @SuppressWarnings(
         "java:S1244" /* The equality check is fragile, but may be seen in the wild. */)
-    boolean before(double a, double b) {
-      return !(a == b);
+    boolean before(double b1, double b2) {
+      return !(b1 == b2);
     }
 
     @BeforeTemplate
-    boolean before(Object a, Object b) {
-      return !(a == b);
+    boolean before(Object b1, Object b2) {
+      return !(b1 == b2);
     }
 
     @AfterTemplate
-    boolean after(boolean a, boolean b) {
-      return a != b;
+    boolean after(boolean b1, boolean b2) {
+      return b1 != b2;
     }
   }
 
-  /**
-   * Don't negate an inequality test or use the ternary operator to compare two booleans; directly
-   * test for equality instead.
-   */
+  /** Prefer {@code ==} over more contrived alternatives. */
   // XXX: Replacing `a ? b : !b` with `a == b` changes semantics if both `a` and `b` are boxed
   // booleans.
   @SuppressWarnings("java:S1940" /* This violation will be rewritten. */)
-  static final class IndirectDoubleNegation {
+  static final class EqualToWithBoolean {
     @BeforeTemplate
-    boolean before(boolean a, boolean b) {
-      return Refaster.anyOf(!(a != b), a ? b : !b);
+    boolean before(boolean b1, boolean b2) {
+      return Refaster.anyOf(!(b1 != b2), b1 ? b2 : !b2);
     }
 
     @BeforeTemplate
     @SuppressWarnings(
         "java:S1244" /* The inequality check is fragile, but may be seen in the wild. */)
-    boolean before(double a, double b) {
-      return !(a != b);
+    boolean before(double b1, double b2) {
+      return !(b1 != b2);
     }
 
     @BeforeTemplate
-    boolean before(Object a, Object b) {
-      return !(a != b);
+    boolean before(Object b1, Object b2) {
+      return !(b1 != b2);
     }
 
     @AfterTemplate
-    boolean after(boolean a, boolean b) {
-      return a == b;
+    boolean after(boolean b1, boolean b2) {
+      return b1 == b2;
     }
   }
 
-  /**
-   * Don't pass a lambda expression to {@link Predicate#not(Predicate)}; instead push the negation
-   * into the lambda expression.
-   */
-  abstract static class PredicateLambda<T> {
+  /** Prefer negated lambda expressions over more contrived alternatives. */
+  abstract static class Not<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean predicate(@MayOptionallyUse T value);
 
@@ -172,32 +164,32 @@ final class EqualityRules {
     }
   }
 
-  /** Avoid contrived ways of handling {@code null} values during equality testing. */
-  static final class Equals<T, S> {
+  /** Prefer {@link Object#equals(Object)} over more contrived alternatives. */
+  static final class ObjectEqualsWithObject<T, S> {
     @BeforeTemplate
-    boolean before(T value1, S value2) {
+    boolean before(T value, S obj) {
       return Refaster.anyOf(
-          Optional.of(value1).equals(Optional.of(value2)),
-          Optional.of(value1).equals(Optional.ofNullable(value2)),
-          Optional.ofNullable(value2).equals(Optional.of(value1)));
+          Optional.of(value).equals(Optional.of(obj)),
+          Optional.of(value).equals(Optional.ofNullable(obj)),
+          Optional.ofNullable(obj).equals(Optional.of(value)));
     }
 
     @AfterTemplate
-    boolean after(T value1, S value2) {
-      return value1.equals(value2);
+    boolean after(T value, S obj) {
+      return value.equals(obj);
     }
   }
 
-  /** Avoid contrived ways of handling {@code null} values during equality testing. */
+  /** Prefer {@link Objects#equals(Object, Object)} over more contrived alternatives. */
   static final class ObjectsEquals<T, S> {
     @BeforeTemplate
-    boolean before(T value1, S value2) {
-      return Optional.ofNullable(value1).equals(Optional.ofNullable(value2));
+    boolean before(T a, S b) {
+      return Optional.ofNullable(a).equals(Optional.ofNullable(b));
     }
 
     @AfterTemplate
-    boolean after(T value1, S value2) {
-      return Objects.equals(value1, value2);
+    boolean after(T a, S b) {
+      return Objects.equals(a, b);
     }
   }
 }

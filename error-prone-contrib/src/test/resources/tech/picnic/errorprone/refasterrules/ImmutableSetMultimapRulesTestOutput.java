@@ -25,40 +25,41 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
     return ImmutableSetMultimap.builder();
   }
 
-  ImmutableSetMultimap<String, Integer> testEmptyImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf0() {
     return ImmutableSetMultimap.of();
   }
 
-  ImmutableSetMultimap<String, Integer> testPairToImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf2() {
     return ImmutableSetMultimap.of("foo", 1);
   }
 
-  ImmutableSet<ImmutableSetMultimap<String, Integer>> testEntryToImmutableSetMultimap() {
+  ImmutableSet<ImmutableSetMultimap<String, Integer>>
+      testImmutableSetMultimapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(
         ImmutableSetMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()),
-        ImmutableSetMultimap.of(Map.entry("foo", 1).getKey(), Map.entry("foo", 1).getValue()));
+        ImmutableSetMultimap.of(Map.entry("bar", 2).getKey(), Map.entry("bar", 2).getValue()));
   }
 
-  ImmutableSet<ImmutableSetMultimap<String, Integer>> testIterableToImmutableSetMultimap() {
+  ImmutableSet<ImmutableSetMultimap<String, Integer>> testImmutableSetMultimapCopyOf() {
     return ImmutableSet.of(
         ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1)),
-        ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1)),
-        ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
-        ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("foo", 1).entries()),
-        ImmutableSetMultimap.copyOf(Iterables.cycle(Map.entry("foo", 1))));
+        ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("bar", 2)),
+        ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("baz", 3).entries()),
+        ImmutableSetMultimap.copyOf(Iterables.cycle(Map.entry("quux", 5))),
+        ImmutableSetMultimap.copyOf(ImmutableSetMultimap.of("qux", 4).entries()));
   }
 
-  ImmutableSetMultimap<Integer, String> testStreamOfMapEntriesToImmutableSetMultimap() {
+  ImmutableSetMultimap<Integer, String> testStreamCollectToImmutableSetMultimap() {
     return Stream.of(1, 2, 3).collect(toImmutableSetMultimap(n -> n, n -> n.toString()));
   }
 
-  ImmutableSetMultimap<String, Integer> testTransformMultimapValuesToImmutableSetMultimap() {
+  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapCopyOfMultimapsTransformValues() {
     return ImmutableSetMultimap.copyOf(
         Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), e -> Math.toIntExact(e)));
   }
 
   ImmutableSet<ImmutableSetMultimap<String, Integer>>
-      testTransformMultimapValuesToImmutableSetMultimap2() {
+      testImmutableSetMultimapCopyOfMultimapsTransformValuesWithFunction() {
     return ImmutableSet.of(
         ImmutableSetMultimap.copyOf(
             Multimaps.transformValues(ImmutableSetMultimap.of("foo", 1L), Math::toIntExact)),
@@ -74,7 +75,7 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
             Multimaps.transformValues(TreeMultimap.<String, Long>create(), Math::toIntExact)));
   }
 
-  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testImmutableSetMultimapBuilderPut() {
+  ImmutableSet<ImmutableSetMultimap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableSetMultimap.<String, Integer>builder().put("foo", 1),
         ImmutableSetMultimap.<String, Integer>builder().put("bar", 2));

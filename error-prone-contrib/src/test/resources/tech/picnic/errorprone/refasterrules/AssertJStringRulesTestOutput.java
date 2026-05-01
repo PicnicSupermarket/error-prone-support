@@ -18,35 +18,35 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Files.class);
   }
 
-  void testAbstractStringAssertStringIsEmpty() {
+  void testAbstractStringAssertIsEmpty() {
     assertThat("foo").isEmpty();
   }
 
-  AbstractStringAssert<?> testAbstractStringAssertStringIsNotEmpty() {
+  AbstractStringAssert<?> testAbstractStringAssertIsNotEmpty() {
     return assertThat("foo").isNotEmpty();
   }
 
-  AbstractAssert<?, ?> testAssertThatStringStartsWith() {
+  AbstractAssert<?, ?> testAssertThatStartsWith() {
     return assertThat("foo").startsWith("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringDoesNotStartWith() {
+  AbstractAssert<?, ?> testAssertThatDoesNotStartWith() {
     return assertThat("foo").doesNotStartWith("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringEndsWith() {
+  AbstractAssert<?, ?> testAssertThatEndsWith() {
     return assertThat("foo").endsWith("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringDoesNotEndWith() {
+  AbstractAssert<?, ?> testAssertThatDoesNotEndWith() {
     return assertThat("foo").doesNotEndWith("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringContains() {
+  AbstractAssert<?, ?> testAssertThatContains() {
     return assertThat("foo").contains("bar");
   }
 
-  AbstractAssert<?, ?> testAssertThatStringDoesNotContain() {
+  AbstractAssert<?, ?> testAssertThatDoesNotContain() {
     return assertThat("foo").doesNotContain("bar");
   }
 
@@ -67,18 +67,18 @@ final class AssertJStringRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   AbstractAssert<?, ?> testAssertThatMatches() {
-    return assertThat("foo").matches(".*");
+    return assertThat("foo").matches("bar");
   }
 
   AbstractAssert<?, ?> testAssertThatDoesNotMatch() {
-    return assertThat("foo").doesNotMatch(".*");
+    return assertThat("foo").doesNotMatch("bar");
   }
 
-  AbstractStringAssert<?> testAssertThatPathContent() throws IOException {
+  AbstractStringAssert<?> testAssertThatContent() throws IOException {
     return assertThat(Paths.get("")).content(Charset.defaultCharset());
   }
 
-  AbstractStringAssert<?> testAssertThatPathContentUtf8() throws IOException {
+  AbstractStringAssert<?> testAssertThatContentUtf8() throws IOException {
     return assertThat(Paths.get("")).content(UTF_8);
   }
 }
