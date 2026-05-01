@@ -71,7 +71,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
-  /** Prefer {@link AbstractBooleanAssert#lisNotEqualTo} over less idiomatic alternatives. */
+  /** Prefer {@link AbstractBooleanAssert#isNotEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean other) {

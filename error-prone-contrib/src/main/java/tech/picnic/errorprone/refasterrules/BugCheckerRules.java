@@ -17,7 +17,7 @@ import tech.picnic.errorprone.utils.SourceCode;
 
 /** Refaster rules related to {@link com.google.errorprone.bugpatterns.BugChecker} classes. */
 @OnlineDocumentation
-final class zBugCheckerRules {
+final class BugCheckerRules {
   private BugCheckerRules() {}
 
   /** Prefer the {@link BugCheckerRefactoringTestHelper} as-is over more verbose alternatives. */
