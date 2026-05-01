@@ -22,7 +22,7 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJPrimitiveRules {
   private AssertJPrimitiveRules() {}
 
-  /** Prefer {@code isEqualTo} over less idiomatic alternatives. */
+  /** Prefer {@link AbstractBooleanAssert#isEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean expected) {
@@ -71,7 +71,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
-  /** Prefer {@code isNotEqualTo} over less idiomatic alternatives. */
+  /** Prefer {@link AbstractBooleanAssert#lisNotEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsNotEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(boolean actual, boolean other) {
@@ -120,7 +120,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
-  /** Prefer {@code isLessThan} over less idiomatic alternatives. */
+  /** Prefer {@link AbstractDoubleAssert#isLessThan} over less idiomatic alternatives. */
   static final class AssertThatIsLessThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
@@ -135,7 +135,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
-  /** Prefer {@code isLessThanOrEqualTo} over less idiomatic alternatives. */
+  /** Prefer {@link AbstractDoubleAssert#isLessThanOrEqualTo} over less idiomatic alternatives. */
   static final class AssertThatIsLessThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
@@ -150,7 +150,7 @@ final class AssertJPrimitiveRules {
     }
   }
 
-  /** Prefer {@code isGreaterThan} over less idiomatic alternatives. */
+  /** Prefer {@link AbstractDoubleAssert#isGreaterThan} over less idiomatic alternatives. */
   static final class AssertThatIsGreaterThan {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
@@ -165,7 +165,9 @@ final class AssertJPrimitiveRules {
     }
   }
 
-  /** Prefer {@code isGreaterThanOrEqualTo} over less idiomatic alternatives. */
+  /**
+   * Prefer {@link AbstractDoubleAssert#isGreaterThanOrEqualTo} over less idiomatic alternatives.
+   */
   static final class AssertThatIsGreaterThanOrEqualTo {
     @BeforeTemplate
     AbstractBooleanAssert<?> before(double actual, double other) {
