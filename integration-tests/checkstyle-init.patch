@@ -107,7 +107,7 @@
       * @throws IllegalArgumentException if there is an error parsing the Javadoc.
       */
 +    // Invoking `getParseErrorMessage` requires that `status.getParseErrorMessage()` is `null`.
-+    @SuppressWarnings("CheckArgumentWithMessage")
++    @SuppressWarnings("CheckArgumentNotWithString")
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocComment(blockComment);
