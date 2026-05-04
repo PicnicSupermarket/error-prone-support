@@ -78,22 +78,20 @@ public final class UncheckedEnumValueOfInvocation extends BugChecker
           .build();
     }
 
-    // Match name argument where it is an invocation of another enum's `.name()` or `.toString()`.
     if (ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
-      Sets.SetView<String> missingValues =
+      ImmutableSet<String> missingValues =
           Sets.difference(
-              findSwitchCoveredValues(
-                  nameArgument, getEnumValues(ASTHelpers.getReceiverType(nameArgument)), state),
-              valuesSourceEnum);
+                  findSwitchCoveredValues(
+                      nameArgument, getEnumValues(ASTHelpers.getReceiverType(nameArgument)), state),
+                  valuesSourceEnum)
+              .immutableCopy();
       return missingValues.isEmpty()
           ? Description.NO_MATCH
           : buildDescription(tree)
               .setMessage(
                   "`%s` might generate values which are missing in `%s`: %s"
                       .formatted(
-                          SourceCode.treeToString(nameArgument, state),
-                          enumType,
-                          missingValues.immutableCopy()))
+                          SourceCode.treeToString(nameArgument, state), enumType, missingValues))
               .build();
     }
 
