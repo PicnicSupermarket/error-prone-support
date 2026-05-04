@@ -186,6 +186,14 @@ final class MoreASTHelpersTest {
             "",
             "    // BUG: Diagnostic contains: String",
             "    ImmutableList<? super String> superStringList = ImmutableList.of(\"foo\");",
+            "",
+            // Capture conversion on a wildcard receiver yields a captured type-var as the type
+            // argument, exercising the `TYPEVAR && isCaptured()` branch.
+            "    // BUG: Diagnostic contains: <nulltype>",
+            "    var capturedWildList = wildCardList.subList(0, 1);",
+            "",
+            "    // BUG: Diagnostic contains: String",
+            "    var capturedSuperList = superStringList.subList(0, 1);",
             "  }",
             "}")
         .doTest();
