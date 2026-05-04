@@ -34,7 +34,6 @@ import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Types;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -78,11 +77,11 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
     tags = LIKELY_ERROR)
 public final class JUnitMethodSourceGenericParams extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String ARGUMENT_SET = "argumentSet";
+  private static final String ARGUMENT_SET_FACTORY = "argumentSet";
   private static final Matcher<ExpressionTree> ARGUMENTS_FACTORY_METHODS =
       staticMethod()
           .onClass("org.junit.jupiter.params.provider.Arguments")
-          .namedAnyOf("of", "arguments", ARGUMENT_SET);
+          .namedAnyOf("of", "arguments", ARGUMENT_SET_FACTORY);
   private static final Matcher<ExpressionTree> SUPPORTED_METHOD_SOURCE_PROVIDERS =
       staticMethod()
           .onDescendantOfAny(
@@ -109,7 +108,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     /* The method source annotation is always found because of the earlier matcher. */
     AnnotationTree methodSourceAnnotation = findMethodSourceAnnotation(tree, state).orElseThrow();
     ImmutableList<MethodTree> offendingMethodSourceProviders =
-        getOffendingMethodSourceProviders(methodSourceAnnotation, tree, state);
+        findOffendingMethodSourceProviders(methodSourceAnnotation, tree, state);
     if (offendingMethodSourceProviders.isEmpty()) {
       return Description.NO_MATCH;
     }
@@ -117,42 +116,29 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     return buildDescription(tree)
         .setMessage(
             "One or more generic parameters used in the following `@MethodSource` provider(s) don't match accepted types: %s"
-                .formatted(getMethodNames(offendingMethodSourceProviders)))
+                .formatted(methodNames(offendingMethodSourceProviders)))
         .build();
   }
 
-  private static ImmutableList<MethodTree> getOffendingMethodSourceProviders(
+  private static ImmutableList<MethodTree> findOffendingMethodSourceProviders(
       AnnotationTree annotation, MethodTree testMethodTree, VisitorState state) {
     return getMethodSourceFactoryNames(annotation, testMethodTree).stream()
-        .map(methodFactoryName -> findMethodTreeFromEnclosingClass(methodFactoryName, state))
+        .map(factoryName -> findMethodTreeFromEnclosingClass(factoryName, state))
         .flatMap(Optional::stream)
-        .flatMap(
-            methodSourceMethodTree ->
-                findOffendingMethodSourceProvider(methodSourceMethodTree, testMethodTree, state)
-                    .stream())
+        .filter(method -> isOffendingMethodSourceProvider(method, testMethodTree, state))
         .collect(toImmutableList());
   }
 
   /**
-   * Returns the method source provider whose generic parameters are incompatible with the test
-   * method, if any.
+   * Returns whether the given method source provider has any {@link Arguments} call whose generic
+   * parameters are incompatible with the test method's parameters.
    */
-  private static Optional<MethodTree> findOffendingMethodSourceProvider(
+  private static boolean isOffendingMethodSourceProvider(
       MethodTree methodSourceMethodTree, MethodTree testMethodTree, VisitorState state) {
-    List<PotentialOffendingArgumentsProvider> potentialOffendingProviders = new ArrayList<>();
-
-    buildPotentialOffendingProviders(methodSourceMethodTree, potentialOffendingProviders, state);
-
     ImmutableList<Type> testMethodTypes = toTypes(testMethodTree.getParameters());
-    for (PotentialOffendingArgumentsProvider potentialOffendingProvider :
-        potentialOffendingProviders) {
-      ImmutableList<Type> providerArgumentTypes = toTypes(potentialOffendingProvider.arguments());
-      if (!hasApplicableTypes(testMethodTypes, providerArgumentTypes, state)) {
-        return Optional.of(methodSourceMethodTree);
-      }
-    }
-
-    return Optional.empty();
+    return findPotentialOffendingProviders(methodSourceMethodTree, state).stream()
+        .anyMatch(
+            provider -> !hasApplicableTypes(testMethodTypes, toTypes(provider.arguments()), state));
   }
 
   /**
@@ -178,73 +164,62 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
    *
    * @implNote All traversed methods are assumed to be within the same class as the test method.
    */
-  private static void buildPotentialOffendingProviders(
-      Tree tree,
-      List<PotentialOffendingArgumentsProvider> potentialOffendingProviders,
-      VisitorState state) {
-    switch (tree) {
-      case MethodTree methodTree -> {
-        for (ExpressionTree returnExpression : getReturnExpressions(methodTree)) {
-          buildPotentialOffendingProviders(returnExpression, potentialOffendingProviders, state);
-        }
-      }
-      case MethodInvocationTree methodInvocationTree -> {
-        Optional<MethodTree> methodTree =
+  private static ImmutableList<PotentialOffendingArgumentsProvider> findPotentialOffendingProviders(
+      Tree tree, VisitorState state) {
+    return switch (tree) {
+      case MethodTree methodTree ->
+          collectReturnExpressions(methodTree).stream()
+              .flatMap(
+                  returnExpression ->
+                      findPotentialOffendingProviders(returnExpression, state).stream())
+              .collect(toImmutableList());
+      case MethodInvocationTree methodInvocation -> {
+        Optional<MethodTree> referencedMethod =
             findMethodTreeFromEnclosingClass(
-                treeToString(methodInvocationTree.getMethodSelect(), state), state);
-
-        if (methodTree.isPresent()) {
+                treeToString(methodInvocation.getMethodSelect(), state), state);
+        if (referencedMethod.isPresent()) {
           // Method is from the call hierarchy, within the same class.
-          buildPotentialOffendingProviders(
-              methodTree.orElseThrow(), potentialOffendingProviders, state);
-        } else {
-          if (SUPPORTED_METHOD_SOURCE_PROVIDERS.matches(methodInvocationTree, state)) {
-            collectPotentialOffendingProviders(
-                potentialOffendingProviders, methodInvocationTree.getArguments(), state);
-          }
-          // Otherwise, the method source provider is not supported. Ignore it as in JUnit this will
-          // be checked compile-time from `MethodArgumentsProvider#isFactoryMethod`.
+          yield findPotentialOffendingProviders(referencedMethod.orElseThrow(), state);
         }
+        if (SUPPORTED_METHOD_SOURCE_PROVIDERS.matches(methodInvocation, state)) {
+          yield collectPotentialOffendingProviders(methodInvocation.getArguments(), state);
+        }
+        // Otherwise, the method source provider is not supported. Ignore it as in JUnit this will
+        // be checked compile-time from `MethodArgumentsProvider#isFactoryMethod`.
+        yield ImmutableList.of();
       }
       case NewArrayTree newArrayTree -> {
         List<? extends ExpressionTree> arrayInitializers = newArrayTree.getInitializers();
-        if (arrayInitializers != null) {
-          collectPotentialOffendingProviders(potentialOffendingProviders, arrayInitializers, state);
-        }
+        yield arrayInitializers == null
+            ? ImmutableList.of()
+            : collectPotentialOffendingProviders(arrayInitializers, state);
       }
-      default -> {}
-    }
+      default -> ImmutableList.of();
+    };
   }
 
-  private static void collectPotentialOffendingProviders(
-      List<PotentialOffendingArgumentsProvider> potentialOffendingProviders,
-      List<? extends ExpressionTree> expressions,
-      VisitorState state) {
-    for (ExpressionTree potentialArgumentExpression : expressions) {
-      if (ARGUMENTS_FACTORY_METHODS.matches(potentialArgumentExpression, state)
-          && potentialArgumentExpression
-              instanceof MethodInvocationTree argumentMethodInvocationTree) {
-        addPotentialOffendingProvider(
-            potentialOffendingProviders, argumentMethodInvocationTree, state);
-      }
-    }
+  private static ImmutableList<PotentialOffendingArgumentsProvider>
+      collectPotentialOffendingProviders(
+          List<? extends ExpressionTree> expressions, VisitorState state) {
+    return expressions.stream()
+        .filter(e -> ARGUMENTS_FACTORY_METHODS.matches(e, state))
+        .filter(MethodInvocationTree.class::isInstance)
+        .map(MethodInvocationTree.class::cast)
+        .map(invocation -> potentialOffendingProvider(invocation, state))
+        .collect(toImmutableList());
   }
 
-  private static void addPotentialOffendingProvider(
-      List<PotentialOffendingArgumentsProvider> potentialOffendingProviders,
-      MethodInvocationTree argumentMethodInvocationTree,
-      VisitorState state) {
-    List<? extends ExpressionTree> arguments = argumentMethodInvocationTree.getArguments();
-    if (treeToString(argumentMethodInvocationTree.getMethodSelect(), state)
-        .contentEquals(ARGUMENT_SET)) {
-      // We skip the first argument, because it's the argument set name.
-      potentialOffendingProviders.add(
-          new PotentialOffendingArgumentsProvider(
-              arguments.stream().skip(1).collect(toImmutableList())));
-    } else {
-      potentialOffendingProviders.add(
-          new PotentialOffendingArgumentsProvider(ImmutableList.copyOf(arguments)));
-    }
+  private static PotentialOffendingArgumentsProvider potentialOffendingProvider(
+      MethodInvocationTree argumentMethodInvocation, VisitorState state) {
+    // Skip the first argument when the factory is `argumentSet(...)`, as it's the argument set
+    // name rather than a test argument.
+    int skip =
+        treeToString(argumentMethodInvocation.getMethodSelect(), state)
+                .contentEquals(ARGUMENT_SET_FACTORY)
+            ? 1
+            : 0;
+    return new PotentialOffendingArgumentsProvider(
+        argumentMethodInvocation.getArguments().stream().skip(skip).collect(toImmutableList()));
   }
 
   /**
@@ -268,55 +243,53 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
       return true;
     }
 
-    for (int i = 0; i < testMethodParameterTypeArguments.size(); i++) {
-      Type methodSourceProviderArgumentTypesArgument = methodSourceProviderTypeArguments.get(i);
-      Type testMethodArgumentTypeArgument = testMethodParameterTypeArguments.get(i);
+    return Streams.zip(
+            testMethodParameterTypeArguments.stream(),
+            methodSourceProviderTypeArguments.stream(),
+            (testArg, providerArg) -> isApplicableTypeArgument(testArg, providerArg, types))
+        .allMatch(applicable -> applicable);
+  }
 
-      if (testMethodArgumentTypeArgument.isExtendsBound()) {
-        Type upperBoundType = ASTHelpers.getUpperBound(testMethodArgumentTypeArgument, types);
-
-        // We assume the user has ensured type compatibility for casting a subtype to the
-        // super type. This ensures we can pass an empty `ImmutableCollection.of()` (effectively a
-        // `ImmutableCollection<Object>`) to a `ImmutableCollection<Integer>`parameter.
-        if (isSuperTypeOrSubtype(
-            methodSourceProviderArgumentTypesArgument, upperBoundType, types)) {
-          return true;
-        }
-      } else if (testMethodArgumentTypeArgument.isSuperBound()) {
-        Type lowerBoundType = MoreASTHelpers.getLowerBound(testMethodArgumentTypeArgument, types);
-        if (types.isSuperType(methodSourceProviderArgumentTypesArgument, lowerBoundType)) {
-          return true;
-        }
-      } else if (testMethodArgumentTypeArgument.isUnbound()
-          || isSuperTypeOrSubtype(
-              methodSourceProviderArgumentTypesArgument, testMethodArgumentTypeArgument, types)) {
-        return true;
-      }
+  private static boolean isApplicableTypeArgument(
+      Type testMethodArgumentTypeArgument,
+      Type methodSourceProviderArgumentTypesArgument,
+      Types types) {
+    if (testMethodArgumentTypeArgument.isExtendsBound()) {
+      Type upperBoundType = ASTHelpers.getUpperBound(testMethodArgumentTypeArgument, types);
+      // We assume the user has ensured type compatibility for casting a subtype to the
+      // super type. This ensures we can pass an empty `ImmutableCollection.of()` (effectively a
+      // `ImmutableCollection<Object>`) to a `ImmutableCollection<Integer>` parameter.
+      return isSuperTypeOrSubtype(methodSourceProviderArgumentTypesArgument, upperBoundType, types);
     }
-
-    return false;
+    if (testMethodArgumentTypeArgument.isSuperBound()) {
+      Type lowerBoundType = MoreASTHelpers.getLowerBound(testMethodArgumentTypeArgument, types);
+      return types.isSuperType(methodSourceProviderArgumentTypesArgument, lowerBoundType);
+    }
+    return testMethodArgumentTypeArgument.isUnbound()
+        || isSuperTypeOrSubtype(
+            methodSourceProviderArgumentTypesArgument, testMethodArgumentTypeArgument, types);
   }
 
   private static Optional<MethodTree> findMethodTreeFromEnclosingClass(
-      String methodName, VisitorState state) {
+      String factoryReference, VisitorState state) {
     return requireNonNull(state.findEnclosing(ClassTree.class), "No class enclosing method")
         .getMembers()
         .stream()
         .flatMap(JUnitMethodSourceGenericParams::extractMembers)
         .filter(MethodTree.class::isInstance)
         .map(MethodTree.class::cast)
-        .filter(method -> hasMethodName(methodName, method))
+        .filter(method -> hasMethodName(factoryReference, method))
         .findFirst();
   }
 
-  private static ImmutableList<String> getMethodNames(ImmutableList<MethodTree> methodTrees) {
+  private static ImmutableList<String> methodNames(ImmutableList<MethodTree> methodTrees) {
     return methodTrees.stream()
         .map(MethodTree::getName)
         .map(Name::toString)
         .collect(toImmutableList());
   }
 
-  private static ImmutableList<ExpressionTree> getReturnExpressions(Tree methodTree) {
+  private static ImmutableList<ExpressionTree> collectReturnExpressions(Tree methodTree) {
     ImmutableList.Builder<ExpressionTree> returnExpressions = ImmutableList.builder();
     new TreeScanner<@Nullable Void, @Nullable Void>() {
       @Override
@@ -335,13 +308,22 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     if (tree instanceof ClassTree classTree) {
       return classTree.getMembers().stream()
           .flatMap(JUnitMethodSourceGenericParams::extractMembers);
-    } else {
-      return Stream.of(tree);
     }
+    return Stream.of(tree);
   }
 
-  private static boolean hasMethodName(String methodName, MethodTree method) {
-    return method.getName().contentEquals(methodName.substring(methodName.lastIndexOf('#') + 1));
+  /**
+   * Returns whether {@code method}'s name matches the trailing portion of {@code factoryReference}.
+   *
+   * <p>{@code factoryReference} can be a bare method name (e.g. {@code "foo"}) or a fully qualified
+   * one (e.g. {@code "com.example.Bar#foo"}); the substring after the last {@code #} is taken as
+   * the method name. {@link String#lastIndexOf(int)} returns {@code -1} when the character is
+   * absent, making the call a no-op for bare names.
+   */
+  private static boolean hasMethodName(String factoryReference, MethodTree method) {
+    return method
+        .getName()
+        .contentEquals(factoryReference.substring(factoryReference.lastIndexOf('#') + 1));
   }
 
   private static boolean isSuperTypeOrSubtype(Type baseType, Type type, Types types) {

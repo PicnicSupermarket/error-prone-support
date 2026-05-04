@@ -14,6 +14,7 @@ final class JUnitMethodSourceGenericParamsTest {
             "",
             "import com.google.common.collect.ImmutableCollection;",
             "import com.google.common.collect.ImmutableList;",
+            "import com.google.common.collect.ImmutableMap;",
             "import java.util.stream.Stream;",
             "import org.junit.jupiter.params.ParameterizedTest;",
             "import org.junit.jupiter.params.provider.Arguments;",
@@ -172,6 +173,26 @@ final class JUnitMethodSourceGenericParamsTest {
             "  @MethodSource(\"superBoundIdentificationTestCases\")",
             "  // BUG: Diagnostic contains: superBoundIdentificationTestCases",
             "  void superBoundIdentification(ImmutableList<? super Integer> intList) {}",
+            "",
+            // Multi-type-argument generics: each type-argument position must independently match.
+            // Without that requirement (i.e. \"any-match\" semantics) a `Map<String, Boolean>`",
+            // would silently satisfy a `Map<String, Integer>` parameter via the matching key type.
+            "  private static Stream<Arguments> mapValueMismatchIdentificationTestCases() {",
+            "    return Stream.of(arguments(ImmutableMap.of(\"key\", false)));",
+            "  }",
+            "",
+            "  @ParameterizedTest",
+            "  @MethodSource(\"mapValueMismatchIdentificationTestCases\")",
+            "  // BUG: Diagnostic contains: mapValueMismatchIdentificationTestCases",
+            "  void mapValueMismatchIdentification(ImmutableMap<String, Integer> map) {}",
+            "",
+            "  private static Stream<Arguments> mapNoIdentificationTestCases() {",
+            "    return Stream.of(arguments(ImmutableMap.of(\"key\", 1)));",
+            "  }",
+            "",
+            "  @ParameterizedTest",
+            "  @MethodSource(\"mapNoIdentificationTestCases\")",
+            "  void mapNoIdentification(ImmutableMap<String, Integer> map) {}",
             "}")
         .doTest();
   }
