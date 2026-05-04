@@ -116,7 +116,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     return buildDescription(tree)
         .setMessage(
             "One or more generic parameters used in the following `@MethodSource` provider(s) don't match accepted types: %s"
-                .formatted(methodNames(offendingMethodSourceProviders)))
+                .formatted(toMethodNames(offendingMethodSourceProviders)))
         .build();
   }
 
@@ -282,7 +282,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
         .findFirst();
   }
 
-  private static ImmutableList<String> methodNames(ImmutableList<MethodTree> methodTrees) {
+  private static ImmutableList<String> toMethodNames(ImmutableList<MethodTree> methodTrees) {
     return methodTrees.stream()
         .map(MethodTree::getName)
         .map(Name::toString)
