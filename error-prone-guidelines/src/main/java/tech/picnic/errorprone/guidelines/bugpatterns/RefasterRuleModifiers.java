@@ -15,6 +15,7 @@ import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
+import com.google.errorprone.fixes.SuggestedFixes.Visibility;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -83,8 +84,7 @@ public final class RefasterRuleModifiers extends BugChecker
 
   private static SuggestedFix suggestCanonicalModifiers(ClassTree tree, VisitorState state) {
     Set<Modifier> modifiersToAdd = EnumSet.noneOf(Modifier.class);
-    Set<Modifier> modifiersToRemove =
-        EnumSet.of(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC, Modifier.SYNCHRONIZED);
+    Set<Modifier> modifiersToRemove = EnumSet.of(Modifier.SYNCHRONIZED);
 
     if (!hasMatchingMember(tree, PLACEHOLDER_METHOD, state)) {
       /*
@@ -101,7 +101,7 @@ public final class RefasterRuleModifiers extends BugChecker
       modifiersToAdd.add(Modifier.STATIC);
     }
 
-    SuggestedFix.Builder fix = SuggestedFix.builder();
+    SuggestedFix.Builder fix = Visibility.PACKAGE.refactor(tree, state).toBuilder();
     SuggestedFixes.addModifiers(tree, tree.getModifiers(), state, modifiersToAdd)
         .ifPresent(fix::merge);
     SuggestedFixes.removeModifiers(tree.getModifiers(), state, modifiersToRemove)

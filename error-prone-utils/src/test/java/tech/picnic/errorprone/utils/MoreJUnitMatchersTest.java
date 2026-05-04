@@ -223,7 +223,7 @@ final class MoreJUnitMatchersTest {
    * exposed by {@link MoreJUnitMatchers}.
    */
   @BugPattern(summary = "Interacts with `MoreJUnitMatchers` for testing purposes", severity = ERROR)
-  public static final class MethodMatchersTestChecker extends BugChecker
+  private static final class MethodMatchersTestChecker extends BugChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
     private static final ImmutableMap<String, Matcher<MethodTree>> METHOD_MATCHERS =
@@ -251,7 +251,7 @@ final class MoreJUnitMatchersTest {
    * enumerating the associated value factory method names.
    */
   @BugPattern(summary = "Interacts with `MoreJUnitMatchers` for testing purposes", severity = ERROR)
-  public static final class MethodSourceFactoryNamesTestChecker extends BugChecker
+  private static final class MethodSourceFactoryNamesTestChecker extends BugChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -271,7 +271,7 @@ final class MoreJUnitMatchersTest {
    * enumerating the associated value factory method descriptors.
    */
   @BugPattern(summary = "Interacts with `MoreJUnitMatchers` for testing purposes", severity = ERROR)
-  public static final class MethodSourceFactoryDescriptorsTestChecker extends BugChecker
+  private static final class MethodSourceFactoryDescriptorsTestChecker extends BugChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 

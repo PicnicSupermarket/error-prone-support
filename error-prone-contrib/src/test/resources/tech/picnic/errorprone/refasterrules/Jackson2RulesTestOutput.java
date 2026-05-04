@@ -34,20 +34,20 @@ final class Jackson2RulesTest implements RefasterRuleCollectionTestCase {
         new ObjectMapper(new JsonFactory()).valueToTree("bar"));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithClass() throws IOException {
+  ImmutableSet<Number> testObjectMapperConvertValueClass() throws IOException {
     return ImmutableSet.of(
         new ObjectMapper().convertValue("1", Integer.class),
         new ObjectMapper(new JsonFactory()).convertValue("2.0", Double.class));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithJavaType() throws IOException {
+  ImmutableSet<Number> testObjectMapperConvertValueJavaType() throws IOException {
     return ImmutableSet.of(
         new ObjectMapper().convertValue("1", SimpleType.constructUnsafe(Integer.class)),
         new ObjectMapper(new JsonFactory())
             .convertValue("2.0", SimpleType.constructUnsafe(Double.class)));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithTypeReference() throws IOException {
+  ImmutableSet<Number> testObjectMapperConvertValueTypeReference() throws IOException {
     return ImmutableSet.of(
         new ObjectMapper().convertValue("1", new TypeReference<Integer>() {}),
         new ObjectMapper(new JsonFactory()).convertValue("2.0", new TypeReference<Double>() {}));

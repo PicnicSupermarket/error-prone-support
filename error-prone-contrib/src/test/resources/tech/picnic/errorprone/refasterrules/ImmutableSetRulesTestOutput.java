@@ -25,34 +25,33 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.builder();
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testIterableToImmutableSet() {
+  ImmutableSet<ImmutableSet<Integer>> testImmutableSetCopyOf() {
     return ImmutableSet.of(
-        ImmutableSet.copyOf(ImmutableList.of(1)),
-        ImmutableSet.copyOf(ImmutableList.of(2)::iterator),
-        ImmutableSet.copyOf(ImmutableList.of(3).iterator()),
-        ImmutableSet.copyOf(ImmutableSet.of(4)),
-        ImmutableSet.copyOf(ImmutableSet.of(5)::iterator),
-        ImmutableSet.copyOf(ImmutableSet.of(6).iterator()),
-        ImmutableSet.copyOf(new Integer[] {7}),
-        ImmutableSet.copyOf(new Integer[] {8}));
+        ImmutableSet.copyOf(new Integer[] {1}),
+        ImmutableSet.copyOf(new Integer[] {2}),
+        ImmutableSet.copyOf(ImmutableSet.of(3).iterator()),
+        ImmutableSet.copyOf(ImmutableList.of(4).iterator()),
+        ImmutableSet.copyOf(ImmutableSet.of(5)),
+        ImmutableSet.copyOf(ImmutableList.of(6)::iterator),
+        ImmutableSet.copyOf(ImmutableList.of(7)));
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testStreamToImmutableSet() {
+  ImmutableSet<ImmutableSet<Integer>> testStreamCollectToImmutableSet() {
     return ImmutableSet.of(
         Stream.of(1).collect(toImmutableSet()), Stream.of(2).collect(toImmutableSet()));
   }
 
-  ImmutableSet<Integer> testImmutableSetCopyOfSetView() {
+  ImmutableSet<Integer> testSetViewImmutableCopy() {
     return Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 
-  ImmutableSet<Set<Integer>> testImmutableSetOf() {
+  ImmutableSet<Set<Integer>> testImmutableSetOf0() {
     return ImmutableSet.of(
         ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of());
   }
 
   ImmutableSet<Set<Integer>> testImmutableSetOf1() {
-    return ImmutableSet.of(ImmutableSet.of(1), ImmutableSet.of(1), ImmutableSet.of(1));
+    return ImmutableSet.of(ImmutableSet.of(1), ImmutableSet.of(2), ImmutableSet.of(3));
   }
 
   Set<Integer> testImmutableSetOf2() {
@@ -71,39 +70,39 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(1, 2, 3, 4, 5);
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifference() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceImmutableCopy() {
     return ImmutableSet.of(
         Sets.difference(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy(),
         Sets.difference(ImmutableSet.of(3), ImmutableSet.of(4)).immutableCopy());
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMap() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMapKeySetImmutableCopy() {
     return ImmutableSet.of(
         Sets.difference(ImmutableSet.of(1), ImmutableMap.of(2, 3).keySet()).immutableCopy(),
         Sets.difference(ImmutableSet.of(4), ImmutableMap.of(5, 6).keySet()).immutableCopy());
   }
 
-  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMultimap() {
+  ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceMultimapKeySetImmutableCopy() {
     return ImmutableSet.of(
         Sets.difference(ImmutableSet.of(1), ImmutableSetMultimap.of(2, 3).keySet()).immutableCopy(),
         Sets.difference(ImmutableSet.of(4), ImmutableSetMultimap.of(5, 6).keySet())
             .immutableCopy());
   }
 
-  ImmutableSet<Integer> testSetsIntersection() {
+  ImmutableSet<Integer> testSetsIntersectionImmutableCopy() {
     return Sets.intersection(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 
-  ImmutableSet<Integer> testSetsIntersectionMap() {
+  ImmutableSet<Integer> testSetsIntersectionMapKeySetImmutableCopy() {
     return Sets.intersection(ImmutableSet.of(1), ImmutableMap.of(2, 3).keySet()).immutableCopy();
   }
 
-  ImmutableSet<Integer> testSetsIntersectionMultimap() {
+  ImmutableSet<Integer> testSetsIntersectionMultimapKeySetImmutableCopy() {
     return Sets.intersection(ImmutableSet.of(1), ImmutableSetMultimap.of(2, 3).keySet())
         .immutableCopy();
   }
 
-  ImmutableSet<Integer> testSetsUnion() {
+  ImmutableSet<Integer> testSetsUnionImmutableCopy() {
     return Sets.union(ImmutableSet.of(1), ImmutableSet.of(2)).immutableCopy();
   }
 }

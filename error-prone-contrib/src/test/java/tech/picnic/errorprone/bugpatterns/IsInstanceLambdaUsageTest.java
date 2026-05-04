@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -61,6 +60,6 @@ final class IsInstanceLambdaUsageTest {
             "    Stream.of(1).filter(Integer.class::isInstance);",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

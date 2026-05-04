@@ -11,12 +11,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
@@ -27,8 +31,8 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class FileRules {
   private FileRules() {}
 
-  /** Prefer the more idiomatic {@link Path#of(URI)} over {@link Paths#get(URI)}. */
-  static final class PathOfUri {
+  /** Prefer {@link Path#of(URI)} over less idiomatic alternatives. */
+  static final class PathOf {
     @BeforeTemplate
     Path before(URI uri) {
       return Paths.get(uri);
@@ -40,25 +44,22 @@ final class FileRules {
     }
   }
 
-  /**
-   * Prefer the more idiomatic {@link Path#of(String, String...)} over {@link Paths#get(String,
-   * String...)}.
-   */
-  static final class PathOfString {
+  /** Prefer {@link Path#of(String, String...)} over less idiomatic alternatives. */
+  static final class PathOfVarargs {
     @BeforeTemplate
     Path before(String first, @Repeated String more) {
-      return Paths.get(first, more);
+      return Paths.get(first, Refaster.asVarargs(more));
     }
 
     @AfterTemplate
     Path after(String first, @Repeated String more) {
-      return Path.of(first, more);
+      return Path.of(first, Refaster.asVarargs(more));
     }
   }
 
-  /** Avoid redundant conversions from {@link Path} to {@link File}. */
+  /** Prefer the {@link Path} as-is over more contrived alternatives. */
   // XXX: Review whether a rule such as this one is better handled by the `IdentityConversion` rule.
-  static final class PathInstance {
+  static final class PathIdentity {
     @BeforeTemplate
     Path before(Path path) {
       return path.toFile().toPath();
@@ -70,16 +71,58 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link Files#readString(Path, Charset)} over more contrived alternatives. */
-  static final class FilesReadStringWithCharset {
+  /**
+   * Prefer {@link Path#resolveSibling(Path)} over more fragile or more verbose alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code path} has no parent: the
+   * original code throws a {@link NullPointerException}, while the replacement handles this case
+   * gracefully.
+   */
+  static final class PathResolveSiblingPath {
     @BeforeTemplate
-    String before(Path path, Charset charset) throws IOException {
-      return new String(Files.readAllBytes(path), charset);
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
+    Path before(Path path, Path other) {
+      return path.getParent().resolve(other);
     }
 
     @AfterTemplate
-    String after(Path path, Charset charset) throws IOException {
-      return Files.readString(path, charset);
+    Path after(Path path, Path other) {
+      return path.resolveSibling(other);
+    }
+  }
+
+  /**
+   * Prefer {@link Path#resolveSibling(String)} over more fragile or more verbose alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when {@code path} has no parent: the
+   * original code throws a {@link NullPointerException}, while the replacement handles this case
+   * gracefully.
+   */
+  static final class PathResolveSiblingString {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
+    Path before(Path path, String other) {
+      return path.getParent().resolve(other);
+    }
+
+    @AfterTemplate
+    Path after(Path path, String other) {
+      return path.resolveSibling(other);
+    }
+  }
+
+  /** Prefer {@link Files#readString(Path, Charset)} over more contrived alternatives. */
+  static final class FilesReadStringWithCharset {
+    @BeforeTemplate
+    String before(Path path, Charset cs) throws IOException {
+      return new String(Files.readAllBytes(path), cs);
+    }
+
+    @AfterTemplate
+    String after(Path path, Charset cs) throws IOException {
+      return Files.readString(path, cs);
     }
   }
 
@@ -97,8 +140,8 @@ final class FileRules {
   }
 
   /**
-   * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over alternatives that
-   * create files with more liberal permissions.
+   * Prefer {@link Files#createTempFile(String, String, FileAttribute[])} over less secure
+   * alternatives.
    *
    * <p>Note that {@link File#createTempFile} treats the given prefix as a path, and ignores all but
    * its file name. That is, the actual prefix used is derived from all characters following the
@@ -109,7 +152,7 @@ final class FileRules {
   static final class FilesCreateTempFileToFile {
     @BeforeTemplate
     @SuppressWarnings({
-      "FilesCreateTempFileInCustomDirectoryToFile" /* This is a more specific template. */,
+      "FilesCreateTempFileFileToPathToFile" /* This is a more specific template. */,
       "java:S5443" /* This violation will be rewritten. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
@@ -127,8 +170,8 @@ final class FileRules {
   }
 
   /**
-   * Prefer {@link Files#createTempFile(Path, String, String, FileAttribute[])} over alternatives
-   * that create files with more liberal permissions.
+   * Prefer {@link Files#createTempFile(Path, String, String, FileAttribute[])} over less secure
+   * alternatives.
    *
    * <p>Note that {@link File#createTempFile} treats the given prefix as a path, and ignores all but
    * its file name. That is, the actual prefix used is derived from all characters following the
@@ -136,7 +179,7 @@ final class FileRules {
    * will instead throw an {@link IllegalArgumentException} if the prefix contains any file
    * separators.
    */
-  static final class FilesCreateTempFileInCustomDirectoryToFile {
+  static final class FilesCreateTempFileFileToPathToFile {
     @BeforeTemplate
     File before(File directory, String prefix, String suffix) throws IOException {
       return File.createTempFile(prefix, suffix, directory);
@@ -149,10 +192,10 @@ final class FileRules {
   }
 
   /**
-   * Invoke {@link File#mkdirs()} before {@link Files#exists(Path, LinkOption...)} to avoid
-   * concurrency issues.
+   * Prefer this evaluation order of {@link File#mkdirs()} and {@link Files#exists(Path,
+   * LinkOption...)} over more fragile alternatives.
    */
-  static final class PathToFileMkDirsFilesExists {
+  static final class PathToFileMkdirsOrFilesExists {
     @BeforeTemplate
     boolean before(Path path) {
       return Files.exists(path) || path.toFile().mkdirs();
@@ -165,8 +208,11 @@ final class FileRules {
     }
   }
 
-  /** Invoke {@link File#mkdirs()} before {@link File#exists()} to avoid concurrency issues. */
-  static final class FileMkDirsFileExists {
+  /**
+   * Prefer this evaluation order of {@link File#mkdirs()} and {@link File#exists()} over more
+   * fragile alternatives.
+   */
+  static final class FileMkdirsOrFileExists {
     @BeforeTemplate
     boolean before(File file) {
       return file.exists() || file.mkdirs();
@@ -179,10 +225,77 @@ final class FileRules {
     }
   }
 
-  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
-  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
-  // code uses UTF-8 rather than the default charset.
-  static final class FilesNewBufferedReaderPathOf {
+  /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewInputStreamPathOf {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    FileInputStream before(String first) throws FileNotFoundException {
+      return new FileInputStream(first);
+    }
+
+    @AfterTemplate
+    InputStream after(String first) throws IOException {
+      return Files.newInputStream(Path.of(first));
+    }
+  }
+
+  /** Prefer {@link Files#newInputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewInputStreamFileToPath {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    FileInputStream before(File file) throws FileNotFoundException {
+      return new FileInputStream(file);
+    }
+
+    @AfterTemplate
+    InputStream after(File file) throws IOException {
+      return Files.newInputStream(file.toPath());
+    }
+  }
+
+  /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewOutputStreamPathOf {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    FileOutputStream before(String first) throws FileNotFoundException {
+      return new FileOutputStream(first);
+    }
+
+    @AfterTemplate
+    OutputStream after(String first) throws IOException {
+      return Files.newOutputStream(Path.of(first));
+    }
+  }
+
+  /** Prefer {@link Files#newOutputStream(Path, OpenOption...)} over less idiomatic alternatives. */
+  // XXX: The replacement code throws a `NoSuchFileException` instead of a `FileNotFoundException`.
+  static final class FilesNewOutputStreamFileToPath {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "java:S2095" /* Matched expressions are in practice embedded in a larger context. */)
+    FileOutputStream before(File file) throws FileNotFoundException {
+      return new FileOutputStream(file);
+    }
+
+    @AfterTemplate
+    OutputStream after(File file) throws IOException {
+      return Files.newOutputStream(file.toPath());
+    }
+  }
+
+  /**
+   * Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes behavior when no charset is specified: the
+   * original code uses the default charset, while the replacement always uses UTF-8.
+   */
+  static final class FilesNewBufferedReader {
     @BeforeTemplate
     @SuppressWarnings({
       "DefaultCharset" /* This violation will be rewritten. */,
@@ -190,64 +303,28 @@ final class FileRules {
       "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    BufferedReader before(String path) throws IOException {
+    BufferedReader before(Path path) throws IOException {
       return Refaster.anyOf(
-          Files.newBufferedReader(Path.of(path), UTF_8),
-          new BufferedReader(new InputStreamReader(new FileInputStream(path))));
+          Files.newBufferedReader(path, UTF_8),
+          new BufferedReader(new InputStreamReader(Files.newInputStream(path))));
     }
 
     @AfterTemplate
-    BufferedReader after(String path) throws IOException {
-      return Files.newBufferedReader(Path.of(path));
-    }
-  }
-
-  /** Prefer {@link Files#newBufferedReader(Path)} over more verbose or contrived alternatives. */
-  // XXX: This rule changes semantics in cases where no charset is specified, as the replacement
-  // code uses UTF-8 rather than the default charset.
-  static final class FilesNewBufferedReaderToPath {
-    @BeforeTemplate
-    @SuppressWarnings({
-      "DefaultCharset" /* This violation will be rewritten. */,
-      "java:S1943" /* This violation will be rewritten. */,
-      "java:S2095" /* Matched expressions are in practice embedded in a larger context. */,
-      "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
-    })
-    BufferedReader before(File file) throws IOException {
-      return Refaster.anyOf(
-          Files.newBufferedReader(file.toPath(), UTF_8),
-          new BufferedReader(new InputStreamReader(new FileInputStream(file))));
-    }
-
-    @AfterTemplate
-    BufferedReader after(File file) throws IOException {
-      return Files.newBufferedReader(file.toPath());
+    BufferedReader after(Path path) throws IOException {
+      return Files.newBufferedReader(path);
     }
   }
 
   /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
-  static final class FilesNewBufferedReaderPathOfWithCharset {
+  static final class FilesNewBufferedReaderWithCharset {
     @BeforeTemplate
-    BufferedReader before(String path, Charset charset) throws FileNotFoundException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset));
+    BufferedReader before(Path path, Charset cs) throws IOException {
+      return new BufferedReader(new InputStreamReader(Files.newInputStream(path), cs));
     }
 
     @AfterTemplate
-    BufferedReader after(String path, Charset charset) throws IOException {
-      return Files.newBufferedReader(Path.of(path), charset);
-    }
-  }
-
-  /** Prefer {@link Files#newBufferedReader(Path, Charset)} over more contrived alternatives. */
-  static final class FilesNewBufferedReaderToPathWithCharset {
-    @BeforeTemplate
-    BufferedReader before(File file, Charset charset) throws FileNotFoundException {
-      return new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
-    }
-
-    @AfterTemplate
-    BufferedReader after(File file, Charset charset) throws IOException {
-      return Files.newBufferedReader(file.toPath(), charset);
+    BufferedReader after(Path path, Charset cs) throws IOException {
+      return Files.newBufferedReader(path, cs);
     }
   }
 }

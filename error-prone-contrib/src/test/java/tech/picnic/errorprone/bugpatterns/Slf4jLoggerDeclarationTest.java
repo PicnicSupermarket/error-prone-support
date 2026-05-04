@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -182,7 +181,7 @@ final class Slf4jLoggerDeclarationTest {
             "    Logger LOG = LoggerFactory.getLogger(StaticLoggerForInterface.class);",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -213,6 +212,6 @@ final class Slf4jLoggerDeclarationTest {
             "    private final Logger fooBar = LoggerFactory.getLogger(getClass());",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

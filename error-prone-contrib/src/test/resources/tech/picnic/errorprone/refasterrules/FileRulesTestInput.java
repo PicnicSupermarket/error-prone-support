@@ -4,8 +4,11 @@ import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,19 +19,27 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class FileRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(FileInputStream.class, InputStreamReader.class);
+    return ImmutableSet.of(FileInputStream.class, FileOutputStream.class, InputStreamReader.class);
   }
 
-  Path testPathOfUri() {
+  Path testPathOf() {
     return Paths.get(URI.create("foo"));
   }
 
-  ImmutableSet<Path> testPathOfString() {
+  ImmutableSet<Path> testPathOfVarargs() {
     return ImmutableSet.of(Paths.get("foo"), Paths.get("bar", "baz", "qux"));
   }
 
-  Path testPathInstance() {
+  Path testPathIdentity() {
     return Path.of("foo").toFile().toPath();
+  }
+
+  Path testPathResolveSiblingPath() {
+    return Path.of("foo").getParent().resolve(Path.of("bar"));
+  }
+
+  Path testPathResolveSiblingString() {
+    return Path.of("foo").getParent().resolve("bar");
   }
 
   String testFilesReadStringWithCharset() throws IOException {
@@ -44,41 +55,46 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
         File.createTempFile("foo", "bar"), File.createTempFile("baz", "qux", null));
   }
 
-  File testFilesCreateTempFileInCustomDirectoryToFile() throws IOException {
+  File testFilesCreateTempFileFileToPathToFile() throws IOException {
     return File.createTempFile("foo", "bar", new File("baz"));
   }
 
-  ImmutableSet<Boolean> testPathToFileMkDirsFilesExists() {
+  ImmutableSet<Boolean> testPathToFileMkdirsOrFilesExists() {
     return ImmutableSet.of(
         Files.exists(Path.of("foo")) || Path.of("foo").toFile().mkdirs(),
         !Files.exists(Path.of("bar")) && !Path.of("bar").toFile().mkdirs());
   }
 
-  ImmutableSet<Boolean> testFileMkDirsFileExists() {
+  ImmutableSet<Boolean> testFileMkdirsOrFileExists() {
     return ImmutableSet.of(
         new File("foo").exists() || new File("foo").mkdirs(),
         !new File("bar").exists() && !new File("bar").mkdirs());
   }
 
-  ImmutableSet<BufferedReader> testFilesNewBufferedReaderPathOf() throws IOException {
+  InputStream testFilesNewInputStreamPathOf() throws IOException {
+    return new FileInputStream("foo");
+  }
+
+  InputStream testFilesNewInputStreamFileToPath() throws IOException {
+    return new FileInputStream(new File("foo"));
+  }
+
+  OutputStream testFilesNewOutputStreamPathOf() throws IOException {
+    return new FileOutputStream("foo");
+  }
+
+  OutputStream testFilesNewOutputStreamFileToPath() throws IOException {
+    return new FileOutputStream(new File("foo"));
+  }
+
+  ImmutableSet<BufferedReader> testFilesNewBufferedReader() throws IOException {
     return ImmutableSet.of(
         Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8),
-        new BufferedReader(new InputStreamReader(new FileInputStream("bar"))));
+        new BufferedReader(new InputStreamReader(Files.newInputStream(Path.of("bar")))));
   }
 
-  ImmutableSet<BufferedReader> testFilesNewBufferedReaderToPath() throws IOException {
-    return ImmutableSet.of(
-        Files.newBufferedReader(new File("foo").toPath(), StandardCharsets.UTF_8),
-        new BufferedReader(new InputStreamReader(new FileInputStream(new File("bar")))));
-  }
-
-  BufferedReader testFilesNewBufferedReaderPathOfWithCharset() throws IOException {
+  BufferedReader testFilesNewBufferedReaderWithCharset() throws IOException {
     return new BufferedReader(
-        new InputStreamReader(new FileInputStream("foo"), StandardCharsets.UTF_8));
-  }
-
-  BufferedReader testFilesNewBufferedReaderToPathWithCharset() throws IOException {
-    return new BufferedReader(
-        new InputStreamReader(new FileInputStream(new File("foo")), StandardCharsets.UTF_8));
+        new InputStreamReader(Files.newInputStream(Path.of("foo")), StandardCharsets.UTF_8));
   }
 }

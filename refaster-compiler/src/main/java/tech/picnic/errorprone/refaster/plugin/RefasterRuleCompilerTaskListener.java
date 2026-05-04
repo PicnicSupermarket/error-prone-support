@@ -132,8 +132,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
   }
 
   private static String toPackageName(ClassSymbol symbol) {
-    PackageSymbol enclosingPackage = ASTHelpers.enclosingPackage(symbol);
-    return enclosingPackage == null ? "" : enclosingPackage.toString();
+    return ASTHelpers.enclosingPackage(symbol).map(PackageSymbol::toString).orElse("");
   }
 
   private static String toSimpleFlatName(ClassSymbol symbol) {

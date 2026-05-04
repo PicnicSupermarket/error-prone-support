@@ -15,15 +15,15 @@ final class SuggestedFixRulesTest implements RefasterRuleCollectionTestCase {
     return SuggestedFix.delete((Tree) null);
   }
 
-  SuggestedFix testSuggestedFixReplaceTree() {
+  SuggestedFix testSuggestedFixReplace2() {
     return SuggestedFix.replace((Tree) null, "foo");
   }
 
-  SuggestedFix testSuggestedFixReplaceStartEnd() {
+  SuggestedFix testSuggestedFixReplace3() {
     return SuggestedFix.replace(1, 2, "foo");
   }
 
-  SuggestedFix testSuggestedFixReplaceTreeStartEnd() {
+  SuggestedFix testSuggestedFixReplace4() {
     return SuggestedFix.replace(null, "foo", 1, 2);
   }
 

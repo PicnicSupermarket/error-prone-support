@@ -27,6 +27,7 @@ import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 final class AssertJNumberRules {
   private AssertJNumberRules() {}
 
+  /** Prefer {@link NumberAssert#isPositive()} over less explicit alternatives. */
   static final class NumberAssertIsPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -78,6 +79,7 @@ final class AssertJNumberRules {
     }
   }
 
+  /** Prefer {@link NumberAssert#isNotPositive()} over less explicit alternatives. */
   static final class NumberAssertIsNotPositive {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -129,6 +131,7 @@ final class AssertJNumberRules {
     }
   }
 
+  /** Prefer {@link NumberAssert#isNegative()} over less explicit alternatives. */
   static final class NumberAssertIsNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -180,6 +183,7 @@ final class AssertJNumberRules {
     }
   }
 
+  /** Prefer {@link NumberAssert#isNotNegative()} over less explicit alternatives. */
   static final class NumberAssertIsNotNegative {
     @BeforeTemplate
     AbstractByteAssert<?> before(AbstractByteAssert<?> numberAssert) {
@@ -233,51 +237,51 @@ final class AssertJNumberRules {
 
   /**
    * Prefer {@link AbstractLongAssert#isOdd()} (and similar methods for other {@link NumberAssert}
-   * subtypes) over alternatives with less informative error messages.
+   * subtypes) over less explicit alternatives.
    *
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isOdd} test.
    */
   static final class AssertThatIsOdd {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
-      return assertThat(number % 2).isEqualTo(1);
+    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int actual) {
+      return assertThat(actual % 2).isEqualTo(1);
     }
 
     @BeforeTemplate
-    AbstractLongAssert<?> before(long number) {
-      return assertThat(number % 2).isEqualTo(1);
+    AbstractLongAssert<?> before(long actual) {
+      return assertThat(actual % 2).isEqualTo(1);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    NumberAssert<?, ?> after(long number) {
-      return assertThat(number).isOdd();
+    AbstractLongAssert<?> after(long actual) {
+      return assertThat(actual).isOdd();
     }
   }
 
   /**
    * Prefer {@link AbstractLongAssert#isEven()} (and similar methods for other {@link NumberAssert}
-   * subtypes) over alternatives with less informative error messages.
+   * subtypes) over less explicit alternatives.
    *
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isEven} test.
    */
   static final class AssertThatIsEven {
     @BeforeTemplate
-    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int number) {
-      return assertThat(number % 2).isEqualTo(0);
+    AbstractIntegerAssert<?> before(@NotMatches(IsCharacter.class) int actual) {
+      return assertThat(actual % 2).isEqualTo(0);
     }
 
     @BeforeTemplate
-    AbstractLongAssert<?> before(long number) {
-      return assertThat(number % 2).isEqualTo(0);
+    AbstractLongAssert<?> before(long actual) {
+      return assertThat(actual % 2).isEqualTo(0);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    NumberAssert<?, ?> after(long number) {
-      return assertThat(number).isEven();
+    AbstractLongAssert<?> after(long actual) {
+      return assertThat(actual).isEven();
     }
   }
 }

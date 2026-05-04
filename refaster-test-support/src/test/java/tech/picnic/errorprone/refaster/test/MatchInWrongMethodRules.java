@@ -9,13 +9,13 @@ final class MatchInWrongMethodRules {
 
   static final class StringIsEmpty {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.equals("");
+    boolean before(String str) {
+      return str.equals("");
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.isEmpty();
+    boolean after(String str) {
+      return str.isEmpty();
     }
   }
 }

@@ -23,23 +23,20 @@ final class ImmutableSortedSetRules {
   private ImmutableSortedSetRules() {}
 
   /** Prefer {@link ImmutableSortedSet#orderedBy(Comparator)} over the associated constructor. */
-  static final class ImmutableSortedSetBuilder<T> {
+  static final class ImmutableSortedSetOrderedBy<T> {
     @BeforeTemplate
-    ImmutableSortedSet.Builder<T> before(Comparator<T> cmp) {
-      return new ImmutableSortedSet.Builder<>(cmp);
+    ImmutableSortedSet.Builder<T> before(Comparator<T> comparator) {
+      return new ImmutableSortedSet.Builder<>(comparator);
     }
 
     @AfterTemplate
-    ImmutableSortedSet.Builder<T> after(Comparator<T> cmp) {
-      return ImmutableSortedSet.orderedBy(cmp);
+    ImmutableSortedSet.Builder<T> after(Comparator<T> comparator) {
+      return ImmutableSortedSet.orderedBy(comparator);
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSortedSet#naturalOrder()} over the alternative that requires explicitly
-   * providing the {@link Comparator}.
-   */
-  static final class ImmutableSortedSetNaturalOrderBuilder<T extends Comparable<? super T>> {
+  /** Prefer {@link ImmutableSortedSet#naturalOrder()} over more verbose alternatives. */
+  static final class ImmutableSortedSetNaturalOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet.Builder<T> before() {
       return ImmutableSortedSet.orderedBy(Comparator.<T>naturalOrder());
@@ -51,11 +48,8 @@ final class ImmutableSortedSetRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSortedSet#reverseOrder()} over the alternative that requires explicitly
-   * providing the {@link Comparator}.
-   */
-  static final class ImmutableSortedSetReverseOrderBuilder<T extends Comparable<? super T>> {
+  /** Prefer {@link ImmutableSortedSet#reverseOrder()} over more verbose alternatives. */
+  static final class ImmutableSortedSetReverseOrder<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet.Builder<T> before() {
       return ImmutableSortedSet.orderedBy(Comparator.<T>reverseOrder());
@@ -67,8 +61,8 @@ final class ImmutableSortedSetRules {
     }
   }
 
-  /** Prefer {@link ImmutableSortedSet#of()} over more contrived alternatives. */
-  static final class EmptyImmutableSortedSet<T extends Comparable<? super T>> {
+  /** Prefer {@link ImmutableSortedSet#of()} over less efficient or more contrived alternatives. */
+  static final class ImmutableSortedSetOf<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before() {
       return Refaster.anyOf(
@@ -83,43 +77,43 @@ final class ImmutableSortedSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSortedSet#copyOf(Iterable)} and variants over more contrived
-   * alternatives.
+   * Prefer {@link ImmutableSortedSet#copyOf(Iterable)} and variants over more verbose, less
+   * efficient, or more contrived alternatives.
    */
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
-  static final class IterableToImmutableSortedSet<T extends Comparable<? super T>> {
+  static final class ImmutableSortedSetCopyOf<T extends Comparable<? super T>> {
     @BeforeTemplate
-    ImmutableSortedSet<T> before(T[] iterable) {
+    ImmutableSortedSet<T> before(T[] elements) {
       return Refaster.anyOf(
-          ImmutableSortedSet.<T>naturalOrder().add(iterable).build(),
-          Arrays.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
+          ImmutableSortedSet.<T>naturalOrder().add(elements).build(),
+          Arrays.stream(elements).collect(toImmutableSortedSet(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSortedSet<T> before(Iterator<T> iterable) {
+    ImmutableSortedSet<T> before(Iterator<T> elements) {
       return Refaster.anyOf(
-          ImmutableSortedSet.copyOf(naturalOrder(), iterable),
-          ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
+          ImmutableSortedSet.copyOf(naturalOrder(), elements),
+          ImmutableSortedSet.<T>naturalOrder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableSortedSet(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSortedSet<T> before(Iterable<T> iterable) {
+    ImmutableSortedSet<T> before(Iterable<T> elements) {
       return Refaster.anyOf(
-          ImmutableSortedSet.copyOf(naturalOrder(), iterable),
-          ImmutableSortedSet.<T>naturalOrder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableSortedSet(naturalOrder())));
+          ImmutableSortedSet.copyOf(naturalOrder(), elements),
+          ImmutableSortedSet.<T>naturalOrder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableSortedSet(naturalOrder())));
     }
 
     @BeforeTemplate
-    ImmutableSortedSet<T> before(Collection<T> iterable) {
-      return iterable.stream().collect(toImmutableSortedSet(naturalOrder()));
+    ImmutableSortedSet<T> before(Collection<T> elements) {
+      return elements.stream().collect(toImmutableSortedSet(naturalOrder()));
     }
 
     @AfterTemplate
-    ImmutableSortedSet<T> after(Iterable<T> iterable) {
-      return ImmutableSortedSet.copyOf(iterable);
+    ImmutableSortedSet<T> after(Iterable<T> elements) {
+      return ImmutableSortedSet.copyOf(elements);
     }
   }
 
@@ -128,9 +122,10 @@ final class ImmutableSortedSetRules {
    * alternatives.
    */
   // XXX: Also handle the variant with a custom comparator.
-  // XXX: Note that this rule rewrites fewer expressions than `StreamToImmutableSet`, because
+  // XXX: Note that this rule rewrites fewer expressions than `StreamCollectToImmutableSet`, because
   // `#compareTo` and `#equals` may be inconsistent. We should separately flag such cases.
-  static final class StreamToImmutableSortedSet<T extends Comparable<? super T>> {
+  static final class StreamCollectToImmutableSortedSetNaturalOrder<
+      T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before(Stream<T> stream) {
       return ImmutableSortedSet.copyOf(stream.iterator());

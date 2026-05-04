@@ -24,77 +24,67 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
     return new ImmutableMap.Builder<>();
   }
 
-  ImmutableMap<Object, Object> testImmutableMapBuilderBuildOrThrow() {
+  ImmutableMap<Object, Object> testBuilderBuildOrThrow() {
     return ImmutableMap.builder().build();
   }
 
-  ImmutableSet<ImmutableMap<String, Integer>> testEntryToImmutableMap() {
+  ImmutableSet<ImmutableMap<String, Integer>> testImmutableMapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(
         ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)).buildOrThrow(),
-        Stream.of(Map.entry("foo", 1))
+        Stream.of(Map.entry("bar", 2))
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableSet<ImmutableMap<Integer, Integer>> testIterableToImmutableMap() {
+  ImmutableSet<ImmutableMap<Integer, Integer>> testMapsToMap() {
     return ImmutableSet.of(
-        ImmutableList.of(1).stream().collect(toImmutableMap(identity(), n -> n * 2)),
-        ImmutableList.of(2).stream().collect(toImmutableMap(k -> k, n -> n * 2)),
-        ImmutableList.of(3).stream().collect(toImmutableMap(k -> 0, n -> n * 2)),
+        Streams.stream(ImmutableList.of(1).iterator())
+            .collect(toImmutableMap(k -> 0, n -> n.intValue())),
+        Streams.stream(ImmutableList.of(2).iterator())
+            .collect(toImmutableMap(identity(), n -> n.intValue())),
+        Streams.stream(ImmutableList.of(3)::iterator)
+            .collect(toImmutableMap(k -> 0, Integer::valueOf)),
         Streams.stream(ImmutableList.of(4)::iterator)
             .collect(toImmutableMap(identity(), Integer::valueOf)),
-        Streams.stream(ImmutableList.of(5)::iterator)
-            .collect(toImmutableMap(k -> k, Integer::valueOf)),
-        Streams.stream(ImmutableList.of(6)::iterator)
-            .collect(toImmutableMap(k -> 0, Integer::valueOf)),
-        Streams.stream(ImmutableList.of(7).iterator())
-            .collect(toImmutableMap(identity(), n -> n.intValue())),
-        Streams.stream(ImmutableList.of(8).iterator())
-            .collect(toImmutableMap(k -> k, n -> n.intValue())),
-        Streams.stream(ImmutableList.of(9).iterator())
-            .collect(toImmutableMap(k -> 0, n -> n.intValue())),
-        ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(10), Integer::valueOf)));
+        ImmutableList.of(5).stream().collect(toImmutableMap(k -> 0, n -> n * 2)),
+        ImmutableList.of(6).stream().collect(toImmutableMap(identity(), n -> n * 2)),
+        ImmutableMap.copyOf(Maps.asMap(ImmutableSet.of(7), Integer::valueOf)));
   }
 
-  ImmutableSet<Map<String, Integer>> testEntryIterableToImmutableMap() {
+  ImmutableSet<Map<String, Integer>> testImmutableMapCopyOf() {
     return ImmutableSet.of(
         ImmutableMap.copyOf(ImmutableMap.of("foo", 1).entrySet()),
-        ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("foo", 1)).buildOrThrow(),
-        Map.copyOf(ImmutableMap.of("foo", 1)),
+        ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("bar", 2)).buildOrThrow(),
+        Map.copyOf(ImmutableMap.of("baz", 3)),
         ImmutableMap.<String, Integer>builder()
-            .putAll(ImmutableMap.of("foo", 1).entrySet())
+            .putAll(ImmutableMap.of("qux", 4).entrySet())
             .buildOrThrow(),
-        ImmutableMap.of("foo", 1).entrySet().stream()
+        Streams.stream(Iterables.cycle(Map.entry("corge", 6)))
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
-        Streams.stream(Iterables.cycle(Map.entry("foo", 1)))
+        ImmutableMap.of("quux", 5).entrySet().stream()
             .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
   }
 
-  ImmutableMap<Integer, String> testStreamOfMapEntriesToImmutableMap() {
+  ImmutableMap<Integer, String> testStreamCollectToImmutableMap() {
     return Stream.of(1, 2, 3)
         .map(n -> Map.entry(n, n.toString()))
         .collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  ImmutableSet<ImmutableMap<Integer, Integer>> testIndexIterableToImmutableMap() {
+  ImmutableSet<ImmutableMap<Integer, Integer>> testMapsUniqueIndex() {
     return ImmutableSet.of(
-        ImmutableList.of(1).stream().collect(toImmutableMap(n -> n * 2, identity())),
-        ImmutableList.of(2).stream().collect(toImmutableMap(n -> n * 2, v -> v)),
-        ImmutableList.of(3).stream().collect(toImmutableMap(n -> n * 2, v -> 0)),
+        Streams.stream(ImmutableList.of(1).iterator())
+            .collect(toImmutableMap(n -> n.intValue(), v -> 0)),
+        Streams.stream(ImmutableList.of(2).iterator())
+            .collect(toImmutableMap(n -> n.intValue(), identity())),
+        Streams.stream(ImmutableList.of(3)::iterator)
+            .collect(toImmutableMap(Integer::valueOf, v -> 0)),
         Streams.stream(ImmutableList.of(4)::iterator)
             .collect(toImmutableMap(Integer::valueOf, identity())),
-        Streams.stream(ImmutableList.of(5)::iterator)
-            .collect(toImmutableMap(Integer::valueOf, v -> v)),
-        Streams.stream(ImmutableList.of(6)::iterator)
-            .collect(toImmutableMap(Integer::valueOf, v -> 0)),
-        Streams.stream(ImmutableList.of(7).iterator())
-            .collect(toImmutableMap(n -> n.intValue(), identity())),
-        Streams.stream(ImmutableList.of(8).iterator())
-            .collect(toImmutableMap(n -> n.intValue(), v -> v)),
-        Streams.stream(ImmutableList.of(9).iterator())
-            .collect(toImmutableMap(n -> n.intValue(), v -> 0)));
+        ImmutableList.of(5).stream().collect(toImmutableMap(n -> n * 2, v -> 0)),
+        ImmutableList.of(6).stream().collect(toImmutableMap(n -> n * 2, identity())));
   }
 
-  ImmutableSet<ImmutableMap<String, Integer>> testTransformMapValuesToImmutableMap() {
+  ImmutableSet<ImmutableMap<String, Integer>> testImmutableMapCopyOfMapsTransformValues() {
     return ImmutableSet.of(
         ImmutableMap.of("foo", 1L).entrySet().stream()
             .collect(toImmutableMap(Map.Entry::getKey, e -> Math.toIntExact(e.getValue()))),
@@ -103,7 +93,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
             k -> Math.toIntExact(ImmutableMap.of("bar", 2L).get(k))));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf0() {
     return ImmutableSet.of(
         ImmutableMap.<String, String>builder().buildOrThrow(),
         ImmutableMap.ofEntries(),
@@ -111,45 +101,46 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.<String, String>of());
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf1() {
-    return ImmutableSet.of(
-        ImmutableMap.<String, String>builder().put("k1", "v1").buildOrThrow(),
-        ImmutableMap.ofEntries(Map.entry("k1", "v1")),
-        Collections.singletonMap("k1", "v1"),
-        Map.of("k1", "v1"));
-  }
-
   ImmutableSet<Map<String, String>> testImmutableMapOf2() {
     return ImmutableSet.of(
-        ImmutableMap.ofEntries(Map.entry("k1", "v1"), Map.entry("k2", "v2")),
-        Map.of("k1", "v1", "k2", "v2"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf3() {
-    return ImmutableSet.of(
-        ImmutableMap.ofEntries(Map.entry("k1", "v1"), Map.entry("k2", "v2"), Map.entry("k3", "v3")),
-        Map.of("k1", "v1", "k2", "v2", "k3", "v3"));
+        ImmutableMap.<String, String>builder().put("foo", "bar").buildOrThrow(),
+        ImmutableMap.ofEntries(Map.entry("baz", "qux")),
+        Collections.singletonMap("quux", "corge"),
+        Map.of("grault", "garply"));
   }
 
   ImmutableSet<Map<String, String>> testImmutableMapOf4() {
     return ImmutableSet.of(
-        ImmutableMap.ofEntries(
-            Map.entry("k1", "v1"),
-            Map.entry("k2", "v2"),
-            Map.entry("k3", "v3"),
-            Map.entry("k4", "v4")),
-        Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4"));
+        ImmutableMap.ofEntries(Map.entry("foo", "bar"), Map.entry("baz", "qux")),
+        Map.of("quux", "corge", "grault", "garply"));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf5() {
+  ImmutableSet<Map<String, String>> testImmutableMapOf6() {
     return ImmutableSet.of(
         ImmutableMap.ofEntries(
-            Map.entry("k1", "v1"),
-            Map.entry("k2", "v2"),
-            Map.entry("k3", "v3"),
-            Map.entry("k4", "v4"),
-            Map.entry("k5", "v5")),
-        Map.of("k1", "v1", "k2", "v2", "k3", "v3", "k4", "v4", "k5", "v5"));
+            Map.entry("foo", "bar"), Map.entry("baz", "qux"), Map.entry("quux", "corge")),
+        Map.of("grault", "garply", "waldo", "fred", "plugh", "xyzzy"));
+  }
+
+  ImmutableSet<Map<String, String>> testImmutableMapOf8() {
+    return ImmutableSet.of(
+        ImmutableMap.ofEntries(
+            Map.entry("foo", "bar"),
+            Map.entry("baz", "qux"),
+            Map.entry("quux", "corge"),
+            Map.entry("grault", "garply")),
+        Map.of("waldo", "fred", "plugh", "xyzzy", "thud", "foo", "bar", "baz"));
+  }
+
+  ImmutableSet<Map<String, String>> testImmutableMapOf10() {
+    return ImmutableSet.of(
+        ImmutableMap.ofEntries(
+            Map.entry("foo", "bar"),
+            Map.entry("baz", "qux"),
+            Map.entry("quux", "corge"),
+            Map.entry("grault", "garply"),
+            Map.entry("waldo", "fred")),
+        Map.of("plugh", "xyzzy", "thud", "foo", "bar", "baz", "qux", "quux", "corge", "grault"));
   }
 
   ImmutableMap<String, Integer> testImmutableMapCopyOfMapsFilterKeys() {
@@ -171,7 +162,7 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
         Map.ofEntries(Map.entry("bar", 2), Map.entry("baz", 3)));
   }
 
-  ImmutableSet<ImmutableMap.Builder<String, Integer>> testImmutableMapBuilderPut() {
+  ImmutableSet<ImmutableMap.Builder<String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableMap.<String, Integer>builder().put(Map.entry("foo", 1)),
         ImmutableMap.<String, Integer>builder().putAll(ImmutableMap.of("bar", 2)));

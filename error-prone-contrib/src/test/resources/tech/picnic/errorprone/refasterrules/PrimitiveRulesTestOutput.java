@@ -1,8 +1,6 @@
 package tech.picnic.errorprone.refasterrules;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Chars;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
@@ -20,8 +18,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
-        Booleans.class,
-        Bytes.class,
         Chars.class,
         Doubles.class,
         Floats.class,
@@ -40,7 +36,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         (short) 3 < (short) 4,
         3 < 4,
         3L < 4L,
-        3F < 4F,
+        3f < 4f,
         3.0 < 4.0);
   }
 
@@ -51,7 +47,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         (short) 3 <= (short) 4,
         3 <= 4,
         3L <= 4L,
-        3F <= 4F,
+        3f <= 4f,
         3.0 <= 4.0);
   }
 
@@ -62,7 +58,7 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         (short) 3 > (short) 4,
         3 > 4,
         3L > 4L,
-        3F > 4F,
+        3f > 4f,
         3.0 > 4.0);
   }
 
@@ -73,11 +69,47 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
         (short) 3 >= (short) 4,
         3 >= 4,
         3L >= 4L,
-        3F >= 4F,
+        3f >= 4f,
         3.0 >= 4.0);
   }
 
-  int testLongToIntExact() {
+  ImmutableSet<Integer> testMathClampInt() {
+    return ImmutableSet.of(
+        Math.clamp(2, 3, 1),
+        Math.clamp(1, 2, 3),
+        Math.clamp(2, 1, 3),
+        Math.clamp(1, 3, 2),
+        Math.clamp(1, 2, 3));
+  }
+
+  ImmutableSet<Long> testMathClampLong() {
+    return ImmutableSet.of(
+        Math.clamp(2L, 3L, 1L),
+        Math.clamp(1L, 2L, 3L),
+        Math.clamp(2L, 1L, 3L),
+        Math.clamp(1L, 3L, 2L),
+        Math.clamp(1L, 2L, 3L));
+  }
+
+  ImmutableSet<Float> testMathClampFloat() {
+    return ImmutableSet.of(
+        Math.clamp(2f, 3f, 1f),
+        Math.clamp(1f, 2f, 3f),
+        Math.clamp(2f, 1f, 3f),
+        Math.clamp(1f, 3f, 2f),
+        Math.clamp(1f, 2f, 3f));
+  }
+
+  ImmutableSet<Double> testMathClampDouble() {
+    return ImmutableSet.of(
+        Math.clamp(2.0, 3.0, 1.0),
+        Math.clamp(1.0, 2.0, 3.0),
+        Math.clamp(2.0, 1.0, 3.0),
+        Math.clamp(1.0, 3.0, 2.0),
+        Math.clamp(1.0, 2.0, 3.0));
+  }
+
+  int testMathToIntExact() {
     return Math.toIntExact(Long.MAX_VALUE);
   }
 
@@ -107,35 +139,35 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Boolean> testIntegerSignumIsPositive() {
     return ImmutableSet.of(
-        Integer.signum(1) == 1,
-        Integer.signum(2) == 1,
-        Integer.signum(3) != 1,
-        Integer.signum(4) != 1);
+        Integer.signum(1) > 0,
+        Integer.signum(2) > 0,
+        Integer.signum(3) <= 0,
+        Integer.signum(4) <= 0);
   }
 
   ImmutableSet<Boolean> testIntegerSignumIsNegative() {
     return ImmutableSet.of(
-        Integer.signum(1) == -1,
-        Integer.signum(2) == -1,
-        Integer.signum(3) != -1,
-        Integer.signum(4) != -1);
+        Integer.signum(1) < 0,
+        Integer.signum(2) < 0,
+        Integer.signum(3) >= 0,
+        Integer.signum(4) >= 0);
   }
 
   ImmutableSet<Boolean> testLongSignumIsPositive() {
     return ImmutableSet.of(
-        Long.signum(1L) == 1, Long.signum(2L) == 1, Long.signum(3L) != 1, Long.signum(4L) != 1);
+        Long.signum(1L) > 0, Long.signum(2L) > 0, Long.signum(3L) <= 0, Long.signum(4L) <= 0);
   }
 
   ImmutableSet<Boolean> testLongSignumIsNegative() {
     return ImmutableSet.of(
-        Long.signum(1L) == -1, Long.signum(2L) == -1, Long.signum(3L) != -1, Long.signum(4L) != -1);
+        Long.signum(1L) < 0, Long.signum(2L) < 0, Long.signum(3L) >= 0, Long.signum(4L) >= 0);
   }
 
   int testIntegerCompareUnsigned() {
     return Integer.compareUnsigned(1, 2);
   }
 
-  long testLongCompareUnsigned() {
+  int testLongCompareUnsigned() {
     return Long.compareUnsigned(1, 2);
   }
 
@@ -163,11 +195,11 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Long.parseUnsignedLong("1"), Long.parseUnsignedLong("2"));
   }
 
-  int testIntegerParseUnsignedIntWithRadix() {
+  int testIntegerParseUnsignedIntWithInt() {
     return Integer.parseUnsignedInt("1", 2);
   }
 
-  long testLongParseUnsignedLongWithRadix() {
+  long testLongParseUnsignedLongWithInt() {
     return Long.parseUnsignedLong("1", 2);
   }
 
@@ -179,23 +211,23 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Long.toUnsignedString(1), Long.toUnsignedString(2));
   }
 
-  String testIntegerToUnsignedStringWithRadix() {
+  String testIntegerToUnsignedStringWithInt() {
     return Integer.toUnsignedString(1, 2);
   }
 
-  String testLongToUnsignedStringWithRadix() {
+  String testLongToUnsignedStringWithInt() {
     return Long.toUnsignedString(1, 2);
   }
 
-  Comparator<byte[]> testArraysCompareUnsignedBytes() {
+  Comparator<byte[]> testArraysCompareUnsignedByte() {
     return Arrays::compareUnsigned;
   }
 
-  Comparator<int[]> testArraysCompareUnsignedInts() {
+  Comparator<int[]> testArraysCompareUnsignedInt() {
     return Arrays::compareUnsigned;
   }
 
-  Comparator<long[]> testArraysCompareUnsignedLongs() {
+  Comparator<long[]> testArraysCompareUnsignedLong() {
     return Arrays::compareUnsigned;
   }
 }

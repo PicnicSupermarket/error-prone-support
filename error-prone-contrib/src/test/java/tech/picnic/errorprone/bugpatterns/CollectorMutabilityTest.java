@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -131,7 +130,7 @@ final class CollectorMutabilityTest {
             "    Stream.of(2).collect(toImmutableSet());",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -207,6 +206,6 @@ final class CollectorMutabilityTest {
             "    Stream.of(2).collect(toCollection(HashSet::new));",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

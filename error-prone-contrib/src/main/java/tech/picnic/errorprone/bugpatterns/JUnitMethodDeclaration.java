@@ -13,14 +13,13 @@ import static tech.picnic.errorprone.utils.MoreJUnitMatchers.SETUP_OR_TEARDOWN_M
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.TEST_METHOD;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
+import com.google.errorprone.fixes.SuggestedFixes.Visibility;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
@@ -46,8 +45,6 @@ import tech.picnic.errorprone.utils.ConflictDetection;
 public final class JUnitMethodDeclaration extends BugChecker implements MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String TEST_PREFIX = "test";
-  private static final ImmutableSet<Modifier> ILLEGAL_MODIFIERS =
-      Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC);
   private static final Matcher<MethodTree> IS_LIKELY_OVERRIDDEN =
       allOf(
           not(hasModifier(Modifier.FINAL)),
@@ -68,10 +65,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
       return Description.NO_MATCH;
     }
 
-    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-    SuggestedFixes.removeModifiers(tree.getModifiers(), state, ILLEGAL_MODIFIERS)
-        .ifPresent(fixBuilder::merge);
-
+    SuggestedFix.Builder fixBuilder = Visibility.PACKAGE.refactor(tree, state).toBuilder();
     if (isTestMethod) {
       suggestTestMethodRenameIfApplicable(tree, fixBuilder, state);
     }

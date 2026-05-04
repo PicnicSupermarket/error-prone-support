@@ -4,7 +4,7 @@
 
     <groupId>tech.picnic.error-prone-support</groupId>
     <artifactId>error-prone-support</artifactId>
-    <version>0.28.1-SNAPSHOT</version>
+    <version>0.29.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Picnic :: Error Prone Support</name>
@@ -127,7 +127,7 @@
         <error-prone.self-check-args />
         <!-- The build timestamp is derived from the most recent commit
         timestamp in support of reproducible builds. -->
-        <project.build.outputTimestamp>2026-01-09T13:44:24Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2026-04-13T09:17:15Z</project.build.outputTimestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Glob pattern identifying Refaster rule definition files. These
         Java classes don't contain "regular" code, and thus require special
@@ -190,9 +190,9 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.46.0</version.error-prone-orig>
+        <version.error-prone-orig>2.49.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
-        <version.maven>3.9.12</version.maven>
+        <version.maven>3.9.14</version.maven>
         <version.pitest-git>2.3.2</version.pitest-git>
     </properties>
 
@@ -246,14 +246,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.20.1</version>
+                <version>2.21.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.4</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -314,7 +314,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.33.0</version>
+                <version>1.35.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -324,7 +324,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.5.0-jre</version>
+                <version>33.6.0-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -341,21 +341,21 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.12.15</version>
+                <version>0.13.4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.16.2</version>
+                <version>1.16.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2024.0.13</version>
+                <version>2025.0.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -372,7 +372,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.41</version>
+                <version>2.2.49</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.3</version>
+                <version>1.18.8</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -420,7 +420,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-bom</artifactId>
-                <version>3.27.6</version>
+                <version>3.27.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -437,7 +437,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.20.10</version>
+                <version>3.21.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -449,30 +449,35 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>6.0.2</version>
+                <version>6.0.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
-                <version>5.21.0</version>
+                <version>5.23.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.6.2</version>
+                <version>5.7.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.22.0</version>
+                <version>3.30.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.reactivestreams</groupId>
+                <artifactId>reactive-streams</artifactId>
+                <version>1.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -484,31 +489,31 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>7.0.2</version>
+                <version>7.0.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.0.1</version>
+                <version>4.0.6</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>7.0.2</version>
+                <version>7.0.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>7.11.0</version>
+                <version>7.12.0</version>
             </dependency>
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.0.3</version>
+                <version>3.1.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -639,7 +644,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>9.0.2</version>
+                    <version>10.0.0</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -738,6 +743,7 @@
                                     </module>
                                     <module name="EmptyStatement" />
                                     <module name="FinalClass" />
+                                    <module name="GoogleNonConstantFieldName" />
                                     <module name="HiddenField">
                                         <property name="ignoreConstructorParameter" value="true" />
                                         <property name="ignoreSetter" value="true" />
@@ -840,6 +846,9 @@
                                         <property name="regexp" value="true" />
                                     </module>
                                     <module name="IllegalCatch" />
+                                    <module name="IllegalSymbol">
+                                        <property name="symbolCodes" value="0x0080-0x10FFFF" />
+                                    </module>
                                     <module name="IllegalThrows" />
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
@@ -859,6 +868,7 @@
                                     <module name="NoCodeInFile" />
                                     <module name="NoEnumTrailingComma" />
                                     <module name="NoFinalizer" />
+                                    <module name="NumericalPrefixesInfixesSuffixesCharacterCase" />
                                     <module name="PackageDeclaration" />
                                     <module name="PackageName">
                                         <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$" />
@@ -882,6 +892,7 @@
                                         but (currently) doesn't warn about
                                         JavaDoc-only imports. -->
                                     </module>
+                                    <module name="UseEnhancedSwitch" />
                                     <module name="VisibilityModifier" />
                                     <module name="WhenShouldBeUsed" />
                                 </module>
@@ -905,7 +916,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.0.0</version>
+                            <version>13.4.2</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -930,7 +941,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.1</version>
+                    <version>3.15.0</version>
                     <configuration>
                         <annotationProcessorPaths>
                             <path>
@@ -943,6 +954,7 @@
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                            <arg>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
                             <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
@@ -1014,6 +1026,14 @@
                             <goals>
                                 <goal>compile</goal>
                             </goals>
+                            <!-- This goal runs *after* the `test-compile`
+                            phase, so that its custom output directory doesn't
+                            replace the default output directory on the
+                            annotation processor classpath when the self-check
+                            profile is active. Because that would prevent
+                            `error-prone-contrib` from flagging issues with its
+                            own test source code. -->
+                            <phase>process-test-classes</phase>
                             <configuration>
                                 <compilerArgs combine.self="override">
                                     <!-- This step only recompiles code, so
@@ -1036,7 +1056,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.9.0</version>
+                    <version>3.10.0</version>
                     <configuration>
                         <!-- XXX: Drop `ignoreAllNonTestScoped` once
                         https://issues.apache.org/jira/browse/MNG-6058 is
@@ -1134,6 +1154,7 @@
                             <requireJavaVersion>
                                 <version>25</version>
                             </requireJavaVersion>
+                            <requireManagedDeps />
                             <requireMatchingCoordinates>
                                 <moduleNameMustMatchArtifactId>true</moduleNameMustMatchArtifactId>
                             </requireMatchingCoordinates>
@@ -1149,7 +1170,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.11.0</version>
+                            <version>1.12.0</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1193,6 +1214,7 @@
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
+                                <Automatic-Module-Name>${jpms.module-name}</Automatic-Module-Name>
                                 <Implementation-Title>${project.name}</Implementation-Title>
                                 <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                 <Implementation-Version>${project.version}.${build.number}.${git.commit.id}</Implementation-Version>
@@ -1249,12 +1271,13 @@
                     <version>3.12.0</version>
                     <configuration>
                         <additionalJOptions>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</additionalJOption>
-                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.api=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.code=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.main=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.model=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.parser=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.tree=${jpms.module-name}</additionalJOption>
+                            <additionalJOption>--add-exports=jdk.compiler/com.sun.tools.javac.util=${jpms.module-name}</additionalJOption>
                         </additionalJOptions>
                         <!-- All relevant doclint checks are performed during
                         the compilation phase; no need to recheck during
@@ -1304,7 +1327,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <delimiters>
                             <delimiter>@</delimiter>
@@ -1334,7 +1357,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1362,6 +1385,39 @@
                             <java.security.egd>file:/dev/./urandom</java.security.egd>
                         </systemPropertyVariables>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.6.1</version>
+                    <executions>
+                        <execution>
+                            <id>derive-jpms-module-name-base</id>
+                            <goals>
+                                <goal>regex-property</goal>
+                            </goals>
+                            <configuration>
+                                <failIfNoMatch>false</failIfNoMatch>
+                                <name>jpms.module-name.base</name>
+                                <regex>^(?:error-prone-)?(.*?)(?:-support)?$</regex>
+                                <replacement>tech.picnic.errorprone.$1</replacement>
+                                <value>${project.artifactId}</value>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>derive-jpms-module-name</id>
+                            <goals>
+                                <goal>regex-property</goal>
+                            </goals>
+                            <configuration>
+                                <failIfNoMatch>false</failIfNoMatch>
+                                <name>jpms.module-name</name>
+                                <regex>-</regex>
+                                <replacement>.</replacement>
+                                <value>${jpms.module-name.base}</value>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1507,7 +1563,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.20.1</version>
+                    <version>2.21.0</version>
                     <configuration>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
@@ -1515,7 +1571,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1558,7 +1614,7 @@
                 <plugin>
                     <groupId>org.kordamp.maven</groupId>
                     <artifactId>pomchecker-maven-plugin</artifactId>
-                    <version>1.14.0</version>
+                    <version>1.15.0</version>
                     <configuration>
                         <failOnError>false</failOnError>
                         <release>false</release>
@@ -1576,7 +1632,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.22.0</version>
+                    <version>1.23.1</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->
@@ -1587,6 +1643,11 @@
                             <mutator>EXTENDED</mutator>
                             <mutator>STRONGER</mutator>
                         </mutators>
+                        <!-- XXX: Look into using Reviewdog to post comments
+                        for surviving mutants; this may replace the
+                        `pitest-{analyze,update}-pr.yml` GitHub actions
+                        workflows. -->
+                        <outputFormats>CSV,HTML</outputFormats>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
@@ -1628,7 +1689,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.5.0.6356</version>
+                    <version>5.6.0.6792</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
@@ -1650,6 +1711,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
@@ -1943,6 +2008,10 @@
                                     -XepOpt:NullAway:JSpecifyMode=true
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
+                                    -XepOpt:RefactorSwitch:EnableAssignmentSwitch=true
+                                    -XepOpt:RefactorSwitch:EnableReturnSwitch=true
+                                    -XepOpt:RefactorSwitch:EnableSimplifySwitch=true
+                                    -XepOpt:UnnamedVariable:OnlyRenameVariablesNamedUnused=false
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
                                     ${error-prone.self-check-args}

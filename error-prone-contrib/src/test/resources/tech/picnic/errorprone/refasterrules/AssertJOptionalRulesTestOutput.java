@@ -3,13 +3,16 @@ package tech.picnic.errorprone.refasterrules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Consumer;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.OptionalAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
-  AbstractAssert<?, ?> testAssertThatOptional() {
+  AbstractAssert<?, ?> testAssertThatGet() {
     return assertThat(Optional.of(new Object())).get();
   }
 
@@ -18,7 +21,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(1)).isPresent(), assertThat(Optional.of(2)).isPresent());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatOptionalIsPresent() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsPresent() {
     return ImmutableSet.of(
         assertThat(Optional.of(1)).isPresent(), assertThat(Optional.of(2)).isPresent());
   }
@@ -28,7 +31,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(1)).isEmpty(), assertThat(Optional.of(2)).isEmpty());
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatOptionalIsEmpty() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEmpty() {
     return ImmutableSet.of(
         assertThat(Optional.of(1)).isEmpty(), assertThat(Optional.of(2)).isEmpty());
   }
@@ -46,7 +49,15 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(1)).containsSame(1), assertThat(Optional.of(2)).containsSame(2));
   }
 
-  AbstractAssert<?, ?> testAssertThatOptionalHasValueMatching() {
+  ImmutableSet<AbstractAssert<?, ?>> testAbstractOptionalAssertHasValueSatisfying() {
+    return ImmutableSet.of(
+        assertThat(Optional.of(Path.of("foo")))
+            .hasValueSatisfying((Consumer<Path>) Object::toString),
+        assertThat(Optional.of(Path.of("baz"))).get().satisfies(Files::readString),
+        assertThat(Optional.of(Path.of("bar"))).hasValueSatisfying(Object::toString));
+  }
+
+  AbstractAssert<?, ?> testAssertThatGetMatches() {
     return assertThat(Optional.of("foo")).get().matches(String::isEmpty);
   }
 }

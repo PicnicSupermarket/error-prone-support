@@ -33,30 +33,31 @@ final class Jackson3RulesTest implements RefasterRuleCollectionTestCase {
         JsonMapper.shared().readTree(JsonMapper.shared().writeValueAsString("bar")));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithClass() {
+  ImmutableSet<Number> testObjectMapperConvertValueClass() {
     return ImmutableSet.of(
-        new ObjectMapper().readValue(new ObjectMapper().writeValueAsBytes("1"), Integer.class),
-        JsonMapper.shared().readValue(JsonMapper.shared().writeValueAsString("2.0"), Double.class));
+        new ObjectMapper().readValue(new ObjectMapper().writeValueAsBytes("foo"), Integer.class),
+        JsonMapper.shared().readValue(JsonMapper.shared().writeValueAsString("bar"), Double.class));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithJavaType() {
+  ImmutableSet<Number> testObjectMapperConvertValueJavaType() {
     return ImmutableSet.of(
         new ObjectMapper()
             .readValue(
-                new ObjectMapper().writeValueAsBytes("1"),
+                new ObjectMapper().writeValueAsBytes("foo"),
                 SimpleType.constructUnsafe(Integer.class)),
         JsonMapper.shared()
             .readValue(
-                JsonMapper.shared().writeValueAsString("2.0"),
+                JsonMapper.shared().writeValueAsString("bar"),
                 SimpleType.constructUnsafe(Double.class)));
   }
 
-  ImmutableSet<Number> testObjectMapperConvertValueWithTypeReference() {
+  ImmutableSet<Number> testObjectMapperConvertValueTypeReference() {
     return ImmutableSet.of(
         new ObjectMapper()
-            .readValue(new ObjectMapper().writeValueAsBytes("1"), new TypeReference<Integer>() {}),
+            .readValue(
+                new ObjectMapper().writeValueAsBytes("foo"), new TypeReference<Integer>() {}),
         JsonMapper.shared()
             .readValue(
-                JsonMapper.shared().writeValueAsString("2.0"), new TypeReference<Double>() {}));
+                JsonMapper.shared().writeValueAsString("bar"), new TypeReference<Double>() {}));
   }
 }

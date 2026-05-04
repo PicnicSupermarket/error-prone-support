@@ -20,7 +20,6 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.SubContext;
@@ -138,7 +137,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             "-XepOpt:" + RULE_COLLECTION_FLAG + '=' + className)
         .addInputLines(inputResource, loadResource(clazz, inputResource))
         .addOutputLines(outputResource, loadResource(clazz, outputResource))
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Override

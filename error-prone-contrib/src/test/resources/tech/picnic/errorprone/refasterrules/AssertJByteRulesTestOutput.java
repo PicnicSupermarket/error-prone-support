@@ -16,23 +16,23 @@ final class AssertJByteRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<AbstractByteAssert<?>> testAbstractByteAssertIsEqualTo() {
     return ImmutableSet.of(
-        assertThat((byte) 0).isEqualTo((byte) 1), assertThat((byte) 0).isEqualTo((byte) 1));
+        assertThat((byte) 1).isEqualTo((byte) 2), assertThat((byte) 1).isEqualTo((byte) 2));
   }
 
   ImmutableSet<AbstractByteAssert<?>> testAbstractByteAssertIsNotEqualTo() {
     return ImmutableSet.of(
-        assertThat((byte) 0).isNotEqualTo((byte) 1), assertThat((byte) 0).isNotEqualTo((byte) 1));
+        assertThat((byte) 1).isNotEqualTo((byte) 2), assertThat((byte) 1).isNotEqualTo((byte) 2));
   }
 
-  AbstractByteAssert<?> testAbstractByteAssertIsZero() {
-    return assertThat((byte) 0).isEqualTo((byte) 0);
+  AbstractByteAssert<?> testAbstractByteAssertIsEqualToZero() {
+    return assertThat((byte) 1).isEqualTo((byte) 0);
   }
 
-  AbstractByteAssert<?> testAbstractByteAssertIsNotZero() {
-    return assertThat((byte) 0).isNotEqualTo((byte) 0);
+  AbstractByteAssert<?> testAbstractByteAssertIsNotEqualToZero() {
+    return assertThat((byte) 1).isNotEqualTo((byte) 0);
   }
 
-  AbstractByteAssert<?> testAbstractByteAssertIsOne() {
-    return assertThat((byte) 0).isEqualTo((byte) 1);
+  AbstractByteAssert<?> testAbstractByteAssertIsEqualToOne() {
+    return assertThat((byte) 1).isEqualTo((byte) 1);
   }
 }

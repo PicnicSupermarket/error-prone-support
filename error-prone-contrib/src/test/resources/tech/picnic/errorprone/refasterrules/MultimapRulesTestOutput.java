@@ -25,7 +25,7 @@ final class MultimapRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableSetMultimap.of("foo", 1).isEmpty(),
         ImmutableSetMultimap.of("bar", 2).isEmpty(),
         ImmutableSetMultimap.of("baz", 3).isEmpty(),
-        ImmutableSetMultimap.of("qux", 54).isEmpty());
+        ImmutableSetMultimap.of("qux", 4).isEmpty());
   }
 
   int testMultimapSize() {

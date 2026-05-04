@@ -7,7 +7,7 @@
 +    <dependency>
 +      <groupId>org.assertj</groupId>
 +      <artifactId>assertj-core</artifactId>
-+      <version>3.27.6<!-- Renovate: org.assertj:assertj-bom --></version>
++      <version>3.27.7<!-- Renovate: org.assertj:assertj-bom --></version>
 +      <scope>test</scope>
 +    </dependency>
      <dependency>
@@ -107,7 +107,7 @@
       * @throws IllegalArgumentException if there is an error parsing the Javadoc.
       */
 +    // Invoking `getParseErrorMessage` requires that `status.getParseErrorMessage()` is `null`.
-+    @SuppressWarnings("CheckArgumentWithMessage")
++    @SuppressWarnings("CheckArgumentNotWithString")
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocComment(blockComment);

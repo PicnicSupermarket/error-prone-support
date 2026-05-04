@@ -1,21 +1,34 @@
 package tech.picnic.errorprone.refasterrules;
 
+import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Collections.disjoint;
+import static java.util.stream.Collectors.toUnmodifiableSet;
+
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 import com.google.common.collect.Streams;
+import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.NotMatches;
+import com.google.errorprone.refaster.annotation.Repeated;
+import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.SequencedCollection;
@@ -27,7 +40,7 @@ import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
-/** Refaster rules related to expressions dealing with (arbitrary) collections. */
+/** Refaster rules related to expressions dealing with {@link Collection}s. */
 // XXX: There are other Guava `Iterables` methods that should not be called if the input is known to
 // be a `Collection`. Add those here.
 @OnlineDocumentation
@@ -35,59 +48,74 @@ final class CollectionRules {
   private CollectionRules() {}
 
   /**
-   * Prefer {@link Collection#isEmpty()} over alternatives that consult the collection's size or are
-   * otherwise more contrived.
+   * Prefer {@link Collection#isEmpty()} over non-JDK, less efficient, or more verbose alternatives.
    */
   static final class CollectionIsEmpty<T> {
     @BeforeTemplate
     @SuppressWarnings({
       "java:S1155" /* This violation will be rewritten. */,
       "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
-      "OptionalFirstCollectionElement" /* This is a more specific template. */,
+      "CollectionStreamFindFirst" /* This is a more specific template. */,
       "StreamFindAnyIsEmpty" /* This is a more specific template. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    boolean before(Collection<T> collection) {
+    boolean before(Collection<T> iterable) {
       return Refaster.anyOf(
-          collection.size() == 0,
-          collection.size() <= 0,
-          collection.size() < 1,
-          Iterables.isEmpty(collection),
-          collection.stream().findAny().isEmpty(),
-          collection.stream().findFirst().isEmpty());
+          iterable.size() == 0,
+          iterable.size() <= 0,
+          iterable.size() < 1,
+          Iterables.isEmpty(iterable),
+          iterable.stream().findAny().isEmpty(),
+          iterable.stream().findFirst().isEmpty());
     }
 
     @BeforeTemplate
-    boolean before(ImmutableCollection<T> collection) {
-      return collection.asList().isEmpty();
+    boolean before(ImmutableCollection<T> iterable) {
+      return iterable.asList().isEmpty();
+    }
+
+    // XXX: Consider introducing similar templates for other `SetView` methods that derive a
+    // stateless object from a `SetView`: `isEmpty()`, `size()`, `contains()`, `containsAll()`,
+    // `equals()` and `hashCode()`, as well as the `toArray` overloads.
+    // XXX: Consider introducing similar templates for other methods that create an immutable copy
+    // of a collection, such as `ImmutableList.copyOf`, `ImmutableSet.copyOf` and
+    // `ImmutableMap.copyOf`.
+    // XXX: Instead of introducing many Refaster rules to cover the Cartesian product of the above
+    // suggestions, consider writing an `UnnecessaryCollectionCopy` Error Prone check that
+    // simplifies all such expressions. Some logic for such a rule may be extracted from the
+    // `IsEmpty` matcher implementation. (Note that `equals()` and `hashCode()` may need special
+    // handling, as they depend on the collection type produced.)
+    @BeforeTemplate
+    boolean before(SetView<T> iterable) {
+      return iterable.immutableCopy().isEmpty();
     }
 
     @AfterTemplate
     @AlsoNegation
-    boolean after(Collection<T> collection) {
-      return collection.isEmpty();
+    boolean after(Collection<T> iterable) {
+      return iterable.isEmpty();
     }
   }
 
-  /** Prefer {@link Collection#size()} over more contrived alternatives. */
+  /** Prefer {@link Collection#size()} over non-JDK or more verbose alternatives. */
   static final class CollectionSize<T> {
     @BeforeTemplate
-    int before(Collection<T> collection) {
-      return Iterables.size(collection);
+    int before(Collection<T> iterable) {
+      return Iterables.size(iterable);
     }
 
     @BeforeTemplate
-    int before(ImmutableCollection<T> collection) {
-      return collection.asList().size();
+    int before(ImmutableCollection<T> iterable) {
+      return iterable.asList().size();
     }
 
     @AfterTemplate
-    int after(Collection<T> collection) {
-      return collection.size();
+    int after(Collection<T> iterable) {
+      return iterable.size();
     }
   }
 
-  /** Prefer {@link Collection#contains(Object)} over more contrived alternatives. */
+  /** Prefer {@link Collection#contains(Object)} over less efficient alternatives. */
   static final class CollectionContains<T, S> {
     @BeforeTemplate
     boolean before(Collection<T> collection, S value) {
@@ -101,10 +129,36 @@ final class CollectionRules {
   }
 
   /**
-   * Don't call {@link Iterables#addAll(Collection, Iterable)} when the elements to be added are
-   * already part of a {@link Collection}.
+   * Prefer {@link Collections#disjoint(Collection, Collection)} over non-JDK or less efficient
+   * alternatives.
    */
-  static final class CollectionAddAllToCollectionExpression<T, S extends T> {
+  static final class Disjoint<T> {
+    @BeforeTemplate
+    boolean before(Set<T> c1, Set<T> c2) {
+      return Sets.intersection(c1, c2).isEmpty();
+    }
+
+    // XXX: Other copy operations could be elided too, but these are the most common ones. If we
+    // ever introduce a generic "makes a copy" stand-in, use it here.
+    @BeforeTemplate
+    boolean before(Collection<T> c1, Collection<T> c2) {
+      return Refaster.anyOf(
+          c1.stream().noneMatch(c2::contains),
+          disjoint(ImmutableSet.copyOf(c1), c2),
+          disjoint(new HashSet<>(c1), c2),
+          disjoint(c1, ImmutableSet.copyOf(c2)),
+          disjoint(c1, new HashSet<>(c2)));
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    boolean after(Collection<T> c1, Collection<T> c2) {
+      return disjoint(c1, c2);
+    }
+  }
+
+  /** Prefer {@link Collection#addAll(Collection)} over non-JDK alternatives. */
+  static final class CollectionAddAllExpression<T, S extends T> {
     @BeforeTemplate
     boolean before(Collection<T> addTo, Collection<S> elementsToAdd) {
       return Iterables.addAll(addTo, elementsToAdd);
@@ -116,60 +170,59 @@ final class CollectionRules {
     }
   }
 
-  static final class CollectionAddAllToCollectionBlock<T, S extends T> {
+  /** Prefer {@link Collection#addAll(Collection)} over more verbose alternatives. */
+  static final class CollectionAddAllBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> addTo, Collection<S> elementsToAdd) {
-      elementsToAdd.forEach(addTo::add);
+    void before(Collection<T> collection1, Collection<S> collection2) {
+      collection2.forEach(collection1::add);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> addTo, Collection<S> elementsToAdd) {
-      for (T element : elementsToAdd) {
-        addTo.add(element);
+    void before2(Collection<T> collection1, Collection<S> collection2) {
+      for (T element : collection2) {
+        collection1.add(element);
       }
     }
 
     // XXX: This method is identical to `before2` except for the loop type. Make Refaster smarter so
     // that this is supported out of the box.
     @BeforeTemplate
-    void before3(Collection<T> addTo, Collection<S> elementsToAdd) {
-      for (S element : elementsToAdd) {
-        addTo.add(element);
+    void before3(Collection<T> collection1, Collection<S> collection2) {
+      for (S element : collection2) {
+        collection1.add(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> addTo, Collection<S> elementsToAdd) {
-      addTo.addAll(elementsToAdd);
+    void after(Collection<T> collection1, Collection<S> collection2) {
+      collection1.addAll(collection2);
     }
   }
 
-  /**
-   * Don't call {@link Iterables#removeAll(Iterable, Collection)} when the elements to be removed
-   * are already part of a {@link Collection}.
-   */
-  static final class CollectionRemoveAllFromCollectionExpression<T, S extends T> {
+  /** Prefer {@link Collection#removeAll(Collection)} over non-JDK alternatives. */
+  static final class CollectionRemoveAllExpression<T, S extends T> {
     @BeforeTemplate
-    boolean before(Collection<T> removeTo, Collection<S> elementsToRemove) {
-      return Iterables.removeAll(removeTo, elementsToRemove);
+    boolean before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
+      return Iterables.removeAll(removeFrom, elementsToRemove);
     }
 
     @AfterTemplate
-    boolean after(Collection<T> removeTo, Collection<S> elementsToRemove) {
-      return removeTo.removeAll(elementsToRemove);
+    boolean after(Collection<T> removeFrom, Collection<S> elementsToRemove) {
+      return removeFrom.removeAll(elementsToRemove);
     }
   }
 
-  static final class CollectionRemoveAllFromCollectionBlock<T, S extends T> {
+  /** Prefer {@link Collection#removeAll(Collection)} over more verbose alternatives. */
+  static final class CollectionRemoveAllBlock<T, S extends T> {
     @BeforeTemplate
-    void before(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      elementsToRemove.forEach(removeFrom::remove);
+    void before(Collection<T> collection1, Collection<S> collection2) {
+      collection2.forEach(collection1::remove);
     }
 
     @BeforeTemplate
-    void before2(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      for (T element : elementsToRemove) {
-        removeFrom.remove(element);
+    void before2(Collection<T> collection1, Collection<S> collection2) {
+      for (T element : collection2) {
+        collection1.remove(element);
       }
     }
 
@@ -177,19 +230,19 @@ final class CollectionRules {
     // that this is supported out of the box. After doing so, also drop the `S extends T` type
     // constraint; ideally this check applies to any `S`.
     @BeforeTemplate
-    void before3(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      for (S element : elementsToRemove) {
-        removeFrom.remove(element);
+    void before3(Collection<T> collection1, Collection<S> collection2) {
+      for (S element : collection2) {
+        collection1.remove(element);
       }
     }
 
     @AfterTemplate
-    void after(Collection<T> removeFrom, Collection<S> elementsToRemove) {
-      removeFrom.removeAll(elementsToRemove);
+    void after(Collection<T> collection1, Collection<S> collection2) {
+      collection1.removeAll(collection2);
     }
   }
 
-  /** Don't unnecessarily call {@link Stream#distinct()} on an already-unique stream of elements. */
+  /** Prefer {@link Set#stream()} over less efficient alternatives. */
   // XXX: This rule assumes that the `Set` relies on `Object#equals`, rather than a custom
   // equivalence relation.
   // XXX: Expressions that drop or reorder elements from the stream, such as `.filter`, `.skip` and
@@ -197,48 +250,63 @@ final class CollectionRules {
   // check.
   static final class SetStream<T> {
     @BeforeTemplate
-    Stream<?> before(Set<T> set) {
+    Stream<T> before(Set<T> set) {
       return set.stream().distinct();
     }
 
     @AfterTemplate
-    Stream<?> after(Set<T> set) {
+    Stream<T> after(Set<T> set) {
       return set.stream();
     }
   }
 
-  /** Prefer {@link ArrayList#ArrayList(Collection)} over the Guava alternative. */
+  /** Prefer {@link Set#of(Object[])} over less efficient alternatives. */
+  // XXX: Ideally we rewrite both of these expressions directly to `ImmutableSet.of(..)` (and
+  // locate this rule in `ImmutableSetRules`), but for now this rule is included as-is for use with
+  // OpenRewrite.
+  // XXX: The replacement code throws `IllegalArgumentException` on duplicate elements, while the
+  // original code deduplicates them.
+  static final class SetOf<T> {
+    @BeforeTemplate
+    Set<T> before(@Repeated T elements) {
+      return Stream.of(Refaster.asVarargs(elements)).collect(toUnmodifiableSet());
+    }
+
+    @AfterTemplate
+    Set<T> after(@Repeated T elements) {
+      return Set.of(Refaster.asVarargs(elements));
+    }
+  }
+
+  /** Prefer {@link ArrayList#ArrayList(Collection)} over non-JDK alternatives. */
   @SuppressWarnings(
       "NonApiType" /* Matching against `List` would unnecessarily constrain the rule. */)
-  static final class NewArrayListFromCollection<T> {
+  static final class NewArrayList<T> {
     @BeforeTemplate
-    ArrayList<T> before(Collection<T> collection) {
-      return Lists.newArrayList(collection);
+    ArrayList<T> before(Collection<T> elements) {
+      return Lists.newArrayList(elements);
     }
 
     @AfterTemplate
-    ArrayList<T> after(Collection<T> collection) {
-      return new ArrayList<>(collection);
+    ArrayList<T> after(Collection<T> elements) {
+      return new ArrayList<>(elements);
     }
   }
 
-  /** Prefer {@link ImmutableCollection#asList()} over the more verbose alternative. */
+  /** Prefer {@link ImmutableCollection#asList()} over more verbose alternatives. */
   static final class ImmutableCollectionAsList<T> {
     @BeforeTemplate
-    ImmutableList<T> before(ImmutableCollection<T> collection) {
-      return ImmutableList.copyOf(collection);
+    ImmutableList<T> before(ImmutableCollection<T> elements) {
+      return ImmutableList.copyOf(elements);
     }
 
     @AfterTemplate
-    ImmutableList<T> after(ImmutableCollection<T> collection) {
-      return collection.asList();
+    ImmutableList<T> after(ImmutableCollection<T> elements) {
+      return elements.asList();
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if the result is going to be streamed; stream
-   * directly.
-   */
+  /** Prefer {@link ImmutableCollection#stream()} over more verbose alternatives. */
   static final class ImmutableCollectionStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
@@ -251,26 +319,20 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link Collection#contains(Object)} is
-   * called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#contains(Object)} over more verbose alternatives. */
   static final class ImmutableCollectionContains<T, S> {
     @BeforeTemplate
-    boolean before(ImmutableCollection<T> collection, S elem) {
-      return collection.asList().contains(elem);
+    boolean before(ImmutableCollection<T> collection, S object) {
+      return collection.asList().contains(object);
     }
 
     @AfterTemplate
-    boolean after(ImmutableCollection<T> collection, S elem) {
-      return collection.contains(elem);
+    boolean after(ImmutableCollection<T> collection, S object) {
+      return collection.contains(object);
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#parallelStream()}
-   * is called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#parallelStream()} over more verbose alternatives. */
   static final class ImmutableCollectionParallelStream<T> {
     @BeforeTemplate
     Stream<T> before(ImmutableCollection<T> collection) {
@@ -283,10 +345,7 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link ImmutableCollection#toString()} is
-   * called on the result; call it directly.
-   */
+  /** Prefer {@link ImmutableCollection#toString()} over more verbose alternatives. */
   static final class ImmutableCollectionToString<T> {
     @BeforeTemplate
     String before(ImmutableCollection<T> collection) {
@@ -299,7 +358,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link Arrays#asList(Object[])} over more contrived alternatives. */
+  /** Prefer {@link Arrays#asList(Object[])} over less efficient alternatives. */
   // XXX: Consider moving this rule to `ImmutableListRules` and having it suggest
   // `ImmutableList#copyOf`. That would retain immutability, at the cost of no longer handling
   // `null`s.
@@ -316,7 +375,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer calling {@link Collection#toArray()} over more contrived alternatives. */
+  /** Prefer {@link Collection#toArray()} over less efficient or more verbose alternatives. */
   static final class CollectionToArray<T> {
     @BeforeTemplate
     Object[] before(Collection<T> collection, int size) {
@@ -335,27 +394,21 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link
-   * ImmutableCollection#toArray(Object[])}` is called on the result; call it directly.
-   */
-  static final class ImmutableCollectionToArrayWithArray<T, S> {
+  /** Prefer {@link ImmutableCollection#toArray(Object[])} over more verbose alternatives. */
+  static final class ImmutableCollectionToArrayObject<T, S> {
     @BeforeTemplate
-    Object[] before(ImmutableCollection<T> collection, S[] array) {
-      return collection.asList().toArray(array);
+    S[] before(ImmutableCollection<T> collection, S[] other) {
+      return collection.asList().toArray(other);
     }
 
     @AfterTemplate
-    Object[] after(ImmutableCollection<T> collection, S[] array) {
-      return collection.toArray(array);
+    S[] after(ImmutableCollection<T> collection, S[] other) {
+      return collection.toArray(other);
     }
   }
 
-  /**
-   * Don't call {@link ImmutableCollection#asList()} if {@link
-   * ImmutableCollection#toArray(IntFunction)}} is called on the result; call it directly.
-   */
-  static final class ImmutableCollectionToArrayWithGenerator<T, S> {
+  /** Prefer {@link ImmutableCollection#toArray(IntFunction)} over more verbose alternatives. */
+  static final class ImmutableCollectionToArrayIntFunction<T, S> {
     @BeforeTemplate
     S[] before(ImmutableCollection<T> collection, IntFunction<S[]> generator) {
       return collection.asList().toArray(generator);
@@ -367,7 +420,7 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link Collection#iterator()} over more contrived or less efficient alternatives. */
+  /** Prefer {@link Collection#iterator()} over less efficient or more verbose alternatives. */
   static final class CollectionIterator<T> {
     @BeforeTemplate
     Iterator<T> before(Collection<T> collection) {
@@ -375,7 +428,7 @@ final class CollectionRules {
     }
 
     @BeforeTemplate
-    Iterator<T> before(ImmutableCollection<T> collection) {
+    UnmodifiableIterator<T> before(ImmutableCollection<T> collection) {
       return collection.asList().iterator();
     }
 
@@ -386,12 +439,9 @@ final class CollectionRules {
   }
 
   /**
-   * Don't use the ternary operator to extract the first element of a possibly-empty {@link
-   * Collection} as an {@link Optional}, and (when applicable) prefer {@link Stream#findFirst()}
-   * over {@link Stream#findAny()} to communicate that the collection's first element (if any,
-   * according to iteration order) will be returned.
+   * Prefer {@code collection.stream().findFirst()} over less explicit or more verbose alternatives.
    */
-  static final class OptionalFirstCollectionElement<T> {
+  static final class CollectionStreamFindFirst<T> {
     @BeforeTemplate
     Optional<T> before(Collection<T> collection) {
       return Refaster.anyOf(
@@ -416,10 +466,9 @@ final class CollectionRules {
   }
 
   /**
-   * Avoid contrived constructions when peeking at the first element of a possibly empty {@link
-   * Queue}.
+   * Prefer {@link Optional#ofNullable(Object)} over less efficient or more contrived alternatives.
    */
-  static final class OptionalFirstQueueElement<T> {
+  static final class OptionalOfNullableQueuePeek<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {
       return Refaster.anyOf(
@@ -435,29 +484,24 @@ final class CollectionRules {
     }
   }
 
-  /**
-   * Avoid contrived constructions when extracting the first element from a possibly empty {@link
-   * NavigableSet}.
-   */
-  static final class RemoveOptionalFirstNavigableSetElement<T> {
+  /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
+  static final class OptionalOfNullableNavigableSetPollFirst<T> {
     @BeforeTemplate
-    Optional<T> before(NavigableSet<T> set) {
-      return set.isEmpty()
+    Optional<T> before(NavigableSet<T> navigableSet) {
+      return navigableSet.isEmpty()
           ? Optional.empty()
-          : Refaster.anyOf(Optional.of(set.pollFirst()), Optional.ofNullable(set.pollFirst()));
+          : Refaster.anyOf(
+              Optional.of(navigableSet.pollFirst()), Optional.ofNullable(navigableSet.pollFirst()));
     }
 
     @AfterTemplate
-    Optional<T> after(NavigableSet<T> set) {
-      return Optional.ofNullable(set.pollFirst());
+    Optional<T> after(NavigableSet<T> navigableSet) {
+      return Optional.ofNullable(navigableSet.pollFirst());
     }
   }
 
-  /**
-   * Avoid contrived constructions when extracting the first element from a possibly empty {@link
-   * Queue}.
-   */
-  static final class RemoveOptionalFirstQueueElement<T> {
+  /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
+  static final class OptionalOfNullableQueuePoll<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {
       return queue.isEmpty()
@@ -473,20 +517,20 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link Collection#forEach(Consumer)} over more contrived alternatives. */
-  static final class CollectionForEach<T> {
+  /** Prefer {@link Collection#forEach(Consumer)} over less efficient alternatives. */
+  static final class CollectionForEach<S, T extends S> {
     @BeforeTemplate
-    void before(Collection<T> collection, Consumer<? super T> consumer) {
-      collection.stream().forEach(consumer);
+    void before(Collection<T> collection, Consumer<S> action) {
+      collection.stream().forEach(action);
     }
 
     @AfterTemplate
-    void after(Collection<T> collection, Consumer<? super T> consumer) {
-      collection.forEach(consumer);
+    void after(Collection<T> collection, Consumer<S> action) {
+      collection.forEach(action);
     }
   }
 
-  /** Prefer {@code collection.iterator().next()} over more contrived alternatives. */
+  /** Prefer {@code collection.iterator().next()} over less efficient alternatives. */
   static final class CollectionIteratorNext<S, T extends S> {
     @BeforeTemplate
     S before(Collection<T> collection) {
@@ -517,7 +561,9 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link SequencedCollection#getLast()} over less idiomatic alternatives. */
+  /**
+   * Prefer {@link SequencedCollection#getLast()} over less idiomatic or more verbose alternatives.
+   */
   static final class SequencedCollectionGetLast<S, T extends S> {
     @BeforeTemplate
     S before(SequencedCollection<T> collection) {
@@ -539,37 +585,40 @@ final class CollectionRules {
   /** Prefer {@link List#addFirst(Object)} over less idiomatic alternatives. */
   static final class ListAddFirst<S, T extends S> {
     @BeforeTemplate
-    void before(List<S> list, T element) {
-      list.add(0, element);
+    void before(List<S> list, T e) {
+      list.add(0, e);
     }
 
     @AfterTemplate
-    void after(List<S> list, T element) {
-      list.addFirst(element);
+    void after(List<S> list, T e) {
+      list.addFirst(e);
     }
   }
 
-  /** Prefer {@link List#add(Object)} over less idiomatic alternatives. */
+  /** Prefer {@link List#add(Object)} over less idiomatic or more verbose alternatives. */
   static final class ListAdd<S, T extends S> {
     @BeforeTemplate
-    void before(List<S> list, T element) {
-      list.addLast(element);
+    void before(List<S> list, T e) {
+      list.addLast(e);
     }
 
     @BeforeTemplate
-    void before2(List<S> list, T element) {
-      list.add(list.size(), element);
+    void before2(List<S> list, T e) {
+      list.add(list.size(), e);
     }
 
     @AfterTemplate
-    void after(List<S> list, T element) {
-      list.add(element);
+    void after(List<S> list, T e) {
+      list.add(e);
     }
   }
 
-  /** Prefer {@link List#removeFirst()}} over less idiomatic alternatives. */
-  // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
-  // `NoSuchElementException`.
+  /**
+   * Prefer {@link List#removeFirst()} over less idiomatic alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the exception thrown for empty lists from
+   * {@link IndexOutOfBoundsException} to {@link NoSuchElementException}.
+   */
   static final class ListRemoveFirst<S, T extends S> {
     @BeforeTemplate
     S before(List<T> list) {
@@ -582,9 +631,12 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link List#removeLast()}} over less idiomatic alternatives. */
-  // XXX: This rule changes the exception thrown for empty lists from `IndexOutOfBoundsException` to
-  // `NoSuchElementException`.
+  /**
+   * Prefer {@link List#removeLast()} over less idiomatic alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite changes the exception thrown for empty lists from
+   * {@link IndexOutOfBoundsException} to {@link NoSuchElementException}.
+   */
   static final class ListRemoveLast<S, T extends S> {
     @BeforeTemplate
     S before(List<T> list) {
@@ -597,29 +649,29 @@ final class CollectionRules {
     }
   }
 
-  /** Prefer {@link SortedSet#first()} over more verbose alternatives. */
+  /** Prefer {@link SortedSet#first()} over less idiomatic alternatives. */
   static final class SortedSetFirst<S, T extends S> {
     @BeforeTemplate
-    S before(SortedSet<T> set) {
-      return set.getFirst();
+    S before(SortedSet<T> sortedSet) {
+      return sortedSet.getFirst();
     }
 
     @AfterTemplate
-    S after(SortedSet<T> set) {
-      return set.first();
+    S after(SortedSet<T> sortedSet) {
+      return sortedSet.first();
     }
   }
 
-  /** Prefer {@link SortedSet#last()} over more verbose alternatives. */
+  /** Prefer {@link SortedSet#last()} over less idiomatic alternatives. */
   static final class SortedSetLast<S, T extends S> {
     @BeforeTemplate
-    S before(SortedSet<T> set) {
-      return set.getLast();
+    S before(SortedSet<T> sortedSet) {
+      return sortedSet.getLast();
     }
 
     @AfterTemplate
-    S after(SortedSet<T> set) {
-      return set.last();
+    S after(SortedSet<T> sortedSet) {
+      return sortedSet.last();
     }
   }
 

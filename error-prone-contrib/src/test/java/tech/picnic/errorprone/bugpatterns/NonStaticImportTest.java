@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +28,8 @@ final class NonStaticImportTest {
         .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
   }
 
+  @SuppressWarnings(
+      "java:S3415" /* Comparing a constant against a non-constant value is intentional here. */)
   @Test
   void candidateIdentifiersDoNotClash() {
     assertThat(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
@@ -201,6 +202,6 @@ final class NonStaticImportTest {
             "    private static final Instant OTHER_MAX = Instant.MAX;",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
