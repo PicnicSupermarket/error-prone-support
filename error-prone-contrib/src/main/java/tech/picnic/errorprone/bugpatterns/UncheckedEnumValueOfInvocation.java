@@ -30,17 +30,17 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags {@link Enum#valueOf} invocations that contain unchecked
+ * A {@link BugChecker} that flags {@link Enum#valueOf} invocations that contain unvalidated
  * arguments.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Avoid passing unvalidated arguments to `Enum#valueOf`",
-    link = BUG_PATTERNS_BASE_URL + "UncheckedEnumValueOfInvocation",
+    link = BUG_PATTERNS_BASE_URL + "UnvalidatedEnumValueOfInvocation",
     linkType = CUSTOM,
     severity = WARNING,
     tags = FRAGILE_CODE)
-public final class UncheckedEnumValueOfInvocation extends BugChecker
+public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> ENUM_VALUE_OF_METHOD =
