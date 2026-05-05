@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 final class UnvalidatedEnumValueOfInvocationTest {
   @Test
   void identification() {
-    CompilationTestHelper.newInstance(UncheckedEnumValueOfInvocation.class, getClass())
+    CompilationTestHelper.newInstance(UnvalidatedEnumValueOfInvocation.class, getClass())
         .expectErrorMessage(
             "INVALID_TYPE",
             m -> m.contains("`<nulltype>` is not a valid type for `Foo.A`, expected: `String`"))
