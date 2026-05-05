@@ -48,8 +48,8 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
   private static final Matcher<ExpressionTree> ENUM_NAME_OR_TO_STRING_METHOD =
       instanceMethod().onDescendantOf(Enum.class.getCanonicalName()).namedAnyOf("name", "toString");
 
-  /** Instantiates a new {@link UncheckedEnumValueOfInvocation} instance. */
-  public UncheckedEnumValueOfInvocation() {}
+  /** Instantiates a new {@link UnvalidatedEnumValueOfInvocation} instance. */
+  public UnvalidatedEnumValueOfInvocation() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
@@ -95,7 +95,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
               .build();
     }
 
-    // Match unchecked identifiers.
+    // Match identifiers.
     return nameArgument instanceof IdentifierTree ? describeMatch(tree) : Description.NO_MATCH;
   }
 
