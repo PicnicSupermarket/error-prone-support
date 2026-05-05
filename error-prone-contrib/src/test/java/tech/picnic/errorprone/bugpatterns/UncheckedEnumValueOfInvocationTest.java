@@ -3,7 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
-final class UncheckedEnumValueOfInvocationTest {
+final class UnvalidatedEnumValueOfInvocationTest {
   @Test
   void identification() {
     CompilationTestHelper.newInstance(UncheckedEnumValueOfInvocation.class, getClass())
