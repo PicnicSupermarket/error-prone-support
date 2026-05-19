@@ -20,7 +20,7 @@ final class UnvalidatedEnumValueOfInvocationTest {
             "import java.util.List;",
             "",
             "class Foo {",
-            "  void safeCases(B b, C c, D d) {",
+            "  void safeCases(B b, C c) {",
             "    A validLabel1 = A.valueOf(\"ONE\");",
             "    A validLabel2 = A.valueOf(A.class, \"TWO\");",
             "    A validLabel3 = Enum.valueOf(A.class, \"TWO\");",
