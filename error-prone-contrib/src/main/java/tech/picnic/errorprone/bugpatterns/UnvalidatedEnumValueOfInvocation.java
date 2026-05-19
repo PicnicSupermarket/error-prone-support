@@ -21,6 +21,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
+import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.SwitchExpressionTree;
@@ -97,16 +98,21 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     }
 
     if (ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
-      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(ASTHelpers.getReceiver(nameArgument));
+      ExpressionTree invocationReceiverTree = ASTHelpers.getReceiver(nameArgument);
+      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(invocationReceiverTree);
       if (enumSymbolPassedToValueOf == null) {
         return Description.NO_MATCH;
       }
+
+      ImmutableSet<String> enumValuesOfNameInvocationReceiver =
+          invocationReceiverTree instanceof MemberSelectTree memberSelectTree
+              ? ImmutableSet.of(memberSelectTree.getIdentifier().toString())
+              : getEnumValues(ASTHelpers.getReceiverType(nameArgument));
+
       ImmutableSet<String> missingValues =
           Sets.difference(
                   findSwitchCoveredValues(
-                      enumSymbolPassedToValueOf,
-                      getEnumValues(ASTHelpers.getReceiverType(nameArgument)),
-                      state),
+                      enumSymbolPassedToValueOf, enumValuesOfNameInvocationReceiver, state),
                   valuesSourceEnum)
               .immutableCopy();
       return missingValues.isEmpty()
