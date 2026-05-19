@@ -182,7 +182,6 @@ final class UnvalidatedEnumValueOfInvocationTest {
             "        consume(Enum.valueOf(A.class, B.FIVE.name()));",
             "      }",
             "      default -> {}",
-            "      }",
             "    }",
             "",
             "    if (d instanceof D(B deconstructedB)) {",
