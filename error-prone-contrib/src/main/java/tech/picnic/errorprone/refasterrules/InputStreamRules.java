@@ -13,18 +13,20 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class InputStreamRules {
   private InputStreamRules() {}
 
+  /** Prefer {@link InputStream#transferTo(OutputStream)} over non-JDK alternatives. */
   static final class InputStreamTransferTo {
     @BeforeTemplate
-    long before(InputStream in, OutputStream out) throws IOException {
-      return ByteStreams.copy(in, out);
+    long before(InputStream from, OutputStream out) throws IOException {
+      return ByteStreams.copy(from, out);
     }
 
     @AfterTemplate
-    long after(InputStream in, OutputStream out) throws IOException {
-      return in.transferTo(out);
+    long after(InputStream from, OutputStream out) throws IOException {
+      return from.transferTo(out);
     }
   }
 
+  /** Prefer {@link InputStream#readAllBytes()} over non-JDK alternatives. */
   static final class InputStreamReadAllBytes {
     @BeforeTemplate
     byte[] before(InputStream in) throws IOException {
@@ -37,18 +39,20 @@ final class InputStreamRules {
     }
   }
 
+  /** Prefer {@link InputStream#readNBytes(int)} over non-JDK alternatives. */
   static final class InputStreamReadNBytes {
     @BeforeTemplate
-    byte[] before(InputStream in, int n) throws IOException {
-      return ByteStreams.limit(in, n).readAllBytes();
+    byte[] before(InputStream in, int len) throws IOException {
+      return ByteStreams.limit(in, len).readAllBytes();
     }
 
     @AfterTemplate
-    byte[] after(InputStream in, int n) throws IOException {
-      return in.readNBytes(n);
+    byte[] after(InputStream in, int len) throws IOException {
+      return in.readNBytes(len);
     }
   }
 
+  /** Prefer {@link InputStream#skipNBytes(long)} over non-JDK alternatives. */
   static final class InputStreamSkipNBytes {
     @BeforeTemplate
     void before(InputStream in, long n) throws IOException {

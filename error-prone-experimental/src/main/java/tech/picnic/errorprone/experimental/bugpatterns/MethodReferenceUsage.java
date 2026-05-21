@@ -29,7 +29,6 @@ import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.code.Symbol.PackageSymbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Optional;
@@ -199,8 +198,9 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     Name sName = target.getSimpleName();
     Optional<SuggestedFix.Builder> fix = constructFix(lambdaExpr, sName, methodName);
 
-    PackageSymbol pkg = ASTHelpers.enclosingPackage(target);
-    if (pkg != null && !"java.lang".equals(pkg.toString())) {
+    if (ASTHelpers.enclosingPackage(target)
+        .filter(pkg -> !"java.lang".equals(pkg.toString()))
+        .isPresent()) {
       Name fqName = target.getQualifiedName();
       if (!sName.equals(fqName)) {
         return fix.map(b -> b.addImport(fqName.toString()));

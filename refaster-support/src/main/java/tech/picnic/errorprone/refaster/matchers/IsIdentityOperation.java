@@ -16,7 +16,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 
 /** A matcher of expressions that represent identity operations. */
-// XXX: In selected contexts many other method invocations can be considered identity operations;
+// XXX: In selected contexts many other method invocations can be considered identity operations:
 // see the `IdentityConversion` check. Review whether those can/should be captured by this matcher
 // as well.
 public final class IsIdentityOperation implements Matcher<ExpressionTree> {

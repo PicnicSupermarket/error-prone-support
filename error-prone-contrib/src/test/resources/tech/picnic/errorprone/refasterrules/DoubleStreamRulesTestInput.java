@@ -14,43 +14,43 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Streams.class);
   }
 
-  DoubleStream testConcatOneDoubleStream() {
+  DoubleStream testDoubleStreamIdentity() {
     return Streams.concat(DoubleStream.of(1));
   }
 
-  DoubleStream testConcatTwoDoubleStreams() {
+  DoubleStream testDoubleStreamConcat() {
     return Streams.concat(DoubleStream.of(1), DoubleStream.of(2));
   }
 
-  DoubleStream testFilterOuterDoubleStreamAfterFlatMap() {
+  DoubleStream testDoubleStreamFlatMapFilter() {
     return DoubleStream.of(1).flatMap(v -> DoubleStream.of(v * v).filter(n -> n > 1));
   }
 
-  DoubleStream testFilterOuterStreamAfterFlatMapToDouble() {
+  DoubleStream testStreamFlatMapToDoubleFilter() {
     return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v).filter(n -> n > 1));
   }
 
-  DoubleStream testMapOuterDoubleStreamAfterFlatMap() {
+  DoubleStream testDoubleStreamFlatMapMap() {
     return DoubleStream.of(1).flatMap(v -> DoubleStream.of(v * v).map(n -> n * 1));
   }
 
-  DoubleStream testMapOuterStreamAfterFlatMapToDouble() {
+  DoubleStream testStreamFlatMapToDoubleMap() {
     return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v).map(n -> n * 1));
   }
 
-  DoubleStream testFlatMapOuterDoubleStreamAfterFlatMap() {
+  DoubleStream testDoubleStreamFlatMapFlatMap() {
     return DoubleStream.of(1).flatMap(v -> DoubleStream.of(v * v).flatMap(DoubleStream::of));
   }
 
-  DoubleStream testFlatMapOuterStreamAfterFlatMapToDouble() {
+  DoubleStream testStreamFlatMapToDoubleFlatMap() {
     return Stream.of(1).flatMapToDouble(v -> DoubleStream.of(v * v).flatMap(DoubleStream::of));
   }
 
   DoubleStream testDoubleStreamFilterSorted() {
-    return DoubleStream.of(1, 4, 3, 2).sorted().filter(d -> d % 2 == 0);
+    return DoubleStream.of(1).sorted().filter(d -> d > 0);
   }
 
-  ImmutableSet<Boolean> testDoubleStreamIsEmpty() {
+  ImmutableSet<Boolean> testDoubleStreamFindAnyIsEmpty() {
     return ImmutableSet.of(
         DoubleStream.of(1).count() == 0,
         DoubleStream.of(2).count() <= 0,
@@ -58,7 +58,7 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
         DoubleStream.of(4).findFirst().isEmpty());
   }
 
-  ImmutableSet<Boolean> testDoubleStreamIsNotEmpty() {
+  ImmutableSet<Boolean> testDoubleStreamFindAnyIsPresent() {
     return ImmutableSet.of(
         DoubleStream.of(1).count() != 0,
         DoubleStream.of(2).count() > 0,
@@ -70,7 +70,7 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
     return DoubleStream.of(1).sorted().findFirst();
   }
 
-  ImmutableSet<Boolean> testDoubleStreamNoneMatch() {
+  ImmutableSet<Boolean> testDoubleStreamNoneMatchWithDoublePredicate() {
     DoublePredicate pred = i -> i > 0;
     return ImmutableSet.of(
         !DoubleStream.of(1).anyMatch(n -> n > 1),
@@ -78,7 +78,7 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
         DoubleStream.of(3).filter(pred).findAny().isEmpty());
   }
 
-  boolean testDoubleStreamNoneMatch2() {
+  boolean testDoubleStreamNoneMatch() {
     return DoubleStream.of(1).allMatch(n -> !(n > 1));
   }
 
@@ -88,12 +88,12 @@ final class DoubleStreamRulesTest implements RefasterRuleCollectionTestCase {
         DoubleStream.of(2).filter(n -> n > 2).findAny().isPresent());
   }
 
-  boolean testDoubleStreamAllMatch() {
+  boolean testDoubleStreamAllMatchWithDoublePredicate() {
     DoublePredicate pred = i -> i > 0;
     return DoubleStream.of(1).noneMatch(pred.negate());
   }
 
-  boolean testDoubleStreamAllMatch2() {
+  boolean testDoubleStreamAllMatch() {
     return DoubleStream.of(1).noneMatch(n -> !(n > 1));
   }
 

@@ -18,7 +18,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
-  ImmutableSet<Boolean> testEnumReferenceEquality() {
+  ImmutableSet<Boolean> testEqualToWithEnum() {
     return ImmutableSet.of(
         RoundingMode.UP.equals(RoundingMode.DOWN),
         Objects.equals(RoundingMode.UP, RoundingMode.DOWN),
@@ -28,59 +28,59 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         RoundingMode.UP.ordinal() != RoundingMode.DOWN.ordinal());
   }
 
-  ImmutableSet<Predicate<RoundingMode>> testEnumReferenceEqualityLambda() {
+  ImmutableSet<Predicate<RoundingMode>> testEqualTo() {
     return ImmutableSet.of(isEqual(RoundingMode.DOWN), RoundingMode.UP::equals);
   }
 
-  boolean testEqualsPredicate() {
+  boolean testObjectEquals() {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch(s -> "bar".equals(s));
   }
 
-  boolean testDoubleNegation() {
+  boolean testBooleanIdentity() {
     return !!Boolean.TRUE;
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
-  ImmutableSet<Boolean> testNegation() {
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
+  ImmutableSet<Boolean> testNotEqualTo() {
     return ImmutableSet.of(
-        true ? !false : false,
         !(true == false),
+        true ? !false : false,
         !((byte) 3 == (byte) 4),
         !((char) 3 == (char) 4),
         !((short) 3 == (short) 4),
         !(3 == 4),
         !(3L == 4L),
-        !(3F == 4F),
+        !(3f == 4f),
         !(3.0 == 4.0),
         !(BoundType.OPEN == BoundType.CLOSED));
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
-  ImmutableSet<Boolean> testIndirectDoubleNegation() {
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
+  ImmutableSet<Boolean> testEqualToWithBoolean() {
     return ImmutableSet.of(
-        true ? false : !false,
         !(true != false),
+        true ? false : !false,
         !((byte) 3 != (byte) 4),
         !((char) 3 != (char) 4),
         !((short) 3 != (short) 4),
         !(3 != 4),
         !(3L != 4L),
-        !(3F != 4F),
+        !(3f != 4f),
         !(3.0 != 4.0),
         !(BoundType.OPEN != BoundType.CLOSED));
   }
 
-  Predicate<String> testPredicateLambda() {
+  Predicate<String> testNot() {
     return not(v -> v.isEmpty());
   }
 
-  ImmutableSet<Boolean> testEquals() {
+  ImmutableSet<Boolean> testObjectEqualsWithObject() {
     return ImmutableSet.of(
         Optional.of("foo").equals(Optional.of("bar")),
         Optional.of("baz").equals(Optional.ofNullable("qux")),
-        Optional.ofNullable("quux").equals(Optional.of("quuz")));
+        Optional.ofNullable("quux").equals(Optional.of("corge")));
   }
 
   boolean testObjectsEquals() {

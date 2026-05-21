@@ -16,81 +16,81 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster templates related to statements dealing with {@link Preconditions}. */
+/** Refaster rules related to expressions dealing with {@link Preconditions}. */
 @OnlineDocumentation
 final class PreconditionsRules {
   private PreconditionsRules() {}
 
   /** Prefer {@link Preconditions#checkArgument(boolean)} over more verbose alternatives. */
-  static final class CheckArgument {
+  static final class CheckArgumentNot {
     @BeforeTemplate
-    void before(boolean condition) {
-      if (condition) {
+    void before(boolean expression) {
+      if (expression) {
         throw new IllegalArgumentException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition) {
-      checkArgument(!condition);
+    void after(boolean expression) {
+      checkArgument(!expression);
     }
   }
 
   /** Prefer {@link Preconditions#checkArgument(boolean, Object)} over more verbose alternatives. */
-  static final class CheckArgumentWithMessage {
+  static final class CheckArgumentNotWithString {
     @BeforeTemplate
-    void before(boolean condition, String message) {
-      if (condition) {
-        throw new IllegalArgumentException(message);
+    void before(boolean expression, String errorMessage) {
+      if (expression) {
+        throw new IllegalArgumentException(errorMessage);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      checkArgument(!condition, message);
+    void after(boolean expression, String errorMessage) {
+      checkArgument(!expression, errorMessage);
     }
   }
 
   /**
-   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less descriptive or more
+   * Prefer {@link Preconditions#checkElementIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    *
    * <p>Note that the two-argument {@link Preconditions#checkElementIndex(int, int)} is better
    * replaced with {@link java.util.Objects#checkIndex(int, int)}.
    */
-  static final class CheckElementIndexWithMessage {
+  static final class CheckElementIndex {
     @BeforeTemplate
-    void before(int index, int size, String message) {
+    void before(int index, int size, String desc) {
       if (index < 0 || index >= size) {
-        throw new IndexOutOfBoundsException(message);
+        throw new IndexOutOfBoundsException(desc);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(int index, int size, String message) {
-      checkElementIndex(index, size, message);
+    void after(int index, int size, String desc) {
+      checkElementIndex(index, size, desc);
     }
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over non-JDK alternatives. */
-  static final class RequireNonNull<T> {
+  static final class RequireNonNullExpression<T> {
     @BeforeTemplate
-    T before(T object) {
-      return checkNotNull(object);
+    T before(T obj) {
+      return checkNotNull(obj);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T object) {
-      return requireNonNull(object);
+    T after(T obj) {
+      return requireNonNull(obj);
     }
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
-  static final class RequireNonNullStatement<T extends @Nullable Object> {
+  static final class RequireNonNullBlock<T extends @Nullable Object> {
     // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
     // annotations.
     @BeforeTemplate
@@ -99,35 +99,35 @@ final class PreconditionsRules {
       "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    void before(T object) {
-      if (object == null) {
+    void before(T obj) {
+      if (obj == null) {
         throw new NullPointerException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(T object) {
-      requireNonNull(object);
+    void after(T obj) {
+      requireNonNull(obj);
     }
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over non-JDK alternatives. */
-  static final class RequireNonNullWithMessage<T> {
+  static final class RequireNonNullWithStringExpression<T> {
     @BeforeTemplate
-    T before(T object, String message) {
-      return checkNotNull(object, message);
+    T before(T obj, String message) {
+      return checkNotNull(obj, message);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    T after(T object, String message) {
-      return requireNonNull(object, message);
+    T after(T obj, String message) {
+      return requireNonNull(obj, message);
     }
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
-  static final class RequireNonNullWithMessageStatement<T extends @Nullable Object> {
+  static final class RequireNonNullWithStringBlock<T extends @Nullable Object> {
     // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
     // annotations.
     @BeforeTemplate
@@ -136,21 +136,21 @@ final class PreconditionsRules {
       "java:S2583" /* SonarCloud incorrectly believes that `object` is not `@Nullable`. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
     })
-    void before(T object, String message) {
-      if (object == null) {
+    void before(T obj, String message) {
+      if (obj == null) {
         throw new NullPointerException(message);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(T object, String message) {
-      requireNonNull(object, message);
+    void after(T obj, String message) {
+      requireNonNull(obj, message);
     }
   }
 
   /**
-   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less descriptive or more verbose
+   * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less explicit or more verbose
    * alternatives.
    */
   static final class CheckPositionIndex {
@@ -169,53 +169,53 @@ final class PreconditionsRules {
   }
 
   /**
-   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less descriptive or more
+   * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    */
-  static final class CheckPositionIndexWithMessage {
+  static final class CheckPositionIndexWithString {
     @BeforeTemplate
-    void before(int index, int size, String message) {
+    void before(int index, int size, String desc) {
       if (index < 0 || index > size) {
-        throw new IndexOutOfBoundsException(message);
+        throw new IndexOutOfBoundsException(desc);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(int index, int size, String message) {
-      checkPositionIndex(index, size, message);
+    void after(int index, int size, String desc) {
+      checkPositionIndex(index, size, desc);
     }
   }
 
   /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
-  static final class CheckState {
+  static final class CheckStateNot {
     @BeforeTemplate
-    void before(boolean condition) {
-      if (condition) {
+    void before(boolean expression) {
+      if (expression) {
         throw new IllegalStateException();
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition) {
-      checkState(!condition);
+    void after(boolean expression) {
+      checkState(!expression);
     }
   }
 
   /** Prefer {@link Preconditions#checkState(boolean, Object)} over more verbose alternatives. */
-  static final class CheckStateWithMessage {
+  static final class CheckStateNotWithString {
     @BeforeTemplate
-    void before(boolean condition, String message) {
-      if (condition) {
-        throw new IllegalStateException(message);
+    void before(boolean expression, String errorMessage) {
+      if (expression) {
+        throw new IllegalStateException(errorMessage);
       }
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    void after(boolean condition, String message) {
-      checkState(!condition, message);
+    void after(boolean expression, String errorMessage) {
+      checkState(!expression, errorMessage);
     }
   }
 }

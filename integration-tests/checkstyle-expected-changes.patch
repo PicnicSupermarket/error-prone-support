@@ -60785,7 +60785,7 @@
  
    private static final Locale[] ALL_LOCALES = {
      Locale.CHINESE,
-@@ -85,20 +85,20 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -85,241 +85,237 @@ public class AllChecksTest extends AbstractModuleTestSupport {
          Stream.of(
                  // we use GenericWhitespace for this behavior
                  "GENERIC_START", "GENERIC_END")
@@ -60809,43 +60809,432 @@
      // we have no need to block these specific tokens
      CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "IllegalToken",
-@@ -280,7 +280,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
-                 "TEXT_BLOCK_LITERAL_END",
-                 "LITERAL_YIELD",
-                 "SWITCH_RULE")
+-        Stream.of(
+-                "LITERAL_SUPER",
+-                "LITERAL_ASSERT",
+-                "ENUM_CONSTANT_DEF",
+-                "TYPE_PARAMETERS",
+-                "TYPE_UPPER_BOUNDS",
+-                "NUM_DOUBLE",
+-                "LITERAL_SWITCH",
+-                "ANNOTATIONS",
+-                "LITERAL_SHORT",
+-                "LITERAL_PROTECTED",
+-                "FOR_CONDITION",
+-                "FOR_INIT",
+-                "LITERAL_LONG",
+-                "MINUS",
+-                "OBJBLOCK",
+-                "LITERAL_NULL",
+-                "ANNOTATION",
+-                "LITERAL_TRUE",
+-                "COMMENT_CONTENT",
+-                "LITERAL_CHAR",
+-                "PARAMETER_DEF",
+-                "POST_DEC",
+-                "ANNOTATION_FIELD_DEF",
+-                "BLOCK_COMMENT_END",
+-                "TYPE",
+-                "LITERAL_INT",
+-                "BSR",
+-                "ENUM",
+-                "ANNOTATION_MEMBER_VALUE_PAIR",
+-                "TYPECAST",
+-                "LITERAL_SYNCHRONIZED",
+-                "PLUS_ASSIGN",
+-                "DOT",
+-                "LPAREN",
+-                "LITERAL_IF",
+-                "LITERAL_CATCH",
+-                "BAND",
+-                "INTERFACE_DEF",
+-                "LOR",
+-                "BNOT",
+-                "METHOD_CALL",
+-                "AT",
+-                "ELLIPSIS",
+-                "ARRAY_INIT",
+-                "FOR_EACH_CLAUSE",
+-                "LITERAL_THROWS",
+-                "CHAR_LITERAL",
+-                "CASE_GROUP",
+-                "POST_INC",
+-                "SEMI",
+-                "LITERAL_FINALLY",
+-                "ASSIGN",
+-                "RESOURCE_SPECIFICATION",
+-                "STATIC_IMPORT",
+-                "GENERIC_START",
+-                "IMPORT",
+-                "SL",
+-                "VARIABLE_DEF",
+-                "LITERAL_DOUBLE",
+-                "RCURLY",
+-                "RESOURCE",
+-                "SR",
+-                "COMMA",
+-                "BAND_ASSIGN",
+-                "METHOD_DEF",
+-                "LITERAL_VOID",
+-                "NUM_LONG",
+-                "LITERAL_TRANSIENT",
+-                "LITERAL_THIS",
+-                "LCURLY",
+-                "MINUS_ASSIGN",
+-                "TYPE_LOWER_BOUNDS",
+-                "TYPE_ARGUMENT",
+-                "LITERAL_CLASS",
+-                "INSTANCE_INIT",
+-                "DIV",
+-                "STAR",
+-                "UNARY_MINUS",
+-                "FOR_ITERATOR",
+-                "NOT_EQUAL",
+-                "LE",
+-                "LITERAL_INTERFACE",
+-                "LITERAL_FLOAT",
+-                "LITERAL_INSTANCEOF",
+-                "BOR_ASSIGN",
+-                "LT",
+-                "SL_ASSIGN",
+-                "ELIST",
+-                "ANNOTATION_ARRAY_INIT",
+-                "MODIFIERS",
+-                "LITERAL_BREAK",
+-                "EXTENDS_CLAUSE",
+-                "TYPE_PARAMETER",
+-                "LITERAL_DEFAULT",
+-                "STATIC_INIT",
+-                "BSR_ASSIGN",
+-                "TYPE_EXTENSION_AND",
+-                "BOR",
+-                "LITERAL_PRIVATE",
+-                "LITERAL_THROW",
+-                "LITERAL_BYTE",
+-                "BXOR",
+-                "WILDCARD_TYPE",
+-                "FINAL",
+-                "PARAMETERS",
+-                "RPAREN",
+-                "SR_ASSIGN",
+-                "UNARY_PLUS",
+-                "EMPTY_STAT",
+-                "LITERAL_STATIC",
+-                "LITERAL_CONTINUE",
+-                "STAR_ASSIGN",
+-                "LAMBDA",
+-                "RBRACK",
+-                "BXOR_ASSIGN",
+-                "CTOR_CALL",
+-                "LITERAL_FALSE",
+-                "DO_WHILE",
+-                "LITERAL_PUBLIC",
+-                "LITERAL_WHILE",
+-                "PLUS",
+-                "INC",
+-                "CTOR_DEF",
+-                "GENERIC_END",
+-                "DIV_ASSIGN",
+-                "SLIST",
+-                "LNOT",
+-                "LAND",
+-                "LITERAL_ELSE",
+-                "ABSTRACT",
+-                "STRICTFP",
+-                "QUESTION",
+-                "LITERAL_NEW",
+-                "LITERAL_RETURN",
+-                "SINGLE_LINE_COMMENT",
+-                "INDEX_OP",
+-                "EXPR",
+-                "BLOCK_COMMENT_BEGIN",
+-                "PACKAGE_DEF",
+-                "IMPLEMENTS_CLAUSE",
+-                "NUM_FLOAT",
+-                "LITERAL_DO",
+-                "EOF",
+-                "GE",
+-                "RESOURCES",
+-                "MOD",
+-                "DEC",
+-                "EQUAL",
+-                "LITERAL_BOOLEAN",
+-                "CLASS_DEF",
+-                "COLON",
+-                "LITERAL_TRY",
+-                "ENUM_DEF",
+-                "GT",
+-                "NUM_INT",
+-                "ANNOTATION_DEF",
+-                "METHOD_REF",
+-                "TYPE_ARGUMENTS",
+-                "DOUBLE_COLON",
+-                "IDENT",
+-                "MOD_ASSIGN",
+-                "LITERAL_FOR",
+-                "SUPER_CTOR_CALL",
+-                "STRING_LITERAL",
+-                "ARRAY_DECLARATOR",
+-                "LITERAL_CASE",
+-                "PATTERN_VARIABLE_DEF",
+-                "RECORD_DEF",
+-                "LITERAL_RECORD",
+-                "RECORD_COMPONENTS",
+-                "RECORD_COMPONENT_DEF",
+-                "COMPACT_CTOR_DEF",
+-                "TEXT_BLOCK_LITERAL_BEGIN",
+-                "TEXT_BLOCK_CONTENT",
+-                "TEXT_BLOCK_LITERAL_END",
+-                "LITERAL_YIELD",
+-                "SWITCH_RULE")
 -            .collect(Collectors.toUnmodifiableSet()));
-+            .collect(toUnmodifiableSet()));
++        Set.of(
++            "LITERAL_SUPER",
++            "LITERAL_ASSERT",
++            "ENUM_CONSTANT_DEF",
++            "TYPE_PARAMETERS",
++            "TYPE_UPPER_BOUNDS",
++            "NUM_DOUBLE",
++            "LITERAL_SWITCH",
++            "ANNOTATIONS",
++            "LITERAL_SHORT",
++            "LITERAL_PROTECTED",
++            "FOR_CONDITION",
++            "FOR_INIT",
++            "LITERAL_LONG",
++            "MINUS",
++            "OBJBLOCK",
++            "LITERAL_NULL",
++            "ANNOTATION",
++            "LITERAL_TRUE",
++            "COMMENT_CONTENT",
++            "LITERAL_CHAR",
++            "PARAMETER_DEF",
++            "POST_DEC",
++            "ANNOTATION_FIELD_DEF",
++            "BLOCK_COMMENT_END",
++            "TYPE",
++            "LITERAL_INT",
++            "BSR",
++            "ENUM",
++            "ANNOTATION_MEMBER_VALUE_PAIR",
++            "TYPECAST",
++            "LITERAL_SYNCHRONIZED",
++            "PLUS_ASSIGN",
++            "DOT",
++            "LPAREN",
++            "LITERAL_IF",
++            "LITERAL_CATCH",
++            "BAND",
++            "INTERFACE_DEF",
++            "LOR",
++            "BNOT",
++            "METHOD_CALL",
++            "AT",
++            "ELLIPSIS",
++            "ARRAY_INIT",
++            "FOR_EACH_CLAUSE",
++            "LITERAL_THROWS",
++            "CHAR_LITERAL",
++            "CASE_GROUP",
++            "POST_INC",
++            "SEMI",
++            "LITERAL_FINALLY",
++            "ASSIGN",
++            "RESOURCE_SPECIFICATION",
++            "STATIC_IMPORT",
++            "GENERIC_START",
++            "IMPORT",
++            "SL",
++            "VARIABLE_DEF",
++            "LITERAL_DOUBLE",
++            "RCURLY",
++            "RESOURCE",
++            "SR",
++            "COMMA",
++            "BAND_ASSIGN",
++            "METHOD_DEF",
++            "LITERAL_VOID",
++            "NUM_LONG",
++            "LITERAL_TRANSIENT",
++            "LITERAL_THIS",
++            "LCURLY",
++            "MINUS_ASSIGN",
++            "TYPE_LOWER_BOUNDS",
++            "TYPE_ARGUMENT",
++            "LITERAL_CLASS",
++            "INSTANCE_INIT",
++            "DIV",
++            "STAR",
++            "UNARY_MINUS",
++            "FOR_ITERATOR",
++            "NOT_EQUAL",
++            "LE",
++            "LITERAL_INTERFACE",
++            "LITERAL_FLOAT",
++            "LITERAL_INSTANCEOF",
++            "BOR_ASSIGN",
++            "LT",
++            "SL_ASSIGN",
++            "ELIST",
++            "ANNOTATION_ARRAY_INIT",
++            "MODIFIERS",
++            "LITERAL_BREAK",
++            "EXTENDS_CLAUSE",
++            "TYPE_PARAMETER",
++            "LITERAL_DEFAULT",
++            "STATIC_INIT",
++            "BSR_ASSIGN",
++            "TYPE_EXTENSION_AND",
++            "BOR",
++            "LITERAL_PRIVATE",
++            "LITERAL_THROW",
++            "LITERAL_BYTE",
++            "BXOR",
++            "WILDCARD_TYPE",
++            "FINAL",
++            "PARAMETERS",
++            "RPAREN",
++            "SR_ASSIGN",
++            "UNARY_PLUS",
++            "EMPTY_STAT",
++            "LITERAL_STATIC",
++            "LITERAL_CONTINUE",
++            "STAR_ASSIGN",
++            "LAMBDA",
++            "RBRACK",
++            "BXOR_ASSIGN",
++            "CTOR_CALL",
++            "LITERAL_FALSE",
++            "DO_WHILE",
++            "LITERAL_PUBLIC",
++            "LITERAL_WHILE",
++            "PLUS",
++            "INC",
++            "CTOR_DEF",
++            "GENERIC_END",
++            "DIV_ASSIGN",
++            "SLIST",
++            "LNOT",
++            "LAND",
++            "LITERAL_ELSE",
++            "ABSTRACT",
++            "STRICTFP",
++            "QUESTION",
++            "LITERAL_NEW",
++            "LITERAL_RETURN",
++            "SINGLE_LINE_COMMENT",
++            "INDEX_OP",
++            "EXPR",
++            "BLOCK_COMMENT_BEGIN",
++            "PACKAGE_DEF",
++            "IMPLEMENTS_CLAUSE",
++            "NUM_FLOAT",
++            "LITERAL_DO",
++            "EOF",
++            "GE",
++            "RESOURCES",
++            "MOD",
++            "DEC",
++            "EQUAL",
++            "LITERAL_BOOLEAN",
++            "CLASS_DEF",
++            "COLON",
++            "LITERAL_TRY",
++            "ENUM_DEF",
++            "GT",
++            "NUM_INT",
++            "ANNOTATION_DEF",
++            "METHOD_REF",
++            "TYPE_ARGUMENTS",
++            "DOUBLE_COLON",
++            "IDENT",
++            "MOD_ASSIGN",
++            "LITERAL_FOR",
++            "SUPER_CTOR_CALL",
++            "STRING_LITERAL",
++            "ARRAY_DECLARATOR",
++            "LITERAL_CASE",
++            "PATTERN_VARIABLE_DEF",
++            "RECORD_DEF",
++            "LITERAL_RECORD",
++            "RECORD_COMPONENTS",
++            "RECORD_COMPONENT_DEF",
++            "COMPACT_CTOR_DEF",
++            "TEXT_BLOCK_LITERAL_BEGIN",
++            "TEXT_BLOCK_CONTENT",
++            "TEXT_BLOCK_LITERAL_END",
++            "LITERAL_YIELD",
++            "SWITCH_RULE"));
      // we have no need to block specific token text
      CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "IllegalTokenText",
-@@ -294,7 +294,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
-                 "STRING_LITERAL",
-                 "CHAR_LITERAL",
-                 "TEXT_BLOCK_CONTENT")
+-        Stream.of(
+-                "NUM_DOUBLE",
+-                "NUM_FLOAT",
+-                "NUM_INT",
+-                "NUM_LONG",
+-                "IDENT",
+-                "COMMENT_CONTENT",
+-                "STRING_LITERAL",
+-                "CHAR_LITERAL",
+-                "TEXT_BLOCK_CONTENT")
 -            .collect(Collectors.toUnmodifiableSet()));
-+            .collect(toUnmodifiableSet()));
++        Set.of(
++            "NUM_DOUBLE",
++            "NUM_FLOAT",
++            "NUM_INT",
++            "NUM_LONG",
++            "IDENT",
++            "COMMENT_CONTENT",
++            "STRING_LITERAL",
++            "CHAR_LITERAL",
++            "TEXT_BLOCK_CONTENT"));
      // we do not use this check as it is deprecated
      CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "WriteTag",
-@@ -305,7 +305,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
-                 "ANNOTATION_FIELD_DEF",
-                 "RECORD_DEF",
-                 "COMPACT_CTOR_DEF")
+-        Stream.of(
+-                "ENUM_CONSTANT_DEF",
+-                "METHOD_DEF",
+-                "CTOR_DEF",
+-                "ANNOTATION_FIELD_DEF",
+-                "RECORD_DEF",
+-                "COMPACT_CTOR_DEF")
 -            .collect(Collectors.toUnmodifiableSet()));
-+            .collect(toUnmodifiableSet()));
++        Set.of(
++            "ENUM_CONSTANT_DEF",
++            "METHOD_DEF",
++            "CTOR_DEF",
++            "ANNOTATION_FIELD_DEF",
++            "RECORD_DEF",
++            "COMPACT_CTOR_DEF"));
      // state of the configuration when test was made until reason found in
      // https://github.com/checkstyle/checkstyle/issues/3730
      CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
-@@ -319,7 +319,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
-                 "VARIABLE_DEF",
-                 "RECORD_DEF",
-                 "COMPACT_CTOR_DEF")
+         "AnnotationLocation",
+-        Stream.of(
+-                "CLASS_DEF",
+-                "CTOR_DEF",
+-                "ENUM_DEF",
+-                "INTERFACE_DEF",
+-                "METHOD_DEF",
+-                "VARIABLE_DEF",
+-                "RECORD_DEF",
+-                "COMPACT_CTOR_DEF")
 -            .collect(Collectors.toUnmodifiableSet()));
-+            .collect(toUnmodifiableSet()));
++        Set.of(
++            "CLASS_DEF",
++            "CTOR_DEF",
++            "ENUM_DEF",
++            "INTERFACE_DEF",
++            "METHOD_DEF",
++            "VARIABLE_DEF",
++            "RECORD_DEF",
++            "COMPACT_CTOR_DEF"));
      CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "NoLineWrap",
          Stream.of(
-@@ -334,33 +334,33 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -334,33 +330,33 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  "ENUM_DEF",
                  "INTERFACE_DEF",
                  "RECORD_DEF")
@@ -60884,7 +61273,7 @@
      CHECKSTYLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "WhitespaceAround",
          Stream.of(
-@@ -371,7 +371,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -371,7 +367,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  "WILDCARD_TYPE",
                  "GENERIC_END",
                  "GENERIC_START")
@@ -60893,7 +61282,7 @@
  
      // google
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
-@@ -380,13 +380,13 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -380,13 +376,13 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  // state of the configuration when test was made until reason found in
                  // https://github.com/checkstyle/checkstyle/issues/3730
                  "ANNOTATION_DEF", "ANNOTATION_FIELD_DEF", "ENUM_CONSTANT_DEF", "PACKAGE_DEF")
@@ -60909,7 +61298,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "NoLineWrap",
          Stream.of(
-@@ -399,7 +399,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -399,7 +395,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  "INTERFACE_DEF",
                  "RECORD_DEF",
                  "COMPACT_CTOR_DEF")
@@ -60918,7 +61307,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "SeparatorWrap",
          Stream.of(
-@@ -416,13 +416,13 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -416,13 +412,13 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  // which this check does not provide
                  "LPAREN",
                  "RPAREN")
@@ -60934,7 +61323,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "EmptyBlock",
          Stream.of(
-@@ -441,7 +441,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -441,7 +437,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  "LITERAL_SYNCHRONIZED",
                  "LITERAL_WHILE",
                  "STATIC_INIT")
@@ -60943,7 +61332,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "WhitespaceAround",
          Stream.of(
-@@ -453,7 +453,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -453,7 +449,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  "GENERIC_START",
                  "GENERIC_END",
                  "WILDCARD_TYPE")
@@ -60952,7 +61341,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "IllegalTokenText",
          Stream.of(
-@@ -466,7 +466,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -466,7 +462,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  "IDENT",
                  // comments should be skipped as nobody write in octal or unicode code style
                  "COMMENT_CONTENT")
@@ -60961,7 +61350,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "OperatorWrap",
          Stream.of(
-@@ -487,7 +487,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -487,7 +483,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  // COLON token ignored in check config, explained in
                  // https://github.com/checkstyle/checkstyle/issues/4122
                  "COLON")
@@ -60970,7 +61359,7 @@
      GOOGLE_TOKENS_IN_CONFIG_TO_IGNORE.put(
          "NoWhitespaceBefore",
          Stream.of(
-@@ -497,7 +497,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -497,7 +493,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                  // whitespace is necessary between a type annotation and ellipsis
                  // according '4.6.2 Horizontal whitespace point 9'
                  "ELLIPSIS")
@@ -60979,7 +61368,7 @@
      INTERNAL_MODULES =
          Definitions.INTERNAL_MODULES.stream()
              .map(
-@@ -505,7 +505,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -505,7 +501,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
                    final String[] packageTokens = moduleName.split("\\.");
                    return packageTokens[packageTokens.length - 1];
                  })
@@ -60988,7 +61377,7 @@
    }
  
    @Override
-@@ -514,7 +514,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -514,7 +510,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -60997,7 +61386,7 @@
      final String inputFilePath = getPath("InputAllChecksDefaultConfig.java");
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
  
-@@ -534,7 +534,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -534,7 +530,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61006,7 +61395,7 @@
      for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
        if (AbstractCheck.class.isAssignableFrom(check)) {
          final AbstractCheck testedCheck =
-@@ -551,7 +551,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -551,7 +547,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61015,7 +61404,7 @@
      for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
        if (AbstractCheck.class.isAssignableFrom(check)) {
          final AbstractCheck testedCheck =
-@@ -568,7 +568,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -568,7 +564,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61024,7 +61413,7 @@
      for (Class<?> check : CheckUtil.getCheckstyleChecks()) {
        if (AbstractCheck.class.isAssignableFrom(check)) {
          final AbstractCheck testedCheck =
-@@ -585,7 +585,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -585,7 +581,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61033,7 +61422,7 @@
      for (Class<?> module : CheckUtil.getCheckstyleModules()) {
        if (ModuleReflectionUtil.isRootModule(module)
            || ModuleReflectionUtil.isFilterModule(module)
-@@ -605,7 +605,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -605,7 +601,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61042,7 +61431,7 @@
      final Set<String> modulesReferencedInConfig = CheckUtil.getConfigCheckStyleModules();
      final Set<String> moduleNames = CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
  
-@@ -622,7 +622,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -622,7 +618,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61051,7 +61440,7 @@
      final Configuration configuration =
          ConfigurationUtil.loadConfiguration("config/checkstyle-checks.xml");
  
-@@ -631,7 +631,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -631,7 +627,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61060,7 +61449,7 @@
      final Configuration configuration =
          ConfigurationUtil.loadConfiguration("src/main/resources/google_checks.xml");
  
-@@ -730,7 +730,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -730,7 +726,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61069,7 +61458,7 @@
      final Set<String> checkstyleModulesNames =
          CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
      final Set<String> modulesNamesWhichHaveXdocs = XdocUtil.getModulesNamesWhichHaveXdoc();
-@@ -752,7 +752,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -752,7 +748,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61078,7 +61467,7 @@
      final Set<String> configChecks = CheckUtil.getConfigCheckStyleModules();
      final Set<String> moduleNames = CheckUtil.getSimpleNames(CheckUtil.getCheckstyleModules());
      moduleNames.removeAll(INTERNAL_MODULES);
-@@ -764,7 +764,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -764,7 +760,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61087,7 +61476,7 @@
      for (Class<?> module : CheckUtil.getCheckstyleChecks()) {
        final String name = module.getSimpleName();
        final Set<Field> messages = CheckUtil.getCheckMessages(module, false);
-@@ -783,7 +783,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -783,7 +779,7 @@ public class AllChecksTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -61635,6 +62024,16 @@
      final ModuleFactory moduleFactory = TestUtil.getPackageObjectFactory();
      final List<Path> templatesWithPropertiesMacro =
          SiteUtil.getTemplatesThatContainPropertiesMacro();
+@@ -293,8 +293,7 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
+       if (!initialValue.startsWith("/dtds")) {
+         value =
+             currentXdocPath
+-                .getParent()
+-                .resolve(Path.of(value))
++                .resolveSibling(Path.of(value))
+                 .normalize()
+                 .toString()
+                 .replaceAll("src[\\\\/]site[\\\\/]xdoc[\\\\/]", "")
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsMobileWrapperTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsMobileWrapperTest.java
 @@ -21,6 +21,7 @@ package com.puppycrawl.tools.checkstyle.internal;

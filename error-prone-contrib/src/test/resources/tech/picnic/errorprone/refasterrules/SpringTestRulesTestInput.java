@@ -6,13 +6,13 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class SpringTestRulesTest implements RefasterRuleCollectionTestCase {
   @SuppressWarnings("deprecation" /* Rule rewrites deprecated method invocation. */)
-  ImmutableSet<BodyContentSpec> testBodyContentSpecJsonLenient() {
+  ImmutableSet<BodyContentSpec> testBodyContentSpecJsonJsonCompareModeLenient() {
     return ImmutableSet.of(
         ((BodyContentSpec) null).json("foo"), ((BodyContentSpec) null).json("bar", false));
   }
 
   @SuppressWarnings("deprecation" /* Rule rewrites deprecated method invocation. */)
-  BodyContentSpec testBodyContentSpecJsonStrict() {
+  BodyContentSpec testBodyContentSpecJsonJsonCompareModeStrict() {
     return ((BodyContentSpec) null).json("foo", true);
   }
 }

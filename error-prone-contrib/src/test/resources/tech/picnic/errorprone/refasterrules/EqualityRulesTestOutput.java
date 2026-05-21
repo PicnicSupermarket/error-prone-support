@@ -18,7 +18,7 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Objects.class, Optional.class, isEqual(null), not(null));
   }
 
-  ImmutableSet<Boolean> testEnumReferenceEquality() {
+  ImmutableSet<Boolean> testEqualToWithEnum() {
     return ImmutableSet.of(
         RoundingMode.UP == RoundingMode.DOWN,
         RoundingMode.UP == RoundingMode.DOWN,
@@ -28,22 +28,22 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         RoundingMode.UP != RoundingMode.DOWN);
   }
 
-  ImmutableSet<Predicate<RoundingMode>> testEnumReferenceEqualityLambda() {
+  ImmutableSet<Predicate<RoundingMode>> testEqualTo() {
     return ImmutableSet.of(v -> v == RoundingMode.DOWN, v -> v == RoundingMode.UP);
   }
 
-  boolean testEqualsPredicate() {
+  boolean testObjectEquals() {
     // XXX: When boxing is involved this rule seems to break. Example:
     // Stream.of(1).anyMatch(e -> Integer.MIN_VALUE.equals(e));
     return Stream.of("foo").anyMatch("bar"::equals);
   }
 
-  boolean testDoubleNegation() {
+  boolean testBooleanIdentity() {
     return Boolean.TRUE;
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
-  ImmutableSet<Boolean> testNegation() {
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
+  ImmutableSet<Boolean> testNotEqualTo() {
     return ImmutableSet.of(
         true != false,
         true != false,
@@ -52,13 +52,13 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         (short) 3 != (short) 4,
         3 != 4,
         3L != 4L,
-        3F != 4F,
+        3f != 4f,
         3.0 != 4.0,
         BoundType.OPEN != BoundType.CLOSED);
   }
 
-  @SuppressWarnings("SimplifyBooleanExpression")
-  ImmutableSet<Boolean> testIndirectDoubleNegation() {
+  @SuppressWarnings("SimplifyBooleanExpression" /* Tests use dummy expressions. */)
+  ImmutableSet<Boolean> testEqualToWithBoolean() {
     return ImmutableSet.of(
         true == false,
         true == false,
@@ -67,17 +67,17 @@ final class EqualityRulesTest implements RefasterRuleCollectionTestCase {
         (short) 3 == (short) 4,
         3 == 4,
         3L == 4L,
-        3F == 4F,
+        3f == 4f,
         3.0 == 4.0,
         BoundType.OPEN == BoundType.CLOSED);
   }
 
-  Predicate<String> testPredicateLambda() {
+  Predicate<String> testNot() {
     return v -> !v.isEmpty();
   }
 
-  ImmutableSet<Boolean> testEquals() {
-    return ImmutableSet.of("foo".equals("bar"), "baz".equals("qux"), "quuz".equals("quux"));
+  ImmutableSet<Boolean> testObjectEqualsWithObject() {
+    return ImmutableSet.of("foo".equals("bar"), "baz".equals("qux"), "corge".equals("quux"));
   }
 
   boolean testObjectsEquals() {

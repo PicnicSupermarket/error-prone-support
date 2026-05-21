@@ -12,12 +12,12 @@ final class DequeRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   void testDequeAddLast() {
-    new ArrayDeque<String>().add("foo");
-    new LinkedList<String>().add("bar");
+    new LinkedList<String>().add("foo");
+    new ArrayDeque<String>().add("bar");
   }
 
   ImmutableSet<String> testDequeRemoveFirst() {
-    return ImmutableSet.of(new ArrayDeque<String>(0).pop(), new ArrayDeque<String>(1).remove());
+    return ImmutableSet.of(new ArrayDeque<String>(1).pop(), new ArrayDeque<String>(2).remove());
   }
 
   boolean testDequeOfferLast() {

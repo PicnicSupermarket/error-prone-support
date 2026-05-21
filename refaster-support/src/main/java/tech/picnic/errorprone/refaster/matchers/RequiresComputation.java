@@ -14,7 +14,7 @@ import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.UnaryTree;
 
-/** A matcher of expressions that may a non-trivial amount of computation. */
+/** A matcher of expressions that may require a non-trivial amount of computation. */
 public final class RequiresComputation implements Matcher<ExpressionTree> {
   private static final long serialVersionUID = 1L;
 

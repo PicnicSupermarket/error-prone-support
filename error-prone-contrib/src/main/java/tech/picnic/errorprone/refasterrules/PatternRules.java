@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
-/** Refaster rules related to code dealing with regular expressions. */
+/** Refaster rules related to expressions dealing with {@link Pattern}s. */
 @OnlineDocumentation
 final class PatternRules {
   private PatternRules() {}
@@ -21,7 +21,7 @@ final class PatternRules {
   // `pattern.asMatchPredicate()`.
   static final class PatternAsPredicate {
     @BeforeTemplate
-    Predicate<CharSequence> before(Pattern pattern) {
+    com.google.common.base.Predicate<CharSequence> before(Pattern pattern) {
       return Predicates.contains(pattern);
     }
 
@@ -34,13 +34,13 @@ final class PatternRules {
   /** Prefer {@link Pattern#asPredicate()} over non-JDK alternatives. */
   static final class PatternCompileAsPredicate {
     @BeforeTemplate
-    Predicate<CharSequence> before(String pattern) {
-      return containsPattern(pattern);
+    com.google.common.base.Predicate<CharSequence> before(String regex) {
+      return containsPattern(regex);
     }
 
     @AfterTemplate
-    Predicate<String> after(String pattern) {
-      return Pattern.compile(pattern).asPredicate();
+    Predicate<String> after(String regex) {
+      return Pattern.compile(regex).asPredicate();
     }
   }
 }

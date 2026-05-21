@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -571,7 +570,7 @@ final class PrimitiveComparisonTest {
             "    dCmp.thenComparingDouble(o -> 0.0);",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -637,7 +636,7 @@ final class PrimitiveComparisonTest {
             "    dCmp.thenComparing(o -> Double.valueOf(0));",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -676,7 +675,7 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> fCmp = comparingDouble(o -> 0.0f);",
             "  Comparator<A> dCmp = comparingDouble(o -> 0.0);",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -717,7 +716,7 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> fCmp = comparing(o -> Float.valueOf(0));",
             "  Comparator<A> dCmp = comparing(o -> Double.valueOf(0));",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -749,7 +748,7 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> fCmp = Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> 0.0f);",
             "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparingDouble(o -> 0.0);",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test
@@ -789,6 +788,6 @@ final class PrimitiveComparisonTest {
             "  Comparator<A> fCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Float.valueOf(0));",
             "  Comparator<A> dCmp = Comparator.<A, A>comparing(o -> o).thenComparing(o -> Double.valueOf(0));",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

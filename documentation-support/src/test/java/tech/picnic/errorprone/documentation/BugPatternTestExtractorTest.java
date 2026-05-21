@@ -389,7 +389,6 @@ final class BugPatternTestExtractorTest {
         "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;",
-        "import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
         "final class SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest {",
@@ -401,7 +400,7 @@ final class BugPatternTestExtractorTest {
         "        .setFixChooser(FixChoosers.SECOND)",
         "        .addInputLines(\"A.java\", \"class A {}\")",
         "        .addOutputLines(\"A.java\", \"class A { /* This is a change. */ }\")",
-        "        .doTest(TestMode.TEXT_MATCH);",
+        "        .doTest();",
         "  }",
         "}");
 

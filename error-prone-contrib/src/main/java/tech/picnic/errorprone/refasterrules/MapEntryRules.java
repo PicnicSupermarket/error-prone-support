@@ -22,31 +22,31 @@ final class MapEntryRules {
   private MapEntryRules() {}
 
   /**
-   * Prefer {@link Map#entry(Object, Object)} over alternative ways to create an immutable map
-   * entry.
+   * Prefer {@link Map#entry(Object, Object)} over non-JDK alternatives or the associated
+   * constructor.
    *
    * <p><strong>Warning:</strong> while both {@link Maps#immutableEntry(Object, Object)} and {@link
-   * AbstractMap.SimpleImmutableEntry} allow {@code null} keys and values, the preferred @link
+   * AbstractMap.SimpleImmutableEntry} allow {@code null} keys and values, the preferred {@link
    * Map#entry(Object, Object)} variant does not. Moreover, the {@link Map.Entry} instances produced
-   * by the former approaches is {@link java.io.Serializable}, while this does not hold for the
+   * by the former approaches are {@link java.io.Serializable}, while this does not hold for the
    * object returned by the preferred approach.
    */
   static final class MapEntry<K, V> {
     @BeforeTemplate
-    Map.Entry<K, V> before(K key, V value) {
+    Map.Entry<K, V> before(K k, V v) {
       return Refaster.anyOf(
-          Maps.immutableEntry(key, value), new AbstractMap.SimpleImmutableEntry<>(key, value));
+          Maps.immutableEntry(k, v), new AbstractMap.SimpleImmutableEntry<>(k, v));
     }
 
     @AfterTemplate
-    Map.Entry<K, V> after(K key, V value) {
-      return Map.entry(key, value);
+    Map.Entry<K, V> after(K k, V v) {
+      return Map.entry(k, v);
     }
   }
 
   /** Prefer {@link Map.Entry#comparingByKey()} over more verbose alternatives. */
   // XXX: Also rewrite `Comparator.comparing{Double,Int,Long}(Map.Entry::getKey)`.
-  static final class MapEntryComparingByKey<K extends Comparable<? super K>, V> {
+  static final class ComparingByKey<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
       return Refaster.anyOf(comparing(Map.Entry::getKey), comparingByKey(naturalOrder()));
@@ -60,22 +60,22 @@ final class MapEntryRules {
   }
 
   /** Prefer {@link Map.Entry#comparingByKey(Comparator)} over more verbose alternatives. */
-  static final class MapEntryComparingByKeyWithCustomComparator<K, V> {
+  static final class ComparingByKeyWithComparator<K extends C, V, C> {
     @BeforeTemplate
-    Comparator<Map.Entry<K, V>> before(Comparator<? super K> cmp) {
+    Comparator<Map.Entry<K, V>> before(Comparator<C> cmp) {
       return comparing(Map.Entry::getKey, cmp);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Comparator<Map.Entry<K, V>> after(Comparator<? super K> cmp) {
+    Comparator<Map.Entry<K, V>> after(Comparator<C> cmp) {
       return comparingByKey(cmp);
     }
   }
 
   /** Prefer {@link Map.Entry#comparingByValue()} over more verbose alternatives. */
   // XXX: Also rewrite `Comparator.comparing{Double,Int,Long}(Map.Entry::getValue)`.
-  static final class MapEntryComparingByValue<K, V extends Comparable<? super V>> {
+  static final class ComparingByValue<K, V extends Comparable<? super V>> {
     @BeforeTemplate
     Comparator<Map.Entry<K, V>> before() {
       return Refaster.anyOf(comparing(Map.Entry::getValue), comparingByValue(naturalOrder()));
@@ -89,15 +89,15 @@ final class MapEntryRules {
   }
 
   /** Prefer {@link Map.Entry#comparingByValue(Comparator)} over more verbose alternatives. */
-  static final class MapEntryComparingByValueWithCustomComparator<K, V> {
+  static final class ComparingByValueWithComparator<K, V extends C, C> {
     @BeforeTemplate
-    Comparator<Map.Entry<K, V>> before(Comparator<? super V> cmp) {
+    Comparator<Map.Entry<K, V>> before(Comparator<C> cmp) {
       return comparing(Map.Entry::getValue, cmp);
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Comparator<Map.Entry<K, V>> after(Comparator<? super V> cmp) {
+    Comparator<Map.Entry<K, V>> after(Comparator<C> cmp) {
       return comparingByValue(cmp);
     }
   }

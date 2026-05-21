@@ -16,7 +16,7 @@ import tech.picnic.errorprone.refaster.matchers.IsList;
 final class DequeRules {
   private DequeRules() {}
 
-  /** Prefer {@link Deque#addLast(Object)} over less clear alternatives. */
+  /** Prefer {@link Deque#addFirst(Object)} over less explicit alternatives. */
   static final class DequeAddFirst<S, T extends S> {
     @BeforeTemplate
     void before(Deque<S> deque, T element) {
@@ -30,7 +30,7 @@ final class DequeRules {
   }
 
   /**
-   * Prefer {@link Deque#addLast(Object)} over less clear alternatives.
+   * Prefer {@link Deque#addLast(Object)} over less explicit alternatives.
    *
    * <p>Note: this rule does not match instances of type {@link java.util.List} (including {@link
    * java.util.LinkedList}, which also implements {@link Deque}), as {@link
@@ -48,20 +48,20 @@ final class DequeRules {
     }
   }
 
-  /** Prefer {@link Deque#removeFirst()} over less clear alternatives. */
+  /** Prefer {@link Deque#removeFirst()} over less explicit alternatives. */
   static final class DequeRemoveFirst<S, T extends S> {
     @BeforeTemplate
-    S before(Deque<T> deque) {
+    T before(Deque<T> deque) {
       return Refaster.anyOf(deque.pop(), deque.remove());
     }
 
     @AfterTemplate
-    S after(Deque<T> deque) {
+    T after(Deque<T> deque) {
       return deque.removeFirst();
     }
   }
 
-  /** Prefer {@link Deque#offerLast(Object)} over less clear alternatives. */
+  /** Prefer {@link Deque#offerLast(Object)} over less explicit alternatives. */
   static final class DequeOfferLast<S, T extends S> {
     @BeforeTemplate
     boolean before(Deque<S> deque, T element) {
@@ -74,55 +74,55 @@ final class DequeRules {
     }
   }
 
-  /** Prefer {@link Deque#pollFirst()} over less clear alternatives. */
+  /** Prefer {@link Deque#pollFirst()} over less explicit alternatives. */
   static final class DequePollFirst<S, T extends S> {
     @BeforeTemplate
-    @Nullable S before(Deque<T> deque) {
+    @Nullable T before(Deque<T> deque) {
       return deque.poll();
     }
 
     @AfterTemplate
-    @Nullable S after(Deque<T> deque) {
+    @Nullable T after(Deque<T> deque) {
       return deque.pollFirst();
     }
   }
 
-  /** Prefer {@link Deque#pollFirst()} over less clear alternatives. */
+  /** Prefer {@link Deque#getFirst()} over less explicit alternatives. */
   static final class DequeGetFirst<S, T extends S> {
     @BeforeTemplate
-    S before(Deque<T> deque) {
+    T before(Deque<T> deque) {
       return deque.element();
     }
 
     @AfterTemplate
-    S after(Deque<T> deque) {
+    T after(Deque<T> deque) {
       return deque.getFirst();
     }
   }
 
-  /** Prefer {@link Deque#peekFirst()} over less clear alternatives. */
+  /** Prefer {@link Deque#peekFirst()} over less explicit alternatives. */
   static final class DequePeekFirst<S, T extends S> {
     @BeforeTemplate
-    @Nullable S before(Deque<T> deque) {
+    @Nullable T before(Deque<T> deque) {
       return deque.peek();
     }
 
     @AfterTemplate
-    @Nullable S after(Deque<T> deque) {
+    @Nullable T after(Deque<T> deque) {
       return deque.peekFirst();
     }
   }
 
-  /** Prefer {@link Deque#removeFirstOccurrence(Object)} over less clear alternatives. */
-  static final class DequeRemoveFirstOccurrence<S, T extends S> {
+  /** Prefer {@link Deque#removeFirstOccurrence(Object)} over less explicit alternatives. */
+  static final class DequeRemoveFirstOccurrence<T> {
     @BeforeTemplate
-    boolean before(Deque<S> deque, T element) {
-      return deque.remove(element);
+    boolean before(Deque<T> deque, Object object) {
+      return deque.remove(object);
     }
 
     @AfterTemplate
-    boolean after(Deque<S> deque, T element) {
-      return deque.removeFirstOccurrence(element);
+    boolean after(Deque<T> deque, Object object) {
+      return deque.removeFirstOccurrence(object);
     }
   }
 

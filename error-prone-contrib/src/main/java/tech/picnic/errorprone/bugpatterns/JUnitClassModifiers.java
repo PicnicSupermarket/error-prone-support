@@ -16,13 +16,13 @@ import static tech.picnic.errorprone.utils.MoreJUnitMatchers.TEST_METHOD;
 import static tech.picnic.errorprone.utils.MoreMatchers.hasMetaAnnotation;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
+import com.google.errorprone.fixes.SuggestedFixes.Visibility;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ClassTree;
@@ -66,12 +66,7 @@ public final class JUnitClassModifiers extends BugChecker implements ClassTreeMa
       return Description.NO_MATCH;
     }
 
-    SuggestedFix.Builder fixBuilder = SuggestedFix.builder();
-    SuggestedFixes.removeModifiers(
-            tree.getModifiers(),
-            state,
-            Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.PROTECTED, Modifier.PUBLIC))
-        .ifPresent(fixBuilder::merge);
+    SuggestedFix.Builder fixBuilder = Visibility.PACKAGE.refactor(tree, state).toBuilder();
 
     if (!HAS_SPRING_CONFIGURATION_ANNOTATION.matches(tree, state)) {
       SuggestedFixes.addModifiers(tree, state, Modifier.FINAL).ifPresent(fixBuilder::merge);

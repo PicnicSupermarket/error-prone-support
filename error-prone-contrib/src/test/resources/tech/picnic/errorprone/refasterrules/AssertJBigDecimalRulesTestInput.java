@@ -18,12 +18,12 @@ final class AssertJBigDecimalRulesTest implements RefasterRuleCollectionTestCase
   ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsEqualByComparingTo() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isCloseTo(BigDecimal.ONE, offset(BigDecimal.ZERO)),
-        assertThat(BigDecimal.ZERO).isCloseTo(BigDecimal.ONE, withPercentage(0)));
+        assertThat(BigDecimal.ONE).isCloseTo(BigDecimal.TEN, withPercentage(0)));
   }
 
   ImmutableSet<AbstractBigDecimalAssert<?>> testAbstractBigDecimalAssertIsNotEqualByComparingTo() {
     return ImmutableSet.of(
         assertThat(BigDecimal.ZERO).isNotCloseTo(BigDecimal.ONE, offset(BigDecimal.ZERO)),
-        assertThat(BigDecimal.ZERO).isNotCloseTo(BigDecimal.ONE, withPercentage(0)));
+        assertThat(BigDecimal.ONE).isNotCloseTo(BigDecimal.TEN, withPercentage(0)));
   }
 }

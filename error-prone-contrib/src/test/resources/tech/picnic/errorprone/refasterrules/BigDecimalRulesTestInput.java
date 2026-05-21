@@ -22,10 +22,10 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<BigDecimal> testBigDecimalValueOf() {
-    return ImmutableSet.of(new BigDecimal(2), new BigDecimal(2L), new BigDecimal(2.0));
+    return ImmutableSet.of(new BigDecimal(1), new BigDecimal(2L), new BigDecimal(3.0));
   }
 
-  ImmutableSet<Boolean> testBigDecimalSignumIsZero() {
+  ImmutableSet<Boolean> testBigDecimalSignumEqualToZero() {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).compareTo(BigDecimal.ZERO) == 0,
         BigDecimal.ZERO.compareTo(BigDecimal.valueOf(2)) == 0,
@@ -37,11 +37,11 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).compareTo(BigDecimal.ZERO) > 0,
         BigDecimal.ZERO.compareTo(BigDecimal.valueOf(2)) < 0,
-        BigDecimal.valueOf(3).signum() > 0,
+        BigDecimal.valueOf(3).signum() == 1,
         BigDecimal.valueOf(4).signum() >= 1,
         BigDecimal.valueOf(5).compareTo(BigDecimal.ZERO) <= 0,
         BigDecimal.ZERO.compareTo(BigDecimal.valueOf(6)) >= 0,
-        BigDecimal.valueOf(7).signum() <= 0,
+        BigDecimal.valueOf(7).signum() != 1,
         BigDecimal.valueOf(8).signum() < 1);
   }
 
@@ -49,11 +49,11 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).compareTo(BigDecimal.ZERO) < 0,
         BigDecimal.ZERO.compareTo(BigDecimal.valueOf(2)) > 0,
-        BigDecimal.valueOf(3).signum() < 0,
+        BigDecimal.valueOf(3).signum() == -1,
         BigDecimal.valueOf(4).signum() <= -1,
         BigDecimal.valueOf(5).compareTo(BigDecimal.ZERO) >= 0,
         BigDecimal.ZERO.compareTo(BigDecimal.valueOf(6)) <= 0,
-        BigDecimal.valueOf(7).signum() >= 0,
+        BigDecimal.valueOf(7).signum() != -1,
         BigDecimal.valueOf(8).signum() > -1);
   }
 }

@@ -20,26 +20,25 @@ final class ImmutableMultisetRulesTest implements RefasterRuleCollectionTestCase
     return new ImmutableMultiset.Builder<>();
   }
 
-  ImmutableMultiset<ImmutableMultiset<Integer>> testEmptyImmutableMultiset() {
-    return ImmutableMultiset.of(
+  ImmutableSet<ImmutableMultiset<Integer>> testImmutableMultisetOf() {
+    return ImmutableSet.of(
         ImmutableMultiset.<Integer>builder().build(),
         Stream.<Integer>empty().collect(toImmutableMultiset()));
   }
 
-  @SuppressWarnings("unchecked")
-  ImmutableMultiset<ImmutableMultiset<Integer>> testIterableToImmutableMultiset() {
-    return ImmutableMultiset.of(
-        ImmutableList.of(1).stream().collect(toImmutableMultiset()),
-        Streams.stream(ImmutableList.of(2)::iterator).collect(toImmutableMultiset()),
-        Streams.stream(ImmutableList.of(3).iterator()).collect(toImmutableMultiset()),
-        ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(4)).build(),
-        ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(5)::iterator).build(),
-        ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(6).iterator()).build(),
-        ImmutableMultiset.<Integer>builder().add(new Integer[] {7}).build(),
-        Arrays.stream(new Integer[] {8}).collect(toImmutableMultiset()));
+  @SuppressWarnings("unchecked" /* Safe generic array type creation. */)
+  ImmutableSet<ImmutableMultiset<Integer>> testImmutableMultisetCopyOf() {
+    return ImmutableSet.of(
+        ImmutableMultiset.<Integer>builder().add(new Integer[] {1}).build(),
+        Arrays.stream(new Integer[] {2}).collect(toImmutableMultiset()),
+        ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(3).iterator()).build(),
+        Streams.stream(ImmutableList.of(4).iterator()).collect(toImmutableMultiset()),
+        ImmutableMultiset.<Integer>builder().addAll(ImmutableMultiset.of(5)).build(),
+        Streams.stream(ImmutableList.of(6)::iterator).collect(toImmutableMultiset()),
+        ImmutableList.of(7).stream().collect(toImmutableMultiset()));
   }
 
-  ImmutableMultiset<Integer> testStreamToImmutableMultiset() {
+  ImmutableMultiset<Integer> testStreamCollectToImmutableMultiset() {
     return ImmutableMultiset.copyOf(Stream.of(1).iterator());
   }
 }

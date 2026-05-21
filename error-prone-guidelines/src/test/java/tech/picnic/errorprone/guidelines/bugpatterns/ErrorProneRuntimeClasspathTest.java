@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -132,6 +131,6 @@ final class ErrorProneRuntimeClasspathTest {
             "    m(\"org.junit.jupiter.api.Nested\");",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }

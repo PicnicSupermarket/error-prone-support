@@ -19,11 +19,12 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
     return new ImmutableTable.Builder<>();
   }
 
-  ImmutableTable<Object, Object, Object> testImmutableTableBuilderBuildOrThrow() {
+  ImmutableTable<Object, Object, Object> testBuilderBuildOrThrow() {
     return ImmutableTable.builder().build();
   }
 
-  ImmutableSet<ImmutableTable<String, Integer, String>> testCellToImmutableTable() {
+  ImmutableSet<ImmutableTable<String, Integer, String>>
+      testImmutableTableOfCellGetRowKeyCellGetColumnKeyCellGetValue() {
     return ImmutableSet.of(
         ImmutableTable.<String, Integer, String>builder()
             .put(Tables.immutableCell("foo", 1, "bar"))
@@ -34,7 +35,7 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
                     Table.Cell::getRowKey, Table.Cell::getColumnKey, Table.Cell::getValue)));
   }
 
-  ImmutableTable<Integer, String, Integer> testStreamOfCellsToImmutableTable() {
+  ImmutableTable<Integer, String, Integer> testStreamCollectToImmutableTable() {
     return Stream.of(1, 2, 3)
         .map(n -> Tables.immutableCell(n, n.toString(), n * 2))
         .collect(
@@ -46,7 +47,7 @@ final class ImmutableTableRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableTable.<String, String, String>builder().buildOrThrow();
   }
 
-  ImmutableSet<ImmutableTable.Builder<String, String, Integer>> testImmutableTableBuilderPut() {
+  ImmutableSet<ImmutableTable.Builder<String, String, Integer>> testBuilderPut() {
     return ImmutableSet.of(
         ImmutableTable.<String, String, Integer>builder()
             .put(Tables.immutableCell("foo", "bar", 1)),

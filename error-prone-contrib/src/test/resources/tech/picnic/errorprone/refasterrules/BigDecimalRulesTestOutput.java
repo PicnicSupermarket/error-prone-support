@@ -22,10 +22,10 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<BigDecimal> testBigDecimalValueOf() {
-    return ImmutableSet.of(BigDecimal.valueOf(2), BigDecimal.valueOf(2L), BigDecimal.valueOf(2.0));
+    return ImmutableSet.of(BigDecimal.valueOf(1), BigDecimal.valueOf(2L), BigDecimal.valueOf(3.0));
   }
 
-  ImmutableSet<Boolean> testBigDecimalSignumIsZero() {
+  ImmutableSet<Boolean> testBigDecimalSignumEqualToZero() {
     return ImmutableSet.of(
         BigDecimal.valueOf(1).signum() == 0,
         BigDecimal.valueOf(2).signum() == 0,
@@ -35,25 +35,25 @@ final class BigDecimalRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Boolean> testBigDecimalSignumIsPositive() {
     return ImmutableSet.of(
-        BigDecimal.valueOf(1).signum() == 1,
-        BigDecimal.valueOf(2).signum() == 1,
-        BigDecimal.valueOf(3).signum() == 1,
-        BigDecimal.valueOf(4).signum() == 1,
-        BigDecimal.valueOf(5).signum() != 1,
-        BigDecimal.valueOf(6).signum() != 1,
-        BigDecimal.valueOf(7).signum() != 1,
-        BigDecimal.valueOf(8).signum() != 1);
+        BigDecimal.valueOf(1).signum() > 0,
+        BigDecimal.valueOf(2).signum() > 0,
+        BigDecimal.valueOf(3).signum() > 0,
+        BigDecimal.valueOf(4).signum() > 0,
+        BigDecimal.valueOf(5).signum() <= 0,
+        BigDecimal.valueOf(6).signum() <= 0,
+        BigDecimal.valueOf(7).signum() <= 0,
+        BigDecimal.valueOf(8).signum() <= 0);
   }
 
   ImmutableSet<Boolean> testBigDecimalSignumIsNegative() {
     return ImmutableSet.of(
-        BigDecimal.valueOf(1).signum() == -1,
-        BigDecimal.valueOf(2).signum() == -1,
-        BigDecimal.valueOf(3).signum() == -1,
-        BigDecimal.valueOf(4).signum() == -1,
-        BigDecimal.valueOf(5).signum() != -1,
-        BigDecimal.valueOf(6).signum() != -1,
-        BigDecimal.valueOf(7).signum() != -1,
-        BigDecimal.valueOf(8).signum() != -1);
+        BigDecimal.valueOf(1).signum() < 0,
+        BigDecimal.valueOf(2).signum() < 0,
+        BigDecimal.valueOf(3).signum() < 0,
+        BigDecimal.valueOf(4).signum() < 0,
+        BigDecimal.valueOf(5).signum() >= 0,
+        BigDecimal.valueOf(6).signum() >= 0,
+        BigDecimal.valueOf(7).signum() >= 0,
+        BigDecimal.valueOf(8).signum() >= 0);
   }
 }

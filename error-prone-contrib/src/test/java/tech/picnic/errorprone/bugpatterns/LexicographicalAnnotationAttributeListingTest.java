@@ -1,7 +1,6 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -285,7 +284,7 @@ final class LexicographicalAnnotationAttributeListingTest {
             "  @Foo(anns = {@Bar(\"a\"), @Bar({\"a\", \"b\"})})",
             "  A unsortedInnderAnns();",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 
   @Test

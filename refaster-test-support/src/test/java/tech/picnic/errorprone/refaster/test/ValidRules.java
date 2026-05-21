@@ -16,13 +16,13 @@ final class ValidRules {
 
   static final class StringIsEmpty2 {
     @BeforeTemplate
-    boolean before(String string) {
-      return string.toCharArray().length == 0;
+    boolean before(String str) {
+      return str.toCharArray().length == 0;
     }
 
     @AfterTemplate
-    boolean after(String string) {
-      return string.isEmpty();
+    boolean after(String str) {
+      return str.isEmpty();
     }
   }
 
@@ -44,17 +44,17 @@ final class ValidRules {
     abstract void doAfterAdd(E element);
 
     @BeforeTemplate
-    void before(Set<E> set, E elem) {
-      if (!set.contains(elem)) {
-        set.add(elem);
-        doAfterAdd(elem);
+    void before(Set<E> set, E element) {
+      if (!set.contains(element)) {
+        set.add(element);
+        doAfterAdd(element);
       }
     }
 
     @AfterTemplate
-    void after(Set<E> set, E elem) {
-      if (set.add(elem)) {
-        doAfterAdd(elem);
+    void after(Set<E> set, E element) {
+      if (set.add(element)) {
+        doAfterAdd(element);
       }
     }
   }

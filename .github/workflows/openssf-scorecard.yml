@@ -3,7 +3,7 @@
 # registered with GitHub's code scanning dashboard. When a pull request is
 # analyzed, any offending lines are annotated. See
 # https://securityscorecards.dev for details.
-name: OpenSSF Scorecard update
+name: Update OpenSSF Scorecard
 on:
   pull_request:
   push:
@@ -21,12 +21,11 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@20cf305ff2072d973412fa9b1e3a4f227bda3c76 # v2.14.0
+        uses: step-security/harden-runner@a5ad31d6a139d249332a2605b85202e8c0b78450 # v2.19.1
         with:
           # XXX: We can't currently use `disable-sudo-and-containers` here, as
           # the OpenSSF Scorecard analysis step below runs a Docker container.
           disable-sudo: true
-          egress-policy: block
           allowed-endpoints: >
             api.deps.dev:443
             api.github.com:443
@@ -40,7 +39,7 @@ jobs:
             *.sigstore.dev:443
             www.bestpractices.dev:443
       - name: Check out code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
       - name: Run OpenSSF Scorecard analysis
@@ -48,8 +47,8 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-          publish_results: ${{ github.ref == 'refs/heads/master' }}
+          publish_results: ${{ github.ref == github.event.repository.default_branch }}
       - name: Update GitHub's code scanning dashboard
-        uses: github/codeql-action/upload-sarif@5d4e8d1aca955e8d8589aabd499c5cae939e33c7 # v4.31.9
+        uses: github/codeql-action/upload-sarif@95e58e9a2cdfd71adc6e0353d5c52f41a045d225 # v4.35.2
         with:
           sarif_file: results.sarif

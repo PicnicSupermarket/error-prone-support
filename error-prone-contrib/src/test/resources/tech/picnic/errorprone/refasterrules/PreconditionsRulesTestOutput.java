@@ -12,52 +12,54 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
-  @SuppressWarnings("RequireNonNull")
+  @SuppressWarnings("RequireNonNullExpression")
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(checkNotNull(null));
   }
 
-  void testCheckArgument() {
+  void testCheckArgumentNot() {
     checkArgument(!"foo".isEmpty());
+    checkArgument("bar".isEmpty());
   }
 
-  void testCheckArgumentWithMessage() {
-    checkArgument(!"foo".isEmpty(), "The string is empty");
+  void testCheckArgumentNotWithString() {
+    checkArgument(!"foo".isEmpty(), "bar");
+    checkArgument("baz".isEmpty(), "qux");
   }
 
-  void testCheckElementIndexWithMessage() {
-    checkElementIndex(1, 2, "My index");
+  void testCheckElementIndex() {
+    checkElementIndex(1, 2, "foo");
   }
 
-  String testRequireNonNull() {
+  String testRequireNonNullExpression() {
     return requireNonNull("foo");
   }
 
-  void testRequireNonNullStatement() {
+  void testRequireNonNullBlock() {
     requireNonNull("foo");
   }
 
-  String testRequireNonNullWithMessage() {
-    return requireNonNull("foo", "The string is null");
+  String testRequireNonNullWithStringExpression() {
+    return requireNonNull("foo", "bar");
   }
 
-  void testRequireNonNullWithMessageStatement() {
-    requireNonNull("foo", "The string is null");
+  void testRequireNonNullWithStringBlock() {
+    requireNonNull("foo", "bar");
   }
 
   void testCheckPositionIndex() {
     checkPositionIndex(1, 2);
   }
 
-  void testCheckPositionIndexWithMessage() {
-    checkPositionIndex(1, 2, "My position");
+  void testCheckPositionIndexWithString() {
+    checkPositionIndex(1, 2, "foo");
   }
 
-  void testCheckState() {
+  void testCheckStateNot() {
     checkState(!"foo".isEmpty());
   }
 
-  void testCheckStateWithMessage() {
-    checkState(!"foo".isEmpty(), "The string is empty");
+  void testCheckStateNotWithString() {
+    checkState(!"foo".isEmpty(), "bar");
   }
 }

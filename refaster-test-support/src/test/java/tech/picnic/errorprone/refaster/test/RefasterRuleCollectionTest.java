@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.ValueSource;
  * intended, the {@code *TestOutput.java} files in this package contain error reporting that is
  * normally not present.
  */
+// XXX: Also add a test for which `RefasterRuleCollection#validate` throws an exception; as-is, a
+// no-op implementation also passes.
 final class RefasterRuleCollectionTest {
   @ParameterizedTest
   @ValueSource(

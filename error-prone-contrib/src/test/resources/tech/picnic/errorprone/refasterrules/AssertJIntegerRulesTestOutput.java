@@ -15,22 +15,22 @@ final class AssertJIntegerRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<AbstractIntegerAssert<?>> testAbstractIntegerAssertIsEqualTo() {
-    return ImmutableSet.of(assertThat(0).isEqualTo(1), assertThat(0).isEqualTo(1));
+    return ImmutableSet.of(assertThat(1).isEqualTo(2), assertThat(1).isEqualTo(2));
   }
 
   ImmutableSet<AbstractIntegerAssert<?>> testAbstractIntegerAssertIsNotEqualTo() {
-    return ImmutableSet.of(assertThat(0).isNotEqualTo(1), assertThat(0).isNotEqualTo(1));
+    return ImmutableSet.of(assertThat(1).isNotEqualTo(2), assertThat(1).isNotEqualTo(2));
   }
 
-  AbstractIntegerAssert<?> testAbstractIntegerAssertIsZero() {
-    return assertThat(0).isEqualTo(0);
+  AbstractIntegerAssert<?> testAbstractIntegerAssertIsEqualToZero() {
+    return assertThat(1).isEqualTo(0);
   }
 
-  AbstractIntegerAssert<?> testAbstractIntegerAssertIsNotZero() {
-    return assertThat(0).isNotEqualTo(0);
+  AbstractIntegerAssert<?> testAbstractIntegerAssertIsNotEqualToZero() {
+    return assertThat(1).isNotEqualTo(0);
   }
 
-  AbstractIntegerAssert<?> testAbstractIntegerAssertIsOne() {
-    return assertThat(0).isEqualTo(1);
+  AbstractIntegerAssert<?> testAbstractIntegerAssertIsEqualToOne() {
+    return assertThat(1).isEqualTo(1);
   }
 }

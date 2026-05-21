@@ -34,8 +34,8 @@ final class ImmutableMultisetRules {
     }
   }
 
-  /** Prefer {@link ImmutableMultiset#of()} over more contrived alternatives. */
-  static final class EmptyImmutableMultiset<T> {
+  /** Prefer {@link ImmutableMultiset#of()} over less efficient alternatives. */
+  static final class ImmutableMultisetOf<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before() {
       return Refaster.anyOf(
@@ -49,44 +49,44 @@ final class ImmutableMultisetRules {
   }
 
   /**
-   * Prefer {@link ImmutableMultiset#copyOf(Iterable)} and variants over more contrived
-   * alternatives.
+   * Prefer {@link ImmutableMultiset#copyOf(Iterable)} and variants over less efficient or more
+   * contrived alternatives.
    */
-  static final class IterableToImmutableMultiset<T> {
+  static final class ImmutableMultisetCopyOf<T> {
     @BeforeTemplate
-    ImmutableMultiset<T> before(T[] iterable) {
+    ImmutableMultiset<T> before(T[] elements) {
       return Refaster.anyOf(
-          ImmutableMultiset.<T>builder().add(iterable).build(),
-          Arrays.stream(iterable).collect(toImmutableMultiset()));
+          ImmutableMultiset.<T>builder().add(elements).build(),
+          Arrays.stream(elements).collect(toImmutableMultiset()));
     }
 
     @BeforeTemplate
-    ImmutableMultiset<T> before(Iterator<T> iterable) {
+    ImmutableMultiset<T> before(Iterator<T> elements) {
       return Refaster.anyOf(
-          ImmutableMultiset.<T>builder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableMultiset()));
+          ImmutableMultiset.<T>builder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableMultiset()));
     }
 
     @BeforeTemplate
-    ImmutableMultiset<T> before(Iterable<T> iterable) {
+    ImmutableMultiset<T> before(Iterable<T> elements) {
       return Refaster.anyOf(
-          ImmutableMultiset.<T>builder().addAll(iterable).build(),
-          Streams.stream(iterable).collect(toImmutableMultiset()));
+          ImmutableMultiset.<T>builder().addAll(elements).build(),
+          Streams.stream(elements).collect(toImmutableMultiset()));
     }
 
     @BeforeTemplate
-    ImmutableMultiset<T> before(Collection<T> iterable) {
-      return iterable.stream().collect(toImmutableMultiset());
+    ImmutableMultiset<T> before(Collection<T> elements) {
+      return elements.stream().collect(toImmutableMultiset());
     }
 
     @AfterTemplate
-    ImmutableMultiset<T> after(Iterable<T> iterable) {
-      return ImmutableMultiset.copyOf(iterable);
+    ImmutableMultiset<T> after(Iterable<T> elements) {
+      return ImmutableMultiset.copyOf(elements);
     }
   }
 
   /** Prefer {@link ImmutableMultiset#toImmutableMultiset()} over less idiomatic alternatives. */
-  static final class StreamToImmutableMultiset<T> {
+  static final class StreamCollectToImmutableMultiset<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before(Stream<T> stream) {
       return ImmutableMultiset.copyOf(stream.iterator());

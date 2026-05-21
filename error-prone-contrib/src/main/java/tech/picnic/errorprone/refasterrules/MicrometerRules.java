@@ -11,78 +11,76 @@ import io.micrometer.core.instrument.Tags;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with Micrometer. */
-// XXX: Consider replacing the `TagsOf[N]` rules with a bug checker, so that various other
-// expressions (e.g. those creating other collection types, those passing in tags some other way, or
-// those passing in more tags) can be replaced as wel.
+// XXX: Consider replacing the `TagsOfN` rules with a bug checker, so that various other expressions
+// (e.g. those creating other collection types, those passing in tags some other way, or those
+// passing in more tags) can be replaced as well.
 @OnlineDocumentation
 final class MicrometerRules {
   private MicrometerRules() {}
 
-  /** Prefer using {@link Tags} over other immutable collections. */
+  /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   static final class TagsOf1 {
     @BeforeTemplate
-    ImmutableCollection<Tag> before(Tag tag) {
-      return Refaster.anyOf(ImmutableSet.of(tag), ImmutableList.of(tag));
+    ImmutableCollection<Tag> before(Tag e1) {
+      return Refaster.anyOf(ImmutableSet.of(e1), ImmutableList.of(e1));
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag) {
-      return Tags.of(tag);
+    Tags after(Tag e1) {
+      return Tags.of(e1);
     }
   }
 
-  /** Prefer using {@link Tags} over other immutable collections. */
+  /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   static final class TagsOf2 {
     @BeforeTemplate
-    ImmutableCollection<Tag> before(Tag tag1, Tag tag2) {
-      return Refaster.anyOf(ImmutableSet.of(tag1, tag2), ImmutableList.of(tag1, tag2));
+    ImmutableCollection<Tag> before(Tag e1, Tag e2) {
+      return Refaster.anyOf(ImmutableSet.of(e1, e2), ImmutableList.of(e1, e2));
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2) {
-      return Tags.of(tag1, tag2);
+    Tags after(Tag e1, Tag e2) {
+      return Tags.of(e1, e2);
     }
   }
 
-  /** Prefer using {@link Tags} over other immutable collections. */
+  /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   static final class TagsOf3 {
     @BeforeTemplate
-    ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3) {
-      return Refaster.anyOf(ImmutableSet.of(tag1, tag2, tag3), ImmutableList.of(tag1, tag2, tag3));
+    ImmutableCollection<Tag> before(Tag e1, Tag e2, Tag e3) {
+      return Refaster.anyOf(ImmutableSet.of(e1, e2, e3), ImmutableList.of(e1, e2, e3));
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2, Tag tag3) {
-      return Tags.of(tag1, tag2, tag3);
+    Tags after(Tag e1, Tag e2, Tag e3) {
+      return Tags.of(e1, e2, e3);
     }
   }
 
-  /** Prefer using {@link Tags} over other immutable collections. */
+  /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   static final class TagsOf4 {
     @BeforeTemplate
-    ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
-      return Refaster.anyOf(
-          ImmutableSet.of(tag1, tag2, tag3, tag4), ImmutableList.of(tag1, tag2, tag3, tag4));
+    ImmutableCollection<Tag> before(Tag e1, Tag e2, Tag e3, Tag e4) {
+      return Refaster.anyOf(ImmutableSet.of(e1, e2, e3, e4), ImmutableList.of(e1, e2, e3, e4));
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2, Tag tag3, Tag tag4) {
-      return Tags.of(tag1, tag2, tag3, tag4);
+    Tags after(Tag e1, Tag e2, Tag e3, Tag e4) {
+      return Tags.of(e1, e2, e3, e4);
     }
   }
 
-  /** Prefer using {@link Tags} over other immutable collections. */
+  /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   static final class TagsOf5 {
     @BeforeTemplate
-    ImmutableCollection<Tag> before(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {
+    ImmutableCollection<Tag> before(Tag e1, Tag e2, Tag e3, Tag e4, Tag e5) {
       return Refaster.anyOf(
-          ImmutableSet.of(tag1, tag2, tag3, tag4, tag5),
-          ImmutableList.of(tag1, tag2, tag3, tag4, tag5));
+          ImmutableSet.of(e1, e2, e3, e4, e5), ImmutableList.of(e1, e2, e3, e4, e5));
     }
 
     @AfterTemplate
-    Iterable<Tag> after(Tag tag1, Tag tag2, Tag tag3, Tag tag4, Tag tag5) {
-      return Tags.of(tag1, tag2, tag3, tag4, tag5);
+    Tags after(Tag e1, Tag e2, Tag e3, Tag e4, Tag e5) {
+      return Tags.of(e1, e2, e3, e4, e5);
     }
   }
 }
