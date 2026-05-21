@@ -106,6 +106,9 @@ public final class MoreASTHelpers {
    * @see ASTHelpers#getUpperBound(Type, Types)
    */
   public static Type getLowerBound(Type type, Types types) {
+    // XXX: The `WILDCARD` guard is technically redundant: `wildLowerBound` returns the input
+    // unchanged for non-wildcards. It is kept for clarity, and because removing it would prevent
+    // the `TYPEVAR` branch below from being reached for captured type variables.
     if (type.hasTag(TypeTag.WILDCARD)) {
       return types.wildLowerBound(type);
     }

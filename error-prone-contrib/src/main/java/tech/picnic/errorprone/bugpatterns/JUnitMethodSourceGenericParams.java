@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.HAS_METHOD_SOURCE;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.findMethodSourceAnnotation;
@@ -42,7 +43,6 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
-import javax.lang.model.element.Name;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -59,9 +59,9 @@ import tech.picnic.errorprone.utils.MoreASTHelpers;
  * enforce type correctness for these parameters, leading to potential runtime errors that are
  * difficult to anticipate.
  *
- * <p>This bug checker only flags the {@link Arguments} provided in the {@code
- * JUnitMethodSourceGenericParams#SUPPORTED_METHOD_SOURCE_PROVIDERS supported method source
- * providers}, and will not flag those calculated at runtime using a map-reduce pattern, such as:
+ * <p>This bug checker only flags {@link Arguments} provided via supported collection and stream
+ * factory methods, and will not flag those calculated at runtime using a map-reduce pattern, such
+ * as:
  *
  * <pre>{@code
  * Stream.of(1, 2).map(Arguments::argument);
@@ -116,7 +116,10 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     return buildDescription(tree)
         .setMessage(
             "One or more generic parameters used in the following `@MethodSource` provider(s) don't match accepted types: %s"
-                .formatted(toMethodNames(offendingMethodSourceProviders)))
+                .formatted(
+                    offendingMethodSourceProviders.stream()
+                        .map(MethodTree::getName)
+                        .collect(joining(", "))))
         .build();
   }
 
@@ -137,12 +140,11 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
       MethodTree methodSourceMethodTree, MethodTree testMethodTree, VisitorState state) {
     ImmutableList<Type> testMethodTypes = toTypes(testMethodTree.getParameters());
     return findPotentialOffendingProviders(methodSourceMethodTree, state).stream()
-        .anyMatch(
-            provider -> !hasApplicableTypes(testMethodTypes, toTypes(provider.arguments()), state));
+        .anyMatch(arguments -> !hasApplicableTypes(testMethodTypes, toTypes(arguments), state));
   }
 
   /**
-   * Returns {@code true} iff all parameterized method source provider argument types are compatible
+   * Returns {@code true} if all parameterized method source provider argument types are compatible
    * with the accepted test method parameters.
    */
   private static boolean hasApplicableTypes(
@@ -154,18 +156,18 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
             testMethodTypes.stream(),
             providerArgumentTypes.stream(),
             (testType, providerType) ->
-                allParameterisedArgumentsHaveApplicableTypes(testType, providerType, types))
+                allParameterizedArgumentsHaveApplicableTypes(testType, providerType, types))
         .allMatch(applicable -> applicable);
   }
 
   /**
-   * Builds the list of {@link PotentialOffendingArgumentsProvider} by traversing the call hierarchy
-   * of the method source providers.
+   * Builds the list of argument lists by traversing the call hierarchy of the method source
+   * providers.
    *
    * @implNote All traversed methods are assumed to be within the same class as the test method.
    */
-  private static ImmutableList<PotentialOffendingArgumentsProvider> findPotentialOffendingProviders(
-      Tree tree, VisitorState state) {
+  private static ImmutableList<ImmutableList<? extends ExpressionTree>>
+      findPotentialOffendingProviders(Tree tree, VisitorState state) {
     return switch (tree) {
       case MethodTree methodTree ->
           collectReturnExpressions(methodTree).stream()
@@ -178,9 +180,11 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
             findMethodTreeFromEnclosingClass(
                 treeToString(methodInvocation.getMethodSelect(), state), state);
         if (referencedMethod.isPresent()) {
-          // Method is from the call hierarchy, within the same class.
           yield findPotentialOffendingProviders(referencedMethod.orElseThrow(), state);
         }
+        // XXX: The `referencedMethod.isPresent()` guard above is hard to mutation-test: Error
+        // Prone's infrastructure catches the `NoSuchElementException` thrown by `orElseThrow()`
+        // when the condition is mutated to always-true, so the test does not observe the failure.
         if (SUPPORTED_METHOD_SOURCE_PROVIDERS.matches(methodInvocation, state)) {
           yield collectPotentialOffendingProviders(methodInvocation.getArguments(), state);
         }
@@ -198,7 +202,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     };
   }
 
-  private static ImmutableList<PotentialOffendingArgumentsProvider>
+  private static ImmutableList<ImmutableList<? extends ExpressionTree>>
       collectPotentialOffendingProviders(
           List<? extends ExpressionTree> expressions, VisitorState state) {
     return expressions.stream()
@@ -209,7 +213,7 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
         .collect(toImmutableList());
   }
 
-  private static PotentialOffendingArgumentsProvider potentialOffendingProvider(
+  private static ImmutableList<? extends ExpressionTree> potentialOffendingProvider(
       MethodInvocationTree argumentMethodInvocation, VisitorState state) {
     // Skip the first argument when the factory is `argumentSet(...)`, as it's the argument set
     // name rather than a test argument.
@@ -218,19 +222,21 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
                 .contentEquals(ARGUMENT_SET_FACTORY)
             ? 1
             : 0;
-    return new PotentialOffendingArgumentsProvider(
-        argumentMethodInvocation.getArguments().stream().skip(skip).collect(toImmutableList()));
+    return argumentMethodInvocation.getArguments().stream().skip(skip).collect(toImmutableList());
   }
 
   /**
    * Determines whether all parameterized arguments have types that are compatible with the types of
    * the corresponding parameters in the test method.
    */
-  private static boolean allParameterisedArgumentsHaveApplicableTypes(
+  private static boolean allParameterizedArgumentsHaveApplicableTypes(
       Type testMethodParameterType, Type methodSourceProviderType, Types types) {
     if (!testMethodParameterType.isParameterized() || !methodSourceProviderType.isParameterized()) {
       // Skip non-parameterized arguments, as any type incompatibility will be flagged by JUnit at
       // runtime.
+      // XXX: This guard is technically redundant: `getTypeArguments()` returns an empty list for
+      // non-parameterized types, and `Streams.zip` of empty lists yields an empty stream for which
+      // `allMatch` trivially returns `true`. It is kept to make the intent explicit.
       return true;
     }
 
@@ -272,21 +278,17 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
 
   private static Optional<MethodTree> findMethodTreeFromEnclosingClass(
       String factoryReference, VisitorState state) {
-    return requireNonNull(state.findEnclosing(ClassTree.class), "No class enclosing method")
-        .getMembers()
-        .stream()
-        .flatMap(JUnitMethodSourceGenericParams::extractMembers)
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .filter(method -> hasMethodName(factoryReference, method))
-        .findFirst();
-  }
-
-  private static ImmutableList<String> toMethodNames(ImmutableList<MethodTree> methodTrees) {
-    return methodTrees.stream()
-        .map(MethodTree::getName)
-        .map(Name::toString)
-        .collect(toImmutableList());
+    ImmutableList.Builder<MethodTree> methods = ImmutableList.builder();
+    new TreeScanner<@Nullable Void, @Nullable Void>() {
+      @Override
+      public @Nullable Void visitMethod(MethodTree node, @Nullable Void unused) {
+        if (hasMethodName(factoryReference, node)) {
+          methods.add(node);
+        }
+        return super.visitMethod(node, null);
+      }
+    }.scan(requireNonNull(state.findEnclosing(ClassTree.class), "No class enclosing method"), null);
+    return methods.build().stream().findFirst();
   }
 
   private static ImmutableList<ExpressionTree> collectReturnExpressions(Tree methodTree) {
@@ -300,16 +302,6 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
     }.scan(methodTree, null);
 
     return returnExpressions.build();
-  }
-
-  // XXX: Having a `Stream` is not ideal as return type. Can we change that while the callers are
-  // not getting less nice?
-  private static Stream<? extends Tree> extractMembers(Tree tree) {
-    if (tree instanceof ClassTree classTree) {
-      return classTree.getMembers().stream()
-          .flatMap(JUnitMethodSourceGenericParams::extractMembers);
-    }
-    return Stream.of(tree);
   }
 
   /**
@@ -333,8 +325,4 @@ public final class JUnitMethodSourceGenericParams extends BugChecker implements 
   private static ImmutableList<Type> toTypes(List<? extends Tree> parameters) {
     return parameters.stream().map(ASTHelpers::getType).collect(toImmutableList());
   }
-
-  /** A representation of a potential offending {@link Arguments} object. */
-  private record PotentialOffendingArgumentsProvider(
-      ImmutableList<? extends ExpressionTree> arguments) {}
 }
