@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -442,6 +443,28 @@ final class OptionalRules {
     @AfterTemplate
     Optional<V> after(Optional<S> optional, Function<W, V> mapper) {
       return optional.map(mapper);
+    }
+  }
+
+  /**
+   * Prefer {@link java.util.Objects#requireNonNull(Object)} over less explicit alternatives.
+   *
+   * <p><strong>Warning:</strong> this rewrite is not behaviour-preserving if the fallback
+   * expression has side effects; such side effects will no longer be executed after the rewrite.
+   */
+  // XXX: Consider introducing a `BugChecker` that also handles the case where `Optional.of` is
+  // used with a possibly-null value, offering two suggested fixes: rewrite to `requireNonNull`
+  // (non-null case) or rewrite to `Optional.ofNullable` (nullable case).
+  static final class RequireNonNull<T> {
+    @BeforeTemplate
+    T before(T value, T fallback) {
+      return Optional.of(value).orElse(fallback);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    T after(T value) {
+      return requireNonNull(value);
     }
   }
 

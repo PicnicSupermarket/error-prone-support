@@ -142,6 +142,10 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.of(1).stream().map(String::valueOf).findAny();
   }
 
+  String testRequireNonNull() {
+    return Optional.of("foo").orElse("bar");
+  }
+
   Stream<String> testOptionalStream() {
     return Optional.of("foo").map(Stream::of).orElseGet(Stream::empty);
   }
