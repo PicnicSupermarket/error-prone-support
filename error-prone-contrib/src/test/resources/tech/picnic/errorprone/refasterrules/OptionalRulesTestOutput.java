@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.common.collect.Streams.stream;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
@@ -138,6 +139,10 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
 
   Optional<String> testOptionalMapWithFunction() {
     return Optional.of(1).map(String::valueOf);
+  }
+
+  String testRequireNonNull() {
+    return requireNonNull("foo");
   }
 
   Stream<String> testOptionalStream() {
