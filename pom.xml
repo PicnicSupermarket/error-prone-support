@@ -193,7 +193,7 @@
         <version.error-prone-orig>2.50.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
         <version.maven>3.9.14</version.maven>
-        <version.pitest-git>2.3.2</version.pitest-git>
+        <version.pitest-git>2.3.3</version.pitest-git>
     </properties>
 
     <dependencyManagement>
