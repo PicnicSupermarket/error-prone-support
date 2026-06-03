@@ -447,10 +447,13 @@ final class OptionalRules {
   }
 
   /**
-   * Prefer {@link java.util.Objects#requireNonNull(Object)} over less explicit alternatives.
+   * Prefer {@link java.util.Objects#requireNonNull(Object)} over an {@link
+   * java.util.Optional#orElse(Object)} call on an {@link java.util.Optional} that is known to be
+   * non-empty.
    *
-   * <p><strong>Warning:</strong> this rewrite is not behaviour-preserving if the fallback
-   * expression has side effects; such side effects will no longer be executed after the rewrite.
+   * <p><strong>Warning:</strong> This rewrite is not behaviour-preserving if the {@code fallback}
+   * expression has side effects: after the rewrite, such side effects will no longer be executed.
+   * In practice such code would be extremely fragile, so this is considered acceptable.
    */
   // XXX: Consider introducing a `BugChecker` that also handles the case where `Optional.of` is
   // used with a possibly-null value, offering two suggested fixes: rewrite to `requireNonNull`
