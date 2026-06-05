@@ -1,7 +1,7 @@
 package tech.picnic.errorprone.guidelines.bugpatterns;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSetMultimap.toImmutableSetMultimap;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
@@ -13,7 +13,7 @@ import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -32,8 +32,16 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Symbol;
+import com.sun.tools.javac.code.Symbol.TypeSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.code.Type.ClassType;
+import com.sun.tools.javac.code.Type.TypeVar;
 import com.sun.tools.javac.code.Types;
+import com.sun.tools.javac.code.Types.AdaptFailure;
+import com.sun.tools.javac.util.List;
+import com.sun.tools.javac.util.ListBuffer;
+import java.util.Iterator;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -63,9 +71,6 @@ import tech.picnic.errorprone.utils.SourceCode;
 // `Executable`/`ThrowingSupplier`/`ThrowingCallable` and `ThrowingRunnable`/`ThrowingCallable`,
 // respectively. (Though there's nuance here involving
 // `@(Not)Matches(ThrowsCheckedException.class)`; see the `MonoFromSupplier` rule.)
-// XXX: As-is, this check is too strict when it claims that `Mono<T>` is not a supertype of
-// `Mono<Void>`, despite `T` being an unconstrained class-level type parameter. See `FluxThen` for
-// an example. Try to do beter.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
@@ -90,14 +95,17 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
     ImmutableList<MethodTree> beforeMethods = getMatchingMethods(tree, IS_BEFORE_TEMPLATE, state);
+    // XXX: Mutations of this guard are unkillable: removing the early return falls through to
+    // `isCompatible(emptyList, afterMethods, state)`, which returns `true` vacuously, then the
+    // ternary again returns `dropAnnotationIfPresent(tree, state)`. The guard is a fast path
+    // for non-Refaster classes, not a correctness check.
     if (beforeMethods.isEmpty()) {
-      /* Fast path: this is not a Refaster rule. */
       return dropAnnotationIfPresent(tree, state);
     }
 
     ImmutableList<MethodTree> afterMethods = getMatchingMethods(tree, IS_AFTER_TEMPLATE, state);
-    return hasCompatibleParameterTypes(beforeMethods, afterMethods, state)
-            && hasCompatibleReturnTypes(beforeMethods, afterMethods, state)
+    Symbol classSymbol = ASTHelpers.getSymbol(tree);
+    return isCompatible(beforeMethods, afterMethods, classSymbol, state)
         ? dropAnnotationIfPresent(tree, state)
         : addAnnotationIfAbsent(tree, state);
   }
@@ -111,58 +119,163 @@ public final class RefasterSourceCompatibility extends BugChecker implements Cla
   }
 
   /**
-   * Tells whether all given {@code @AfterTemplate} methods have parameter types that are supertypes
-   * of each of the corresponding {@code @BeforeTemplate} parameter types.
+   * Tells whether every pair of {@link BeforeTemplate} and {@link AfterTemplate} methods admits a
+   * single substitution of the class-level type variables that simultaneously makes each
+   * before-parameter a subtype of the corresponding (by name) after-parameter and the
+   * after-return-type a subtype of the before-return-type.
    */
-  private static boolean hasCompatibleParameterTypes(
+  private static boolean isCompatible(
       ImmutableList<MethodTree> beforeMethods,
       ImmutableList<MethodTree> afterMethods,
+      Symbol classSymbol,
       VisitorState state) {
-    ImmutableSetMultimap<String, Type> beforeTypes =
-        beforeMethods.stream()
-            .flatMap(m -> m.getParameters().stream())
-            .collect(
-                toImmutableSetMultimap(
-                    p -> p.getName().toString(), p -> ASTHelpers.getSymbol(p).type));
-
     Types types = state.getTypes();
-    for (MethodTree afterMethod : afterMethods) {
-      for (VariableTree afterParam : afterMethod.getParameters()) {
-        Type afterParamType = ASTHelpers.getSymbol(afterParam).type;
-        if (!beforeTypes.get(afterParam.getName().toString()).stream()
-            .allMatch(type -> types.isSubtype(type, afterParamType))) {
+    boolean hasClassTypeVars = classSymbol.type.getTypeArguments().nonEmpty();
+    TypeSymbol carrier = state.getSymtab().objectType.tsym;
+    for (MethodTree beforeMethod : beforeMethods) {
+      for (MethodTree afterMethod : afterMethods) {
+        if (!isCompatible(beforeMethod, afterMethod, hasClassTypeVars, carrier, types)) {
           return false;
         }
       }
     }
-
     return true;
   }
 
   /**
-   * Tells whether all given {@code @AfterTemplate} methods have a return type that is a subtype of
-   * each of the given {@code @BeforeTemplate} methods.
+   * Tells whether one before/after pair admits such a substitution.
    *
-   * @implNote Note that this method does not need to implement custom logic to handle {@code void}
-   *     return types (associated with "block templates"): Refaster rules cannot combine {@code
-   *     void} after-templates with non-{@code void} before-templates, and while the reverse is
-   *     supported, it is not in general safe to replace a sequence of statements with a {@code
-   *     return} statement.
+   * <p>First attempts direct subtype checks on the original types. If those fail and the rule's
+   * class declares type variables, packages the matched parameter pairs and the return-type pair
+   * into a synthetic n-ary {@link ClassType} carrier and feeds them through a single {@link
+   * Types#adapt} invocation, which throws {@link AdaptFailure} if a class-level type variable would
+   * have to map to two different types within this pair.
    */
-  private static boolean hasCompatibleReturnTypes(
-      ImmutableList<MethodTree> beforeMethods,
-      ImmutableList<MethodTree> afterMethods,
-      VisitorState state) {
-    for (MethodTree afterMethod : afterMethods) {
-      Type afterReturnType = ASTHelpers.getSymbol(afterMethod).getReturnType();
-      for (MethodTree beforeMethod : beforeMethods) {
-        Type beforeReturnType = ASTHelpers.getSymbol(beforeMethod).getReturnType();
-        if (!state.getTypes().isSubtype(afterReturnType, beforeReturnType)) {
-          return false;
-        }
+  private static boolean isCompatible(
+      MethodTree beforeMethod,
+      MethodTree afterMethod,
+      boolean hasClassTypeVars,
+      TypeSymbol carrier,
+      Types types) {
+    ImmutableMap<String, Type> beforeParamsByName =
+        beforeMethod.getParameters().stream()
+            .collect(
+                toImmutableMap(p -> p.getName().toString(), p -> ASTHelpers.getSymbol(p).type));
+
+    ImmutableList.Builder<Type> afterTupleBuilder = ImmutableList.builder();
+    ImmutableList.Builder<Type> beforeTupleBuilder = ImmutableList.builder();
+    for (VariableTree afterParam : afterMethod.getParameters()) {
+      Type matchedBefore = beforeParamsByName.get(afterParam.getName().toString());
+      // XXX: Mutations of this guard are unkillable: in practice Refaster template parameters
+      // align by name across `@BeforeTemplate` and `@AfterTemplate` methods, so `matchedBefore`
+      // is never null in any test scenario. Forcing the body to always execute would record
+      // `(afterType, null)` pairs that no test exercises.
+      if (matchedBefore != null) {
+        afterTupleBuilder.add(ASTHelpers.getSymbol(afterParam).type);
+        beforeTupleBuilder.add(matchedBefore);
       }
     }
+    afterTupleBuilder.add(ASTHelpers.getSymbol(afterMethod).getReturnType());
+    beforeTupleBuilder.add(ASTHelpers.getSymbol(beforeMethod).getReturnType());
 
+    ImmutableList<Type> afterTuple = afterTupleBuilder.build();
+    ImmutableList<Type> beforeTuple = beforeTupleBuilder.build();
+    int returnIndex = afterTuple.size() - 1;
+
+    /*
+     * Fast path: direct subtype checks. If all hold, the rule is compatible without needing any
+     * substitution. This bypasses {@link Types#adapt} and the subsequent {@link Types#subst},
+     * both of which structurally walk types and can lose reflexivity of {@link Types#isSubtype}
+     * on F-bounded wildcards such as `AbstractBigDecimalAssert<?>` and `Enum<?>`.
+     */
+    if (isDirectlyCompatible(afterTuple, beforeTuple, returnIndex, types)) {
+      return true;
+    }
+    // XXX: Mutations of this guard are unkillable: dropping the early return falls through to
+    // `Types#adapt` with no class-level type variables to bind, which produces empty
+    // `from`/`to` lists. The slot verification with empty substitution yields the same verdict
+    // as the fast path that just failed.
+    if (!hasClassTypeVars) {
+      return false;
+    }
+
+    ListBuffer<Type> from = new ListBuffer<>();
+    ListBuffer<Type> to = new ListBuffer<>();
+    try {
+      types.adapt(
+          new ClassType(Type.noType, List.from(afterTuple), carrier),
+          new ClassType(Type.noType, List.from(beforeTuple), carrier),
+          from,
+          to);
+    } catch (AdaptFailure e) {
+      /* The before-method forces conflicting bindings of a class-level type variable. */
+      return false;
+    }
+    List<Type> fromList = from.toList();
+    List<Type> toList = to.toList();
+
+    if (!areBindingsValid(fromList, toList, types)) {
+      return false;
+    }
+
+    /*
+     * After substitution, each before-parameter must be a subtype of the corresponding
+     * after-parameter (contravariant), and the after-return-type must be a subtype of the
+     * before-return-type (covariant).
+     */
+    // XXX: Mutating the loop bound from `<` to `<=` is unkillable: the extra iteration would
+    // apply the contravariant subtype check to the return-type slot, but for every test case
+    // that reaches this loop, the substituted after-return-type either equals the
+    // before-return-type (so both directions pass) or is rejected by the explicit covariant
+    // check on the next line.
+    for (int i = 0; i < returnIndex; i++) {
+      if (!types.isSubtype(beforeTuple.get(i), types.subst(afterTuple.get(i), fromList, toList))) {
+        return false;
+      }
+    }
+    return types.isSubtype(
+        types.subst(afterTuple.get(returnIndex), fromList, toList), beforeTuple.get(returnIndex));
+  }
+
+  private static boolean isDirectlyCompatible(
+      ImmutableList<Type> afterTuple,
+      ImmutableList<Type> beforeTuple,
+      int returnIndex,
+      Types types) {
+    for (int i = 0; i < returnIndex; i++) {
+      if (!types.isSubtype(beforeTuple.get(i), afterTuple.get(i))) {
+        return false;
+      }
+    }
+    return types.isSubtype(afterTuple.get(returnIndex), beforeTuple.get(returnIndex));
+  }
+
+  /**
+   * Rejects substitutions that map a class-level type variable to a <em>different</em> type
+   * variable, or that violate a type variable's declared upper bound. {@link Types#adapt} does not
+   * verify either constraint itself; identity bindings, where the same type variable appears on
+   * both sides, are accepted as no-ops.
+   */
+  private static boolean areBindingsValid(List<Type> fromList, List<Type> toList, Types types) {
+    Iterator<Type> fromIt = fromList.iterator();
+    Iterator<Type> toIt = toList.iterator();
+    while (fromIt.hasNext()) {
+      TypeVar tv = (TypeVar) fromIt.next();
+      Type val = toIt.next();
+      if (val instanceof TypeVar valVar) {
+        // XXX: Mutating this guard to always execute the body is unkillable: identity bindings
+        // (`T -> T`, the only `valVar.tsym.equals(tv.tsym)` case here) can only arise when the
+        // same type variable appears on both sides, and such cases are caught by the fast-path
+        // direct subtype check before reaching this method.
+        if (!valVar.tsym.equals(tv.tsym)) {
+          /* Substituting one type variable for another does not yield a concrete type. */
+          return false;
+        }
+        /* Identity binding; trivially satisfies the upper bound. */
+      } else if (!types.isSubtype(val, tv.getUpperBound())) {
+        return false;
+      }
+    }
     return true;
   }
 
