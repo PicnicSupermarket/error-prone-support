@@ -163,5 +163,5 @@ final class DocumentationGeneratorTaskListenerTest {
     }
   }
 
-  private record ExtractionParameters(String className, ImmutableList<String> path) {}
+  record ExtractionParameters(String className, ImmutableList<String> path) {}
 }
