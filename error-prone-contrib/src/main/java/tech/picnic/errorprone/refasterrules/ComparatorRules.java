@@ -54,7 +54,10 @@ final class ComparatorRules {
   static final class NaturalOrder<T extends Comparable<? super T>, U extends T> {
     // XXX: Ideally `? super T` would also be replaced by a class-level type parameter, but Java
     // does not allow a type variable to be followed by other bounds.
+    // XXX: Drop the `TypeParameterQualifier` suppression if
+    // https://github.com/google/error-prone/pull/5884 is merged and released.
     @BeforeTemplate
+    @SuppressWarnings("TypeParameterQualifier" /* We aim to match `T::compareTo` for any `T`. */)
     Comparator<T> before(
         @Matches(IsIdentityOperation.class) Function<? super T, U> identityKeyExtractor) {
       return Refaster.anyOf(

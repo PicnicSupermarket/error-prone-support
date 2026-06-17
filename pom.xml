@@ -2010,11 +2010,11 @@
                                     -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
                                     -XepOpt:RefactorSwitch:EnableAssignmentSwitch=true
                                     -XepOpt:RefactorSwitch:EnableSimplifySwitch=true
-                                    <!-- Refaster `@BeforeTemplate` methods
-                                    legitimately use type-parameter-qualified
-                                    method references such as `T::compareTo` to
-                                    match user code; this (unsuppressible) check
-                                    must not flag them. -->
+                                    <!-- XXX: Enable once
+                                    https://github.com/google/error-prone/pull/5883
+                                    or
+                                    https://github.com/google/error-prone/pull/5884
+                                    is merged and released. -->
                                     -XepOpt:TypeParameterQualifier:MatchMethodReferences=false
                                     -XepOpt:UnnamedVariable:OnlyRenameVariablesNamedUnused=false
                                     <!-- Append additional custom arguments. -->
