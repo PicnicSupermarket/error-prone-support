@@ -447,9 +447,10 @@ final class OptionalRules {
   }
 
   /**
-   * Prefer {@link java.util.Objects#requireNonNull(Object)} over an {@link
-   * java.util.Optional#orElse(Object)} call on an {@link java.util.Optional} that is known to be
-   * non-empty.
+   * Prefer {@link java.util.Objects#requireNonNull(Object)} over more contrived alternatives.
+   *
+   * <p>Since {@link Optional#of(Object)} rejects {@code null}, the {@link Optional#orElse(Object)}
+   * fallback is unreachable and merely obscures a plain non-{@code null} assertion.
    *
    * <p><strong>Warning:</strong> This rewrite is not behaviour-preserving if the {@code fallback}
    * expression has side effects: after the rewrite, such side effects will no longer be executed.
