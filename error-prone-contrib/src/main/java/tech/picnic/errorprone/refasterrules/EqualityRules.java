@@ -110,6 +110,7 @@ final class EqualityRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings("ReferenceEquality" /* This violation will be rewritten. */)
     boolean before(Object b1, Object b2) {
       return !(b1 == b2);
     }
@@ -138,6 +139,7 @@ final class EqualityRules {
     }
 
     @BeforeTemplate
+    @SuppressWarnings("ReferenceEquality" /* This violation will be rewritten. */)
     boolean before(Object b1, Object b2) {
       return !(b1 != b2);
     }

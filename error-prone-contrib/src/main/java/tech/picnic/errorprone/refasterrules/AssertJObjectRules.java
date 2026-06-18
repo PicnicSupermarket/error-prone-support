@@ -117,6 +117,7 @@ final class AssertJObjectRules {
   /** Prefer {@link ObjectAssert#isSameAs(Object)} over more contrived alternatives. */
   static final class AssertThatIsSameAs<T> {
     @BeforeTemplate
+    @SuppressWarnings("ReferenceEquality" /* This violation will be rewritten. */)
     AbstractBooleanAssert<?> before(T actual, T expected) {
       return Refaster.anyOf(
           assertThat(actual == expected).isTrue(), assertThat(actual != expected).isFalse());
@@ -132,6 +133,7 @@ final class AssertJObjectRules {
   /** Prefer {@link ObjectAssert#isNotSameAs(Object)} over more contrived alternatives. */
   static final class AssertThatIsNotSameAs<T> {
     @BeforeTemplate
+    @SuppressWarnings("ReferenceEquality" /* This violation will be rewritten. */)
     AbstractBooleanAssert<?> before(T actual, T other) {
       return Refaster.anyOf(
           assertThat(actual == other).isFalse(), assertThat(actual != other).isTrue());

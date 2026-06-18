@@ -42,6 +42,8 @@ import tech.picnic.errorprone.utils.SourceCode;
  */
 // XXX: Add more documentation. Explain how this is useful in the face of refactoring to more
 // specific types.
+// XXX: Document how this check differs from Error Prone's built-in `BoxingComparator` check, and
+// consider contributing it upstream.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =

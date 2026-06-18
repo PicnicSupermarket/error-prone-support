@@ -350,7 +350,10 @@ final class StreamRules {
   // (Perhaps we could add a `@Matches` guard that validates that the collector expression does not
   // contain a `Collectors#filtering` call. That'd still not be 100% accurate, though.)
   static final class StreamFindAnyIsEmpty<T, K, V, C extends Collection<K>, M extends Map<K, V>> {
+    // XXX: Drop the `TypeParameterQualifier` suppression if
+    // https://github.com/google/error-prone/pull/5884 is merged and released.
     @BeforeTemplate
+    @SuppressWarnings("TypeParameterQualifier" /* We aim to match `C::isEmpty` for any `C`. */)
     Boolean before(Stream<T> stream, Collector<? super T, ?, ? extends C> downstream) {
       return Refaster.anyOf(
           stream.count() == 0,
@@ -361,7 +364,10 @@ final class StreamRules {
           stream.collect(collectingAndThen(downstream, C::isEmpty)));
     }
 
+    // XXX: Drop the `TypeParameterQualifier` suppression if
+    // https://github.com/google/error-prone/pull/5884 is merged and released.
     @BeforeTemplate
+    @SuppressWarnings("TypeParameterQualifier" /* We aim to match `M::isEmpty` for any `M`. */)
     Boolean before2(Stream<T> stream, Collector<? super T, ?, ? extends M> downstream) {
       return stream.collect(collectingAndThen(downstream, M::isEmpty));
     }

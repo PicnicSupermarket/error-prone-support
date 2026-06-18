@@ -190,7 +190,7 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.49.0</version.error-prone-orig>
+        <version.error-prone-orig>2.50.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
         <version.maven>3.9.14</version.maven>
         <version.pitest-git>2.3.2</version.pitest-git>
@@ -2009,8 +2009,13 @@
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
                                     -XepOpt:RefactorSwitch:EnableAssignmentSwitch=true
-                                    -XepOpt:RefactorSwitch:EnableReturnSwitch=true
                                     -XepOpt:RefactorSwitch:EnableSimplifySwitch=true
+                                    <!-- XXX: Enable once
+                                    https://github.com/google/error-prone/pull/5883
+                                    or
+                                    https://github.com/google/error-prone/pull/5884
+                                    is merged and released. -->
+                                    -XepOpt:TypeParameterQualifier:MatchMethodReferences=false
                                     -XepOpt:UnnamedVariable:OnlyRenameVariablesNamedUnused=false
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}
