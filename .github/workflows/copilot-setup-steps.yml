@@ -33,4 +33,4 @@ jobs:
             21.0.10
             25.0.2
           java-distribution: temurin
-          maven-version: 3.9.14
+          maven-version: 3.9.16
