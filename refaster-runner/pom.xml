@@ -26,7 +26,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>refaster-support</artifactId>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.google.auto.service</groupId>
@@ -50,12 +49,22 @@
         </dependency>
         <dependency>
             <groupId>com.google.errorprone</groupId>
+            <artifactId>error_prone_core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.errorprone</groupId>
             <artifactId>error_prone_test_helpers</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jakewharton.nopen</groupId>
+            <artifactId>nopen-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -81,6 +90,11 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
