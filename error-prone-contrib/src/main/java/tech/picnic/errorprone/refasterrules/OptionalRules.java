@@ -461,6 +461,7 @@ final class OptionalRules {
   // (non-null case) or rewrite to `Optional.ofNullable` (nullable case).
   static final class RequireNonNull<T> {
     @BeforeTemplate
+    @SuppressWarnings("OptionalOfRedundantMethod" /* This violation will be rewritten. */)
     T before(T value, T fallback) {
       return Optional.of(value).orElse(fallback);
     }
