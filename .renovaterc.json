@@ -34,6 +34,15 @@
       "schedule": "every 4 weeks on Monday"
     }
   ],
+  "postUpgradeTasks": {
+    "commands": [
+      "./update-maven-checksums.sh"
+    ],
+    "executionMode": "branch",
+    "fileFilters": [
+      ".mvn/checksums/*"
+    ]
+  },
   "reviewers": [
     "rickie",
     "Stephan202"
