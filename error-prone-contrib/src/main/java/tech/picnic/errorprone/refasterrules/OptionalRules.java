@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Streams;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -442,6 +443,35 @@ final class OptionalRules {
     @AfterTemplate
     Optional<V> after(Optional<S> optional, Function<W, V> mapper) {
       return optional.map(mapper);
+    }
+  }
+
+  /**
+   * Prefer {@link java.util.Objects#requireNonNull(Object)} over more contrived alternatives.
+   *
+   * <p>Since {@link Optional#of(Object)} rejects {@code null}, the {@link Optional#orElse(Object)}
+   * fallback is unreachable and merely obscures a plain non-{@code null} assertion.
+   *
+   * <p><strong>Warning:</strong> This rewrite is not behaviour-preserving if the {@code fallback}
+   * expression has side effects: after the rewrite, such side effects will no longer be executed.
+   * In practice such code would be extremely fragile, so this is considered acceptable.
+   */
+  // XXX: Consider introducing a `BugChecker` that also handles the case where `Optional.of` is
+  // used with a possibly-null value, offering two suggested fixes: rewrite to `requireNonNull`
+  // (non-null case) or rewrite to `Optional.ofNullable` (nullable case).
+  // XXX: This rule partially overlaps with Error Prone's built-in
+  // `OptionalOfRedundantMethod` check, but provides a more precise rewrite.
+  static final class RequireNonNull<T> {
+    @BeforeTemplate
+    @SuppressWarnings("OptionalOfRedundantMethod" /* This is a more specific template. */)
+    T before(T value, T fallback) {
+      return Optional.of(value).orElse(fallback);
+    }
+
+    @AfterTemplate
+    @UseImportPolicy(STATIC_IMPORT_ALWAYS)
+    T after(T value) {
+      return requireNonNull(value);
     }
   }
 
