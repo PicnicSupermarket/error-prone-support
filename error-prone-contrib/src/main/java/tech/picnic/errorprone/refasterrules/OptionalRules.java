@@ -459,9 +459,11 @@ final class OptionalRules {
   // XXX: Consider introducing a `BugChecker` that also handles the case where `Optional.of` is
   // used with a possibly-null value, offering two suggested fixes: rewrite to `requireNonNull`
   // (non-null case) or rewrite to `Optional.ofNullable` (nullable case).
+  // XXX: This rule partially overlaps with Error Prone's built-in
+  // `OptionalOfRedundantMethod` check, but provides a more precise rewrite.
   static final class RequireNonNull<T> {
     @BeforeTemplate
-    @SuppressWarnings("OptionalOfRedundantMethod" /* This violation will be rewritten. */)
+    @SuppressWarnings("OptionalOfRedundantMethod" /* This is a more specific template. */)
     T before(T value, T fallback) {
       return Optional.of(value).orElse(fallback);
     }
