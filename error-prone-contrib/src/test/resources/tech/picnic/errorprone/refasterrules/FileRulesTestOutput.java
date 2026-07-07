@@ -1,7 +1,9 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class FileRulesTest implements RefasterRuleCollectionTestCase {
@@ -48,6 +53,22 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
 
   String testFilesReadString() throws IOException {
     return Files.readString(Paths.get("foo"));
+  }
+
+  List<String> testFilesReadAllLines() throws IOException {
+    return Files.readAllLines(Path.of("foo"));
+  }
+
+  Stream<String> testFilesLines() throws IOException {
+    return Files.lines(Path.of("foo"));
+  }
+
+  Path testFilesWriteString() throws IOException {
+    return Files.writeString(Path.of("foo"), "bar", StandardOpenOption.CREATE);
+  }
+
+  Path testFilesWrite() throws IOException {
+    return Files.write(Path.of("foo"), ImmutableList.of("bar"), StandardOpenOption.CREATE);
   }
 
   ImmutableSet<File> testFilesCreateTempFileToFile() throws IOException {
@@ -94,5 +115,9 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
 
   BufferedReader testFilesNewBufferedReaderWithCharset() throws IOException {
     return Files.newBufferedReader(Path.of("foo"), StandardCharsets.UTF_8);
+  }
+
+  BufferedWriter testFilesNewBufferedWriter() throws IOException {
+    return Files.newBufferedWriter(Path.of("foo"), StandardOpenOption.CREATE);
   }
 }
