@@ -63,14 +63,21 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
     return Files.lines(Path.of("foo"), StandardCharsets.UTF_8);
   }
 
-  Path testFilesWriteString() throws IOException {
-    return Files.writeString(
-        Path.of("foo"), "bar", StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+  ImmutableSet<Path> testFilesWriteString() throws IOException {
+    return ImmutableSet.of(
+        Files.writeString(Path.of("foo"), "bar", StandardCharsets.UTF_8),
+        Files.writeString(
+            Path.of("baz"), "qux", StandardCharsets.UTF_8, StandardOpenOption.CREATE));
   }
 
-  Path testFilesWrite() throws IOException {
-    return Files.write(
-        Path.of("foo"), ImmutableList.of("bar"), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+  ImmutableSet<Path> testFilesWrite() throws IOException {
+    return ImmutableSet.of(
+        Files.write(Path.of("foo"), ImmutableList.of("bar"), StandardCharsets.UTF_8),
+        Files.write(
+            Path.of("baz"),
+            ImmutableList.of("qux"),
+            StandardCharsets.UTF_8,
+            StandardOpenOption.CREATE));
   }
 
   ImmutableSet<File> testFilesCreateTempFileToFile() throws IOException {
@@ -121,8 +128,9 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
         new InputStreamReader(Files.newInputStream(Path.of("foo")), StandardCharsets.UTF_8));
   }
 
-  BufferedWriter testFilesNewBufferedWriter() throws IOException {
-    return Files.newBufferedWriter(
-        Path.of("foo"), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+  ImmutableSet<BufferedWriter> testFilesNewBufferedWriter() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedWriter(Path.of("foo"), StandardCharsets.UTF_8),
+        Files.newBufferedWriter(Path.of("bar"), StandardCharsets.UTF_8, StandardOpenOption.CREATE));
   }
 }
