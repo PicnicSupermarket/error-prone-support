@@ -452,9 +452,12 @@ final class OptionalRules {
    * <p>Since {@link Optional#of(Object)} rejects {@code null}, the {@link Optional#orElse(Object)}
    * fallback is unreachable and merely obscures a plain non-{@code null} assertion.
    *
-   * <p><strong>Warning:</strong> This rewrite is not behaviour-preserving if the {@code fallback}
+   * <p><strong>Warning:</strong> This rewrite is not behavior-preserving if the {@code fallback}
    * expression has side effects: after the rewrite, such side effects will no longer be executed.
    * In practice such code would be extremely fragile, so this is considered acceptable.
+   *
+   * @implNote This rule has overlap with the existing `OptionalOfRedundantMethod`, but this is more
+   *     behavior-preserving.
    */
   // XXX: Consider introducing a `BugChecker` that also handles the case where `Optional.of` is
   // used with a possibly-null value, offering two suggested fixes: rewrite to `requireNonNull`
@@ -463,7 +466,8 @@ final class OptionalRules {
   // `OptionalOfRedundantMethod` check, but provides a more precise rewrite.
   static final class RequireNonNull<T> {
     @BeforeTemplate
-    @SuppressWarnings("OptionalOfRedundantMethod" /* This is a more specific template. */)
+    @SuppressWarnings(
+        "OptionalOfRedundantMethod" /* This is a template with an alternative rewrite. */)
     T before(T value, T fallback) {
       return Optional.of(value).orElse(fallback);
     }
