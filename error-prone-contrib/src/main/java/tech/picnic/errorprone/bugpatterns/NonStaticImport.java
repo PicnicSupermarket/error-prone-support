@@ -3,17 +3,16 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
-import static tech.picnic.errorprone.bugpatterns.StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableTable;
 import com.google.errorprone.BugPattern;
+import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
@@ -35,12 +34,16 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags static imports of type members that should *not* be statically
  * imported.
+ *
+ * <p>This check honors the {@code StaticImport:CandidateMembers} flag documented by {@link
+ * StaticImport}: members thus specified are not flagged.
  */
 // XXX: This check is closely linked to `StaticImport`. Consider merging the two.
 // XXX: Add suppression support. If qualification of one more more identifiers is suppressed, then
@@ -54,8 +57,11 @@ import tech.picnic.errorprone.utils.SourceCode;
     linkType = CUSTOM,
     severity = SUGGESTION,
     tags = STYLE)
-@SuppressWarnings(
-    "javaarchitecture:S7027" /* `StaticImport` and `NonStaticImport` ensure mutual exclusivity. */)
+@SuppressWarnings({
+  "java:S2160" /* Super class equality definition suffices. */,
+  "javaarchitecture:S7027" /* `StaticImport` and `NonStaticImport` ensure mutual exclusivity. */,
+  "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
+})
 public final class NonStaticImport extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
 
@@ -66,7 +72,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
    * <p>Types listed here should be mutually exclusive with {@link
    * StaticImport#STATIC_IMPORT_CANDIDATE_TYPES}.
    */
-  @VisibleForTesting
   static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
           ASTHelpers.class.getCanonicalName(),
@@ -147,8 +152,22 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "valueOf",
           "values");
 
-  /** Instantiates a new {@link NonStaticImport} instance. */
-  public NonStaticImport() {}
+  private final ImmutableSetMultimap<String, String> staticImportCandidateMembers;
+
+  /** Instantiates a default {@link NonStaticImport} instance. */
+  public NonStaticImport() {
+    this(ErrorProneFlags.empty());
+  }
+
+  /**
+   * Instantiates a customized {@link NonStaticImport}.
+   *
+   * @param flags Any provided command line flags.
+   */
+  @Inject
+  NonStaticImport(ErrorProneFlags flags) {
+    staticImportCandidateMembers = StaticImport.getCandidateMembers(flags);
+  }
 
   @Override
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
@@ -168,7 +187,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
     return Description.NO_MATCH;
   }
 
-  private static ImmutableTable<String, String, UndesiredStaticImport> getUndesiredStaticImports(
+  private ImmutableTable<String, String, UndesiredStaticImport> getUndesiredStaticImports(
       CompilationUnitTree tree, VisitorState state) {
     ImmutableTable.Builder<String, String, UndesiredStaticImport> imports =
         ImmutableTable.builder();
@@ -190,9 +209,9 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
     return imports.buildOrThrow();
   }
 
-  private static boolean shouldNotBeStaticallyImported(String type, String member) {
+  private boolean shouldNotBeStaticallyImported(String type, String member) {
     return (NON_STATIC_IMPORT_CANDIDATE_TYPES.contains(type)
-            && !STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type, member))
+            && !staticImportCandidateMembers.containsEntry(type, member))
         || NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type, member)
         || NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(member);
   }
