@@ -120,6 +120,25 @@ final class NonStaticImportTest {
   }
 
   @Test
+  void identificationWithAdditionalStaticImportCandidateMembers() {
+    CompilationTestHelper.newInstance(NonStaticImport.class, getClass())
+        .setArgs("-XepOpt:StaticImport:CandidateMembers=reactor.core.publisher.Flux#just")
+        .addSourceLines(
+            "A.java",
+            "import static reactor.core.publisher.Flux.just;",
+            "// BUG: Diagnostic contains:",
+            "import static reactor.core.publisher.Flux.range;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    just(1);",
+            "    range(0, 1);",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
   void replacement() {
     BugCheckerRefactoringTestHelper.newInstance(NonStaticImport.class, getClass())
         .addInputLines(
