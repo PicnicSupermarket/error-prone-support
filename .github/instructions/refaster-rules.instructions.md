@@ -1010,6 +1010,7 @@ The `unmigratedMethods` list in `@TypeMigration` is managed by the
 | `IsLambdaExpressionOrMethodReference` | Expression is a lambda or method reference |
 | `IsList` | Expression type implements `java.util.List` |
 | `IsMultidimensionalArray` | Expression type is a multidimensional array |
+| `IsNullLiteral` | Expression is the `null` literal |
 | `IsRefasterAsVarargs` | Expression is a `Refaster.asVarargs(...)` call |
 | `RequiresComputation` | Expression is not a simple literal, identifier, or member select |
 | `ReturnsMono` | Expression returns `Mono<T>` |

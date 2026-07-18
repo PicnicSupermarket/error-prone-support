@@ -23,6 +23,9 @@ final class NullRules {
   private NullRules() {}
 
   /** Prefer {@code == null} over less idiomatic alternatives. */
+  // XXX: This rule suggests an identity transformation for `null == null`. Rather than guarding
+  // against that with `@NotMatches(IsNullLiteral.class)`, consider updating Refaster or our
+  // `Refaster` bug checker bridge to generically suppress such vacuous suggestions.
   static final class EqualToNull {
     @BeforeTemplate
     boolean before(@Nullable Object obj) {
@@ -36,6 +39,9 @@ final class NullRules {
   }
 
   /** Prefer {@code != null} over less idiomatic alternatives. */
+  // XXX: This rule suggests an identity transformation for `null != null`. Rather than guarding
+  // against that with `@NotMatches(IsNullLiteral.class)`, consider updating Refaster or our
+  // `Refaster` bug checker bridge to generically suppress such vacuous suggestions.
   static final class NotEqualToNull {
     @BeforeTemplate
     boolean before(@Nullable Object obj) {
