@@ -32,20 +32,39 @@ final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsSameAs() {
-    return ImmutableSet.of(assertThat("foo").isSameAs("bar"), assertThat(0).isSameAs(1));
+    return ImmutableSet.of(
+        assertThat(null == "foo").isTrue(),
+        assertThat("bar").isSameAs("baz"),
+        assertThat(null != "qux").isFalse(),
+        assertThat("quux").isSameAs("corge"));
   }
 
+  @SuppressWarnings("AssertThatIsNotNull" /* Tests verify correctness absent this other rule. */)
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotSameAs() {
-    return ImmutableSet.of(assertThat("foo").isNotSameAs("bar"), assertThat(0).isNotSameAs(1));
+    return ImmutableSet.of(
+        assertThat(null == "foo").isFalse(),
+        assertThat("bar").isNotSameAs("baz"),
+        assertThat(null != "qux").isTrue(),
+        assertThat("quux").isNotSameAs("corge"));
   }
 
   void testAssertThatIsNull() {
+    assertThat(null == null).isTrue();
     assertThat("foo").isNull();
     assertThat("bar").isNull();
+    assertThat(null != null).isFalse();
+    assertThat("baz").isNull();
+    assertThat("qux").isNull();
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotNull() {
-    return ImmutableSet.of(assertThat("foo").isNotNull(), assertThat("bar").isNotNull());
+    return ImmutableSet.of(
+        assertThat(null == null).isFalse(),
+        assertThat("foo").isNotNull(),
+        assertThat("bar").isNotNull(),
+        assertThat(null != null).isTrue(),
+        assertThat("baz").isNotNull(),
+        assertThat("qux").isNotNull());
   }
 
   AbstractAssert<?, ?> testAssertThatHasSameHashCodeAs() {
