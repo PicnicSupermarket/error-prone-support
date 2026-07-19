@@ -8,6 +8,7 @@ import com.google.errorprone.refaster.annotation.AlsoNegation;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.Repeated;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,6 +25,8 @@ import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
+import java.util.List;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
 /** Refaster rules related to expressions dealing with files. */
@@ -136,6 +139,67 @@ final class FileRules {
     @AfterTemplate
     String after(Path path) throws IOException {
       return Files.readString(path);
+    }
+  }
+
+  /** Prefer {@link Files#readAllLines(Path)} over more verbose alternatives. */
+  static final class FilesReadAllLines {
+    @BeforeTemplate
+    List<String> before(Path path) throws IOException {
+      return Files.readAllLines(path, UTF_8);
+    }
+
+    @AfterTemplate
+    List<String> after(Path path) throws IOException {
+      return Files.readAllLines(path);
+    }
+  }
+
+  /** Prefer {@link Files#lines(Path)} over more verbose alternatives. */
+  static final class FilesLines {
+    @BeforeTemplate
+    @SuppressWarnings(
+        "StreamResourceLeak" /* Matched expressions are in practice embedded in a larger context. */)
+    Stream<String> before(Path path) throws IOException {
+      return Files.lines(path, UTF_8);
+    }
+
+    @AfterTemplate
+    @SuppressWarnings(
+        "StreamResourceLeak" /* Matched expressions are in practice embedded in a larger context. */)
+    Stream<String> after(Path path) throws IOException {
+      return Files.lines(path);
+    }
+  }
+
+  /**
+   * Prefer {@link Files#writeString(Path, CharSequence, OpenOption...)} over more verbose
+   * alternatives.
+   */
+  static final class FilesWriteString {
+    @BeforeTemplate
+    Path before(Path path, CharSequence charSequence, @Repeated OpenOption options)
+        throws IOException {
+      return Files.writeString(path, charSequence, UTF_8, Refaster.asVarargs(options));
+    }
+
+    @AfterTemplate
+    Path after(Path path, CharSequence charSequence, @Repeated OpenOption options)
+        throws IOException {
+      return Files.writeString(path, charSequence, Refaster.asVarargs(options));
+    }
+  }
+
+  /** Prefer {@link Files#write(Path, Iterable, OpenOption...)} over more verbose alternatives. */
+  static final class FilesWrite<T extends CharSequence> {
+    @BeforeTemplate
+    Path before(Path path, Iterable<T> lines, @Repeated OpenOption options) throws IOException {
+      return Files.write(path, lines, UTF_8, Refaster.asVarargs(options));
+    }
+
+    @AfterTemplate
+    Path after(Path path, Iterable<T> lines, @Repeated OpenOption options) throws IOException {
+      return Files.write(path, lines, Refaster.asVarargs(options));
     }
   }
 
@@ -325,6 +389,19 @@ final class FileRules {
     @AfterTemplate
     BufferedReader after(Path path, Charset cs) throws IOException {
       return Files.newBufferedReader(path, cs);
+    }
+  }
+
+  /** Prefer {@link Files#newBufferedWriter(Path, OpenOption...)} over more verbose alternatives. */
+  static final class FilesNewBufferedWriter {
+    @BeforeTemplate
+    BufferedWriter before(Path path, @Repeated OpenOption options) throws IOException {
+      return Files.newBufferedWriter(path, UTF_8, Refaster.asVarargs(options));
+    }
+
+    @AfterTemplate
+    BufferedWriter after(Path path, @Repeated OpenOption options) throws IOException {
+      return Files.newBufferedWriter(path, Refaster.asVarargs(options));
     }
   }
 }

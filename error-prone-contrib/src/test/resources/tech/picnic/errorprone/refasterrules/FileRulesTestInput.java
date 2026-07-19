@@ -1,7 +1,9 @@
 package tech.picnic.errorprone.refasterrules;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,6 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.List;
+import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class FileRulesTest implements RefasterRuleCollectionTestCase {
@@ -48,6 +53,31 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
 
   String testFilesReadString() throws IOException {
     return Files.readString(Paths.get("foo"), StandardCharsets.UTF_8);
+  }
+
+  List<String> testFilesReadAllLines() throws IOException {
+    return Files.readAllLines(Path.of("foo"), StandardCharsets.UTF_8);
+  }
+
+  Stream<String> testFilesLines() throws IOException {
+    return Files.lines(Path.of("foo"), StandardCharsets.UTF_8);
+  }
+
+  ImmutableSet<Path> testFilesWriteString() throws IOException {
+    return ImmutableSet.of(
+        Files.writeString(Path.of("foo"), "bar", StandardCharsets.UTF_8),
+        Files.writeString(
+            Path.of("baz"), "qux", StandardCharsets.UTF_8, StandardOpenOption.CREATE));
+  }
+
+  ImmutableSet<Path> testFilesWrite() throws IOException {
+    return ImmutableSet.of(
+        Files.write(Path.of("foo"), ImmutableList.of("bar"), StandardCharsets.UTF_8),
+        Files.write(
+            Path.of("baz"),
+            ImmutableList.of("qux"),
+            StandardCharsets.UTF_8,
+            StandardOpenOption.CREATE));
   }
 
   ImmutableSet<File> testFilesCreateTempFileToFile() throws IOException {
@@ -96,5 +126,11 @@ final class FileRulesTest implements RefasterRuleCollectionTestCase {
   BufferedReader testFilesNewBufferedReaderWithCharset() throws IOException {
     return new BufferedReader(
         new InputStreamReader(Files.newInputStream(Path.of("foo")), StandardCharsets.UTF_8));
+  }
+
+  ImmutableSet<BufferedWriter> testFilesNewBufferedWriter() throws IOException {
+    return ImmutableSet.of(
+        Files.newBufferedWriter(Path.of("foo"), StandardCharsets.UTF_8),
+        Files.newBufferedWriter(Path.of("bar"), StandardCharsets.UTF_8, StandardOpenOption.CREATE));
   }
 }
