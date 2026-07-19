@@ -23,6 +23,10 @@ import java.util.stream.Stream;
 // XXX: Document design decision that the project stays as close as possible to Error Prone.
 //      ^ ... and *therefore* uses Google Auto Value rather than Immutables.org.
 // XXX: Make this class implement the `MultiMatcher` interface.
+// XXX: Consider generalizing this class into a broader type/member matcher (name TBD), covering
+// e.g. a bare-identifier-only restriction (independent of any type), and have
+// `tech.picnic.errorprone.bugpatterns.StaticImportConfig` delegate its candidate matching to it,
+// rather than just sharing `TypeMemberSpec` parsing.
 /**
  * A matcher of (annotation, attribute) pairs.
  *
@@ -87,14 +91,11 @@ public final class AnnotationAttributeMatcher implements Serializable {
       Set<String> wholeTypes,
       SetMultimap<String, String> attributeRestrictions) {
     for (String entry : enumeration) {
-      int hash = entry.indexOf('#');
-      if (hash < 0) {
-        wholeTypes.add(entry);
-      } else {
-        String annotationType = entry.substring(0, hash);
-        String attribute = entry.substring(hash + 1);
-        attributeRestrictions.put(annotationType, attribute);
-      }
+      TypeMemberSpec spec = TypeMemberSpec.parse(entry);
+      spec.member()
+          .ifPresentOrElse(
+              attribute -> attributeRestrictions.put(spec.type(), attribute),
+              () -> wholeTypes.add(spec.type()));
     }
   }
 
