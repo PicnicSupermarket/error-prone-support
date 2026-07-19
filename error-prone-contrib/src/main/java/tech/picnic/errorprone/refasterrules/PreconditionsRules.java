@@ -9,10 +9,12 @@ import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Preconditions;
+import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Objects;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 
@@ -75,11 +77,22 @@ final class PreconditionsRules {
     }
   }
 
-  /** Prefer {@link Objects#requireNonNull(Object)} over non-JDK alternatives. */
+  /**
+   * Prefer {@link Objects#requireNonNull(Object)} over non-JDK or more contrived alternatives.
+   *
+   * <p><strong>Warning:</strong> rewriting {@code Optional.of(obj).orElse(other)} is not
+   * behavior-preserving if {@code fallback} has side effects: after the rewrite, such side effects
+   * will no longer be executed. In practice such code would be extremely fragile, so this is
+   * considered acceptable.
+   */
+  // XXX: The `Optional.of(value).orElse(fallback)` variant is also flagged by Error Prone's
+  // built-in `OptionalOfRedundantMethod` check, but this rewrite suggests a different resolution,
+  // in which the redundant `Optional` allocation is avoided entirely.
   static final class RequireNonNullExpression<T> {
     @BeforeTemplate
-    T before(T obj) {
-      return checkNotNull(obj);
+    @SuppressWarnings("OptionalOfRedundantMethod" /* This violation will be rewritten. */)
+    T before(T obj, T other) {
+      return Refaster.anyOf(checkNotNull(obj), Optional.of(obj).orElse(other));
     }
 
     @AfterTemplate
