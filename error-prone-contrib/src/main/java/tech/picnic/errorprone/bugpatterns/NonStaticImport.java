@@ -6,10 +6,6 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.Predicates;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ImmutableTable;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
@@ -27,13 +23,6 @@ import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
 import com.sun.tools.javac.code.Symbol;
-import java.time.Clock;
-import java.time.InstantSource;
-import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -42,8 +31,8 @@ import tech.picnic.errorprone.utils.SourceCode;
  * A {@link BugChecker} that flags static imports of type members that should *not* be statically
  * imported.
  *
- * <p>This check honors the {@code StaticImport:CandidateMembers} flag documented by {@link
- * StaticImport}: members thus specified are not flagged.
+ * <p>See {@link StaticImportConfig} for how additional candidates can be configured, and how this
+ * check interacts with {@link StaticImport}.
  */
 // XXX: This check is closely linked to `StaticImport`. Consider merging the two.
 // XXX: Add suppression support. If qualification of one more more identifiers is suppressed, then
@@ -59,114 +48,26 @@ import tech.picnic.errorprone.utils.SourceCode;
     tags = STYLE)
 @SuppressWarnings({
   "java:S2160" /* Super class equality definition suffices. */,
-  "javaarchitecture:S7027" /* `StaticImport` and `NonStaticImport` ensure mutual exclusivity. */,
   "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
 })
 public final class NonStaticImport extends BugChecker implements CompilationUnitTreeMatcher {
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Types whose members should not be statically imported, unless exempted by {@link
-   * StaticImport#STATIC_IMPORT_CANDIDATE_MEMBERS}.
-   *
-   * <p>Types listed here should be mutually exclusive with {@link
-   * StaticImport#STATIC_IMPORT_CANDIDATE_TYPES}.
-   */
-  static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_TYPES =
-      ImmutableSet.of(
-          ASTHelpers.class.getCanonicalName(),
-          Clock.class.getCanonicalName(),
-          InstantSource.class.getCanonicalName(),
-          Strings.class.getCanonicalName(),
-          VisitorState.class.getCanonicalName(),
-          ZoneOffset.class.getCanonicalName(),
-          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
-          "reactor.core.publisher.Flux",
-          "reactor.core.publisher.Mono");
-
-  /**
-   * Type members that should never be statically imported.
-   *
-   * <p>Please note that:
-   *
-   * <ul>
-   *   <li>Types listed by {@link #NON_STATIC_IMPORT_CANDIDATE_TYPES} and members listed by {@link
-   *       #NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS} should be omitted from this collection.
-   *   <li>This collection should be mutually exclusive with {@link
-   *       StaticImport#STATIC_IMPORT_CANDIDATE_MEMBERS}.
-   * </ul>
-   */
-  // XXX: Perhaps the set of exempted `java.util.Collections` methods is too strict. For now any
-  // method name that could be considered "too vague" or could conceivably mean something else in a
-  // specific context is left out.
-  static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
-      ImmutableSetMultimap.<String, String>builder()
-          .putAll(
-              Collections.class.getCanonicalName(),
-              "addAll",
-              "copy",
-              "fill",
-              "list",
-              "max",
-              "min",
-              "nCopies",
-              "rotate",
-              "sort",
-              "swap")
-          .put(Locale.class.getCanonicalName(), "ROOT")
-          .put(Optional.class.getCanonicalName(), "empty")
-          .putAll(Pattern.class.getCanonicalName(), "compile", "matches", "quote")
-          .put(Predicates.class.getCanonicalName(), "contains")
-          .put("org.springframework.http.MediaType", "ALL")
-          .build();
-
-  /**
-   * Identifiers that should never be statically imported.
-   *
-   * <p>Please note that:
-   *
-   * <ul>
-   *   <li>Identifiers listed by {@link StaticImport#STATIC_IMPORT_CANDIDATE_MEMBERS} should be
-   *       mutually exclusive with identifiers listed here.
-   *   <li>This list should contain a superset of the identifiers flagged by {@link
-   *       com.google.errorprone.bugpatterns.BadImport}.
-   * </ul>
-   */
-  static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS =
-      ImmutableSet.of(
-          "builder",
-          "copyOf",
-          "create",
-          "EPOCH",
-          "from",
-          "getDefaultInstance",
-          "INSTANCE",
-          "MAX",
-          "MAX_VALUE",
-          "MIN",
-          "MIN_VALUE",
-          "newBuilder",
-          "newInstance",
-          "of",
-          "parse",
-          "valueOf",
-          "values");
-
-  private final ImmutableSetMultimap<String, String> staticImportCandidateMembers;
+  private final StaticImportConfig config;
 
   /** Instantiates a default {@link NonStaticImport} instance. */
   public NonStaticImport() {
-    this(ErrorProneFlags.empty());
+    this(new StaticImportConfig(ErrorProneFlags.empty()));
   }
 
   /**
    * Instantiates a customized {@link NonStaticImport}.
    *
-   * @param flags Any provided command line flags.
+   * @param config The candidate-matching configuration to apply.
    */
   @Inject
-  NonStaticImport(ErrorProneFlags flags) {
-    staticImportCandidateMembers = StaticImport.getCandidateMembers(flags);
+  NonStaticImport(StaticImportConfig config) {
+    this.config = config;
   }
 
   @Override
@@ -196,7 +97,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
       if (importTree.isStatic() && qualifiedIdentifier instanceof MemberSelectTree memberSelect) {
         String type = SourceCode.treeToString(memberSelect.getExpression(), state);
         String member = memberSelect.getIdentifier().toString();
-        if (shouldNotBeStaticallyImported(type, member)) {
+        if (config.shouldNotBeStaticallyImported(type, member)) {
           imports.put(
               type,
               member,
@@ -207,13 +108,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
     }
 
     return imports.buildOrThrow();
-  }
-
-  private boolean shouldNotBeStaticallyImported(String type, String member) {
-    return (NON_STATIC_IMPORT_CANDIDATE_TYPES.contains(type)
-            && !staticImportCandidateMembers.containsEntry(type, member))
-        || NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type, member)
-        || NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(member);
   }
 
   private static void replaceUndesiredStaticImportUsages(
