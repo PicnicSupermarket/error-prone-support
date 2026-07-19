@@ -258,6 +258,17 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
         .orElse(Description.NO_MATCH);
   }
 
+  private Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {
+    String canonicalName = importInfo.canonicalName();
+    return importInfo
+        .simpleName()
+        .toJavaUtil()
+        .filter(
+            name ->
+                candidateTypes.contains(canonicalName)
+                    || candidateMembers.containsEntry(canonicalName, name));
+  }
+
   private static boolean isCandidateContext(VisitorState state) {
     Tree parentTree =
         requireNonNull(state.getPath().getParentPath(), "MemberSelectTree lacks enclosing node")
@@ -277,17 +288,6 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
     Type type = ASTHelpers.getType(tree.getExpression());
     return type != null
         && !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
-  }
-
-  private Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {
-    String canonicalName = importInfo.canonicalName();
-    return importInfo
-        .simpleName()
-        .toJavaUtil()
-        .filter(
-            name ->
-                candidateTypes.contains(canonicalName)
-                    || candidateMembers.containsEntry(canonicalName, name));
   }
 
   private static Optional<Fix> tryStaticImport(
