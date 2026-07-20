@@ -2881,18 +2881,17 @@
      checkConfig.addProperty("groups", "android,com.twitter,com,junit,net,org,java,javax");
 --- a/src/it/java/org/checkstyle/suppressionxpathfilter/AbstractXpathTestSupport.java
 +++ b/src/it/java/org/checkstyle/suppressionxpathfilter/AbstractXpathTestSupport.java
-@@ -19,7 +19,10 @@
+@@ -19,7 +19,9 @@
  
  package org.checkstyle.suppressionxpathfilter;
  
 +import static com.google.common.base.Preconditions.checkArgument;
  import static com.google.common.truth.Truth.assertWithMessage;
-+import static java.nio.charset.StandardCharsets.UTF_8;
 +import static java.util.UUID.randomUUID;
  
  import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
  import com.puppycrawl.tools.checkstyle.JavaParser;
-@@ -35,7 +38,6 @@ import java.nio.charset.StandardCharsets;
+@@ -35,7 +37,6 @@ import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
  import java.util.List;
  import java.util.Locale;
@@ -2900,7 +2899,7 @@
  import java.util.regex.Matcher;
  import java.util.regex.Pattern;
  import org.checkstyle.base.AbstractCheckstyleModuleTestSupport;
-@@ -113,10 +115,9 @@ public abstract class AbstractXpathTestSupport extends AbstractCheckstyleModuleT
+@@ -113,10 +114,9 @@ public abstract class AbstractXpathTestSupport extends AbstractCheckstyleModuleT
     */
    private String createSuppressionsXpathConfigFile(String checkName, List<String> xpathQueries)
        throws Exception {
@@ -2909,11 +2908,11 @@
      final File suppressionsXpathConfigPath = new File(temporaryFolder, uniqueFileName);
 -    try (Writer bw =
 -        Files.newBufferedWriter(suppressionsXpathConfigPath.toPath(), StandardCharsets.UTF_8)) {
-+    try (Writer bw = Files.newBufferedWriter(suppressionsXpathConfigPath.toPath(), UTF_8)) {
++    try (Writer bw = Files.newBufferedWriter(suppressionsXpathConfigPath.toPath())) {
        bw.write("<?xml version=\"1.0\"?>\n");
        bw.write("<!DOCTYPE suppressions PUBLIC\n");
        bw.write("    \"-//Checkstyle//DTD SuppressionXpathFilter ");
-@@ -192,11 +193,10 @@ public abstract class AbstractXpathTestSupport extends AbstractCheckstyleModuleT
+@@ -192,11 +192,10 @@ public abstract class AbstractXpathTestSupport extends AbstractCheckstyleModuleT
        String[] expectedViolation,
        List<String> expectedXpathQueries)
        throws Exception {
@@ -19251,15 +19250,7 @@
          .isTrue();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/DetailAstImplTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/DetailAstImplTest.java
-@@ -20,6 +20,7 @@
- package com.puppycrawl.tools.checkstyle;
- 
- import static com.google.common.truth.Truth.assertWithMessage;
-+import static java.nio.charset.StandardCharsets.UTF_8;
- 
- import com.puppycrawl.tools.checkstyle.api.DetailAST;
- import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-@@ -28,7 +29,6 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -28,7 +28,6 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
  import java.io.File;
  import java.io.Writer;
  import java.lang.reflect.Method;
@@ -19267,7 +19258,7 @@
  import java.nio.file.Files;
  import java.text.MessageFormat;
  import java.util.ArrayList;
-@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
+@@ -43,7 +42,7 @@ import org.junit.jupiter.api.Test;
  import org.junit.jupiter.api.io.TempDir;
  
  /** TestCase to check DetailAST. */
@@ -19276,7 +19267,7 @@
  
    // Ignores file which are not meant to have root node intentionally.
    public static final Set<String> NO_ROOT_FILES =
-@@ -74,7 +74,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -74,7 +73,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19285,7 +19276,7 @@
      final DetailAstImpl ast = new DetailAstImpl();
      ast.setText("test");
      ast.setType(1);
-@@ -94,7 +94,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -94,7 +93,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19294,7 +19285,7 @@
      final CommonToken token = new CommonToken(1);
      token.setText("test");
      token.setLine(2);
-@@ -110,7 +110,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -110,7 +109,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19303,7 +19294,7 @@
      final DetailAstImpl root = new DetailAstImpl();
      final DetailAstImpl firstLevelA = new DetailAstImpl();
      final DetailAstImpl firstLevelB = new DetailAstImpl();
-@@ -146,7 +146,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -146,7 +145,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19312,7 +19303,7 @@
      final DetailAstImpl root = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      root.setFirstChild(child);
-@@ -156,7 +156,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -156,7 +155,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19321,7 +19312,7 @@
      final DetailAstImpl root = new DetailAstImpl();
      final DetailAstImpl firstLevelA = new DetailAstImpl();
      final DetailAstImpl firstLevelB = new DetailAstImpl();
-@@ -185,7 +185,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -185,7 +184,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19330,7 +19321,7 @@
      final DetailAstImpl root = new DetailAstImpl();
      final DetailAstImpl firstLevelA = new DetailAstImpl();
  
-@@ -201,7 +201,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -201,7 +200,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19339,7 +19330,7 @@
      final DetailAST previousSibling = new DetailAstImpl();
      final DetailAstImpl instance = new DetailAstImpl();
      final DetailAstImpl parent = new DetailAstImpl();
-@@ -250,7 +250,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -250,7 +249,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19348,7 +19339,7 @@
      final DetailAstImpl child = new DetailAstImpl();
      final DetailAST newSibling = new DetailAstImpl();
  
-@@ -261,7 +261,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -261,7 +260,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19357,7 +19348,7 @@
      final DetailAstImpl root = new DetailAstImpl();
      final DetailAstImpl firstLevelA = new DetailAstImpl();
      final DetailAST firstLevelB = new DetailAstImpl();
-@@ -291,7 +291,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -291,7 +290,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19366,7 +19357,7 @@
      final DetailAstImpl root = createToken(null, TokenTypes.CLASS_DEF);
      final DetailAstImpl modifiers = createToken(root, TokenTypes.MODIFIERS);
      createToken(modifiers, TokenTypes.LITERAL_PUBLIC);
-@@ -312,7 +312,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -312,7 +311,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19375,7 +19366,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      parent.setFirstChild(child);
-@@ -348,7 +348,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -348,7 +347,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19384,7 +19375,7 @@
      final DetailAST root = new DetailAstImpl();
      final BitSet bitSet = new BitSet();
      bitSet.set(999);
-@@ -358,7 +358,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -358,7 +357,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19393,7 +19384,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      parent.setFirstChild(child);
-@@ -384,7 +384,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -384,7 +383,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19402,7 +19393,7 @@
      final DetailAST root = new DetailAstImpl();
  
      TestUtil.setInternalState(root, "childCount", 999);
-@@ -392,7 +392,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -392,7 +391,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19411,7 +19402,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      final DetailAstImpl sibling = new DetailAstImpl();
-@@ -425,7 +425,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -425,7 +424,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19420,7 +19411,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      parent.setFirstChild(child);
-@@ -443,7 +443,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -443,7 +442,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19429,7 +19420,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      final DetailAstImpl child = new DetailAstImpl();
      final DetailAstImpl sibling = new DetailAstImpl();
-@@ -456,7 +456,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -456,7 +455,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19438,7 +19429,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      parent.setText("Parent");
      final DetailAstImpl child = new DetailAstImpl();
-@@ -470,7 +470,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -470,7 +469,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19447,7 +19438,7 @@
      final DetailAstImpl child = new DetailAstImpl();
      final DetailAstImpl newSibling = new DetailAstImpl();
      final DetailAstImpl oldParent = new DetailAstImpl();
-@@ -483,7 +483,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -483,7 +482,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19456,7 +19447,7 @@
      final DetailAstImpl root1 = new DetailAstImpl();
      root1.setLineNo(1);
      assertWithMessage("Invalid line number").that(root1.getLineNo()).isEqualTo(1);
-@@ -509,7 +509,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -509,7 +508,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19465,7 +19456,7 @@
      final DetailAstImpl root1 = new DetailAstImpl();
      root1.setColumnNo(1);
      assertWithMessage("Invalid column number").that(root1.getColumnNo()).isEqualTo(1);
-@@ -537,7 +537,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -537,7 +536,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19474,7 +19465,7 @@
      final DetailAstImpl root = new DetailAstImpl();
      final DetailAstImpl firstChild = new DetailAstImpl();
      firstChild.setType(TokenTypes.IDENT);
-@@ -559,10 +559,10 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -559,10 +558,10 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19483,11 +19474,11 @@
      final File file = new File(temporaryFolder, "InputDetailASTManyComments.java");
  
 -    try (Writer bw = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
-+    try (Writer bw = Files.newBufferedWriter(file.toPath(), UTF_8)) {
++    try (Writer bw = Files.newBufferedWriter(file.toPath())) {
        bw.write("/*\ncom.puppycrawl.tools.checkstyle.checks.TodoCommentCheck\n\n\n\n*/\n");
        bw.write("class C {\n");
        for (int i = 0; i <= 30000; i++) {
-@@ -576,7 +576,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -576,7 +575,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19496,7 +19487,7 @@
      final List<File> files =
          getAllFiles(new File("src/test/resources/com/puppycrawl/tools/checkstyle"));
  
-@@ -592,7 +592,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -592,7 +591,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19505,7 +19496,7 @@
      final DetailAstImpl ast = new DetailAstImpl();
      ast.setText("text");
      ast.setColumnNo(1);
-@@ -601,7 +601,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -601,7 +600,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -19514,7 +19505,7 @@
      final DetailAstImpl parent = new DetailAstImpl();
      final DetailAstImpl child1 = new DetailAstImpl();
      parent.setFirstChild(child1);
-@@ -614,7 +614,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
+@@ -614,7 +613,7 @@ public class DetailAstImplTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22467,11 +22458,10 @@
      final ThreadModeSettings singleThreadModeSettings =
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
-@@ -21,11 +21,16 @@ package com.puppycrawl.tools.checkstyle;
+@@ -21,11 +21,15 @@ package com.puppycrawl.tools.checkstyle;
  
  import static com.google.common.truth.Truth.assertWithMessage;
  import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
-+import static java.nio.charset.StandardCharsets.UTF_8;
 +import static java.util.UUID.randomUUID;
  import static org.mockito.ArgumentMatchers.any;
  import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -22484,7 +22474,7 @@
  import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
  import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
  import com.puppycrawl.tools.checkstyle.api.Configuration;
-@@ -59,13 +64,11 @@ import java.nio.file.StandardCopyOption;
+@@ -59,13 +63,11 @@ import java.nio.file.StandardCopyOption;
  import java.util.ArrayList;
  import java.util.Arrays;
  import java.util.Collection;
@@ -22498,7 +22488,7 @@
  import java.util.regex.Matcher;
  import java.util.regex.Pattern;
  import org.junit.jupiter.api.Test;
-@@ -94,7 +97,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -94,7 +96,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22507,7 +22497,7 @@
      final String path = getPath("InputTreeWalkerProperFileExtension.java");
      final String[] expected = {
        "10:27: "
-@@ -130,14 +133,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -130,14 +132,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * @throws Exception if an error occurs
     */
    @Test
@@ -22524,7 +22514,7 @@
              TreeWalkerAuditEvent.class,
              (mock, context) -> {
                throw new CheckstyleException("No audit events expected");
-@@ -151,7 +154,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -151,7 +153,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * that the {@code if (!ordinaryChecks.isEmpty())} condition cannot be removed.
     */
    @Test
@@ -22533,7 +22523,7 @@
      final String[] expected = {
        "7:5: "
            + getCheckMessage(
-@@ -163,7 +166,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -163,7 +165,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
          JavaParser.parseFile(new File(path), JavaParser.Options.WITH_COMMENTS);
      // Ensure that there is no calls to walk(..., AstState.ORDINARY)
      doThrow(IllegalStateException.class).when(mockAst).getFirstChild();
@@ -22542,7 +22532,7 @@
        parser.when(() -> JavaParser.parse(any(FileContents.class))).thenReturn(mockAst);
        // This will re-enable walk(..., AstState.WITH_COMMENTS)
        parser.when(() -> JavaParser.appendHiddenCommentNodes(mockAst)).thenReturn(realAst);
-@@ -177,14 +180,13 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -177,14 +179,13 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * that the {@code if (!commentChecks.isEmpty())} condition cannot be removed.
     */
    @Test
@@ -22559,7 +22549,7 @@
        // Ensure that there is no calls to walk(..., AstState.WITH_COMMENTS)
        parser
            .when(() -> JavaParser.appendHiddenCommentNodes(any(DetailAST.class)))
-@@ -195,7 +197,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -195,7 +196,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22568,7 +22558,7 @@
      final String regularFilePath = getPath("InputTreeWalkerImproperFileExtension.java");
      final File originalFile = new File(regularFilePath);
      final File tempFile = new File(temporaryFolder, "file.pdf");
-@@ -205,7 +207,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -205,7 +206,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22577,7 +22567,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(HiddenFieldCheck.class);
      checkConfig.addProperty("tokens", "VARIABLE_DEF, ENUM_DEF, CLASS_DEF, METHOD_DEF," + "IMPORT");
      try {
-@@ -229,9 +231,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -229,9 +230,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22589,7 +22579,7 @@
      final File emptyFile = new File(temporaryFolder, uniqueFileName);
      emptyFile.createNewFile();
      execute(checkConfig, emptyFile.getPath());
-@@ -240,11 +242,11 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -240,11 +241,11 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22603,7 +22593,7 @@
        final File filePath = new File(temporaryFolder, uniqueFileName);
        execute(createTreeWalkerConfig(checkConfig), filePath.toString());
        assertWithMessage("CheckstyleException is expected").fail();
-@@ -256,7 +258,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -256,7 +257,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22612,7 +22602,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -277,7 +279,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -277,7 +278,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22621,7 +22611,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final DefaultConfiguration config = new DefaultConfiguration("default config");
      treeWalker.setTabWidth(1);
-@@ -291,9 +293,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -291,9 +292,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22633,7 +22623,7 @@
      final File pathToEmptyFile = new File(temporaryFolder, uniqueFileName);
  
      try {
-@@ -315,7 +317,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -315,7 +316,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22642,7 +22632,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -343,7 +345,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -343,7 +344,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22651,7 +22641,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.setTabWidth(1);
      treeWalker.configure(new DefaultConfiguration("default config"));
-@@ -356,14 +358,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -356,14 +357,14 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22668,7 +22658,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.configure(createModuleConfig(TypeNameCheck.class));
      final PackageObjectFactory factory =
-@@ -386,7 +388,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -386,7 +387,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22677,7 +22667,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.configure(createModuleConfig(TypeNameCheck.class));
      final PackageObjectFactory factory =
-@@ -409,9 +411,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -409,9 +410,9 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22685,11 +22675,11 @@
 +  void requiredTokenIsEmptyIntArray() throws Exception {
      final File file = new File(temporaryFolder, "file.java");
 -    try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
-+    try (Writer writer = Files.newBufferedWriter(file.toPath(), UTF_8)) {
++    try (Writer writer = Files.newBufferedWriter(file.toPath())) {
        final String configComment =
            """
                      /*
-@@ -427,7 +429,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -427,7 +428,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22698,7 +22688,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -443,7 +445,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -443,7 +444,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22707,7 +22697,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.configure(createModuleConfig(TypeNameCheck.class));
      treeWalker.configure(createModuleConfig(CommentsIndentationCheck.class));
-@@ -470,7 +472,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -470,7 +471,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22716,7 +22706,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      final PackageObjectFactory factory =
          new PackageObjectFactory(new HashSet<>(), Thread.currentThread().getContextClassLoader());
-@@ -492,7 +494,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -492,7 +493,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22725,7 +22715,7 @@
  
      final String[] expected = {
        "17:17: "
-@@ -508,7 +510,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -508,7 +509,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22734,7 +22724,7 @@
  
      final String[] expected = {
        "13:9: " + getCheckMessage(WhitespaceAfterCheck.class, "ws.notFollowed", "if"),
-@@ -519,7 +521,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -519,7 +520,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22743,7 +22733,7 @@
  
      final String[] expected = {
        "15:28: "
-@@ -537,7 +539,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -537,7 +538,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22752,7 +22742,7 @@
      final TreeWalker treeWalker = new TreeWalker();
      treeWalker.setSeverity("error");
      treeWalker.setTabWidth(100);
-@@ -553,19 +555,19 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -553,19 +554,19 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22776,7 +22766,7 @@
      final File file = new File(temporaryFolder, uniqueFileName);
      execute(checkConfig, file.getPath());
      assertWithMessage("Destroy was not called")
-@@ -574,10 +576,10 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -574,10 +575,10 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22789,7 +22779,7 @@
      final File file = new File(temporaryFolder, uniqueFileName);
      execute(checkConfig, file.getPath());
      assertWithMessage("Destroy was not called")
-@@ -586,18 +588,18 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -586,18 +587,18 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22811,7 +22801,7 @@
      final File filePath = new File(temporaryFolder, uniqueFileName2);
  
      execute(checkerConfig, filePath.toString());
-@@ -610,7 +612,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -610,7 +611,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22820,7 +22810,7 @@
      // test is only valid when relative paths are given
      final String filePath =
          "src/test/resources/"
-@@ -622,7 +624,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -622,7 +623,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22829,7 +22819,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(EmptyStatementCheck.class);
      final DefaultConfiguration filterConfig =
          createModuleConfig(SuppressWithNearbyCommentFilter.class);
-@@ -631,10 +633,10 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -631,10 +632,10 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
      treeWalkerConfig.addChild(filterConfig);
  
      final DefaultConfiguration checkerConfig = createRootConfig(treeWalkerConfig);
@@ -22842,7 +22832,7 @@
      final File filePath = new File(temporaryFolder, uniqueFileName2);
  
      execute(checkerConfig, filePath.toString());
-@@ -649,7 +651,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -649,7 +650,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * @throws Exception if file is not found
     */
    @Test
@@ -22851,7 +22841,7 @@
  
      final DefaultConfiguration configuration1 = createModuleConfig(AaCheck.class);
      configuration1.addProperty("id", "2");
-@@ -660,7 +662,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -660,7 +661,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
      treeWalkerConfig.addChild(configuration2);
      treeWalkerConfig.addChild(configuration1);
  
@@ -22860,7 +22850,7 @@
      final Checker checker = createChecker(treeWalkerConfig);
  
      try {
-@@ -674,7 +676,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -674,7 +675,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22869,7 +22859,7 @@
      final DefaultConfiguration config = createModuleConfig(TreeWalker.class);
      config.addProperty("skipFileOnJavaParseException", "true");
      config.addProperty("javaParseExceptionSeverity", "ignore");
-@@ -690,7 +692,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -690,7 +691,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
      final Map<String, List<String>> expectedViolation = new HashMap<>();
      expectedViolation.put(
          getPath("InputTreeWalkerProperFileExtension.java"),
@@ -22878,7 +22868,7 @@
              "10:27: "
                  + getCheckMessage(
                      ConstantNameCheck.class,
-@@ -708,7 +710,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -708,7 +709,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
     * exception} is indeed thrown.
     */
    @Test
@@ -22887,7 +22877,7 @@
      final DefaultConfiguration config = createModuleConfig(TreeWalker.class);
      config.addProperty("skipFileOnJavaParseException", "false");
      config.addChild(createModuleConfig(ConstantNameCheck.class));
-@@ -727,7 +729,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -727,7 +728,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22896,7 +22886,7 @@
      final String path =
          getNonCompilablePath("InputTreeWalkerSkipParsingExceptionConfigSeverityIgnore.java");
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
-@@ -735,7 +737,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -735,7 +736,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22905,7 +22895,7 @@
      final String path =
          getNonCompilablePath("InputTreeWalkerSkipParsingExceptionConfigSeverityDefault.java");
      final String[] expected = {
-@@ -749,7 +751,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -749,7 +750,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22914,7 +22904,7 @@
      final DefaultConfiguration config = createModuleConfig(TreeWalker.class);
      config.addProperty("skipFileOnJavaParseException", "true");
      config.addProperty("javaParseExceptionSeverity", "ignore");
-@@ -769,7 +771,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -769,7 +770,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -22923,7 +22913,7 @@
      final DefaultConfiguration config = createModuleConfig(TreeWalker.class);
      config.addProperty("skipFileOnJavaParseException", "true");
      config.addChild(createModuleConfig(NoCodeInFileCheck.class));
-@@ -786,7 +788,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
+@@ -786,7 +787,7 @@ public class TreeWalkerTest extends AbstractModuleTestSupport {
      expectedViolation.put(getPath("InputTreeWalkerProperFileExtension.java"), new ArrayList<>());
      expectedViolation.put(
          getNonCompilablePath("InputTreeWalkerSkipParsingException.java"),
@@ -23422,19 +23412,18 @@
  
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/ant/CheckstyleAntTaskTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/ant/CheckstyleAntTaskTest.java
-@@ -21,8 +21,10 @@ package com.puppycrawl.tools.checkstyle.ant;
+@@ -21,8 +21,9 @@ package com.puppycrawl.tools.checkstyle.ant;
  
  import static com.google.common.truth.Truth.assertWithMessage;
  import static com.puppycrawl.tools.checkstyle.internal.utils.TestUtil.getExpectedThrowable;
 -import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-+import static java.nio.charset.StandardCharsets.UTF_8;
 +import static org.assertj.core.api.Assertions.assertThatCode;
  
 +import com.google.common.collect.ImmutableList;
  import com.google.common.truth.StandardSubjectBuilder;
  import com.puppycrawl.tools.checkstyle.AbstractPathTestSupport;
  import com.puppycrawl.tools.checkstyle.DefaultLogger;
-@@ -36,7 +38,6 @@ import com.puppycrawl.tools.checkstyle.internal.testmodules.TestRootModuleChecke
+@@ -36,7 +37,6 @@ import com.puppycrawl.tools.checkstyle.internal.testmodules.TestRootModuleChecke
  import java.io.File;
  import java.io.IOException;
  import java.net.URL;
@@ -23442,7 +23431,7 @@
  import java.nio.file.Files;
  import java.util.Arrays;
  import java.util.List;
-@@ -54,7 +55,7 @@ import org.apache.tools.ant.types.Path;
+@@ -54,7 +54,7 @@ import org.apache.tools.ant.types.Path;
  import org.apache.tools.ant.types.resources.FileResource;
  import org.junit.jupiter.api.Test;
  
@@ -23451,7 +23440,7 @@
  
    private static final String FLAWLESS_INPUT = "InputCheckstyleAntTaskFlawless.java";
    private static final String VIOLATED_INPUT = "InputCheckstyleAntTaskError.java";
-@@ -82,7 +83,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -82,7 +82,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23460,7 +23449,7 @@
      TestRootModuleChecker.reset();
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
      antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
-@@ -94,7 +95,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -94,7 +94,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23469,7 +23458,7 @@
      // given
      TestRootModuleChecker.reset();
  
-@@ -115,12 +116,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -115,12 +115,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
      final List<File> filesToCheck = TestRootModuleChecker.getFilesToCheck();
      assertWithMessage("There are more files to check than expected").that(filesToCheck).hasSize(1);
      assertWithMessage("The path of file differs from expected")
@@ -23484,7 +23473,7 @@
      // given
      TestRootModuleChecker.reset();
      final CheckstyleAntTaskLogStub antTask = new CheckstyleAntTaskLogStub();
-@@ -166,12 +167,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -166,12 +166,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
      final List<File> filesToCheck = TestRootModuleChecker.getFilesToCheck();
      assertWithMessage("There are more files to check than expected").that(filesToCheck).hasSize(1);
      assertWithMessage("The path of file differs from expected")
@@ -23499,7 +23488,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTaskLogStub antTask = new CheckstyleAntTaskLogStub();
-@@ -197,7 +198,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -197,7 +197,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23508,7 +23497,7 @@
      // given
      TestRootModuleChecker.reset();
  
-@@ -228,7 +229,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -228,7 +228,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23517,7 +23506,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
-@@ -241,7 +242,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -241,7 +241,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23526,7 +23515,7 @@
      TestRootModuleChecker.reset();
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
      final FileSet examinationFileSet = new FileSet();
-@@ -255,12 +256,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -255,12 +255,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
      final List<File> filesToCheck = TestRootModuleChecker.getFilesToCheck();
      assertWithMessage("There are more files to check than expected").that(filesToCheck).hasSize(1);
      assertWithMessage("The path of file differs from expected")
@@ -23541,7 +23530,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setProject(new Project());
      antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
-@@ -278,7 +279,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -278,7 +278,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23550,7 +23539,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setProject(new Project());
  
-@@ -297,7 +298,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -297,7 +297,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23559,7 +23548,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setConfig(getPath(NOT_EXISTING_FILE));
      antTask.setProject(new Project());
-@@ -314,7 +315,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -314,7 +314,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23568,7 +23557,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setConfig(getPath("InputCheckstyleAntTaskEmptyConfig.xml"));
      antTask.setProject(new Project());
-@@ -332,7 +333,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -332,7 +332,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23577,7 +23566,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      final BuildException ex =
          getExpectedThrowable(BuildException.class, antTask::execute, "BuildException is expected");
-@@ -342,7 +343,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -342,7 +342,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23586,7 +23575,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(WARNING_INPUT)));
      antTask.setMaxWarnings(0);
-@@ -360,7 +361,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -360,7 +360,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23595,7 +23584,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(VIOLATED_INPUT)));
      antTask.setMaxErrors(1);
-@@ -373,7 +374,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -373,7 +373,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23604,7 +23593,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
-@@ -387,7 +388,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -387,7 +387,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23613,7 +23602,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setConfig(getPath(CONFIG_FILE));
      antTask.setFile(new File(getPath(VIOLATED_INPUT)));
-@@ -411,7 +412,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -411,7 +411,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23622,7 +23611,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
-@@ -429,7 +430,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -429,7 +429,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23631,7 +23620,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(VIOLATED_INPUT)));
      antTask.setFailOnViolation(false);
-@@ -452,7 +453,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -452,7 +452,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
      final String auditFinishedMessage = bundle.getString(DefaultLogger.AUDIT_FINISHED_MESSAGE);
      final List<String> output = readWholeFile(outputFile);
      final String errorMessage = "Content of file with violations differs from expected";
@@ -23640,7 +23629,7 @@
      assertWithMessage(errorMessage)
          .that(output.get(1))
          .matches(
-@@ -472,7 +473,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -472,7 +472,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23649,7 +23638,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setProject(new Project());
      final URL url = new File(getPath(CONFIG_FILE)).toURI().toURL();
-@@ -496,7 +497,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -496,7 +496,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23658,7 +23647,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      antTask.setProject(new Project());
      antTask.setConfig(getPath(CONFIG_FILE));
-@@ -519,7 +520,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -519,7 +519,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23667,7 +23656,7 @@
      final File file = new File(getPath(CONFIG_FILE));
      final URL url = file.toURI().toURL();
  
-@@ -535,7 +536,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -535,7 +535,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23676,7 +23665,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
-@@ -549,7 +550,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -549,7 +549,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23685,7 +23674,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
      antTask.setProperties(new File(getPath(NOT_EXISTING_FILE)));
-@@ -561,7 +562,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -561,7 +561,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23694,7 +23683,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(VIOLATED_INPUT)));
      antTask.setFailOnViolation(false);
-@@ -588,7 +589,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -588,7 +588,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23703,7 +23692,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(VIOLATED_INPUT)));
      antTask.setFailOnViolation(false);
-@@ -620,7 +621,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -620,7 +620,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23712,7 +23701,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -631,11 +632,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -631,11 +631,12 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
          getExpectedThrowable(BuildException.class, antTask::execute, "BuildException is expected");
      assertWithMessage("Error message is unexpected")
          .that(ex.getMessage())
@@ -23727,7 +23716,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -653,7 +655,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -653,7 +654,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23736,7 +23725,7 @@
      final CheckstyleAntTask antTask = getCheckstyleAntTask();
      antTask.setFile(new File(getPath(FLAWLESS_INPUT)));
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -671,7 +673,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -671,7 +672,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23745,7 +23734,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      final BuildException ex =
          getExpectedThrowable(
-@@ -684,7 +686,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -684,7 +685,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23754,7 +23743,7 @@
      final String filename = getPath("InputCheckstyleAntTaskCheckstyleAntTest.properties");
      final CheckstyleAntTask.Property property = new CheckstyleAntTask.Property();
      property.setFile(new File(filename));
-@@ -694,7 +696,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -694,7 +695,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23763,7 +23752,7 @@
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
      formatter.setUseFile(false);
      assertWithMessage("Listener instance has unexpected type")
-@@ -703,7 +705,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -703,7 +704,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23772,7 +23761,7 @@
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
      formatter.setUseFile(false);
      formatter.setTofile(new File("target/"));
-@@ -713,7 +715,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -713,7 +714,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23781,7 +23770,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      formatterType.setValue("xml");
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -725,7 +727,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -725,7 +726,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23790,7 +23779,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      formatterType.setValue("xml");
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -738,7 +740,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -738,7 +739,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23799,7 +23788,7 @@
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
      formatter.setTofile(null);
      assertWithMessage("Listener instance has unexpected type")
-@@ -747,7 +749,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -747,7 +748,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23808,7 +23797,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      formatterType.setValue("xml");
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -759,7 +761,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -759,7 +760,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23817,7 +23806,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      formatterType.setValue("sarif");
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -771,7 +773,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -771,7 +772,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23826,7 +23815,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      formatterType.setValue("sarif");
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -784,7 +786,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -784,7 +785,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23835,7 +23824,7 @@
      final CheckstyleAntTask.FormatterType formatterType = new CheckstyleAntTask.FormatterType();
      formatterType.setValue("sarif");
      final CheckstyleAntTask.Formatter formatter = new CheckstyleAntTask.Formatter();
-@@ -797,7 +799,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -797,7 +798,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
  
    /** Testing deprecated method. */
    @Test
@@ -23844,7 +23833,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTask();
      final Project mockProject = new Project();
      antTask.setProject(mockProject);
-@@ -810,7 +812,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -810,7 +811,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23853,7 +23842,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
-@@ -824,7 +826,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -824,7 +825,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23862,7 +23851,7 @@
      TestRootModuleChecker.reset();
  
      final CheckstyleAntTask antTask = getCheckstyleAntTask(CUSTOM_ROOT_CONFIG_FILE);
-@@ -838,7 +840,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -838,7 +839,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23871,7 +23860,7 @@
      final URL url = new File(getPath(CONFIG_FILE)).toURI().toURL();
      final ResourceBundle bundle =
          ResourceBundle.getBundle(Definitions.CHECKSTYLE_BUNDLE, Locale.ROOT);
-@@ -883,7 +885,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -883,7 +884,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23880,7 +23869,7 @@
      final CheckstyleAntTask antTask = new CheckstyleAntTaskStub();
      antTask.setConfig(getPath(CONFIG_FILE));
      antTask.setProject(new Project());
-@@ -897,7 +899,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -897,7 +898,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -23889,16 +23878,16 @@
      final CheckstyleAntTaskLogStub antTask = new CheckstyleAntTaskLogStub();
      antTask.setConfig(getPath(CONFIG_FILE));
      antTask.setProject(new Project());
-@@ -932,7 +934,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -932,7 +933,7 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    private static List<String> readWholeFile(File outputFile) throws IOException {
 -    return Files.readAllLines(outputFile.toPath(), StandardCharsets.UTF_8);
-+    return Files.readAllLines(outputFile.toPath(), UTF_8);
++    return Files.readAllLines(outputFile.toPath());
    }
  
    private static long getNumberFromLine(String line) {
-@@ -942,13 +944,15 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
+@@ -942,13 +943,15 @@ public class CheckstyleAntTaskTest extends AbstractPathTestSupport {
    }
  
    @Test
@@ -27313,17 +27302,15 @@
        "15:27: " + getCheckMessage(MSG_KEY),
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/checks/TranslationCheckTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/checks/TranslationCheckTest.java
-@@ -22,7 +22,9 @@ package com.puppycrawl.tools.checkstyle.checks;
- import static com.google.common.truth.Truth.assertWithMessage;
+@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
  import static com.puppycrawl.tools.checkstyle.checks.TranslationCheck.MSG_KEY;
  import static com.puppycrawl.tools.checkstyle.checks.TranslationCheck.MSG_KEY_MISSING_TRANSLATION_FILE;
-+import static java.nio.charset.StandardCharsets.UTF_8;
  
 +import com.google.common.collect.ImmutableList;
  import com.google.common.collect.ImmutableMap;
  import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean.OutputStreamOptions;
  import com.puppycrawl.tools.checkstyle.AbstractXmlTestSupport;
-@@ -44,7 +46,6 @@ import java.io.Writer;
+@@ -44,7 +45,6 @@ import java.io.Writer;
  import java.lang.reflect.Field;
  import java.nio.charset.StandardCharsets;
  import java.nio.file.Files;
@@ -27331,7 +27318,7 @@
  import java.util.Set;
  import java.util.SortedSet;
  import java.util.TreeSet;
-@@ -52,7 +53,7 @@ import org.junit.jupiter.api.Test;
+@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
  import org.junit.jupiter.api.io.TempDir;
  import org.w3c.dom.Node;
  
@@ -27340,7 +27327,7 @@
  
    @TempDir public File temporaryFolder;
  
-@@ -62,7 +63,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -62,7 +62,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27349,7 +27336,7 @@
      final Configuration checkConfig = createModuleConfig(TranslationCheck.class);
      final String[] expected = {
        "1: " + getCheckMessage(MSG_KEY, "only.english"),
-@@ -79,7 +80,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -79,7 +79,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27358,7 +27345,7 @@
      final Configuration checkConfig = createModuleConfig(TranslationCheck.class);
      final String[] expected = {
        "1: " + getCheckMessage(MSG_KEY, "only.english"),
-@@ -98,9 +99,9 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -98,9 +98,9 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27366,11 +27353,11 @@
 +  void differentPaths() throws Exception {
      final File file = new File(temporaryFolder, "messages_test_de.properties");
 -    try (Writer writer = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
-+    try (Writer writer = Files.newBufferedWriter(file.toPath(), UTF_8)) {
++    try (Writer writer = Files.newBufferedWriter(file.toPath())) {
        final String content = "hello=Hello\ncancel=Cancel";
        writer.write(content);
      }
-@@ -122,7 +123,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -122,7 +122,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
     * @throws Exception when code tested throws exception
     */
    @Test
@@ -27379,7 +27366,7 @@
      final File fileToProcess = new File(getPath("InputTranslationCheckFireErrors_de.properties"));
      final String charset = StandardCharsets.UTF_8.name();
      final TranslationCheck check = new TranslationCheck();
-@@ -138,7 +139,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -138,7 +138,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27388,7 +27375,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("baseName", "^InputTranslation.*$");
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
-@@ -149,7 +150,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -149,7 +149,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27397,7 +27384,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "ja,de");
      checkConfig.addProperty("baseName", "^InputTranslation.*$");
-@@ -176,9 +177,9 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -176,9 +176,9 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
          checker,
          propertyFiles,
          ImmutableMap.of(
@@ -27409,7 +27396,7 @@
  
      verifyXml(
          getPath("ExpectedTranslationLog.xml"),
-@@ -189,7 +190,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -189,7 +189,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27418,7 +27405,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      final String[] expected = CommonUtil.EMPTY_STRING_ARRAY;
      final File[] propertyFiles = {
-@@ -199,7 +200,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -199,7 +199,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27427,7 +27414,7 @@
      // I can't put wrong file here. Checkstyle fails before check started.
      // I saw some usage of file or handling of wrong file in Checker, or somewhere
      // in checks running part. So I had to do it with reflection to improve coverage.
-@@ -231,7 +232,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -231,7 +231,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27436,7 +27423,7 @@
      // I can't put wrong file here. Checkstyle fails before check started.
      // I saw some usage of file or handling of wrong file in Checker, or somewhere
      // in checks running part. So I had to do it with reflection to improve coverage.
-@@ -263,7 +264,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -263,7 +263,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27445,7 +27432,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("baseName", "^bad.*$");
      final String[] expected = {
-@@ -277,7 +278,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -277,7 +277,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27454,7 +27441,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "ja,,, de, ja");
  
-@@ -293,7 +294,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -293,7 +293,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27463,7 +27450,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "ja, de");
  
-@@ -310,7 +311,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -310,7 +310,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27472,7 +27459,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "fr");
  
-@@ -325,7 +326,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -325,7 +325,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27481,7 +27468,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "fr, tr");
  
-@@ -342,7 +343,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -342,7 +342,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27490,7 +27477,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de");
  
-@@ -355,7 +356,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -355,7 +355,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27499,7 +27486,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "es, de");
  
-@@ -372,7 +373,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -372,7 +372,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27508,7 +27495,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "es, fr");
  
-@@ -387,7 +388,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -387,7 +387,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27517,7 +27504,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de, es, fr, ja");
      checkConfig.addProperty("baseName", "^.*Labels$");
-@@ -409,7 +410,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -409,7 +409,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27526,7 +27513,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de, es, fr, ja");
      checkConfig.addProperty("fileExtensions", "properties,translation");
-@@ -435,7 +436,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -435,7 +435,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27535,7 +27522,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de, es, fr, ja");
      checkConfig.addProperty("fileExtensions", "properties,translations");
-@@ -461,7 +462,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -461,7 +461,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27544,7 +27531,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de, es");
      checkConfig.addProperty("fileExtensions", "properties, translations");
-@@ -484,7 +485,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -484,7 +484,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27553,7 +27540,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de, es, fr, ja");
      checkConfig.addProperty("fileExtensions", "properties,translations");
-@@ -505,7 +506,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -505,7 +505,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -27562,7 +27549,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(TranslationCheck.class);
      checkConfig.addProperty("requiredTranslations", "de");
      checkConfig.addProperty("fileExtensions", "properties");
-@@ -524,7 +525,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
+@@ -524,7 +524,7 @@ public class TranslationCheckTest extends AbstractXmlTestSupport {
    }
  
    @Test
@@ -37483,11 +37470,10 @@
          mockConstruction(
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/checks/header/MultiFileRegexpHeaderCheckTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/checks/header/MultiFileRegexpHeaderCheckTest.java
-@@ -23,19 +23,22 @@ import static com.google.common.truth.Truth.assertWithMessage;
+@@ -23,19 +23,21 @@ import static com.google.common.truth.Truth.assertWithMessage;
  import static com.puppycrawl.tools.checkstyle.checks.header.MultiFileRegexpHeaderCheck.MSG_HEADER_MISMATCH;
  import static com.puppycrawl.tools.checkstyle.checks.header.MultiFileRegexpHeaderCheck.MSG_HEADER_MISSING;
  import static com.puppycrawl.tools.checkstyle.utils.CommonUtil.EMPTY_STRING_ARRAY;
-+import static java.nio.charset.StandardCharsets.UTF_8;
 +import static org.assertj.core.api.Assertions.assertThatCode;
 +import static org.junit.jupiter.api.Assertions.assertEquals;
 +import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37508,7 +37494,7 @@
  import org.junit.jupiter.api.Test;
  import org.junit.jupiter.api.io.TempDir;
  
-@@ -48,7 +51,7 @@ import org.junit.jupiter.api.io.TempDir;
+@@ -48,7 +50,7 @@ import org.junit.jupiter.api.io.TempDir;
   * check, it will cause errors. Always use distinct paths for test input files versus header
   * template files.
   */
@@ -37517,7 +37503,7 @@
  
    @TempDir public File temporaryFolder;
  
-@@ -58,7 +61,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -58,7 +60,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37526,7 +37512,7 @@
      final MultiFileRegexpHeaderCheck instance = new MultiFileRegexpHeaderCheck();
      try {
        instance.setHeaderFiles(String.valueOf(URI.create("file://test")));
-@@ -71,7 +74,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -71,7 +73,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37535,7 +37521,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
  
      final MultiFileRegexpHeaderCheck instance = new MultiFileRegexpHeaderCheck();
-@@ -85,7 +88,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -85,7 +87,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37544,7 +37530,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", " , ");
  
-@@ -99,7 +102,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -99,7 +101,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37553,7 +37539,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", "");
  
-@@ -113,14 +116,14 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -113,14 +115,14 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37570,7 +37556,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", getPath("InputRegexpHeaderNewLines.header"));
  
-@@ -135,9 +138,9 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -135,9 +137,9 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37578,11 +37564,11 @@
 +  void emptyHeaderFile() throws IOException {
      final File emptyFile = new File(temporaryFolder, "empty.header");
 -    Files.write(emptyFile.toPath(), new ArrayList<>(), StandardCharsets.UTF_8);
-+    Files.write(emptyFile.toPath(), new ArrayList<>(), UTF_8);
++    Files.write(emptyFile.toPath(), new ArrayList<>());
      final URI fileUri = emptyFile.toURI();
  
      try {
-@@ -152,7 +155,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -152,7 +154,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37591,7 +37577,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", getPath("InputRegexpHeader.header"));
  
-@@ -167,7 +170,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -167,7 +169,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37600,7 +37586,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", getUriString("InputRegexpHeader.header"));
  
-@@ -182,7 +185,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -182,7 +184,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37609,7 +37595,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", getUriString("InputRegexpHeaderNewLines.header"));
  
-@@ -197,7 +200,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -197,7 +199,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37618,7 +37604,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty(
          "headerFiles",
-@@ -206,25 +209,21 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -206,25 +208,19 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37633,22 +37619,22 @@
 -  public void testBlankPatternBranch() throws Exception {
 +  void blankPatternBranch() throws Exception {
      final File headerFile = new File(temporaryFolder, "blankPattern.header");
-     Files.write(
+-    Files.write(
 -        headerFile.toPath(),
 -        List.of("// First line", "// Second line", "   "),
 -        StandardCharsets.UTF_8);
-+        headerFile.toPath(), ImmutableList.of("// First line", "// Second line", "   "), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// First line", "// Second line", "   "));
  
      final File testFile = new File(temporaryFolder, "testFile.java");
-     Files.write(
+-    Files.write(
 -        testFile.toPath(),
 -        List.of("// First line", "// Second line", "   "),
 -        StandardCharsets.UTF_8);
-+        testFile.toPath(), ImmutableList.of("// First line", "// Second line", "   "), UTF_8);
++    Files.write(testFile.toPath(), ImmutableList.of("// First line", "// Second line", "   "));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -233,7 +232,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -233,7 +229,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37657,7 +37643,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", getPath("InputRegexpHeader.header"));
  
-@@ -248,7 +247,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -248,7 +244,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37666,7 +37652,7 @@
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", getPath("InputRegexpHeader.header"));
  
-@@ -263,16 +262,16 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -263,16 +259,16 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37682,11 +37668,11 @@
 +  void emptyPatternInHeader() throws Exception {
      final File headerFile = new File(temporaryFolder, "headerFiles.header");
 -    Files.write(headerFile.toPath(), List.of("", "valid"), StandardCharsets.UTF_8);
-+    Files.write(headerFile.toPath(), ImmutableList.of("", "valid"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("", "valid"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath() + "," + headerFile.getPath());
-@@ -281,7 +280,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -281,7 +277,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37695,7 +37681,7 @@
      final DefaultConfiguration configNoHeaderFiles =
          createModuleConfig(MultiFileRegexpHeaderCheck.class);
      final MultiFileRegexpHeaderCheck checkNoHeaders = new MultiFileRegexpHeaderCheck();
-@@ -294,7 +293,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -294,7 +290,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37704,7 +37690,7 @@
      final DefaultConfiguration configWithHeaderFiles =
          createModuleConfig(MultiFileRegexpHeaderCheck.class);
      final String header4Path = getPath("InputRegexpHeader4.header");
-@@ -321,19 +320,19 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -321,19 +317,17 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37716,41 +37702,40 @@
  
      final File testFile = new File(temporaryFolder, "test.java");
 -    Files.write(testFile.toPath(), List.of(fileLines), StandardCharsets.UTF_8);
-+    Files.write(testFile.toPath(), List.of(fileLines), UTF_8);
++    Files.write(testFile.toPath(), List.of(fileLines));
  
      final File headerFile = new File(temporaryFolder, "header.header");
      Files.write(
-         headerFile.toPath(),
+-        headerFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line"),
-+        UTF_8);
++        headerFile.toPath(), ImmutableList.of("// First line", "// Second line", "// Third line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -342,18 +341,14 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -342,18 +336,12 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testEmptyPatternMatch() throws Exception {
 +  void emptyPatternMatch() throws Exception {
      final File fileWithBlank = new File(temporaryFolder, "blank.java");
-     Files.write(
+-    Files.write(
 -        fileWithBlank.toPath(),
 -        List.of("// First line", "", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        fileWithBlank.toPath(), ImmutableList.of("// First line", "", "// Third line"), UTF_8);
++    Files.write(fileWithBlank.toPath(), ImmutableList.of("// First line", "", "// Third line"));
  
      final File headerFile = new File(temporaryFolder, "header.header");
-     Files.write(
+-    Files.write(
 -        headerFile.toPath(),
 -        List.of("// First line", "^$", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        headerFile.toPath(), ImmutableList.of("// First line", "^$", "// Third line"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// First line", "^$", "// Third line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -362,18 +357,16 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -362,18 +350,13 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37758,22 +37743,21 @@
 +  void blankLineMismatch() throws Exception {
      final File fileNoBlank = new File(temporaryFolder, "noblank.java");
      Files.write(
-         fileNoBlank.toPath(),
+-        fileNoBlank.toPath(),
 -        List.of("// First line", "// Second line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line"),
-+        UTF_8);
++        fileNoBlank.toPath(), ImmutableList.of("// First line", "// Second line", "// Third line"));
  
      final File headerFile = new File(temporaryFolder, "header.header");
-     Files.write(
+-    Files.write(
 -        headerFile.toPath(),
 -        List.of("// First line", "^$", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        headerFile.toPath(), ImmutableList.of("// First line", "^$", "// Third line"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// First line", "^$", "// Third line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -389,18 +382,18 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -389,18 +372,16 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37781,23 +37765,22 @@
 +  void multipleHeaderFilesAllInvalid() throws Exception {
      final File testFile = new File(temporaryFolder, "test.java");
      Files.write(
-         testFile.toPath(),
+-        testFile.toPath(),
 -        List.of("// Different content", "// Not matching any headers"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// Different content", "// Not matching any headers"),
-+        UTF_8);
++        testFile.toPath(), ImmutableList.of("// Different content", "// Not matching any headers"));
  
      final File header1File = new File(temporaryFolder, "header1.header");
 -    Files.write(header1File.toPath(), List.of("// Header 1"), StandardCharsets.UTF_8);
-+    Files.write(header1File.toPath(), ImmutableList.of("// Header 1"), UTF_8);
++    Files.write(header1File.toPath(), ImmutableList.of("// Header 1"));
  
      final File header2File = new File(temporaryFolder, "header2.header");
 -    Files.write(header2File.toPath(), List.of("// Header 2"), StandardCharsets.UTF_8);
-+    Files.write(header2File.toPath(), ImmutableList.of("// Header 2"), UTF_8);
++    Files.write(header2File.toPath(), ImmutableList.of("// Header 2"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", header1File.getPath() + "," + header2File.getPath());
-@@ -416,18 +409,15 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -416,18 +397,15 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37806,21 +37789,21 @@
      final File headerFile1 = new File(temporaryFolder, "header1.header");
 -    Files.write(
 -        headerFile1.toPath(), List.of("Copyright", "Author: .*", ""), StandardCharsets.UTF_8);
-+    Files.write(headerFile1.toPath(), ImmutableList.of("Copyright", "Author: .*", ""), UTF_8);
++    Files.write(headerFile1.toPath(), ImmutableList.of("Copyright", "Author: .*", ""));
  
      final File headerFile2 = new File(temporaryFolder, "header2.header");
 -    Files.write(
 -        headerFile2.toPath(), List.of("License", "Year: \\d{4}", ""), StandardCharsets.UTF_8);
-+    Files.write(headerFile2.toPath(), ImmutableList.of("License", "Year: \\d{4}", ""), UTF_8);
++    Files.write(headerFile2.toPath(), ImmutableList.of("License", "Year: \\d{4}", ""));
  
      final File testFile = new File(temporaryFolder, "TestFile.java");
 -    Files.write(
 -        testFile.toPath(), List.of("Copyright", "Author: John Doe", ""), StandardCharsets.UTF_8);
-+    Files.write(testFile.toPath(), ImmutableList.of("Copyright", "Author: John Doe", ""), UTF_8);
++    Files.write(testFile.toPath(), ImmutableList.of("Copyright", "Author: John Doe", ""));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile1.getPath() + "," + headerFile2.getPath());
-@@ -436,10 +426,9 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -436,10 +414,9 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37829,11 +37812,11 @@
      final File corruptedHeaderFile = new File(temporaryFolder, "corrupted.header");
 -    Files.write(
 -        corruptedHeaderFile.toPath(), List.of("Invalid regex [a-z"), StandardCharsets.UTF_8);
-+    Files.write(corruptedHeaderFile.toPath(), ImmutableList.of("Invalid regex [a-z"), UTF_8);
++    Files.write(corruptedHeaderFile.toPath(), ImmutableList.of("Invalid regex [a-z"));
  
      final MultiFileRegexpHeaderCheck check = new MultiFileRegexpHeaderCheck();
  
-@@ -454,35 +443,35 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -454,35 +431,32 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37860,24 +37843,23 @@
 +  void headerMoreLinesThanFile() throws Exception {
      final File testFile = new File(temporaryFolder, "shortFile.java");
      Files.write(
-         testFile.toPath(),
+-        testFile.toPath(),
 -        List.of("// Different content", "// Not matching header"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// Different content", "// Not matching header"),
-+        UTF_8);
++        testFile.toPath(), ImmutableList.of("// Different content", "// Not matching header"));
  
      final File headerFile = new File(temporaryFolder, "longHeader.header");
      Files.write(
          headerFile.toPath(),
 -        List.of(
-+        ImmutableList.of(
-             "// First line", "// Second line", "// Third line", "// Fourth line", "// Fifth line"),
+-            "// First line", "// Second line", "// Third line", "// Fourth line", "// Fifth line"),
 -        StandardCharsets.UTF_8);
-+        UTF_8);
++        ImmutableList.of(
++            "// First line", "// Second line", "// Third line", "// Fourth line", "// Fifth line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -498,21 +487,22 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -498,21 +472,20 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37890,9 +37872,9 @@
 +        ImmutableList.of(
              "// First line matches",
              "// This line doesn't match the header pattern",
-             "// Third line matches"),
+-            "// Third line matches"),
 -        StandardCharsets.UTF_8);
-+        UTF_8);
++            "// Third line matches"));
  
      final File headerFile = new File(temporaryFolder, "mismatchHeader.header");
      Files.write(
@@ -37900,12 +37882,11 @@
 -        List.of("// First line matches", "// Second line matches", "// Third line matches"),
 -        StandardCharsets.UTF_8);
 +        ImmutableList.of(
-+            "// First line matches", "// Second line matches", "// Third line matches"),
-+        UTF_8);
++            "// First line matches", "// Second line matches", "// Third line matches"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -528,18 +518,18 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -528,18 +501,15 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37913,23 +37894,21 @@
 +  void findFirstMismatch() throws Exception {
      final File testFile = new File(temporaryFolder, "test.java");
      Files.write(
-         testFile.toPath(),
+-        testFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line"),
-+        UTF_8);
++        testFile.toPath(), ImmutableList.of("// First line", "// Second line", "// Third line"));
  
      final File headerFile = new File(temporaryFolder, "header.header");
      Files.write(
          headerFile.toPath(),
 -        List.of("// First line", "// Different line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Different line", "// Third line"),
-+        UTF_8);
++        ImmutableList.of("// First line", "// Different line", "// Third line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -555,18 +545,16 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -555,18 +525,13 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37937,22 +37916,21 @@
 +  void noMatchingHeaderFile() throws Exception {
      final File testFile = new File(temporaryFolder, "test.java");
      Files.write(
-         testFile.toPath(),
+-        testFile.toPath(),
 -        List.of("// Different content", "// Not matching any headers"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// Different content", "// Not matching any headers"),
-+        UTF_8);
++        testFile.toPath(), ImmutableList.of("// Different content", "// Not matching any headers"));
  
      final File headerFile = new File(temporaryFolder, "header.header");
-     Files.write(
+-    Files.write(
 -        headerFile.toPath(),
 -        List.of("// Header content", "// Another line"),
 -        StandardCharsets.UTF_8);
-+        headerFile.toPath(), ImmutableList.of("// Header content", "// Another line"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// Header content", "// Another line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -582,18 +570,18 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -582,18 +547,17 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -37963,39 +37941,38 @@
          headerFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line with different pattern"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line with different pattern"),
-+        UTF_8);
++        ImmutableList.of(
++            "// First line", "// Second line", "// Third line with different pattern"));
  
      final File testFile = new File(temporaryFolder, "testFile.java");
      Files.write(
          testFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line that does not match"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line that does not match"),
-+        UTF_8);
++        ImmutableList.of("// First line", "// Second line", "// Third line that does not match"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -610,15 +598,13 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -610,15 +574,12 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
 -  public void testFileFailsWhenShorterThanHeader() throws Exception {
 +  void fileFailsWhenShorterThanHeader() throws Exception {
      final File headerFile = new File(temporaryFolder, "longerHeader.header");
-     Files.write(
+-    Files.write(
 -        headerFile.toPath(),
 -        List.of("// Line 1", "// Line 2", "// Line 3"),
 -        StandardCharsets.UTF_8);
-+        headerFile.toPath(), ImmutableList.of("// Line 1", "// Line 2", "// Line 3"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// Line 1", "// Line 2", "// Line 3"));
  
      final File testFile = new File(temporaryFolder, "shorterFile.java");
 -    Files.write(testFile.toPath(), List.of("// Line 1"), StandardCharsets.UTF_8);
-+    Files.write(testFile.toPath(), ImmutableList.of("// Line 1"), UTF_8);
++    Files.write(testFile.toPath(), ImmutableList.of("// Line 1"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -634,12 +620,12 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -634,12 +595,12 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38003,15 +37980,15 @@
 +  void headerWithTrailingBlanksFailsWhenFileIsShorter() throws Exception {
      final File headerFile = new File(temporaryFolder, "headerWithBlanks.header");
 -    Files.write(headerFile.toPath(), List.of("// Line 1", "", "// Line 3"), StandardCharsets.UTF_8);
-+    Files.write(headerFile.toPath(), ImmutableList.of("// Line 1", "", "// Line 3"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// Line 1", "", "// Line 3"));
  
      final File testFile = new File(temporaryFolder, "shorterFile.java");
 -    Files.write(testFile.toPath(), List.of("// Line 1"), StandardCharsets.UTF_8);
-+    Files.write(testFile.toPath(), ImmutableList.of("// Line 1"), UTF_8);
++    Files.write(testFile.toPath(), ImmutableList.of("// Line 1"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -655,20 +641,20 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -655,20 +616,17 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38019,25 +37996,24 @@
 +  void fileSizeGreaterThanHeaderPatternSize() throws Exception {
      final File headerFile = new File(temporaryFolder, "shorterHeader.header");
      Files.write(
-         headerFile.toPath(),
+-        headerFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line"),
-+        UTF_8);
++        headerFile.toPath(), ImmutableList.of("// First line", "// Second line", "// Third line"));
  
      // Create a test file with more lines than the header
      final File testFile = new File(temporaryFolder, "longerFile.java");
      Files.write(
          testFile.toPath(),
 -        List.of(
-+        ImmutableList.of(
-             "// First line", "// Second line", "// Third line", "// Fourth line", "// Fifth line"),
+-            "// First line", "// Second line", "// Third line", "// Fourth line", "// Fifth line"),
 -        StandardCharsets.UTF_8);
-+        UTF_8);
++        ImmutableList.of(
++            "// First line", "// Second line", "// Third line", "// Fourth line", "// Fifth line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -677,18 +663,18 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -677,18 +635,14 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38045,23 +38021,21 @@
 +  void fileSizeEqualHeaderPatternSize() throws Exception {
      final File headerFile = new File(temporaryFolder, "shorterHeader.header");
      Files.write(
-         headerFile.toPath(),
+-        headerFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line"),
-+        UTF_8);
++        headerFile.toPath(), ImmutableList.of("// First line", "// Second line", "// Third line"));
  
      final File testFile = new File(temporaryFolder, "longerFile.java");
      Files.write(
-         testFile.toPath(),
+-        testFile.toPath(),
 -        List.of("// First line", "// Second line", "// Third line"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First line", "// Second line", "// Third line"),
-+        UTF_8);
++        testFile.toPath(), ImmutableList.of("// First line", "// Second line", "// Third line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -697,28 +683,28 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -697,28 +651,26 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38076,9 +38050,9 @@
              "// Second line",
              "// Third line with pattern .*",
              "// Fourth line",
-             "// Fifth line"),
+-            "// Fifth line"),
 -        StandardCharsets.UTF_8);
-+        UTF_8);
++            "// Fifth line"));
  
      final File testFile = new File(temporaryFolder, "mismatchThirdLine.java");
      Files.write(
@@ -38089,13 +38063,13 @@
              "// Second line",
              "This line doesn't match the pattern",
              "// Fourth line",
-             "// Fifth line"),
+-            "// Fifth line"),
 -        StandardCharsets.UTF_8);
-+        UTF_8);
++            "// Fifth line"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty("headerFiles", headerFile.getPath());
-@@ -734,24 +720,24 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -734,24 +686,20 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38106,28 +38080,25 @@
          matchingHeaderFile.toPath(),
 -        List.of("// This header matches", "// The file content"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// This header matches", "// The file content"),
-+        UTF_8);
++        ImmutableList.of("// This header matches", "// The file content"));
  
      final File nonMatchingHeaderFile = new File(temporaryFolder, "nonMatching.header");
      Files.write(
          nonMatchingHeaderFile.toPath(),
 -        List.of("// This header doesn't match", "// Different content"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// This header doesn't match", "// Different content"),
-+        UTF_8);
++        ImmutableList.of("// This header doesn't match", "// Different content"));
  
      final File testFile = new File(temporaryFolder, "TestFile.java");
      Files.write(
-         testFile.toPath(),
+-        testFile.toPath(),
 -        List.of("// This header matches", "// The file content"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// This header matches", "// The file content"),
-+        UTF_8);
++        testFile.toPath(), ImmutableList.of("// This header matches", "// The file content"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty(
-@@ -760,24 +746,24 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -760,24 +708,21 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38138,28 +38109,25 @@
          matchingHeader.toPath(),
 -        List.of("// First matching header", "// Second matching header"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First matching header", "// Second matching header"),
-+        UTF_8);
++        ImmutableList.of("// First matching header", "// Second matching header"));
  
      final File nonMatchingHeader = new File(temporaryFolder, "nonMatching2.header");
      Files.write(
          nonMatchingHeader.toPath(),
 -        List.of("// First matching header", "// Second no-matching header"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First matching header", "// Second no-matching header"),
-+        UTF_8);
++        ImmutableList.of("// First matching header", "// Second no-matching header"));
  
      final File testFile = new File(temporaryFolder, "TestFile.java");
      Files.write(
          testFile.toPath(),
 -        List.of("// First matching header", "// Second matching header"),
 -        StandardCharsets.UTF_8);
-+        ImmutableList.of("// First matching header", "// Second matching header"),
-+        UTF_8);
++        ImmutableList.of("// First matching header", "// Second matching header"));
  
      final DefaultConfiguration checkConfig = createModuleConfig(MultiFileRegexpHeaderCheck.class);
      checkConfig.addProperty(
-@@ -787,29 +773,30 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -787,29 +732,30 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38198,7 +38166,7 @@
  
      assertWithMessage(
              "External locations should be empty when setHeaderFiles is called with null array")
-@@ -818,12 +805,11 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -818,12 +764,11 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38209,21 +38177,21 @@
      final File headerFileA = new File(temporaryFolder, "testHeaderA_clear_check.header");
 -    Files.write(
 -        headerFileA.toPath(), List.of("// Header A for clear check"), StandardCharsets.UTF_8);
-+    Files.write(headerFileA.toPath(), ImmutableList.of("// Header A for clear check"), UTF_8);
++    Files.write(headerFileA.toPath(), ImmutableList.of("// Header A for clear check"));
      final String pathA = headerFileA.getAbsolutePath();
      final URI uriA = headerFileA.toURI();
  
-@@ -833,8 +819,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -833,8 +778,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
          .containsExactly(uriA.toASCIIString());
  
      final File headerFileB = new File(temporaryFolder, "testHeaderB_clear_check.header");
 -    Files.write(
 -        headerFileB.toPath(), List.of("// Header B for clear check"), StandardCharsets.UTF_8);
-+    Files.write(headerFileB.toPath(), ImmutableList.of("// Header B for clear check"), UTF_8);
++    Files.write(headerFileB.toPath(), ImmutableList.of("// Header B for clear check"));
      final String pathB = headerFileB.getAbsolutePath();
      final URI uriB = headerFileB.toURI();
  
-@@ -845,10 +830,9 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -845,10 +789,9 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38232,11 +38200,11 @@
      final File headerFile = new File(temporaryFolder, "header.header");
 -    Files.write(
 -        headerFile.toPath(), List.of("// First line", "", "// Third line"), StandardCharsets.UTF_8);
-+    Files.write(headerFile.toPath(), ImmutableList.of("// First line", "", "// Third line"), UTF_8);
++    Files.write(headerFile.toPath(), ImmutableList.of("// First line", "", "// Third line"));
  
      final MultiFileRegexpHeaderCheck check = new MultiFileRegexpHeaderCheck();
      check.setHeaderFiles(headerFile.getPath());
-@@ -863,7 +847,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -863,7 +806,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38245,7 +38213,7 @@
      final File nonExistentFile = new File(temporaryFolder, "nonexistent.header");
      final URI fileUri = nonExistentFile.toURI();
  
-@@ -879,7 +863,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -879,7 +822,7 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38254,7 +38222,7 @@
      final MultiFileRegexpHeaderCheck check = new MultiFileRegexpHeaderCheck();
      assertWithMessage("Expected empty string when no header files are configured")
          .that(check.getConfiguredHeaderPaths())
-@@ -887,10 +871,10 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -887,10 +830,10 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38263,11 +38231,11 @@
      final MultiFileRegexpHeaderCheck check = new MultiFileRegexpHeaderCheck();
      final File headerFile = new File(temporaryFolder, "singleTest.header");
 -    Files.writeString(headerFile.toPath(), "// Single test header", StandardCharsets.UTF_8);
-+    Files.writeString(headerFile.toPath(), "// Single test header", UTF_8);
++    Files.writeString(headerFile.toPath(), "// Single test header");
      final String path = headerFile.getAbsolutePath();
  
      check.setHeaderFiles(path);
-@@ -901,14 +885,14 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
+@@ -901,14 +844,14 @@ public class MultiFileRegexpHeaderCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -38276,12 +38244,12 @@
      final MultiFileRegexpHeaderCheck check = new MultiFileRegexpHeaderCheck();
      final File headerFile1 = new File(temporaryFolder, "multiTest1.header");
 -    Files.writeString(headerFile1.toPath(), "// Multi test header 1", StandardCharsets.UTF_8);
-+    Files.writeString(headerFile1.toPath(), "// Multi test header 1", UTF_8);
++    Files.writeString(headerFile1.toPath(), "// Multi test header 1");
      final String path1 = headerFile1.getAbsolutePath();
  
      final File headerFile2 = new File(temporaryFolder, "multiTest2.header");
 -    Files.writeString(headerFile2.toPath(), "// Multi test header 2", StandardCharsets.UTF_8);
-+    Files.writeString(headerFile2.toPath(), "// Multi test header 2", UTF_8);
++    Files.writeString(headerFile2.toPath(), "// Multi test header 2");
      final String path2 = headerFile2.getAbsolutePath();
  
      check.setHeaderFiles(path1, path2);
@@ -51137,15 +51105,7 @@
    }
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpMultilineCheckTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/checks/regexp/RegexpMultilineCheckTest.java
-@@ -24,6 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.MS
- import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.MSG_REGEXP_EXCEEDED;
- import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.MSG_REGEXP_MINIMUM;
- import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.MSG_STACKOVERFLOW;
-+import static java.nio.charset.StandardCharsets.UTF_8;
- 
- import com.puppycrawl.tools.checkstyle.AbstractModuleTestSupport;
- import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-@@ -36,7 +37,7 @@ import java.nio.file.Files;
+@@ -36,7 +36,7 @@ import java.nio.file.Files;
  import org.junit.jupiter.api.Test;
  import org.junit.jupiter.api.io.TempDir;
  
@@ -51154,7 +51114,7 @@
  
    @TempDir public File temporaryFolder;
  
-@@ -46,7 +47,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -46,7 +46,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51163,7 +51123,7 @@
      final String[] expected = {
        "78: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "System\\.(out)|(err)\\.print(ln)?\\("),
      };
-@@ -54,7 +55,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -54,7 +54,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51172,7 +51132,7 @@
      final String[] expected = {
        "79: " + "Bad line :(",
      };
-@@ -62,7 +63,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -62,7 +62,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51181,7 +51141,7 @@
      final String[] expected = {
        "79: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\("),
      };
-@@ -70,13 +71,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -70,13 +70,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51197,7 +51157,7 @@
      final String[] expected = {
        "16: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "^import"),
        "17: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "^import"),
-@@ -86,7 +87,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -86,7 +86,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51206,13 +51166,13 @@
      final DefaultConfiguration checkConfig = createModuleConfig(RegexpMultilineCheck.class);
      checkConfig.addProperty("format", "\\r");
      checkConfig.addProperty("maximum", "0");
-@@ -96,14 +97,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -96,14 +96,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
      };
  
      final File file = Files.createTempFile(temporaryFolder.toPath(), "junit", null).toFile();
 -    Files.writeString(
 -        file.toPath(), "first line \r\n second line \n\r third line", StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), "first line \r\n second line \n\r third line", UTF_8);
++    Files.writeString(file.toPath(), "first line \r\n second line \n\r third line");
  
      verify(checkConfig, file.getPath(), expected);
    }
@@ -51223,17 +51183,17 @@
      final DefaultConfiguration checkConfig = createModuleConfig(RegexpMultilineCheck.class);
      checkConfig.addProperty("format", "\\r");
      checkConfig.addProperty("maximum", "1");
-@@ -112,8 +112,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -112,8 +111,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
      };
  
      final File file = Files.createTempFile(temporaryFolder.toPath(), "junit", null).toFile();
 -    Files.writeString(
 -        file.toPath(), "first line \r\n second line \n\r third line", StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), "first line \r\n second line \n\r third line", UTF_8);
++    Files.writeString(file.toPath(), "first line \r\n second line \n\r third line");
  
      verify(checkConfig, file.getPath(), expected);
    }
-@@ -124,15 +123,14 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -124,15 +122,14 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
     * @throws Exception some Exception
     */
    @Test
@@ -51247,11 +51207,11 @@
      final File file = Files.createTempFile(temporaryFolder.toPath(), "junit", null).toFile();
 -    Files.writeString(
 -        file.toPath(), "first line \r\n second line \n\r third line", StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), "first line \r\n second line \n\r third line", UTF_8);
++    Files.writeString(file.toPath(), "first line \r\n second line \n\r third line");
  
      detector.processLines(new FileText(file, StandardCharsets.UTF_8.name()));
      detector.processLines(new FileText(file, StandardCharsets.UTF_8.name()));
-@@ -142,13 +140,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -142,13 +139,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51267,7 +51227,7 @@
      final String[] expected = {
        "1: " + getCheckMessage(MSG_EMPTY),
      };
-@@ -156,7 +154,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -156,7 +153,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51276,7 +51236,7 @@
      final String[] expected = {
        "1: " + getCheckMessage(MSG_EMPTY),
      };
-@@ -164,7 +162,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -164,7 +161,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51285,12 +51245,12 @@
      final DefaultConfiguration checkConfig = createModuleConfig(RegexpMultilineCheck.class);
      // http://madbean.com/2004/mb2004-20/
      checkConfig.addProperty("format", "(x|y)*");
-@@ -174,13 +172,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -174,13 +171,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
      };
  
      final File file = Files.createTempFile(temporaryFolder.toPath(), "junit", null).toFile();
 -    Files.writeString(file.toPath(), makeLargeXyString().toString(), StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), makeLargeXyString().toString(), UTF_8);
++    Files.writeString(file.toPath(), makeLargeXyString().toString());
  
      verify(checkConfig, file.getPath(), expected);
    }
@@ -51301,12 +51261,12 @@
      final DefaultConfiguration checkConfig = createModuleConfig(RegexpMultilineCheck.class);
      checkConfig.addProperty("format", "\\r");
      checkConfig.addProperty("minimum", "5");
-@@ -189,13 +187,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -189,13 +186,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
      };
  
      final File file = Files.createTempFile(temporaryFolder.toPath(), "junit", null).toFile();
 -    Files.writeString(file.toPath(), "", StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), "", UTF_8);
++    Files.writeString(file.toPath(), "");
  
      verify(checkConfig, file.getPath(), expected);
    }
@@ -51317,16 +51277,16 @@
      final DefaultConfiguration checkConfig = createModuleConfig(RegexpMultilineCheck.class);
      checkConfig.addProperty("format", "\\r");
      checkConfig.addProperty("minimum", "5");
-@@ -205,7 +203,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -205,7 +202,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
      };
  
      final File file = Files.createTempFile(temporaryFolder.toPath(), "junit", null).toFile();
 -    Files.writeString(file.toPath(), "", StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), "", UTF_8);
++    Files.writeString(file.toPath(), "");
  
      verify(checkConfig, file.getPath(), expected);
    }
-@@ -218,13 +216,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -218,13 +215,13 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -51342,7 +51302,7 @@
      final String[] expected = {
        "22: " + getCheckMessage(MSG_REGEXP_EXCEEDED, "(a)bc.*def"),
      };
-@@ -232,7 +230,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
+@@ -232,7 +229,7 @@ public class RegexpMultilineCheckTest extends AbstractModuleTestSupport {
    }
  
    @Test
@@ -64698,16 +64658,15 @@
          .isTrue();
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/XpathUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/XpathUtilTest.java
-@@ -23,6 +23,8 @@ import static com.google.common.truth.Truth.assertWithMessage;
+@@ -23,6 +23,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
  import static com.puppycrawl.tools.checkstyle.AbstractPathTestSupport.addEndOfLine;
  import static com.puppycrawl.tools.checkstyle.internal.utils.TestUtil.isUtilsClassHasPrivateConstructor;
  import static com.puppycrawl.tools.checkstyle.utils.XpathUtil.getTextAttributeValue;
-+import static java.nio.charset.StandardCharsets.UTF_8;
 +import static java.util.UUID.randomUUID;
  
  import com.puppycrawl.tools.checkstyle.DetailAstImpl;
  import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-@@ -32,26 +34,24 @@ import com.puppycrawl.tools.checkstyle.xpath.AbstractNode;
+@@ -32,26 +33,24 @@ import com.puppycrawl.tools.checkstyle.xpath.AbstractNode;
  import com.puppycrawl.tools.checkstyle.xpath.RootNode;
  import java.io.File;
  import java.io.IOException;
@@ -64737,7 +64696,7 @@
      assertWithMessage("Should return true for supported token types")
          .that(XpathUtil.supportsTextAttribute(createDetailAST(TokenTypes.IDENT)))
          .isTrue();
-@@ -79,7 +79,7 @@ public class XpathUtilTest {
+@@ -79,7 +78,7 @@ public class XpathUtilTest {
    }
  
    @Test
@@ -64746,7 +64705,7 @@
      assertWithMessage("Returned value differs from expected")
          .that(getTextAttributeValue(createDetailAST(TokenTypes.STRING_LITERAL, "\"HELLO WORLD\"")))
          .isEqualTo("HELLO WORLD");
-@@ -95,11 +95,11 @@ public class XpathUtilTest {
+@@ -95,11 +94,11 @@ public class XpathUtilTest {
    }
  
    @Test
@@ -64757,11 +64716,11 @@
 +    final String uniqueFileName = "junit_" + randomUUID() + ".java";
      final File file = new File(tempFolder, uniqueFileName);
 -    Files.writeString(file.toPath(), fileContent, StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), fileContent, UTF_8);
++    Files.writeString(file.toPath(), fileContent);
      final String expected =
          addEndOfLine(
              "COMPILATION_UNIT -> COMPILATION_UNIT [1:0]",
-@@ -115,11 +115,11 @@ public class XpathUtilTest {
+@@ -115,11 +114,11 @@ public class XpathUtilTest {
    }
  
    @Test
@@ -64772,11 +64731,11 @@
 +    final String uniqueFileName = "junit_" + randomUUID() + ".java";
      final File file = new File(tempFolder, uniqueFileName);
 -    Files.writeString(file.toPath(), fileContent, StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), fileContent, UTF_8);
++    Files.writeString(file.toPath(), fileContent);
      final String expected =
          addEndOfLine(
              "COMPILATION_UNIT -> COMPILATION_UNIT [1:0]",
-@@ -131,11 +131,11 @@ public class XpathUtilTest {
+@@ -131,11 +130,11 @@ public class XpathUtilTest {
    }
  
    @Test
@@ -64787,11 +64746,11 @@
 +    final String uniqueFileName = "junit_" + randomUUID() + ".java";
      final File file = new File(tempFolder, uniqueFileName);
 -    Files.writeString(file.toPath(), fileContent, StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), fileContent, UTF_8);
++    Files.writeString(file.toPath(), fileContent);
      final String expected =
          addEndOfLine(
              "COMPILATION_UNIT -> COMPILATION_UNIT [1:0]",
-@@ -159,11 +159,11 @@ public class XpathUtilTest {
+@@ -159,11 +158,11 @@ public class XpathUtilTest {
    }
  
    @Test
@@ -64802,11 +64761,11 @@
 +    final String uniqueFileName = "junit_" + randomUUID() + ".java";
      final File file = new File(tempFolder, uniqueFileName);
 -    Files.writeString(file.toPath(), fileContent, StandardCharsets.UTF_8);
-+    Files.writeString(file.toPath(), fileContent, UTF_8);
++    Files.writeString(file.toPath(), fileContent);
      final String invalidXpath = "\\//CLASS_DEF" + "//METHOD_DEF//VARIABLE_DEF//IDENT";
      try {
        XpathUtil.printXpathBranch(invalidXpath, file);
-@@ -181,7 +181,7 @@ public class XpathUtilTest {
+@@ -181,7 +180,7 @@ public class XpathUtilTest {
    }
  
    @Test
@@ -64815,7 +64774,7 @@
      final DetailAstImpl rootAst = new DetailAstImpl();
      final DetailAstImpl elementAst = new DetailAstImpl();
      rootAst.addChild(elementAst);
-@@ -189,7 +189,7 @@ public class XpathUtilTest {
+@@ -189,7 +188,7 @@ public class XpathUtilTest {
      final List<AbstractNode> children = XpathUtil.createChildren(rootNode, rootNode, elementAst);
  
      assertWithMessage("Expected one child node").that(children).hasSize(1);
