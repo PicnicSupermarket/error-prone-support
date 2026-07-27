@@ -990,14 +990,19 @@ Refaster rules and associated tests do *not* require follow-up by running
 
 | Annotation | Target | Purpose |
 |------------|--------|---------|
-| `@OnlineDocumentation` | Outer collection class | Links to generated documentation on the website |
 | `@Description("...")` | Inner rule class | Overrides the default rule description |
+| `@OnlineDocumentation` | Outer collection class | Links to generated documentation on the website |
+| `@OpenRewriteIncompatible` | Inner rule class | Marks a rule for which no OpenRewrite recipe is generated, and which is thus unavailable to users of the generated recipes |
+| `@PossibleSourceIncompatibility` | Inner rule class | Marks a rule whose application may yield uncompilable code |
 | `@Severity(SeverityLevel.X)` | Inner rule class | Overrides the default severity level |
 | `@TypeMigration(of=X.class, unmigratedMethods={"..."})` | Outer collection class | Marks a rule collection as part of a type migration. Lists method signatures that cannot yet be migrated, with comments explaining why (e.g., no target equivalent, complex semantics). See `JUnitToAssertJRules` and `TestNGToAssertJRules` for examples |
 
-The `unmigratedMethods` list in `@TypeMigration` is managed by the
-`ExhaustiveRefasterTypeMigration` check. Do not update it manually; run
-`./apply-error-prone-suggestions.sh` to keep it in sync.
+Some of these annotations are managed by an Error Prone check and must not be
+updated manually: `@OpenRewriteIncompatible` by
+`RefasterOpenRewriteCompatibility`, `@PossibleSourceIncompatibility` by
+`RefasterSourceCompatibility`, and the `unmigratedMethods` list in
+`@TypeMigration` by `ExhaustiveRefasterTypeMigration`. Run
+`./apply-error-prone-suggestions.sh` to keep them in sync.
 
 ## Reference: Available matchers (for `@Matches` / `@NotMatches`)
 
