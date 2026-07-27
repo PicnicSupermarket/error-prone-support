@@ -19,6 +19,7 @@ import org.assertj.core.api.ObjectAssert;
 import org.assertj.core.api.OptionalAssert;
 import org.assertj.core.api.ThrowingConsumer;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.ThrowsCheckedException;
 
@@ -144,6 +145,7 @@ final class AssertJOptionalRules {
    * Prefer {@link AbstractOptionalAssert#hasValueSatisfying(Consumer)} over less idiomatic
    * alternatives.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AbstractOptionalAssertHasValueSatisfying<T> {
     @BeforeTemplate

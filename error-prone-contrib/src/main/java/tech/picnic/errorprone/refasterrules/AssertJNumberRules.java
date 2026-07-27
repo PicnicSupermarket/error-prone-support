@@ -20,6 +20,7 @@ import org.assertj.core.api.AbstractLongAssert;
 import org.assertj.core.api.AbstractShortAssert;
 import org.assertj.core.api.NumberAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsCharacter;
 
@@ -247,6 +248,7 @@ final class AssertJNumberRules {
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isOdd} test.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatIsOdd {
     @BeforeTemplate
@@ -273,6 +275,7 @@ final class AssertJNumberRules {
    * <p>Note that {@link org.assertj.core.api.AbstractCharacterAssert} does not implement {@link
    * NumberAssert} and does not provide an {@code isEven} test.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatIsEven {
     @BeforeTemplate

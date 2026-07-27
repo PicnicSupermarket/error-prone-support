@@ -13,6 +13,7 @@ import com.sun.tools.javac.util.Convert;
 import com.sun.tools.javac.util.JCDiagnostic.DiagnosticPosition;
 import javax.lang.model.element.Name;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /** Refaster rules related to {@link com.google.errorprone.bugpatterns.BugChecker} classes. */
@@ -63,6 +64,7 @@ final class BugCheckerRules {
    * Prefer {@link SourceCode#toStringConstantExpression(Object,
    * com.google.errorprone.VisitorState)} over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   static final class SourceCodeToStringConstantExpression {
     @BeforeTemplate
     String before(CharSequence value) {

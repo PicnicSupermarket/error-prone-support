@@ -37,6 +37,7 @@ import org.assertj.core.data.Offset;
 import org.testng.Assert;
 import org.testng.Assert.ThrowingRunnable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.annotation.TypeMigration;
 import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodReference;
@@ -1308,6 +1309,7 @@ final class TestNGToAssertJRules {
   /**
    * Prefer {@link Assertions#assertThatThrownBy(ThrowingCallable)} over non-AssertJ alternatives.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatThrownBy {
     @BeforeTemplate
@@ -1324,6 +1326,7 @@ final class TestNGToAssertJRules {
   }
 
   /** Prefer {@code assertThatThrownBy(...).isInstanceOf(...)} over non-AssertJ alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatThrownByIsInstanceOf<T extends Throwable> {
     @BeforeTemplate

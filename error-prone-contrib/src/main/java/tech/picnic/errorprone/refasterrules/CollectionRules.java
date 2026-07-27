@@ -38,6 +38,7 @@ import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsRefasterAsVarargs;
 
@@ -172,6 +173,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Collection#addAll(Collection)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class CollectionAddAllBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> collection1, Collection<S> collection2) {
@@ -214,6 +216,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Collection#removeAll(Collection)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class CollectionRemoveAllBlock<T, S extends T> {
     @BeforeTemplate
     void before(Collection<T> collection1, Collection<S> collection2) {
@@ -363,6 +366,7 @@ final class CollectionRules {
   // XXX: Consider moving this rule to `ImmutableListRules` and having it suggest
   // `ImmutableList#copyOf`. That would retain immutability, at the cost of no longer handling
   // `null`s.
+  @OpenRewriteIncompatible
   static final class ArraysAsList<T> {
     // XXX: This expression produces an unmodifiable list, while the alternative doesn't.
     @BeforeTemplate
@@ -470,6 +474,7 @@ final class CollectionRules {
   /**
    * Prefer {@link Optional#ofNullable(Object)} over less efficient or more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   static final class OptionalOfNullableQueuePeek<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {
@@ -503,6 +508,7 @@ final class CollectionRules {
   }
 
   /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class OptionalOfNullableQueuePoll<T> {
     @BeforeTemplate
     Optional<T> before(Queue<T> queue) {

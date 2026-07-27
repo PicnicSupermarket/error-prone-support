@@ -8,6 +8,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.matchers.IsList;
 
 /** Refaster rules related to expressions dealing with {@link Deque} instances. */
@@ -36,6 +37,7 @@ final class DequeRules {
    * java.util.LinkedList}, which also implements {@link Deque}), as {@link
    * java.util.List#add(Object)} is the idiomatic method for those types.
    */
+  @OpenRewriteIncompatible
   static final class DequeAddLast<S, T extends S> {
     @BeforeTemplate
     void before(@NotMatches(IsList.class) Deque<S> deque, T element) {

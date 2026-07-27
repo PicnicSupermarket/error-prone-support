@@ -14,6 +14,7 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to expressions dealing with {@link DoubleStream}s. */
 @OnlineDocumentation
@@ -48,6 +49,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#filter(DoublePredicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class DoubleStreamFlatMapFilter {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
@@ -64,6 +66,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#filter(DoublePredicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToDoubleFilter<T> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
@@ -80,6 +83,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#map(DoubleUnaryOperator)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class DoubleStreamFlatMapMap {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
@@ -96,6 +100,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#map(DoubleUnaryOperator)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToDoubleMap<T> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
@@ -112,6 +117,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#flatMap(DoubleFunction)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class DoubleStreamFlatMapFlatMap<S extends DoubleStream> {
     @Placeholder
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse double element);
@@ -128,6 +134,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#flatMap(DoubleFunction)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToDoubleFlatMap<T, S extends DoubleStream> {
     @Placeholder(allowsIdentity = true)
     abstract DoubleStream toDoubleStreamFunction(@MayOptionallyUse T element);
@@ -223,6 +230,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#noneMatch(DoublePredicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class DoubleStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);
@@ -267,6 +275,7 @@ final class DoubleStreamRules {
   }
 
   /** Prefer {@link DoubleStream#allMatch(DoublePredicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class DoubleStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse double element);

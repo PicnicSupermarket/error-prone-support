@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to expressions dealing with {@link Preconditions}. */
 @OnlineDocumentation
@@ -24,6 +25,7 @@ final class PreconditionsRules {
   private PreconditionsRules() {}
 
   /** Prefer {@link Preconditions#checkArgument(boolean)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class CheckArgumentNot {
     @BeforeTemplate
     void before(boolean expression) {
@@ -40,6 +42,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Preconditions#checkArgument(boolean, Object)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class CheckArgumentNotWithString {
     @BeforeTemplate
     void before(boolean expression, String errorMessage) {
@@ -62,6 +65,7 @@ final class PreconditionsRules {
    * <p>Note that the two-argument {@link Preconditions#checkElementIndex(int, int)} is better
    * replaced with {@link java.util.Objects#checkIndex(int, int)}.
    */
+  @OpenRewriteIncompatible
   static final class CheckElementIndex {
     @BeforeTemplate
     void before(int index, int size, String desc) {
@@ -103,6 +107,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class RequireNonNullBlock<T extends @Nullable Object> {
     // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
     // annotations.
@@ -140,6 +145,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Objects#requireNonNull(Object, String)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class RequireNonNullWithStringBlock<T extends @Nullable Object> {
     // XXX: Drop the `java:S2583` violation suppression once SonarCloud better supports JSpecify
     // annotations.
@@ -166,6 +172,7 @@ final class PreconditionsRules {
    * Prefer {@link Preconditions#checkPositionIndex(int, int)} over less explicit or more verbose
    * alternatives.
    */
+  @OpenRewriteIncompatible
   static final class CheckPositionIndex {
     @BeforeTemplate
     void before(int index, int size) {
@@ -185,6 +192,7 @@ final class PreconditionsRules {
    * Prefer {@link Preconditions#checkPositionIndex(int, int, String)} over less explicit or more
    * verbose alternatives.
    */
+  @OpenRewriteIncompatible
   static final class CheckPositionIndexWithString {
     @BeforeTemplate
     void before(int index, int size, String desc) {
@@ -201,6 +209,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Preconditions#checkState(boolean)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class CheckStateNot {
     @BeforeTemplate
     void before(boolean expression) {
@@ -217,6 +226,7 @@ final class PreconditionsRules {
   }
 
   /** Prefer {@link Preconditions#checkState(boolean, Object)} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class CheckStateNotWithString {
     @BeforeTemplate
     void before(boolean expression, String errorMessage) {

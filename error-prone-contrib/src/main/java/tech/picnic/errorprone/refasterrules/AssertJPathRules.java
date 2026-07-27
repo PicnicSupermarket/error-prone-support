@@ -11,6 +11,7 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractPathAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link Path}s. */
@@ -236,6 +237,7 @@ final class AssertJPathRules {
   }
 
   /** Prefer {@link AbstractPathAssert#hasExtension(String)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatHasExtension {
     @BeforeTemplate

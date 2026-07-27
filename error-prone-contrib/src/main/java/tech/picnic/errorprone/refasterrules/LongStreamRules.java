@@ -14,6 +14,7 @@ import java.util.function.LongUnaryOperator;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to expressions dealing with {@link LongStream}s. */
 @OnlineDocumentation
@@ -67,6 +68,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#filter(LongPredicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class LongStreamFlatMapFilter {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
@@ -83,6 +85,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#filter(LongPredicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToLongFilter<T> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
@@ -99,6 +102,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#map(LongUnaryOperator)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class LongStreamFlatMapMap {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
@@ -115,6 +119,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#map(LongUnaryOperator)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToLongMap<T> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
@@ -131,6 +136,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#flatMap(LongFunction)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class LongStreamFlatMapFlatMap<S extends LongStream> {
     @Placeholder
     abstract LongStream toLongStreamFunction(@MayOptionallyUse long element);
@@ -147,6 +153,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#flatMap(LongFunction)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToLongFlatMap<T, S extends LongStream> {
     @Placeholder(allowsIdentity = true)
     abstract LongStream toLongStreamFunction(@MayOptionallyUse T element);
@@ -242,6 +249,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#noneMatch(LongPredicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class LongStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);
@@ -286,6 +294,7 @@ final class LongStreamRules {
   }
 
   /** Prefer {@link LongStream#allMatch(LongPredicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class LongStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse long element);

@@ -13,6 +13,7 @@ import org.assertj.core.api.Assert;
 import org.assertj.core.api.EnumerableAssert;
 import org.assertj.core.api.ObjectEnumerableAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
@@ -22,6 +23,7 @@ final class AssertJEnumerableRules {
   private AssertJEnumerableRules() {}
 
   /** Prefer {@link EnumerableAssert#isEmpty()} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class EnumerableAssertIsEmpty<E> {
     @BeforeTemplate
     void before(
@@ -63,6 +65,7 @@ final class AssertJEnumerableRules {
   /** Prefer {@link EnumerableAssert#isEmpty()} over more contrived alternatives. */
   // XXX: This rule assumes that the rewritten assertion aims to compare the contents of two
   // iterables, rather than other semantics (such as `Set` vs. `List`).
+  @OpenRewriteIncompatible
   static final class AssertIsEmpty<
       E, A extends Assert<?, ? extends Iterable<? extends E>> & EnumerableAssert<?, E>> {
     @BeforeTemplate

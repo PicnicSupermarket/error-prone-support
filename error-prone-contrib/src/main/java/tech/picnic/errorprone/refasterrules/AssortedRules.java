@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /**
  * Assorted Refaster rules that do not (yet) belong in one of the other classes with more topical
@@ -46,6 +47,7 @@ final class AssortedRules {
    * <p>If a custom error message is desired, consider using Guava's {@link
    * com.google.common.base.Preconditions#checkElementIndex(int, int, String)}.
    */
+  @OpenRewriteIncompatible
   static final class CheckIndexBlock {
     @BeforeTemplate
     void before(int index, int length) {

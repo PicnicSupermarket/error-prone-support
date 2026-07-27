@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with (in)equalities. */
@@ -154,6 +155,7 @@ final class EqualityRules {
   }
 
   /** Prefer negated lambda expressions over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class Not<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean predicate(@MayOptionallyUse T value);

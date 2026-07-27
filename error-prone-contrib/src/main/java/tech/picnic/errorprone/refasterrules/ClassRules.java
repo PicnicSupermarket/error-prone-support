@@ -6,6 +6,7 @@ import com.google.errorprone.refaster.annotation.BeforeTemplate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to expressions dealing with {@link Class}es. */
 @OnlineDocumentation
@@ -26,6 +27,7 @@ final class ClassRules {
   }
 
   /** Prefer using the {@code instanceof} keyword over less idiomatic alternatives. */
+  @OpenRewriteIncompatible
   static final class RefasterIsInstance<T, S> {
     @BeforeTemplate
     boolean before(S object) {
@@ -39,6 +41,7 @@ final class ClassRules {
   }
 
   /** Prefer {@code Refaster.<T>clazz()::isInstance} over more verbose alternatives. */
+  @OpenRewriteIncompatible
   static final class ClassIsInstance<T, S> {
     @BeforeTemplate
     Predicate<S> before() {

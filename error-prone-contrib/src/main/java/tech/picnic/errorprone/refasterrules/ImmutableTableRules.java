@@ -14,6 +14,7 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableTable}s. */
 @OnlineDocumentation
@@ -70,6 +71,7 @@ final class ImmutableTableRules {
   }
 
   /** Prefer {@code stream.collect(toImmutableTable(...))} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamCollectToImmutableTable<E, R, C, V> {
     @Placeholder(allowsIdentity = true)
     abstract R rowFunction(@MayOptionallyUse E element);

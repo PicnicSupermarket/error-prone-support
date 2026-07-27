@@ -40,6 +40,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
 /** Refaster rules related to expressions dealing with {@link Comparator}s. */
@@ -51,6 +52,7 @@ final class ComparatorRules {
    * Prefer {@link Comparator#naturalOrder()} over less explicit, more verbose, or more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   static final class NaturalOrder<T extends Comparable<? super T>, U extends T> {
     // XXX: Ideally `? super T` would also be replaced by a class-level type parameter, but Java
     // does not allow a type variable to be followed by other bounds.
@@ -96,6 +98,7 @@ final class ComparatorRules {
   }
 
   /** Prefer using the {@link Comparator} as-is over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class ComparatorIdentity<S, T extends S, U extends T> {
     @BeforeTemplate
     Comparator<T> before(
@@ -112,6 +115,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparator#comparing(Function)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class Comparing<E extends Enum<E>, T> {
     @Placeholder(allowsIdentity = true)
     abstract E toEnumFunction(@MayOptionallyUse T value);
@@ -236,6 +240,7 @@ final class ComparatorRules {
   }
 
   /** Prefer {@link Comparator#thenComparing(Comparator)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   static final class ComparatorThenComparingNaturalOrder<
       T extends Comparable<? super T>, U extends T> {
     // XXX: Ideally `? super T` would also be replaced by a class-level type parameter, but Java
@@ -341,6 +346,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#min(Comparable, Comparable)} over less efficient, more verbose, or
    * more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   static final class ComparatorsMin2<T extends Comparable<? super T>> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
@@ -366,6 +372,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#min(Object, Object, Comparator)} over less efficient or more verbose
    * alternatives.
    */
+  @OpenRewriteIncompatible
   static final class ComparatorsMin3<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
@@ -445,6 +452,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#max(Comparable, Comparable)} over less efficient, more verbose, or
    * more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   static final class ComparatorsMax2<T extends Comparable<? super T>> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)
@@ -470,6 +478,7 @@ final class ComparatorRules {
    * Prefer {@link Comparators#max(Object, Object, Comparator)} over less efficient or more verbose
    * alternatives.
    */
+  @OpenRewriteIncompatible
   static final class ComparatorsMax3<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("java:S1067" /* The conditional operators are independent. */)

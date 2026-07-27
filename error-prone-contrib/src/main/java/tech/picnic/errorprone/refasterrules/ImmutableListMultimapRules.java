@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
@@ -149,6 +150,7 @@ final class ImmutableListMultimapRules {
   /**
    * Prefer {@code stream.collect(toImmutableListMultimap(...))} over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class StreamCollectToImmutableListMultimap<E, K, V> {
     @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
@@ -176,6 +178,7 @@ final class ImmutableListMultimapRules {
    * Prefer {@link Multimaps#index(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MultimapsIndex<S, K, V extends S, K2 extends K, V2 extends V> {
     @BeforeTemplate
@@ -215,6 +218,7 @@ final class ImmutableListMultimapRules {
    * Prefer an immutable copy of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class ImmutableListMultimapCopyOfMultimapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);

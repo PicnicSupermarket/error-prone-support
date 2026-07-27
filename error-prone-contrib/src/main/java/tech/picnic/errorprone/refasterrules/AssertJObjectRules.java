@@ -13,6 +13,7 @@ import org.assertj.core.api.AbstractIntegerAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsNullLiteral;
 
@@ -22,6 +23,7 @@ final class AssertJObjectRules {
   private AssertJObjectRules() {}
 
   /** Prefer {@link ObjectAssert#isInstanceOf(Class)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatIsInstanceOfClass<S, T> {
     @BeforeTemplate
@@ -52,6 +54,7 @@ final class AssertJObjectRules {
   }
 
   /** Prefer {@link ObjectAssert#isNotInstanceOf(Class)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatIsNotInstanceOfClass<S, T> {
     @BeforeTemplate

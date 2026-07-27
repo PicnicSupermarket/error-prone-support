@@ -33,6 +33,7 @@ import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
 
@@ -209,6 +210,7 @@ final class AssertJRules {
    * Prefer {@link ObjectEnumerableAssert#containsExactly(Object[])} over more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   static final class ObjectEnumerableAssertContainsExactly<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)

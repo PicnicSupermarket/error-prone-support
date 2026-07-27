@@ -60,6 +60,7 @@ import reactor.util.context.Context;
 import reactor.util.function.Tuple2;
 import tech.picnic.errorprone.refaster.annotation.Description;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -76,6 +77,7 @@ final class ReactorRules {
    * Prefer {@link Mono#fromSupplier(Supplier)} over {@link Mono#fromCallable(Callable)} where
    * feasible.
    */
+  @OpenRewriteIncompatible
   @SuppressWarnings(
       "RefasterSourceCompatibility" /* `@NotMatches` guard prevents incompatibility. */)
   static final class MonoFromSupplier<T> {
@@ -559,6 +561,7 @@ final class ReactorRules {
   /** Prefer {@link Flux#empty()} over more contrived alternatives. */
   // XXX: Using `@Matches(IsEmpty.class)`, the non-varargs overloads of most methods referenced here
   // can be rewritten as well. That would require adding a bunch more suitably-typed parameters.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class FluxEmpty<T, S extends Comparable<? super S>> {
     // XXX: The methods enumerated here are not ordered entirely lexicographically, to accommodate a
@@ -669,6 +672,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#fromArray(Object[])} over more ambiguous or contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class FluxFromArray<T> {
     @BeforeTemplate
     Flux<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
@@ -732,6 +736,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#using(Callable, Function)} over more contrived alternatives. */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoUsing<D extends AutoCloseable, T> {
     @BeforeTemplate
@@ -755,6 +760,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#using(Callable, Function, boolean)} over more contrived alternatives. */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoUsingWithBoolean<D extends AutoCloseable, T> {
     @BeforeTemplate
@@ -780,6 +786,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#using(Callable, Function, Consumer)} over more contrived alternatives. */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoUsingWithConsumer<D, T> {
     @BeforeTemplate
@@ -808,6 +815,7 @@ final class ReactorRules {
    */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoUsingWithConsumerAndBoolean<D, T> {
     @BeforeTemplate
@@ -837,6 +845,7 @@ final class ReactorRules {
    */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoUsingWhen<D, T> {
     @BeforeTemplate
@@ -865,6 +874,7 @@ final class ReactorRules {
    */
   // XXX: The `.single()` variant emits a `NoSuchElementException` if the source is empty, while the
   // replacement does not.
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoUsingWhenWithBiFunctionAndFunction<D, T> {
     @BeforeTemplate
@@ -912,6 +922,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#concatMap(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class FluxConcatMap<T, S, P extends Publisher<? extends S>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
@@ -934,6 +945,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#concatMap(Function, int)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class FluxConcatMapWithInt<T, S, P extends Publisher<? extends S>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
@@ -956,6 +968,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMapIterable(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class MonoFlatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
     Flux<S> before(Mono<T> mono, Function<? super T, I> mapper) {
@@ -999,6 +1012,7 @@ final class ReactorRules {
    * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less explicit syntax or
    * semantics.
    */
+  @OpenRewriteIncompatible
   static final class FluxConcatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
     Flux<S> before(
@@ -1020,6 +1034,7 @@ final class ReactorRules {
    * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less explicit
    * syntax or semantics.
    */
+  @OpenRewriteIncompatible
   static final class FluxConcatMapIterableWithInt<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
     Flux<S> before(
@@ -1044,6 +1059,7 @@ final class ReactorRules {
    * Prefer using {@link Mono#flatMap(Function)} followed by {@code .flux()} over {@link
    * Mono#flatMapMany(Function)} for explicit type conversion.
    */
+  @OpenRewriteIncompatible
   abstract static class MonoFlatMapFlux<T, S> {
     // XXX: It would be more expressive if this `@Placeholder` were replaced with a `Function<?
     // super T, ? extends Mono<? extends S>>` parameter, so that compatible non-lambda expression
@@ -1068,6 +1084,7 @@ final class ReactorRules {
    * Prefer {@link Mono#map(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
+  @OpenRewriteIncompatible
   abstract static class MonoMap<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
@@ -1087,6 +1104,7 @@ final class ReactorRules {
    * Prefer {@link Flux#map(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
+  @OpenRewriteIncompatible
   abstract static class FluxMap<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
@@ -1132,6 +1150,7 @@ final class ReactorRules {
    * Prefer {@link Mono#mapNotNull(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
+  @OpenRewriteIncompatible
   abstract static class MonoMapNotNull<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
@@ -1154,6 +1173,7 @@ final class ReactorRules {
    * Prefer {@link Flux#mapNotNull(Function)} over alternatives that unnecessarily require an inner
    * subscription.
    */
+  @OpenRewriteIncompatible
   abstract static class FluxMapNotNull<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract S transformation(@MayOptionallyUse T value);
@@ -1248,6 +1268,7 @@ final class ReactorRules {
    * Prefer immediately unwrapping {@link Optional} transformation results inside {@link
    * Flux#mapNotNull(Function)} over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class FluxMapNotNullOrElseNull<T, S> {
     @Placeholder(allowsIdentity = true)
     abstract Optional<S> transformation(@MayOptionallyUse T value);
@@ -1482,6 +1503,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#cast(Class)} over {@link Mono#map(Function)} with a cast. */
+  @OpenRewriteIncompatible
   static final class MonoCastClass<T, S> {
     @BeforeTemplate
     Mono<S> before(Mono<T> mono) {
@@ -1495,6 +1517,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#cast(Class)} over {@link Flux#map(Function)} with a cast. */
+  @OpenRewriteIncompatible
   static final class FluxCastClass<T, S> {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux) {
@@ -1534,6 +1557,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMap(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class MonoFlatMap<S, T, P extends Mono<? extends T>> {
     @BeforeTemplate
     @SuppressWarnings("NestedPublishers")
@@ -1552,6 +1576,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Mono#flatMapMany(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MonoFlatMapMany<S, T, P extends Publisher<? extends T>> {
     @BeforeTemplate
@@ -1650,6 +1675,7 @@ final class ReactorRules {
    * Prefer {@link Flux#count()} followed by a conversion from {@code long} to {@code int} over
    * collecting into a list and counting its elements.
    */
+  @OpenRewriteIncompatible
   static final class FluxCountMapMathToIntExact<T> {
     @BeforeTemplate
     Mono<Integer> before(Flux<T> flux) {
@@ -1744,6 +1770,7 @@ final class ReactorRules {
    * Prefer {@link Flux#onErrorComplete()} over more contrived alternatives, and don't chain it with
    * redundant calls to {@link Flux#doOnError}.
    */
+  @OpenRewriteIncompatible
   static final class FluxOnErrorComplete<T, E extends Throwable> {
     @BeforeTemplate
     Flux<T> before(
@@ -1780,6 +1807,7 @@ final class ReactorRules {
   }
 
   /** Prefer {@link Flux#onErrorComplete(Class)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class FluxOnErrorCompleteWithClass<T> {
     @BeforeTemplate
     Flux<T> before(Flux<T> flux, Class<? extends Throwable> type) {
@@ -2203,6 +2231,7 @@ final class ReactorRules {
   /** Prefer {@link reactor.util.context.Context#empty()} over more verbose alternatives. */
   // XXX: Introduce Refaster rules or a `BugChecker` that maps `(Immutable)Map.of(k, v)` to
   // `Context.of(k, v)` and likewise for multi-pair overloads.
+  @OpenRewriteIncompatible
   static final class ContextEmpty {
     @BeforeTemplate
     Context before(@Matches(IsEmpty.class) Map<?, ?> emptyMap) {
@@ -2317,6 +2346,7 @@ final class ReactorRules {
    * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
    * {@link PublisherProbe#wasSubscribed() subscribed to}, over more verbose alternatives.
    */
+  @OpenRewriteIncompatible
   static final class AssertThatPublisherProbeWasSubscribedIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
@@ -2338,6 +2368,7 @@ final class ReactorRules {
    * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
    * {@link PublisherProbe#wasCancelled() cancelled}, over more verbose alternatives.
    */
+  @OpenRewriteIncompatible
   static final class AssertThatPublisherProbeWasCancelledIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
@@ -2359,6 +2390,7 @@ final class ReactorRules {
    * Prefer {@link Assertions#assertThat(boolean)} to check whether a {@link PublisherProbe} was
    * {@link PublisherProbe#wasRequested() requested}, over more verbose alternatives.
    */
+  @OpenRewriteIncompatible
   static final class AssertThatPublisherProbeWasRequestedIsEqualTo<T> {
     @AlsoNegation
     @BeforeTemplate
@@ -2460,6 +2492,7 @@ final class ReactorRules {
   }
 
   /** Prefer using {@link StepVerifier.Step}s as-is over unnecessarily expecting no elements. */
+  @OpenRewriteIncompatible
   static final class StepIdentity<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Safe generic array type creation. */)

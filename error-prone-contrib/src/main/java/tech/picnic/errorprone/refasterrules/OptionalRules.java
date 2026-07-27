@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.RequiresComputation;
 
@@ -148,6 +149,7 @@ final class OptionalRules {
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Review whether a `@Matcher` can be used to avoid this.
+  @OpenRewriteIncompatible
   abstract static class RefasterEmitCommentBeforeOptionalOfFilter<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -168,6 +170,7 @@ final class OptionalRules {
   // XXX: This rule may introduce a compilation error: the `test` expression may reference a
   // non-effectively final variable, which is not allowed in the replacement lambda expression.
   // Review whether a `@Matcher` can be used to avoid this.
+  @OpenRewriteIncompatible
   abstract static class RefasterEmitCommentBeforeOptionalOfFilterNot<T> {
     @Placeholder
     abstract boolean test(T value);
@@ -199,6 +202,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#map(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class OptionalMap<T, S> {
     @Placeholder
     abstract S toNullableFunction(@MayOptionallyUse T element);
@@ -218,6 +222,7 @@ final class OptionalRules {
   }
 
   /** Prefer {@link Optional#flatMap(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class OptionalFlatMap<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
@@ -253,6 +258,7 @@ final class OptionalRules {
   // XXX: This rule is the counterpart to the `OptionalOrElseGet` bug checker. Once the
   // `MethodReferenceUsage` bug checker is "production ready", that bug checker may similarly be
   // replaced with a Refaster rule.
+  @OpenRewriteIncompatible
   static final class OptionalOrElse<T> {
     @BeforeTemplate
     T before(Optional<T> optional, @NotMatches(RequiresComputation.class) T other) {
@@ -297,6 +303,7 @@ final class OptionalRules {
    */
   // XXX: An alternative approach is to use `.flatMap(Optional::stream)`. That may be a bit longer,
   // but yields nicer code. Think about it.
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapStream<T, S> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
@@ -316,6 +323,7 @@ final class OptionalRules {
    * Prefer {@link Optional#filter(Predicate)} outside of {@link Optional#flatMap(Function)} over
    * more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class OptionalFlatMapFilter<T, W, S extends W> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
@@ -335,6 +343,7 @@ final class OptionalRules {
    * Prefer {@link Optional#map(Function)} outside of {@link Optional#flatMap(Function)} over more
    * contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class OptionalFlatMapMap<T, U, S extends U, R, V extends R> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
@@ -351,6 +360,7 @@ final class OptionalRules {
   }
 
   /** Avoid unnecessary nesting of {@link Optional#flatMap(Function)} operations. */
+  @OpenRewriteIncompatible
   abstract static class OptionalFlatMapFlatMap<T, S, R> {
     @Placeholder
     abstract Optional<S> toOptionalFunction(@MayOptionallyUse T element);
@@ -395,6 +405,7 @@ final class OptionalRules {
   }
 
   /** Prefer using {@link Optional}s as-is over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class OptionalIdentity<S, T extends S> {
     @BeforeTemplate
     @SuppressWarnings("NestedOptionals")

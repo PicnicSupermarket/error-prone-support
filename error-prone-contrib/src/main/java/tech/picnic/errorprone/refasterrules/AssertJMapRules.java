@@ -17,6 +17,7 @@ import org.assertj.core.api.AbstractMapAssert;
 import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.ObjectAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 
@@ -26,6 +27,7 @@ final class AssertJMapRules {
   private AssertJMapRules() {}
 
   /** Prefer {@link AbstractMapAssert#isEmpty()} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class AbstractMapAssertIsEmpty<K, V, M extends K, N extends V, T extends K> {
     @BeforeTemplate
     void before(
@@ -74,6 +76,7 @@ final class AssertJMapRules {
   }
 
   /** Prefer {@link AbstractMapAssert#isNotEmpty()} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class AbstractMapAssertIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractMapAssert<?, ?, K, V> before(
@@ -88,6 +91,7 @@ final class AssertJMapRules {
   }
 
   /** Prefer {@code assertThat(map).isNotEmpty()} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class AssertThatIsNotEmpty<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> actual) {
@@ -139,6 +143,7 @@ final class AssertJMapRules {
   }
 
   /** Prefer {@code assertThat(map).hasSize(int)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class AssertThatHasSize<K, V> {
     @BeforeTemplate
     AbstractAssert<?, ?> before(Map<K, V> actual, int expected) {

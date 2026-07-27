@@ -10,6 +10,7 @@ import org.assertj.core.api.AbstractBooleanAssert;
 import org.assertj.core.api.AbstractFileAssert;
 import org.assertj.core.api.AbstractStringAssert;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to AssertJ assertions over {@link File}s. */
@@ -202,6 +203,7 @@ final class AssertJFileRules {
    * Prefer {@link AbstractFileAssert#hasExtension(String)} over more verbose or less explicit
    * alternatives.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class AssertThatHasExtension {
     @BeforeTemplate

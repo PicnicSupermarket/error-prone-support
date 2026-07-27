@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
 
@@ -79,6 +80,7 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#toMap(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MapsToMap<S, K extends S, V, V2 extends V, K2 extends K> {
     @BeforeTemplate
@@ -151,6 +153,7 @@ final class ImmutableMapRules {
   }
 
   /** Prefer {@code stream.collect(toImmutableMap(...))} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamCollectToImmutableMap<E, K, V> {
     @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
@@ -176,6 +179,7 @@ final class ImmutableMapRules {
    * Prefer {@link Maps#uniqueIndex(Iterable, com.google.common.base.Function)} over more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class MapsUniqueIndex<S, K, V extends S, K2 extends K, V2 extends V> {
     @BeforeTemplate
@@ -213,6 +217,7 @@ final class ImmutableMapRules {
    * Prefer an immutable copy of {@link Maps#transformValues(Map, com.google.common.base.Function)}
    * over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class ImmutableMapCopyOfMapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse @Nullable V1 value);
@@ -364,6 +369,7 @@ final class ImmutableMapRules {
    * Prefer an immutable copy of {@link Maps#filterKeys(Map, Predicate)} over more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class ImmutableMapCopyOfMapsFilterKeys<K, V> {
     @Placeholder(allowsIdentity = true)
     abstract boolean keyFilter(@MayOptionallyUse K key);
@@ -385,6 +391,7 @@ final class ImmutableMapRules {
    * Prefer an immutable copy of {@link Maps#filterValues(Map, Predicate)} over more contrived
    * alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class ImmutableMapCopyOfMapsFilterValues<K, V> {
     @Placeholder(allowsIdentity = true)
     abstract boolean valueFilter(@MayOptionallyUse V value);

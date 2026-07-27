@@ -58,6 +58,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 import tech.picnic.errorprone.refaster.matchers.IsEmpty;
 import tech.picnic.errorprone.refaster.matchers.IsIdentityOperation;
@@ -88,6 +89,7 @@ final class StreamRules {
   // XXX: We can additionally introduce a rule that maps `OptionalInt.empty().stream()` to
   // `IntStream.empty()`, and likewise for `OptionalLong` and `OptionalDouble`, but those
   // expressions are highly unlikely to be seen in the wild.
+  @OpenRewriteIncompatible
   static final class StreamEmpty<T> {
     @BeforeTemplate
     Stream<T> before(
@@ -132,6 +134,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Arrays#stream(Object[])} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   static final class ArraysStream<T> {
     @BeforeTemplate
     Stream<T> before(@NotMatches(IsRefasterAsVarargs.class) T[] array) {
@@ -172,6 +175,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#filter(Predicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapFilter<T, S2, S extends S2> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
@@ -188,6 +192,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#map(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapMap<T, S2, S extends S2, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
@@ -204,6 +209,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#flatMap(Function)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapFlatMap<T, S2, S extends S2, R> {
     @Placeholder
     abstract Stream<S> toStreamFunction(@MayOptionallyUse T element);
@@ -490,6 +496,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class StreamNoneMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
@@ -517,6 +524,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#noneMatch(Predicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamNoneMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
@@ -533,6 +541,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#anyMatch(Predicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class StreamAnyMatch<S, T extends S> {
     @BeforeTemplate
@@ -558,6 +567,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#allMatch(Predicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class StreamAllMatchWithPredicate<S, T extends S> {
     @BeforeTemplate
@@ -581,6 +591,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Stream#allMatch(Predicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamAllMatch<T> {
     @Placeholder(allowsIdentity = true)
     abstract boolean test(@MayOptionallyUse T element);
@@ -597,6 +608,7 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToInt(mapper).sum()} over less efficient alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class StreamMapToIntSum<S, T extends S> {
     @BeforeTemplate
@@ -619,6 +631,7 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToDouble(mapper).sum()} over less efficient alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class StreamMapToDoubleSum<S, T extends S> {
     @BeforeTemplate
@@ -641,6 +654,7 @@ final class StreamRules {
   }
 
   /** Prefer {@code stream.mapToLong(mapper).sum()} over less efficient alternatives. */
+  @OpenRewriteIncompatible
   @PossibleSourceIncompatibility
   static final class StreamMapToLongSum<S, T extends S> {
     @BeforeTemplate
@@ -797,6 +811,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Streams#concat(Stream...)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class StreamsConcat<T> {
     @BeforeTemplate
     Stream<T> before(
@@ -938,6 +953,7 @@ final class StreamRules {
   }
 
   /** Prefer {@link Collections#nCopies(int, Object)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   static final class CollectionsNCopiesStream<T> {
     @BeforeTemplate
     Stream<T> before(int n, @NotMatches(RequiresComputation.class) T o) {

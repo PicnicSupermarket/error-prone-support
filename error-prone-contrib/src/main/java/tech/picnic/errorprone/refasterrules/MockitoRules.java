@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.verification.VerificationMode;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to Mockito expressions and statements. */
 @OnlineDocumentation
@@ -61,6 +62,7 @@ final class MockitoRules {
   }
 
   /** Prefer {@code invocation.<T>getArgument(int)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   static final class InvocationOnMockGetArgumentObject<T> {
     @BeforeTemplate
     @SuppressWarnings("unchecked" /* Cast is presumed safe in matched context. */)

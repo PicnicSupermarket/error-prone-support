@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
 
 /** Refaster rules related to expressions dealing with {@link ImmutableSetMultimap}s. */
@@ -128,6 +129,7 @@ final class ImmutableSetMultimapRules {
   /**
    * Prefer {@code stream.collect(toImmutableSetMultimap(...))} over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class StreamCollectToImmutableSetMultimap<E, K, V> {
     @Placeholder(allowsIdentity = true)
     abstract K keyFunction(@MayOptionallyUse E element);
@@ -155,6 +157,7 @@ final class ImmutableSetMultimapRules {
    * Prefer an immutable copy of {@link Multimaps#transformValues(Multimap,
    * com.google.common.base.Function)} over more contrived alternatives.
    */
+  @OpenRewriteIncompatible
   abstract static class ImmutableSetMultimapCopyOfMultimapsTransformValues<K, V1, V2> {
     @Placeholder(allowsIdentity = true)
     abstract V2 valueTransformation(@MayOptionallyUse V1 value);

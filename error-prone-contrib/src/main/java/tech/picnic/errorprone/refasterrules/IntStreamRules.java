@@ -14,6 +14,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
+import tech.picnic.errorprone.refaster.annotation.OpenRewriteIncompatible;
 
 /** Refaster rules related to expressions dealing with {@link IntStream}s. */
 @OnlineDocumentation
@@ -67,6 +68,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#filter(IntPredicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class IntStreamFlatMapFilter {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
@@ -83,6 +85,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#filter(IntPredicate)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToIntFilter<T> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
@@ -99,6 +102,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#map(IntUnaryOperator)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class IntStreamFlatMapMap {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
@@ -115,6 +119,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#map(IntUnaryOperator)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToIntMap<T> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
@@ -131,6 +136,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#flatMap(IntFunction)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class IntStreamFlatMapFlatMap<S extends IntStream> {
     @Placeholder
     abstract IntStream toIntStreamFunction(@MayOptionallyUse int element);
@@ -147,6 +153,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#flatMap(IntFunction)} over more contrived alternatives. */
+  @OpenRewriteIncompatible
   abstract static class StreamFlatMapToIntFlatMap<T, S extends IntStream> {
     @Placeholder(allowsIdentity = true)
     abstract IntStream toIntStreamFunction(@MayOptionallyUse T element);
@@ -242,6 +249,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#noneMatch(IntPredicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class IntStreamNoneMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
@@ -286,6 +294,7 @@ final class IntStreamRules {
   }
 
   /** Prefer {@link IntStream#allMatch(IntPredicate)} over less explicit alternatives. */
+  @OpenRewriteIncompatible
   abstract static class IntStreamAllMatch {
     @Placeholder
     abstract boolean test(@MayOptionallyUse int element);
