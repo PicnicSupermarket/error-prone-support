@@ -1739,7 +1739,7 @@
                 `BugChecker` test code and the Refaster test files) does not
                 exhibit anti-patterns other than those associated with the
                 check/rule under test. Ideally all test cases are realistic. -->
-                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF</error-prone.self-check-args>
+                <error-prone.self-check-args>-Xep:MethodReferenceUsage:OFF -Xep:RefasterOpenRewriteCompatibility:OFF</error-prone.self-check-args>
             </properties>
             <build>
                 <plugins>
@@ -1766,6 +1766,61 @@
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <!-- Validates that Refaster rules are
+                                annotated with `@OpenRewriteIncompatible` if
+                                and only if the `generate-recipes` step above
+                                generated no OpenRewrite recipe for them. This
+                                validation requires a separate compilation
+                                step, as the generated recipes are not yet
+                                available during the default compilation step;
+                                the associated check is therefore disabled
+                                there (see the `self-check` profile). Recipe
+                                generation cannot instead be performed earlier:
+                                any compilation step that precedes the default
+                                compilation step causes the module's reactor
+                                artifact to resolve to an output directory that
+                                does not yet hold its classes, silently
+                                shadowing the module's previously installed
+                                counterpart on the annotation processor path
+                                used by the `self-check` profile. -->
+                                <id>check-recipe-coverage</id>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <phase>process-classes</phase>
+                                <configuration>
+                                    <!-- Recompilation is forced (by relying on
+                                    the MCOMPILER-209 bug mentioned above)
+                                    because the Refaster rule files are
+                                    otherwise considered up-to-date, causing
+                                    this validation to be skipped. Doing so
+                                    clears the configured
+                                    `generatedSourcesDirectory`; a dedicated
+                                    directory is therefore used, so that the
+                                    generated recipe sources are retained. -->
+                                    <generatedSourcesDirectory>${project.build.directory}/generated-sources/recipe-coverage</generatedSourcesDirectory>
+                                    <includes>
+                                        <include>**/*Rules.java</include>
+                                    </includes>
+                                    <useIncrementalCompilation>true</useIncrementalCompilation>
+                                    <compilerArgs combine.self="override">
+                                        <!-- This step exists only to run the
+                                        check below; all other static analysis
+                                        is performed during the default
+                                        compilation step. -->
+                                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                        <!-- This step only recompiles code, so
+                                        javac linting is irrelevant. -->
+                                        <arg>-Xlint:none</arg>
+                                        <arg>-Xplugin:ErrorProne -XepDisableAllChecks -Xep:RefasterOpenRewriteCompatibility:WARN ${error-prone.patch-args}</arg>
+                                        <arg>-XDcompilePolicy=simple</arg>
+                                        <arg>--should-stop=ifError=FLOW</arg>
+                                    </compilerArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

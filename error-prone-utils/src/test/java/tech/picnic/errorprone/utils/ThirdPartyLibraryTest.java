@@ -24,7 +24,8 @@ final class ThirdPartyLibraryTest {
     CompilationTestHelper.newInstance(IsIntroductionAllowedTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, REACTOR: true",
+            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true,",
+            "// OPEN_REWRITE_TEMPLATING: true, REACTOR: true",
             "class A {}")
         .doTest();
   }
@@ -38,7 +39,8 @@ final class ThirdPartyLibraryTest {
             "import org.assertj.core.api.Assertions;",
             "import reactor.core.publisher.Flux;",
             "",
-            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true, REACTOR: true",
+            "// BUG: Diagnostic contains: ASSERTJ: true, GUAVA: true,",
+            "// OPEN_REWRITE_TEMPLATING: true, REACTOR: true",
             "class A {",
             "  void m(Class<?> clazz) {",
             "    m(Assertions.class);",
@@ -55,7 +57,8 @@ final class ThirdPartyLibraryTest {
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true, REACTOR: true",
+            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: true,",
+            "// OPEN_REWRITE_TEMPLATING: false, REACTOR: true",
             "class A {}")
         .doTest();
   }
@@ -66,8 +69,8 @@ final class ThirdPartyLibraryTest {
         .withClasspath()
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false, REACTOR:",
-            "// false",
+            "// BUG: Diagnostic contains: ASSERTJ: false, GUAVA: false,",
+            "// OPEN_REWRITE_TEMPLATING: false, REACTOR: false",
             "class A {}")
         .doTest();
   }
@@ -80,8 +83,8 @@ final class ThirdPartyLibraryTest {
         .withClasspath(ImmutableList.class, Flux.class)
         .addSourceLines(
             "A.java",
-            "// BUG: Diagnostic contains: ASSERTJ: %s, GUAVA: true, REACTOR: true"
-                .formatted(ignoreClassPath),
+            "// BUG: Diagnostic contains: ASSERTJ: %s, GUAVA: true,".formatted(ignoreClassPath),
+            "// OPEN_REWRITE_TEMPLATING: %s, REACTOR: true".formatted(ignoreClassPath),
             "class A {}")
         .doTest();
   }

@@ -30,6 +30,13 @@ public enum ThirdPartyLibrary {
    */
   GUAVA(ImmutableList.class.getCanonicalName()),
   /**
+   * OpenRewrite's Refaster template processor.
+   *
+   * @see <a href="https://github.com/openrewrite/rewrite-templating">rewrite-templating on
+   *     GitHub</a>
+   */
+  OPEN_REWRITE_TEMPLATING("org.openrewrite.java.template.RecipeDescriptor"),
+  /**
    * VMWare's Project Reactor.
    *
    * @see <a href="https://projectreactor.io">Home page</a>
