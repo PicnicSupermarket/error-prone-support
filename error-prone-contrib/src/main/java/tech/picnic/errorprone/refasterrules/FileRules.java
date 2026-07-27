@@ -179,15 +179,13 @@ final class FileRules {
    */
   static final class FilesWriteString {
     @BeforeTemplate
-    Path before(Path path, CharSequence charSequence, @Repeated OpenOption options)
-        throws IOException {
-      return Files.writeString(path, charSequence, UTF_8, Refaster.asVarargs(options));
+    Path before(Path path, CharSequence csq, @Repeated OpenOption options) throws IOException {
+      return Files.writeString(path, csq, UTF_8, Refaster.asVarargs(options));
     }
 
     @AfterTemplate
-    Path after(Path path, CharSequence charSequence, @Repeated OpenOption options)
-        throws IOException {
-      return Files.writeString(path, charSequence, Refaster.asVarargs(options));
+    Path after(Path path, CharSequence csq, @Repeated OpenOption options) throws IOException {
+      return Files.writeString(path, csq, Refaster.asVarargs(options));
     }
   }
 
