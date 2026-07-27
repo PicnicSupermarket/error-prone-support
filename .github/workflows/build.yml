@@ -61,6 +61,11 @@ jobs:
         run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # XXX: Enable this step on Windows as well, once the script is
+      # compatible with that platform.
+      - name: Validate that the self-check profile analyzes this project's own code
+        if: runner.os != 'Windows'
+        run: ./validate-self-check.sh
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   deploy:
