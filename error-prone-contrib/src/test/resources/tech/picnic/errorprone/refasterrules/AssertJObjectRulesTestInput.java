@@ -39,32 +39,12 @@ final class AssertJObjectRulesTest implements RefasterRuleCollectionTestCase {
         assertThat("quux" != "corge").isFalse());
   }
 
-  @SuppressWarnings("AssertThatIsNotNull" /* Tests verify correctness absent this other rule. */)
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotSameAs() {
     return ImmutableSet.of(
         assertThat(null == "foo").isFalse(),
         assertThat("bar" == "baz").isFalse(),
         assertThat(null != "qux").isTrue(),
         assertThat("quux" != "corge").isTrue());
-  }
-
-  void testAssertThatIsNull() {
-    assertThat(null == null).isTrue();
-    assertThat("foo" == null).isTrue();
-    assertThat(null == "bar").isTrue();
-    assertThat(null != null).isFalse();
-    assertThat("baz" != null).isFalse();
-    assertThat(null != "qux").isFalse();
-  }
-
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotNull() {
-    return ImmutableSet.of(
-        assertThat(null == null).isFalse(),
-        assertThat("foo" == null).isFalse(),
-        assertThat(null == "bar").isFalse(),
-        assertThat(null != null).isTrue(),
-        assertThat("baz" != null).isTrue(),
-        assertThat(null != "qux").isTrue());
   }
 
   AbstractAssert<?, ?> testAssertThatHasSameHashCodeAs() {
