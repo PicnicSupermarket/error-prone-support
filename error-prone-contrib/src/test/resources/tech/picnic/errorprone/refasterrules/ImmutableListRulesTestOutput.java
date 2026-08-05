@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
@@ -80,22 +81,27 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<List<Integer>> testImmutableListOf1() {
-    return ImmutableSet.of(ImmutableList.of(1), ImmutableList.of(2), ImmutableList.of(3));
+    return ImmutableSet.of(
+        ImmutableList.of(1), ImmutableList.of(2), ImmutableList.of(3), ImmutableList.of(4));
   }
 
-  List<Integer> testImmutableListOf2() {
-    return ImmutableList.of(1, 2);
+  ImmutableSet<List<Integer>> testImmutableListOf2() {
+    return ImmutableSet.of(ImmutableList.of(1, 2), ImmutableList.of(2, 3));
   }
 
-  List<Integer> testImmutableListOf3() {
-    return ImmutableList.of(1, 2, 3);
+  ImmutableSet<List<Integer>> testImmutableListOf3() {
+    return ImmutableSet.of(ImmutableList.of(1, 2, 3), ImmutableList.of(2, 3, 4));
   }
 
-  List<Integer> testImmutableListOf4() {
-    return ImmutableList.of(1, 2, 3, 4);
+  ImmutableSet<List<Integer>> testImmutableListOf4() {
+    return ImmutableSet.of(ImmutableList.of(1, 2, 3, 4), ImmutableList.of(2, 3, 4, 5));
   }
 
-  List<Integer> testImmutableListOf5() {
-    return ImmutableList.of(1, 2, 3, 4, 5);
+  ImmutableSet<List<Integer>> testImmutableListOf5() {
+    return ImmutableSet.of(ImmutableList.of(1, 2, 3, 4, 5), ImmutableList.of(2, 3, 4, 5, 6));
+  }
+
+  ImmutableList<String> testOptionalMapImmutableListOfOrElseGetImmutableListOf() {
+    return Optional.of("foo").map(ImmutableList::of).orElseGet(ImmutableList::of);
   }
 }

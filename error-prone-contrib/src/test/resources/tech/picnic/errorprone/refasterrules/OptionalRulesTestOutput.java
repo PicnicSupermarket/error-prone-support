@@ -95,8 +95,10 @@ final class OptionalRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(Optional.of("foo")).flatMap(Optional::stream));
   }
 
-  Stream<String> testStreamFlatMapStream() {
-    return Stream.of(1).flatMap(n -> Optional.of(String.valueOf(n)).stream());
+  ImmutableSet<Stream<String>> testStreamFlatMapStream() {
+    return ImmutableSet.of(
+        Stream.of(1).flatMap(n -> Optional.of(String.valueOf(n)).stream()),
+        Stream.of(2).flatMap(n -> Optional.of(String.valueOf(n)).stream()));
   }
 
   Optional<Integer> testOptionalFlatMapFilter() {

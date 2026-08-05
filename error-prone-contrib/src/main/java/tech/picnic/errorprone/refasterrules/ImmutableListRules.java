@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.annotation.PossibleSourceIncompatibility;
@@ -224,7 +225,10 @@ final class ImmutableListRules {
     @BeforeTemplate
     List<T> before(T e1) {
       return Refaster.anyOf(
-          ImmutableList.<T>builder().add(e1).build(), singletonList(e1), List.of(e1));
+          ImmutableList.<T>builder().add(e1).build(),
+          singletonList(e1),
+          List.of(e1),
+          Stream.of(e1).collect(toImmutableList()));
     }
 
     @AfterTemplate
@@ -233,13 +237,16 @@ final class ImmutableListRules {
     }
   }
 
-  /** Prefer {@link ImmutableList#of(Object, Object)} over imprecisely typed alternatives. */
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object)} over imprecisely typed or less efficient
+   * alternatives.
+   */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf2<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2) {
-      return List.of(e1, e2);
+      return Refaster.anyOf(List.of(e1, e2), Stream.of(e1, e2).collect(toImmutableList()));
     }
 
     @AfterTemplate
@@ -249,14 +256,15 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object)} over imprecisely typed alternatives.
+   * Prefer {@link ImmutableList#of(Object, Object, Object)} over imprecisely typed or less
+   * efficient alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf3<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3) {
-      return List.of(e1, e2, e3);
+      return Refaster.anyOf(List.of(e1, e2, e3), Stream.of(e1, e2, e3).collect(toImmutableList()));
     }
 
     @AfterTemplate
@@ -266,15 +274,16 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over imprecisely typed
-   * alternatives.
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over imprecisely typed or less
+   * efficient alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf4<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3, T e4) {
-      return List.of(e1, e2, e3, e4);
+      return Refaster.anyOf(
+          List.of(e1, e2, e3, e4), Stream.of(e1, e2, e3, e4).collect(toImmutableList()));
     }
 
     @AfterTemplate
@@ -285,19 +294,36 @@ final class ImmutableListRules {
 
   /**
    * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over imprecisely typed
-   * alternatives.
+   * or less efficient alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf5<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3, T e4, T e5) {
-      return List.of(e1, e2, e3, e4, e5);
+      return Refaster.anyOf(
+          List.of(e1, e2, e3, e4, e5), Stream.of(e1, e2, e3, e4, e5).collect(toImmutableList()));
     }
 
     @AfterTemplate
     ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5) {
       return ImmutableList.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  /**
+   * Prefer {@code optional.map(ImmutableList::of).orElseGet(ImmutableList::of)} over less efficient
+   * alternatives.
+   */
+  static final class OptionalMapImmutableListOfOrElseGetImmutableListOf<T> {
+    @BeforeTemplate
+    ImmutableList<T> before(Optional<T> optional) {
+      return optional.stream().collect(toImmutableList());
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(Optional<T> optional) {
+      return optional.map(ImmutableList::of).orElseGet(ImmutableList::of);
     }
   }
 }

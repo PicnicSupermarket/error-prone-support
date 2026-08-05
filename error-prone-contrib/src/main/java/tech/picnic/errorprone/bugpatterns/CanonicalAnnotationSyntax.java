@@ -51,8 +51,7 @@ public final class CanonicalAnnotationSyntax extends BugChecker implements Annot
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
     return FIX_FACTORIES.stream()
-        .map(op -> op.apply(tree, state))
-        .flatMap(Optional::stream)
+        .flatMap(op -> op.apply(tree, state).stream())
         .findFirst()
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);

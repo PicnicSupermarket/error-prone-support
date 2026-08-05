@@ -1268,6 +1268,11 @@ final class ReactorRules {
    * Prefer immediately unwrapping {@link Optional} transformation results inside {@link
    * Flux#mapNotNull(Function)} over more contrived alternatives.
    */
+  // XXX: This rule does not match if the transformation is expressed as a method reference, as a
+  // `@Placeholder` method only unifies with a lambda expression. As a result, a
+  // `flux.map(Foo::toOptional).concatMap(Mono::justOrEmpty)` chain is only partially collapsed:
+  // `FluxMapNotNullOptionalOrElseNull` drops the inner subscription, but the `map` operation
+  // remains. Consider introducing an Error Prone check that merges such chained operations.
   @OpenRewriteIncompatible
   abstract static class FluxMapNotNullOrElseNull<T, S> {
     @Placeholder(allowsIdentity = true)
@@ -1290,11 +1295,30 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Flux#mapNotNull(Function)} over more contrived alternatives. */
+  /**
+   * Prefer {@link Flux#mapNotNull(Function)} over alternatives that unnecessarily require an inner
+   * subscription, or that are more contrived.
+   */
+  // XXX: Introduce a `Mono` counterpart for the `Mono#flatMap(Function)` variant. Doing so requires
+  // that the `@BeforeTemplate`s of `FluxTransformMathFluxMinSingleOrEmptyWithComparator` and
+  // `FluxTransformMathFluxMaxSingleOrEmptyWithComparator` are updated accordingly.
   static final class FluxMapNotNullOptionalOrElseNull<T> {
     @BeforeTemplate
-    Flux<T> before(Flux<Optional<T>> flux) {
-      return flux.filter(Optional::isPresent).map(Optional::orElseThrow);
+    Flux<T> before(Flux<Optional<T>> flux, int prefetch, boolean delayUntilEnd, int concurrency) {
+      return Refaster.anyOf(
+          flux.filter(Optional::isPresent).map(Optional::orElseThrow),
+          flux.concatMap(Mono::justOrEmpty),
+          flux.concatMap(Mono::justOrEmpty, prefetch),
+          flux.concatMapDelayError(Mono::justOrEmpty),
+          flux.concatMapDelayError(Mono::justOrEmpty, prefetch),
+          flux.concatMapDelayError(Mono::justOrEmpty, delayUntilEnd, prefetch),
+          flux.flatMap(Mono::justOrEmpty, concurrency),
+          flux.flatMap(Mono::justOrEmpty, concurrency, prefetch),
+          flux.flatMapDelayError(Mono::justOrEmpty, concurrency, prefetch),
+          flux.flatMapSequential(Mono::justOrEmpty, concurrency),
+          flux.flatMapSequential(Mono::justOrEmpty, concurrency, prefetch),
+          flux.flatMapSequentialDelayError(Mono::justOrEmpty, concurrency, prefetch),
+          flux.switchMap(Mono::justOrEmpty));
     }
 
     // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is

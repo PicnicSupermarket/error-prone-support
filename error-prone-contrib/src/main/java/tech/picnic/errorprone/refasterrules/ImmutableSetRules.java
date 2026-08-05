@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
@@ -135,13 +136,18 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of(Object)} over imprecisely typed or more contrived alternatives.
+   * Prefer {@link ImmutableSet#of(Object)} over imprecisely typed, less efficient, or more
+   * contrived alternatives.
    */
   // XXX: Note that the replacement of `Collections#singleton` is incorrect for nullable elements.
   static final class ImmutableSetOf1<T> {
     @BeforeTemplate
     Set<T> before(T e1) {
-      return Refaster.anyOf(ImmutableSet.<T>builder().add(e1).build(), singleton(e1), Set.of(e1));
+      return Refaster.anyOf(
+          ImmutableSet.<T>builder().add(e1).build(),
+          singleton(e1),
+          Set.of(e1),
+          Stream.of(e1).collect(toImmutableSet()));
     }
 
     @AfterTemplate
@@ -150,13 +156,16 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link ImmutableSet#of(Object, Object)} over imprecisely typed alternatives. */
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object)} over imprecisely typed or less efficient
+   * alternatives.
+   */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf2<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2) {
-      return Set.of(e1, e2);
+      return Refaster.anyOf(Set.of(e1, e2), Stream.of(e1, e2).collect(toImmutableSet()));
     }
 
     @AfterTemplate
@@ -165,13 +174,16 @@ final class ImmutableSetRules {
     }
   }
 
-  /** Prefer {@link ImmutableSet#of(Object, Object, Object)} over imprecisely typed alternatives. */
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object)} over imprecisely typed or less efficient
+   * alternatives.
+   */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf3<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3) {
-      return Set.of(e1, e2, e3);
+      return Refaster.anyOf(Set.of(e1, e2, e3), Stream.of(e1, e2, e3).collect(toImmutableSet()));
     }
 
     @AfterTemplate
@@ -181,15 +193,16 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over imprecisely typed
-   * alternatives.
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over imprecisely typed or less
+   * efficient alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf4<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3, T e4) {
-      return Set.of(e1, e2, e3, e4);
+      return Refaster.anyOf(
+          Set.of(e1, e2, e3, e4), Stream.of(e1, e2, e3, e4).collect(toImmutableSet()));
     }
 
     @AfterTemplate
@@ -200,19 +213,36 @@ final class ImmutableSetRules {
 
   /**
    * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over imprecisely typed
-   * alternatives.
+   * or less efficient alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf5<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3, T e4, T e5) {
-      return Set.of(e1, e2, e3, e4, e5);
+      return Refaster.anyOf(
+          Set.of(e1, e2, e3, e4, e5), Stream.of(e1, e2, e3, e4, e5).collect(toImmutableSet()));
     }
 
     @AfterTemplate
     ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5) {
       return ImmutableSet.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  /**
+   * Prefer {@code optional.map(ImmutableSet::of).orElseGet(ImmutableSet::of)} over less efficient
+   * alternatives.
+   */
+  static final class OptionalMapImmutableSetOfOrElseGetImmutableSetOf<T> {
+    @BeforeTemplate
+    ImmutableSet<T> before(Optional<T> optional) {
+      return optional.stream().collect(toImmutableSet());
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(Optional<T> optional) {
+      return optional.map(ImmutableSet::of).orElseGet(ImmutableSet::of);
     }
   }
 

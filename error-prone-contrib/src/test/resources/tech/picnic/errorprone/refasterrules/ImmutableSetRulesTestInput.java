@@ -11,6 +11,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
@@ -56,23 +57,31 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Set<Integer>> testImmutableSetOf1() {
     return ImmutableSet.of(
-        ImmutableSet.<Integer>builder().add(1).build(), Collections.singleton(2), Set.of(3));
+        ImmutableSet.<Integer>builder().add(1).build(),
+        Collections.singleton(2),
+        Set.of(3),
+        Stream.of(4).collect(toImmutableSet()));
   }
 
-  Set<Integer> testImmutableSetOf2() {
-    return Set.of(1, 2);
+  ImmutableSet<Set<Integer>> testImmutableSetOf2() {
+    return ImmutableSet.of(Set.of(1, 2), Stream.of(2, 3).collect(toImmutableSet()));
   }
 
-  Set<Integer> testImmutableSetOf3() {
-    return Set.of(1, 2, 3);
+  ImmutableSet<Set<Integer>> testImmutableSetOf3() {
+    return ImmutableSet.of(Set.of(1, 2, 3), Stream.of(2, 3, 4).collect(toImmutableSet()));
   }
 
-  Set<Integer> testImmutableSetOf4() {
-    return Set.of(1, 2, 3, 4);
+  ImmutableSet<Set<Integer>> testImmutableSetOf4() {
+    return ImmutableSet.of(Set.of(1, 2, 3, 4), Stream.of(2, 3, 4, 5).collect(toImmutableSet()));
   }
 
-  Set<Integer> testImmutableSetOf5() {
-    return Set.of(1, 2, 3, 4, 5);
+  ImmutableSet<Set<Integer>> testImmutableSetOf5() {
+    return ImmutableSet.of(
+        Set.of(1, 2, 3, 4, 5), Stream.of(2, 3, 4, 5, 6).collect(toImmutableSet()));
+  }
+
+  ImmutableSet<String> testOptionalMapImmutableSetOfOrElseGetImmutableSetOf() {
+    return Optional.of("foo").stream().collect(toImmutableSet());
   }
 
   ImmutableSet<ImmutableSet<Integer>> testSetsDifferenceImmutableCopy() {

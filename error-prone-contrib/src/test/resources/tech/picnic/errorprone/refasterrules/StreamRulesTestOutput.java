@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.DoubleSummaryStatistics;
 import java.util.IntSummaryStatistics;
@@ -50,6 +51,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
+        Collection.class,
         ImmutableList.class,
         ImmutableMap.class,
         List.class,
@@ -126,6 +128,16 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
 
   Stream<Integer> testStreamFlatMapFlatMap() {
     return Stream.of("foo").flatMap(v -> Stream.of(v.length())).flatMap(Stream::of);
+  }
+
+  ImmutableSet<Stream<Integer>> testStreamFlatMapStream() {
+    return ImmutableSet.of(
+        Stream.of("foo").flatMap(v -> ImmutableList.of(v.length()).stream()),
+        Stream.of("bar").flatMap(v -> ImmutableSet.of(v.hashCode()).stream()));
+  }
+
+  Stream<Integer> testStreamMapFilterObjectsNonNull() {
+    return Stream.of("foo").map(v -> v.length()).filter(Objects::nonNull);
   }
 
   Stream<Integer> testStreamSorted() {

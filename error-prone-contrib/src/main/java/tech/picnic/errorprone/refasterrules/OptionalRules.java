@@ -294,15 +294,18 @@ final class OptionalRules {
   }
 
   /**
-   * Prefer {@link Optional#stream()} within {@link Stream#flatMap(Function)} over more contrived
-   * alternatives.
+   * Prefer {@link Optional#stream()} within {@link Stream#flatMap(Function)} over more contrived or
+   * less efficient alternatives.
    *
    * <p><strong>Warning:</strong> this rewrite rule is not completely behavior preserving. The
-   * original code throws an exception if the mapping operation does not produce a value, while the
-   * replacement does not.
+   * {@link Optional#orElseThrow()} variant of the original code throws an exception if the mapping
+   * operation does not produce a value, while the replacement does not.
    */
   // XXX: An alternative approach is to use `.flatMap(Optional::stream)`. That may be a bit longer,
   // but yields nicer code. Think about it.
+  // XXX: The second before-template does not match if the mapping operation is expressed as a
+  // method reference, as a `@Placeholder` method only unifies with a lambda expression. Consider
+  // introducing an Error Prone check that merges such chained operations.
   @OpenRewriteIncompatible
   abstract static class StreamFlatMapStream<T, S> {
     @Placeholder
@@ -310,7 +313,9 @@ final class OptionalRules {
 
     @BeforeTemplate
     Stream<S> before(Stream<T> stream) {
-      return stream.map(e -> toOptionalFunction(e).orElseThrow());
+      return Refaster.anyOf(
+          stream.map(e -> toOptionalFunction(e).orElseThrow()),
+          stream.map(e -> toOptionalFunction(e)).flatMap(Optional::stream));
     }
 
     @AfterTemplate

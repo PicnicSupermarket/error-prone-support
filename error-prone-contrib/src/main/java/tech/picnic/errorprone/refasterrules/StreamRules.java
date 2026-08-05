@@ -225,6 +225,53 @@ final class StreamRules {
     }
   }
 
+  /**
+   * Prefer {@link Collection#stream()} within {@link Stream#flatMap(Function)} over less efficient
+   * alternatives.
+   */
+  // XXX: This rule does not match if the mapping operation is expressed as a method reference, as a
+  // `@Placeholder` method only unifies with a lambda expression. Consider introducing an Error
+  // Prone check that merges such chained operations.
+  @OpenRewriteIncompatible
+  abstract static class StreamFlatMapStream<T, S, C extends Collection<S>> {
+    @Placeholder
+    abstract C toCollectionFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Stream<S> before(Stream<T> stream) {
+      return stream.map(v -> toCollectionFunction(v)).flatMap(C::stream);
+    }
+
+    @AfterTemplate
+    Stream<S> after(Stream<T> stream) {
+      return stream.flatMap(v -> toCollectionFunction(v).stream());
+    }
+  }
+
+  /**
+   * Prefer {@code stream.map(...).filter(Objects::nonNull)} over less efficient alternatives.
+   *
+   * <p>The alternative matched allocates a {@link Stream} instance for every element, while the
+   * replacement allocates none.
+   */
+  // XXX: This rule generalizes `StreamMapMapGetFilterObjectsNonNull`, but cannot replace it: a
+  // `@Placeholder` method does not match a method reference such as `map::get`.
+  @OpenRewriteIncompatible
+  abstract static class StreamMapFilterObjectsNonNull<T, S extends @Nullable Object> {
+    @Placeholder
+    abstract S toNullableFunction(@MayOptionallyUse T element);
+
+    @BeforeTemplate
+    Stream<S> before(Stream<T> stream) {
+      return stream.flatMap(v -> Stream.ofNullable(toNullableFunction(v)));
+    }
+
+    @AfterTemplate
+    Stream<S> after(Stream<T> stream) {
+      return stream.map(v -> toNullableFunction(v)).filter(Objects::nonNull);
+    }
+  }
+
   /** Prefer {@link Stream#sorted()} over more verbose alternatives. */
   static final class StreamSorted<T extends Comparable<? super T>> {
     @BeforeTemplate

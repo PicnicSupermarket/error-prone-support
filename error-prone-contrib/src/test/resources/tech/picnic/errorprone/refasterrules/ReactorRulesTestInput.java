@@ -471,8 +471,21 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).map(x -> Optional.of(x.toString())).mapNotNull(x -> x.orElse(null));
   }
 
-  Flux<Integer> testFluxMapNotNullOptionalOrElseNull() {
-    return Flux.just(Optional.of(1)).filter(Optional::isPresent).map(Optional::orElseThrow);
+  ImmutableSet<Flux<Integer>> testFluxMapNotNullOptionalOrElseNull() {
+    return ImmutableSet.of(
+        Flux.just(Optional.of(1)).filter(Optional::isPresent).map(Optional::orElseThrow),
+        Flux.just(Optional.of(1)).concatMap(Mono::justOrEmpty),
+        Flux.just(Optional.of(1)).concatMap(Mono::justOrEmpty, 3),
+        Flux.just(Optional.of(1)).concatMapDelayError(Mono::justOrEmpty),
+        Flux.just(Optional.of(1)).concatMapDelayError(Mono::justOrEmpty, 3),
+        Flux.just(Optional.of(1)).concatMapDelayError(Mono::justOrEmpty, true, 3),
+        Flux.just(Optional.of(1)).flatMap(Mono::justOrEmpty, 3),
+        Flux.just(Optional.of(1)).flatMap(Mono::justOrEmpty, 3, 4),
+        Flux.just(Optional.of(1)).flatMapDelayError(Mono::justOrEmpty, 3, 4),
+        Flux.just(Optional.of(1)).flatMapSequential(Mono::justOrEmpty, 3),
+        Flux.just(Optional.of(1)).flatMapSequential(Mono::justOrEmpty, 3, 4),
+        Flux.just(Optional.of(1)).flatMapSequentialDelayError(Mono::justOrEmpty, 3, 4),
+        Flux.just(Optional.of(1)).switchMap(Mono::justOrEmpty));
   }
 
   ImmutableSet<Flux<String>> testMonoFlux() {

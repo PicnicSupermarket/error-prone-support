@@ -119,8 +119,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
      */
     return matcher
         .extractMatchingArguments(tree)
-        .map(expr -> extractArray(expr).flatMap(arr -> suggestSorting(arr, state)))
-        .flatMap(Optional::stream)
+        .flatMap(expr -> extractArray(expr).flatMap(arr -> suggestSorting(arr, state)).stream())
         .reduce(SuggestedFix.Builder::merge)
         .map(SuggestedFix.Builder::build);
   }
