@@ -293,6 +293,32 @@ final class OptionalRules {
     }
   }
 
+  /** Prefer {@code stream.anyMatch(Optional::isPresent)} over less efficient alternatives. */
+  static final class StreamAnyMatchOptionalIsPresent<T> {
+    @BeforeTemplate
+    boolean before(Stream<Optional<T>> stream) {
+      return stream.flatMap(Optional::stream).findAny().isPresent();
+    }
+
+    @AfterTemplate
+    boolean after(Stream<Optional<T>> stream) {
+      return stream.anyMatch(Optional::isPresent);
+    }
+  }
+
+  /** Prefer {@code stream.noneMatch(Optional::isPresent)} over less efficient alternatives. */
+  static final class StreamNoneMatchOptionalIsPresent<T> {
+    @BeforeTemplate
+    boolean before(Stream<Optional<T>> stream) {
+      return stream.flatMap(Optional::stream).findAny().isEmpty();
+    }
+
+    @AfterTemplate
+    boolean after(Stream<Optional<T>> stream) {
+      return stream.noneMatch(Optional::isPresent);
+    }
+  }
+
   /**
    * Prefer {@link Optional#stream()} within {@link Stream#flatMap(Function)} over more contrived or
    * less efficient alternatives.
