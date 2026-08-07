@@ -391,7 +391,7 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
   }
 
-  Stream<Integer> testStreamOf13() {
+  Stream<Integer> testStreamOfVarargs() {
     return Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
   }
 

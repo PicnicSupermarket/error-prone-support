@@ -468,7 +468,13 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
         suffixes.put(rule, useArityNumbers ? String.valueOf(arity) : "");
       } else {
         ImmutableList<String> extraNames = extraTypeNames.get(rule);
-        if (extraNames.stream().allMatch("Varargs"::equals)) {
+        if (extraNames.stream().allMatch("Varargs"::equals)
+            || (useArityNumbers && hasAnyRepeatedParam(rule))) {
+          /*
+           * The arity of a rule with a `@Repeated` parameter is dictated by the varargs threshold
+           * of the method matched by its before-template, rather than by the number of values the
+           * rule accepts, making a numeric suffix misleading.
+           */
           suffixes.put(rule, "Varargs");
         } else {
           suffixes.put(rule, useArityNumbers ? String.valueOf(arity) : buildWithSuffix(extraNames));
@@ -566,15 +572,29 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
     return false;
   }
 
+  /**
+   * Prefixes the suffix on which the given rules clash with each rule's number of non-{@link
+   * Repeated} parameters, yielding e.g. {@code SetOf2Varargs} and {@code SetOf4Varargs}. A
+   * {@code @Repeated} parameter is disregarded, as it renders the rule's arity a function of the
+   * varargs threshold of the method matched by its before-template.
+   */
   private static boolean numberByArity(
       ImmutableList<RuleInfo> clash, Map<RuleInfo, String> suffixes) {
     long distinctArities =
-        clash.stream().map(r -> r.afterMethod().getParameters().size()).distinct().count();
+        clash.stream().map(RefasterRuleName::countNonRepeatedParams).distinct().count();
     if (distinctArities < clash.size()) {
       return false;
     }
-    clash.forEach(r -> suffixes.put(r, String.valueOf(r.afterMethod().getParameters().size())));
+    clash.forEach(r -> suffixes.put(r, countNonRepeatedParams(r) + suffixes.get(r)));
     return true;
+  }
+
+  private static int countNonRepeatedParams(RuleInfo rule) {
+    return (int)
+        rule.afterMethod().getParameters().stream()
+            .map(ASTHelpers::getSymbol)
+            .filter(sym -> !hasRepeatedAnnotation(sym))
+            .count();
   }
 
   private static boolean splitByExpressionBlock(

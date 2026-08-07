@@ -1062,7 +1062,7 @@ final class StreamRules {
    */
   // XXX: Generalize this and similar rules using an Error Prone check.
   @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class StreamOf13<T> {
+  static final class StreamOfVarargs<T> {
     @BeforeTemplate
     Stream<T> before(
         T e1,

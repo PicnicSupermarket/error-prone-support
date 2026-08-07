@@ -130,7 +130,7 @@ final class MicrometerRulesTest implements RefasterRuleCollectionTestCase {
         Tag.of("plugh", "v11"));
   }
 
-  Iterable<Tag> testTagsOfVarargs() {
+  Iterable<Tag> testTagsOf6Varargs() {
     return ImmutableSet.of(
         Tag.of("foo", "v1"),
         Tag.of("bar", "v2"),
@@ -140,7 +140,7 @@ final class MicrometerRulesTest implements RefasterRuleCollectionTestCase {
         Tag.of("corge", "v6"));
   }
 
-  Iterable<Tag> testTagsOf13() {
+  Iterable<Tag> testTagsOf12Varargs() {
     return ImmutableList.of(
         Tag.of("foo", "v1"),
         Tag.of("bar", "v2"),

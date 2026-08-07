@@ -185,7 +185,7 @@ final class MicrometerRules {
 
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
-  static final class TagsOfVarargs {
+  static final class TagsOf6Varargs {
     @BeforeTemplate
     ImmutableSet<Tag> before(Tag e1, Tag e2, Tag e3, Tag e4, Tag e5, Tag e6, @Repeated Tag tags) {
       return ImmutableSet.of(e1, e2, e3, e4, e5, e6, Refaster.asVarargs(tags));
@@ -200,7 +200,7 @@ final class MicrometerRules {
   /** Prefer {@link Tags#of(Tag...)} over less idiomatic alternatives. */
   @PossibleSourceIncompatibility
   @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class TagsOf13 {
+  static final class TagsOf12Varargs {
     @BeforeTemplate
     ImmutableList<Tag> before(
         Tag e1,

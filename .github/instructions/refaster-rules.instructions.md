@@ -345,6 +345,12 @@ these guidelines:
     returning) variant, append `Expression` and `Block` as appropriate.
   - When rules differ only in the number of arguments (arity), append a numeric
     suffix: e.g., `ImmutableMapOf1`, `ImmutableMapOf2`, etc.
+  - A rule with a `@Repeated` parameter instead gets a `Varargs` suffix, as its
+    arity merely reflects the varargs threshold of the method matched by its
+    `@BeforeTemplate`: e.g., `ImmutableSetOfVarargs`, `StreamOfVarargs`. If a
+    class contains several such rules with the same base name, prefix the
+    suffix with the number of values that must precede the varargs sequence:
+    e.g., `TagsOf6Varargs` and `TagsOf12Varargs`.
 - When invoking static methods or fields, check the rest of the code base to
   assess whether a method or field is usually statically imported; if so,
   follow that style.
