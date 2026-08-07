@@ -52,10 +52,15 @@ mvn fmt:format
 ./run-branch-mutation-tests.sh
 ```
 
+Never omit the `clean` goal; predictability outweighs speed. Stale build output
+can silently alter behaviour: for example, each Refaster rule compiles to its
+own `.refaster` resource, and Maven does not delete those of removed or renamed
+rules.
+
 ### Running a single test
 
 ```sh
-mvn test -pl error-prone-contrib -Dtest=DirectReturnTest -Dverification.skip
+mvn clean test -pl error-prone-contrib -Dtest=DirectReturnTest -Dverification.skip
 ```
 
 Replace the module (`-pl`) and test class (`-Dtest=`) as needed.

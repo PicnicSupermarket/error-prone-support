@@ -471,6 +471,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).map(x -> Optional.of(x.toString())).mapNotNull(x -> x.orElse(null));
   }
 
+  Mono<Integer> testMonoMapNotNullOptionalOrElseNull() {
+    return Mono.just(Optional.of(1)).flatMap(Mono::justOrEmpty);
+  }
+
   ImmutableSet<Flux<Integer>> testFluxMapNotNullOptionalOrElseNull() {
     return ImmutableSet.of(
         Flux.just(Optional.of(1)).filter(Optional::isPresent).map(Optional::orElseThrow),
@@ -741,7 +745,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Integer>> testFluxTransformMathFluxMinSingleOrEmptyWithComparator() {
     return ImmutableSet.of(
         Flux.just(1).sort(reverseOrder()).next(),
-        Flux.just(2).collect(minBy(reverseOrder())).flatMap(Mono::justOrEmpty));
+        Flux.just(2).collect(minBy(reverseOrder())).mapNotNull(x -> x.orElse(null)));
   }
 
   Mono<Integer> testFluxTransformMathFluxMaxSingleOrEmpty() {
@@ -751,7 +755,7 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Mono<Integer>> testFluxTransformMathFluxMaxSingleOrEmptyWithComparator() {
     return ImmutableSet.of(
         Flux.just(1).sort(reverseOrder()).last(),
-        Flux.just(2).collect(maxBy(reverseOrder())).flatMap(Mono::justOrEmpty));
+        Flux.just(2).collect(maxBy(reverseOrder())).mapNotNull(x -> x.orElse(null)));
   }
 
   ImmutableSet<Mono<Integer>> testMathFluxMin() {

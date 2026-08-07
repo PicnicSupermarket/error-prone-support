@@ -63,21 +63,45 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
         Stream.of(4).collect(toImmutableSet()));
   }
 
-  ImmutableSet<Set<Integer>> testImmutableSetOf2() {
-    return ImmutableSet.of(Set.of(1, 2), Stream.of(2, 3).collect(toImmutableSet()));
+  Set<Integer> testImmutableSetOf2() {
+    return Set.of(1, 2);
   }
 
-  ImmutableSet<Set<Integer>> testImmutableSetOf3() {
-    return ImmutableSet.of(Set.of(1, 2, 3), Stream.of(2, 3, 4).collect(toImmutableSet()));
+  Set<Integer> testImmutableSetOf3() {
+    return Set.of(1, 2, 3);
   }
 
-  ImmutableSet<Set<Integer>> testImmutableSetOf4() {
-    return ImmutableSet.of(Set.of(1, 2, 3, 4), Stream.of(2, 3, 4, 5).collect(toImmutableSet()));
+  Set<Integer> testImmutableSetOf4() {
+    return Set.of(1, 2, 3, 4);
   }
 
-  ImmutableSet<Set<Integer>> testImmutableSetOf5() {
+  Set<Integer> testImmutableSetOf5() {
+    return Set.of(1, 2, 3, 4, 5);
+  }
+
+  Set<Integer> testImmutableSetOf6() {
+    return Set.of(1, 2, 3, 4, 5, 6);
+  }
+
+  Set<Integer> testImmutableSetOf7() {
+    return Set.of(1, 2, 3, 4, 5, 6, 7);
+  }
+
+  Set<Integer> testImmutableSetOf8() {
+    return Set.of(1, 2, 3, 4, 5, 6, 7, 8);
+  }
+
+  Set<Integer> testImmutableSetOf9() {
+    return Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+  }
+
+  Set<Integer> testImmutableSetOf10() {
+    return Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  }
+
+  ImmutableSet<Set<Integer>> testImmutableSetOfVarargs() {
     return ImmutableSet.of(
-        Set.of(1, 2, 3, 4, 5), Stream.of(2, 3, 4, 5, 6).collect(toImmutableSet()));
+        Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), Stream.of(12, 13).collect(toImmutableSet()));
   }
 
   ImmutableSet<String> testOptionalMapImmutableSetOfOrElseGetImmutableSetOf() {

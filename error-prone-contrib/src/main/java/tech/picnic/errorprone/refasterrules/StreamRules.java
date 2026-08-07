@@ -229,9 +229,8 @@ final class StreamRules {
    * Prefer {@link Collection#stream()} within {@link Stream#flatMap(Function)} over less efficient
    * alternatives.
    */
-  // XXX: This rule does not match if the mapping operation is expressed as a method reference, as a
-  // `@Placeholder` method only unifies with a lambda expression. Consider introducing an Error
-  // Prone check that merges such chained operations.
+  // XXX: This rule does not match if the mapping operation is expressed as a method reference.
+  // Consider introducing an Error Prone check that merges such chained operations.
   @OpenRewriteIncompatible
   abstract static class StreamFlatMapStream<T, S, C extends Collection<S>> {
     @Placeholder
@@ -248,14 +247,7 @@ final class StreamRules {
     }
   }
 
-  /**
-   * Prefer {@code stream.map(...).filter(Objects::nonNull)} over less efficient alternatives.
-   *
-   * <p>The alternative matched allocates a {@link Stream} instance for every element, while the
-   * replacement allocates none.
-   */
-  // XXX: This rule generalizes `StreamMapMapGetFilterObjectsNonNull`, but cannot replace it: a
-  // `@Placeholder` method does not match a method reference such as `map::get`.
+  /** Prefer {@code stream.map(...).filter(Objects::nonNull)} over less efficient alternatives. */
   @OpenRewriteIncompatible
   abstract static class StreamMapFilterObjectsNonNull<T, S extends @Nullable Object> {
     @Placeholder
@@ -970,6 +962,143 @@ final class StreamRules {
     @AfterTemplate
     Stream<T> after(T e1, T e2, T e3, T e4, T e5) {
       return Stream.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf6<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5, T e6) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5, T e6) {
+      return Stream.of(e1, e2, e3, e4, e5, e6);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  static final class StreamOf7<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
+      return Stream.of(e1, e2, e3, e4, e5, e6, e7);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class StreamOf8<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
+      return Stream.of(e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class StreamOf9<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
+      return Stream.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class StreamOf10<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
+      return Stream.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
+    }
+  }
+
+  /** Prefer {@link Stream#of(Object[])} over more contrived alternatives. */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class StreamOf11<T> {
+    @BeforeTemplate
+    Stream<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10, T e11) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11).stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10, T e11) {
+      return Stream.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11);
+    }
+  }
+
+  /**
+   * Prefer {@link Stream#of(Object[])} over more contrived alternatives.
+   *
+   * <p>This rule matches {@code ImmutableList.of(...)} invocations that resolve to Guava's varargs
+   * overload, i.e. those listing twelve or more elements; smaller element counts are covered by the
+   * {@code StreamOfN} rules above.
+   */
+  // XXX: Generalize this and similar rules using an Error Prone check.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class StreamOf13<T> {
+    @BeforeTemplate
+    Stream<T> before(
+        T e1,
+        T e2,
+        T e3,
+        T e4,
+        T e5,
+        T e6,
+        T e7,
+        T e8,
+        T e9,
+        T e10,
+        T e11,
+        T e12,
+        @Repeated T values) {
+      return ImmutableList.of(
+          e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, Refaster.asVarargs(values))
+          .stream();
+    }
+
+    @AfterTemplate
+    Stream<T> after(
+        T e1,
+        T e2,
+        T e3,
+        T e4,
+        T e5,
+        T e6,
+        T e7,
+        T e8,
+        T e9,
+        T e10,
+        T e11,
+        T e12,
+        @Repeated T values) {
+      return Stream.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, values);
     }
   }
 

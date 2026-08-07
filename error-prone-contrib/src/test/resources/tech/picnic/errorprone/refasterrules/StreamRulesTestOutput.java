@@ -367,6 +367,34 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1, 2, 3, 4, 5);
   }
 
+  Stream<Integer> testStreamOf6() {
+    return Stream.of(1, 2, 3, 4, 5, 6);
+  }
+
+  Stream<Integer> testStreamOf7() {
+    return Stream.of(1, 2, 3, 4, 5, 6, 7);
+  }
+
+  Stream<Integer> testStreamOf8() {
+    return Stream.of(1, 2, 3, 4, 5, 6, 7, 8);
+  }
+
+  Stream<Integer> testStreamOf9() {
+    return Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+  }
+
+  Stream<Integer> testStreamOf10() {
+    return Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  }
+
+  Stream<Integer> testStreamOf11() {
+    return Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+  }
+
+  Stream<Integer> testStreamOf13() {
+    return Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+  }
+
   Stream<String> testStreamsStream() {
     return Streams.stream(Iterables.cycle("foo"));
   }

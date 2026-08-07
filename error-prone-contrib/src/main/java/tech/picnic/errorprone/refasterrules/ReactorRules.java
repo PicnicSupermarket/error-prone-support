@@ -1112,32 +1112,44 @@ final class ReactorRules {
     @BeforeTemplate
     Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int concurrency) {
       return Refaster.anyOf(
-          flux.concatMap(x -> Mono.just(transformation(x))),
-          flux.concatMap(x -> Flux.just(transformation(x))),
-          flux.concatMap(x -> Mono.just(transformation(x)), prefetch),
-          flux.concatMap(x -> Flux.just(transformation(x)), prefetch),
-          flux.concatMapDelayError(x -> Mono.just(transformation(x))),
-          flux.concatMapDelayError(x -> Flux.just(transformation(x))),
-          flux.concatMapDelayError(x -> Mono.just(transformation(x)), prefetch),
-          flux.concatMapDelayError(x -> Flux.just(transformation(x)), prefetch),
-          flux.concatMapDelayError(x -> Mono.just(transformation(x)), delayUntilEnd, prefetch),
-          flux.concatMapDelayError(x -> Flux.just(transformation(x)), delayUntilEnd, prefetch),
-          flux.flatMap(x -> Mono.just(transformation(x)), concurrency),
-          flux.flatMap(x -> Flux.just(transformation(x)), concurrency),
-          flux.flatMap(x -> Mono.just(transformation(x)), concurrency, prefetch),
-          flux.flatMap(x -> Flux.just(transformation(x)), concurrency, prefetch),
-          flux.flatMapDelayError(x -> Mono.just(transformation(x)), concurrency, prefetch),
-          flux.flatMapDelayError(x -> Flux.just(transformation(x)), concurrency, prefetch),
-          flux.flatMapSequential(x -> Mono.just(transformation(x)), concurrency),
-          flux.flatMapSequential(x -> Flux.just(transformation(x)), concurrency),
-          flux.flatMapSequential(x -> Mono.just(transformation(x)), concurrency, prefetch),
-          flux.flatMapSequential(x -> Flux.just(transformation(x)), concurrency, prefetch),
+          flux.concatMap(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x)))),
+          flux.concatMap(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              prefetch),
+          flux.concatMapDelayError(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x)))),
+          flux.concatMapDelayError(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              prefetch),
+          flux.concatMapDelayError(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              delayUntilEnd,
+              prefetch),
+          flux.flatMap(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              concurrency),
+          flux.flatMap(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              concurrency,
+              prefetch),
+          flux.flatMapDelayError(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              concurrency,
+              prefetch),
+          flux.flatMapSequential(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              concurrency),
+          flux.flatMapSequential(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              concurrency,
+              prefetch),
           flux.flatMapSequentialDelayError(
-              x -> Mono.just(transformation(x)), concurrency, prefetch),
-          flux.flatMapSequentialDelayError(
-              x -> Flux.just(transformation(x)), concurrency, prefetch),
-          flux.switchMap(x -> Mono.just(transformation(x))),
-          flux.switchMap(x -> Flux.just(transformation(x))));
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x))),
+              concurrency,
+              prefetch),
+          flux.switchMap(
+              x -> Refaster.anyOf(Mono.just(transformation(x)), Flux.just(transformation(x)))));
     }
 
     @AfterTemplate
@@ -1268,11 +1280,8 @@ final class ReactorRules {
    * Prefer immediately unwrapping {@link Optional} transformation results inside {@link
    * Flux#mapNotNull(Function)} over more contrived alternatives.
    */
-  // XXX: This rule does not match if the transformation is expressed as a method reference, as a
-  // `@Placeholder` method only unifies with a lambda expression. As a result, a
-  // `flux.map(Foo::toOptional).concatMap(Mono::justOrEmpty)` chain is only partially collapsed:
-  // `FluxMapNotNullOptionalOrElseNull` drops the inner subscription, but the `map` operation
-  // remains. Consider introducing an Error Prone check that merges such chained operations.
+  // XXX: This rule does not match if the transformation is expressed as a method reference.
+  // Consider introducing an Error Prone check that merges such chained operations.
   @OpenRewriteIncompatible
   abstract static class FluxMapNotNullOrElseNull<T, S> {
     @Placeholder(allowsIdentity = true)
@@ -1295,13 +1304,23 @@ final class ReactorRules {
     }
   }
 
-  /**
-   * Prefer {@link Flux#mapNotNull(Function)} over alternatives that unnecessarily require an inner
-   * subscription, or that are more contrived.
-   */
-  // XXX: Introduce a `Mono` counterpart for the `Mono#flatMap(Function)` variant. Doing so requires
-  // that the `@BeforeTemplate`s of `FluxTransformMathFluxMinSingleOrEmptyWithComparator` and
-  // `FluxTransformMathFluxMaxSingleOrEmptyWithComparator` are updated accordingly.
+  /** Prefer {@link Mono#mapNotNull(Function)} over less efficient alternatives. */
+  static final class MonoMapNotNullOptionalOrElseNull<T> {
+    @BeforeTemplate
+    Mono<T> before(Mono<Optional<T>> mono) {
+      return mono.flatMap(Mono::justOrEmpty);
+    }
+
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
+    // resolved.
+    @AfterTemplate
+    @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
+    Mono<T> after(Mono<Optional<T>> mono) {
+      return mono.mapNotNull(v -> v.orElse(null));
+    }
+  }
+
+  /** Prefer {@link Flux#mapNotNull(Function)} over less efficient alternatives. */
   static final class FluxMapNotNullOptionalOrElseNull<T> {
     @BeforeTemplate
     Flux<T> before(Flux<Optional<T>> flux, int prefetch, boolean delayUntilEnd, int concurrency) {
@@ -1326,7 +1345,7 @@ final class ReactorRules {
     @AfterTemplate
     @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<T> after(Flux<Optional<T>> flux) {
-      return flux.mapNotNull(x -> x.orElse(null));
+      return flux.mapNotNull(v -> v.orElse(null));
     }
   }
 
@@ -2182,10 +2201,14 @@ final class ReactorRules {
    * alternatives.
    */
   static final class FluxTransformMathFluxMinSingleOrEmptyWithComparator<T> {
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
+    // resolved.
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Mono<T> before(Flux<T> flux, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          flux.sort(comparator).next(), flux.collect(minBy(comparator)).flatMap(Mono::justOrEmpty));
+          flux.sort(comparator).next(),
+          flux.collect(minBy(comparator)).mapNotNull(v -> v.orElse(null)));
     }
 
     @AfterTemplate
@@ -2212,10 +2235,14 @@ final class ReactorRules {
    * alternatives.
    */
   static final class FluxTransformMathFluxMaxSingleOrEmptyWithComparator<T> {
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
+    // resolved.
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Mono<T> before(Flux<T> flux, Comparator<? super T> comparator) {
       return Refaster.anyOf(
-          flux.sort(comparator).last(), flux.collect(maxBy(comparator)).flatMap(Mono::justOrEmpty));
+          flux.sort(comparator).last(),
+          flux.collect(maxBy(comparator)).mapNotNull(v -> v.orElse(null)));
     }
 
     @AfterTemplate

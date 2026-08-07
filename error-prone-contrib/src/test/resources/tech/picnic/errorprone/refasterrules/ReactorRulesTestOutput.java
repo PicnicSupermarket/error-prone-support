@@ -456,21 +456,25 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Flux.just(1).mapNotNull(x -> Optional.of(x.toString()).orElse(null));
   }
 
+  Mono<Integer> testMonoMapNotNullOptionalOrElseNull() {
+    return Mono.just(Optional.of(1)).mapNotNull(v -> v.orElse(null));
+  }
+
   ImmutableSet<Flux<Integer>> testFluxMapNotNullOptionalOrElseNull() {
     return ImmutableSet.of(
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)),
-        Flux.just(Optional.of(1)).mapNotNull(x -> x.orElse(null)));
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)),
+        Flux.just(Optional.of(1)).mapNotNull(v -> v.orElse(null)));
   }
 
   ImmutableSet<Flux<String>> testMonoFlux() {

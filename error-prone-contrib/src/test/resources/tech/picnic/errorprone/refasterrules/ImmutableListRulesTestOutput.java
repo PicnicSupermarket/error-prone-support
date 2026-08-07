@@ -85,20 +85,45 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
         ImmutableList.of(1), ImmutableList.of(2), ImmutableList.of(3), ImmutableList.of(4));
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf2() {
-    return ImmutableSet.of(ImmutableList.of(1, 2), ImmutableList.of(2, 3));
+  List<Integer> testImmutableListOf2() {
+    return ImmutableList.of(1, 2);
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf3() {
-    return ImmutableSet.of(ImmutableList.of(1, 2, 3), ImmutableList.of(2, 3, 4));
+  List<Integer> testImmutableListOf3() {
+    return ImmutableList.of(1, 2, 3);
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf4() {
-    return ImmutableSet.of(ImmutableList.of(1, 2, 3, 4), ImmutableList.of(2, 3, 4, 5));
+  List<Integer> testImmutableListOf4() {
+    return ImmutableList.of(1, 2, 3, 4);
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf5() {
-    return ImmutableSet.of(ImmutableList.of(1, 2, 3, 4, 5), ImmutableList.of(2, 3, 4, 5, 6));
+  List<Integer> testImmutableListOf5() {
+    return ImmutableList.of(1, 2, 3, 4, 5);
+  }
+
+  List<Integer> testImmutableListOf6() {
+    return ImmutableList.of(1, 2, 3, 4, 5, 6);
+  }
+
+  List<Integer> testImmutableListOf7() {
+    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7);
+  }
+
+  List<Integer> testImmutableListOf8() {
+    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8);
+  }
+
+  List<Integer> testImmutableListOf9() {
+    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+  }
+
+  List<Integer> testImmutableListOf10() {
+    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  }
+
+  ImmutableSet<List<Integer>> testImmutableListOfVarargs() {
+    return ImmutableSet.of(
+        ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11), ImmutableList.of(12, 13));
   }
 
   ImmutableList<String> testOptionalMapImmutableListOfOrElseGetImmutableListOf() {

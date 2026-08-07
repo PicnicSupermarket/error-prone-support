@@ -14,6 +14,7 @@ import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -156,16 +157,13 @@ final class ImmutableSetRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSet#of(Object, Object)} over imprecisely typed or less efficient
-   * alternatives.
-   */
+  /** Prefer {@link ImmutableSet#of(Object, Object)} over imprecisely typed alternatives. */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf2<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2) {
-      return Refaster.anyOf(Set.of(e1, e2), Stream.of(e1, e2).collect(toImmutableSet()));
+      return Set.of(e1, e2);
     }
 
     @AfterTemplate
@@ -174,16 +172,13 @@ final class ImmutableSetRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSet#of(Object, Object, Object)} over imprecisely typed or less efficient
-   * alternatives.
-   */
+  /** Prefer {@link ImmutableSet#of(Object, Object, Object)} over imprecisely typed alternatives. */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf3<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3) {
-      return Refaster.anyOf(Set.of(e1, e2, e3), Stream.of(e1, e2, e3).collect(toImmutableSet()));
+      return Set.of(e1, e2, e3);
     }
 
     @AfterTemplate
@@ -193,16 +188,15 @@ final class ImmutableSetRules {
   }
 
   /**
-   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over imprecisely typed or less
-   * efficient alternatives.
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object)} over imprecisely typed
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf4<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3, T e4) {
-      return Refaster.anyOf(
-          Set.of(e1, e2, e3, e4), Stream.of(e1, e2, e3, e4).collect(toImmutableSet()));
+      return Set.of(e1, e2, e3, e4);
     }
 
     @AfterTemplate
@@ -213,20 +207,127 @@ final class ImmutableSetRules {
 
   /**
    * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object)} over imprecisely typed
-   * or less efficient alternatives.
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableSet.builder()` usages.
   static final class ImmutableSetOf5<T> {
     @BeforeTemplate
     Set<T> before(T e1, T e2, T e3, T e4, T e5) {
-      return Refaster.anyOf(
-          Set.of(e1, e2, e3, e4, e5), Stream.of(e1, e2, e3, e4, e5).collect(toImmutableSet()));
+      return Set.of(e1, e2, e3, e4, e5);
     }
 
     @AfterTemplate
     ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5) {
       return ImmutableSet.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object, Object, Object[])} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  static final class ImmutableSetOf6<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5, T e6) {
+      return Set.of(e1, e2, e3, e4, e5, e6);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5, e6);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object, Object, Object[])} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  static final class ImmutableSetOf7<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
+      return Set.of(e1, e2, e3, e4, e5, e6, e7);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5, e6, e7);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object, Object, Object[])} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class ImmutableSetOf8<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
+      return Set.of(e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object, Object, Object[])} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class ImmutableSetOf9<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
+      return Set.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableSet#of(Object, Object, Object, Object, Object, Object, Object[])} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableSet.builder()` usages.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class ImmutableSetOf10<T> {
+    @BeforeTemplate
+    Set<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
+      return Set.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
+      return ImmutableSet.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
+    }
+  }
+
+  /** Prefer {@code ImmutableSet.of(...)} over imprecisely typed alternatives. */
+  static final class ImmutableSetOfVarargs<T> {
+    @BeforeTemplate
+    Set<T> before(@Repeated T e1) {
+      return Refaster.anyOf(
+          Set.of(Refaster.asVarargs(e1)),
+          Stream.of(Refaster.asVarargs(e1)).collect(toImmutableSet()));
+    }
+
+    @AfterTemplate
+    ImmutableSet<T> after(@Repeated T e1) {
+      return ImmutableSet.of(e1);
     }
   }
 

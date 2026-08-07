@@ -13,6 +13,7 @@ import com.google.common.collect.UnmodifiableIterator;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.refaster.annotation.UseImportPolicy;
 import java.util.Arrays;
 import java.util.Collection;
@@ -237,16 +238,13 @@ final class ImmutableListRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object)} over imprecisely typed or less efficient
-   * alternatives.
-   */
+  /** Prefer {@link ImmutableList#of(Object, Object)} over imprecisely typed alternatives. */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf2<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2) {
-      return Refaster.anyOf(List.of(e1, e2), Stream.of(e1, e2).collect(toImmutableList()));
+      return List.of(e1, e2);
     }
 
     @AfterTemplate
@@ -256,15 +254,14 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object)} over imprecisely typed or less
-   * efficient alternatives.
+   * Prefer {@link ImmutableList#of(Object, Object, Object)} over imprecisely typed alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf3<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3) {
-      return Refaster.anyOf(List.of(e1, e2, e3), Stream.of(e1, e2, e3).collect(toImmutableList()));
+      return List.of(e1, e2, e3);
     }
 
     @AfterTemplate
@@ -274,16 +271,15 @@ final class ImmutableListRules {
   }
 
   /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over imprecisely typed or less
-   * efficient alternatives.
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over imprecisely typed
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf4<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3, T e4) {
-      return Refaster.anyOf(
-          List.of(e1, e2, e3, e4), Stream.of(e1, e2, e3, e4).collect(toImmutableList()));
+      return List.of(e1, e2, e3, e4);
     }
 
     @AfterTemplate
@@ -294,20 +290,127 @@ final class ImmutableListRules {
 
   /**
    * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over imprecisely typed
-   * or less efficient alternatives.
+   * alternatives.
    */
   // XXX: Consider writing an Error Prone check that also flags straightforward
   // `ImmutableList.builder()` usages.
   static final class ImmutableListOf5<T> {
     @BeforeTemplate
     List<T> before(T e1, T e2, T e3, T e4, T e5) {
-      return Refaster.anyOf(
-          List.of(e1, e2, e3, e4, e5), Stream.of(e1, e2, e3, e4, e5).collect(toImmutableList()));
+      return List.of(e1, e2, e3, e4, e5);
     }
 
     @AfterTemplate
     ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5) {
       return ImmutableList.of(e1, e2, e3, e4, e5);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object)} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableList.builder()` usages.
+  static final class ImmutableListOf6<T> {
+    @BeforeTemplate
+    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6) {
+      return List.of(e1, e2, e3, e4, e5, e6);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object)} over
+   * imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableList.builder()` usages.
+  static final class ImmutableListOf7<T> {
+    @BeforeTemplate
+    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
+      return List.of(e1, e2, e3, e4, e5, e6, e7);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object, Object)}
+   * over imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableList.builder()` usages.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class ImmutableListOf8<T> {
+    @BeforeTemplate
+    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
+      return List.of(e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object, Object,
+   * Object)} over imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableList.builder()` usages.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class ImmutableListOf9<T> {
+    @BeforeTemplate
+    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
+      return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
+    }
+  }
+
+  /**
+   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object, Object,
+   * Object, Object)} over imprecisely typed alternatives.
+   */
+  // XXX: Consider writing an Error Prone check that also flags straightforward
+  // `ImmutableList.builder()` usages.
+  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
+  static final class ImmutableListOf10<T> {
+    @BeforeTemplate
+    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
+      return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
+      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
+    }
+  }
+
+  /** Prefer {@code ImmutableList.of(...)} over imprecisely typed alternatives. */
+  static final class ImmutableListOfVarargs<T> {
+    @BeforeTemplate
+    List<T> before(@Repeated T e1) {
+      return Refaster.anyOf(
+          List.of(Refaster.asVarargs(e1)),
+          Stream.of(Refaster.asVarargs(e1)).collect(toImmutableList()));
+    }
+
+    @AfterTemplate
+    ImmutableList<T> after(@Repeated T e1) {
+      return ImmutableList.of(e1);
     }
   }
 

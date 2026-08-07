@@ -327,11 +327,9 @@ final class OptionalRules {
    * {@link Optional#orElseThrow()} variant of the original code throws an exception if the mapping
    * operation does not produce a value, while the replacement does not.
    */
-  // XXX: An alternative approach is to use `.flatMap(Optional::stream)`. That may be a bit longer,
-  // but yields nicer code. Think about it.
   // XXX: The second before-template does not match if the mapping operation is expressed as a
-  // method reference, as a `@Placeholder` method only unifies with a lambda expression. Consider
-  // introducing an Error Prone check that merges such chained operations.
+  // method reference. Consider introducing an Error Prone check that merges such chained
+  // operations.
   @OpenRewriteIncompatible
   abstract static class StreamFlatMapStream<T, S> {
     @Placeholder

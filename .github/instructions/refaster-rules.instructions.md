@@ -16,8 +16,10 @@ conventions, see [`testing.instructions.md`][testing].
 
 [Refaster][refaster] rules define source code transformations using
 `@BeforeTemplate` / `@AfterTemplate` method pairs. Each `@BeforeTemplate`
-matches a code pattern; the `@AfterTemplate` specifies its replacement. Rules
-are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
+matches a code pattern; the `@AfterTemplate` specifies its replacement. What a
+rule matches is determined exclusively by its `@BeforeTemplate`s; the
+`@AfterTemplate` need only compile. Rules are grouped into topic-based
+_collections_ (e.g., `BigDecimalRules`).
 
 ## File locations
 
@@ -265,6 +267,9 @@ fully redundant:
   `@BeforeTemplate` methods; those rules may now be simplifiable.
 - Search for your new rule's `@BeforeTemplate` expression in other rules'
   `@AfterTemplate` methods; those rules may now be redundant.
+- Compare your new rule's `@BeforeTemplate`s with those of other rules; two
+  rules must not match the same expression. If yours matches a more general
+  form, remove the now-covered expressions from the other rule.
 
 Update or remove affected rules as needed.
 
@@ -737,9 +742,13 @@ static final class CollectionsMinArraysAsList<S, T extends S> {
 }
 ```
 
-When using `@Repeated` parameters, **always** wrap them with
-`Refaster.asVarargs(param)` in both `@BeforeTemplate` and `@AfterTemplate`
-methods.
+A `@Repeated` parameter matches only invocations that resolve to a *varargs*
+overload, and does so from zero repetitions onwards. Wrap such parameters with
+`Refaster.asVarargs(param)` in both the `@BeforeTemplate` and `@AfterTemplate`
+methods. Omit the wrapper in the `@AfterTemplate` only if the target method
+cannot absorb a spliced array alongside fixed arguments: `Stream.of(e1, rest)`
+splices correctly, while `Stream.of(e1, Refaster.asVarargs(rest))` does not
+compile.
 
 ### `@UseImportPolicy(STATIC_IMPORT_ALWAYS)`
 <!-- check: skip -->

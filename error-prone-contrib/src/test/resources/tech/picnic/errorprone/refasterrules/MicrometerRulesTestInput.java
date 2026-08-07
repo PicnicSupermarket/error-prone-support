@@ -54,4 +54,106 @@ final class MicrometerRulesTest implements RefasterRuleCollectionTestCase {
             Tag.of("waldo", "v9"),
             Tag.of("fred", "v10")));
   }
+
+  Iterable<Tag> testTagsOf6() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"));
+  }
+
+  Iterable<Tag> testTagsOf7() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"),
+        Tag.of("grault", "v7"));
+  }
+
+  Iterable<Tag> testTagsOf8() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"),
+        Tag.of("grault", "v7"),
+        Tag.of("garply", "v8"));
+  }
+
+  Iterable<Tag> testTagsOf9() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"),
+        Tag.of("grault", "v7"),
+        Tag.of("garply", "v8"),
+        Tag.of("waldo", "v9"));
+  }
+
+  Iterable<Tag> testTagsOf10() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"),
+        Tag.of("grault", "v7"),
+        Tag.of("garply", "v8"),
+        Tag.of("waldo", "v9"),
+        Tag.of("fred", "v10"));
+  }
+
+  Iterable<Tag> testTagsOf11() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"),
+        Tag.of("grault", "v7"),
+        Tag.of("garply", "v8"),
+        Tag.of("waldo", "v9"),
+        Tag.of("fred", "v10"),
+        Tag.of("plugh", "v11"));
+  }
+
+  Iterable<Tag> testTagsOfVarargs() {
+    return ImmutableSet.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"));
+  }
+
+  Iterable<Tag> testTagsOf13() {
+    return ImmutableList.of(
+        Tag.of("foo", "v1"),
+        Tag.of("bar", "v2"),
+        Tag.of("baz", "v3"),
+        Tag.of("qux", "v4"),
+        Tag.of("quux", "v5"),
+        Tag.of("corge", "v6"),
+        Tag.of("grault", "v7"),
+        Tag.of("garply", "v8"),
+        Tag.of("waldo", "v9"),
+        Tag.of("fred", "v10"),
+        Tag.of("plugh", "v11"),
+        Tag.of("xyzzy", "v12"),
+        Tag.of("thud", "v13"));
+  }
 }
