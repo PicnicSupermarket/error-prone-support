@@ -138,8 +138,8 @@ jobs:
         with:
           checkout-ref: ${{ env.CHECKOUT_REF }}
           java-version: |
-            21.0.10
-            25.0.2
+            21.0.12
+            25.0.4
           java-distribution: temurin
           maven-version: 3.9.16
       - name: Install project to local Maven repository
