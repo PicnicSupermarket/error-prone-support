@@ -20,6 +20,7 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.Source;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,8 +59,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)
-        || !COLLECTOR_METHOD.matches(tree, state)) {
+    if (!COLLECTOR_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -67,6 +67,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       return suggestToCollectionAlternatives(
           tree,
           ImmutableList.class.getCanonicalName() + ".toImmutableList",
+          Collectors.class.getCanonicalName() + ".toUnmodifiableList",
           ArrayList.class.getCanonicalName(),
           state);
     }
@@ -79,6 +80,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       return suggestToCollectionAlternatives(
           tree,
           ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
+          Collectors.class.getCanonicalName() + ".toUnmodifiableSet",
           HashSet.class.getCanonicalName(),
           state);
     }
@@ -89,21 +91,30 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
   private Description suggestToCollectionAlternatives(
       MethodInvocationTree tree,
       String immutableReplacement,
+      String unmodifiableReplacement,
       String mutableReplacement,
       VisitorState state) {
+    Description.Builder description = buildDescription(tree);
+
+    if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
+      description.addFix(replaceMethodInvocation(tree, immutableReplacement, state));
+    }
+
+    if (isJdk10Plus(state)) {
+      description.addFix(replaceMethodInvocation(tree, unmodifiableReplacement, state));
+    }
+
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String toCollectionSelect =
         SuggestedFixes.qualifyStaticImport(
             Collectors.class.getCanonicalName() + ".toCollection", mutableFix, state);
     String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
+    description.addFix(
+        mutableFix
+            .replace(tree, "%s(%s::new)".formatted(toCollectionSelect, mutableCollection))
+            .build());
 
-    return buildDescription(tree)
-        .addFix(replaceMethodInvocation(tree, immutableReplacement, state))
-        .addFix(
-            mutableFix
-                .replace(tree, "%s(%s::new)".formatted(toCollectionSelect, mutableCollection))
-                .build())
-        .build();
+    return description.build();
   }
 
   private Description suggestToMapAlternatives(MethodInvocationTree tree, VisitorState state) {
@@ -112,22 +123,37 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       return Description.NO_MATCH;
     }
 
+    Description.Builder description = buildDescription(tree);
+
+    if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
+      description.addFix(
+          replaceMethodInvocation(
+              tree, ImmutableMap.class.getCanonicalName() + ".toImmutableMap", state));
+    }
+
+    if (isJdk10Plus(state)) {
+      description.addFix(
+          replaceMethodInvocation(
+              tree, Collectors.class.getCanonicalName() + ".toUnmodifiableMap", state));
+    }
+
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String hashMap =
         SuggestedFixes.qualifyType(state, mutableFix, HashMap.class.getCanonicalName());
+    description.addFix(
+        mutableFix
+            .postfixWith(
+                tree.getArguments().get(argCount - 1),
+                (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
+                    + ", %s::new".formatted(hashMap))
+            .build());
 
-    return buildDescription(tree)
-        .addFix(
-            replaceMethodInvocation(
-                tree, ImmutableMap.class.getCanonicalName() + ".toImmutableMap", state))
-        .addFix(
-            mutableFix
-                .postfixWith(
-                    tree.getArguments().get(argCount - 1),
-                    (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
-                        + ", %s::new".formatted(hashMap))
-                .build())
-        .build();
+    return description.build();
+  }
+
+  private static boolean isJdk10Plus(VisitorState state) {
+    Source lowerBound = Source.lookup("10");
+    return lowerBound != null && Source.instance(state.context).compareTo(lowerBound) >= 0;
   }
 
   private static SuggestedFix replaceMethodInvocation(
