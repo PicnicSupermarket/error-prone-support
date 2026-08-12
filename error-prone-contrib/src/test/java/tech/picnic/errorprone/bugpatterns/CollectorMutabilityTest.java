@@ -65,6 +65,32 @@ final class CollectorMutabilityTest {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
         .expectErrorMessage("X", m -> !m.contains("toImmutableList"))
+        .expectErrorMessage("Y", m -> !m.contains("toImmutableMap"))
+        .expectErrorMessage("Z", m -> !m.contains("toImmutableSet"))
+        .addSourceLines(
+            "A.java",
+            "import java.util.stream.Collectors;",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    // BUG: Diagnostic matches: X",
+            "    Stream.empty().collect(Collectors.toList());",
+            "    // BUG: Diagnostic matches: Y",
+            "    Stream.empty().collect(Collectors.toMap(o -> o, o -> o));",
+            "    // BUG: Diagnostic matches: Z",
+            "    Stream.empty().collect(Collectors.toSet());",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationWithoutGuavaAtExactlyJdk10OnClasspath() {
+    CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
+        .withClasspath()
+        .setArgs("--release", "10")
+        .expectErrorMessage("X", m -> m.contains("toUnmodifiableList"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
