@@ -38,6 +38,14 @@ final class RefasterRuleCollectionExtractorTest {
         "      return 0;",
         "    }",
         "  }",
+        "",
+        "  /** Inline.<p>Tight.<pre>{@code tight();}</pre> */",
+        "  static final class TightRule {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 1;",
+        "    }",
+        "  }",
         "}");
 
     assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
@@ -231,6 +239,87 @@ final class RefasterRuleCollectionExtractorTest {
                 new Rule("RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING),
                 /* An empty Javadoc comment is disregarded. */
                 new Rule("RuleWithEmptyJavadoc", "Collection description.", WARNING))));
+  }
+
+  @Test
+  void javadocMarkup(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "MarkupRules.java",
+        "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+        "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
+        "",
+        "/**",
+        " * Rules for {@link String}s.",
+        " *",
+        " * <p><strong>Warning:</strong> these rules are {@code contrived}.",
+        " *",
+        " * <pre>{@code",
+        " * List<String> strings = new ArrayList<>();",
+        " * }</pre>",
+        " */",
+        "@OnlineDocumentation",
+        "final class MarkupRules {",
+        "  /**",
+        "   * Prefer {@link String#isEmpty()} over {@link String#length() the alternative}, as",
+        "   * discussed <a href=\"https://example.com\">here</a>.",
+        "   *",
+        "   * <P>See {@linkplain String#chars()}, which is <EM>very</EM> <code>useful</code>,",
+        "   * <BR>and costs {@literal <1ms}.",
+        "   */",
+        "  static final class MyRule {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 0;",
+        "    }",
+        "  }",
+        "",
+        "  /** Inline.<p>Tight.<pre>{@code tight();}</pre> */",
+        "  static final class TightRule {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 1;",
+        "    }",
+        "  }",
+        "}");
+
+    verifyGeneratedFileContent(
+        outputDirectory,
+        "MarkupRules",
+        new RefasterRuleCollection(
+            URI.create("file:///MarkupRules.java"),
+            "MarkupRules",
+            """
+            Rules for `String`s.
+
+            **Warning:** these rules are `contrived`.
+
+            ```java
+            List<String> strings = new ArrayList<>();
+            ```""",
+            ImmutableList.of(
+                new Rule(
+                    "MyRule",
+                    /* Line breaks within a paragraph are retained; Markdown treats them as such. */
+                    """
+                    Prefer `String#isEmpty()` over the alternative, as
+                    discussed <a href="https://example.com">here</a>.
+
+                    See String#chars(), which is *very* `useful`,\s\s
+                    and costs <1ms.""",
+                    SUGGESTION),
+                new Rule(
+                    "TightRule",
+                    /* Paragraphs and code blocks are separated even without surrounding blanks. */
+                    """
+                    Inline.
+
+                    Tight.
+
+                    ```java
+                    tight();
+                    ```""",
+                    SUGGESTION))));
   }
 
   private static void verifyGeneratedFileContent(

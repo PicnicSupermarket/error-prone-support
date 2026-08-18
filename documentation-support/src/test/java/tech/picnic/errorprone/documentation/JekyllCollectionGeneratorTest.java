@@ -49,26 +49,6 @@ final class JekyllCollectionGeneratorTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
-  private static Stream<Arguments> toMarkdownTestCases() {
-    return Stream.of(
-        arguments("", ""),
-        arguments("Plain text.", "Plain text."),
-        arguments("Prefer {@link Foo#bar(int, int)}.", "Prefer `Foo#bar(int, int)`."),
-        arguments("Prefer {@code null}.", "Prefer `null`."),
-        /* Javadoc wraps long lines, so an inline tag may span multiple lines. */
-        arguments("Prefer {@link\nFoo#bar()}.", "Prefer `Foo#bar()`."),
-        /* An HTML block element would cause the remainder of the page to be treated as raw HTML. */
-        arguments("First.\n\n <p>Second.", "First.\n\nSecond."),
-        /* `$` and `\\` must not be interpreted as regular expression replacement syntax. */
-        arguments("Prefer {@code a$b\\c}.", "Prefer `a$b\\c`."));
-  }
-
-  @MethodSource("toMarkdownTestCases")
-  @ParameterizedTest
-  void toMarkdown(String javadoc, String expected) {
-    assertThat(JekyllCollectionGenerator.toMarkdown(javadoc)).isEqualTo(expected);
-  }
-
   @Test
   void homePage(@TempDir Path projectRoot) throws IOException {
     runGenerator(projectRoot, "# Test Readme\n\nSome content with link src=\"website/img.png\".\n");

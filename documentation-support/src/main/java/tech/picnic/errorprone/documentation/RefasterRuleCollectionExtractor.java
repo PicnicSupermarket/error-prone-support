@@ -22,6 +22,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
+import com.sun.tools.javac.api.JavacTrees;
 import java.util.Optional;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.Rule;
@@ -127,10 +128,10 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
         .map(value -> ASTHelpers.constValue(value, String.class));
   }
 
-  // XXX: Consider whether/how to further post-process the Javadoc.
   private static Optional<String> getJavadoc(ClassTree tree, VisitorState state) {
-    return Optional.ofNullable(state.getElements().getDocComment(ASTHelpers.getSymbol(tree)))
-        .map(String::strip)
+    return Optional.ofNullable(
+            JavacTrees.instance(state.context).getDocCommentTree(ASTHelpers.getSymbol(tree)))
+        .map(MarkdownRenderer::render)
         .filter(not(String::isEmpty));
   }
 
