@@ -6,13 +6,12 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
-import static java.util.Objects.requireNonNullElse;
+import static java.util.function.Predicate.not;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import com.google.errorprone.VisitorState;
-import com.google.errorprone.annotations.Var;
 import com.google.errorprone.matchers.AnnotationMatcherUtils;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.MultiMatcher;
@@ -20,6 +19,7 @@ import com.google.errorprone.matchers.MultiMatcher.MultiMatchResult;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
@@ -72,15 +72,28 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
       return Optional.empty();
     }
 
+    /*
+     * A rule collection's Javadoc describes the collection as a whole, so unlike its
+     * `@Description` it is not inherited by the rules it contains.
+     */
+    Optional<String> annotatedDescription = getAnnotatedDescription(tree, state);
     return Optional.of(
         new RefasterRuleCollection(
             state.getPath().getCompilationUnit().getSourceFile().toUri(),
             tree.getSimpleName().toString(),
-            getDescription(tree, state),
-            getRules(tree, state)));
+            annotatedDescription.or(() -> getJavadoc(tree, state)).orElse(""),
+            getRules(
+                tree,
+                state,
+                annotatedDescription.orElse(""),
+                getSeverity(tree, state).orElse(SUGGESTION))));
   }
 
-  private static ImmutableList<Rule> getRules(ClassTree tree, VisitorState state) {
+  private static ImmutableList<Rule> getRules(
+      ClassTree tree,
+      VisitorState state,
+      String inheritedDescription,
+      SeverityLevel inheritedSeverity) {
     return tree.getMembers().stream()
         .filter(ClassTree.class::isInstance)
         .map(ClassTree.class::cast)
@@ -90,8 +103,10 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
               VisitorState ruleState = state.withPath(new TreePath(state.getPath(), rule));
               return new Rule(
                   rule.getSimpleName().toString(),
-                  getDescription(rule, ruleState),
-                  getSeverity(ruleState));
+                  getAnnotatedDescription(rule, ruleState)
+                      .or(() -> getJavadoc(rule, ruleState))
+                      .orElse(inheritedDescription),
+                  getSeverity(rule, ruleState).orElse(inheritedSeverity));
             })
         .collect(toImmutableList());
   }
@@ -104,40 +119,32 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
   }
 
   // XXX: If we extract the rule description from the Javadoc, do we need the `@Description`
-  // annotation at all? (Only the latter currently supports "inheritance" of a collection-level
-  // description, but if desired we could implement similar logic for Javadoc as well.)
+  // annotation at all? (Only the latter is inherited from the enclosing rule collection, but if
+  // desired we could implement similar logic for Javadoc as well.)
+  private static Optional<String> getAnnotatedDescription(ClassTree tree, VisitorState state) {
+    return getAnnotationValue(DESCRIPTION, tree, state)
+        .map(value -> ASTHelpers.constValue(value, String.class));
+  }
+
   // XXX: Consider whether/how to further post-process the Javadoc.
-  private static String getDescription(ClassTree tree, VisitorState state) {
-    return getNearestAnnotation(DESCRIPTION, state)
-        .map(annotation -> AnnotationMatcherUtils.getArgument(annotation, "value"))
-        .map(value -> ASTHelpers.constValue(value, String.class))
-        .orElseGet(
-            () ->
-                requireNonNullElse(
-                        state.getElements().getDocComment(ASTHelpers.getSymbol(tree)), "")
-                    .strip());
+  private static Optional<String> getJavadoc(ClassTree tree, VisitorState state) {
+    return Optional.ofNullable(state.getElements().getDocComment(ASTHelpers.getSymbol(tree)))
+        .map(String::strip)
+        .filter(not(String::isEmpty));
   }
 
-  private static SeverityLevel getSeverity(VisitorState state) {
-    return getNearestAnnotation(SEVERITY, state)
-        .map(annotation -> AnnotationMatcherUtils.getArgument(annotation, "value"))
+  private static Optional<SeverityLevel> getSeverity(ClassTree tree, VisitorState state) {
+    return getAnnotationValue(SEVERITY, tree, state)
         .map(ASTHelpers::getSymbol)
-        .map(symbol -> SeverityLevel.valueOf(symbol.getSimpleName().toString()))
-        .orElse(SUGGESTION);
+        .map(symbol -> SeverityLevel.valueOf(symbol.getSimpleName().toString()));
   }
 
-  private static Optional<AnnotationTree> getNearestAnnotation(
-      MultiMatcher<Tree, AnnotationTree> matcher, VisitorState state) {
-    @Var TreePath path = state.getPath();
-    do {
-      MultiMatchResult<AnnotationTree> matchResult =
-          matcher.multiMatchResult(path.getLeaf(), state);
-      if (matchResult.matches()) {
-        return Optional.of(matchResult.onlyMatchingNode());
-      }
-      path = ASTHelpers.findPathFromEnclosingNodeToTopLevel(path, ClassTree.class);
-    } while (path != null);
-
-    return Optional.empty();
+  private static Optional<ExpressionTree> getAnnotationValue(
+      MultiMatcher<Tree, AnnotationTree> matcher, ClassTree tree, VisitorState state) {
+    MultiMatchResult<AnnotationTree> matchResult = matcher.multiMatchResult(tree, state);
+    return matchResult.matches()
+        ? Optional.ofNullable(
+            AnnotationMatcherUtils.getArgument(matchResult.onlyMatchingNode(), "value"))
+        : Optional.empty();
   }
 }

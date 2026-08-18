@@ -69,6 +69,13 @@ final class RefasterRuleCollectionExtractorTest {
         "      return 1;",
         "    }",
         "  }",
+        "",
+        "  static final class UndocumentedRule {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 2;",
+        "    }",
+        "  }",
         "}");
 
     verifyGeneratedFileContent(
@@ -78,7 +85,10 @@ final class RefasterRuleCollectionExtractorTest {
             URI.create("file:///SimpleRules.java"),
             "SimpleRules",
             "Rules for simplification.",
-            ImmutableList.of(new Rule("MyRule", "Prefer simpler alternative.", SUGGESTION))));
+            ImmutableList.of(
+                new Rule("MyRule", "Prefer simpler alternative.", SUGGESTION),
+                /* A rule collection's Javadoc is not inherited by the rules it contains. */
+                new Rule("UndocumentedRule", "", SUGGESTION))));
   }
 
   @Test
@@ -142,6 +152,7 @@ final class RefasterRuleCollectionExtractorTest {
         "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
         "import tech.picnic.errorprone.refaster.annotation.Severity;",
         "",
+        "/** Collection Javadoc. */",
         "@OnlineDocumentation",
         "@Severity(SeverityLevel.WARNING)",
         "@Description(\"Collection description.\")",
@@ -178,10 +189,12 @@ final class RefasterRuleCollectionExtractorTest {
         new RefasterRuleCollection(
             URI.create("file:///AnnotatedRules.java"),
             "AnnotatedRules",
+            /* The `@Description` annotation takes precedence over the Javadoc. */
             "Collection description.",
             ImmutableList.of(
                 new Rule("RuleWithAnnotations", "Rule description.", ERROR),
-                new Rule("RuleWithJavadocOnly", "Collection description.", WARNING),
+                /* A rule's own Javadoc takes precedence over the inherited `@Description`. */
+                new Rule("RuleWithJavadocOnly", "Only Javadoc.", WARNING),
                 new Rule("RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING))));
   }
 

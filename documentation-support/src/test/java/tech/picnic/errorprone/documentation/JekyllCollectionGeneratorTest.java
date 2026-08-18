@@ -50,6 +50,26 @@ final class JekyllCollectionGeneratorTest {
         .isInstanceOf(IllegalArgumentException.class);
   }
 
+  private static Stream<Arguments> toMarkdownTestCases() {
+    return Stream.of(
+        arguments("", ""),
+        arguments("Plain text.", "Plain text."),
+        arguments("Prefer {@link Foo#bar(int, int)}.", "Prefer `Foo#bar(int, int)`."),
+        arguments("Prefer {@code null}.", "Prefer `null`."),
+        /* Javadoc wraps long lines, so an inline tag may span multiple lines. */
+        arguments("Prefer {@link\nFoo#bar()}.", "Prefer `Foo#bar()`."),
+        /* An HTML block element would cause the remainder of the page to be treated as raw HTML. */
+        arguments("First.\n\n <p>Second.", "First.\n\nSecond."),
+        /* `$` and `\\` must not be interpreted as regular expression replacement syntax. */
+        arguments("Prefer {@code a$b\\c}.", "Prefer `a$b\\c`."));
+  }
+
+  @MethodSource("toMarkdownTestCases")
+  @ParameterizedTest
+  void toMarkdown(String javadoc, String expected) {
+    assertThat(JekyllCollectionGenerator.toMarkdown(javadoc)).isEqualTo(expected);
+  }
+
   private static Stream<Arguments> mainTestCases() {
     return Stream.of(bugpatternAndRefaster(), onlyBugpattern());
   }
@@ -142,17 +162,20 @@ final class JekyllCollectionGeneratorTest {
                           ---
                           title: Beta
                           name: Beta
+                          description: Beta description
                           severity: SUGGESTION
                           tags:
                           - Simplification
                           source: module-b/src/main/java/beta/Beta.java
                           rules:
                           - name: Rule1
-                            severity: SUGGESTION
+                            description: Rule1 description
+                            severity: WARNING
                             tags:
                             - Simplification
                             diff: "-void testRule1() {}\\n+void testRule1() { /* changed */ }\\n "
                           - name: Rule2
+                            description: ""
                             severity: SUGGESTION
                             tags:
                             - Simplification
@@ -300,9 +323,9 @@ final class JekyllCollectionGeneratorTest {
     return new RefasterRuleCollection(
         resolvePath(projectRoot, module, "src", "main", "java", "beta", "Beta.java").toUri(),
         "Beta",
-        "",
+        "Beta description",
         ImmutableList.of(
-            new RefasterRuleCollection.Rule("Rule1", "", SUGGESTION),
+            new RefasterRuleCollection.Rule("Rule1", "Rule1 description", WARNING),
             new RefasterRuleCollection.Rule("Rule2", "", SUGGESTION)));
   }
 

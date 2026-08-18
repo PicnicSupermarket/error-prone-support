@@ -25,6 +25,8 @@ import javax.tools.JavaFileObject;
  * and writes it to disk.
  */
 // XXX: Find a better name for this class; it doesn't generate documentation per se.
+// XXX: Review whether this type should be a record: it is a behavioural class rather than a data
+// carrier, and the `Context` it holds is mutable.
 record DocumentationGeneratorTaskListener(Context context, Path docsPath) implements TaskListener {
   @SuppressWarnings({"rawtypes", "unchecked"} /* Unbounded wildcard type introduction is safe. */)
   private static final ImmutableList<Extractor<?>> EXTRACTORS =

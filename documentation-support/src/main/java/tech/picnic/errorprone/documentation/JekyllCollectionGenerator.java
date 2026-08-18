@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern.SeverityLevel;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,6 +33,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternInfo;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugPatternTestCase;
@@ -67,6 +68,10 @@ public record JekyllCollectionGenerator() {
           .enable(YAMLWriteFeature.MINIMIZE_QUOTES)
           .propertyNamingStrategy(new SnakeCaseStrategy())
           .build();
+  /* Note that Javadoc wraps long lines, so an inline tag may span multiple lines. */
+  private static final Pattern INLINE_TAG = Pattern.compile("\\{@(?:code|link)\\s+([^}]*)}");
+  private static final Pattern PARAGRAPH_TAG = Pattern.compile("\\s*<p>");
+  private static final Pattern WHITESPACE = Pattern.compile("\\s+");
   @VisibleForTesting static final Path WEBSITE_ROOT = Path.of("website");
   @VisibleForTesting static final Path BUGPATTERNS_ROOT = WEBSITE_ROOT.resolve("_bugpatterns");
   @VisibleForTesting static final Path REFASTER_RULES_ROOT = WEBSITE_ROOT.resolve("_refasterrules");
@@ -105,6 +110,25 @@ public record JekyllCollectionGenerator() {
      * irrespective of the platform, so we must not use `BufferedWriter#newLine` here.
      */
     writer.write("---\n");
+  }
+
+  /**
+   * Converts a Javadoc comment to Markdown.
+   *
+   * <p>Descriptions are rendered inside Markdown block quotes, so any HTML block element would
+   * cause the remainder of the page to be treated as raw HTML.
+   */
+  // XXX: This conversion covers only the Javadoc constructs currently used by this project's
+  // Refaster rule collections. Consider delegating to a proper Javadoc-to-Markdown converter.
+  @VisibleForTesting
+  static String toMarkdown(String javadoc) {
+    String text = PARAGRAPH_TAG.matcher(javadoc).replaceAll("\n\n");
+    return INLINE_TAG
+        .matcher(text)
+        .replaceAll(
+            match ->
+                Matcher.quoteReplacement(
+                    "`%s`".formatted(WHITESPACE.matcher(match.group(1)).replaceAll(" "))));
   }
 
   // XXX: Review whether this class should be split in two: one for bug patterns and one for
@@ -218,22 +242,15 @@ public record JekyllCollectionGenerator() {
                       RefasterTestCases::isInput,
                       RefasterTestCases::testCases));
 
-      return collectionsByName.entrySet().stream()
+      return collectionsByName.values().stream()
           .map(
-              e -> {
-                String name = e.getKey();
-                RefasterRuleCollection collection = e.getValue();
+              collection -> {
                 ImmutableMap<Boolean, ImmutableList<RefasterTestCase>> tests =
-                    refasterTests.row(name);
+                    refasterTests.row(collection.name());
 
                 return createRefasterRuleCollectionDescription(
-                    name,
+                    collection,
                     projectRoot.relativize(Path.of(collection.source())).toString(),
-                    collection.rules().stream()
-                        .collect(
-                            toImmutableMap(
-                                RefasterRuleCollection.Rule::name,
-                                RefasterRuleCollection.Rule::severityLevel)),
                     requireNonNullElseGet(tests.get(true), ImmutableList::of),
                     requireNonNullElseGet(tests.get(false), ImmutableList::of));
               })
@@ -241,42 +258,44 @@ public record JekyllCollectionGenerator() {
     }
 
     private static RefasterRuleCollectionDescription createRefasterRuleCollectionDescription(
-        String name,
+        RefasterRuleCollection collection,
         String source,
-        ImmutableMap<String, SeverityLevel> ruleSeverities,
         ImmutableList<RefasterTestCase> inputTests,
         ImmutableList<RefasterTestCase> outputTests) {
       return new RefasterRuleCollectionDescription(
-          name,
-          name,
+          collection.name(),
+          collection.name(),
+          toMarkdown(collection.description()),
           // XXX: Derive severity from input (or drop this feature).
           SUGGESTION,
           // XXX: Derive tags from input (or drop this feature).
           ImmutableList.of("Simplification"),
           source,
-          createRefasterRuleDescriptions(ruleSeverities, inputTests, outputTests));
+          createRefasterRuleDescriptions(collection, inputTests, outputTests));
     }
 
     private static ImmutableList<RefasterRuleCollectionDescription.Rule>
         createRefasterRuleDescriptions(
-            ImmutableMap<String, SeverityLevel> ruleSeverities,
+            RefasterRuleCollection collection,
             ImmutableList<RefasterTestCase> inputTests,
             ImmutableList<RefasterTestCase> outputTests) {
       ImmutableMap<String, String> inputs = indexRefasterTestCases(inputTests);
       ImmutableMap<String, String> outputs = indexRefasterTestCases(outputTests);
 
       // XXX: Consider simply requiring that input and output test cases have the same names.
-      return Sets.intersection(inputs.keySet(), outputs.keySet()).stream()
+      return collection.rules().stream()
+          .filter(rule -> inputs.containsKey(rule.name()) && outputs.containsKey(rule.name()))
           .map(
-              name ->
+              rule ->
                   new RefasterRuleCollectionDescription.Rule(
-                      name,
-                      ruleSeverities.getOrDefault(name, SUGGESTION),
+                      rule.name(),
+                      toMarkdown(rule.description()),
+                      rule.severityLevel(),
                       // XXX: Derive tags from input (or drop this feature).
                       ImmutableList.of("Simplification"),
                       generateDiff(
-                          requireNonNull(inputs.get(name), "No input test case"),
-                          requireNonNull(outputs.get(name), "No output test case"))))
+                          requireNonNull(inputs.get(rule.name()), "No input test case"),
+                          requireNonNull(outputs.get(rule.name()), "No output test case"))))
           .collect(toImmutableList());
     }
 
@@ -324,6 +343,7 @@ public record JekyllCollectionGenerator() {
   private record RefasterRuleCollectionDescription(
       String title,
       String name,
+      String description,
       SeverityLevel severity,
       ImmutableList<String> tags,
       // XXX: The documentation could link to the original test code. Perhaps even with the correct
@@ -331,6 +351,10 @@ public record JekyllCollectionGenerator() {
       String source,
       ImmutableList<RefasterRuleCollectionDescription.Rule> rules) {
     private record Rule(
-        String name, SeverityLevel severity, ImmutableList<String> tags, String diff) {}
+        String name,
+        String description,
+        SeverityLevel severity,
+        ImmutableList<String> tags,
+        String diff) {}
   }
 }

@@ -22,6 +22,17 @@ layout: default
     </svg>
 </a>
 
+{% comment %}
+  # Note that Liquid considers the empty string truthy, so the guards in this
+  # layout must compare against it explicitly.
+{% endcomment %}
+{% if page.description != "" %}
+{: .summary-title }
+> Summary
+>
+> {{ page.description }}
+{% endif %}
+
 {: .note-title }
 > Suppression
 >
@@ -50,6 +61,13 @@ layout: default
 {{ tag }}
   {: .label }
 {% endfor %}
+
+{% if rule.description != "" %}
+{: .summary-title }
+> Summary
+>
+> {{ rule.description }}
+{% endif %}
 
 {: .note-title }
 > Suppression
