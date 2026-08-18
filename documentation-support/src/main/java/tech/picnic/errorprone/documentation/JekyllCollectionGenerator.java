@@ -100,15 +100,19 @@ public record JekyllCollectionGenerator() {
       throws IOException {
     /* Write the data as a YAML document, including a document start marker (`---`). */
     YAML_MAPPER.writeValue(writer, frontMatter);
-    /* Close the front matter by emitting another three dashes. */
-    writer.write("---");
-    writer.newLine();
+    /*
+     * Close the front matter by emitting another three dashes. Note that Jackson emits line feeds
+     * irrespective of the platform, so we must not use `BufferedWriter#newLine` here.
+     */
+    writer.write("---\n");
   }
 
   // XXX: Review whether this class should be split in two: one for bug patterns and one for
   // Refaster rules.
   private static final class PageGenerator extends SimpleFileVisitor<Path> {
-    private static final Splitter LINE_SPLITTER = Splitter.on(System.lineSeparator());
+    /* The extracted (test) code is line separated using line feeds, irrespective of the platform. */
+    private static final String LINE_SEPARATOR = "\n";
+    private static final Splitter LINE_SPLITTER = Splitter.on(LINE_SEPARATOR);
 
     private final List<BugPatternInfo> bugPatterns = new ArrayList<>();
     private final List<BugPatternTestCases> bugPatternTests = new ArrayList<>();
@@ -301,7 +305,7 @@ public record JekyllCollectionGenerator() {
               "", "", originalLines, diff, Integer.MAX_VALUE / 2)
           .stream()
           .skip(3)
-          .collect(joining(System.lineSeparator()));
+          .collect(joining(LINE_SEPARATOR));
     }
   }
 

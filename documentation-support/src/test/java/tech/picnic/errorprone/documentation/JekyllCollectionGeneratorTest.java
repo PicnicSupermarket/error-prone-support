@@ -409,8 +409,7 @@ final class JekyllCollectionGeneratorTest {
 
     private static TestOutput create(
         Path directory, String name, @Language("yaml") String content) {
-      return new TestOutput(
-          directory.resolve(name + ".md"), content.replace("\n", System.lineSeparator()));
+      return new TestOutput(directory.resolve(name + ".md"), content);
     }
 
     void verify() {
