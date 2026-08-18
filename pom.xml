@@ -447,7 +447,7 @@
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
-                <version>24.0.0</version>
+                <version>26.1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
