@@ -182,8 +182,7 @@ final class RefasterRuleCollectionExtractorTest {
             ImmutableList.of(
                 new Rule("RuleWithAnnotations", "Rule description.", ERROR),
                 new Rule("RuleWithJavadocOnly", "Collection description.", WARNING),
-                new Rule(
-                    "RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING))));
+                new Rule("RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING))));
   }
 
   private static void verifyGeneratedFileContent(

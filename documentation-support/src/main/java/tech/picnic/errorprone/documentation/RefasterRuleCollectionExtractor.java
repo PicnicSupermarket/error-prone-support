@@ -91,7 +91,7 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
               return new Rule(
                   rule.getSimpleName().toString(),
                   getDescription(rule, ruleState),
-                  getSeverity(rule, ruleState));
+                  getSeverity(ruleState));
             })
         .collect(toImmutableList());
   }
@@ -118,7 +118,7 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
                     .strip());
   }
 
-  private static SeverityLevel getSeverity(ClassTree tree, VisitorState state) {
+  private static SeverityLevel getSeverity(VisitorState state) {
     return getNearestAnnotation(SEVERITY, state)
         .map(annotation -> AnnotationMatcherUtils.getArgument(annotation, "value"))
         .map(ASTHelpers::getSymbol)
