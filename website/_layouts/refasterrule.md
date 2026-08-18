@@ -25,8 +25,8 @@ layout: default
 {: .note-title }
 > Suppression
 >
-> Disable all rules by adding `-XepOpt:Refaster:NamePattern=^(?!{{page.name}}\$).*` as
-> compiler argument.
+> Disable all rules by adding
+> `-XepOpt:Refaster:NamePattern=^(?!{{ page.name }}\$).*` as compiler argument.
 {% comment %}
   # XXX: Create an internal page on documenting the usage of compiler flags.
 {% endcomment %}
@@ -41,9 +41,9 @@ layout: default
 </details>
 
 {% for rule in page.rules %}
-## {{rule.name}}
+## {{ rule.name }}
 
-{{ page.severity }}
+{{ rule.severity }}
   {: .label .label-{{ site.data.severities[rule.severity].color }} }
 
 {% for tag in rule.tags %}
@@ -54,11 +54,12 @@ layout: default
 {: .note-title }
 > Suppression
 >
-> Suppress false positives by adding the suppression annotation `@SuppressWarnings("{{rule.name}}")` to
-> the enclosing element.
+> Suppress false positives by adding the suppression annotation
+> `@SuppressWarnings("{{ rule.name }}")` to the enclosing element.
 >
-> Disable this rule by adding `-XepOpt:Refaster:NamePattern=^(?!{{page.name}}\${{rule.name}}).*`
-> as compiler argument.
+> Disable this rule by adding
+> `-XepOpt:Refaster:NamePattern=^(?!{{ page.name }}\${{ rule.name }}).*` as
+> compiler argument.
 {% comment %}
   # XXX: Create an internal page on documenting the usage of compiler flags.
 {% endcomment %}

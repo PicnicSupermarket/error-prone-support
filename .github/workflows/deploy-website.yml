@@ -70,7 +70,8 @@ jobs:
         # XXX: Baeldung and StackOverflow return HTTP 403 responses when run on
         # a GitHub Action node. Similarly, the Picnic blog appears to block
         # connections made by HTMLProofer. Lastly, GitHub blob URLs aren't
-        # validated, as those may reference unmerged files.
+        # validated, as those may reference unmerged files. HTTP 429 responses
+        # are tolerated, as some hosts rate limit the many requests issued.
         run: bundle exec htmlproofer --no-check-external-hash --swap-url 'https\://error-prone.picnic.tech:' --ignore-urls '/^https:\/\/(blog\.picnic\.nl|www\.baeldung\.com|stackoverflow\.com)(\/.*|$)|^https\:\/\/github\.com\/PicnicSupermarket\/error-prone-support\/blob\/master\/.*/' --ignore-status-codes 429 ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0

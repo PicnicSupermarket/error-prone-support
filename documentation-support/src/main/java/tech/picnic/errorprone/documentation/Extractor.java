@@ -5,8 +5,8 @@ import com.sun.source.tree.ClassTree;
 import java.util.Optional;
 
 /**
- * Interface implemented by classes that define how to extract some type {@link ProjectInfo} from a
- * given {@link ClassTree}.
+ * Interface implemented by classes that define how to extract {@link ProjectInfo} data of some type
+ * {@code T} from a given {@link ClassTree}.
  *
  * @param <T> The type of data that is extracted.
  */

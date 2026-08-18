@@ -87,7 +87,6 @@ final class JekyllCollectionGeneratorTest {
         .doesNotContain("src=\"website/img.png\"");
   }
 
-  // XXX: Use `argumentSet`? Rename test cases then.
   private static Arguments bugpatternAndRefaster() {
     return argumentSet(
         "bugpattern-and-refaster",
@@ -243,7 +242,7 @@ final class JekyllCollectionGeneratorTest {
         ImmutableList.of(SuppressWarnings.class.getCanonicalName()));
   }
 
-  // XXX: Add variant
+  // XXX: Add a variant with multiple test cases.
   private static BugPatternTestCases bugPatternTestCasesAlpha(Path projectRoot, String module) {
     return bugPatternTestCases(
         projectRoot, module, "Alpha", identificationTestA(), replacementTestB());
@@ -278,20 +277,20 @@ final class JekyllCollectionGeneratorTest {
     return new Identification(
         "A.java",
         """
-		// BUG: Diagnostic contains:
-		class A {}
-		""");
+        // BUG: Diagnostic contains:
+        class A {}
+        """);
   }
 
   private static Replacement replacementTestB() {
     return new Replacement(
         "B.java",
         """
-		class B {}
-		""",
+        class B {}
+        """,
         """
-		class B { /* changed */ }
-		""");
+        class B { /* changed */ }
+        """);
   }
 
   /* Refaster helpers. */
@@ -371,6 +370,7 @@ final class JekyllCollectionGeneratorTest {
 
   /* Inner record types. */
 
+  /* This type cannot be private, as it is referenced by the `main` test method's signature. */
   record TestCase(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {
     void setUp() throws IOException {
       for (TestInput input : inputs()) {

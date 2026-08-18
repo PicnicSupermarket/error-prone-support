@@ -14,7 +14,6 @@ import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
@@ -34,6 +33,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternInfo;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases;
 import tech.picnic.errorprone.documentation.ProjectInfo.BugPatternTestCases.BugPatternTestCase;
@@ -142,7 +142,7 @@ public record JekyllCollectionGenerator() {
           BugPatternDescription::name);
       writePages(
           projectRoot.resolve(REFASTER_RULES_ROOT),
-          createRefasterRuleCollection(projectRoot),
+          createRefasterRuleCollectionDescriptions(projectRoot),
           RefasterRuleCollectionDescription::name);
     }
 
@@ -169,24 +169,22 @@ public record JekyllCollectionGenerator() {
       return bugPatterns.stream()
           .map(
               bugPattern ->
-                  getBugPatternDescription(
+                  createBugPatternDescription(
                       projectRoot,
                       bugPattern,
                       bugPatternTestCases.get(bugPattern.fullyQualifiedName())))
           .collect(toImmutableList());
     }
 
-    private static BugPatternDescription getBugPatternDescription(
+    private static BugPatternDescription createBugPatternDescription(
         Path projectRoot, BugPatternInfo bugPattern, ImmutableList<TestEntry> testEntries) {
       ImmutableList.Builder<String> identification = ImmutableList.builder();
       ImmutableList.Builder<String> replacement = ImmutableList.builder();
 
-      // XXX: Replace with type switch once we target JDK 21+.
       for (TestEntry testEntry : testEntries) {
-        if (testEntry instanceof Identification entry) {
-          identification.add(entry.code());
-        } else if (testEntry instanceof Replacement entry) {
-          replacement.add(generateDiff(entry));
+        switch (testEntry) {
+          case Identification entry -> identification.add(entry.code());
+          case Replacement entry -> replacement.add(generateDiff(entry));
         }
       }
 
@@ -203,8 +201,8 @@ public record JekyllCollectionGenerator() {
           replacement.build());
     }
 
-    private ImmutableList<RefasterRuleCollectionDescription> createRefasterRuleCollection(
-        Path projectRoot) {
+    private ImmutableList<RefasterRuleCollectionDescription>
+        createRefasterRuleCollectionDescriptions(Path projectRoot) {
       ImmutableMap<String, RefasterRuleCollection> collectionsByName =
           Maps.uniqueIndex(refasterRuleCollections, RefasterRuleCollection::name);
 
@@ -224,7 +222,7 @@ public record JekyllCollectionGenerator() {
                 ImmutableMap<Boolean, ImmutableList<RefasterTestCase>> tests =
                     refasterTests.row(name);
 
-                return createRefasterRuleCollection(
+                return createRefasterRuleCollectionDescription(
                     name,
                     projectRoot.relativize(Path.of(collection.source())).toString(),
                     collection.rules().stream()
@@ -238,7 +236,7 @@ public record JekyllCollectionGenerator() {
           .collect(toImmutableList());
     }
 
-    private static RefasterRuleCollectionDescription createRefasterRuleCollection(
+    private static RefasterRuleCollectionDescription createRefasterRuleCollectionDescription(
         String name,
         String source,
         ImmutableMap<String, SeverityLevel> ruleSeverities,
@@ -252,13 +250,14 @@ public record JekyllCollectionGenerator() {
           // XXX: Derive tags from input (or drop this feature).
           ImmutableList.of("Simplification"),
           source,
-          createRefasterRule(ruleSeverities, inputTests, outputTests));
+          createRefasterRuleDescriptions(ruleSeverities, inputTests, outputTests));
     }
 
-    private static ImmutableList<RefasterRuleCollectionDescription.Rule> createRefasterRule(
-        ImmutableMap<String, SeverityLevel> ruleSeverities,
-        ImmutableList<RefasterTestCase> inputTests,
-        ImmutableList<RefasterTestCase> outputTests) {
+    private static ImmutableList<RefasterRuleCollectionDescription.Rule>
+        createRefasterRuleDescriptions(
+            ImmutableMap<String, SeverityLevel> ruleSeverities,
+            ImmutableList<RefasterTestCase> inputTests,
+            ImmutableList<RefasterTestCase> outputTests) {
       ImmutableMap<String, String> inputs = indexRefasterTestCases(inputTests);
       ImmutableMap<String, String> outputs = indexRefasterTestCases(outputTests);
 
@@ -272,8 +271,8 @@ public record JekyllCollectionGenerator() {
                       // XXX: Derive tags from input (or drop this feature).
                       ImmutableList.of("Simplification"),
                       generateDiff(
-                          requireNonNull(inputs.get(name), "Input"),
-                          requireNonNull(outputs.get(name), "Output"))))
+                          requireNonNull(inputs.get(name), "No input test case"),
+                          requireNonNull(outputs.get(name), "No output test case"))))
           .collect(toImmutableList());
     }
 
@@ -293,6 +292,11 @@ public record JekyllCollectionGenerator() {
 
       Patch<String> diff = DiffUtils.diff(originalLines, replacementLines);
 
+      /*
+       * The context size is chosen such that the full input is retained; halving `Integer#MAX_VALUE`
+       * avoids overflow inside `UnifiedDiffUtils`. The first three lines of the result are dropped,
+       * as we're not interested in the `---`, `+++` and `@@` headers.
+       */
       return UnifiedDiffUtils.generateUnifiedDiff(
               "", "", originalLines, diff, Integer.MAX_VALUE / 2)
           .stream()

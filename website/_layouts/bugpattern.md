@@ -38,16 +38,20 @@ layout: default
 {: .note-title }
 > Suppression
 >
-> Suppress false positives by adding the suppression annotation `@SuppressWarnings("{{ page.name }}")` to
-> the enclosing element.
+> Suppress false positives by adding the suppression annotation
+> `@SuppressWarnings("{{ page.name }}")` to the enclosing element.
 >
-> Disable this pattern completely by adding `-Xep:{{ page.name }}:OFF` as compiler argument.
-> [Learn more][error-prone-flags].
+> Disable this pattern completely by adding `-Xep:{{ page.name }}:OFF` as
+> compiler argument. [Learn more][error-prone-flags].
 {% comment %}
   # XXX: Create an internal page on documenting the usage of compiler flags.
 {% endcomment %}
 
-{% if page.replacement or page.identification %}
+{% comment %}
+  # Note that Liquid considers empty collections truthy, so the guards below
+  # must explicitly inspect the collection sizes.
+{% endcomment %}
+{% if page.replacement.size > 0 or page.identification.size > 0 %}
 
 ## Samples
 
@@ -56,7 +60,7 @@ layout: default
   # the wrapping conjunctive guard should also go.)
 {% endcomment %}
 
-{% if page.replacement %}
+{% if page.replacement.size > 0 %}
 
 ### Replacement
 
@@ -71,7 +75,7 @@ applied.
 
 {% endif %}
 
-{% if page.identification %}
+{% if page.identification.size > 0 %}
 
 ### Identification
 
