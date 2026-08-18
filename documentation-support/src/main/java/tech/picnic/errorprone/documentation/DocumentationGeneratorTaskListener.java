@@ -44,6 +44,11 @@ record DocumentationGeneratorTaskListener(Context context, Path docsPath) implem
 
   @Override
   public void finished(TaskEvent taskEvent) {
+    /*
+     * XXX: The `Kind#ANALYZE` condition yields an unkillable mutant: for the other task event kinds
+     * the extraction below either finds no class tree or writes the exact same files, so skipping
+     * them is not observable. The condition is retained to avoid the redundant work.
+     */
     if (taskEvent.getKind() != Kind.ANALYZE || JavaCompiler.instance(context()).errorCount() > 0) {
       return;
     }

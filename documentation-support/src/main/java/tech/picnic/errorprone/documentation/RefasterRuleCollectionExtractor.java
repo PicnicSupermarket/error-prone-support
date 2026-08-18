@@ -22,7 +22,6 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import com.sun.source.util.TreePath;
 import java.util.Optional;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection;
 import tech.picnic.errorprone.documentation.ProjectInfo.RefasterRuleCollection.Rule;
@@ -56,8 +55,12 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
 
   @Override
   public Optional<RefasterRuleCollection> tryExtract(ClassTree tree, VisitorState state) {
+    /*
+     * Only top-level rule collection classes are supported. XXX: This guard yields an unkillable
+     * mutant, as extractors are currently only ever handed top-level classes; it is retained to
+     * make the assumption explicit.
+     */
     if (ASTHelpers.findEnclosingNode(state.getPath(), ClassTree.class) != null) {
-      /* Only top-level rule collection classes are supported. */
       return Optional.empty();
     }
 
@@ -99,15 +102,13 @@ public record RefasterRuleCollectionExtractor() implements Extractor<RefasterRul
         .map(ClassTree.class::cast)
         .filter(innerClass -> isRefasterRule(innerClass, state))
         .map(
-            rule -> {
-              VisitorState ruleState = state.withPath(new TreePath(state.getPath(), rule));
-              return new Rule(
-                  rule.getSimpleName().toString(),
-                  getAnnotatedDescription(rule, ruleState)
-                      .or(() -> getJavadoc(rule, ruleState))
-                      .orElse(inheritedDescription),
-                  getSeverity(rule, ruleState).orElse(inheritedSeverity));
-            })
+            rule ->
+                new Rule(
+                    rule.getSimpleName().toString(),
+                    getAnnotatedDescription(rule, state)
+                        .or(() -> getJavadoc(rule, state))
+                        .orElse(inheritedDescription),
+                    getSeverity(rule, state).orElse(inheritedSeverity)))
         .collect(toImmutableList());
   }
 

@@ -126,6 +126,8 @@ final class RefasterRuleCollectionExtractorTest {
         "  }",
         "",
         "  static final class NotARule {",
+        "    static final int CONSTANT = 1;",
+        "",
         "    void helper() {}",
         "  }",
         "}");
@@ -139,6 +141,29 @@ final class RefasterRuleCollectionExtractorTest {
             "",
             ImmutableList.of(
                 new Rule("RuleA", "", SUGGESTION), new Rule("RuleB", "", SUGGESTION))));
+  }
+
+  @Test
+  void nestedOnlineDocumentation(@TempDir Path outputDirectory) {
+    Compilation.compileWithDocumentationGenerator(
+        outputDirectory,
+        "Outer.java",
+        "import com.google.errorprone.refaster.annotation.BeforeTemplate;",
+        "import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;",
+        "",
+        "final class Outer {",
+        "  @OnlineDocumentation",
+        "  static final class NestedRules {",
+        "    static final class MyRule {",
+        "      @BeforeTemplate",
+        "      int before() {",
+        "        return 0;",
+        "      }",
+        "    }",
+        "  }",
+        "}");
+
+    assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
 
   @Test
@@ -181,6 +206,14 @@ final class RefasterRuleCollectionExtractorTest {
         "      return 2;",
         "    }",
         "  }",
+        "",
+        "  /** */",
+        "  static final class RuleWithEmptyJavadoc {",
+        "    @BeforeTemplate",
+        "    int before() {",
+        "      return 3;",
+        "    }",
+        "  }",
         "}");
 
     verifyGeneratedFileContent(
@@ -195,7 +228,9 @@ final class RefasterRuleCollectionExtractorTest {
                 new Rule("RuleWithAnnotations", "Rule description.", ERROR),
                 /* A rule's own Javadoc takes precedence over the inherited `@Description`. */
                 new Rule("RuleWithJavadocOnly", "Only Javadoc.", WARNING),
-                new Rule("RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING))));
+                new Rule("RuleWithoutAnnotationsOrJavadoc", "Collection description.", WARNING),
+                /* An empty Javadoc comment is disregarded. */
+                new Rule("RuleWithEmptyJavadoc", "Collection description.", WARNING))));
   }
 
   private static void verifyGeneratedFileContent(

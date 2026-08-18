@@ -326,7 +326,11 @@ final class JekyllCollectionGeneratorTest {
         "Beta description",
         ImmutableList.of(
             new RefasterRuleCollection.Rule("Rule1", "Rule1 description", WARNING),
-            new RefasterRuleCollection.Rule("Rule2", "", SUGGESTION)));
+            new RefasterRuleCollection.Rule("Rule2", "", SUGGESTION),
+            /* Rules without both an input and an output test case are not documented. */
+            new RefasterRuleCollection.Rule("Rule3", "Rule3 description", SUGGESTION),
+            new RefasterRuleCollection.Rule("Rule4", "Rule4 description", SUGGESTION),
+            new RefasterRuleCollection.Rule("Rule5", "Rule5 description", SUGGESTION)));
   }
 
   private static RefasterTestCases refasterTestCasesBetaInput(Path projectRoot, String module) {
@@ -336,7 +340,9 @@ final class JekyllCollectionGeneratorTest {
         "Beta",
         /* isInput= */ true,
         refasterTestCaseInputRule1(),
-        refasterTestCaseInputRule2());
+        refasterTestCaseInputRule2(),
+        /* `Rule3` has an input test case, but no output test case. */
+        new RefasterTestCase("Rule3", "void testRule3() {}\n"));
   }
 
   private static RefasterTestCases refasterTestCasesBetaOutput(Path projectRoot, String module) {
@@ -346,7 +352,9 @@ final class JekyllCollectionGeneratorTest {
         "Beta",
         /* isInput= */ false,
         refasterTestCaseOutputRule1(),
-        refasterTestCaseOutputRule2());
+        refasterTestCaseOutputRule2(),
+        /* `Rule4` has an output test case, but no input test case. */
+        new RefasterTestCase("Rule4", "void testRule4() { /* changed */ }\n"));
   }
 
   private static RefasterTestCases createRefasterTestCases(
