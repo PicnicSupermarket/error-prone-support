@@ -6,7 +6,6 @@ import static com.google.common.collect.ImmutableListMultimap.flatteningToImmuta
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.common.collect.ImmutableTable.toImmutableTable;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 import static java.util.Objects.requireNonNullElseGet;
 import static java.util.stream.Collectors.joining;
@@ -89,7 +88,7 @@ public record JekyllCollectionGenerator() {
 
   private static void generateIndex(Path projectRoot) throws IOException {
     Path index = projectRoot.resolve(WEBSITE_ROOT).resolve("index.md");
-    try (BufferedWriter writer = Files.newBufferedWriter(index, UTF_8)) {
+    try (BufferedWriter writer = Files.newBufferedWriter(index)) {
       record IndexFrontMatter(String layout, String title, int navOrder) {}
       writeFrontMatter(writer, new IndexFrontMatter("default", "Home", 1));
       writer.write(
@@ -153,8 +152,7 @@ public record JekyllCollectionGenerator() {
       Files.createDirectories(directory);
       for (T document : documents) {
         try (BufferedWriter writer =
-            Files.newBufferedWriter(
-                directory.resolve(nameExtractor.apply(document) + ".md"), UTF_8)) {
+            Files.newBufferedWriter(directory.resolve(nameExtractor.apply(document) + ".md"))) {
           writeFrontMatter(writer, document);
         }
       }

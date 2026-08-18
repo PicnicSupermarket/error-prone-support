@@ -71,8 +71,7 @@ final class JekyllCollectionGeneratorTest {
 
     Files.writeString(
         projectRoot.resolve("README.md"),
-        "# Test Readme\n\nSome content with link src=\"website/img.png\".\n",
-        UTF_8);
+        "# Test Readme\n\nSome content with link src=\"website/img.png\".\n");
 
     JekyllCollectionGenerator.main(new String[] {projectRoot.toString()});
 
@@ -372,7 +371,7 @@ final class JekyllCollectionGeneratorTest {
 
   /* Inner record types. */
 
-  private record TestCase(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {
+  record TestCase(ImmutableList<TestInput> inputs, ImmutableList<TestOutput> outputs) {
     void setUp() throws IOException {
       for (TestInput input : inputs()) {
         input.writeFile();
