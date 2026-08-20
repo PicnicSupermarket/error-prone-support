@@ -32,6 +32,7 @@ import org.assertj.core.api.ObjectEnumerableAssert;
 import org.assertj.core.api.OptionalDoubleAssert;
 import org.assertj.core.api.OptionalIntAssert;
 import org.assertj.core.api.OptionalLongAssert;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 import tech.picnic.errorprone.refaster.matchers.IsArray;
 
@@ -339,7 +340,7 @@ final class AssertJRules {
   // `assertThat` overload. Consider defining a `BugChecker` instead.
   static final class AssertThatContainsEntry<K, V> {
     @BeforeTemplate
-    ObjectAssert<V> before(Map<K, V> actual, K key, V value) {
+    ObjectAssert<@Nullable V> before(Map<K, V> actual, K key, V value) {
       return assertThat(actual.get(key)).isEqualTo(value);
     }
 
