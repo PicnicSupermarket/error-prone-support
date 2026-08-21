@@ -133,6 +133,11 @@
         Java classes don't contain "regular" code, and thus require special
         handling by various code analysis tools. -->
         <refaster-rules.path-pattern>**/tech/picnic/errorprone/refasterrules/*.java</refaster-rules.path-pattern>
+        <!-- Some Refaster rules declare template methods with incompatible
+        return types; by default we suppress them so that the build can pass. -->
+        <!-- XXX: Ideally we skip recipe generation for such rules instead, so
+        that warning suppression isn't necessary. -->
+        <refaster-rules.suppress-openrewrite-warnings>true</refaster-rules.suppress-openrewrite-warnings>
         <!-- SonarCloud analysis settings. Refaster rules are excluded from
         coverage computation, because they are tested using a custom method
         that does not cause code coverage to be registered. -->
@@ -470,7 +475,7 @@
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.31.0</version>
+                <version>3.37.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1005,6 +1010,7 @@
                                     `JavaParser.Builder#classpathFromResources`
                                     rather than `JavaParser.Builder#classpath`. -->
                                     <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
+                                    <arg>-Arewrite.suppressWarnings=${refaster-rules.suppress-openrewrite-warnings}</arg>
                                 </compilerArgs>
                                 <includes>
                                     <include>**/*Rules.java</include>
@@ -1781,6 +1787,13 @@
                     <name>verification.warn</name>
                 </property>
             </activation>
+            <properties>
+                <!-- XXX: As an exeption to the rule that this profile "tones
+                down" checks, we enable OpenRewrite warnings so that they are
+                at least visible with `-Dverification.warn`; they'd otherwise
+                be entirely invisible. -->
+                <refaster-rules.suppress-openrewrite-warnings>false</refaster-rules.suppress-openrewrite-warnings>
+            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
