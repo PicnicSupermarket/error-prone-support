@@ -37,11 +37,13 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
+import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.util.Name;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -100,10 +102,6 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           generic(
               type(Iterable.class.getCanonicalName()),
               subOf(type("io.micrometer.core.instrument.Tag"))));
-  // XXX: This guard is unkillable: Guava is on the classpath of every test, and absent it the
-  // targets' factory method overloads cannot be resolved either.
-  private static final Matcher<ExpressionTree> GUAVA_INTRODUCTION_ALLOWED =
-      (tree, state) -> ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state);
   private static final Matcher<ExpressionTree> HAS_COMPARABLE_KEYS =
       MoreMatchers.isSubTypeOf(
           generic(
@@ -132,6 +130,8 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
       staticMethod()
           .onClassAny(ImmutableList.class.getCanonicalName(), ImmutableSet.class.getCanonicalName())
           .named("of");
+  private static final Supplier<Name> FACTORY_METHOD_NAME =
+      VisitorState.memoize(state -> state.getName("of"));
   private static final ImmutableMap<Enumerator, CanonicalFactory> RULES = createRules();
 
   /** Instantiates a new {@link CanonicalEnumeration} instance. */
@@ -215,7 +215,15 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
   private static CanonicalFactory guavaFactory(
       Class<?> owner, int argsPerEntry, Matcher<ExpressionTree> guard) {
     return new CanonicalFactory(
-        owner.getCanonicalName(), argsPerEntry, allOf(GUAVA_INTRODUCTION_ALLOWED, guard));
+        owner.getCanonicalName(),
+        argsPerEntry,
+        allOf(CanonicalEnumeration::isGuavaIntroductionAllowed, guard));
+  }
+
+  // XXX: This guard's mutant is unkillable: Guava is on the classpath of every test, and absent it
+  // the target types' factory method overloads cannot be resolved either.
+  private static boolean isGuavaIntroductionAllowed(ExpressionTree tree, VisitorState state) {
+    return ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state);
   }
 
   /** Enumerates the arguments of an invocation of the given method. */
@@ -387,7 +395,7 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
       // argument count that the target type itself rejects. The predicate is nevertheless required
       // for the arity derivation to be meaningful.
       return ASTHelpers.matchingMethods(
-              state.getName("of"),
+              FACTORY_METHOD_NAME.get(state),
               method -> method.isStatic() && method.owner.equals(type.tsym),
               type,
               state.getTypes())
