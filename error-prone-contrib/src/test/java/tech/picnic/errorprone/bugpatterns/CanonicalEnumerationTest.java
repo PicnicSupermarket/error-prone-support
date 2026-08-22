@@ -179,7 +179,6 @@ final class CanonicalEnumerationTest {
             "import com.google.common.collect.ImmutableList;",
             "import com.google.common.collect.ImmutableMap;",
             "import com.google.common.collect.ImmutableMultimap;",
-            "import com.google.common.collect.ImmutableSet;",
             "import com.google.common.collect.ImmutableSortedSet;",
             "import io.micrometer.core.instrument.Tag;",
             "import java.util.List;",
