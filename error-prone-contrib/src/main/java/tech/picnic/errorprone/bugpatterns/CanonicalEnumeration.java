@@ -132,97 +132,87 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           .named("of");
   private static final Supplier<Name> FACTORY_METHOD_NAME =
       VisitorState.memoize(state -> state.getName("of"));
-  private static final ImmutableMap<Enumerator, CanonicalFactory> RULES = createRules();
+
+  /**
+   * The enumerations that may be streamed directly.
+   *
+   * <p>Only enumerations that preserve both the order and the cardinality of the values enumerated
+   * qualify; streaming e.g. a {@link Set} would impose an unspecified iteration order, and
+   * streaming a deduplicating collection would change the number of values streamed.
+   */
+  private static final ImmutableList<Enumerator> STREAMABLE_ENUMERATORS =
+      ImmutableList.of(
+          arguments(JDK_LIST_FACTORY),
+          arguments(IMMUTABLE_LIST_FACTORY),
+          builderChain(ImmutableList.class, /* argsPerEntry= */ 1));
+
+  /** The non-canonical enumerations recognized, and the factory methods that supersede them. */
+  private static final ImmutableList<Rule> RULES =
+      ImmutableList.of(
+          guavaRule(arguments(JDK_LIST_FACTORY), ImmutableList.class),
+          guavaRule(arguments(JDK_MAP_FACTORY), ImmutableMap.class),
+          guavaRule(arguments(JDK_SET_FACTORY), ImmutableSet.class),
+          guavaRule(CanonicalEnumeration::enumerateMapEntries, ImmutableMap.class),
+          guavaRule(arguments(IMMUTABLE_MULTIMAP_FACTORY), ImmutableListMultimap.class),
+          new Rule(
+              arguments(TAG_ENUMERATION_FACTORY),
+              "io.micrometer.core.instrument.Tags",
+              ENUMERATES_TAGS),
+          new Rule(
+              CanonicalEnumeration::enumerateStreamedValues,
+              Stream.class.getCanonicalName(),
+              anything()),
+          builderRule(ImmutableBiMap.class, /* argsPerEntry= */ 2),
+          builderRule(ImmutableList.class, /* argsPerEntry= */ 1),
+          builderRule(ImmutableListMultimap.class, /* argsPerEntry= */ 2),
+          builderRule(ImmutableMap.class, /* argsPerEntry= */ 2),
+          builderRule(ImmutableMultiset.class, /* argsPerEntry= */ 1),
+          builderRule(ImmutableSet.class, /* argsPerEntry= */ 1),
+          builderRule(ImmutableSetMultimap.class, /* argsPerEntry= */ 2),
+          builderRule(ImmutableSortedMap.class, /* argsPerEntry= */ 2, HAS_COMPARABLE_KEYS),
+          builderRule(ImmutableSortedSet.class, /* argsPerEntry= */ 1, ENUMERATES_COMPARABLES));
 
   /** Instantiates a new {@link CanonicalEnumeration} instance. */
   public CanonicalEnumeration() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    return RULES.entrySet().stream()
-        .flatMap(
-            rule ->
-                rule
-                    .getKey()
-                    .enumerate(tree, state)
-                    .flatMap(elements -> rule.getValue().tryRender(tree, elements, state))
-                    .stream())
+    return RULES.stream()
+        .flatMap(rule -> rule.tryRewrite(tree, state).stream())
         .findFirst()
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }
 
-  private static ImmutableMap<Enumerator, CanonicalFactory> createRules() {
-    CanonicalFactory immutableList = guavaFactory(ImmutableList.class, /* argsPerEntry= */ 1);
-    CanonicalFactory immutableListMultimap =
-        guavaFactory(ImmutableListMultimap.class, /* argsPerEntry= */ 2);
-    CanonicalFactory immutableMap = guavaFactory(ImmutableMap.class, /* argsPerEntry= */ 2);
-    CanonicalFactory immutableSet = guavaFactory(ImmutableSet.class, /* argsPerEntry= */ 1);
-
-    ImmutableMap.Builder<Enumerator, CanonicalFactory> rules =
-        ImmutableMap.<Enumerator, CanonicalFactory>builder()
-            .put(arguments(JDK_LIST_FACTORY), immutableList)
-            .put(arguments(JDK_MAP_FACTORY), immutableMap)
-            .put(arguments(JDK_SET_FACTORY), immutableSet)
-            .put(flatteningEntries(arguments(MAP_ENTRIES_FACTORY)), immutableMap)
-            .put(arguments(IMMUTABLE_MULTIMAP_FACTORY), immutableListMultimap)
-            .put(
-                arguments(TAG_ENUMERATION_FACTORY),
-                new CanonicalFactory(
-                    "io.micrometer.core.instrument.Tags",
-                    /* argsPerEntry= */ 1,
-                    /* guard= */ ENUMERATES_TAGS))
-            /*
-             * Only enumerations that preserve both the order and the cardinality of the values
-             * enumerated may be streamed directly; doing so for e.g. a `Set` would impose an
-             * unspecified iteration order, and for a deduplicating collection it would change the
-             * number of values streamed.
-             */
-            .put(
-                chained(
-                    ImmutableList.of(
-                        arguments(JDK_LIST_FACTORY),
-                        arguments(IMMUTABLE_LIST_FACTORY),
-                        builderChain(
-                            ImmutableList.class.getCanonicalName(), /* argsPerEntry= */ 1)),
-                    COLLECTION_STREAM_METHOD),
-                new CanonicalFactory(
-                    Stream.class.getCanonicalName(),
-                    /* argsPerEntry= */ 1,
-                    /* guard= */ anything()));
-
-    ImmutableList.of(
-            guavaFactory(ImmutableBiMap.class, /* argsPerEntry= */ 2),
-            immutableList,
-            immutableListMultimap,
-            immutableMap,
-            guavaFactory(ImmutableMultiset.class, /* argsPerEntry= */ 1),
-            immutableSet,
-            guavaFactory(ImmutableSetMultimap.class, /* argsPerEntry= */ 2),
-            guavaFactory(ImmutableSortedMap.class, /* argsPerEntry= */ 2, HAS_COMPARABLE_KEYS),
-            guavaFactory(ImmutableSortedSet.class, /* argsPerEntry= */ 1, ENUMERATES_COMPARABLES))
-        .forEach(
-            factory ->
-                rules.put(builderChain(factory.ownerFqcn(), factory.argsPerEntry()), factory));
-
-    return rules.buildOrThrow();
+  /** Returns a {@link Rule} that rewrites matching expressions to a Guava factory invocation. */
+  private static Rule guavaRule(Enumerator enumerator, Class<?> target) {
+    return new Rule(
+        enumerator, target.getCanonicalName(), CanonicalEnumeration::isGuavaIntroductionAllowed);
   }
 
-  private static CanonicalFactory guavaFactory(Class<?> owner, int argsPerEntry) {
-    return guavaFactory(owner, argsPerEntry, anything());
+  /**
+   * Returns a {@link Rule} that rewrites a fluent chain of builder invocations to an invocation of
+   * the associated type's factory method.
+   */
+  private static Rule builderRule(Class<?> target, int argsPerEntry) {
+    return guavaRule(builderChain(target, argsPerEntry), target);
   }
 
-  private static CanonicalFactory guavaFactory(
-      Class<?> owner, int argsPerEntry, Matcher<ExpressionTree> guard) {
-    return new CanonicalFactory(
-        owner.getCanonicalName(),
-        argsPerEntry,
+  /**
+   * Returns a {@link Rule} that rewrites a fluent chain of builder invocations to an invocation of
+   * the associated type's factory method, provided the given constraint is satisfied.
+   */
+  private static Rule builderRule(
+      Class<?> target, int argsPerEntry, Matcher<ExpressionTree> guard) {
+    return new Rule(
+        builderChain(target, argsPerEntry),
+        target.getCanonicalName(),
         allOf(CanonicalEnumeration::isGuavaIntroductionAllowed, guard));
   }
 
   // XXX: This guard cannot be exercised by a test, as Guava is on the classpath of every test. It
   // is retained for explicitness; absent Guava the target types' factory method overloads cannot be
-  // resolved either, so `CanonicalFactory#hasOverload` would reject the enumeration regardless.
+  // resolved either, so `Rule#hasOverload` would reject the enumeration regardless.
   private static boolean isGuavaIntroductionAllowed(ExpressionTree tree, VisitorState state) {
     return ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state);
   }
@@ -237,92 +227,94 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
             : Optional.empty();
   }
 
-  /** Enumerates the keys and values of the map entries enumerated by the given delegate. */
-  private static Enumerator flatteningEntries(Enumerator delegate) {
-    return (tree, state) ->
-        delegate.enumerate(tree, state).flatMap(entries -> tryFlattenEntries(entries, state));
-  }
-
   /**
    * Enumerates the values added to a fluent chain of invocations rooted at one of the given type's
    * builder factory methods.
    *
    * <p>Builder factory methods that impose a non-natural ordering, such as {@code orderedBy} and
    * {@code reverseOrder}, are deliberately omitted.
+   *
+   * @param target The type whose builder invocations are to be enumerated.
+   * @param argsPerEntry The number of arguments that make up a single enumerated entry.
    */
-  private static Enumerator builderChain(String ownerFqcn, int argsPerEntry) {
+  private static Enumerator builderChain(Class<?> target, int argsPerEntry) {
     Matcher<ExpressionTree> builderFactory =
         staticMethod()
-            .onClass(ownerFqcn)
+            .onClass(target.getCanonicalName())
             .namedAnyOf(
                 "builder", "builderWithExpectedKeys", "builderWithExpectedSize", "naturalOrder");
-    return (tree, state) -> tryEnumerateBuilderChain(tree, builderFactory, argsPerEntry, state);
-  }
 
-  /** Enumerates the values enumerated by the receiver of an invocation of the given method. */
-  private static Enumerator chained(
-      ImmutableList<Enumerator> delegates, Matcher<ExpressionTree> matcher) {
     return (tree, state) -> {
-      if (!matcher.matches(tree, state)) {
+      if (!BUILDER_TERMINAL_METHOD.matches(tree, state)) {
         return Optional.empty();
       }
 
-      ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-      return receiver == null
-          ? Optional.empty()
-          : delegates.stream()
-              .flatMap(delegate -> delegate.enumerate(receiver, state).stream())
-              .findFirst();
+      ImmutableList.Builder<ExpressionTree> elements = ImmutableList.builder();
+      for (ExpressionTree receiver = ASTHelpers.getReceiver(tree);
+          receiver != null;
+          receiver = ASTHelpers.getReceiver(receiver)) {
+        if (builderFactory.matches(receiver, state)) {
+          return Optional.of(elements.build().reverse());
+        }
+
+        /*
+         * Each invocation must contribute whole entries; this rejects e.g.
+         * `ImmutableMap.Builder#put(Map.Entry)`, whose sole argument is not itself a map key.
+         */
+        if (!(receiver instanceof MethodInvocationTree invocation)
+            || !BUILDER_ELEMENT_METHOD.matches(invocation, state)
+            || invocation.getArguments().size() % argsPerEntry != 0
+            || isArrayVarargsInvocation(invocation, state)) {
+          return Optional.empty();
+        }
+
+        elements.addAll(invocation.getArguments().reversed());
+      }
+
+      return Optional.empty();
     };
   }
 
-  private static Optional<ImmutableList<ExpressionTree>> tryFlattenEntries(
-      ImmutableList<ExpressionTree> entries, VisitorState state) {
+  /**
+   * Enumerates the keys and values of the map entries passed to an {@code ofEntries} invocation.
+   *
+   * <p>Each entry must be created inline, as only then are its key and value statically known. This
+   * requirement also rules out the case in which an array of entries is passed to the associated
+   * varargs parameter.
+   */
+  private static Optional<ImmutableList<ExpressionTree>> enumerateMapEntries(
+      ExpressionTree tree, VisitorState state) {
+    if (!(tree instanceof MethodInvocationTree invocation)
+        || !MAP_ENTRIES_FACTORY.matches(invocation, state)) {
+      return Optional.empty();
+    }
+
     ImmutableList.Builder<ExpressionTree> elements = ImmutableList.builder();
-    for (ExpressionTree entry : entries) {
-      if (!(entry instanceof MethodInvocationTree invocation)
-          || !MAP_ENTRY_FACTORY.matches(invocation, state)) {
+    for (ExpressionTree entry : invocation.getArguments()) {
+      if (!(entry instanceof MethodInvocationTree entryFactory)
+          || !MAP_ENTRY_FACTORY.matches(entryFactory, state)) {
         return Optional.empty();
       }
 
-      elements.addAll(invocation.getArguments());
+      elements.addAll(entryFactory.getArguments());
     }
 
     return Optional.of(elements.build());
   }
 
-  private static Optional<ImmutableList<ExpressionTree>> tryEnumerateBuilderChain(
-      ExpressionTree tree,
-      Matcher<ExpressionTree> builderFactory,
-      int argsPerEntry,
-      VisitorState state) {
-    if (!BUILDER_TERMINAL_METHOD.matches(tree, state)) {
+  /** Enumerates the values streamed by an invocation of {@link Collection#stream()}. */
+  private static Optional<ImmutableList<ExpressionTree>> enumerateStreamedValues(
+      ExpressionTree tree, VisitorState state) {
+    if (!COLLECTION_STREAM_METHOD.matches(tree, state)) {
       return Optional.empty();
     }
 
-    ImmutableList.Builder<ExpressionTree> elements = ImmutableList.builder();
-    for (ExpressionTree receiver = ASTHelpers.getReceiver(tree);
-        receiver != null;
-        receiver = ASTHelpers.getReceiver(receiver)) {
-      if (builderFactory.matches(receiver, state)) {
-        return Optional.of(elements.build().reverse());
-      }
-
-      /*
-       * Each invocation must contribute whole entries; this rejects e.g.
-       * `ImmutableMap.Builder#put(Map.Entry)`, whose sole argument is not itself a map key.
-       */
-      if (!(receiver instanceof MethodInvocationTree invocation)
-          || !BUILDER_ELEMENT_METHOD.matches(invocation, state)
-          || invocation.getArguments().size() % argsPerEntry != 0
-          || isArrayVarargsInvocation(invocation, state)) {
-        return Optional.empty();
-      }
-
-      elements.addAll(invocation.getArguments().reversed());
-    }
-
-    return Optional.empty();
+    ExpressionTree receiver = ASTHelpers.getReceiver(tree);
+    return receiver == null
+        ? Optional.empty()
+        : STREAMABLE_ENUMERATORS.stream()
+            .flatMap(enumerator -> enumerator.enumerate(receiver, state).stream())
+            .findFirst();
   }
 
   /**
@@ -350,38 +342,38 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
   }
 
   /**
-   * The canonical static factory method by way of which an enumeration of values should be
-   * expressed.
+   * A rewrite of a recognized non-canonical enumeration to the canonical static factory method by
+   * way of which it should be expressed.
    *
-   * @param ownerFqcn The fully qualified name of the type that declares the factory method.
-   * @param argsPerEntry The number of arguments that make up a single enumerated entry.
+   * @param enumerator Recognizes the expressions to be rewritten, and the values they enumerate.
+   * @param targetFqcn The fully qualified name of the type that declares the factory method.
    * @param guard A constraint on the expression to be replaced, capturing preconditions of the
    *     factory method that are not implied by the number of arguments passed to it.
    */
-  private record CanonicalFactory(
-      String ownerFqcn, int argsPerEntry, Matcher<ExpressionTree> guard) {
-    Optional<SuggestedFix> tryRender(
-        ExpressionTree tree, ImmutableList<ExpressionTree> elements, VisitorState state) {
-      if (!hasOverload(elements.size(), state) || !guard.matches(tree, state)) {
-        return Optional.empty();
-      }
-
-      SuggestedFix.Builder fix = SuggestedFix.builder();
-      String owner = SuggestedFixes.qualifyType(state, fix, ownerFqcn);
-      return Optional.of(
-          fix.replace(
-                  tree,
-                  elements.stream()
-                      .map(element -> SourceCode.treeToString(element, state))
-                      .collect(joining(", ", owner + ".of(", ")")))
-              .build());
+  private record Rule(Enumerator enumerator, String targetFqcn, Matcher<ExpressionTree> guard) {
+    /** Returns a fix that rewrites the given expression, if this rule applies to it. */
+    Optional<SuggestedFix> tryRewrite(ExpressionTree tree, VisitorState state) {
+      return enumerator
+          .enumerate(tree, state)
+          .filter(elements -> hasOverload(elements.size(), state) && guard.matches(tree, state))
+          .map(
+              elements -> {
+                SuggestedFix.Builder fix = SuggestedFix.builder();
+                String target = SuggestedFixes.qualifyType(state, fix, targetFqcn);
+                return fix.replace(
+                        tree,
+                        elements.stream()
+                            .map(element -> SourceCode.treeToString(element, state))
+                            .collect(joining(", ", target + ".of(", ")")))
+                    .build();
+              });
     }
 
     /** Tells whether the factory method has an overload that accepts the given argument count. */
     // XXX: The null check below is unkillable: every target type is either part of the JDK or
     // implied by the matched expression's own type.
     private boolean hasOverload(int argCount, VisitorState state) {
-      Type type = state.getTypeFromString(ownerFqcn);
+      Type type = state.getTypeFromString(targetFqcn);
       if (type == null) {
         return false;
       }
