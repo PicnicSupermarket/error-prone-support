@@ -886,6 +886,7 @@
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
+                                    <module name="UnnecessaryTypeArgumentsWithRecordPattern" />
                                     <module name="UnusedImports">
                                         <!-- Error-prone also detects these,
                                         but (currently) doesn't warn about
