@@ -220,8 +220,9 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
         allOf(CanonicalEnumeration::isGuavaIntroductionAllowed, guard));
   }
 
-  // XXX: This guard's mutant is unkillable: Guava is on the classpath of every test, and absent it
-  // the target types' factory method overloads cannot be resolved either.
+  // XXX: This guard cannot be exercised by a test, as Guava is on the classpath of every test. It
+  // is retained for explicitness; absent Guava the target types' factory method overloads cannot be
+  // resolved either, so `CanonicalFactory#hasOverload` would reject the enumeration regardless.
   private static boolean isGuavaIntroductionAllowed(ExpressionTree tree, VisitorState state) {
     return ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state);
   }
