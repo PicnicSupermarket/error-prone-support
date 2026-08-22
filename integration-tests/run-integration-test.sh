@@ -254,7 +254,12 @@ else
   # build analyzes the same code. An empty patch means that Error Prone Support
   # suggested no changes at all.
   if [ -s "${actual_changes}" ]; then
-    git apply --index "${actual_changes}"
+    if ! git apply --index "${actual_changes}"; then
+      # The two phases run on separate machines, so say which two things
+      # disagree; the raw `git apply` output does not.
+      echo "Cannot replay the changes produced by the 'patch' phase." >&2
+      exit 1
+    fi
     git commit -m 'minor: Apply patches' .
   fi
 
