@@ -120,7 +120,7 @@ final class ImmutableSetRules {
    */
   // XXX: The `Stream` variant may be too contrived to warrant inclusion. Review its usage if/when
   // this and similar Refaster rules are replaced with an Error Prone check.
-  static final class ImmutableSetOf0<T> {
+  static final class ImmutableSetOf<T> {
     @BeforeTemplate
     Set<T> before() {
       return Refaster.anyOf(Stream.<T>empty().collect(toImmutableSet()), emptySet());
@@ -137,7 +137,7 @@ final class ImmutableSetRules {
    * contrived alternatives.
    */
   // XXX: Note that the replacement of `Collections#singleton` is incorrect for nullable elements.
-  static final class ImmutableSetOf1<T> {
+  static final class ImmutableSetOfWithObject<T> {
     @BeforeTemplate
     Set<T> before(T e1) {
       return Refaster.anyOf(singleton(e1), Stream.of(e1).collect(toImmutableSet()));

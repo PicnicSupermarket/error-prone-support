@@ -75,11 +75,11 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.of(1).collect(toImmutableSet()).asList();
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf0() {
+  ImmutableSet<List<Integer>> testImmutableListOf() {
     return ImmutableSet.of(ImmutableList.of(), ImmutableList.of());
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf1() {
+  ImmutableSet<List<Integer>> testImmutableListOfWithObject() {
     return ImmutableSet.of(ImmutableList.of(2), ImmutableList.of(4));
   }
 
