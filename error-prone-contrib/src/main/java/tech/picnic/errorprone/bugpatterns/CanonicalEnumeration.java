@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static com.google.common.collect.MoreCollectors.onlyElement;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
@@ -62,17 +61,10 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
  * immutable collection types. This check rewrites such expressions to the canonical factory method
  * for the type at hand, irrespective of the number of values enumerated.
  *
- * <p>This check subsumes the arity-specific Refaster rules that would otherwise be required, as
- * Refaster templates bind a fixed number of parameters, and {@code @Repeated} parameters only
- * unify with invocations that resolve to a varargs overload.
- *
- * <p>Note that {@link #TAGS} is not a collection type: rewriting a collection of Micrometer {@code
- * Tag}s to a {@code Tags} instance drops duplicate tag keys and sorts the remaining tags. This
- * matches the behaviour of the Refaster rules superseded by this check.
+ * <p>Note that Micrometer's {@code Tags} is not a collection type: rewriting a collection of {@code
+ * Tag}s to a {@code Tags} instance drops duplicate tag keys, sorts the remaining tags, and may
+ * yield uncompilable code if the enclosing expression requires a collection type.
  */
-// XXX: Expressions rewritten by this check may require a second pass to reach their canonical form;
-// e.g. `ImmutableList.builder().add(tag).build()` first becomes `ImmutableList.of(tag)` and only
-// then `Tags.of(tag)`.
 // XXX: Consider also enumerating values held by a builder that is assigned to a local variable.
 // Doing so requires proving that the variable does not escape and that no element is added
 // conditionally.
@@ -89,7 +81,6 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
     tags = {PERFORMANCE, SIMPLIFICATION})
 public final class CanonicalEnumeration extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final String TAGS = "io.micrometer.core.instrument.Tags";
   private static final Matcher<ExpressionTree> BUILDER_ELEMENT_METHOD =
       instanceMethod().anyClass().namedAnyOf("add", "put");
   private static final Matcher<ExpressionTree> BUILDER_TERMINAL_METHOD =
@@ -137,40 +128,8 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           staticMethod().onClass(Maps.class.getCanonicalName()).named("immutableEntry"));
   private static final Matcher<ExpressionTree> TAG_ENUMERATION_FACTORY =
       staticMethod()
-          .onClassAny(
-              ImmutableList.class.getCanonicalName(), ImmutableSet.class.getCanonicalName())
+          .onClassAny(ImmutableList.class.getCanonicalName(), ImmutableSet.class.getCanonicalName())
           .named("of");
-  /**
-   * The static methods that yield a builder of one of the {@link #GUAVA_FACTORIES} types, excluding
-   * those that impose a non-natural ordering.
-   */
-  private static final ImmutableSet<String> BUILDER_FACTORY_METHODS =
-      ImmutableSet.of(
-          "builder", "builderWithExpectedKeys", "builderWithExpectedSize", "naturalOrder");
-
-  private static final CanonicalFactory STREAM_FACTORY =
-      new CanonicalFactory(
-          Stream.class.getCanonicalName(), /* argsPerEntry= */ 1, /* guard= */ anything());
-  private static final CanonicalFactory TAGS_FACTORY =
-      new CanonicalFactory(TAGS, /* argsPerEntry= */ 1, /* guard= */ ENUMERATES_TAGS);
-  private static final ImmutableList<CanonicalFactory> GUAVA_FACTORIES =
-      ImmutableList.of(
-          guavaFactory(ImmutableBiMap.class, /* argsPerEntry= */ 2),
-          guavaFactory(ImmutableList.class, /* argsPerEntry= */ 1),
-          guavaFactory(ImmutableListMultimap.class, /* argsPerEntry= */ 2),
-          guavaFactory(ImmutableMap.class, /* argsPerEntry= */ 2),
-          guavaFactory(ImmutableMultiset.class, /* argsPerEntry= */ 1),
-          guavaFactory(ImmutableSet.class, /* argsPerEntry= */ 1),
-          guavaFactory(ImmutableSetMultimap.class, /* argsPerEntry= */ 2),
-          guavaFactory(ImmutableSortedMap.class, /* argsPerEntry= */ 2, HAS_COMPARABLE_KEYS),
-          guavaFactory(ImmutableSortedSet.class, /* argsPerEntry= */ 1, ENUMERATES_COMPARABLES));
-  /** The enumerations whose elements can safely be streamed in the order in which they appear. */
-  private static final ImmutableList<Enumerator> ORDERED_ENUMERATORS =
-      ImmutableList.of(
-          arguments(JDK_LIST_FACTORY),
-          arguments(IMMUTABLE_LIST_FACTORY),
-          builderChain(ImmutableList.class.getCanonicalName()));
-
   private static final ImmutableMap<Enumerator, CanonicalFactory> RULES = createRules();
 
   /** Instantiates a new {@link CanonicalEnumeration} instance. */
@@ -181,7 +140,8 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
     return RULES.entrySet().stream()
         .flatMap(
             rule ->
-                rule.getKey()
+                rule
+                    .getKey()
                     .enumerate(tree, state)
                     .flatMap(elements -> rule.getValue().tryRender(tree, elements, state))
                     .stream())
@@ -191,16 +151,55 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
   }
 
   private static ImmutableMap<Enumerator, CanonicalFactory> createRules() {
+    CanonicalFactory immutableList = guavaFactory(ImmutableList.class, /* argsPerEntry= */ 1);
+    CanonicalFactory immutableListMultimap =
+        guavaFactory(ImmutableListMultimap.class, /* argsPerEntry= */ 2);
+    CanonicalFactory immutableMap = guavaFactory(ImmutableMap.class, /* argsPerEntry= */ 2);
+    CanonicalFactory immutableSet = guavaFactory(ImmutableSet.class, /* argsPerEntry= */ 1);
+
     ImmutableMap.Builder<Enumerator, CanonicalFactory> rules =
         ImmutableMap.<Enumerator, CanonicalFactory>builder()
-            .put(arguments(JDK_LIST_FACTORY), guavaFactory(ImmutableList.class))
-            .put(arguments(JDK_MAP_FACTORY), guavaFactory(ImmutableMap.class))
-            .put(arguments(JDK_SET_FACTORY), guavaFactory(ImmutableSet.class))
-            .put(flatteningEntries(arguments(MAP_ENTRIES_FACTORY)), guavaFactory(ImmutableMap.class))
-            .put(arguments(IMMUTABLE_MULTIMAP_FACTORY), guavaFactory(ImmutableListMultimap.class))
-            .put(arguments(TAG_ENUMERATION_FACTORY), TAGS_FACTORY)
-            .put(chained(ORDERED_ENUMERATORS, COLLECTION_STREAM_METHOD), STREAM_FACTORY);
-    GUAVA_FACTORIES.forEach(factory -> rules.put(builderChain(factory.ownerFqcn()), factory));
+            .put(arguments(JDK_LIST_FACTORY), immutableList)
+            .put(arguments(JDK_MAP_FACTORY), immutableMap)
+            .put(arguments(JDK_SET_FACTORY), immutableSet)
+            .put(flatteningEntries(arguments(MAP_ENTRIES_FACTORY)), immutableMap)
+            .put(arguments(IMMUTABLE_MULTIMAP_FACTORY), immutableListMultimap)
+            .put(
+                arguments(TAG_ENUMERATION_FACTORY),
+                new CanonicalFactory(
+                    "io.micrometer.core.instrument.Tags",
+                    /* argsPerEntry= */ 1,
+                    /* guard= */ ENUMERATES_TAGS))
+            /*
+             * Only enumerations that preserve both the order and the cardinality of the values
+             * enumerated may be streamed directly; doing so for e.g. a `Set` would impose an
+             * unspecified iteration order, and for a deduplicating collection it would change the
+             * number of values streamed.
+             */
+            .put(
+                chained(
+                    ImmutableList.of(
+                        arguments(JDK_LIST_FACTORY),
+                        arguments(IMMUTABLE_LIST_FACTORY),
+                        builderChain(ImmutableList.class.getCanonicalName())),
+                    COLLECTION_STREAM_METHOD),
+                new CanonicalFactory(
+                    Stream.class.getCanonicalName(),
+                    /* argsPerEntry= */ 1,
+                    /* guard= */ anything()));
+
+    ImmutableList.of(
+            guavaFactory(ImmutableBiMap.class, /* argsPerEntry= */ 2),
+            immutableList,
+            immutableListMultimap,
+            immutableMap,
+            guavaFactory(ImmutableMultiset.class, /* argsPerEntry= */ 1),
+            immutableSet,
+            guavaFactory(ImmutableSetMultimap.class, /* argsPerEntry= */ 2),
+            guavaFactory(ImmutableSortedMap.class, /* argsPerEntry= */ 2, HAS_COMPARABLE_KEYS),
+            guavaFactory(ImmutableSortedSet.class, /* argsPerEntry= */ 1, ENUMERATES_COMPARABLES))
+        .forEach(factory -> rules.put(builderChain(factory.ownerFqcn()), factory));
+
     return rules.buildOrThrow();
   }
 
@@ -212,13 +211,6 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
       Class<?> owner, int argsPerEntry, Matcher<ExpressionTree> guard) {
     return new CanonicalFactory(
         owner.getCanonicalName(), argsPerEntry, allOf(GUAVA_INTRODUCTION_ALLOWED, guard));
-  }
-
-  /** Returns the previously declared {@link CanonicalFactory} for the given Guava type. */
-  private static CanonicalFactory guavaFactory(Class<?> owner) {
-    return GUAVA_FACTORIES.stream()
-        .filter(factory -> factory.ownerFqcn().equals(owner.getCanonicalName()))
-        .collect(onlyElement());
   }
 
   /** Enumerates the arguments of an invocation of the given method. */
@@ -240,10 +232,16 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
   /**
    * Enumerates the values added to a fluent chain of invocations rooted at one of the given type's
    * builder factory methods.
+   *
+   * <p>Builder factory methods that impose a non-natural ordering, such as {@code orderedBy} and
+   * {@code reverseOrder}, are deliberately omitted.
    */
   private static Enumerator builderChain(String ownerFqcn) {
     Matcher<ExpressionTree> builderFactory =
-        staticMethod().onClass(ownerFqcn).namedAnyOf(BUILDER_FACTORY_METHODS);
+        staticMethod()
+            .onClass(ownerFqcn)
+            .namedAnyOf(
+                "builder", "builderWithExpectedKeys", "builderWithExpectedSize", "naturalOrder");
     return (tree, state) -> tryEnumerateBuilderChain(tree, builderFactory, state);
   }
 
@@ -295,7 +293,6 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
 
       if (!(receiver instanceof MethodInvocationTree invocation)
           || !BUILDER_ELEMENT_METHOD.matches(invocation, state)
-          || invocation.getArguments().isEmpty()
           || isArrayVarargsInvocation(invocation, state)) {
         return Optional.empty();
       }
