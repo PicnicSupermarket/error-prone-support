@@ -100,6 +100,8 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           generic(
               type(Iterable.class.getCanonicalName()),
               subOf(type("io.micrometer.core.instrument.Tag"))));
+  // XXX: This guard is unkillable: Guava is on the classpath of every test, and absent it the
+  // targets' factory method overloads cannot be resolved either.
   private static final Matcher<ExpressionTree> GUAVA_INTRODUCTION_ALLOWED =
       (tree, state) -> ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state);
   private static final Matcher<ExpressionTree> HAS_COMPARABLE_KEYS =
@@ -181,7 +183,8 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
                     ImmutableList.of(
                         arguments(JDK_LIST_FACTORY),
                         arguments(IMMUTABLE_LIST_FACTORY),
-                        builderChain(ImmutableList.class.getCanonicalName())),
+                        builderChain(
+                            ImmutableList.class.getCanonicalName(), /* argsPerEntry= */ 1)),
                     COLLECTION_STREAM_METHOD),
                 new CanonicalFactory(
                     Stream.class.getCanonicalName(),
@@ -198,7 +201,9 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
             guavaFactory(ImmutableSetMultimap.class, /* argsPerEntry= */ 2),
             guavaFactory(ImmutableSortedMap.class, /* argsPerEntry= */ 2, HAS_COMPARABLE_KEYS),
             guavaFactory(ImmutableSortedSet.class, /* argsPerEntry= */ 1, ENUMERATES_COMPARABLES))
-        .forEach(factory -> rules.put(builderChain(factory.ownerFqcn()), factory));
+        .forEach(
+            factory ->
+                rules.put(builderChain(factory.ownerFqcn(), factory.argsPerEntry()), factory));
 
     return rules.buildOrThrow();
   }
@@ -236,13 +241,13 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
    * <p>Builder factory methods that impose a non-natural ordering, such as {@code orderedBy} and
    * {@code reverseOrder}, are deliberately omitted.
    */
-  private static Enumerator builderChain(String ownerFqcn) {
+  private static Enumerator builderChain(String ownerFqcn, int argsPerEntry) {
     Matcher<ExpressionTree> builderFactory =
         staticMethod()
             .onClass(ownerFqcn)
             .namedAnyOf(
                 "builder", "builderWithExpectedKeys", "builderWithExpectedSize", "naturalOrder");
-    return (tree, state) -> tryEnumerateBuilderChain(tree, builderFactory, state);
+    return (tree, state) -> tryEnumerateBuilderChain(tree, builderFactory, argsPerEntry, state);
   }
 
   /** Enumerates the values enumerated by the receiver of an invocation of the given method. */
@@ -278,7 +283,10 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
   }
 
   private static Optional<ImmutableList<ExpressionTree>> tryEnumerateBuilderChain(
-      ExpressionTree tree, Matcher<ExpressionTree> builderFactory, VisitorState state) {
+      ExpressionTree tree,
+      Matcher<ExpressionTree> builderFactory,
+      int argsPerEntry,
+      VisitorState state) {
     if (!BUILDER_TERMINAL_METHOD.matches(tree, state)) {
       return Optional.empty();
     }
@@ -291,8 +299,13 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
         return Optional.of(elements.build().reverse());
       }
 
+      /*
+       * Each invocation must contribute whole entries; this rejects e.g.
+       * `ImmutableMap.Builder#put(Map.Entry)`, whose sole argument is not itself a map key.
+       */
       if (!(receiver instanceof MethodInvocationTree invocation)
           || !BUILDER_ELEMENT_METHOD.matches(invocation, state)
+          || invocation.getArguments().size() % argsPerEntry != 0
           || isArrayVarargsInvocation(invocation, state)) {
         return Optional.empty();
       }
@@ -340,9 +353,7 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
       String ownerFqcn, int argsPerEntry, Matcher<ExpressionTree> guard) {
     Optional<SuggestedFix> tryRender(
         ExpressionTree tree, ImmutableList<ExpressionTree> elements, VisitorState state) {
-      if (elements.size() % argsPerEntry != 0
-          || !hasOverload(elements.size(), state)
-          || !guard.matches(tree, state)) {
+      if (!hasOverload(elements.size(), state) || !guard.matches(tree, state)) {
         return Optional.empty();
       }
 
@@ -358,12 +369,23 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
     }
 
     /** Tells whether the factory method has an overload that accepts the given argument count. */
+    // XXX: The null check below is unkillable: every target type is either part of the JDK or
+    // implied by the matched expression's own type.
     private boolean hasOverload(int argCount, VisitorState state) {
       Type type = state.getTypeFromString(ownerFqcn);
       if (type == null) {
         return false;
       }
 
+      /*
+       * Only overloads declared by the target type itself are considered; static methods declared
+       * by supertypes (such as `Set#of`, reachable through `ImmutableSet`'s type closure) are not
+       * inherited, and hence cannot be invoked by way of the target type.
+       */
+      // XXX: This predicate's mutants are unkillable: no target type declares an instance method
+      // named `of`, and no supertype of a target type declares an `of` overload that accepts an
+      // argument count that the target type itself rejects. The predicate is nevertheless required
+      // for the arity derivation to be meaningful.
       return ASTHelpers.matchingMethods(
               state.getName("of"),
               method -> method.isStatic() && method.owner.equals(type.tsym),
@@ -372,6 +394,9 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           .anyMatch(method -> accepts(method, argCount));
     }
 
+    // XXX: The lower bound imposed on varargs invocations is unkillable: for every target type, the
+    // argument counts below that bound are also accepted by a fixed-arity overload. The bound is
+    // nevertheless required to avoid suggesting uncompilable code for future target types.
     private static boolean accepts(MethodSymbol method, int argCount) {
       int parameterCount = method.getParameters().size();
       return method.isVarArgs() ? argCount >= parameterCount - 1 : argCount == parameterCount;
