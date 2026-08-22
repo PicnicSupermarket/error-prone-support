@@ -1,6 +1,5 @@
 package tech.picnic.errorprone.documentation;
 
-import static com.google.common.base.Verify.verify;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.util.Objects.requireNonNull;
 
@@ -67,20 +66,13 @@ public record BugPatternExtractor() implements Extractor<BugPatternInfo> {
             ASTHelpers.getAnnotations(tree), BugPattern.class.getSimpleName());
     requireNonNull(annotationTree, "BugPattern annotation must be present");
 
-    Attribute.Array types =
-        doCast(
-            AnnotationMirrors.getAnnotationValue(
-                ASTHelpers.getAnnotationMirror(annotationTree), "suppressionAnnotations"),
-            Attribute.Array.class);
+    AnnotationValue value =
+        AnnotationMirrors.getAnnotationValue(
+            ASTHelpers.getAnnotationMirror(annotationTree), "suppressionAnnotations");
+    Attribute.Array types = (Attribute.Array) value;
 
     return types.getValue().stream()
-        .map(v -> doCast(v, Attribute.Class.class).classType.toString())
+        .map(v -> ((Attribute.Class) v).classType.toString())
         .collect(toImmutableList());
-  }
-
-  @SuppressWarnings("unchecked" /* Type safety is validated, but a caller responsibility. */)
-  private static <T extends AnnotationValue> T doCast(AnnotationValue value, Class<T> target) {
-    verify(target.isInstance(value), "Value '%s' is not of type '%s'", value, target);
-    return (T) value;
   }
 }
