@@ -349,54 +349,6 @@ final class StreamRulesTest implements RefasterRuleCollectionTestCase {
     return Stream.iterate(0, i -> i + 1).takeWhile(i -> i < 10);
   }
 
-  Stream<Integer> testStreamOf1() {
-    return ImmutableList.of(1).stream();
-  }
-
-  Stream<Integer> testStreamOf2() {
-    return ImmutableList.of(1, 2).stream();
-  }
-
-  Stream<Integer> testStreamOf3() {
-    return ImmutableList.of(1, 2, 3).stream();
-  }
-
-  Stream<Integer> testStreamOf4() {
-    return ImmutableList.of(1, 2, 3, 4).stream();
-  }
-
-  Stream<Integer> testStreamOf5() {
-    return ImmutableList.of(1, 2, 3, 4, 5).stream();
-  }
-
-  Stream<Integer> testStreamOf6() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6).stream();
-  }
-
-  Stream<Integer> testStreamOf7() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7).stream();
-  }
-
-  Stream<Integer> testStreamOf8() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8).stream();
-  }
-
-  Stream<Integer> testStreamOf9() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9).stream();
-  }
-
-  Stream<Integer> testStreamOf10() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).stream();
-  }
-
-  Stream<Integer> testStreamOf11() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).stream();
-  }
-
-  Stream<Integer> testStreamOfVarargs() {
-    return ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13).stream();
-  }
-
   Stream<String> testStreamsStream() {
     return StreamSupport.stream(Iterables.cycle("foo").spliterator(), false);
   }

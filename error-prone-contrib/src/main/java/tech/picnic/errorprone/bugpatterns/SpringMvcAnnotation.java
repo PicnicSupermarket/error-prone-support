@@ -50,16 +50,11 @@ public final class SpringMvcAnnotation extends BugChecker implements AnnotationT
           ImmutableList.of());
   private static final ImmutableMap<String, String> REPLACEMENTS =
       ImmutableMap.of(
-          "DELETE",
-          "DeleteMapping",
-          "GET",
-          "GetMapping",
-          "PATCH",
-          "PatchMapping",
-          "POST",
-          "PostMapping",
-          "PUT",
-          "PutMapping");
+          "DELETE", "DeleteMapping",
+          "GET", "GetMapping",
+          "PATCH", "PatchMapping",
+          "POST", "PostMapping",
+          "PUT", "PutMapping");
 
   /** Instantiates a new {@link SpringMvcAnnotation} instance. */
   public SpringMvcAnnotation() {}

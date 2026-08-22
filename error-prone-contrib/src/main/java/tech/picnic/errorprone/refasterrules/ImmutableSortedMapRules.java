@@ -66,38 +66,6 @@ final class ImmutableSortedMapRules {
     }
   }
 
-  /** Prefer {@link ImmutableSortedMap#of()} over less efficient alternatives. */
-  static final class ImmutableSortedMapOf<K extends Comparable<? super K>, V> {
-    @BeforeTemplate
-    ImmutableSortedMap<K, V> before() {
-      return ImmutableSortedMap.<K, V>naturalOrder().buildOrThrow();
-    }
-
-    @AfterTemplate
-    ImmutableSortedMap<K, V> after() {
-      return ImmutableSortedMap.of();
-    }
-  }
-
-  /** Prefer {@link ImmutableSortedMap#of(Object, Object)} over less efficient alternatives. */
-  // XXX: One can define variants for more than one key-value pair, but at some point the builder
-  // actually produces nicer code. So it's not clear we should add Refaster rules for those
-  // variants.
-  // XXX: We could also rewrite builders with non-natural orders, but that would affect
-  // `ImmutableSortedMap#comparator()`.
-  static final class ImmutableSortedMapOfWithComparableAndObject<
-      K extends Comparable<? super K>, V> {
-    @BeforeTemplate
-    ImmutableSortedMap<K, V> before(K k1, V v1) {
-      return ImmutableSortedMap.<K, V>naturalOrder().put(k1, v1).buildOrThrow();
-    }
-
-    @AfterTemplate
-    ImmutableSortedMap<K, V> after(K k1, V v1) {
-      return ImmutableSortedMap.of(k1, v1);
-    }
-  }
-
   /**
    * Prefer {@link ImmutableSortedMap#of(Object, Object)} over less efficient or more contrived
    * alternatives.

@@ -47,49 +47,11 @@ final class ImmutableSetRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<Set<Integer>> testImmutableSetOf0() {
-    return ImmutableSet.of(
-        ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of(), ImmutableSet.of());
+    return ImmutableSet.of(ImmutableSet.of(), ImmutableSet.of());
   }
 
   ImmutableSet<Set<Integer>> testImmutableSetOf1() {
-    return ImmutableSet.of(
-        ImmutableSet.of(1), ImmutableSet.of(2), ImmutableSet.of(3), ImmutableSet.of(4));
-  }
-
-  Set<Integer> testImmutableSetOf2() {
-    return ImmutableSet.of(1, 2);
-  }
-
-  Set<Integer> testImmutableSetOf3() {
-    return ImmutableSet.of(1, 2, 3);
-  }
-
-  Set<Integer> testImmutableSetOf4() {
-    return ImmutableSet.of(1, 2, 3, 4);
-  }
-
-  Set<Integer> testImmutableSetOf5() {
-    return ImmutableSet.of(1, 2, 3, 4, 5);
-  }
-
-  Set<Integer> testImmutableSetOf6() {
-    return ImmutableSet.of(1, 2, 3, 4, 5, 6);
-  }
-
-  Set<Integer> testImmutableSetOf7() {
-    return ImmutableSet.of(1, 2, 3, 4, 5, 6, 7);
-  }
-
-  Set<Integer> testImmutableSetOf8() {
-    return ImmutableSet.of(1, 2, 3, 4, 5, 6, 7, 8);
-  }
-
-  Set<Integer> testImmutableSetOf9() {
-    return ImmutableSet.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
-  }
-
-  Set<Integer> testImmutableSetOf10() {
-    return ImmutableSet.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    return ImmutableSet.of(ImmutableSet.of(2), ImmutableSet.of(4));
   }
 
   ImmutableSet<Set<Integer>> testImmutableSetOfVarargs() {

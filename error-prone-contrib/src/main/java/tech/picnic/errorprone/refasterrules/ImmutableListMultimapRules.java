@@ -55,42 +55,6 @@ final class ImmutableListMultimapRules {
   }
 
   /**
-   * Prefer {@link ImmutableListMultimap#of()} over imprecisely typed or less efficient
-   * alternatives.
-   */
-  static final class ImmutableListMultimapOf0<K, V> {
-    @BeforeTemplate
-    ImmutableMultimap<K, V> before() {
-      return Refaster.anyOf(ImmutableListMultimap.<K, V>builder().build(), ImmutableMultimap.of());
-    }
-
-    @AfterTemplate
-    ImmutableListMultimap<K, V> after() {
-      return ImmutableListMultimap.of();
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableListMultimap#of(Object, Object)} over imprecisely typed or less
-   * efficient alternatives.
-   */
-  // XXX: One can define variants for more than one key-value pair, but at some point the builder
-  // actually produces nicer code. So it's not clear we should add Refaster rules for those
-  // variants.
-  static final class ImmutableListMultimapOf2<K, V> {
-    @BeforeTemplate
-    ImmutableMultimap<K, V> before(K k1, V v1) {
-      return Refaster.anyOf(
-          ImmutableListMultimap.<K, V>builder().put(k1, v1).build(), ImmutableMultimap.of(k1, v1));
-    }
-
-    @AfterTemplate
-    ImmutableListMultimap<K, V> after(K k1, V v1) {
-      return ImmutableListMultimap.of(k1, v1);
-    }
-  }
-
-  /**
    * Prefer {@link ImmutableListMultimap#of(Object, Object)} over less efficient or more contrived
    * alternatives.
    */

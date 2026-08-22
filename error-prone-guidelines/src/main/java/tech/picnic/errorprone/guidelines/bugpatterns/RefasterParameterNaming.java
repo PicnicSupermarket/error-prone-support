@@ -119,20 +119,13 @@ public final class RefasterParameterNaming extends BugChecker implements ClassTr
       ImmutableList.of("Abstract", "Double", "Immutable", "Int", "Long", "Sequenced");
   private static final ImmutableMap<String, String> TYPE_NAME_SHORTHANDS =
       ImmutableMap.of(
-          "asyncCache",
-          "cache",
-          "asyncLoadingCache",
-          "cache",
-          "comparator",
-          "cmp",
-          "invocationOnMock",
-          "invocation",
-          "publisherProbe",
-          "probe",
-          "string",
-          "str",
-          "stringBuilder",
-          "sb");
+          "asyncCache", "cache",
+          "asyncLoadingCache", "cache",
+          "comparator", "cmp",
+          "invocationOnMock", "invocation",
+          "publisherProbe", "probe",
+          "string", "str",
+          "stringBuilder", "sb");
 
   /** Instantiates a new {@link RefasterParameterNaming} instance. */
   public RefasterParameterNaming() {}

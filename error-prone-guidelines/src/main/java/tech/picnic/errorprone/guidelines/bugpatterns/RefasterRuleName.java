@@ -148,18 +148,15 @@ public final class RefasterRuleName extends BugChecker implements ClassTreeMatch
    * are checked in declaration order.
    */
   private static final ImmutableMap<ImmutableList<String>, String> NAME_NORMALIZATIONS =
-      ImmutableMap.<ImmutableList<String>, String>builder()
-          .put(ImmutableList.of("CompareTo", "GreaterThan", "Zero"), "IsGreaterThan")
-          .put(
-              ImmutableList.of("CompareTo", "GreaterThanOrEqualTo", "Zero"),
-              "IsGreaterThanOrEqualTo")
-          .put(ImmutableList.of("CompareTo", "LessThan", "Zero"), "IsLessThan")
-          .put(ImmutableList.of("CompareTo", "LessThanOrEqualTo", "Zero"), "IsLessThanOrEqualTo")
-          .put(ImmutableList.of("GreaterThan", "Zero"), "IsPositive")
-          .put(ImmutableList.of("GreaterThanOrEqualTo", "Zero"), "IsNonPositive")
-          .put(ImmutableList.of("LessThan", "Zero"), "IsNegative")
-          .put(ImmutableList.of("LessThanOrEqualTo", "Zero"), "IsNonPositive")
-          .buildOrThrow();
+      ImmutableMap.of(
+          ImmutableList.of("CompareTo", "GreaterThan", "Zero"), "IsGreaterThan",
+          ImmutableList.of("CompareTo", "GreaterThanOrEqualTo", "Zero"), "IsGreaterThanOrEqualTo",
+          ImmutableList.of("CompareTo", "LessThan", "Zero"), "IsLessThan",
+          ImmutableList.of("CompareTo", "LessThanOrEqualTo", "Zero"), "IsLessThanOrEqualTo",
+          ImmutableList.of("GreaterThan", "Zero"), "IsPositive",
+          ImmutableList.of("GreaterThanOrEqualTo", "Zero"), "IsNonPositive",
+          ImmutableList.of("LessThan", "Zero"), "IsNegative",
+          ImmutableList.of("LessThanOrEqualTo", "Zero"), "IsNonPositive");
 
   /** Instantiates a new {@link RefasterRuleName} instance. */
   public RefasterRuleName() {}

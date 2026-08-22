@@ -25,14 +25,6 @@ final class ImmutableSetMultimapRulesTest implements RefasterRuleCollectionTestC
     return new ImmutableSetMultimap.Builder<>();
   }
 
-  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf0() {
-    return ImmutableSetMultimap.<String, Integer>builder().build();
-  }
-
-  ImmutableSetMultimap<String, Integer> testImmutableSetMultimapOf2() {
-    return ImmutableSetMultimap.<String, Integer>builder().put("foo", 1).build();
-  }
-
   ImmutableSet<ImmutableSetMultimap<String, Integer>>
       testImmutableSetMultimapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(

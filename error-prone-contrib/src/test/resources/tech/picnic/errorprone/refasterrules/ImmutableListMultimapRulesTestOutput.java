@@ -32,14 +32,6 @@ final class ImmutableListMultimapRulesTest implements RefasterRuleCollectionTest
         ImmutableListMultimap.builder());
   }
 
-  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf0() {
-    return ImmutableSet.of(ImmutableListMultimap.of(), ImmutableListMultimap.of());
-  }
-
-  ImmutableSet<ImmutableMultimap<String, Integer>> testImmutableListMultimapOf2() {
-    return ImmutableSet.of(ImmutableListMultimap.of("foo", 1), ImmutableListMultimap.of("bar", 2));
-  }
-
   ImmutableSet<ImmutableMultimap<String, Integer>>
       testImmutableListMultimapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(

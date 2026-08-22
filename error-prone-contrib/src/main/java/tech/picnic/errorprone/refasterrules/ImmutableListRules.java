@@ -204,11 +204,7 @@ final class ImmutableListRules {
   static final class ImmutableListOf0<T> {
     @BeforeTemplate
     List<T> before() {
-      return Refaster.anyOf(
-          ImmutableList.<T>builder().build(),
-          Stream.<T>empty().collect(toImmutableList()),
-          emptyList(),
-          List.of());
+      return Refaster.anyOf(Stream.<T>empty().collect(toImmutableList()), emptyList());
     }
 
     @AfterTemplate
@@ -225,177 +221,12 @@ final class ImmutableListRules {
   static final class ImmutableListOf1<T> {
     @BeforeTemplate
     List<T> before(T e1) {
-      return Refaster.anyOf(
-          ImmutableList.<T>builder().add(e1).build(),
-          singletonList(e1),
-          List.of(e1),
-          Stream.of(e1).collect(toImmutableList()));
+      return Refaster.anyOf(singletonList(e1), Stream.of(e1).collect(toImmutableList()));
     }
 
     @AfterTemplate
     ImmutableList<T> after(T e1) {
       return ImmutableList.of(e1);
-    }
-  }
-
-  /** Prefer {@link ImmutableList#of(Object, Object)} over imprecisely typed alternatives. */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  static final class ImmutableListOf2<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2) {
-      return List.of(e1, e2);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2) {
-      return ImmutableList.of(e1, e2);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object)} over imprecisely typed alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  static final class ImmutableListOf3<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3) {
-      return List.of(e1, e2, e3);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3) {
-      return ImmutableList.of(e1, e2, e3);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object)} over imprecisely typed
-   * alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  static final class ImmutableListOf4<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4) {
-      return List.of(e1, e2, e3, e4);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4) {
-      return ImmutableList.of(e1, e2, e3, e4);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object)} over imprecisely typed
-   * alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  static final class ImmutableListOf5<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4, T e5) {
-      return List.of(e1, e2, e3, e4, e5);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5) {
-      return ImmutableList.of(e1, e2, e3, e4, e5);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object)} over
-   * imprecisely typed alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  static final class ImmutableListOf6<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6) {
-      return List.of(e1, e2, e3, e4, e5, e6);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6) {
-      return ImmutableList.of(e1, e2, e3, e4, e5, e6);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object)} over
-   * imprecisely typed alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  static final class ImmutableListOf7<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
-      return List.of(e1, e2, e3, e4, e5, e6, e7);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7) {
-      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object, Object)}
-   * over imprecisely typed alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableListOf8<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
-      return List.of(e1, e2, e3, e4, e5, e6, e7, e8);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8) {
-      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object, Object,
-   * Object)} over imprecisely typed alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableListOf9<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
-      return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9) {
-      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableList#of(Object, Object, Object, Object, Object, Object, Object, Object,
-   * Object, Object)} over imprecisely typed alternatives.
-   */
-  // XXX: Consider writing an Error Prone check that also flags straightforward
-  // `ImmutableList.builder()` usages.
-  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableListOf10<T> {
-    @BeforeTemplate
-    List<T> before(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
-      return List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
-    }
-
-    @AfterTemplate
-    ImmutableList<T> after(T e1, T e2, T e3, T e4, T e5, T e6, T e7, T e8, T e9, T e10) {
-      return ImmutableList.of(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10);
     }
   }
 

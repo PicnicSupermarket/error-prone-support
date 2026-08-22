@@ -32,14 +32,6 @@ final class ImmutableSortedMapRulesTest implements RefasterRuleCollectionTestCas
     return ImmutableSortedMap.orderedBy(Comparator.<String>reverseOrder());
   }
 
-  ImmutableSortedMap<String, Integer> testImmutableSortedMapOf() {
-    return ImmutableSortedMap.<String, Integer>naturalOrder().buildOrThrow();
-  }
-
-  ImmutableSortedMap<String, Integer> testImmutableSortedMapOfWithComparableAndObject() {
-    return ImmutableSortedMap.<String, Integer>naturalOrder().put("foo", 1).buildOrThrow();
-  }
-
   ImmutableSet<ImmutableSortedMap<String, Integer>>
       testImmutableSortedMapOfEntryGetKeyEntryGetValue() {
     return ImmutableSet.of(

@@ -30,10 +30,8 @@ final class ImmutableSortedSetRulesTest implements RefasterRuleCollectionTestCas
     return ImmutableSortedSet.orderedBy(Comparator.<String>reverseOrder());
   }
 
-  ImmutableSet<ImmutableSortedSet<Integer>> testImmutableSortedSetOf() {
-    return ImmutableSet.of(
-        ImmutableSortedSet.<Integer>naturalOrder().build(),
-        Stream.<Integer>empty().collect(toImmutableSortedSet(naturalOrder())));
+  ImmutableSortedSet<Integer> testImmutableSortedSetOf() {
+    return Stream.<Integer>empty().collect(toImmutableSortedSet(naturalOrder()));
   }
 
   ImmutableSet<ImmutableSortedSet<Integer>> testImmutableSortedSetCopyOf() {

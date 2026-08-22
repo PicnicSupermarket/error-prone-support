@@ -66,9 +66,7 @@ final class ImmutableSortedSetRules {
   static final class ImmutableSortedSetOf<T extends Comparable<? super T>> {
     @BeforeTemplate
     ImmutableSortedSet<T> before() {
-      return Refaster.anyOf(
-          ImmutableSortedSet.<T>naturalOrder().build(),
-          Stream.<T>empty().collect(toImmutableSortedSet(naturalOrder())));
+      return Stream.<T>empty().collect(toImmutableSortedSet(naturalOrder()));
     }
 
     @AfterTemplate

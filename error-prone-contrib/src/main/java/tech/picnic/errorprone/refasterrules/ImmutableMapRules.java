@@ -243,11 +243,7 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf0<K, V> {
     @BeforeTemplate
     Map<K, V> before() {
-      return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().buildOrThrow(),
-          ImmutableMap.ofEntries(),
-          emptyMap(),
-          Map.of());
+      return emptyMap();
     }
 
     @AfterTemplate
@@ -265,103 +261,12 @@ final class ImmutableMapRules {
   static final class ImmutableMapOf2<K, V> {
     @BeforeTemplate
     Map<K, V> before(K k1, V v1) {
-      return Refaster.anyOf(
-          ImmutableMap.<K, V>builder().put(k1, v1).buildOrThrow(),
-          ImmutableMap.ofEntries(Map.entry(k1, v1)),
-          singletonMap(k1, v1),
-          Map.of(k1, v1));
+      return singletonMap(k1, v1);
     }
 
     @AfterTemplate
     ImmutableMap<K, V> after(K k1, V v1) {
       return ImmutableMap.of(k1, v1);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object)} over more verbose or imprecisely
-   * typed alternatives.
-   */
-  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
-  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
-  static final class ImmutableMapOf4<K, V> {
-    @BeforeTemplate
-    Map<K, V> before(K k1, V v1, K k2, V v2) {
-      return Refaster.anyOf(
-          ImmutableMap.ofEntries(Map.entry(k1, v1), Map.entry(k2, v2)), Map.of(k1, v1, k2, v2));
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2) {
-      return ImmutableMap.of(k1, v1, k2, v2);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object)} over more
-   * verbose or imprecisely typed alternatives.
-   */
-  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
-  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
-  static final class ImmutableMapOf6<K, V> {
-    @BeforeTemplate
-    Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3) {
-      return Refaster.anyOf(
-          ImmutableMap.ofEntries(Map.entry(k1, v1), Map.entry(k2, v2), Map.entry(k3, v3)),
-          Map.of(k1, v1, k2, v2, k3, v3));
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3) {
-      return ImmutableMap.of(k1, v1, k2, v2, k3, v3);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object)}
-   * over more verbose or imprecisely typed alternatives.
-   */
-  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
-  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
-  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableMapOf8<K, V> {
-    @BeforeTemplate
-    Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-      return Refaster.anyOf(
-          ImmutableMap.ofEntries(
-              Map.entry(k1, v1), Map.entry(k2, v2), Map.entry(k3, v3), Map.entry(k4, v4)),
-          Map.of(k1, v1, k2, v2, k3, v3, k4, v4));
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-      return ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4);
-    }
-  }
-
-  /**
-   * Prefer {@link ImmutableMap#of(Object, Object, Object, Object, Object, Object, Object, Object,
-   * Object, Object)} over more verbose or imprecisely typed alternatives.
-   */
-  // XXX: Consider introducing a `BugChecker` to replace these `ImmutableMapOfX` rules. That will
-  // also make it easier to rewrite various `ImmutableMap.builder()` variants.
-  @SuppressWarnings("java:S107" /* Can't avoid many method parameters here. */)
-  static final class ImmutableMapOf10<K, V> {
-    @BeforeTemplate
-    Map<K, V> before(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-      return Refaster.anyOf(
-          ImmutableMap.ofEntries(
-              Map.entry(k1, v1),
-              Map.entry(k2, v2),
-              Map.entry(k3, v3),
-              Map.entry(k4, v4),
-              Map.entry(k5, v5)),
-          Map.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5));
-    }
-
-    @AfterTemplate
-    ImmutableMap<K, V> after(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-      return ImmutableMap.of(k1, v1, k2, v2, k3, v3, k4, v4, k5, v5);
     }
   }
 

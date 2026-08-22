@@ -20,8 +20,8 @@ final class ImmutableMultisetRulesTest implements RefasterRuleCollectionTestCase
     return ImmutableMultiset.builder();
   }
 
-  ImmutableSet<ImmutableMultiset<Integer>> testImmutableMultisetOf() {
-    return ImmutableSet.of(ImmutableMultiset.of(), ImmutableMultiset.of());
+  ImmutableMultiset<Integer> testImmutableMultisetOf() {
+    return ImmutableMultiset.of();
   }
 
   @SuppressWarnings("unchecked" /* Safe generic array type creation. */)

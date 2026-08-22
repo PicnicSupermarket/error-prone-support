@@ -81,43 +81,12 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
             Maps.transformValues(ImmutableMap.of("bar", 2L), v -> Math.toIntExact(v))));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf0() {
-    return ImmutableSet.of(
-        ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
+  Map<String, String> testImmutableMapOf0() {
+    return ImmutableMap.of();
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf2() {
-    return ImmutableSet.of(
-        ImmutableMap.of("foo", "bar"),
-        ImmutableMap.of("baz", "qux"),
-        ImmutableMap.of("quux", "corge"),
-        ImmutableMap.of("grault", "garply"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf4() {
-    return ImmutableSet.of(
-        ImmutableMap.of("foo", "bar", "baz", "qux"),
-        ImmutableMap.of("quux", "corge", "grault", "garply"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf6() {
-    return ImmutableSet.of(
-        ImmutableMap.of("foo", "bar", "baz", "qux", "quux", "corge"),
-        ImmutableMap.of("grault", "garply", "waldo", "fred", "plugh", "xyzzy"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf8() {
-    return ImmutableSet.of(
-        ImmutableMap.of("foo", "bar", "baz", "qux", "quux", "corge", "grault", "garply"),
-        ImmutableMap.of("waldo", "fred", "plugh", "xyzzy", "thud", "foo", "bar", "baz"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf10() {
-    return ImmutableSet.of(
-        ImmutableMap.of(
-            "foo", "bar", "baz", "qux", "quux", "corge", "grault", "garply", "waldo", "fred"),
-        ImmutableMap.of(
-            "plugh", "xyzzy", "thud", "foo", "bar", "baz", "qux", "quux", "corge", "grault"));
+  Map<String, String> testImmutableMapOf2() {
+    return ImmutableMap.of("quux", "corge");
   }
 
   ImmutableMap<String, Integer> testImmutableMapCopyOfMapsFilterKeys() {

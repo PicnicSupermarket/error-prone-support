@@ -44,35 +44,6 @@ final class ImmutableSetMultimapRules {
     }
   }
 
-  /** Prefer {@link ImmutableSetMultimap#of()} over less efficient alternatives. */
-  static final class ImmutableSetMultimapOf0<K, V> {
-    @BeforeTemplate
-    ImmutableSetMultimap<K, V> before() {
-      return ImmutableSetMultimap.<K, V>builder().build();
-    }
-
-    @AfterTemplate
-    ImmutableSetMultimap<K, V> after() {
-      return ImmutableSetMultimap.of();
-    }
-  }
-
-  /** Prefer {@link ImmutableSetMultimap#of(Object, Object)} over less efficient alternatives. */
-  // XXX: One can define variants for more than one key-value pair, but at some point the builder
-  // actually produces nicer code. So it's not clear we should add Refaster rules for those
-  // variants.
-  static final class ImmutableSetMultimapOf2<K, V> {
-    @BeforeTemplate
-    ImmutableSetMultimap<K, V> before(K k1, V v1) {
-      return ImmutableSetMultimap.<K, V>builder().put(k1, v1).build();
-    }
-
-    @AfterTemplate
-    ImmutableSetMultimap<K, V> after(K k1, V v1) {
-      return ImmutableSetMultimap.of(k1, v1);
-    }
-  }
-
   /**
    * Prefer {@link ImmutableSetMultimap#of(Object, Object)} over less efficient or more contrived
    * alternatives.

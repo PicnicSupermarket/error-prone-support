@@ -93,54 +93,12 @@ final class ImmutableMapRulesTest implements RefasterRuleCollectionTestCase {
             k -> Math.toIntExact(ImmutableMap.of("bar", 2L).get(k))));
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf0() {
-    return ImmutableSet.of(
-        ImmutableMap.<String, String>builder().buildOrThrow(),
-        ImmutableMap.ofEntries(),
-        Collections.<String, String>emptyMap(),
-        Map.<String, String>of());
+  Map<String, String> testImmutableMapOf0() {
+    return Collections.emptyMap();
   }
 
-  ImmutableSet<Map<String, String>> testImmutableMapOf2() {
-    return ImmutableSet.of(
-        ImmutableMap.<String, String>builder().put("foo", "bar").buildOrThrow(),
-        ImmutableMap.ofEntries(Map.entry("baz", "qux")),
-        Collections.singletonMap("quux", "corge"),
-        Map.of("grault", "garply"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf4() {
-    return ImmutableSet.of(
-        ImmutableMap.ofEntries(Map.entry("foo", "bar"), Map.entry("baz", "qux")),
-        Map.of("quux", "corge", "grault", "garply"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf6() {
-    return ImmutableSet.of(
-        ImmutableMap.ofEntries(
-            Map.entry("foo", "bar"), Map.entry("baz", "qux"), Map.entry("quux", "corge")),
-        Map.of("grault", "garply", "waldo", "fred", "plugh", "xyzzy"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf8() {
-    return ImmutableSet.of(
-        ImmutableMap.ofEntries(
-            Map.entry("foo", "bar"),
-            Map.entry("baz", "qux"),
-            Map.entry("quux", "corge"),
-            Map.entry("grault", "garply")),
-        Map.of("waldo", "fred", "plugh", "xyzzy", "thud", "foo", "bar", "baz"));
-  }
-
-  ImmutableSet<Map<String, String>> testImmutableMapOf10() {
-    return ImmutableSet.of(
-        ImmutableMap.ofEntries(
-            Map.entry("foo", "bar"),
-            Map.entry("baz", "qux"),
-            Map.entry("quux", "corge"),
-            Map.entry("grault", "garply"),
-            Map.entry("waldo", "fred")),
-        Map.of("plugh", "xyzzy", "thud", "foo", "bar", "baz", "qux", "quux", "corge", "grault"));
+  Map<String, String> testImmutableMapOf2() {
+    return Collections.singletonMap("quux", "corge");
   }
 
   ImmutableMap<String, Integer> testImmutableMapCopyOfMapsFilterKeys() {

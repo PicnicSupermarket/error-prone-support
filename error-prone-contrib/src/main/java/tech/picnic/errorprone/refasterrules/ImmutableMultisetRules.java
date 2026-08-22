@@ -39,8 +39,7 @@ final class ImmutableMultisetRules {
   static final class ImmutableMultisetOf<T> {
     @BeforeTemplate
     ImmutableMultiset<T> before() {
-      return Refaster.anyOf(
-          ImmutableMultiset.<T>builder().build(), Stream.<T>empty().collect(toImmutableMultiset()));
+      return Stream.<T>empty().collect(toImmutableMultiset());
     }
 
     @AfterTemplate
