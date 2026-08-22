@@ -16,8 +16,8 @@ integration_test_root="$(cd "$(dirname -- "${0}")" && pwd)"
 error_prone_support_root="${integration_test_root}/.."
 repos_root="${integration_test_root}/.repos"
 
-if [ "${#}" -lt 10 ] || [ "${#}" -gt 12 ] || ([ "${#}" = 12 ] && [ "${11:---sync}" != '--sync' ]); then
-  echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <shared_error_prone_flags> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [--sync] [<report_directory>]" >&2
+if [ "${#}" -lt 10 ]; then
+  echo "Usage: $(basename "${0}") <test_name> <project> <repository> <revision> <additional_build_flags> <additional_source_directories> <shared_error_prone_flags> <patch_error_prone_flags> <validation_error_prone_flags> <validation_build_flags> [<option>...]" >&2
   exit 1
 fi
 
@@ -31,8 +31,57 @@ shared_error_prone_flags="${7}"
 patch_error_prone_flags="${8}"
 validation_error_prone_flags="${9}"
 validation_build_flags="${10}"
-do_sync="$([ "${#}" = 10 ] || [ "${11:-}" != '--sync' ] || echo 1)"
-report_directory="$([ "${#}" = 10 ] || ([ -z "${do_sync}" ] && echo "${11}") || ([ "${#}" = 11 ] || echo "${12}"))"
+shift 10
+
+# The remaining options are forwarded verbatim by the top-level integration
+# test scripts, so they are reported in terms of those.
+function usage() {
+  echo "Usage: ${test_name}.sh [--phase={patch,validate}] [--sync] [<report_directory>]" >&2
+  exit 1
+}
+
+# The `patch` phase applies Error Prone Support's suggested changes and
+# validates the resulting diff, while the `validate` phase replays those
+# changes, builds and tests the resulting code, and validates the emitted
+# diagnostics. Selecting a single phase allows the two to be distributed over
+# separate CI jobs. By default both phases are executed in sequence.
+phase='all'
+do_sync=''
+report_directory=''
+while [ "${#}" -gt 0 ]; do
+  case "${1}" in
+    --phase=patch | --phase=validate)
+      phase="${1#--phase=}"
+      ;;
+    --sync)
+      do_sync=1
+      ;;
+    -*)
+      usage
+      ;;
+    *)
+      [ -z "${report_directory}" ] || usage
+      report_directory="${1}"
+      ;;
+  esac
+  shift
+done
+
+if [ "${phase}" != 'all' ]; then
+  # Each phase refreshes only the expected output it produces, so syncing would
+  # leave the remaining files stale.
+  if [ -n "${do_sync}" ]; then
+    echo 'Cannot sync expected output unless both phases are executed.' >&2
+    exit 1
+  fi
+
+  # The `patch` phase communicates its result to the `validate` phase through
+  # the report directory, so a transient one will not do.
+  if [ -z "${report_directory}" ]; then
+    echo 'A report directory must be specified when executing a single phase.' >&2
+    exit 1
+  fi
+fi
 
 if [ -n "${report_directory}" ]; then
   mkdir -p "${report_directory}"
@@ -57,6 +106,7 @@ case "$(uname -s)" in
 esac
 
 shared_build_flags="
+  -T1C
   -Derror-prone.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=version.error-prone -q -DforceStdout
   )
@@ -126,8 +176,8 @@ git config user.name || git config user.name 'Integration Test'
 # Prepare the code for analysis by applying the minimal set of changes required
 # to run Error Prone with Error Prone Support.
 initial_patch="${integration_test_root}/${test_name}-init.patch"
-git clean -fdx
-git apply < "${initial_patch}"
+git clean -ffdx
+git apply --index < "${initial_patch}"
 git commit -m 'dependency: Introduce Error Prone Support' .
 if [ -n "${do_sync}" ]; then
   # The initial patch applied successfully, but if it was created against a
@@ -143,14 +193,24 @@ mvn ${shared_build_flags} "${format_goal}"
 git commit -m 'minor: Reformat using Google Java Format' .
 diff_base="$(git rev-parse HEAD)"
 
-# Apply Error Prone Support-suggested changes until a fixed point is reached.
-function apply_patch() {
-  local extra_build_args="${1}"
+# Files containing the changes applied by the `patch` phase, and the tree they
+# yield, respectively. Tracking the latter enables guarding against the two
+# phases analyzing different code, including for reasons the patch does not
+# itself describe: for example, `git apply` silently ignores file mode changes
+# not expressed in the `diff` headers stripped below.
+actual_changes="${report_directory}/${test_name}-changes.patch"
+patched_tree="${report_directory}/${test_name}-patched-tree.txt"
 
+# Apply Error Prone Support-suggested changes until a fixed point is reached.
+# Every round recompiles all sources, as there are cases in which violations
+# are missed during incremental compilation. Doing so is generally also faster:
+# a round that recompiles only the files changed by its predecessor is cheaper,
+# but often more rounds are then required to reach the fixed point.
+function apply_patch() {
   (
     set -x \
-      && mvn ${shared_build_flags} ${extra_build_args} \
-           package "${format_goal}" \
+      && mvn ${shared_build_flags} \
+           clean package "${format_goal}" \
            -Derror-prone.configuration-args="${error_prone_patch_flags}" \
            -DskipTests
   )
@@ -159,59 +219,80 @@ function apply_patch() {
     git commit -m 'minor: Apply patches' .
 
     # Changes were applied, so another compilation round may apply yet more
-    # changes. For performance reasons we perform incremental compilation,
-    # enabled using a misleading flag. (See
-    # https://issues.apache.org/jira/browse/MCOMPILER-209 for details.)
-    apply_patch '-Dmaven.compiler.useIncrementalCompilation=false'
-  elif [ "${extra_build_args}" != 'clean' ]; then
-    # No changes were applied. We'll attempt one more round in which all files
-    # are recompiled, because there are cases in which violations are missed
-    # during incremental compilation.
-    apply_patch 'clean'
+    # changes.
+    apply_patch
   fi
 }
-apply_patch ''
+if [ "${phase}" != 'validate' ]; then
+  apply_patch
+  git rev-parse 'HEAD^{tree}' > "${patched_tree}"
 
-# Run one more full build and log the output.
-#
-# By also running the tests, we validate that the (majority of) applied changes
-# are behavior preserving.
-validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
-(
-  set -x \
-    && mvn ${shared_build_flags} \
-         clean package \
-         -Derror-prone.configuration-args="${error_prone_validation_flags}" \
-         ${validation_build_flags}
-) | tee "${validation_build_log}" || failure=1
+  # Collect the applied changes.
+  expected_changes="${integration_test_root}/${test_name}-expected-changes.patch"
+  git diff "${diff_base}"..HEAD | ("${grep_command}" -vP '^(diff|index)' || true) > "${actual_changes}"
 
-# Collect the applied changes.
-expected_changes="${integration_test_root}/${test_name}-expected-changes.patch"
-actual_changes="${report_directory}/${test_name}-changes.patch"
-(git diff "${diff_base}"..HEAD | "${grep_command}" -vP '^(diff|index)' || true) > "${actual_changes}"
-
-# Collect the warnings reported by Error Prone Support checks.
-expected_warnings="${integration_test_root}/${test_name}-expected-warnings.txt"
-actual_warnings="${report_directory}/${test_name}-validation-build-warnings.txt"
-("${grep_command}" -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | "${grep_command}" -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
-
-# Persist or validate the applied changes and reported warnings.
-if [ -n "${do_sync}" ]; then
-  echo 'Saving changes...'
-  cp "${actual_changes}" "${expected_changes}"
-  cp "${actual_warnings}" "${expected_warnings}"
-else
-  echo 'Inspecting changes...'
-  # XXX: This "diff of diffs" also contains vacuous sections, introduced due to
-  # line offset differences. Try to omit those from the final output.
-  if ! diff -u "${expected_changes}" "${actual_changes}"; then
-    echo 'There are unexpected changes. Inspect the preceding output for details.'
-    failure=1
+  # Persist or validate the applied changes.
+  if [ -n "${do_sync}" ]; then
+    echo 'Saving changes...'
+    cp "${actual_changes}" "${expected_changes}"
+  else
+    echo 'Inspecting changes...'
+    # XXX: This "diff of diffs" also contains vacuous sections, introduced due
+    # to line offset differences. Try to omit those from the final output.
+    if ! diff -u "${expected_changes}" "${actual_changes}"; then
+      echo 'There are unexpected changes. Inspect the preceding output for details.'
+      failure=1
+    fi
   fi
-  echo 'Inspecting emitted warnings...'
-  if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
-    echo 'Diagnostics output changed. Inspect the preceding output for details.'
-    failure=1
+else
+  if [ ! -f "${actual_changes}" ] || [ ! -f "${patched_tree}" ]; then
+    echo "Output of the 'patch' phase not found in '${report_directory}'." >&2
+    exit 1
+  fi
+
+  # Replay the changes applied by the `patch` phase, so that the validation
+  # build analyzes the same code. An empty patch means that Error Prone Support
+  # suggested no changes at all.
+  if [ -s "${actual_changes}" ]; then
+    git apply --index "${actual_changes}"
+    git commit -m 'minor: Apply patches' .
+  fi
+
+  if [ "$(git rev-parse 'HEAD^{tree}')" != "$(cat "${patched_tree}")" ]; then
+    echo "Replayed code differs from that produced by the 'patch' phase." >&2
+    exit 1
+  fi
+fi
+
+if [ "${phase}" != 'patch' ]; then
+  # Run a full build and log the output.
+  #
+  # By also running the tests, we validate that the (majority of) applied
+  # changes are behavior preserving.
+  validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
+  (
+    set -x \
+      && mvn ${shared_build_flags} \
+           clean package \
+           -Derror-prone.configuration-args="${error_prone_validation_flags}" \
+           ${validation_build_flags}
+  ) | tee "${validation_build_log}" || failure=1
+
+  # Collect the warnings reported by Error Prone Support checks.
+  expected_warnings="${integration_test_root}/${test_name}-expected-warnings.txt"
+  actual_warnings="${report_directory}/${test_name}-validation-build-warnings.txt"
+  ("${grep_command}" -oP "(?<=^\\Q[WARNING] ${PWD}/\\E).*" "${validation_build_log}" | "${grep_command}" -P '\] \[' || true) | LC_ALL=C sort > "${actual_warnings}"
+
+  # Persist or validate the reported warnings.
+  if [ -n "${do_sync}" ]; then
+    echo 'Saving warnings...'
+    cp "${actual_warnings}" "${expected_warnings}"
+  else
+    echo 'Inspecting emitted warnings...'
+    if ! diff -u "${expected_warnings}" "${actual_warnings}"; then
+      echo 'Diagnostics output changed. Inspect the preceding output for details.'
+      failure=1
+    fi
   fi
 fi
 
