@@ -705,7 +705,9 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
-                                    <module name="ConstructorsDeclarationGrouping" />
+                                    <module name="ConstructorsDeclarationGrouping">
+                                        <property name="orderByIncreasingParameterCount" value="true" />
+                                    </module>
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
