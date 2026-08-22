@@ -873,6 +873,7 @@
                                     </module>
                                     <module name="ParameterAssignment" />
                                     <module name="PatternVariableAssignment" />
+                                    <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
