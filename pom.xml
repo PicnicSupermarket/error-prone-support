@@ -1930,6 +1930,14 @@
                                     <groupId>com.google.errorprone</groupId>
                                     <artifactId>error_prone_core</artifactId>
                                 </path>
+                                <!-- Refaster rule compilation and loading
+                                relies on (de)serialization using compatible
+                                versions of Guava. This explicit dependency
+                                declaration ensures said compatibility. -->
+                                <path>
+                                    <groupId>com.google.guava</groupId>
+                                    <artifactId>guava</artifactId>
+                                </path>
                                 <path>
                                     <groupId>com.google.guava</groupId>
                                     <artifactId>guava-beta-checker</artifactId>
