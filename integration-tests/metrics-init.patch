@@ -1,3 +1,17 @@
+new file mode 100644
+--- /dev/null
++++ b/.mvn/jvm.config
+@@ -0,0 +1,10 @@
++--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED
++--add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED
++--add-opens jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED
++--add-opens jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED
 --- a/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 +++ b/metrics-jakarta-servlets/src/main/java/io/dropwizard/metrics5/servlets/MetricsServlet.java
 @@ -188,6 +188,9 @@ public class MetricsServlet extends HttpServlet {
@@ -52,21 +66,30 @@
      <profiles>
          <profile>
              <id>jdk17</id>
-@@ -145,7 +166,9 @@
+@@ -140,28 +161,32 @@
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-compiler-plugin</artifactId>
+                         <configuration>
+-                            <fork>true</fork>
++                            <!-- XXX: `javac` is not forked here; drop this deviation, and `.mvn/jvm.config`, if/when https://github.com/dropwizard/metrics/pull/5366 lands. -->
+                             <compilerArgs>
                                  <arg>-Xlint:all</arg>
                                  <arg>-XDcompilePolicy=simple</arg>
                                  <arg>--should-stop=ifError=FLOW</arg>
 -                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.*</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+-                                <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+-                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+-                                <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
 +                                <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
 +                                <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
 +                                <arg>-Xplugin:ErrorProne -XepExcludedPaths:.*/target/generated-sources/.* ${error-prone.configuration-args}</arg>
-                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
-                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
-                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-@@ -156,12 +179,24 @@
-                                 <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
-                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-                                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
 +                                <arg>-Xmaxwarns</arg>
 +                                <arg>1000000</arg>
                              </compilerArgs>
@@ -89,12 +112,14 @@
                                  </path>
                              </annotationProcessorPaths>
                          </configuration>
-@@ -283,7 +318,7 @@
+@@ -283,8 +308,8 @@
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-compiler-plugin</artifactId>
                  <configuration>
 -                    <release>17</release>
+-                    <fork>true</fork>
 +                    <release>21</release>
-                     <fork>true</fork>
++                    <!-- XXX: `javac` is not forked here; drop this deviation, and `.mvn/jvm.config`, if/when https://github.com/dropwizard/metrics/pull/5366 lands. -->
                      <parameters>true</parameters>
                      <showWarnings>true</showWarnings>
+                     <compilerArgs>

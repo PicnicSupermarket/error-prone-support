@@ -9,6 +9,70 @@
              .withFileSystemBind(sampleAppVolume.getHostPath(), "/app", BindMode.READ_ONLY)
              .withWorkingDirectory("/app")
              .withLogConsumer(LogConsumer.withPrefix(sampleApp))
+--- a/integration-tests/it-exporter/it-exporter-test/pom.xml
++++ b/integration-tests/it-exporter/it-exporter-test/pom.xml
+@@ -24,5 +24,24 @@
+       <version>${project.version}</version>
+       <scope>test</scope>
+     </dependency>
++    <!-- XXX: Drop this if/when https://github.com/prometheus/client_java/pull/2407 lands. -->
++    <dependency>
++      <groupId>io.prometheus</groupId>
++      <artifactId>it-exporter-servlet-tomcat-sample</artifactId>
++      <version>${project.version}</version>
++      <scope>test</scope>
++    </dependency>
++    <dependency>
++      <groupId>io.prometheus</groupId>
++      <artifactId>it-exporter-servlet-jetty-sample</artifactId>
++      <version>${project.version}</version>
++      <scope>test</scope>
++    </dependency>
++    <dependency>
++      <groupId>io.prometheus</groupId>
++      <artifactId>it-exporter-httpserver-sample</artifactId>
++      <version>${project.version}</version>
++      <scope>test</scope>
++    </dependency>
+   </dependencies>
+ </project>
+--- a/integration-tests/it-exporter/it-no-protobuf-test/pom.xml
++++ b/integration-tests/it-exporter/it-no-protobuf-test/pom.xml
+@@ -24,5 +24,12 @@
+       <version>${project.version}</version>
+       <scope>test</scope>
+     </dependency>
++    <!-- XXX: Drop this if/when https://github.com/prometheus/client_java/pull/2407 lands. -->
++    <dependency>
++      <groupId>io.prometheus</groupId>
++      <artifactId>it-exporter-no-protobuf</artifactId>
++      <version>${project.version}</version>
++      <scope>test</scope>
++    </dependency>
+   </dependencies>
+ </project>
+--- a/integration-tests/it-spring-boot-smoke-test/pom.xml
++++ b/integration-tests/it-spring-boot-smoke-test/pom.xml
+@@ -58,6 +58,19 @@
+       <artifactId>micrometer-registry-prometheus</artifactId>
+       <scope>runtime</scope>
+     </dependency>
++    <!-- XXX: Drop this if/when https://github.com/prometheus/client_java/pull/2407 lands. -->
++    <dependency>
++      <groupId>io.prometheus</groupId>
++      <artifactId>prometheus-metrics-core</artifactId>
++      <version>${project.version}</version>
++      <scope>runtime</scope>
++      <exclusions>
++        <exclusion>
++          <groupId>io.prometheus</groupId>
++          <artifactId>prometheus-metrics-tracer-initializer</artifactId>
++        </exclusion>
++      </exclusions>
++    </dependency>
+     <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-test</artifactId>
 --- a/pom.xml
 +++ b/pom.xml
 @@ -252,36 +252,49 @@
@@ -74,6 +138,39 @@
          </dependency>
          <dependency>
            <groupId>org.slf4j</groupId>
+--- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/ExemplarTest.java
++++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/ExemplarTest.java
+@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+ import static org.awaitility.Awaitility.await;
+ 
+ import com.github.tomakehurst.wiremock.http.Request;
++import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+ import com.github.tomakehurst.wiremock.matching.MatchResult;
+ import com.github.tomakehurst.wiremock.matching.ValueMatcher;
+@@ -34,7 +35,8 @@ import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ 
+-@WireMockTest(httpPort = 4317)
++// XXX: Drop these changes if/when https://github.com/prometheus/client_java/pull/2407 lands.
++@WireMockTest
+ class ExemplarTest {
+   private static final String ENDPOINT_PATH = "/v1/metrics";
+   private static final int TIMEOUT = 3;
+@@ -45,10 +47,10 @@ class ExemplarTest {
+   private OpenTelemetryExporter openTelemetryExporter;
+ 
+   @BeforeEach
+-  public void setUp() {
++  public void setUp(WireMockRuntimeInfo wireMockRuntimeInfo) {
+     openTelemetryExporter =
+         OpenTelemetryExporter.builder()
+-            .endpoint("http://localhost:4317")
++            .endpoint(wireMockRuntimeInfo.getHttpBaseUrl())
+             .protocol("http/protobuf")
+             .intervalSeconds(1)
+             .buildAndStart();
 --- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
 +++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
 @@ -32,6 +32,8 @@ import org.junit.jupiter.api.Test;

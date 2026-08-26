@@ -21,11 +21,6 @@ validation_error_prone_flags=''
 # Harden-Runner configuration.
 validation_build_flags='-Dtest=!InstrumentedHttpClientsTest#registersExpectedMetricsGivenNameStrategy -Dsurefire.failIfNoSpecifiedTests=false'
 
-if [ "${#}" -gt 2 ] || ([ "${#}" = 2 ] && [ "${1:---sync}" != '--sync' ]); then
-  echo "Usage: ${0} [--sync] [<report_directory>]" >&2
-  exit 1
-fi
-
 "$(dirname "${0}")/run-integration-test.sh" \
   "${test_name}" \
   "${project}" \
@@ -37,4 +32,4 @@ fi
   "${patch_error_prone_flags}" \
   "${validation_error_prone_flags}" \
   "${validation_build_flags}" \
-  $@
+  "${@}"

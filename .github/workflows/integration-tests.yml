@@ -97,12 +97,12 @@ jobs:
             });
 
             core.setOutput('commentId', response.data.id);
-  test:
-    name: Integration test
-    # On push events the `acknowledge` job is skipped; `always()` ensures this
-    # job still runs in that case.
+  patch:
+    name: Apply patches
+    # On push events the `acknowledge` job is skipped; `!cancelled()` ensures
+    # this job still runs in that case.
     needs: [ matrix, acknowledge ]
-    if: ${{ always() && needs.matrix.result == 'success' }}
+    if: ${{ !cancelled() && needs.matrix.result == 'success' }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -112,27 +112,17 @@ jobs:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          # We can't use `disable-sudo-and-containers` here, as some
-          # integration test projects have unit tests that start Docker
-          # containers.
-          disable-sudo: true
-          # XXX: After updating the validation build flags in
-          # `integration-tests/prometheus-java-client.sh`, review whether the
-          # Docker domains specified here can be dropped.
+          disable-sudo-and-containers: true
           allowed-endpoints: >
             api.adoptium.net:443
-            auth.docker.io:443
-            checkstyle.org:443
+            api.github.com:443
             github.com:443
             hosted-compute-watchdog-prod-*.githubapp.com:443
             objects.githubusercontent.com:443
             oss.sonatype.org:443
-            production.cloudflare.docker.com:443
-            raw.githubusercontent.com:443
-            registry-1.docker.io:443
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
-            repository.sonatype.org:443
+            results-receiver.actions.githubusercontent.com:443
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
         with:
@@ -144,8 +134,74 @@ jobs:
           maven-version: 3.9.16
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
-      - name: Run integration test
-        run: xvfb-run "./integration-tests/${INTEGRATION_TEST}.sh" "${{ runner.temp }}/artifacts"
+      - name: Apply patches
+        run: |
+          "./integration-tests/${INTEGRATION_TEST}.sh" --phase=patch "${{ runner.temp }}/artifacts"
+        env:
+          INTEGRATION_TEST: ${{ matrix.integration-test }}
+          JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
+      # The `validate` job replays the changes recorded here, so these
+      # artifacts are uploaded even if this job reported unexpected changes; in
+      # that case they are also the primary evidence of what went wrong.
+      - name: Upload patch phase artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: "integration-test-patch-${{ matrix.integration-test }}"
+          path: "${{ runner.temp }}/artifacts"
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove installed project artifacts
+        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+  validate:
+    name: Validate patched code
+    # Runs even if the `patch` job reported unexpected changes, so that the
+    # validation build's result is observed in the same run.
+    needs: [ matrix, patch ]
+    if: ${{ !cancelled() && needs.matrix.result == 'success' }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        integration-test: ${{ fromJson(needs.matrix.outputs.matrix) }}
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            api.adoptium.net:443
+            api.github.com:443
+            checkstyle.org:443
+            github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
+            objects.githubusercontent.com:443
+            oss.sonatype.org:443
+            raw.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            results-receiver.actions.githubusercontent.com:443
+      # Download the `patch` job's output before the more expensive setup
+      # steps, so that a missing artifact is reported within seconds.
+      - name: Download patch phase artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: "integration-test-patch-${{ matrix.integration-test }}"
+          path: "${{ runner.temp }}/artifacts"
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        with:
+          checkout-ref: ${{ env.CHECKOUT_REF }}
+          java-version: |
+            21.0.12
+            25.0.4
+          java-distribution: temurin
+          maven-version: 3.9.16
+      - name: Install project to local Maven repository
+        run: mvn install -DskipTests -Dverification.skip
+      - name: Validate patched code
+        run: |
+          "./integration-tests/${INTEGRATION_TEST}.sh" --phase=validate "${{ runner.temp }}/artifacts"
         env:
           INTEGRATION_TEST: ${{ matrix.integration-test }}
           JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
@@ -153,13 +209,13 @@ jobs:
         if: ${{ failure() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: "integration-test-${{ matrix.integration-test }}"
+          name: "integration-test-validate-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   report:
     name: Report integration test result
-    needs: [ acknowledge, test ]
+    needs: [ acknowledge, patch, validate ]
     # Using `always()` ensures that this job runs even if previous jobs failed
     # or were cancelled.
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
@@ -177,11 +233,13 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           COMMENT_ID: ${{ needs.acknowledge.outputs.comment_id }}
-          CONCLUSION: ${{ needs.test.result }}
+          CONCLUSION: ${{ (needs.patch.result == 'success' && needs.validate.result) || needs.patch.result }}
         with:
           script: |
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
-            const conclusion = process.env.CONCLUSION;
+            // A phase that has not started by the time the workflow is
+            // cancelled is reported as skipped rather than cancelled.
+            const conclusion = process.env.CONCLUSION === 'skipped' ? 'cancelled' : process.env.CONCLUSION;
 
             let [statusEmoji, message] = (() => {
               switch (conclusion) {
