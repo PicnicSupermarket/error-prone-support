@@ -501,7 +501,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.0.6</version>
+                <version>4.1.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
