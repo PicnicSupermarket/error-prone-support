@@ -8,6 +8,7 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.isSameType;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 import static com.google.errorprone.matchers.Matchers.not;
@@ -23,6 +24,7 @@ import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import java.io.InputStream;
+import java.security.Principal;
 import java.time.ZoneId;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -68,6 +70,7 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                   annotations(
                       AT_LEAST_ONE,
                       anyOf(
+                          isType(ANN_PACKAGE_PREFIX + "ModelAttribute"),
                           isType(ANN_PACKAGE_PREFIX + "PathVariable"),
                           isType(ANN_PACKAGE_PREFIX + "RequestAttribute"),
                           isType(ANN_PACKAGE_PREFIX + "RequestBody"),
@@ -78,6 +81,7 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                               "org.springframework.security.core.annotation.CurrentSecurityContext"))),
                   isSameType(InputStream.class.getCanonicalName()),
                   isSameType(Locale.class.getCanonicalName()),
+                  isSubtypeOf(Principal.class.getCanonicalName()),
                   isSameType(TimeZone.class.getCanonicalName()),
                   isSameType(ZoneId.class.getCanonicalName()),
                   isSameType("jakarta.servlet.http.HttpServletRequest"),
