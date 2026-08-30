@@ -188,9 +188,10 @@ fi
 
 # Format the patched code using the same method by which it will be formatted
 # after each compilation round. This initial formatting operation ensures that
-# subsequent modifications can be rendered in a clean manner.
+# subsequent modifications can be rendered in a clean manner. Projects that
+# already adhere to this format require no such operation.
 mvn ${shared_build_flags} "${format_goal}"
-git commit -m 'minor: Reformat using Google Java Format' .
+git diff --quiet || git commit -m 'minor: Reformat using Google Java Format' .
 diff_base="$(git rev-parse HEAD)"
 
 # Files containing the changes applied by the `patch` phase, and the tree they

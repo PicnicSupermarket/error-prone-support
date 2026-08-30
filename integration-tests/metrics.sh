@@ -5,7 +5,7 @@ set -e -u -o pipefail
 test_name="$(basename "${0}" .sh)"
 project='metrics'
 repository='https://github.com/dropwizard/metrics.git'
-revision='v5.0.5'
+revision='v5.0.8'
 additional_build_flags='-Dmaven.compiler.release=21'
 additional_source_directories=''
 shared_error_prone_flags='-XepOpt:Slf4jLoggerDeclaration:CanonicalStaticLoggerName=LOGGER'
