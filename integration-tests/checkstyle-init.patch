@@ -1,6 +1,6 @@
 --- a/pom.xml
 +++ b/pom.xml
-@@ -383,6 +383,12 @@
+@@ -431,6 +431,12 @@
        <version>1.4.4</version>
        <scope>test</scope>
      </dependency>
@@ -13,12 +13,33 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2571,9 +2577,13 @@
-                     <arg>-Xpkginfo:always</arg>
-                     <arg>-XDcompilePolicy=simple</arg>
-                     <arg>--should-stop=ifError=FLOW</arg>
-+                    <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
-+                    <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+@@ -1035,6 +1041,10 @@
+             <phase>process-classes</phase>
+             <goals><goal>java</goal></goals>
+             <configuration>
++              <!-- This generator requires that the XDoc files it consumes are well-formed XML,
++                   while Google Java Format drops the closing tags from the Javadoc that these
++                   files are generated from. -->
++              <skip>true</skip>
+               <classpathScope>compile</classpathScope>
+               <mainClass>
+                 com.puppycrawl.tools.checkstyle.site.SearchIndexGenerator
+@@ -1819,6 +1829,14 @@
+           <argLine>-Dfile.encoding=UTF-8 ${surefire.options}</argLine>
+           <systemPropertyVariables>
+             <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
++            <!-- The `src/it/java` tests are compiled as test sources, and as such executed by
++                 Surefire rather than by Failsafe, where these properties are declared. -->
++            <header.file.paths.separated.by.coma>
++              ${project.basedir}/src/it/resources/com/openjdk/checkstyle/test/chapterformatting/rulecopyrightnotice/openjdk-style.header
++            </header.file.paths.separated.by.coma>
++            <org.checkstyle.sun.header.files>
++              ${project.basedir}/src/it/resources/com/sun/checkstyle/test/chapter3fileorganization/rule311beginningcomments/sun-style.header
++            </org.checkstyle.sun.header.files>
+             <!-- Virtual AWT driver for GUI unit tests -->
+             <awt.toolkit>com.github.caciocavallosilano.cacio.ctc.CTCToolkit</awt.toolkit>
+             <java.awt.headless>false</java.awt.headless>
+@@ -2808,6 +2826,8 @@
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -27,7 +48,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2586,6 +2596,11 @@
+@@ -2820,6 +2840,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -39,12 +60,8 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2627,11 +2642,14 @@
-                     <arg>--should-stop=ifError=FLOW</arg>
-                     <arg>-Xpkginfo:always</arg>
-                     <arg>-XDcompilePolicy=simple</arg>
-+                    <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
-+                    <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+@@ -2864,9 +2889,10 @@
+                     <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                      <arg>
                        -Xplugin:ErrorProne \
 -                      -XepExcludedPaths:.*[\\/]resources[\\/].* \
@@ -55,7 +72,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2644,6 +2662,11 @@
+@@ -2879,6 +2905,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -102,7 +119,7 @@
      @Override
 --- a/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
 +++ b/src/main/java/com/puppycrawl/tools/checkstyle/DetailNodeTreeStringPrinter.java
-@@ -62,6 +62,8 @@ public final class DetailNodeTreeStringPrinter {
+@@ -63,6 +63,8 @@ public final class DetailNodeTreeStringPrinter {
       * @return DetailNode tree
       * @throws IllegalArgumentException if there is an error parsing the Javadoc.
       */
@@ -111,60 +128,9 @@
      public static DetailNode parseJavadocAsDetailNode(DetailAST blockComment) {
          final JavadocDetailNodeParser parser = new JavadocDetailNodeParser();
          final ParseStatus status = parser.parseJavadocComment(blockComment);
---- a/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/SarifLogger.java
-@@ -327,6 +327,9 @@ public class SarifLogger extends AbstractAutomaticBean implements AuditListener
-      * @param report report content where replace should happen
-      * @return a version string based on the package implementation version
-      */
-+    // Here `version` may be `null`, while `String#replace` requires non-`null` arguments.
-+    // XXX: Investigate better nullness handling by `IdentityConversion`.
-+    @SuppressWarnings("IdentityConversion")
-     private static String replaceVersionString(String report) {
-         final String version = SarifLogger.class.getPackage().getImplementationVersion();
-         return report.replace(VERSION_PLACEHOLDER, String.valueOf(version));
---- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTypeCheck.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/coding/IllegalTypeCheck.java
-@@ -509,6 +509,10 @@ public final class IllegalTypeCheck extends AbstractCheck {
-      * @param importAst {@link TokenTypes#IMPORT Import}
-      * @return Imported canonical type's name.
-      */
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     private static String getImportedTypeCanonicalName(DetailAST importAst) {
-         final StringBuilder canonicalNameBuilder = new StringBuilder(256);
-         DetailAST toVisit = importAst;
---- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheck.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/design/VisibilityModifierCheck.java
-@@ -658,6 +658,10 @@ public class VisibilityModifierCheck
-      * @param type DetailAST {@link TokenTypes#TYPE TYPE} node.
-      * @return canonical type's name
-      */
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     private static String getCanonicalName(DetailAST type) {
-         final StringBuilder canonicalNameBuilder = new StringBuilder(256);
-         DetailAST toVisit = type;
---- a/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentLevel.java
-+++ b/src/main/java/com/puppycrawl/tools/checkstyle/checks/indentation/IndentLevel.java
-@@ -143,6 +143,10 @@ public class IndentLevel {
-     }
- 
-     @Override
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     public String toString() {
-         final String result;
-         if (levels.cardinality() == 1) {
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/CheckerTest.java
-@@ -98,6 +98,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
+@@ -100,6 +100,8 @@ import de.thetaphi.forbiddenapis.SuppressForbidden;
   * @noinspectionreason ClassWithTooManyDependencies - complex tests require a large number
   *      of imports
   */
@@ -175,7 +141,7 @@
      @TempDir
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/ConfigurationLoaderTest.java
-@@ -50,6 +50,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
+@@ -46,6 +46,8 @@ import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
  /**
   * Unit test for ConfigurationLoader.
   */
@@ -186,27 +152,27 @@
      @Override
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/PackageObjectFactoryTest.java
-@@ -113,6 +113,8 @@ public class PackageObjectFactoryTest {
-     public void testCtorNullPackageException1() {
+@@ -111,6 +111,8 @@ public class PackageObjectFactoryTest {
          final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-         try {
-+            // XXX: Don't suggest `ImmutableSet.of(elem)` for nullable `elem`.
-+            @SuppressWarnings("ImmutableSetOf1")
-             final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader);
-             assertWithMessage("Exception is expected but got " + test).fail();
-         }
-@@ -141,6 +143,8 @@ public class PackageObjectFactoryTest {
-     public void testCtorNullPackageException3() {
+         final IllegalArgumentException exc =
+                 getExpectedThrowable(IllegalArgumentException.class, () -> {
++                    // XXX: Don't suggest `ImmutableSet.of(elem)` for nullable `elem`.
++                    @SuppressWarnings("ImmutableSetOf1")
+                     final Object test =
+                             new PackageObjectFactory(Collections.singleton(null), classLoader);
+                     assertWithMessage("Exception is expected but got %s", test).fail();
+@@ -139,6 +141,8 @@ public class PackageObjectFactoryTest {
          final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-         try {
-+            // XXX: Don't suggest `ImmutableSet.of(elem)` for nullable `elem`.
-+            @SuppressWarnings("ImmutableSetOf1")
-             final Object test = new PackageObjectFactory(Collections.singleton(null), classLoader,
-                     TRY_IN_ALL_REGISTERED_PACKAGES);
-             assertWithMessage("Exception is expected but got " + test).fail();
+         final IllegalArgumentException exc =
+                 getExpectedThrowable(IllegalArgumentException.class, () -> {
++                    // XXX: Don't suggest `ImmutableSet.of(elem)` for nullable `elem`.
++                    @SuppressWarnings("ImmutableSetOf1")
+                     final Object test =
+                             new PackageObjectFactory(Collections.singleton(null), classLoader,
+                                     TRY_IN_ALL_REGISTERED_PACKAGES);
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/TreeWalkerTest.java
-@@ -84,6 +84,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
+@@ -88,6 +88,8 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtil;
   * @noinspectionreason ClassWithTooManyDependencies - complex tests require a
   *      large number of imports
   */
@@ -215,59 +181,9 @@
  public class TreeWalkerTest extends AbstractModuleTestSupport {
  
      @TempDir
---- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
-+++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
-@@ -220,6 +220,10 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
-         }
-     }
- 
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     private static boolean shouldAppendSpace(StringBuilder text, char firstCharToAppend) {
-         final boolean result;
- 
---- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsPagesTest.java
-+++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsPagesTest.java
-@@ -1638,6 +1638,10 @@ public class XdocsPagesTest {
-         return result;
-     }
- 
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     private static void validateViolationSection(String fileName, String sectionName,
-                                                  Node subSection,
-                                                  Object instance) throws Exception {
---- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/utils/CheckUtil.java
-+++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/utils/CheckUtil.java
-@@ -290,6 +290,10 @@ public final class CheckUtil {
-         return checkMessage;
-     }
- 
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     public static String getTokenText(int[] tokens, int... subtractions) {
-         final String tokenText;
-         if (subtractions.length == 0 && Arrays.equals(tokens, TokenUtil.getAllTokenIds())) {
-@@ -342,6 +346,10 @@ public final class CheckUtil {
-         return result;
-     }
- 
-+    // XXX: The Refaster `CharSequenceIsEmpty` rule unconditionally assumes
-+    // Java 15 runtime compatibility when suggesting use of
-+    // `StringBuilder#isEmpty()`, while this project targets Java 11.
-+    @SuppressWarnings("CharSequenceIsEmpty")
-     public static String getJavadocTokenText(int[] tokens, int... subtractions) {
-         final StringBuilder result = new StringBuilder(50);
-         boolean first = true;
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/utils/CheckUtilTest.java
-@@ -47,6 +47,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;
+@@ -48,6 +48,8 @@ import com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck;
  import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck;
  import com.puppycrawl.tools.checkstyle.checks.naming.AccessModifierOption;
  
