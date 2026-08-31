@@ -74,11 +74,10 @@
      <test.java.version>25</test.java.version>
      <!-- renovate: datasource=maven packageName=io.prometheus:prometheus-metrics-core -->
      <api.diff.baseline.version>1.7.0</api.diff.baseline.version>
-@@ -73,6 +74,12 @@
+@@ -73,6 +74,11 @@
        <version>3.0.2</version>
        <scope>provided</scope>
      </dependency>
-+    <!-- Error Prone Support suggests Guava-based alternatives in production code. -->
 +    <dependency>
 +      <groupId>com.google.guava</groupId>
 +      <artifactId>guava</artifactId>
@@ -87,7 +86,7 @@
      <!-- test dependencies -->
      <dependency>
        <groupId>org.junit.jupiter</groupId>
-@@ -492,21 +499,34 @@
+@@ -492,21 +498,34 @@
                    -Xep:MissingSummary:OFF
                    -Xep:LongDoubleConversion:OFF
                    -Xep:StringSplitter:OFF
