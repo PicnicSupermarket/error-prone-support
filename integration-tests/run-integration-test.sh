@@ -272,12 +272,13 @@ if [ "${phase}" != 'patch' ]; then
   # Run a full build and log the output.
   #
   # By also running the tests, we validate that the (majority of) applied
-  # changes are behavior preserving.
+  # changes are behavior preserving. The `verify` phase is targeted so that
+  # tests bound to Failsafe are covered as well.
   validation_build_log="${report_directory}/${test_name}-validation-build-log.txt"
   (
     set -x \
       && mvn ${shared_build_flags} \
-           clean package \
+           clean verify \
            -Derror-prone.configuration-args="${error_prone_validation_flags}" \
            ${validation_build_flags}
   ) | tee "${validation_build_log}" || failure=1
