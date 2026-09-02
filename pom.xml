@@ -705,7 +705,9 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
-                                    <module name="ConstructorsDeclarationGrouping" />
+                                    <module name="ConstructorsDeclarationGrouping">
+                                        <property name="orderByIncreasingParameterCount" value="true" />
+                                    </module>
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
@@ -858,15 +860,13 @@
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
-                                    <module name="JavadocStyle">
-                                        <property name="checkEmptyJavadoc" value="true" />
-                                    </module>
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
                                         <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
                                         <message key="matchxpath.match" value="Avoid the `@author` Javadoc tag; Git history suffices." />
                                     </module>
                                     <module name="MissingDeprecated" />
+                                    <module name="MultilineCommentLeadingAsteriskPresence" />
                                     <module name="MutableException" />
                                     <module name="NeedBraces" />
                                     <module name="NoClone" />
@@ -880,6 +880,7 @@
                                     </module>
                                     <module name="ParameterAssignment" />
                                     <module name="PatternVariableAssignment" />
+                                    <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
@@ -892,6 +893,7 @@
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
+                                    <module name="UnnecessaryTypeArgumentsWithRecordPattern" />
                                     <module name="UnusedImports">
                                         <!-- Error-prone also detects these,
                                         but (currently) doesn't warn about
@@ -921,7 +923,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.5.0</version>
+                            <version>14.0.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
