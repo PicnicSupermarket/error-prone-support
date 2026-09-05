@@ -704,6 +704,7 @@
                                         <property name="allowIfAllCharactersEscaped" value="true" />
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
+                                    <module name="AvoidModuleImport" />
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
                                     <module name="ConstructorsDeclarationGrouping">
                                         <property name="orderByIncreasingParameterCount" value="true" />
@@ -749,6 +750,7 @@
                                         <property name="tokens" value="CLASS_DEF, CTOR_DEF, ENUM_DEF, INSTANCE_INIT, INTERFACE_DEF, METHOD_DEF, STATIC_INIT" />
                                     </module>
                                     <module name="EmptyStatement" />
+                                    <module name="ExpressionOverBlockLambda" />
                                     <module name="FinalClass" />
                                     <module name="GoogleNonConstantFieldName" />
                                     <module name="HiddenField">
@@ -860,6 +862,9 @@
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
+                                    <module name="JavadocNoErrorInThrowsTag" />
+                                    <module name="JavadocParamOrder" />
+                                    <module name="JavadocThrowsOrder" />
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
                                         <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
@@ -880,6 +885,10 @@
                                     </module>
                                     <module name="ParameterAssignment" />
                                     <module name="PatternVariableAssignment" />
+                                    <!-- XXX: Once `UnescapedEntity` recognizes
+                                    `@snippet`, enable this check. See
+                                    https://github.com/google/error-prone/issues/4914.
+                                    <module name="PreferCodeOrSnippetJavadocInlineTag" /> -->
                                     <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
