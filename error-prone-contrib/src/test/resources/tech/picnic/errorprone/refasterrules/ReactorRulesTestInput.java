@@ -385,6 +385,10 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return Mono.just(ImmutableSet.of(1)).flatMapMany(Flux::fromIterable);
   }
 
+  Flux<Integer> testMonoFlatMapIterableWithTransformation() {
+    return Mono.just(1).flatMapMany(v -> Flux.fromIterable(ImmutableSet.of(v)));
+  }
+
   ImmutableSet<Flux<Integer>> testFluxConcatMapIterable() {
     return ImmutableSet.of(
         Flux.just(1).flatMapIterable(ImmutableList::of),

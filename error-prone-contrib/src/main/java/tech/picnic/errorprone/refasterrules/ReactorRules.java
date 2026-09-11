@@ -983,6 +983,23 @@ final class ReactorRules {
     }
   }
 
+  /** Prefer {@link Mono#flatMapIterable(Function)} over more contrived alternatives. */
+  abstract static class MonoFlatMapIterableWithTransformation<
+      T, S, I extends Iterable<? extends S>> {
+    @Placeholder
+    abstract I transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Mono<T> mono) {
+      return mono.flatMapMany(v -> Flux.fromIterable(transformation(v)));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Mono<T> mono) {
+      return mono.flatMapIterable(v -> transformation(v));
+    }
+  }
+
   /**
    * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less explicit syntax or
    * semantics.
