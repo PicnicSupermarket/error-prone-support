@@ -19,13 +19,13 @@ import java.util.function.BiFunction;
  *
  * <p>These methods are meant to be statically imported. Example usage:
  *
- * <pre>{@code
+ * {@snippet :
  * Supplier<Type> type =
  *     VisitorState.memoize(
  *         generic(
  *             type("reactor.core.publisher.Flux"),
  *             subOf(generic(type("org.reactivestreams.Publisher"), unbound()))));
- * }</pre>
+ * }
  *
  * This statement produces a memoized supplier of the type {@code Flux<? extends Publisher<?>>}.
  */
