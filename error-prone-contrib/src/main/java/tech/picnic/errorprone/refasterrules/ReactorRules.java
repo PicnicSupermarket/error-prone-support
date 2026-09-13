@@ -946,18 +946,16 @@ final class ReactorRules {
   /** Prefer {@link Mono#flatMapIterable(Function)} over more contrived alternatives. */
   static final class MonoFlatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
-    Flux<S> before(Mono<T> mono, Function<? super T, I> mapper) {
-      return mono.map(mapper).flatMapMany(Flux::fromIterable);
-    }
-
-    @BeforeTemplate
     Flux<S> before(
         Mono<T> mono,
         Function<? super T, I> mapper,
         @Matches(IsIdentityOperation.class)
-            Function<? super I, ? extends Iterable<? extends S>> identityMapper) {
+            Function<? super I, ? extends Iterable<? extends S>> identityMapper,
+        int prefetch) {
       return Refaster.anyOf(
-          mono.map(mapper).flatMapIterable(identityMapper), mono.flux().concatMapIterable(mapper));
+          mono.map(mapper).flatMapIterable(identityMapper),
+          mono.flux().concatMapIterable(mapper),
+          mono.flux().concatMapIterable(mapper, prefetch));
     }
 
     @AfterTemplate
@@ -967,13 +965,14 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Mono#flatMapIterable(Function)} to flatten a {@link Mono} of some {@link
-   * Iterable} over less efficient alternatives.
+   * Prefer {@link Mono#flatMapIterable(Function)} over alternatives that unnecessarily require an
+   * inner subscription.
    */
   static final class MonoFlatMapIterableIdentity<T, S extends Iterable<T>> {
     @BeforeTemplate
     Flux<T> before(Mono<S> mono) {
-      return mono.flatMapMany(Flux::fromIterable);
+      return Refaster.anyOf(
+          mono.flatMapMany(v -> Flux.fromIterable(v)), mono.flatMapMany(Flux::fromIterable));
     }
 
     @AfterTemplate
@@ -983,7 +982,10 @@ final class ReactorRules {
     }
   }
 
-  /** Prefer {@link Mono#flatMapIterable(Function)} over more contrived alternatives. */
+  /**
+   * Prefer {@link Mono#flatMapIterable(Function)} over alternatives that unnecessarily require an
+   * inner subscription.
+   */
   abstract static class MonoFlatMapIterableWithTransformation<
       T, S, I extends Iterable<? extends S>> {
     @Placeholder
@@ -1001,8 +1003,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives with less explicit syntax or
-   * semantics.
+   * Prefer {@link Flux#concatMapIterable(Function)} over less explicit or more contrived
+   * alternatives.
    */
   static final class FluxConcatMapIterable<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
@@ -1022,8 +1024,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives with less explicit
-   * syntax or semantics.
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over less explicit or more contrived
+   * alternatives.
    */
   static final class FluxConcatMapIterableWithInt<T, S, I extends Iterable<? extends S>> {
     @BeforeTemplate
@@ -1592,8 +1594,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives that require an additional
-   * subscription.
+   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives that unnecessarily require an
+   * inner subscription.
    */
   static final class FluxConcatMapIterableIdentity<T> {
     @BeforeTemplate
@@ -1610,8 +1612,8 @@ final class ReactorRules {
   }
 
   /**
-   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives that require an
-   * additional subscription.
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives that unnecessarily
+   * require an inner subscription.
    */
   static final class FluxConcatMapIterableIdentityWithInt<T> {
     @BeforeTemplate
@@ -1625,6 +1627,46 @@ final class ReactorRules {
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
     Flux<T> after(Flux<? extends Iterable<T>> flux, int prefetch) {
       return flux.concatMapIterable(identity(), prefetch);
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function)} over alternatives that unnecessarily require an
+   * inner subscription.
+   */
+  abstract static class FluxConcatMapIterableWithTransformation<
+      T, S, I extends Iterable<? extends S>> {
+    @Placeholder
+    abstract I transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux) {
+      return flux.concatMap(v -> Flux.fromIterable(transformation(v)));
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux) {
+      return flux.concatMapIterable(v -> transformation(v));
+    }
+  }
+
+  /**
+   * Prefer {@link Flux#concatMapIterable(Function, int)} over alternatives that unnecessarily
+   * require an inner subscription.
+   */
+  abstract static class FluxConcatMapIterableWithTransformationAndInt<
+      T, S, I extends Iterable<? extends S>> {
+    @Placeholder
+    abstract I transformation(@MayOptionallyUse T value);
+
+    @BeforeTemplate
+    Flux<S> before(Flux<T> flux, int prefetch) {
+      return flux.concatMap(v -> Flux.fromIterable(transformation(v)), prefetch);
+    }
+
+    @AfterTemplate
+    Flux<S> after(Flux<T> flux, int prefetch) {
+      return flux.concatMapIterable(v -> transformation(v), prefetch);
     }
   }
 
