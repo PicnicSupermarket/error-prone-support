@@ -2190,7 +2190,7 @@
    void reportsTasksInformationForForkJoinPool() throws Exception {
      executor = Executors.newWorkStealingPool(4);
      instrumentedExecutorService = new InstrumentedExecutorService(executor, registry, "fjp");
-@@ -291,7 +291,7 @@ class InstrumentedExecutorServiceTest {
+@@ -294,7 +294,7 @@ class InstrumentedExecutorServiceTest {
    }
  
    @Test
@@ -6412,6 +6412,215 @@
    private final List<byte[]> sent = new ArrayList<>();
  
    @BeforeEach
+--- a/metrics-jackson3/src/main/java/io/dropwizard/metrics5/jackson3/HealthCheckModule.java
++++ b/metrics-jackson3/src/main/java/io/dropwizard/metrics5/jackson3/HealthCheckModule.java
+@@ -1,8 +1,8 @@
+ package io.dropwizard.metrics5.jackson3;
+ 
++import com.google.common.collect.ImmutableList;
+ import io.dropwizard.metrics5.health.HealthCheck;
+ import java.io.IOException;
+-import java.util.Collections;
+ import java.util.Map;
+ import tools.jackson.core.JsonGenerator;
+ import tools.jackson.core.Version;
+@@ -83,6 +83,6 @@ public class HealthCheckModule extends JacksonModule {
+   @Override
+   public void setupModule(SetupContext context) {
+     context.addSerializers(
+-        new SimpleSerializers(Collections.singletonList(new HealthCheckResultSerializer())));
++        new SimpleSerializers(ImmutableList.of(new HealthCheckResultSerializer())));
+   }
+ }
+--- a/metrics-jackson3/src/test/java/io/dropwizard/metrics5/jackson3/HealthCheckModuleTest.java
++++ b/metrics-jackson3/src/test/java/io/dropwizard/metrics5/jackson3/HealthCheckModuleTest.java
+@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
+ import tools.jackson.databind.ObjectMapper;
+ import tools.jackson.databind.json.JsonMapper;
+ 
+-class HealthCheckModuleTest {
++final class HealthCheckModuleTest {
+   private final ObjectMapper mapper =
+       JsonMapper.builder().addModule(new HealthCheckModule()).build();
+ 
+@@ -19,8 +19,7 @@ class HealthCheckModuleTest {
+   void serializesAHealthyResult() throws Exception {
+     HealthCheck.Result result = HealthCheck.Result.healthy();
+     assertThat(mapper.writeValueAsString(result))
+-        .isEqualTo(
+-            "{\"healthy\":true,\"duration\":0,\"timestamp\":\"" + result.getTimestamp() + "\"}");
++        .isEqualTo("{\"healthy\":true,\"duration\":0,\"timestamp\":\"%s\"}", result.getTimestamp());
+   }
+ 
+   @Test
+@@ -28,14 +27,8 @@ class HealthCheckModuleTest {
+     HealthCheck.Result result = HealthCheck.Result.healthy("yay for %s", "me");
+     assertThat(mapper.writeValueAsString(result))
+         .isEqualTo(
+-            "{"
+-                + "\"healthy\":true,"
+-                + "\"message\":\"yay for me\","
+-                + "\"duration\":0,"
+-                + "\"timestamp\":\""
+-                + result.getTimestamp()
+-                + "\""
+-                + "}");
++            "{\"healthy\":true,\"message\":\"yay for me\",\"duration\":0,\"timestamp\":\"%s\"}",
++            result.getTimestamp());
+   }
+ 
+   @Test
+@@ -43,14 +36,8 @@ class HealthCheckModuleTest {
+     HealthCheck.Result result = HealthCheck.Result.unhealthy("boo");
+     assertThat(mapper.writeValueAsString(result))
+         .isEqualTo(
+-            "{"
+-                + "\"healthy\":false,"
+-                + "\"message\":\"boo\","
+-                + "\"duration\":0,"
+-                + "\"timestamp\":\""
+-                + result.getTimestamp()
+-                + "\""
+-                + "}");
++            "{\"healthy\":false,\"message\":\"boo\",\"duration\":0,\"timestamp\":\"%s\"}",
++            result.getTimestamp());
+   }
+ 
+   @Test
+@@ -62,19 +49,8 @@ class HealthCheckModuleTest {
+     HealthCheck.Result result = HealthCheck.Result.unhealthy(e);
+     assertThat(mapper.writeValueAsString(result))
+         .isEqualTo(
+-            "{"
+-                + "\"healthy\":false,"
+-                + "\"message\":\"oh no\","
+-                + "\"error\":{"
+-                + "\"type\":\"java.lang.RuntimeException\","
+-                + "\"message\":\"oh no\","
+-                + "\"stack\":[\"Blah.bloo(Blah.java:100)\"]"
+-                + "},"
+-                + "\"duration\":0,"
+-                + "\"timestamp\":\""
+-                + result.getTimestamp()
+-                + "\""
+-                + "}");
++            "{\"healthy\":false,\"message\":\"oh no\",\"error\":{\"type\":\"java.lang.RuntimeException\",\"message\":\"oh no\",\"stack\":[\"Blah.bloo(Blah.java:100)\"]},\"duration\":0,\"timestamp\":\"%s\"}",
++            result.getTimestamp());
+   }
+ 
+   @Test
+@@ -90,24 +66,8 @@ class HealthCheckModuleTest {
+     HealthCheck.Result result = HealthCheck.Result.unhealthy(b);
+     assertThat(mapper.writeValueAsString(result))
+         .isEqualTo(
+-            "{"
+-                + "\"healthy\":false,"
+-                + "\"message\":\"oh well\","
+-                + "\"error\":{"
+-                + "\"type\":\"java.lang.RuntimeException\","
+-                + "\"message\":\"oh well\","
+-                + "\"stack\":[\"Blah.blee(Blah.java:150)\"],"
+-                + "\"cause\":{"
+-                + "\"type\":\"java.lang.RuntimeException\","
+-                + "\"message\":\"oh no\","
+-                + "\"stack\":[\"Blah.bloo(Blah.java:100)\"]"
+-                + "}"
+-                + "},"
+-                + "\"duration\":0,"
+-                + "\"timestamp\":\""
+-                + result.getTimestamp()
+-                + "\""
+-                + "}");
++            "{\"healthy\":false,\"message\":\"oh well\",\"error\":{\"type\":\"java.lang.RuntimeException\",\"message\":\"oh well\",\"stack\":[\"Blah.blee(Blah.java:150)\"],\"cause\":{\"type\":\"java.lang.RuntimeException\",\"message\":\"oh no\",\"stack\":[\"Blah.bloo(Blah.java:100)\"]}},\"duration\":0,\"timestamp\":\"%s\"}",
++            result.getTimestamp());
+   }
+ 
+   @Test
+@@ -131,23 +91,7 @@ class HealthCheckModuleTest {
+ 
+     assertThat(mapper.writeValueAsString(result))
+         .isEqualTo(
+-            "{"
+-                + "\"healthy\":true,"
+-                + "\"duration\":0,"
+-                + "\"boolean\":true,"
+-                + "\"integer\":1,"
+-                + "\"long\":2,"
+-                + "\"float\":3.546,"
+-                + "\"double\":4.567,"
+-                + "\"BigInteger\":12345,"
+-                + "\"BigDecimal\":12345.56789,"
+-                + "\"String\":\"string\","
+-                + "\"complex\":{"
+-                + "\"field\":\"value\""
+-                + "},"
+-                + "\"timestamp\":\""
+-                + result.getTimestamp()
+-                + "\""
+-                + "}");
++            "{\"healthy\":true,\"duration\":0,\"boolean\":true,\"integer\":1,\"long\":2,\"float\":3.546,\"double\":4.567,\"BigInteger\":12345,\"BigDecimal\":12345.56789,\"String\":\"string\",\"complex\":{\"field\":\"value\"},\"timestamp\":\"%s\"}",
++            result.getTimestamp());
+   }
+ }
+--- a/metrics-jackson3/src/test/java/io/dropwizard/metrics5/jackson3/MetricsModuleTest.java
++++ b/metrics-jackson3/src/test/java/io/dropwizard/metrics5/jackson3/MetricsModuleTest.java
+@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
+ import tools.jackson.databind.ObjectMapper;
+ import tools.jackson.databind.json.JsonMapper;
+ 
+-class MetricsModuleTest {
++final class MetricsModuleTest {
+   private final ObjectMapper mapper =
+       JsonMapper.builder()
+           .addModule(
+@@ -44,7 +44,7 @@ class MetricsModuleTest {
+ 
+   @Test
+   void serializesCounters() throws Exception {
+-    final Counter counter = mock(Counter.class);
++    final Counter counter = mock();
+     when(counter.getCount()).thenReturn(100L);
+ 
+     assertThat(mapper.writeValueAsString(counter)).isEqualTo("{\"count\":100}");
+@@ -52,10 +52,10 @@ class MetricsModuleTest {
+ 
+   @Test
+   void serializesHistograms() throws Exception {
+-    final Histogram histogram = mock(Histogram.class);
++    final Histogram histogram = mock();
+     when(histogram.getCount()).thenReturn(1L);
+ 
+-    final Snapshot snapshot = mock(Snapshot.class);
++    final Snapshot snapshot = mock();
+     when(snapshot.getMax()).thenReturn(2L);
+     when(snapshot.getMean()).thenReturn(3.0);
+     when(snapshot.getMin()).thenReturn(4L);
+@@ -110,7 +110,7 @@ class MetricsModuleTest {
+ 
+   @Test
+   void serializesMeters() throws Exception {
+-    final Meter meter = mock(Meter.class);
++    final Meter meter = mock();
+     when(meter.getCount()).thenReturn(1L);
+     when(meter.getMeanRate()).thenReturn(2.0);
+     when(meter.getOneMinuteRate()).thenReturn(5.0);
+@@ -130,14 +130,14 @@ class MetricsModuleTest {
+ 
+   @Test
+   void serializesTimers() throws Exception {
+-    final Timer timer = mock(Timer.class);
++    final Timer timer = mock();
+     when(timer.getCount()).thenReturn(1L);
+     when(timer.getMeanRate()).thenReturn(2.0);
+     when(timer.getOneMinuteRate()).thenReturn(3.0);
+     when(timer.getFiveMinuteRate()).thenReturn(4.0);
+     when(timer.getFifteenMinuteRate()).thenReturn(5.0);
+ 
+-    final Snapshot snapshot = mock(Snapshot.class);
++    final Snapshot snapshot = mock();
+     when(snapshot.getMax()).thenReturn(TimeUnit.MILLISECONDS.toNanos(100));
+     when(snapshot.getMean()).thenReturn((double) TimeUnit.MILLISECONDS.toNanos(200));
+     when(snapshot.getMin()).thenReturn(TimeUnit.MILLISECONDS.toNanos(300));
 --- a/metrics-jakarta-servlet/src/main/java/io/dropwizard/metrics5/servlet/AbstractInstrumentedFilter.java
 +++ b/metrics-jakarta-servlet/src/main/java/io/dropwizard/metrics5/servlet/AbstractInstrumentedFilter.java
 @@ -2,6 +2,7 @@ package io.dropwizard.metrics5.servlet;
@@ -8939,6 +9148,606 @@
    @Path("/responseMeteredPerClass")
 --- a/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceTimedPerClass.java
 +++ b/metrics-jersey31/src/test/java/io/dropwizard/metrics5/jersey31/resources/InstrumentedSubResourceTimedPerClass.java
+@@ -6,8 +6,8 @@ import jakarta.ws.rs.Path;
+ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedSubResourceTimedPerClass {
+   @GET
+   @Path("/timedPerClass")
+--- a/metrics-jersey40/src/main/java/io/dropwizard/metrics5/jersey40/InstrumentedResourceMethodApplicationListener.java
++++ b/metrics-jersey40/src/main/java/io/dropwizard/metrics5/jersey40/InstrumentedResourceMethodApplicationListener.java
+@@ -4,7 +4,11 @@ import static io.dropwizard.metrics5.MetricRegistry.name;
+ import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.ALL;
+ import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.COARSE;
+ import static io.dropwizard.metrics5.annotation.ResponseMeteredLevel.DETAILED;
++import static java.util.Collections.unmodifiableList;
+ 
++import com.google.common.base.Strings;
++import com.google.common.collect.ImmutableList;
++import com.google.common.collect.ImmutableMap;
+ import io.dropwizard.metrics5.Clock;
+ import io.dropwizard.metrics5.ExponentiallyDecayingReservoir;
+ import io.dropwizard.metrics5.Meter;
+@@ -22,7 +26,6 @@ import jakarta.ws.rs.ext.Provider;
+ import java.lang.annotation.Annotation;
+ import java.lang.reflect.Method;
+ import java.util.Arrays;
+-import java.util.Collections;
+ import java.util.EnumSet;
+ import java.util.List;
+ import java.util.Map;
+@@ -160,7 +163,7 @@ public class InstrumentedResourceMethodApplicationListener
+       this.level = responseMetered.level();
+       this.meters =
+           COARSE_METER_LEVELS.contains(level)
+-              ? Collections.unmodifiableList(
++              ? unmodifiableList(
+                   Arrays.asList(
+                       registry.meter(metricName.resolve("1xx-responses")), // 1xx
+                       registry.meter(metricName.resolve("2xx-responses")), // 2xx
+@@ -168,11 +171,9 @@ public class InstrumentedResourceMethodApplicationListener
+                       registry.meter(metricName.resolve("4xx-responses")), // 4xx
+                       registry.meter(metricName.resolve("5xx-responses")) // 5xx
+                       ))
+-              : Collections.emptyList();
++              : ImmutableList.of();
+       this.responseCodeMeters =
+-          DETAILED_METER_LEVELS.contains(level)
+-              ? new ConcurrentHashMap<>()
+-              : Collections.emptyMap();
++          DETAILED_METER_LEVELS.contains(level) ? new ConcurrentHashMap<>() : ImmutableMap.of();
+       this.metricRegistry = registry;
+     }
+ 
+@@ -192,7 +193,7 @@ public class InstrumentedResourceMethodApplicationListener
+     private Meter getResponseCodeMeter(int statusCode) {
+       return responseCodeMeters.computeIfAbsent(
+           statusCode,
+-          sc -> metricRegistry.meter(metricName.resolve(String.format("%d-responses", sc))));
++          sc -> metricRegistry.meter(metricName.resolve(("%d-responses").formatted(sc))));
+     }
+   }
+ 
+@@ -306,9 +307,9 @@ public class InstrumentedResourceMethodApplicationListener
+                 : null;
+ 
+         if (metric != null) {
+-          if (metric.cause.isAssignableFrom(event.getException().getClass())
++          if (metric.cause.isInstance(event.getException())
+               || (event.getException().getCause() != null
+-                  && metric.cause.isAssignableFrom(event.getException().getCause().getClass()))) {
++                  && metric.cause.isInstance(event.getException().getCause()))) {
+             metric.meter.mark();
+           }
+         }
+@@ -419,14 +420,11 @@ public class InstrumentedResourceMethodApplicationListener
+ 
+   @Override
+   public RequestEventListener onRequest(final RequestEvent event) {
+-    final RequestEventListener listener =
+-        new ChainedRequestEventListener(
+-            new TimerRequestEventListener(timers, clock),
+-            new MeterRequestEventListener(meters),
+-            new ExceptionMeterRequestEventListener(exceptionMeters),
+-            new ResponseMeterRequestEventListener(responseMeters));
+-
+-    return listener;
++    return new ChainedRequestEventListener(
++        new TimerRequestEventListener(timers, clock),
++        new MeterRequestEventListener(meters),
++        new ExceptionMeterRequestEventListener(exceptionMeters),
++        new ResponseMeterRequestEventListener(responseMeters));
+   }
+ 
+   private <T extends Annotation> T getClassLevelAnnotation(
+@@ -544,7 +542,7 @@ public class InstrumentedResourceMethodApplicationListener
+       final String... suffixes) {
+     final Method definitionMethod = method.getInvocable().getDefinitionMethod();
+     MetricName metricName;
+-    if (explicitName != null && !explicitName.isEmpty()) {
++    if (!Strings.isNullOrEmpty(explicitName)) {
+       metricName =
+           absolute ? name(explicitName) : name(definitionMethod.getDeclaringClass(), explicitName);
+     } else {
+@@ -602,8 +600,7 @@ public class InstrumentedResourceMethodApplicationListener
+     @Override
+     public int hashCode() {
+       int result = type.hashCode();
+-      result = 31 * result + method.hashCode();
+-      return result;
++      return 31 * result + method.hashCode();
+     }
+   }
+ }
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/CustomReservoirImplementationTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/CustomReservoirImplementationTest.java
+@@ -14,7 +14,7 @@ import org.glassfish.jersey.server.ResourceConfig;
+ import org.glassfish.jersey.test.JerseyTest;
+ import org.junit.jupiter.api.Test;
+ 
+-class CustomReservoirImplementationTest extends JerseyTest {
++final class CustomReservoirImplementationTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonFilterMetricsJerseyTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonFilterMetricsJerseyTest.java
+@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
+  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton in a
+  * Jersey {@link ResourceConfig} with filter tracking
+  */
+-class SingletonFilterMetricsJerseyTest extends JerseyTest {
++final class SingletonFilterMetricsJerseyTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+@@ -35,8 +35,7 @@ class SingletonFilterMetricsJerseyTest extends JerseyTest {
+     ResourceConfig config = new ResourceConfig();
+     config = config.register(new MetricsFeature(this.registry, testClock, true));
+     config = config.register(new TestRequestFilter(testClock));
+-    config = config.register(new InstrumentedFilteredResource(testClock));
+-    return config;
++    return config.register(new InstrumentedFilteredResource(testClock));
+   }
+ 
+   @BeforeEach
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsExceptionMeteredPerClassJerseyTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsExceptionMeteredPerClassJerseyTest.java
+@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
+  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton in a
+  * Jersey {@link ResourceConfig}
+  */
+-class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
++final class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+@@ -35,9 +35,7 @@ class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
+     ResourceConfig config = new ResourceConfig();
+ 
+     config = config.register(new MetricsFeature(this.registry));
+-    config = config.register(InstrumentedResourceExceptionMeteredPerClass.class);
+-
+-    return config;
++    return config.register(InstrumentedResourceExceptionMeteredPerClass.class);
+   }
+ 
+   @Test
+@@ -51,7 +49,7 @@ class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
+ 
+     assertThat(target("exception-metered").request().get(String.class)).isEqualTo("fuh");
+ 
+-    assertThat(meter.getCount()).isZero();
++    assertThat(meter.getCount()).isEqualTo(0);
+ 
+     try {
+       target("exception-metered").queryParam("splode", true).request().get(String.class);
+@@ -76,7 +74,7 @@ class SingletonMetricsExceptionMeteredPerClassJerseyTest extends JerseyTest {
+     assertThat(target("subresource/exception-metered").request().get(String.class))
+         .isEqualTo("fuh");
+ 
+-    assertThat(meter.getCount()).isZero();
++    assertThat(meter.getCount()).isEqualTo(0);
+ 
+     try {
+       target("subresource/exception-metered")
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsJerseyTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsJerseyTest.java
+@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
+  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton in a
+  * Jersey {@link ResourceConfig}
+  */
+-class SingletonMetricsJerseyTest extends JerseyTest {
++final class SingletonMetricsJerseyTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+@@ -38,9 +38,7 @@ class SingletonMetricsJerseyTest extends JerseyTest {
+ 
+     ResourceConfig config = new ResourceConfig();
+     config = config.register(new MetricsFeature(this.registry));
+-    config = config.register(InstrumentedResource.class);
+-
+-    return config;
++    return config.register(InstrumentedResource.class);
+   }
+ 
+   @Test
+@@ -67,7 +65,7 @@ class SingletonMetricsJerseyTest extends JerseyTest {
+ 
+     assertThat(target("exception-metered").request().get(String.class)).isEqualTo("fuh");
+ 
+-    assertThat(meter.getCount()).isZero();
++    assertThat(meter.getCount()).isEqualTo(0);
+ 
+     try {
+       target("exception-metered").queryParam("splode", true).request().get(String.class);
+@@ -89,33 +87,33 @@ class SingletonMetricsJerseyTest extends JerseyTest {
+     final Meter meter5xx =
+         registry.meter(name(InstrumentedResource.class, "response5xxMetered", "5xx-responses"));
+ 
+-    assertThat(meter2xx.getCount()).isZero();
++    assertThat(meter2xx.getCount()).isEqualTo(0);
+     assertThat(target("response-2xx-metered").request().get().getStatus()).isEqualTo(200);
+ 
+-    assertThat(meter4xx.getCount()).isZero();
++    assertThat(meter4xx.getCount()).isEqualTo(0);
+     assertThat(target("response-4xx-metered").request().get().getStatus()).isEqualTo(400);
+ 
+-    assertThat(meter5xx.getCount()).isZero();
++    assertThat(meter5xx.getCount()).isEqualTo(0);
+     assertThat(target("response-5xx-metered").request().get().getStatus()).isEqualTo(500);
+   }
+ 
+   @Test
+-  public void responseMeteredMethodsAreMeteredWithCoarseLevel() {
++  void responseMeteredMethodsAreMeteredWithCoarseLevel() {
+     final Meter meter2xx =
+         registry.meter(name(InstrumentedResource.class, "responseMeteredCoarse", "2xx-responses"));
+     final Meter meter200 =
+         registry.meter(name(InstrumentedResource.class, "responseMeteredCoarse", "200-responses"));
+ 
+-    assertThat(meter2xx.getCount()).isZero();
+-    assertThat(meter200.getCount()).isZero();
++    assertThat(meter2xx.getCount()).isEqualTo(0);
++    assertThat(meter200.getCount()).isEqualTo(0);
+     assertThat(target("response-metered-coarse").request().get().getStatus()).isEqualTo(200);
+ 
+-    assertThat(meter2xx.getCount()).isOne();
+-    assertThat(meter200.getCount()).isZero();
++    assertThat(meter2xx.getCount()).isEqualTo(1);
++    assertThat(meter200.getCount()).isEqualTo(0);
+   }
+ 
+   @Test
+-  public void responseMeteredMethodsAreMeteredWithDetailedLevel() {
++  void responseMeteredMethodsAreMeteredWithDetailedLevel() {
+     final Meter meter2xx =
+         registry.meter(
+             name(InstrumentedResource.class, "responseMeteredDetailed", "2xx-responses"));
+@@ -126,9 +124,9 @@ class SingletonMetricsJerseyTest extends JerseyTest {
+         registry.meter(
+             name(InstrumentedResource.class, "responseMeteredDetailed", "201-responses"));
+ 
+-    assertThat(meter2xx.getCount()).isZero();
+-    assertThat(meter200.getCount()).isZero();
+-    assertThat(meter201.getCount()).isZero();
++    assertThat(meter2xx.getCount()).isEqualTo(0);
++    assertThat(meter200.getCount()).isEqualTo(0);
++    assertThat(meter201.getCount()).isEqualTo(0);
+     assertThat(target("response-metered-detailed").request().get().getStatus()).isEqualTo(200);
+     assertThat(
+             target("response-metered-detailed")
+@@ -138,28 +136,28 @@ class SingletonMetricsJerseyTest extends JerseyTest {
+                 .getStatus())
+         .isEqualTo(201);
+ 
+-    assertThat(meter2xx.getCount()).isZero();
+-    assertThat(meter200.getCount()).isOne();
+-    assertThat(meter201.getCount()).isOne();
++    assertThat(meter2xx.getCount()).isEqualTo(0);
++    assertThat(meter200.getCount()).isEqualTo(1);
++    assertThat(meter201.getCount()).isEqualTo(1);
+   }
+ 
+   @Test
+-  public void responseMeteredMethodsAreMeteredWithAllLevel() {
++  void responseMeteredMethodsAreMeteredWithAllLevel() {
+     final Meter meter2xx =
+         registry.meter(name(InstrumentedResource.class, "responseMeteredAll", "2xx-responses"));
+     final Meter meter200 =
+         registry.meter(name(InstrumentedResource.class, "responseMeteredAll", "200-responses"));
+ 
+-    assertThat(meter2xx.getCount()).isZero();
+-    assertThat(meter200.getCount()).isZero();
++    assertThat(meter2xx.getCount()).isEqualTo(0);
++    assertThat(meter200.getCount()).isEqualTo(0);
+     assertThat(target("response-metered-all").request().get().getStatus()).isEqualTo(200);
+ 
+-    assertThat(meter2xx.getCount()).isOne();
+-    assertThat(meter200.getCount()).isOne();
++    assertThat(meter2xx.getCount()).isEqualTo(1);
++    assertThat(meter200.getCount()).isEqualTo(1);
+   }
+ 
+   @Test
+-  void testResourceNotFound() {
++  void resourceNotFound() {
+     final Response response = target().path("not-found").request().get();
+     assertThat(response.getStatus()).isEqualTo(404);
+ 
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsMeteredPerClassJerseyTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsMeteredPerClassJerseyTest.java
+@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
+  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton in a
+  * Jersey {@link ResourceConfig}
+  */
+-class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
++final class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+@@ -32,9 +32,7 @@ class SingletonMetricsMeteredPerClassJerseyTest extends JerseyTest {
+     ResourceConfig config = new ResourceConfig();
+ 
+     config = config.register(new MetricsFeature(this.registry));
+-    config = config.register(InstrumentedResourceMeteredPerClass.class);
+-
+-    return config;
++    return config.register(InstrumentedResourceMeteredPerClass.class);
+   }
+ 
+   @Test
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsResponseMeteredPerClassJerseyTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsResponseMeteredPerClassJerseyTest.java
+@@ -2,7 +2,7 @@ package io.dropwizard.metrics5.jersey40;
+ 
+ import static io.dropwizard.metrics5.MetricRegistry.name;
+ import static org.assertj.core.api.Assertions.assertThat;
+-import static org.junit.jupiter.api.Assertions.fail;
++import static org.assertj.core.api.Assertions.fail;
+ 
+ import io.dropwizard.metrics5.Meter;
+ import io.dropwizard.metrics5.MetricRegistry;
+@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
+  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton in a
+  * Jersey {@link ResourceConfig}
+  */
+-class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTest {
++final class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+@@ -35,9 +35,7 @@ class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTest {
+ 
+     config = config.register(new MetricsFeature(this.registry));
+     config = config.register(InstrumentedResourceResponseMeteredPerClass.class);
+-    config = config.register(new TestExceptionMapper());
+-
+-    return config;
++    return config.register(new TestExceptionMapper());
+   }
+ 
+   @Test
+@@ -140,13 +138,13 @@ class SingletonMetricsResponseMeteredPerClassJerseyTest extends JerseyTest {
+                 "responseMeteredPerClass",
+                 "200-responses"));
+ 
+-    assertThat(meter2xx.getCount()).isZero();
+-    assertThat(meter200.getCount()).isZero();
++    assertThat(meter2xx.getCount()).isEqualTo(0);
++    assertThat(meter200.getCount()).isEqualTo(0);
+ 
+     assertThat(target("subresource/responseMeteredPerClass").request().get().getStatus())
+         .isEqualTo(200);
+ 
+-    assertThat(meter2xx.getCount()).isOne();
+-    assertThat(meter200.getCount()).isOne();
++    assertThat(meter2xx.getCount()).isEqualTo(1);
++    assertThat(meter200.getCount()).isEqualTo(1);
+   }
+ }
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsTimedPerClassJerseyTest.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/SingletonMetricsTimedPerClassJerseyTest.java
+@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
+  * Tests registering {@link InstrumentedResourceMethodApplicationListener} as a singleton in a
+  * Jersey {@link ResourceConfig}
+  */
+-class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
++final class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
+   static {
+     Logger.getLogger("org.glassfish.jersey").setLevel(Level.OFF);
+   }
+@@ -32,9 +32,7 @@ class SingletonMetricsTimedPerClassJerseyTest extends JerseyTest {
+     ResourceConfig config = new ResourceConfig();
+ 
+     config = config.register(new MetricsFeature(this.registry));
+-    config = config.register(InstrumentedResourceTimedPerClass.class);
+-
+-    return config;
++    return config.register(InstrumentedResourceTimedPerClass.class);
+   }
+ 
+   @Test
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedFilteredResource.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedFilteredResource.java
+@@ -18,24 +18,24 @@ public class InstrumentedFilteredResource {
+   }
+ 
+   @GET
+-  @Timed
+   @Path("/timed")
++  @Timed
+   public String timed() {
+     testClock.tick++;
+     return "yay";
+   }
+ 
+   @GET
+-  @Timed(name = "fancyName")
+   @Path("/named")
++  @Timed(name = "fancyName")
+   public String named() {
+     testClock.tick++;
+     return "fancy";
+   }
+ 
+   @GET
+-  @Timed(name = "absolutelyFancy", absolute = true)
+   @Path("/absolute")
++  @Timed(name = "absolutelyFancy", absolute = true)
+   public String absolute() {
+     testClock.tick++;
+     return "absolute";
+@@ -50,8 +50,8 @@ public class InstrumentedFilteredResource {
+   public class InstrumentedFilteredSubResource {
+ 
+     @GET
+-    @Timed
+     @Path("/timed")
++    @Timed
+     public String timed() {
+       testClock.tick += 2;
+       return "yay";
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResource.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResource.java
+@@ -21,8 +21,8 @@ import java.io.IOException;
+ @Produces(MediaType.TEXT_PLAIN)
+ public class InstrumentedResource {
+   @GET
+-  @Timed
+   @Path("/timed")
++  @Timed
+   public String timed() {
+     return "yay";
+   }
+@@ -34,10 +34,10 @@ public class InstrumentedResource {
+     return "woo";
+   }
+ 
+-  @GET
+   @ExceptionMetered(cause = IOException.class)
++  @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+@@ -46,46 +46,46 @@ public class InstrumentedResource {
+   }
+ 
+   @GET
+-  @ResponseMetered(level = DETAILED)
+   @Path("/response-metered-detailed")
++  @ResponseMetered(level = DETAILED)
+   public Response responseMeteredDetailed(
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
+     return Response.status(Response.Status.fromStatusCode(statusCode)).build();
+   }
+ 
+   @GET
+-  @ResponseMetered(level = COARSE)
+   @Path("/response-metered-coarse")
++  @ResponseMetered(level = COARSE)
+   public Response responseMeteredCoarse(
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
+     return Response.status(Response.Status.fromStatusCode(statusCode)).build();
+   }
+ 
+   @GET
+-  @ResponseMetered(level = ALL)
+   @Path("/response-metered-all")
++  @ResponseMetered(level = ALL)
+   public Response responseMeteredAll(
+-      @QueryParam("status_code") @DefaultValue("200") int statusCode) {
++      @DefaultValue("200") @QueryParam("status_code") int statusCode) {
+     return Response.status(Response.Status.fromStatusCode(statusCode)).build();
+   }
+ 
+   @GET
+-  @ResponseMetered
+   @Path("/response-2xx-metered")
++  @ResponseMetered
+   public Response response2xxMetered() {
+     return Response.ok().build();
+   }
+ 
+   @GET
+-  @ResponseMetered
+   @Path("/response-4xx-metered")
++  @ResponseMetered
+   public Response response4xxMetered() {
+     return Response.status(Response.Status.BAD_REQUEST).build();
+   }
+ 
+   @GET
+-  @ResponseMetered
+   @Path("/response-5xx-metered")
++  @ResponseMetered
+   public Response response5xxMetered() {
+     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+   }
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResourceExceptionMeteredPerClass.java
+@@ -16,7 +16,7 @@ public class InstrumentedResourceExceptionMeteredPerClass {
+ 
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResourceResponseMeteredPerClass.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResourceResponseMeteredPerClass.java
+@@ -9,9 +9,9 @@ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ import jakarta.ws.rs.core.Response;
+ 
+-@ResponseMetered
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered
+ public class InstrumentedResourceResponseMeteredPerClass {
+ 
+   @GET
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResourceTimedPerClass.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedResourceTimedPerClass.java
+@@ -6,9 +6,9 @@ import jakarta.ws.rs.Path;
+ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ 
+-@Timed
+ @Path("/")
+ @Produces(MediaType.TEXT_PLAIN)
++@Timed
+ public class InstrumentedResourceTimedPerClass {
+ 
+   @GET
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResource.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResource.java
+@@ -10,8 +10,8 @@ import jakarta.ws.rs.core.MediaType;
+ public class InstrumentedSubResource {
+ 
+   @GET
+-  @Timed
+   @Path("/timed")
++  @Timed
+   public String timed() {
+     return "yay";
+   }
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResourceExceptionMeteredPerClass.java
+@@ -14,7 +14,7 @@ import java.io.IOException;
+ public class InstrumentedSubResourceExceptionMeteredPerClass {
+   @GET
+   @Path("/exception-metered")
+-  public String exceptionMetered(@QueryParam("splode") @DefaultValue("false") boolean splode)
++  public String exceptionMetered(@DefaultValue("false") @QueryParam("splode") boolean splode)
+       throws IOException {
+     if (splode) {
+       throw new IOException("AUGH");
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResourceResponseMeteredPerClass.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResourceResponseMeteredPerClass.java
+@@ -8,8 +8,8 @@ import jakarta.ws.rs.Produces;
+ import jakarta.ws.rs.core.MediaType;
+ import jakarta.ws.rs.core.Response;
+ 
+-@ResponseMetered(level = ResponseMeteredLevel.ALL)
+ @Produces(MediaType.TEXT_PLAIN)
++@ResponseMetered(level = ResponseMeteredLevel.ALL)
+ public class InstrumentedSubResourceResponseMeteredPerClass {
+   @GET
+   @Path("/responseMeteredPerClass")
+--- a/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResourceTimedPerClass.java
++++ b/metrics-jersey40/src/test/java/io/dropwizard/metrics5/jersey40/resources/InstrumentedSubResourceTimedPerClass.java
 @@ -6,8 +6,8 @@ import jakarta.ws.rs.Path;
  import jakarta.ws.rs.Produces;
  import jakarta.ws.rs.core.MediaType;
@@ -12046,6 +12855,24 @@
    void setUp() {
 --- a/metrics-logback15/src/test/java/io/dropwizard/metrics5/logback15/InstrumentedAppenderTest.java
 +++ b/metrics-logback15/src/test/java/io/dropwizard/metrics5/logback15/InstrumentedAppenderTest.java
+@@ -12,13 +12,13 @@ import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ 
+-public class InstrumentedAppenderTest {
++final class InstrumentedAppenderTest {
+ 
+   public static final String METRIC_NAME_PREFIX = "ch.qos.logback.core.Appender";
+ 
+   private final MetricRegistry registry = new MetricRegistry();
+   private final InstrumentedAppender appender = new InstrumentedAppender(registry);
+-  private final ILoggingEvent event = mock(ILoggingEvent.class);
++  private final ILoggingEvent event = mock();
+ 
+   @BeforeEach
+   void setUp() {
+--- a/metrics-logback16/src/test/java/io/dropwizard/metrics5/logback16/InstrumentedAppenderTest.java
++++ b/metrics-logback16/src/test/java/io/dropwizard/metrics5/logback16/InstrumentedAppenderTest.java
 @@ -12,13 +12,13 @@ import org.junit.jupiter.api.AfterEach;
  import org.junit.jupiter.api.BeforeEach;
  import org.junit.jupiter.api.Test;

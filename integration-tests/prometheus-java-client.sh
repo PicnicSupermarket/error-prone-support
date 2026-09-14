@@ -5,8 +5,11 @@ set -e -u -o pipefail
 test_name="$(basename "${0}" .sh)"
 project='prometheus-java-client'
 repository='https://github.com/prometheus/client_java.git'
-revision='v1.4.1'
-additional_build_flags='-Djava.version=21 -Dwarnings='
+revision='v1.8.0'
+# Checkstyle validation is disabled because this project's line length limit
+# is not respected by the string literals that some Error Prone Support checks
+# introduce, and which Google Java Format does not wrap.
+additional_build_flags='-Dwarnings= -Dcheckstyle.skip=true'
 additional_source_directories=''
 shared_error_prone_flags=''
 patch_error_prone_flags=''
