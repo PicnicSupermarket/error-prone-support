@@ -1240,16 +1240,18 @@ final class ReactorRules {
     @Placeholder(allowsIdentity = true)
     abstract Optional<S> transformation(@MayOptionallyUse T value);
 
-    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
-    // resolved.
+    // XXX: Attempt to drop the `NullAway` suppression once the `JSpecifyExperimental` flag is
+    // released; see
+    // https://github.com/PicnicSupermarket/error-prone-support/pull/2299#issuecomment-5349925585.
     @BeforeTemplate
     @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<S> before(Flux<T> flux) {
       return flux.map(v -> transformation(v)).mapNotNull(o -> o.orElse(null));
     }
 
-    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
-    // resolved.
+    // XXX: Attempt to drop the `NullAway` suppression once the `JSpecifyExperimental` flag is
+    // released; see
+    // https://github.com/PicnicSupermarket/error-prone-support/pull/2299#issuecomment-5349925585.
     @AfterTemplate
     @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<S> after(Flux<T> flux) {
@@ -1264,8 +1266,9 @@ final class ReactorRules {
       return flux.filter(Optional::isPresent).map(Optional::orElseThrow);
     }
 
-    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
-    // resolved.
+    // XXX: Attempt to drop the `NullAway` suppression once the `JSpecifyExperimental` flag is
+    // released; see
+    // https://github.com/PicnicSupermarket/error-prone-support/pull/2299#issuecomment-5349925585.
     @AfterTemplate
     @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<T> after(Flux<Optional<T>> flux) {
