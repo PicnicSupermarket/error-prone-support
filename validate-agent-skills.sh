@@ -285,6 +285,7 @@ function check_references() {
     fi
   done < <(
     grep -oE '`[^`]+`' "${skill_file}" \
+      | sed -E 's/^`//; s/`$//' \
       | grep -oE \
         '(^|[[:space:]])\./[^`[:space:]]+\.sh([[:space:]]|$)' \
       | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//' \

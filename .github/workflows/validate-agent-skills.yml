@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - '.agents/skills/**'
-      - '.github/instructions/skills.instructions.md'
+      - '.github/instructions/**'
       - 'AGENTS.md'
       - 'validate-agent-skills.sh'
       - '.github/workflows/validate-agent-skills.yml'
@@ -11,7 +11,7 @@ on:
     branches: [ master ]
     paths:
       - '.agents/skills/**'
-      - '.github/instructions/skills.instructions.md'
+      - '.github/instructions/**'
       - 'AGENTS.md'
       - 'validate-agent-skills.sh'
       - '.github/workflows/validate-agent-skills.yml'
@@ -29,5 +29,7 @@ jobs:
             github.com:443
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Validate agent skills
         run: ./validate-agent-skills.sh
