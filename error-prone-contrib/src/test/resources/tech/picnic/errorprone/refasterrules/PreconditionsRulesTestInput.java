@@ -3,13 +3,14 @@ package tech.picnic.errorprone.refasterrules;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.Optional;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   @SuppressWarnings("RequireNonNullExpression")
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(checkNotNull(null));
+    return ImmutableSet.of(checkNotNull(null), Optional.class);
   }
 
   void testCheckArgumentNot() {
@@ -36,8 +37,8 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     }
   }
 
-  String testRequireNonNullExpression() {
-    return checkNotNull("foo");
+  ImmutableSet<String> testRequireNonNullExpression() {
+    return ImmutableSet.of(checkNotNull("foo"), Optional.of("bar").orElse("baz"));
   }
 
   void testRequireNonNullBlock() {

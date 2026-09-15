@@ -8,13 +8,14 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.Optional;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   @SuppressWarnings("RequireNonNullExpression")
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(checkNotNull(null));
+    return ImmutableSet.of(checkNotNull(null), Optional.class);
   }
 
   void testCheckArgumentNot() {
@@ -31,8 +32,8 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     checkElementIndex(1, 2, "foo");
   }
 
-  String testRequireNonNullExpression() {
-    return requireNonNull("foo");
+  ImmutableSet<String> testRequireNonNullExpression() {
+    return ImmutableSet.of(requireNonNull("foo"), requireNonNull("bar"));
   }
 
   void testRequireNonNullBlock() {

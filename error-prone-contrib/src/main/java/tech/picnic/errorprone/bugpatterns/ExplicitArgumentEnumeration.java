@@ -35,7 +35,6 @@ import com.sun.source.tree.MethodTree;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.code.Type.WildcardType;
 import com.sun.tools.javac.code.Types;
 import java.util.Arrays;
 import java.util.List;
@@ -262,11 +261,7 @@ public final class ExplicitArgumentEnumeration extends BugChecker
     }
 
     Type actualVarargsType = types.elemtype(parameters.getLast().type);
-    return switch (iterableElementType) {
-      case WildcardType wildcard when wildcard.isExtendsBound() ->
-          types.isSubtype(wildcard.getExtendsBound(), actualVarargsType);
-      default -> types.isSubtype(iterableElementType, actualVarargsType);
-    };
+    return types.isSubtype(types.wildUpperBound(iterableElementType), actualVarargsType);
   }
 
   private static Optional<SuggestedFix> trySuggestCallingCustomAlternative(
