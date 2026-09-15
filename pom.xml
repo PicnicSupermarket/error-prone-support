@@ -329,7 +329,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.6.0-jre</version>
+                <version>33.7.1-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -954,6 +954,17 @@
                             <path>
                                 <groupId>com.google.auto.service</groupId>
                                 <artifactId>auto-service</artifactId>
+                            </path>
+                            <!-- Refaster rule compilation and loading
+                            relies on (de)serialization using compatible
+                            versions of Guava. This explicit dependency
+                            declaration ensures said compatibility. It's
+                            unconditionnaly added to the annotation processor
+                            path, so that it applies anywhere that
+                            `refaster-compiler` is active. -->
+                            <path>
+                                <groupId>com.google.guava</groupId>
+                                <artifactId>guava</artifactId>
                             </path>
                         </annotationProcessorPaths>
                         <compilerArgs>
