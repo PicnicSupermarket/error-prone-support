@@ -32,6 +32,12 @@ rule's name and its home are anchored to the code it rewrites _to_.
 - **Don't**: place that rule in `OptionalRules` merely because its
   `@BeforeTemplate` matches an `Optional.of(...).orElse(...)` expression.
 
+If the `@AfterTemplate` references more than one type, the collection follows
+the _subject_ of the rewritten expression rather than the type wrapping it.
+So `CollectionRules.OptionalOfNullableQueuePeek`, which rewrites to
+`Optional.ofNullable(queue.peek())`, belongs in `CollectionRules` rather than
+`OptionalRules`.
+
 Before adding a new rule, check whether an existing rule already rewrites to
 the same target. If so, prefer extending that rule with an additional
 `@BeforeTemplate` over introducing a separate rule.
