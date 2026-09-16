@@ -13,7 +13,17 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -2571,9 +2577,13 @@
+@@ -1686,6 +1692,9 @@
+             --add-opens=java.desktop/java.awt=ALL-UNNAMED
+             --add-opens=java.desktop/sun.java2d=ALL-UNNAMED
+             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
++            <!-- XXX: Drop this change once Checkstyle 12.1.1+ is used; see https://github.com/checkstyle/checkstyle/pull/17955. -->
++            -XX:+EnableDynamicAgentLoading
++            -Xshare:off
+           </argLine>
+           <additionalClasspathElements>
+             <additionalClasspathElement>
+@@ -2571,9 +2580,13 @@
                      <arg>-Xpkginfo:always</arg>
                      <arg>-XDcompilePolicy=simple</arg>
                      <arg>--should-stop=ifError=FLOW</arg>
@@ -27,7 +37,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2586,6 +2596,11 @@
+@@ -2586,6 +2599,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -39,7 +49,7 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2627,11 +2642,14 @@
+@@ -2627,11 +2645,14 @@
                      <arg>--should-stop=ifError=FLOW</arg>
                      <arg>-Xpkginfo:always</arg>
                      <arg>-XDcompilePolicy=simple</arg>
@@ -55,7 +65,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2644,6 +2662,11 @@
+@@ -2644,6 +2665,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
