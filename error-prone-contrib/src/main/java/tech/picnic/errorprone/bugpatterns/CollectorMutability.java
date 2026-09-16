@@ -33,7 +33,8 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
  * (im)mutability.
  *
  * <p>Replacing such collectors with alternatives that produce immutable collections is preferred.
- * Do note that Guava's immutable collections are null-hostile.
+ * Do note that both Guava's immutable collections and the JDK's unmodifiable collections are
+ * null-hostile.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -100,7 +101,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       description.addFix(replaceMethodInvocation(tree, immutableReplacement, state));
     }
 
-    if (isJdk10Plus(state)) {
+    if (supportsUnmodifiableCollectors(state)) {
       description.addFix(replaceMethodInvocation(tree, unmodifiableReplacement, state));
     }
 
@@ -131,7 +132,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
               tree, ImmutableMap.class.getCanonicalName() + ".toImmutableMap", state));
     }
 
-    if (isJdk10Plus(state)) {
+    if (supportsUnmodifiableCollectors(state)) {
       description.addFix(
           replaceMethodInvocation(
               tree, Collectors.class.getCanonicalName() + ".toUnmodifiableMap", state));
@@ -151,9 +152,8 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     return description.build();
   }
 
-  private static boolean isJdk10Plus(VisitorState state) {
-    Source lowerBound = Source.lookup("10");
-    return lowerBound != null && Source.instance(state.context).compareTo(lowerBound) >= 0;
+  private static boolean supportsUnmodifiableCollectors(VisitorState state) {
+    return Source.instance(state.context).compareTo(Source.JDK10) >= 0;
   }
 
   private static SuggestedFix replaceMethodInvocation(
