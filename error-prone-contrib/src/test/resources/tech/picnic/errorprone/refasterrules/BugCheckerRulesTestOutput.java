@@ -3,6 +3,7 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.tools.javac.tree.JCTree;
@@ -15,7 +16,8 @@ import tech.picnic.errorprone.utils.SourceCode;
 final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Constants.class, Convert.class, FixChoosers.class, JCTree.class);
+    return ImmutableSet.of(
+        Constants.class, Convert.class, FixChoosers.class, JCTree.class, TestMode.class);
   }
 
   ImmutableSet<BugCheckerRefactoringTestHelper> testBugCheckerRefactoringTestHelperIdentity() {
@@ -29,6 +31,14 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
     return BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass())
         .addInputLines("A.java", "class A {}")
         .expectUnchanged();
+  }
+
+  @SuppressWarnings("deprecation" /* Rule rewrites deprecated method invocation. */)
+  void testBugCheckerRefactoringTestHelperDoTest() {
+    BugCheckerRefactoringTestHelper.newInstance(BugChecker.class, getClass())
+        .addInputLines("A.java", "class A {}")
+        .expectUnchanged()
+        .doTest();
   }
 
   ImmutableSet<String> testSourceCodeToStringConstantExpression() {

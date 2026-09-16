@@ -2,6 +2,7 @@ package tech.picnic.errorprone.refasterrules;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
+import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
@@ -56,6 +57,20 @@ final class BugCheckerRules {
     BugCheckerRefactoringTestHelper after(
         BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper, String path, String str) {
       return bugCheckerRefactoringTestHelper.addInputLines(path, str).expectUnchanged();
+    }
+  }
+
+  /** Prefer {@link BugCheckerRefactoringTestHelper#doTest()} over deprecated alternatives. */
+  static final class BugCheckerRefactoringTestHelperDoTest {
+    @BeforeTemplate
+    @SuppressWarnings("deprecation" /* This deprecated API usage will be rewritten. */)
+    void before(BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper) {
+      bugCheckerRefactoringTestHelper.doTest(TestMode.TEXT_MATCH);
+    }
+
+    @AfterTemplate
+    void after(BugCheckerRefactoringTestHelper bugCheckerRefactoringTestHelper) {
+      bugCheckerRefactoringTestHelper.doTest();
     }
   }
 
