@@ -129,7 +129,12 @@ final class CollectorMutabilityTest {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
         .setArgs("--release", "10")
-        .expectErrorMessage("X", m -> m.contains("toUnmodifiableList"))
+        .expectErrorMessage(
+            "X", m -> m.contains("toUnmodifiableList") && !m.contains("toImmutableList"))
+        .expectErrorMessage(
+            "Y", m -> m.contains("toUnmodifiableMap") && !m.contains("toImmutableMap"))
+        .expectErrorMessage(
+            "Z", m -> m.contains("toUnmodifiableSet") && !m.contains("toImmutableSet"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
@@ -139,6 +144,10 @@ final class CollectorMutabilityTest {
             "  void m() {",
             "    // BUG: Diagnostic matches: X",
             "    Stream.empty().collect(Collectors.toList());",
+            "    // BUG: Diagnostic matches: Y",
+            "    Stream.empty().collect(Collectors.toMap(o -> o, o -> o));",
+            "    // BUG: Diagnostic matches: Z",
+            "    Stream.empty().collect(Collectors.toSet());",
             "  }",
             "}")
         .doTest();
