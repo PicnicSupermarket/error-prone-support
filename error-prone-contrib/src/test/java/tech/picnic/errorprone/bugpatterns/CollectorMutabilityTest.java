@@ -20,6 +20,9 @@ final class CollectorMutabilityTest {
             "import static java.util.stream.Collectors.toList;",
             "import static java.util.stream.Collectors.toMap;",
             "import static java.util.stream.Collectors.toSet;",
+            "import static java.util.stream.Collectors.toUnmodifiableList;",
+            "import static java.util.stream.Collectors.toUnmodifiableMap;",
+            "import static java.util.stream.Collectors.toUnmodifiableSet;",
             "",
             "import java.util.ArrayList;",
             "import java.util.HashMap;",
@@ -35,24 +38,28 @@ final class CollectorMutabilityTest {
             "    // BUG: Diagnostic contains:",
             "    Flux.just(2).collect(toList());",
             "    Flux.just(3).collect(toImmutableList());",
-            "    Flux.just(4).collect(toCollection(ArrayList::new));",
+            "    Flux.just(4).collect(toUnmodifiableList());",
+            "    Flux.just(5).collect(toCollection(ArrayList::new));",
             "",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(\"foo\").collect(Collectors.toMap(String::getBytes, String::length));",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(\"bar\").collect(toMap(String::getBytes, String::length));",
             "    Flux.just(\"baz\").collect(toImmutableMap(String::getBytes, String::length));",
+            "    Flux.just(\"qux\").collect(toUnmodifiableMap(String::getBytes, String::length));",
             "    // BUG: Diagnostic contains:",
-            "    Flux.just(\"qux\").collect(toMap(String::getBytes, String::length, (a, b) -> a));",
-            "    Flux.just(\"quux\").collect(toImmutableMap(String::getBytes, String::length, (a, b) -> a));",
-            "    Flux.just(\"quuz\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
+            "    Flux.just(\"quux\").collect(toMap(String::getBytes, String::length, (a, b) -> a));",
+            "    Flux.just(\"quuz\").collect(toImmutableMap(String::getBytes, String::length, (a, b) -> a));",
+            "    Flux.just(\"corge\").collect(toUnmodifiableMap(String::getBytes, String::length, (a, b) -> a));",
+            "    Flux.just(\"grault\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
             "",
             "    // BUG: Diagnostic contains:",
             "    Stream.of(1).collect(Collectors.toSet());",
             "    // BUG: Diagnostic contains:",
             "    Stream.of(2).collect(toSet());",
             "    Stream.of(3).collect(toImmutableSet());",
-            "    Stream.of(4).collect(toCollection(HashSet::new));",
+            "    Stream.of(4).collect(toUnmodifiableSet());",
+            "    Stream.of(5).collect(toCollection(HashSet::new));",
             "",
             "    Flux.just(\"foo\").collect(Collectors.joining());",
             "  }",
@@ -64,9 +71,12 @@ final class CollectorMutabilityTest {
   void identificationWithoutGuavaOnClasspath() {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
-        .expectErrorMessage("X", m -> !m.contains("toImmutableList"))
-        .expectErrorMessage("Y", m -> !m.contains("toImmutableMap"))
-        .expectErrorMessage("Z", m -> !m.contains("toImmutableSet"))
+        .expectErrorMessage(
+            "X", m -> m.contains("toUnmodifiableList") && !m.contains("toImmutableList"))
+        .expectErrorMessage(
+            "Y", m -> m.contains("toUnmodifiableMap") && !m.contains("toImmutableMap"))
+        .expectErrorMessage(
+            "Z", m -> m.contains("toUnmodifiableSet") && !m.contains("toImmutableSet"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
@@ -86,11 +96,16 @@ final class CollectorMutabilityTest {
   }
 
   @Test
-  void identificationWithoutGuavaAtExactlyJdk10OnClasspath() {
+  void identificationWithoutGuavaOnJdk9() {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
-        .setArgs("--release", "10")
-        .expectErrorMessage("X", m -> m.contains("toUnmodifiableList"))
+        .setArgs("--release", "9")
+        .expectErrorMessage(
+            "X", m -> !m.contains("toImmutableList") && !m.contains("toUnmodifiableList"))
+        .expectErrorMessage(
+            "Y", m -> !m.contains("toImmutableMap") && !m.contains("toUnmodifiableMap"))
+        .expectErrorMessage(
+            "Z", m -> !m.contains("toImmutableSet") && !m.contains("toUnmodifiableSet"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
@@ -100,18 +115,21 @@ final class CollectorMutabilityTest {
             "  void m() {",
             "    // BUG: Diagnostic matches: X",
             "    Stream.empty().collect(Collectors.toList());",
+            "    // BUG: Diagnostic matches: Y",
+            "    Stream.empty().collect(Collectors.toMap(o -> o, o -> o));",
+            "    // BUG: Diagnostic matches: Z",
+            "    Stream.empty().collect(Collectors.toSet());",
             "  }",
             "}")
         .doTest();
   }
 
   @Test
-  void identificationWithoutGuavaAndOlderJdkOnClasspath() {
+  void identificationWithoutGuavaOnJdk10() {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
-        .setArgs("--release", "9")
-        .expectErrorMessage(
-            "X", m -> !m.contains("toImmutableList") && !m.contains("toUnmodifiableList"))
+        .setArgs("--release", "10")
+        .expectErrorMessage("X", m -> m.contains("toUnmodifiableList"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
