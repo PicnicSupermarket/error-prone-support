@@ -8,6 +8,9 @@ on: # zizmor: ignore[dangerous-triggers] the documented GitHub pattern for posti
     types: [ completed ]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:

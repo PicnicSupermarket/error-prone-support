@@ -17,6 +17,11 @@ on:
     branches: [ master ]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number || github.ref }}
+  # Superseded `/integration-test` comment requests are safe to cancel, but
+  # every push to the default branch must run to completion.
+  cancel-in-progress: ${{ github.event_name == 'issue_comment' }}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
   CHECKOUT_REF: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}

@@ -4,6 +4,9 @@ on: # zizmor: ignore[dangerous-triggers] no PR code is checked out; only the Git
     types: [ labeled ]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 jobs:
   assign-milestone:
     if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null }}

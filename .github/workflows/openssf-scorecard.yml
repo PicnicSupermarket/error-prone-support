@@ -12,6 +12,12 @@ on:
     - cron: '0 4 * * 1'
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Superseded pull request runs are safe to cancel, but push and scheduled
+  # runs must complete so their SARIF upload keeps the code scanning
+  # dashboard current.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   analyze:
     permissions:

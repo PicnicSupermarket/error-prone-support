@@ -12,6 +12,11 @@ on:
     branches: [ master ]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Superseded pull request builds are safe to cancel, but every push to the
+  # default branch must run to completion so that its build status is known.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:

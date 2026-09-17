@@ -8,6 +8,11 @@ on:
     branches: [ master ]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Superseded pull request runs are safe to cancel, but every push to the
+  # default branch must run to completion.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   validate:
     runs-on: ubuntu-24.04
