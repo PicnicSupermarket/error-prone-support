@@ -46,7 +46,7 @@ public final class FluxGroupByUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> FLUX_GROUP_BY =
-      instanceMethod().onDescendantOf("reactor.core.publisher.Flux").named("groupBy");
+      instanceMethod().onExactClass("reactor.core.publisher.Flux").named("groupBy");
 
   /** Instantiates a new {@link FluxGroupByUsage} instance. */
   public FluxGroupByUsage() {}
