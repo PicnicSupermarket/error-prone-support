@@ -1,5 +1,5 @@
 name: Assign milestone to dependency upgrade PR
-on:
+on: # zizmor: ignore[dangerous-triggers] no PR code is checked out; only the GitHub API is used, gated on the "dependencies" label
   pull_request_target:
     types: [ labeled ]
 permissions:
