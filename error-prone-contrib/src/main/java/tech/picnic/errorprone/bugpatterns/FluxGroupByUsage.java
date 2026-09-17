@@ -26,6 +26,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 
 /**
@@ -54,6 +55,7 @@ public final class FluxGroupByUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> BOOLEAN = Suppliers.typeFromClass(Boolean.class);
+  private static final Supplier<Type> FUNCTION = Suppliers.typeFromClass(Function.class);
   private static final Matcher<ExpressionTree> FLUX_GROUP_BY =
       instanceMethod().onExactClass("reactor.core.publisher.Flux").named("groupBy");
 
@@ -82,14 +84,19 @@ public final class FluxGroupByUsage extends BugChecker
     return describeIfUnbounded(tree, getFunctionReturnType(keyMapperType, state), state);
   }
 
-  private Description describeIfUnbounded(ExpressionTree tree, Type keyType, VisitorState state) {
-    return ASTHelpers.isSameType(keyType, BOOLEAN.get(state), state)
-            || keyType.asElement().getKind() == ENUM
+  private Description describeIfUnbounded(
+      ExpressionTree tree, @Nullable Type keyType, VisitorState state) {
+    return keyType != null
+            && (ASTHelpers.isSameType(keyType, BOOLEAN.get(state), state)
+                || keyType.asElement().getKind() == ENUM)
         ? Description.NO_MATCH
         : describeMatch(tree);
   }
 
-  private static Type getFunctionReturnType(Type functionType, VisitorState state) {
-    return state.getTypes().findDescriptorType(functionType).getReturnType();
+  private static @Nullable Type getFunctionReturnType(Type type, VisitorState state) {
+    Type functionType = state.getTypes().asSuper(type, FUNCTION.get(state).tsym);
+    return functionType == null
+        ? null
+        : state.getTypes().findDescriptorType(functionType).getReturnType();
   }
 }
