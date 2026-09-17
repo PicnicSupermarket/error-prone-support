@@ -36,8 +36,8 @@ import reactor.core.publisher.Flux;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "`Flux#groupBy` can deadlock; prefer explicit aggregation or suppress this check for a "
-            + "proven low-cardinality use case",
+        "`Flux#groupBy` can deadlock; avoid it unless group cardinality is bounded and downstream "
+            + "consumption is provably safe",
     link = BUG_PATTERNS_BASE_URL + "FluxGroupByUsage",
     linkType = CUSTOM,
     severity = ERROR,
