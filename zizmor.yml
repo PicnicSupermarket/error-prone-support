@@ -1,0 +1,31 @@
+# Configuration for the zizmor GitHub Actions security scanner. See
+# https://docs.zizmor.sh/configuration/ for details.
+#
+# This repository's `.github/instructions/github-actions.instructions.md`
+# documents an explicit convention: single-job workflows use a short,
+# lowercase job id (e.g. `build`, `validate`, `analyze`) as the job's
+# effective name, rather than adding a redundant `name:` field. Multi-job
+# workflows already give each job a descriptive `name:` (see
+# `integration-tests.yml`). Adding a `name:` purely to satisfy the
+# `anonymous-definition` audit would violate that documented convention, and
+# renaming these long-standing job ids' displayed check names could break any
+# branch-protection required-status-check rule keyed on them. Ignore the
+# audit for the affected files instead of disabling it outright, so that any
+# newly introduced anonymous multi-job workflow is still flagged.
+rules:
+  anonymous-definition:
+    ignore:
+      - assign-milestone.yml
+      - build.yml
+      - codeql.yml
+      - default-branch-health-gate.yml
+      - deploy-website.yml
+      - error-prone-compat.yml
+      - openssf-scorecard.yml
+      - pitest-analyze-pr.yml
+      - pitest-update-pr.yml
+      - reviewdog.yml
+      - sonarcloud.yml
+      - suggest-commit-message.yml
+      - validate-review-checklist.yml
+      - zizmor.yml
