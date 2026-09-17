@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.CONCURRENCY;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static java.util.Objects.requireNonNull;
 import static javax.lang.model.element.ElementKind.ENUM;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -19,13 +20,12 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.suppliers.Suppliers;
 import com.google.errorprone.util.ASTHelpers;
-import com.google.errorprone.util.TargetType;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.function.Function;
-import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 
 /**
@@ -44,8 +44,8 @@ import reactor.core.publisher.Flux;
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "`Flux#groupBy` can deadlock; use a Boolean or enum key, or prove bounded cardinality and "
-            + "safe consumption",
+        "Use a Boolean or concrete enum key, or suppress this check for another provably bounded "
+            + "`Flux#groupBy` key space",
     link = BUG_PATTERNS_BASE_URL + "FluxGroupByUsage",
     linkType = CUSTOM,
     severity = ERROR,
@@ -53,51 +53,43 @@ import reactor.core.publisher.Flux;
 public final class FluxGroupByUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
+  private static final Supplier<Type> BOOLEAN = Suppliers.typeFromClass(Boolean.class);
   private static final Matcher<ExpressionTree> FLUX_GROUP_BY =
       instanceMethod().onExactClass("reactor.core.publisher.Flux").named("groupBy");
-  private static final Supplier<Type> BOOLEAN = Suppliers.typeFromClass(Boolean.class);
 
   /** Instantiates a new {@link FluxGroupByUsage} instance. */
   public FluxGroupByUsage() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    return shouldFlag(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
+    if (!FLUX_GROUP_BY.matches(tree, state)) {
+      return Description.NO_MATCH;
+    }
+
+    Type keyMapperType =
+        requireNonNull(
+            ASTHelpers.getType(tree.getArguments().getFirst()), "Key mapper lacks a type");
+    return describeIfUnbounded(tree, getFunctionReturnType(keyMapperType, state), state);
   }
 
   @Override
   public Description matchMemberReference(MemberReferenceTree tree, VisitorState state) {
-    return shouldFlag(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
-  }
-
-  private static boolean shouldFlag(ExpressionTree tree, VisitorState state) {
     if (!FLUX_GROUP_BY.matches(tree, state)) {
-      return false;
+      return Description.NO_MATCH;
     }
 
-    Type returnType = getReturnType(tree, state);
-    if (returnType == null || returnType.getTypeArguments().isEmpty()) {
-      return true;
-    }
-
-    Type groupedFluxType = returnType.getTypeArguments().getFirst();
-    if (groupedFluxType.getTypeArguments().isEmpty()) {
-      return true;
-    }
-
-    Type keyType = groupedFluxType.getTypeArguments().getFirst();
-    return !ASTHelpers.isSameType(keyType, BOOLEAN.get(state), state)
-        && keyType.asElement().getKind() != ENUM;
+    Type keyMapperType = ((JCMemberReference) tree).referentType.getParameterTypes().getFirst();
+    return describeIfUnbounded(tree, getFunctionReturnType(keyMapperType, state), state);
   }
 
-  private static @Nullable Type getReturnType(ExpressionTree tree, VisitorState state) {
-    if (tree instanceof MemberReferenceTree) {
-      TargetType targetType = TargetType.targetType(state);
-      if (targetType != null) {
-        return state.getTypes().findDescriptorType(targetType.type()).getReturnType();
-      }
-    }
+  private Description describeIfUnbounded(ExpressionTree tree, Type keyType, VisitorState state) {
+    return ASTHelpers.isSameType(keyType, BOOLEAN.get(state), state)
+            || keyType.asElement().getKind() == ENUM
+        ? Description.NO_MATCH
+        : describeMatch(tree);
+  }
 
-    return ASTHelpers.getResultType(tree);
+  private static Type getFunctionReturnType(Type functionType, VisitorState state) {
+    return state.getTypes().findDescriptorType(functionType).getReturnType();
   }
 }
