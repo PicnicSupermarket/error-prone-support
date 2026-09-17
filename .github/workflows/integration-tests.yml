@@ -75,7 +75,7 @@ jobs:
     if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-24.04
     permissions:
-      pull-requests: write
+      pull-requests: write # Needed to post the acknowledgement comment.
     outputs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
     steps:
@@ -227,7 +227,7 @@ jobs:
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
     runs-on: ubuntu-24.04
     permissions:
-      pull-requests: write
+      pull-requests: write # Needed to update the acknowledgement comment with results.
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4

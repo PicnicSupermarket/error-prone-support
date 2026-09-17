@@ -17,10 +17,10 @@ jobs:
   update-pr:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
-      actions: read
-      checks: write
+      actions: read # Needed to download the Pitest artifact from the triggering workflow run.
+      checks: write # Needed to annotate surviving mutants on the corresponding lines.
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed to post the mutation testing summary as a pull request comment.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

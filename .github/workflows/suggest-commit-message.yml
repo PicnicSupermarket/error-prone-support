@@ -29,7 +29,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed to post the suggested commit message as a pull request comment.
     runs-on: ubuntu-24.04
     environment: codex
     steps:

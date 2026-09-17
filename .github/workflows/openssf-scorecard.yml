@@ -22,8 +22,8 @@ jobs:
   analyze:
     permissions:
       contents: read
-      security-events: write
-      id-token: write
+      security-events: write # Needed to upload Scorecard's SARIF results to the code scanning dashboard.
+      id-token: write # Needed to publish results to the public Scorecard API via Sigstore/OIDC.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

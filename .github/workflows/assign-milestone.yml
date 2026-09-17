@@ -12,8 +12,8 @@ jobs:
     if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null }}
     permissions:
       contents: read
-      issues: write
-      pull-requests: write
+      issues: write # Needed to set the milestone via the Issues API.
+      pull-requests: write # Needed to read and update the pull request's milestone.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
