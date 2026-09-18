@@ -75,6 +75,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Prepare Codex prompt
         id: prompt
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -213,7 +214,7 @@ jobs:
             fs.writeFileSync(promptPath, instructions.trim() + '\n', { encoding: 'utf8' });
       - name: Suggest commit message with Codex
         id: codex
-        uses: openai/codex-action@e0fdf01220eb9a88167c4898839d273e3f2609d1 # v1.8
+        uses: openai/codex-action@86365089eb2b84e0a8fb0717b304f8bdcb13b20e # v1.12
         with:
           # XXX: We're using `safety-strategy: unsafe` and
           # `sandbox: danger-full-access` so that the agent is able to access

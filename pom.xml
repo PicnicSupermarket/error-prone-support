@@ -133,6 +133,11 @@
         Java classes don't contain "regular" code, and thus require special
         handling by various code analysis tools. -->
         <refaster-rules.path-pattern>**/tech/picnic/errorprone/refasterrules/*.java</refaster-rules.path-pattern>
+        <!-- Some Refaster rules declare template methods with incompatible
+        return types; by default we suppress them so that the build can pass. -->
+        <!-- XXX: Ideally we skip recipe generation for such rules instead, so
+        that warning suppression isn't necessary. -->
+        <refaster-rules.suppress-openrewrite-warnings>true</refaster-rules.suppress-openrewrite-warnings>
         <!-- SonarCloud analysis settings. Refaster rules are excluded from
         coverage computation, because they are tested using a custom method
         that does not cause code coverage to be registered. -->
@@ -193,7 +198,7 @@
         <version.error-prone-orig>2.50.0</version.error-prone-orig>
         <version.jdk>21</version.jdk>
         <version.maven>3.9.16</version.maven>
-        <version.pitest-git>2.3.3</version.pitest-git>
+        <version.pitest-git>2.3.4</version.pitest-git>
     </properties>
 
     <dependencyManagement>
@@ -246,7 +251,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.22.0</version>
+                <version>2.22.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -314,7 +319,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.35.0</version>
+                <version>1.36.1</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -348,14 +353,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.16.5</version>
+                <version>1.17.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2025.0.5</version>
+                <version>2025.0.7</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -372,7 +377,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.50</version>
+                <version>2.2.55</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -402,7 +407,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.9</version>
+                <version>1.18.12</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -437,19 +442,19 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.21.4</version>
+                <version>3.21.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.jspecify</groupId>
                 <artifactId>jspecify</artifactId>
-                <version>1.0.0</version>
+                <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>6.1.0</version>
+                <version>6.1.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -463,14 +468,14 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.8.0</version>
+                <version>5.11.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite.recipe</groupId>
                 <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.31.0</version>
+                <version>3.37.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -482,26 +487,26 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-bom</artifactId>
-                <version>2.0.18</version>
+                <version>2.0.19</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>7.0.7</version>
+                <version>7.0.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.0.6</version>
+                <version>4.1.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>7.0.5</version>
+                <version>7.1.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -513,7 +518,7 @@
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.1.3</version>
+                <version>3.2.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -700,7 +705,9 @@
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
-                                    <module name="ConstructorsDeclarationGrouping" />
+                                    <module name="ConstructorsDeclarationGrouping">
+                                        <property name="orderByIncreasingParameterCount" value="true" />
+                                    </module>
                                     <module name="DeclarationOrder">
                                         <!-- We don't enforce sorting fields by
                                         their visibility modifier, for two
@@ -853,15 +860,13 @@
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
-                                    <module name="JavadocStyle">
-                                        <property name="checkEmptyJavadoc" value="true" />
-                                    </module>
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
                                         <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
                                         <message key="matchxpath.match" value="Avoid the `@author` Javadoc tag; Git history suffices." />
                                     </module>
                                     <module name="MissingDeprecated" />
+                                    <module name="MultilineCommentLeadingAsteriskPresence" />
                                     <module name="MutableException" />
                                     <module name="NeedBraces" />
                                     <module name="NoClone" />
@@ -875,6 +880,7 @@
                                     </module>
                                     <module name="ParameterAssignment" />
                                     <module name="PatternVariableAssignment" />
+                                    <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
@@ -887,6 +893,7 @@
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
+                                    <module name="UnnecessaryTypeArgumentsWithRecordPattern" />
                                     <module name="UnusedImports">
                                         <!-- Error-prone also detects these,
                                         but (currently) doesn't warn about
@@ -916,7 +923,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>13.5.0</version>
+                            <version>14.0.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -941,7 +948,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.15.0</version>
+                    <version>3.16.0</version>
                     <configuration>
                         <annotationProcessorPaths>
                             <path>
@@ -1005,6 +1012,7 @@
                                     `JavaParser.Builder#classpathFromResources`
                                     rather than `JavaParser.Builder#classpath`. -->
                                     <arg>-Arewrite.javaParserClasspathFrom=resources</arg>
+                                    <arg>-Arewrite.suppressWarnings=${refaster-rules.suppress-openrewrite-warnings}</arg>
                                 </compilerArgs>
                                 <includes>
                                     <include>**/*Rules.java</include>
@@ -1201,12 +1209,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
                     <configuration>
                         <skipIfEmpty>true</skipIfEmpty>
                         <archive>
@@ -1357,7 +1365,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.6</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1563,7 +1571,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.21.0</version>
+                    <version>2.22.0</version>
                     <configuration>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
@@ -1571,7 +1579,7 @@
                 <plugin>
                     <groupId>org.gaul</groupId>
                     <artifactId>modernizer-maven-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <exclusionPatterns>
                             <!-- The plugin suggests replacing usages of
@@ -1602,7 +1610,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.14</version>
+                    <version>0.8.15</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
@@ -1632,7 +1640,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.25.3</version>
+                    <version>1.30.0</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->
@@ -1659,12 +1667,12 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.7.1</version>
+                            <version>1.7.2</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>pitest-accelerator-junit5</artifactId>
-                            <version>1.2.2</version>
+                            <version>1.2.3</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
@@ -1689,12 +1697,12 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.7.0.6970</version>
+                    <version>5.8.0.7211</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.10.0</version>
+                    <version>0.11.0</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
@@ -1781,6 +1789,13 @@
                     <name>verification.warn</name>
                 </property>
             </activation>
+            <properties>
+                <!-- XXX: As an exeption to the rule that this profile "tones
+                down" checks, we enable OpenRewrite warnings so that they are
+                at least visible with `-Dverification.warn`; they'd otherwise
+                be entirely invisible. -->
+                <refaster-rules.suppress-openrewrite-warnings>false</refaster-rules.suppress-openrewrite-warnings>
+            </properties>
             <build>
                 <pluginManagement>
                     <plugins>

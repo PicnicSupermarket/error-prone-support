@@ -75,7 +75,6 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           Strings.class.getCanonicalName(),
           VisitorState.class.getCanonicalName(),
           ZoneOffset.class.getCanonicalName(),
-          "com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode",
           "reactor.core.publisher.Flux",
           "reactor.core.publisher.Mono");
 

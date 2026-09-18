@@ -375,14 +375,20 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
 
   ImmutableSet<Flux<Integer>> testMonoFlatMapIterable() {
     return ImmutableSet.of(
-        Mono.just(1).map(ImmutableSet::of).flatMapMany(Flux::fromIterable),
-        Mono.just(2).map(ImmutableSet::of).flatMapIterable(v -> ImmutableSet.of()),
-        Mono.just(3).map(ImmutableSet::of).flatMapIterable(identity()),
-        Mono.just(4).flux().concatMapIterable(ImmutableSet::of));
+        Mono.just(1).map(ImmutableSet::of).flatMapIterable(v -> ImmutableSet.of()),
+        Mono.just(2).map(ImmutableSet::of).flatMapIterable(identity()),
+        Mono.just(3).flux().concatMapIterable(ImmutableSet::of),
+        Mono.just(4).flux().concatMapIterable(ImmutableSet::of, 5));
   }
 
-  Flux<Integer> testMonoFlatMapIterableIdentity() {
-    return Mono.just(ImmutableSet.of(1)).flatMapMany(Flux::fromIterable);
+  ImmutableSet<Flux<Integer>> testMonoFlatMapIterableIdentity() {
+    return ImmutableSet.of(
+        Mono.just(ImmutableSet.of(1)).flatMapMany(set -> Flux.fromIterable(set)),
+        Mono.just(ImmutableSet.of(2)).flatMapMany(Flux::fromIterable));
+  }
+
+  Flux<Integer> testMonoFlatMapIterableWithTransformation() {
+    return Mono.just(1).flatMapMany(v -> Flux.fromIterable(ImmutableSet.of(v)));
   }
 
   ImmutableSet<Flux<Integer>> testFluxConcatMapIterable() {
@@ -589,6 +595,14 @@ final class ReactorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(
         Flux.just(ImmutableList.of("foo")).concatMap(list -> Flux.fromIterable(list), 1),
         Flux.just(ImmutableList.of("bar")).concatMap(Flux::fromIterable, 2));
+  }
+
+  Flux<Integer> testFluxConcatMapIterableWithTransformation() {
+    return Flux.just(1).concatMap(v -> Flux.fromIterable(ImmutableList.of(v)));
+  }
+
+  Flux<Integer> testFluxConcatMapIterableWithTransformationAndInt() {
+    return Flux.just(1).concatMap(v -> Flux.fromIterable(ImmutableList.of(v)), 2);
   }
 
   ImmutableSet<Flux<String>> testFluxFromIterable() {
