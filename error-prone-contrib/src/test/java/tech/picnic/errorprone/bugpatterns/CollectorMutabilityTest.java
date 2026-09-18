@@ -68,34 +68,6 @@ final class CollectorMutabilityTest {
   }
 
   @Test
-  void identificationWithoutGuavaOnClasspath() {
-    CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
-        .withClasspath()
-        .expectErrorMessage(
-            "X", m -> m.contains("toUnmodifiableList") && !m.contains("toImmutableList"))
-        .expectErrorMessage(
-            "Y", m -> m.contains("toUnmodifiableMap") && !m.contains("toImmutableMap"))
-        .expectErrorMessage(
-            "Z", m -> m.contains("toUnmodifiableSet") && !m.contains("toImmutableSet"))
-        .addSourceLines(
-            "A.java",
-            "import java.util.stream.Collectors;",
-            "import java.util.stream.Stream;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    // BUG: Diagnostic matches: X",
-            "    Stream.empty().collect(Collectors.toList());",
-            "    // BUG: Diagnostic matches: Y",
-            "    Stream.empty().collect(Collectors.toMap(o -> o, o -> o));",
-            "    // BUG: Diagnostic matches: Z",
-            "    Stream.empty().collect(Collectors.toSet());",
-            "  }",
-            "}")
-        .doTest();
-  }
-
-  @Test
   void identificationWithoutGuavaOnJdk9() {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
