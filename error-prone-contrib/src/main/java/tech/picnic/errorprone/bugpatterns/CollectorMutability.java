@@ -35,10 +35,6 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
  * <p>Replacing such collectors with alternatives that produce immutable collections is preferred.
  * Do note that both Guava's immutable collections and the JDK's unmodifiable collections are
  * null-hostile.
- *
- * <p><strong>Warning:</strong> unlike Guava's, the JDK's {@code toUnmodifiable*} collectors are
- * null-hostile on lookup too: {@code contains(null)} and {@code get(null)} throw. The resulting
- * sets and maps also iterate in an order that varies between JVM runs.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
