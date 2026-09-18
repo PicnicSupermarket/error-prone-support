@@ -275,6 +275,10 @@ the files you modified.
 
 ## Refaster Rule Conventions (`refaster-rules.instructions.md`)
 
+### Choosing the collection
+
+- [ ] Rule lives in the collection matching its `@AfterTemplate` target
+
 ### Rule file structure
 
 - [ ] Rule classes use `static final class` (not `abstract`) unless `@Placeholder` is needed
