@@ -35,6 +35,10 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
  * <p>Replacing such collectors with alternatives that produce immutable collections is preferred.
  * Do note that both Guava's immutable collections and the JDK's unmodifiable collections are
  * null-hostile.
+ *
+ * <p><strong>Warning:</strong> unlike Guava's, the JDK's {@code toUnmodifiable*} collectors are
+ * null-hostile on lookup too: {@code contains(null)} and {@code get(null)} throw. The resulting
+ * sets and maps also iterate in an order that varies between JVM runs.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -152,15 +156,15 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     return description.build();
   }
 
-  private static boolean supportsUnmodifiableCollectors(VisitorState state) {
-    return Source.instance(state.context).compareTo(Source.JDK10) >= 0;
-  }
-
   private static SuggestedFix replaceMethodInvocation(
       MethodInvocationTree tree, String fullyQualifiedReplacement, VisitorState state) {
     SuggestedFix.Builder fix = SuggestedFix.builder();
     String replacement = SuggestedFixes.qualifyStaticImport(fullyQualifiedReplacement, fix, state);
     fix.merge(SuggestedFix.replace(tree.getMethodSelect(), replacement));
     return fix.build();
+  }
+
+  private static boolean supportsUnmodifiableCollectors(VisitorState state) {
+    return Source.instance(state.context).compareTo(Source.JDK10) >= 0;
   }
 }
