@@ -6,6 +6,9 @@ on:
   workflow_run:
     workflows: ["Run mutation tests"]
     types: [ completed ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.conclusion }}
+  cancel-in-progress: true
 permissions:
   contents: read
 env:

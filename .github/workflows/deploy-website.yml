@@ -3,10 +3,12 @@ on:
   pull_request:
   push:
     branches: [ master, website ]
-permissions:
-  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-24.04

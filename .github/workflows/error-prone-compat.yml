@@ -16,6 +16,9 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * *'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  queue: max
 permissions:
   contents: read
 env:

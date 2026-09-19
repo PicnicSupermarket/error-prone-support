@@ -8,11 +8,11 @@ on:
         description: Pull request number of interest
         required: true
         type: number
-permissions:
-  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
+permissions:
+  contents: read
 env:
   # XXX: Figure out how we can block access to `ab.chatgpt.com` and
   # `chatgpt.com` without causing PR checks to fail.
