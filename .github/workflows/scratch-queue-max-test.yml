@@ -7,7 +7,7 @@ permissions:
 concurrency:
   group: scratch-queue-max-test
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-  queue: max
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 jobs:
   noop:
     runs-on: ubuntu-24.04
