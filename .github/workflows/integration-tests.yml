@@ -15,8 +15,7 @@ on:
     types: [ created ]
   push:
     branches: [ master ]
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
   CHECKOUT_REF: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
@@ -25,6 +24,8 @@ jobs:
     name: Determine integration test matrix
     if: ${{ github.event_name == 'push' || (github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')) }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -70,7 +71,7 @@ jobs:
     if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-24.04
     permissions:
-      pull-requests: write
+      pull-requests: write # Needed to post a comment on the pull request that triggered this workflow.
     outputs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
     steps:
@@ -105,6 +106,8 @@ jobs:
     needs: [ matrix, acknowledge ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -161,6 +164,8 @@ jobs:
     needs: [ matrix, patch ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -222,7 +227,7 @@ jobs:
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
     runs-on: ubuntu-24.04
     permissions:
-      pull-requests: write
+      pull-requests: write # Needed to update the pull request comment posted by the `acknowledge` job.
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4

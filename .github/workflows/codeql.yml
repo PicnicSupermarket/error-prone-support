@@ -9,8 +9,7 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * 1'
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -20,7 +19,7 @@ jobs:
         language: [ java, ruby ]
     permissions:
       contents: read
-      security-events: write
+      security-events: write # Needed to upload CodeQL's SARIF results to the code scanning dashboard.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

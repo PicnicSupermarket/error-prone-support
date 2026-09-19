@@ -1,15 +1,14 @@
 name: Run Reviewdog
 on:
   pull_request:
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed to post Reviewdog's findings and suggested fixes as pull request review comments.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

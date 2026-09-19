@@ -8,8 +8,7 @@ on:
         description: Pull request number of interest
         required: true
         type: number
-permissions:
-  contents: read
+permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
@@ -32,7 +31,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed to read pull request metadata and to post/update the suggested commit message comment.
     runs-on: ubuntu-24.04
     environment: codex
     steps:

@@ -6,18 +6,17 @@ on:
   workflow_run:
     workflows: ["Run mutation tests"]
     types: [ completed ]
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   update-pr:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
-      actions: read
-      checks: write
+      actions: read # Needed to download the Pitest analysis artifact from the triggering workflow run.
+      checks: write # Needed to annotate surviving mutants using a check run.
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed to post the mutation testing summary as a pull request comment.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

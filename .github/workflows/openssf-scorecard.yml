@@ -10,14 +10,13 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * 1'
-permissions:
-  contents: read
+permissions: {}
 jobs:
   analyze:
     permissions:
       contents: read
-      security-events: write
-      id-token: write
+      security-events: write # Needed to upload the Scorecard SARIF results to the code scanning dashboard.
+      id-token: write # Needed to obtain the OIDC token with which published Scorecard results are signed.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

@@ -3,12 +3,13 @@ on:
   pull_request:
   push:
     branches: [ master, website ]
-permissions:
-  contents: read
+permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   build:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -67,8 +68,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:
-      id-token: write
-      pages: write
+      id-token: write # Needed to request the OIDC token that certifies the origin of the deployment.
+      pages: write # Needed to deploy the built site to GitHub Pages.
     runs-on: ubuntu-24.04
     environment:
       name: github-pages

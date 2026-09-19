@@ -116,8 +116,9 @@ the files you modified.
 
 ### Declare least-privilege permissions
 
-- [ ] `permissions` declared at workflow level with `contents: read`
-- [ ] Job-level permissions scoped to only what is needed
+- [ ] `permissions: {}` declared at workflow level
+- [ ] Every job declares its own complete `permissions` block
+- [ ] Permissions beyond `contents: read` have a trailing explanatory comment
 
 ### Use explicit runner versions
 

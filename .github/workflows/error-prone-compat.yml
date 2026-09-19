@@ -16,12 +16,13 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * *'
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   validate:
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
