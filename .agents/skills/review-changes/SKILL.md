@@ -25,8 +25,5 @@ checklist. Then:
    naming, test coverage, error handling). Continue passes until diminishing
    returns.
 5. **Commit** any improvements.
-6. **Finalize**: Invoke [`/finalize-changes`][skill-finalize-changes] to run
-   the full build, mutation tests, and self-check.
 
 [review]: ../../../.github/instructions/review.instructions.md
-[skill-finalize-changes]: ../finalize-changes/SKILL.md
