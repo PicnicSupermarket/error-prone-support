@@ -78,8 +78,10 @@ Produces: `- [ ] All collection types use ...`
 
 ```markdown
 ### Declare least-privilege permissions
-<!-- check: `permissions` declared at workflow level with `contents: read` -->
-<!-- check: Job-level permissions scoped to only what is needed -->
+<!-- check: `permissions: {}` declared at workflow level -->
+<!-- check: Every job declares its own complete `permissions` block -->
+<!-- check: Permissions are listed lexicographically -->
+<!-- check: Permissions beyond `contents: read` have a trailing explanatory comment -->
 ```
 
 **Skip**: exclude a heading from the checklist.
@@ -137,8 +139,10 @@ check: -->` annotation per requirement rather than a single coarse item.
 
 ```markdown
 ### Declare least-privilege permissions
-<!-- check: `permissions` declared at workflow level with `contents: read` -->
-<!-- check: Job-level permissions scoped to only what is needed -->
+<!-- check: `permissions: {}` declared at workflow level -->
+<!-- check: Every job declares its own complete `permissions` block -->
+<!-- check: Permissions are listed lexicographically -->
+<!-- check: Permissions beyond `contents: read` have a trailing explanatory comment -->
 ```
 
 **Don't:**

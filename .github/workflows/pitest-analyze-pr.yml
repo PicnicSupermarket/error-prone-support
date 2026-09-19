@@ -8,13 +8,14 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze-pr:
     name: Analyze mutation test coverage
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

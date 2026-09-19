@@ -13,12 +13,15 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-permissions:
-  contents: read
+permissions: {}
 jobs:
   check:
     name: Check default branch health
     if: ${{ github.base_ref == github.event.repository.default_branch }}
+    permissions:
+      actions: read # Needed to list workflow runs.
+      checks: read # Needed to list check runs.
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

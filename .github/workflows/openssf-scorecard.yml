@@ -14,15 +14,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
-permissions:
-  contents: read
+permissions: {}
 jobs:
   analyze:
     name: Run OpenSSF Scorecard analysis
     permissions:
       contents: read
-      security-events: write
-      id-token: write
+      id-token: write # Needed to obtain the OIDC token with which published Scorecard results are signed.
+      security-events: write # Needed to upload the analysis results to the code scanning dashboard.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
