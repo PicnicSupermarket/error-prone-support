@@ -34,61 +34,56 @@ jobs:
               return;
             }
 
+            // Only consider completed workflow runs triggered by a push event
+            // against the default branch: other events (such as
+            // `issue_comment` and `schedule`) do not reflect that branch's
+            // health, while runs that have yet to complete do not (yet) have
+            // an outcome to report. A single page of results suffices, as the
+            // most recent runs are returned first.
             const defaultBranch = context.payload.repository.default_branch;
-            const { data: branchRef } = await github.rest.git.getRef({
+            const { data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `heads/${defaultBranch}`,
+              branch: defaultBranch,
+              event: 'push',
+              status: 'completed',
+              per_page: 100,
             });
-            const defaultBranchSha = branchRef.object.sha;
-            core.info(`Checking ${defaultBranch} at ${defaultBranchSha}`);
+            if (runs.length === 0) {
+              core.setFailed(`Found no completed push event workflow runs against ${defaultBranch}; unable to establish its health.`);
+              return;
+            }
 
-            // Only consider workflow runs triggered by a push event, so as to
-            // ignore other events such as `issue_comment` that also trigger
-            // workflow runs against the default branch.
-            const [workflowRuns, allCheckRuns] = await Promise.all([
-              github.paginate(github.rest.actions.listWorkflowRunsForRepo, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                head_sha: defaultBranchSha,
-                event: 'push',
-                per_page: 100,
-              }),
-              github.paginate(github.rest.checks.listForRef, {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: defaultBranchSha,
-                per_page: 100,
-              }),
-            ]);
-            const pushSuiteIds = new Set(workflowRuns.map((run) => run.check_suite_id));
-            const checkRuns = allCheckRuns.filter((cr) => pushSuiteIds.has(cr.check_suite?.id));
-
-            // When a workflow is re-run, GitHub creates a new check suite per
-            // attempt. This means that the same check name can appear multiple
-            // times for a given SHA, once per attempt. To correctly handle
-            // re-runs, we deduplicate by name and keep only the most recently
-            // created check run (the one with the highest ID, as IDs are
-            // monotonically increasing).
-            const latestByName = new Map();
-            for (const cr of checkRuns) {
-              const existing = latestByName.get(cr.name);
-              if (!existing || cr.id > existing.id) {
-                latestByName.set(cr.name, cr);
+            // Retain each workflow's most recent outcome. Such an outcome need
+            // not pertain to the default branch's current head commit: a
+            // workflow that is still running against a more recent commit does
+            // not invalidate what its last completed run reported. Run IDs
+            // increase monotonically, and re-runs update the associated run in
+            // place, so the run with the highest ID per workflow reports that
+            // workflow's most recent outcome.
+            const latestByWorkflow = new Map();
+            for (const run of runs) {
+              const existing = latestByWorkflow.get(run.workflow_id);
+              if (!existing || run.id > existing.id) {
+                latestByWorkflow.set(run.workflow_id, run);
               }
             }
-            core.info(`Found ${checkRuns.length} push event check runs; ${latestByName.size} unique names.`);
+            core.info(`Found ${runs.length} completed push event workflow runs; ${latestByWorkflow.size} unique workflows.`);
 
-            // XXX: The check for completed rules leaves the door open for slow
-            // checks to be missed; see the comment at the top of this file.
+            // XXX: Until a workflow completes its first run against a new
+            // commit, that commit is judged by the workflow's prior outcome,
+            // so a regression goes unnoticed for the duration of that run. See
+            // the comment at the top of this file.
             const successConclusions = new Set(['neutral', 'skipped', 'stale', 'success']);
-            const failures = [...latestByName.values()].filter(
-              (cr) => cr.status === 'completed' && !successConclusions.has(cr.conclusion),
+            const failures = [...latestByWorkflow.values()].filter(
+              (run) => !successConclusions.has(run.conclusion),
             );
 
             if (failures.length > 0) {
-              const details = failures.map((cr) => `  - ${cr.name}: ${cr.conclusion} (${cr.html_url})`).join('\n');
-              core.setFailed(`Default branch has ${failures.length} failing check(s):\n${details}`);
+              const details = failures
+                .map((run) => `  - ${run.name} @ ${run.head_sha.slice(0, 7)}: ${run.conclusion} (${run.html_url})`)
+                .join('\n');
+              core.setFailed(`Default branch has ${failures.length} failing workflow(s):\n${details}`);
             } else {
-              core.info('All completed checks on the default branch are green.');
+              core.info('The most recent run of each workflow against the default branch is green.');
             }
