@@ -1,0 +1,20 @@
+name: Scratch queue:max test
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: scratch-queue-max-test
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: max
+jobs:
+  noop:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          disable-sudo-and-containers: true
+      - name: No-op
+        run: echo "event=${{ github.event_name }}"
