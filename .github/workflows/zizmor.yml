@@ -1,0 +1,51 @@
+# Analyzes this repository's GitHub Actions workflow and action definitions
+# for security issues such as template injection, credential persistence and
+# overly broad permissions. Identified issues are registered with GitHub's code
+# scanning dashboard. When a pull request is analyzed, any offending lines are
+# annotated. See https://docs.zizmor.sh for details.
+name: Run zizmor analysis
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  # Some audits consult the GitHub API, so findings may appear without any
+  # local change; a weekly run surfaces those.
+  schedule:
+    - cron: '0 4 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  analyze:
+    permissions:
+      contents: read
+      security-events: write # Needed to update the code scanning dashboard.
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          # XXX: We can't currently use `disable-sudo-and-containers` here, as
+          # the zizmor analysis step below runs zizmor inside a Docker
+          # container pulled from the GitHub Container Registry.
+          disable-sudo: true
+          allowed-endpoints: >
+            api.github.com:443
+            ghcr.io:443
+            github.com:443
+            pkg-containers.githubusercontent.com:443
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor analysis
+        # The `auditor` persona is the most sensitive one offered; it reports
+        # code smells and possible false positives in addition to actionable
+        # security findings. The `min-severity` and `min-confidence` inputs are
+        # left unset, so that no findings are filtered out. Note that the
+        # zizmor version analyzed is the newest one known to the pinned action
+        # revision, identified by container image digest.
+        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          persona: auditor

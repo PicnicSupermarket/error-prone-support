@@ -2,22 +2,25 @@
 # performed by the `pitest-analyze-pr.yml` workflow. See
 # https://blog.pitest.org/oss-pitest-pr/ for details.
 name: Post mutation test results
-on:
+on: # zizmor: ignore[dangerous-triggers] the documented GitHub pattern for posting elevated-permission comments on fork PRs from a trusted, non-fork trigger
   workflow_run:
     workflows: ["Run mutation tests"]
     types: [ completed ]
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: true
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   update-pr:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
-      actions: read
-      checks: write
+      actions: read # Needed to download the Pitest artifact from the triggering workflow run.
+      checks: write # Needed to annotate surviving mutants on the corresponding lines.
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed to post the mutation testing summary as a pull request comment.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

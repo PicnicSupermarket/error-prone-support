@@ -67,8 +67,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:
-      id-token: write
-      pages: write
+      id-token: write # Needed to authenticate the deployment via OIDC.
+      pages: write # Needed to deploy the built site to GitHub Pages.
     runs-on: ubuntu-24.04
     environment:
       name: github-pages

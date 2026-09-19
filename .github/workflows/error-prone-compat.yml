@@ -18,6 +18,10 @@ on:
     - cron: '0 4 * * *'
 permissions:
   contents: read
+concurrency:
+  # Not cancelled: every push and scheduled run should complete so that
+  # compatibility regressions are reliably detected.
+  group: ${{ github.workflow }}-${{ github.ref }}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:

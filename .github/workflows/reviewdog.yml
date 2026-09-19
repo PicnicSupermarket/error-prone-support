@@ -3,13 +3,16 @@ on:
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # Needed for Reviewdog to post findings as pull request review comments.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
