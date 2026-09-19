@@ -26,6 +26,7 @@ env:
     release-assets.githubusercontent.com:443
 jobs:
   suggest:
+    name: Suggest commit message
     # No commit message is suggested for code originating from forked
     # repositories, as such workflow runs do not have access to the requisite
     # secrets.
