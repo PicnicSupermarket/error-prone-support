@@ -1,0 +1,185 @@
+# DISPOSABLE: empirically determines which GITHUB_TOKEN permissions are
+# actually required for various API calls used elsewhere in this repository's
+# workflows. Not meant to be merged; deleted along with its throwaway branch
+# once the experiment concludes.
+name: "ZZ scratch permission probe (DO NOT MERGE)"
+on:
+  pull_request:
+    types: [ labeled ]
+permissions: {}
+jobs:
+  # Q0(a): does checkout succeed with no permissions at all, on this public repo?
+  q0a-checkout-no-perms:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions: {}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+  # Q0(b): does github.rest.git.getRef succeed with no permissions at all?
+  q0b-getref-no-perms:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions: {}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Call git.getRef
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const { data } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `heads/${context.payload.repository.default_branch}`,
+            });
+            core.info(`OK: ${JSON.stringify(data.object)}`);
+
+  # Q0(c): do actions.listWorkflowRunsForRepo and checks.listForRef succeed
+  # with no permissions at all?
+  q0c-actions-checks-no-perms:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions: {}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Call actions.listWorkflowRunsForRepo and checks.listForRef
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const defaultBranch = context.payload.repository.default_branch;
+            const { data: branchRef } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `heads/${defaultBranch}`,
+            });
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: branchRef.object.sha,
+              event: 'push',
+              per_page: 5,
+            });
+            core.info(`OK listWorkflowRunsForRepo: ${runs.data.workflow_runs.length} run(s)`);
+            const checks = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: branchRef.object.sha,
+              per_page: 5,
+            });
+            core.info(`OK checks.listForRef: ${checks.data.check_runs.length} check(s)`);
+
+  # Q1: does assign-milestone's logic work with ONLY `issues: write`?
+  q1-issues-write-only:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions:
+      issues: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Call listMilestones and issues.update (issues:write only)
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const milestones = (await github.rest.issues.listMilestones({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            })).data;
+            core.info(`OK listMilestones: ${milestones.length} milestone(s)`);
+            if (milestones.length === 0) {
+              core.setFailed('No open milestones found; cannot probe issues.update.');
+              return;
+            }
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              milestone: milestones[0].number,
+            });
+            core.info('OK issues.update');
+
+  # Sub-question to Q1: does the same work with ONLY `pull-requests: write`
+  # (i.e. does setting a milestone on a PR need pull-requests:write instead
+  # of / in addition to issues:write)?
+  q1b-pull-requests-write-only:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Call listMilestones and issues.update (pull-requests:write only)
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const milestones = (await github.rest.issues.listMilestones({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            })).data;
+            core.info(`OK listMilestones: ${milestones.length} milestone(s)`);
+            if (milestones.length === 0) {
+              core.setFailed('No open milestones found; cannot probe issues.update.');
+              return;
+            }
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              milestone: milestones[0].number,
+            });
+            core.info('OK issues.update');
+
+  # Q2: default-branch-health-gate.yml declares only `contents: read` but
+  # calls git.getRef, actions.listWorkflowRunsForRepo, and checks.listForRef.
+  # Confirm this combination works (as it does in production) and note that
+  # this alone does not prove `contents: read` grants actions/checks access;
+  # see Q0(c) for the no-permissions control.
+  q2-contents-read-only:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Call all three default-branch-health-gate.yml APIs
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const defaultBranch = context.payload.repository.default_branch;
+            const { data: branchRef } = await github.rest.git.getRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `heads/${defaultBranch}`,
+            });
+            core.info(`OK git.getRef: ${branchRef.object.sha}`);
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head_sha: branchRef.object.sha,
+              event: 'push',
+              per_page: 5,
+            });
+            core.info(`OK listWorkflowRunsForRepo: ${runs.data.workflow_runs.length} run(s)`);
+            const checks = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: branchRef.object.sha,
+              per_page: 5,
+            });
+            core.info(`OK checks.listForRef: ${checks.data.check_runs.length} check(s)`);
+
+  # Q3: pitest-update-pr.yml checks out the repo (via s4u/setup-maven-action)
+  # under `contents: read`. Test whether that checkout succeeds with NO
+  # `contents` permission at all. Interpret jointly with Q0(a): if plain
+  # actions/checkout already succeeds with permissions:{}, a pass here shows
+  # only the public-repo loophole, not that `contents: read` is droppable.
+  q3-setup-maven-checkout-no-perms:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions: {}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
+        with:
+          java-version: 25.0.4
+          java-distribution: temurin
+          maven-version: 3.9.16
