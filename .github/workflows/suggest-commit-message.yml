@@ -50,7 +50,6 @@ jobs:
         id: pr-details
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = Number(context.payload.pull_request?.number ?? context.payload.inputs?.pr_number);
             if (!Number.isFinite(prNumber) || prNumber <= 0) {
@@ -247,7 +246,6 @@ jobs:
           PR_NUMBER: ${{ steps.pr-details.outputs.number }}
           CODEX_RESULT: ${{ steps.codex.outputs.final-message }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
 
