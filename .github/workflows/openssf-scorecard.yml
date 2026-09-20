@@ -14,6 +14,7 @@ permissions:
   contents: read
 jobs:
   analyze:
+    name: Run OpenSSF Scorecard analysis
     permissions:
       contents: read
       security-events: write

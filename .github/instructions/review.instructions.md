@@ -146,7 +146,8 @@ the files you modified.
 ### Naming conventions
 
 - [ ] Workflow names use imperative form (e.g., "Run mutation tests")
-- [ ] Job names are short, lowercase identifiers (e.g., `build`, `validate`)
+- [ ] Job IDs are short, lowercase identifiers (e.g., `build`, `validate`)
+- [ ] Every job has a `name:` field, in imperative form, unique across the repository's workflows
 - [ ] Step names use imperative form (e.g., "Install Harden-Runner")
 
 ### YAML formatting
