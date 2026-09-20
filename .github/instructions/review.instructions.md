@@ -258,6 +258,10 @@ the files you modified.
 
 - [ ] PR title matches the commit message summary (without `(#N)`)
 
+### Draft status
+
+- [ ] PR opened by an AI agent is created as a draft, not marked ready for review
+
 ### Label
 
 - [ ] PR has exactly one label from `.github/release.yml`
@@ -268,7 +272,7 @@ the files you modified.
 
 ### Reviewers
 
-- [ ] PR assigns the correct reviewers
+- [ ] PR does not manually assign reviewers
 
 ### Description format
 
