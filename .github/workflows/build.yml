@@ -60,12 +60,18 @@ jobs:
           maven-version: 3.9.16
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn install javadoc:jar
-      # Note that the `-D` argument is quoted for compatibility with the
-      # Windows build.
       - name: Build project with self-check against Error Prone fork, test using the targeted JDK
-        run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # While generally we avoid expression interpolation inside `run`
+        # arguments through the use of environment variables, we make an
+        # exception here to avoid shell-conditional syntax: PowerShell expects
+        # `$env:VAR` instead of `${VAR}`. We do not specify `shell: bash`, as
+        # that would make the Windows test environment "less realistic", and
+        # would cause e.g. some filesystem ACL settings to behave differently.
+        # Note that `matrix.target-jdk` is controlled by this workflow, so this
+        # compromise is safe.
+        run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   deploy:
@@ -92,9 +98,9 @@ jobs:
           java-distribution: temurin
           maven-version: 3.9.16
       - name: Build and deploy
-        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
         env:
           MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
           MAVEN_CENTRAL_PASS: ${{ secrets.MAVEN_CENTRAL_PASS }}
           MAVEN_GPG_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
+        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
