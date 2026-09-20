@@ -36,7 +36,7 @@ jobs:
             *.sonarcloud.io:443
             sonarcloud.io:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
         with:
           checkout-fetch-depth: 0
           java-version: 25.0.4

@@ -7,6 +7,9 @@ on:
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -25,7 +28,7 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
         with:
           checkout-fetch-depth: 2
           java-version: 25.0.4
@@ -39,7 +42,7 @@ jobs:
         # details.
         run: mvn test pitest:mutationCoverage -DargLine.xmx=2048m -Dverification.skip -Dfeatures="+GIT(from[HEAD~1]), +gitci"
       - name: Aggregate Pitest reports
-        run: mvn pitest-git:aggregate -DkilledEmoji=":tada:" -DmutantEmoji=":zombie:" -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under [_Files changed_](${{ github.event.number }}/files)."
+        run: mvn pitest-git:aggregate -DkilledEmoji=":tada:" -DmutantEmoji=":zombie:" -DtrailingText="Mutation testing report by [Pitest](https://pitest.org/). Review any surviving mutants by inspecting the line comments under [_Files changed_](${{ github.event.pull_request.html_url }}/files)."
       - name: Upload Pitest reports as artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
