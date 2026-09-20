@@ -129,6 +129,39 @@ jobs:
             });
             core.info('OK issues.update');
 
+  # Follow-up rigor check: reproduce PR #2368's EXACT proposed permission
+  # block for this job ({contents: read, issues: write}) verbatim, in case
+  # `contents: read` unexpectedly affects Issues-API access (it shouldn't).
+  q1c-contents-read-issues-write:
+    if: ${{ github.event.label.name == 'do not merge' }}
+    permissions:
+      contents: read
+      issues: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Call listMilestones and issues.update (contents:read + issues:write, PR#2368's exact proposal)
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const milestones = (await github.rest.issues.listMilestones({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            })).data;
+            core.info(`OK listMilestones: ${milestones.length} milestone(s)`);
+            if (milestones.length === 0) {
+              core.setFailed('No open milestones found; cannot probe issues.update.');
+              return;
+            }
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              milestone: milestones[0].number,
+            });
+            core.info('OK issues.update');
+
   # Q2: default-branch-health-gate.yml declares only `contents: read` but
   # calls git.getRef, actions.listWorkflowRunsForRepo, and checks.listForRef.
   # Confirm this combination works (as it does in production) and note that
