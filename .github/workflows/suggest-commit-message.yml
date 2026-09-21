@@ -8,11 +8,11 @@ on:
         description: Pull request number of interest
         required: true
         type: number
-permissions:
-  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
+permissions:
+  contents: read
 env:
   ALLOWED_ENDPOINTS: >
     api.github.com:443

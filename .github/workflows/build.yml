@@ -10,6 +10,10 @@ on:
   pull_request:
   push:
     branches: [ master ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 permissions:
   contents: read
 env:
