@@ -1578,6 +1578,29 @@
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.22.0</version>
                     <configuration>
+                        <ruleSet>
+                            <ignoreVersions>
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>.*\b(alpha\d*|beta-?\d*|b\d+(\.\d+)*|M\d+|(rc|RC)-?\d+)\b.*</version>
+                                </ignoreVersion>
+                            </ignoreVersions>
+                            <rules>
+                                <rule>
+                                    <groupId>net.bytebuddy</groupId>
+                                    <artifactId>byte-buddy</artifactId>
+                                    <ignoreVersions>
+                                        <!-- Byte Buddy publishes a parallel
+                                        `-jdk5` build alongside each release;
+                                        it is not an upgrade. -->
+                                        <ignoreVersion>
+                                            <type>regex</type>
+                                            <version>.*-jdk5</version>
+                                        </ignoreVersion>
+                                    </ignoreVersions>
+                                </rule>
+                            </rules>
+                        </ruleSet>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
                 </plugin>
@@ -2194,27 +2217,6 @@
                             <artifactId>license-maven-plugin</artifactId>
                             <configuration>
                                 <fileTemplate>${path.third-party-licenses-template}</fileTemplate>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
-            <id>version-number-rules</id>
-            <activation>
-                <file>
-                    <exists>${path.version-number-rules}</exists>
-                </file>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>versions-maven-plugin</artifactId>
-                            <configuration>
-                                <rulesUri>file://${path.version-number-rules}</rulesUri>
                             </configuration>
                         </plugin>
                     </plugins>
