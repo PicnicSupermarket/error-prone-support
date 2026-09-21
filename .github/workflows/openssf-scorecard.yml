@@ -10,10 +10,15 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * 1'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 permissions:
   contents: read
 jobs:
   analyze:
+    name: Run OpenSSF Scorecard analysis
     permissions:
       contents: read
       security-events: write
@@ -39,7 +44,7 @@ jobs:
             *.sigstore.dev:443
             www.bestpractices.dev:443
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Run OpenSSF Scorecard analysis
@@ -47,7 +52,7 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-          publish_results: ${{ github.ref == github.event.repository.default_branch }}
+          publish_results: ${{ github.ref_name == github.event.repository.default_branch }}
       - name: Update GitHub's code scanning dashboard
         uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
         with:

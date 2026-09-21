@@ -8,16 +8,13 @@ on:
         description: Pull request number of interest
         required: true
         type: number
-permissions:
-  contents: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
   cancel-in-progress: true
+permissions:
+  contents: read
 env:
-  # XXX: Figure out how we can block access to `ab.chatgpt.com` and
-  # `chatgpt.com` without causing PR checks to fail.
   ALLOWED_ENDPOINTS: >
-    ab.chatgpt.com:443
     api.github.com:443
     api.openai.com:443
     chatgpt.com:443
@@ -26,6 +23,7 @@ env:
     release-assets.githubusercontent.com:443
 jobs:
   suggest:
+    name: Suggest commit message
     # No commit message is suggested for code originating from forked
     # repositories, as such workflow runs do not have access to the requisite
     # secrets.
@@ -39,9 +37,9 @@ jobs:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
         with:
-          # We can't disable `sudo`, as `openai/codex-action` unconditionally
-          # invokes `sudo`, even with `safety-strategy: unsafe` and
-          # `sandbox: danger-full-access`.
+          # We can't disable `sudo`, as `openai/codex-action` requires it in
+          # all cases. However, that action does revoke `sudo` access before
+          # invoking the agent; see below.
           # XXX: Consider splitting this workflow into three jobs, with
           # `openai/codex-action` being the sole step of the second job.
           disable-sudo-and-containers: false
@@ -50,7 +48,6 @@ jobs:
         id: pr-details
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = Number(context.payload.pull_request?.number ?? context.payload.inputs?.pr_number);
             if (!Number.isFinite(prNumber) || prNumber <= 0) {
@@ -72,7 +69,7 @@ jobs:
             core.setOutput('headRef', pr.head.ref ?? '');
             core.setOutput('headSha', pr.head.sha ?? '');
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -212,16 +209,29 @@ jobs:
 
             const promptPath = '/tmp/codex-prompt-suggest-commit-message.md';
             fs.writeFileSync(promptPath, instructions.trim() + '\n', { encoding: 'utf8' });
+      - name: Define Codex permission profile
+        # Codex' built-in and default `:workspace` profile denies network
+        # access, which the agent requires so as to look up e.g. GitHub release
+        # tags. Here we extend it; see
+        # https://developers.openai.com/codex/permissions.
+        run: |
+          mkdir "${HOME}/.codex"
+          cat > "${HOME}/.codex/config.toml" << 'EOF'
+          [permissions.suggest-commit-message]
+          extends = ":workspace"
+
+          [permissions.suggest-commit-message.network]
+          enabled = true
+          EOF
       - name: Suggest commit message with Codex
         id: codex
         uses: openai/codex-action@86365089eb2b84e0a8fb0717b304f8bdcb13b20e # v1.12
         with:
-          # XXX: We're using `safety-strategy: unsafe` and
-          # `sandbox: danger-full-access` so that the agent is able to access
-          # the network and look up e.g. GitHub release tags. Some amount of
-          # safety is provided by the Harden-Runner step further up.
-          safety-strategy: unsafe
-          sandbox: danger-full-access
+          permission-profile: suggest-commit-message
+          # By default the Codex CLI reports metrics to `ab.chatgpt.com`.
+          # Opting out of analytics avoids the need to grant network access to
+          # that endpoint.
+          codex-args: -c analytics.enabled=false
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           prompt-file: /tmp/codex-prompt-suggest-commit-message.md
           model: gpt-5.4-mini
@@ -247,7 +257,6 @@ jobs:
           PR_NUMBER: ${{ steps.pr-details.outputs.number }}
           CODEX_RESULT: ${{ steps.codex.outputs.final-message }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
 
@@ -262,9 +271,15 @@ jobs:
             // attach it as a workflow artifact for debug purposes.
             fs.writeFileSync('/tmp/suggested-commit-message.txt', commitMessage, { encoding: 'utf8' });
 
+            // The suggested commit message is derived from untrusted input, so
+            // fence its code block with a backtick run longer than any it
+            // contains.
+            const backtickRuns = [...commitMessage.matchAll(/`+/g)].map((match) => match[0].length);
+            const fence = '`'.repeat(Math.max(3, ...backtickRuns.map((length) => length + 1)));
+
             // The comment to be upserted includes a hidden marker to identify it.
             const marker = '<!-- codex-suggested-commit-message -->';
-            const commentBody = `Suggested commit message:\n${marker}\n\n\`\`\`\n${commitMessage}\n\`\`\`\n`;
+            const commentBody = `Suggested commit message:\n${marker}\n\n${fence}\n${commitMessage}\n${fence}\n`;
 
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,

@@ -7,12 +7,17 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * 1'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 permissions:
   contents: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
+    name: Analyze code with SonarCloud
     # Analysis of code in forked repositories is skipped, as such workflow runs
     # do not have access to the requisite secrets.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}

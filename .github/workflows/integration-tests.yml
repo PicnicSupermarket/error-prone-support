@@ -15,6 +15,10 @@ on:
     types: [ created ]
   push:
     branches: [ master ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number || github.ref }}-${{ github.event_name == 'issue_comment' && github.event.issue.pull_request != null && contains(github.event.comment.body, '/integration-test') }}
+  cancel-in-progress: ${{ github.event_name == 'issue_comment' }}
+  queue: ${{ github.event_name == 'issue_comment' && 'single' || 'max' }}
 permissions:
   contents: read
 env:
@@ -35,7 +39,7 @@ jobs:
           allowed-endpoints: >
             github.com:443
       - name: Check out integration tests
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.CHECKOUT_REF }}
           sparse-checkout: integration-tests
