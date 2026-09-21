@@ -10,6 +10,7 @@ permissions:
   contents: read
 jobs:
   validate:
+    name: Check for review checklist drift
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

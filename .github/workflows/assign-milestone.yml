@@ -5,7 +5,8 @@ on:
 permissions:
   contents: read
 jobs:
-  assign-milestone:
+  assign:
+    name: Assign milestone
     if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null }}
     permissions:
       contents: read

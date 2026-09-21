@@ -1,4 +1,4 @@
-name: Update `error-prone.picnic.tech` website content
+name: Update website
 on:
   pull_request:
   push:
@@ -9,6 +9,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   build:
+    name: Build website
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -64,6 +65,7 @@ jobs:
         with:
           path: ./website/_site
   deploy:
+    name: Deploy website
     if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:
