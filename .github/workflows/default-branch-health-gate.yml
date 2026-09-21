@@ -6,7 +6,7 @@
 # blocking any further merges until all workflow succeed) and on `pull_request`
 # events for new PRs (to assign an initial check state), that would make for a
 # more robust guard less susceptible to race conditions.
-name: Require that all checks on the default branch pass
+name: Enforce default branch health
 on:
   pull_request:
     types: [ opened, synchronize, reopened, labeled, unlabeled ]
@@ -14,6 +14,7 @@ permissions:
   contents: read
 jobs:
   check:
+    name: Check default branch health
     if: ${{ github.base_ref == github.event.repository.default_branch }}
     runs-on: ubuntu-24.04
     steps:

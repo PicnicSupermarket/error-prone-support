@@ -22,6 +22,7 @@ env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   validate:
+    name: Validate Error Prone compatibility
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

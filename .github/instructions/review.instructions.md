@@ -146,7 +146,8 @@ the files you modified.
 ### Naming conventions
 
 - [ ] Workflow names use imperative form (e.g., "Run mutation tests")
-- [ ] Job names are short, lowercase identifiers (e.g., `build`, `validate`)
+- [ ] Job IDs are short, lowercase identifiers (e.g., `build`, `validate`)
+- [ ] Every job has a `name:` field, in imperative form, unique across the repository's workflows
 - [ ] Step names use imperative form (e.g., "Install Harden-Runner")
 
 ### YAML formatting
@@ -257,6 +258,10 @@ the files you modified.
 
 - [ ] PR title matches the commit message summary (without `(#N)`)
 
+### Draft status
+
+- [ ] PR opened by an AI agent is created as a draft, not marked ready for review
+
 ### Label
 
 - [ ] PR has exactly one label from `.github/release.yml`
@@ -267,7 +272,7 @@ the files you modified.
 
 ### Reviewers
 
-- [ ] PR assigns the correct reviewers
+- [ ] PR does not manually assign reviewers
 
 ### Description format
 
