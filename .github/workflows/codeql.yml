@@ -19,6 +19,7 @@ env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
+    name: Analyze code with CodeQL
     strategy:
       matrix:
         language: [ java, ruby ]

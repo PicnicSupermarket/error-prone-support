@@ -1,4 +1,4 @@
-name: Update `error-prone.picnic.tech` website content
+name: Update website
 on:
   pull_request:
   push:
@@ -11,6 +11,7 @@ permissions:
   contents: read
 jobs:
   build:
+    name: Build website
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -41,7 +42,7 @@ jobs:
             www.youtube.com:443
             youtrack.jetbrains.com:443
       - name: Check out code
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Set up Ruby
@@ -66,6 +67,7 @@ jobs:
         with:
           path: ./website/_site
   deploy:
+    name: Deploy website
     if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:

@@ -14,6 +14,7 @@ env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze-pr:
+    name: Analyze mutation test coverage
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
