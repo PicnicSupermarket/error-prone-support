@@ -6,12 +6,16 @@ on:
   workflow_run:
     workflows: ["Run mutation tests"]
     types: [ completed ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.conclusion }}
+  cancel-in-progress: true
 permissions:
   contents: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   update-pr:
+    name: Update PR with mutation test results
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
       actions: read
@@ -32,16 +36,17 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
         with:
           java-version: 25.0.4
           java-distribution: temurin
           maven-version: 3.9.16
       - name: Download Pitest analysis artifact
-        uses: dawidd6/action-download-artifact@09f2f74827fd3a8607589e5ad7f9398816f540fe # v3.1.4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          workflow: ${{ github.event.workflow_run.workflow_id }}
           name: pitest-reports
           path: ./target/pit-reports-ci
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update PR
         run: mvn -DrepoToken="${{ secrets.GITHUB_TOKEN }}" pitest-github:updatePR

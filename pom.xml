@@ -377,7 +377,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.54</version>
+                <version>2.2.55</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -407,7 +407,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.12</version>
+                <version>1.18.14</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -442,7 +442,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.21.7</version>
+                <version>3.21.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -468,16 +468,21 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.11.0</version>
+                <version>5.12.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.openrewrite.recipe</groupId>
-                <artifactId>rewrite-recipe-bom</artifactId>
-                <version>3.37.0</version>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-bom</artifactId>
+                <version>8.90.4</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-templating</artifactId>
+                <version>1.44.0</version>
             </dependency>
             <dependency>
                 <groupId>org.reactivestreams</groupId>
@@ -487,7 +492,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-bom</artifactId>
-                <version>2.0.18</version>
+                <version>2.0.19</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -649,7 +654,7 @@
                 <plugin>
                     <groupId>io.github.git-commit-id</groupId>
                     <artifactId>git-commit-id-maven-plugin</artifactId>
-                    <version>10.0.0</version>
+                    <version>10.0.1</version>
                     <configuration>
                         <injectAllReactorProjects>true</injectAllReactorProjects>
                         <runOnlyOnce>true</runOnlyOnce>
@@ -957,7 +962,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.15.0</version>
+                    <version>3.16.0</version>
                     <configuration>
                         <annotationProcessorPaths>
                             <path>
@@ -1102,7 +1107,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <deployAtEnd>true</deployAtEnd>
                         <retryFailedDeploymentCount>3</retryFailedDeploymentCount>
@@ -1187,7 +1192,7 @@
                         <dependency>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>extra-enforcer-rules</artifactId>
-                            <version>1.12.0</version>
+                            <version>1.12.1</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -1218,7 +1223,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1374,7 +1379,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.6</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1406,7 +1411,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                     <executions>
                         <execution>
                             <id>derive-jpms-module-name-base</id>
@@ -1567,7 +1572,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>tidy-maven-plugin</artifactId>
-                    <version>1.4.0</version>
+                    <version>1.4.1</version>
                     <executions>
                         <execution>
                             <id>check-pom</id>
@@ -1580,8 +1585,31 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.21.0</version>
+                    <version>2.22.0</version>
                     <configuration>
+                        <ruleSet>
+                            <ignoreVersions>
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>.*\b(alpha\d*|beta-?\d*|b\d+(\.\d+)*|M\d+|(rc|RC)-?\d+)\b.*</version>
+                                </ignoreVersion>
+                            </ignoreVersions>
+                            <rules>
+                                <rule>
+                                    <groupId>net.bytebuddy</groupId>
+                                    <artifactId>byte-buddy</artifactId>
+                                    <ignoreVersions>
+                                        <!-- Byte Buddy publishes a parallel
+                                        `-jdk5` build alongside each release;
+                                        it is not an upgrade. -->
+                                        <ignoreVersion>
+                                            <type>regex</type>
+                                            <version>.*-jdk5</version>
+                                        </ignoreVersion>
+                                    </ignoreVersions>
+                                </rule>
+                            </rules>
+                        </ruleSet>
                         <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
                     </configuration>
                 </plugin>
@@ -1706,7 +1734,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.7.0.6970</version>
+                    <version>5.8.0.7211</version>
                 </plugin>
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
@@ -2198,27 +2226,6 @@
                             <artifactId>license-maven-plugin</artifactId>
                             <configuration>
                                 <fileTemplate>${path.third-party-licenses-template}</fileTemplate>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-        <profile>
-            <id>version-number-rules</id>
-            <activation>
-                <file>
-                    <exists>${path.version-number-rules}</exists>
-                </file>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>versions-maven-plugin</artifactId>
-                            <configuration>
-                                <rulesUri>file://${path.version-number-rules}</rulesUri>
                             </configuration>
                         </plugin>
                     </plugins>

@@ -15,6 +15,10 @@ on:
     types: [ created ]
   push:
     branches: [ master ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number || github.ref }}-${{ github.event_name == 'issue_comment' && github.event.issue.pull_request != null && contains(github.event.comment.body, '/integration-test') }}
+  cancel-in-progress: ${{ github.event_name == 'issue_comment' }}
+  queue: ${{ github.event_name == 'issue_comment' && 'single' || 'max' }}
 permissions:
   contents: read
 env:
@@ -35,10 +39,11 @@ jobs:
           allowed-endpoints: >
             github.com:443
       - name: Check out integration tests
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.CHECKOUT_REF }}
           sparse-checkout: integration-tests
+          persist-credentials: false
       - name: Determine integration tests to run
         id: set-matrix
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -124,7 +129,7 @@ jobs:
             repo.maven.apache.org:443
             results-receiver.actions.githubusercontent.com:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
         with:
           checkout-ref: ${{ env.CHECKOUT_REF }}
           java-version: |
@@ -189,7 +194,7 @@ jobs:
           name: "integration-test-patch-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@ba34de01b7f4ba2ab8e2860df8993a29f4477056 # v1.20.0
+        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
         with:
           checkout-ref: ${{ env.CHECKOUT_REF }}
           java-version: |
