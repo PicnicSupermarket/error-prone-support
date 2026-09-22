@@ -269,7 +269,6 @@ directory as `{CheckName}Test.java`. A complete test class looks like this:
 package tech.picnic.errorprone.bugpatterns;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
-import com.google.errorprone.BugCheckerRefactoringTestHelper.TestMode;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
@@ -309,7 +308,7 @@ final class {CheckName}Test {
             "    fixedCode();",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
 ```
@@ -326,7 +325,7 @@ Conventions:
   suggested replacement code. When using this approach, ensure that enough
   replacement cases remain to validate that the suggested fix compiles.
 - **`replacement()` test**: Uses `BugCheckerRefactoringTestHelper` with
-  `.doTest(TestMode.TEXT_MATCH)`.
+  `.doTest()`.
 - **Prefer single test files**: Prefer a single `identification()` and
   `replacement()` test method per test class. Prefer a single `A.java` test
   file per test. Introduce additional test methods or files only when required
@@ -344,7 +343,7 @@ BugCheckerRefactoringTestHelper.newInstance(MyCheck.class, getClass())
     .setFixChooser(SECOND)
     .addInputLines("A.java", ...)
     .addOutputLines("A.java", ...)
-    .doTest(TestMode.TEXT_MATCH);
+    .doTest();
 ```
 
 ### Testing flag-based configuration
@@ -360,7 +359,7 @@ void replacementWithCustomFlag() {
       .setArgs("-XepOpt:MyCheck:FlagName=value")
       .addInputLines("A.java", ...)
       .addOutputLines("A.java", ...)
-      .doTest(TestMode.TEXT_MATCH);
+      .doTest();
 }
 ```
 
@@ -456,7 +455,7 @@ final class IsInstanceLambdaUsageTest {
             "    Stream.of(1).filter(Integer.class::isInstance);",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
 ```
@@ -516,7 +515,7 @@ final class AutowiredConstructorTest {
             "    A(String x) {}",
             "  }",
             "}")
-        .doTest(TestMode.TEXT_MATCH);
+        .doTest();
   }
 }
 ```

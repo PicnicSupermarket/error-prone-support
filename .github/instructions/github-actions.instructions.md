@@ -190,13 +190,18 @@ value. This reduces noise and makes intentional overrides obvious.
 
 ## Naming conventions
 <!-- check: Workflow names use imperative form (e.g., "Run mutation tests") -->
-<!-- check: Job names are short, lowercase identifiers (e.g., `build`, `validate`) -->
+<!-- check: Job IDs are short, lowercase identifiers (e.g., `build`, `validate`) -->
+<!-- check: Every job has a `name:` field, in imperative form, unique across the repository's workflows -->
 <!-- check: Step names use imperative form (e.g., "Install Harden-Runner") -->
 
 - **Workflow names**: use imperative form ("Run mutation tests", "Validate
   review checklist"). Avoid bare noun phrases ("Mutation testing").
-- **Job names**: short, lowercase identifiers (`build`, `validate`, `deploy`,
+- **Job IDs**: short, lowercase identifiers (`build`, `validate`, `deploy`,
   `analyze`).
+- **Job names**: every job must have a `name:` field, in imperative form (e.g.
+  "Assign milestone"), distinct from its own workflow's name and unique across
+  the repository, so it is unambiguous in the GitHub Actions UI even when
+  another workflow uses the same job ID.
 - **Step names**: use imperative form ("Install Harden-Runner", "Check out
   code", "Build project").
 
