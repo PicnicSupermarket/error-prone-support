@@ -4,7 +4,9 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.StandardTags.CONCURRENCY;
 import static com.google.errorprone.BugPattern.StandardTags.LIKELY_ERROR;
+import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static com.google.errorprone.suppliers.Suppliers.JAVA_LANG_BOOLEAN_TYPE;
 import static java.util.Objects.requireNonNull;
 import static javax.lang.model.element.ElementKind.ENUM;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
@@ -26,27 +28,27 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.tree.JCTree.JCMemberReference;
 import java.util.function.Function;
-import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 
 /**
- * A {@link BugChecker} that flags usages of {@link Flux#groupBy(Function)} without a statically
- * bounded key space.
+ * A {@link BugChecker} that flags {@link Flux#groupBy(Function)} usages with a statically unbounded
+ * key space.
  *
  * <p>The groups emitted by {@link Flux#groupBy(Function)} are live views of the source and must be
- * drained downstream. If the number of groups exceeds the downstream subscription concurrency,
- * backpressure can prevent both the groups and their source from making progress. This can result
- * in a deadlock.
+ * drained downstream. If the number of groups exceeds the downstream subscription concurrency, then
+ * backpressure prevents both the groups and their source from making progress, resulting in a
+ * deadlock.
  *
- * <p>This check permits Boolean and concrete enum keys, whose cardinality is statically bounded.
- * Suppress it for another key type only when the number of groups is provably small and the
- * downstream consumption strategy is known to be safe.
+ * <p>Boolean and enum keys are accepted, as their cardinality is statically bounded. For any other
+ * key type, make sure that all groups are consumed concurrently, and suppress this check.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
     summary =
-        "Use a Boolean or concrete enum key, or suppress this check for another provably bounded "
-            + "`Flux#groupBy` key space",
+        """
+        `Flux#groupBy` may deadlock if the number of groups exceeds the downstream subscription \
+        concurrency; please use a statically bounded key type, or make sure that all groups are \
+        consumed concurrently""",
     link = BUG_PATTERNS_BASE_URL + "FluxGroupByUsage",
     linkType = CUSTOM,
     severity = ERROR,
@@ -54,10 +56,23 @@ import reactor.core.publisher.Flux;
 public final class FluxGroupByUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> BOOLEAN = Suppliers.typeFromClass(Boolean.class);
-  private static final Supplier<Type> FUNCTION = Suppliers.typeFromClass(Function.class);
+  private static final String FLUX = "reactor.core.publisher.Flux";
+  private static final String FUNCTION = Function.class.getCanonicalName();
+  private static final Supplier<Type> FUNCTION_TYPE = Suppliers.typeFromString(FUNCTION);
+  /*
+   * Reactor's `Flux#groupBy` overloads. These are enumerated explicitly so that identically named
+   * methods declared by `Flux` subtypes are not matched, and so that the presence of a key mapper
+   * argument is guaranteed.
+   */
   private static final Matcher<ExpressionTree> FLUX_GROUP_BY =
-      instanceMethod().onExactClass("reactor.core.publisher.Flux").named("groupBy");
+      anyOf(
+          instanceMethod().onDescendantOf(FLUX).named("groupBy").withParameters(FUNCTION),
+          instanceMethod().onDescendantOf(FLUX).named("groupBy").withParameters(FUNCTION, "int"),
+          instanceMethod().onDescendantOf(FLUX).named("groupBy").withParameters(FUNCTION, FUNCTION),
+          instanceMethod()
+              .onDescendantOf(FLUX)
+              .named("groupBy")
+              .withParameters(FUNCTION, FUNCTION, "int"));
 
   /** Instantiates a new {@link FluxGroupByUsage} instance. */
   public FluxGroupByUsage() {}
@@ -71,7 +86,7 @@ public final class FluxGroupByUsage extends BugChecker
     Type keyMapperType =
         requireNonNull(
             ASTHelpers.getType(tree.getArguments().getFirst()), "Key mapper lacks a type");
-    return describeIfUnbounded(tree, getFunctionReturnType(keyMapperType, state), state);
+    return hasBoundedKeySpace(keyMapperType, state) ? Description.NO_MATCH : describeMatch(tree);
   }
 
   @Override
@@ -80,23 +95,26 @@ public final class FluxGroupByUsage extends BugChecker
       return Description.NO_MATCH;
     }
 
+    /*
+     * The `MemberReferenceTree` API does not expose the referenced method's instantiated type, so
+     * this information is obtained from the associated javac AST node. Note that its parameter list
+     * omits the receiver, also for unbound references such as `Flux::groupBy`.
+     */
     Type keyMapperType = ((JCMemberReference) tree).referentType.getParameterTypes().getFirst();
-    return describeIfUnbounded(tree, getFunctionReturnType(keyMapperType, state), state);
+    return hasBoundedKeySpace(keyMapperType, state) ? Description.NO_MATCH : describeMatch(tree);
   }
 
-  private Description describeIfUnbounded(
-      ExpressionTree tree, @Nullable Type keyType, VisitorState state) {
-    return keyType != null
-            && (ASTHelpers.isSameType(keyType, BOOLEAN.get(state), state)
-                || keyType.asElement().getKind() == ENUM)
-        ? Description.NO_MATCH
-        : describeMatch(tree);
-  }
+  private static boolean hasBoundedKeySpace(Type keyMapperType, VisitorState state) {
+    Type functionType = state.getTypes().asSuper(keyMapperType, FUNCTION_TYPE.get(state).tsym);
+    if (functionType == null) {
+      return false;
+    }
 
-  private static @Nullable Type getFunctionReturnType(Type type, VisitorState state) {
-    Type functionType = state.getTypes().asSuper(type, FUNCTION.get(state).tsym);
-    return functionType == null
-        ? null
-        : state.getTypes().findDescriptorType(functionType).getReturnType();
+    /* Unwrap wildcards such as the `? extends K` in `Function<? super T, ? extends K>`. */
+    Type keyType =
+        ASTHelpers.getUpperBound(
+            state.getTypes().findDescriptorType(functionType).getReturnType(), state.getTypes());
+    return ASTHelpers.isSameType(keyType, JAVA_LANG_BOOLEAN_TYPE.get(state), state)
+        || keyType.asElement().getKind() == ENUM;
   }
 }
