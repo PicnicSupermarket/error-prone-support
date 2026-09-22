@@ -29,7 +29,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
       contents: read
-      pull-requests: write # Needed to read PR metadata and to upsert the suggested commit message comment.
+      pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
     runs-on: ubuntu-24.04
     environment: codex
     steps:

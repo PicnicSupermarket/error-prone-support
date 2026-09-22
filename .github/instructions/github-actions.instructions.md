@@ -77,7 +77,7 @@ Declare `permissions: {}` at workflow level, granting nothing by default. Every
 job must declare its own complete `permissions` block, listing exactly what it
 needs. Permissions must be sorted alphabetically. Document every permission
 scope beyond `contents: read` with a trailing comment explaining why it is
-needed; `contents: read` itself needs no comment.  Never use `permissions:
+needed; `contents: read` itself needs no comment. Never use `permissions:
 write-all`.
 
 **Do:**
@@ -92,7 +92,7 @@ jobs:
     needs: build
     permissions:
       contents: read
-      pages: write # Needed to deploy the built site to GitHub Pages.
+      pages: write # To deploy the built site to GitHub Pages.
 ```
 
 **Don't:**

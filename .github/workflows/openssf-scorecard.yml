@@ -20,8 +20,8 @@ jobs:
     name: Run OpenSSF Scorecard analysis
     permissions:
       contents: read
-      id-token: write # Needed to obtain the OIDC token with which published Scorecard results are signed.
-      security-events: write # Needed to upload the analysis results to the code scanning dashboard.
+      id-token: write # To obtain the OIDC token with which published Scorecard results are signed.
+      security-events: write # To upload the analysis results to the code scanning dashboard.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

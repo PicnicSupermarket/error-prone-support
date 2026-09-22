@@ -15,7 +15,7 @@ jobs:
     # directly push to this repository.
     if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null && github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
-      pull-requests: write # Needed to set the milestone
+      pull-requests: write # To set the milestone.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
