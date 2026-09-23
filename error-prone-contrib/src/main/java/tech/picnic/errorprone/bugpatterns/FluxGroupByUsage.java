@@ -26,7 +26,7 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
-import com.sun.tools.javac.tree.JCTree.JCMemberReference;
+import java.util.List;
 import java.util.function.Function;
 import reactor.core.publisher.Flux;
 
@@ -57,6 +57,7 @@ public final class FluxGroupByUsage extends BugChecker
     implements MethodInvocationTreeMatcher, MemberReferenceTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final String FLUX = "reactor.core.publisher.Flux";
+  private static final String GROUP_BY = "groupBy";
   private static final String FUNCTION = Function.class.getCanonicalName();
   private static final Supplier<Type> FUNCTION_TYPE = Suppliers.typeFromString(FUNCTION);
   /*
@@ -66,12 +67,12 @@ public final class FluxGroupByUsage extends BugChecker
    */
   private static final Matcher<ExpressionTree> FLUX_GROUP_BY =
       anyOf(
-          instanceMethod().onDescendantOf(FLUX).named("groupBy").withParameters(FUNCTION),
-          instanceMethod().onDescendantOf(FLUX).named("groupBy").withParameters(FUNCTION, "int"),
-          instanceMethod().onDescendantOf(FLUX).named("groupBy").withParameters(FUNCTION, FUNCTION),
+          instanceMethod().onDescendantOf(FLUX).named(GROUP_BY).withParameters(FUNCTION),
+          instanceMethod().onDescendantOf(FLUX).named(GROUP_BY).withParameters(FUNCTION, "int"),
+          instanceMethod().onDescendantOf(FLUX).named(GROUP_BY).withParameters(FUNCTION, FUNCTION),
           instanceMethod()
               .onDescendantOf(FLUX)
-              .named("groupBy")
+              .named(GROUP_BY)
               .withParameters(FUNCTION, FUNCTION, "int"));
 
   /** Instantiates a new {@link FluxGroupByUsage} instance. */
@@ -96,11 +97,19 @@ public final class FluxGroupByUsage extends BugChecker
     }
 
     /*
-     * The `MemberReferenceTree` API does not expose the referenced method's instantiated type, so
-     * this information is obtained from the associated javac AST node. Note that its parameter list
-     * omits the receiver, also for unbound references such as `Flux::groupBy`.
+     * The key mapper type is derived from the method reference's functional descriptor. For unbound
+     * method references such as `Flux::groupBy` the descriptor's first parameter is the receiver,
+     * so the key mapper's index is determined relative to the end of the parameter list.
      */
-    Type keyMapperType = ((JCMemberReference) tree).referentType.getParameterTypes().getFirst();
+    List<Type> parameterTypes =
+        state
+            .getTypes()
+            .findDescriptorType(
+                requireNonNull(ASTHelpers.getType(tree), "Method reference lacks a type"))
+            .getParameterTypes();
+    Type keyMapperType =
+        parameterTypes.get(
+            parameterTypes.size() - ASTHelpers.getSymbol(tree).getParameters().size());
     return hasBoundedKeySpace(keyMapperType, state) ? Description.NO_MATCH : describeMatch(tree);
   }
 
