@@ -5,8 +5,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.label.name }}
   cancel-in-progress: true
-permissions:
-  contents: read
+permissions: {}
 jobs:
   assign:
     name: Assign milestone
@@ -16,9 +15,7 @@ jobs:
     # directly push to this repository.
     if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null && github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
-      contents: read
-      issues: write
-      pull-requests: write
+      pull-requests: write # To set the milestone.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

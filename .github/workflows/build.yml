@@ -14,8 +14,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -30,6 +29,8 @@ jobs:
           - os: ubuntu-24.04
             build-jdk: 26.0.2
             target-jdk: 21.0.12
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Harden-Runner
@@ -78,6 +79,8 @@ jobs:
     name: Deploy artifacts
     if: ${{ github.ref_name == github.event.repository.default_branch }}
     needs: build
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     environment: maven-deploy
     steps:

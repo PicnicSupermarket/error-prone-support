@@ -19,13 +19,14 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   queue: max
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   validate:
     name: Validate Error Prone compatibility
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

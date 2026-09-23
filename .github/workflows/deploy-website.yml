@@ -7,11 +7,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
-permissions:
-  contents: read
+permissions: {}
 jobs:
   build:
     name: Build website
+    permissions:
+      contents: read
+      pages: read # To configure GitHub pages.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -71,8 +73,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:
-      id-token: write
-      pages: write
+      id-token: write # To obtain the OIDC token that certifies the origin of the deployment.
+      pages: write # To deploy the built site to GitHub Pages.
     runs-on: ubuntu-24.04
     environment:
       name: github-pages

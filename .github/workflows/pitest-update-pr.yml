@@ -9,8 +9,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.conclusion }}
   cancel-in-progress: true
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -18,10 +17,10 @@ jobs:
     name: Update PR with mutation test results
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
-      actions: read
-      checks: write
+      actions: read # To download the analysis artifact from the triggering workflow run.
+      checks: write # To annotate surviving mutants using a check run.
       contents: read
-      pull-requests: write
+      pull-requests: write # To post a summary as a PR comment.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

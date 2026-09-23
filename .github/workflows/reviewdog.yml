@@ -4,8 +4,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-permissions:
-  contents: read
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -13,7 +12,7 @@ jobs:
     name: Report code issues with Reviewdog
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # To post findings and suggested fixes as PR comments.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
