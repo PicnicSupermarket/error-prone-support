@@ -49,4 +49,6 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Update PR
-        run: mvn -DrepoToken="${{ secrets.GITHUB_TOKEN }}" pitest-github:updatePR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mvn -DrepoToken="${GITHUB_TOKEN}" pitest-github:updatePR
