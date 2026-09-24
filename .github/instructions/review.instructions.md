@@ -14,9 +14,9 @@ the files you modified.
 
 ## Agent Configuration Conventions (`agents.instructions.md`)
 
-### `AGENT.md` is the canonical entry point
+### `AGENTS.md` is the canonical entry point
 
-- [ ] `AGENT.md` is the single source of truth for agent workflow
+- [ ] `AGENTS.md` is the single source of truth for agent workflow
 
 ### Use symlinks to avoid duplication across agent platforms
 

@@ -1,0 +1,35 @@
+name: Validate agent skills
+on:
+  pull_request:
+    paths:
+      - '.agents/skills/**'
+      - '.github/instructions/**'
+      - 'AGENTS.md'
+      - 'validate-agent-skills.sh'
+      - '.github/workflows/validate-agent-skills.yml'
+  push:
+    branches: [ master ]
+    paths:
+      - '.agents/skills/**'
+      - '.github/instructions/**'
+      - 'AGENTS.md'
+      - 'validate-agent-skills.sh'
+      - '.github/workflows/validate-agent-skills.yml'
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            github.com:443
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Validate agent skills
+        run: ./validate-agent-skills.sh

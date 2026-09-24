@@ -23,9 +23,9 @@ the full conventions. Then:
 4. **Verify** by running the tests.
 5. **Review** your changes following
    [`.github/instructions/review.instructions.md`][review].
-6. **Follow the workflow** described in [`AGENT.md`][agent-md] (mutation tests,
+6. **Follow the workflow** described in [`AGENTS.md`][agents-md] (mutation tests,
    apply suggestions, full build).
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [bug-checkers]: ../../../.github/instructions/bug-checkers.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md
