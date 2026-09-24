@@ -30,6 +30,7 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Objects;
+import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
 
@@ -100,14 +101,15 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     if (ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
       ExpressionTree invocationReceiverTree = ASTHelpers.getReceiver(nameArgument);
       Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(invocationReceiverTree);
-      if (enumSymbolPassedToValueOf == null) {
+      Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
+      if (enumSymbolPassedToValueOf == null || receiverType == null) {
         return Description.NO_MATCH;
       }
 
       ImmutableSet<String> enumValuesOfNameInvocationReceiver =
           invocationReceiverTree instanceof MemberSelectTree memberSelectTree
               ? ImmutableSet.of(memberSelectTree.getIdentifier().toString())
-              : getEnumValues(ASTHelpers.getReceiverType(nameArgument));
+              : getEnumValues(receiverType);
 
       ImmutableSet<String> missingValues =
           Sets.difference(
@@ -131,7 +133,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
 
   private static CaptureResult captureEnumType(MethodInvocationTree tree, VisitorState state) {
     if (ENUM_INSTANCE_VALUE_OF_NAME_ONLY.matches(tree, state)) {
-      return new Captured(ASTHelpers.getReceiverType(tree));
+      return capture(ASTHelpers.getReceiverType(tree), state);
     }
     if (ENUM_INSTANCE_VALUE_OF_CLASS_AND_NAME.matches(tree, state)
         || ABSTRACT_ENUM_VALUE_OF.matches(tree, state)) {
@@ -139,9 +141,27 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
       if (classArgType == null || classArgType.getTypeArguments().isEmpty()) {
         return new NoMatch();
       }
-      return new Captured(classArgType.getTypeArguments().getFirst());
+      return capture(classArgType.getTypeArguments().getFirst(), state);
     }
     return new NoMatch();
+  }
+
+  private static CaptureResult capture(@Nullable Type type, VisitorState state) {
+    Type enumType = toEnumType(type, state);
+    return enumType == null ? new NoMatch() : new Captured(enumType);
+  }
+
+  /**
+   * Returns the enum type denoted by the given type, resolving type variables to their upper bound,
+   * or {@code null} if it does not denote a specific enum type (e.g. {@code T extends Enum<T>}).
+   */
+  private static @Nullable Type toEnumType(@Nullable Type type, VisitorState state) {
+    if (type == null) {
+      return null;
+    }
+
+    Type upperBound = ASTHelpers.getUpperBound(type, state.getTypes());
+    return upperBound.asElement().isEnum() ? upperBound : null;
   }
 
   private static ImmutableSet<String> getEnumValues(Type type) {
