@@ -113,6 +113,10 @@ public final class FluxGroupByUsage extends BugChecker
     return hasBoundedKeySpace(keyMapperType, state) ? Description.NO_MATCH : describeMatch(tree);
   }
 
+  /**
+   * Tells whether the given key mapper produces {@link Boolean} or enum keys, whose cardinality is
+   * statically bounded.
+   */
   private static boolean hasBoundedKeySpace(Type keyMapperType, VisitorState state) {
     Type functionType = state.getTypes().asSuper(keyMapperType, FUNCTION_TYPE.get(state).tsym);
     if (functionType == null) {
