@@ -58,11 +58,6 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
           .onDescendantOf(Enum.class.getCanonicalName())
           .named("valueOf")
           .withParameters(Class.class.getCanonicalName(), String.class.getCanonicalName());
-  private static final Matcher<ExpressionTree> ABSTRACT_ENUM_VALUE_OF =
-      staticMethod()
-          .onClass(Enum.class.getCanonicalName())
-          .named("valueOf")
-          .withParameters(Class.class.getCanonicalName(), String.class.getCanonicalName());
   private static final Matcher<ExpressionTree> ENUM_NAME_OR_TO_STRING_METHOD =
       instanceMethod()
           .onDescendantOf(Enum.class.getCanonicalName())
@@ -135,8 +130,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     if (ENUM_INSTANCE_VALUE_OF_NAME_ONLY.matches(tree, state)) {
       return capture(ASTHelpers.getReceiverType(tree), state);
     }
-    if (ENUM_INSTANCE_VALUE_OF_CLASS_AND_NAME.matches(tree, state)
-        || ABSTRACT_ENUM_VALUE_OF.matches(tree, state)) {
+    if (ENUM_INSTANCE_VALUE_OF_CLASS_AND_NAME.matches(tree, state)) {
       Type classArgType = ASTHelpers.getType(tree.getArguments().getFirst());
       if (classArgType == null || classArgType.getTypeArguments().isEmpty()) {
         return new NoMatch();
