@@ -9,6 +9,7 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.errorprone.BugPattern;
@@ -23,13 +24,13 @@ import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.ParenthesizedTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.SwitchTree;
+import com.sun.source.tree.Tree;
+import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
-import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -163,12 +164,11 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
   }
 
   /**
-   * Finds the enum values covered by the switch cases containing {@code enumValueArgument}.
+   * Finds the enum values covered by the innermost enclosing switch case whose switch selects on
+   * {@code enumSymbolPassedToValueOf}.
    *
    * <p>For a non-default case, returns the labels of that case. For a default case, returns the
-   * enum values not covered by other cases. Returns all values if {@code enumValueArgument} is not
-   * part of a switch statement or expression, or if the switch expression symbol doesn't match the
-   * symbol of {@code enumValueArgument}.
+   * enum values not covered by other cases. Returns all values if there is no such switch case.
    *
    * <p>Example 1 - non-default case returns {@code ["B1", "B2"]}:
    *
@@ -199,47 +199,44 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
   // labels are considered.
   private static ImmutableSet<String> findSwitchCoveredValues(
       Symbol enumSymbolPassedToValueOf, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
-    CaseTree enclosingCaseTree = ASTHelpers.findEnclosingNode(state.getPath(), CaseTree.class);
-    if (enclosingCaseTree == null) {
-      /* Fast path: avoids unnecessary switch-tree lookups when not inside a case. */
-      return valuesOfReceiver;
-    }
-
-    Symbol switchExpressionSymbol;
-    List<? extends CaseTree> switchCases;
-    SwitchExpressionTree switchExprTree =
-        ASTHelpers.findEnclosingNode(state.getPath(), SwitchExpressionTree.class);
-    if (switchExprTree != null) {
-      switchExpressionSymbol =
-          ASTHelpers.getSymbol(
-              ((ParenthesizedTree) switchExprTree.getExpression()).getExpression());
-      switchCases = switchExprTree.getCases();
-    } else {
-      SwitchTree switchStmtTree = ASTHelpers.findEnclosingNode(state.getPath(), SwitchTree.class);
-      if (switchStmtTree == null) {
-        /* Defensive: a `CaseTree` is structurally always inside a switch. */
-        return valuesOfReceiver;
+    for (TreePath path = state.getPath(); path != null; path = path.getParentPath()) {
+      if (path.getLeaf() instanceof CaseTree caseTree) {
+        List<? extends CaseTree> switchCases =
+            getCasesIfSelecting(path.getParentPath().getLeaf(), enumSymbolPassedToValueOf);
+        if (switchCases != null) {
+          return ASTHelpers.isSwitchDefault(caseTree)
+              ? Sets.difference(valuesOfReceiver, getLabels(switchCases, state)).immutableCopy()
+              : getLabels(ImmutableList.of(caseTree), state);
+        }
       }
-      switchExpressionSymbol =
-          ASTHelpers.getSymbol(
-              ((ParenthesizedTree) switchStmtTree.getExpression()).getExpression());
-      switchCases = switchStmtTree.getCases();
     }
 
-    if (!Objects.equals(switchExpressionSymbol, enumSymbolPassedToValueOf)) {
-      return valuesOfReceiver;
-    }
+    return valuesOfReceiver;
+  }
 
-    if (ASTHelpers.isSwitchDefault(enclosingCaseTree)) {
-      ImmutableSet<String> coveredCases =
-          switchCases.stream()
-              .flatMap(caseTree -> caseTree.getLabels().stream())
-              .map(label -> SourceCode.treeToString(label, state))
-              .collect(toImmutableSet());
-      return Sets.difference(valuesOfReceiver, coveredCases).immutableCopy();
-    }
+  /**
+   * Returns the cases of the given switch statement or expression, or {@code null} if it does not
+   * select on the given symbol.
+   */
+  private static @Nullable List<? extends CaseTree> getCasesIfSelecting(Tree tree, Symbol symbol) {
+    return switch (tree) {
+      case SwitchTree switchTree when isSymbol(switchTree.getExpression(), symbol) ->
+          switchTree.getCases();
+      case SwitchExpressionTree switchExpression
+          when isSymbol(switchExpression.getExpression(), symbol) ->
+          switchExpression.getCases();
+      default -> null;
+    };
+  }
 
-    return enclosingCaseTree.getLabels().stream()
+  private static boolean isSymbol(ExpressionTree tree, Symbol symbol) {
+    return symbol.equals(ASTHelpers.getSymbol(ASTHelpers.stripParentheses(tree)));
+  }
+
+  private static ImmutableSet<String> getLabels(
+      List<? extends CaseTree> cases, VisitorState state) {
+    return cases.stream()
+        .flatMap(caseTree -> caseTree.getLabels().stream())
         .map(label -> SourceCode.treeToString(label, state))
         .collect(toImmutableSet());
   }
