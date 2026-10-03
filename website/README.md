@@ -42,7 +42,8 @@ several configuration options.
 ###### Switch Ruby versions
 
 The required Ruby version is set in `.ruby-version`. To switch, you can use a
-Ruby version manager such as [mise][mise]:
+Ruby version manager such as [mise][mise], after [activating it in your
+shell][mise-activate]:
 
 ```sh
 mise settings add idiomatic_version_file_enable_tools ruby
@@ -79,3 +80,4 @@ Actions workflow any time a change is merged to `master`.
 [just-the-docs]: https://just-the-docs.github.io/just-the-docs/
 [localhost-port-4000]: http://127.0.0.1:4000
 [mise]: https://mise.jdx.dev/lang/ruby.html
+[mise-activate]: https://mise.jdx.dev/getting-started.html#activate-mise
