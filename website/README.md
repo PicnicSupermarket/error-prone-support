@@ -41,8 +41,13 @@ several configuration options.
 
 ###### Switch Ruby versions
 
-The required Ruby version is set in `.ruby-version`. To switch, you can use
-[rvm][rvm] to manage your Ruby version.
+The required Ruby version is set in `.ruby-version`. To switch, you can use a
+Ruby version manager such as [mise][mise]:
+
+```sh
+mise settings add idiomatic_version_file_enable_tools ruby
+mise install
+```
 
 ###### Resolve Bundler issues
 
@@ -73,4 +78,4 @@ Actions workflow any time a change is merged to `master`.
 [jekyll-docs-installation]: https://jekyllrb.com/docs/installation
 [just-the-docs]: https://just-the-docs.github.io/just-the-docs/
 [localhost-port-4000]: http://127.0.0.1:4000
-[rvm]: https://rvm.io
+[mise]: https://mise.jdx.dev/lang/ruby.html
