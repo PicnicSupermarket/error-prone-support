@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static java.util.Comparator.comparingInt;
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -184,8 +185,8 @@ final class RefasterTest {
                 .formatted(Pattern.quote(fileName)))
         .matcher(message)
         .results()
-        .sorted(comparingInt(r -> Integer.parseInt(r.group(1))))
-        .map(r -> toSeverityLevel(r.group(2)))
+        .sorted(comparingInt(r -> Integer.parseInt(requireNonNull(r.group(1), "No line number"))))
+        .map(r -> toSeverityLevel(requireNonNull(r.group(2), "No severity")))
         .collect(toImmutableList());
   }
 

@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Splitter;
 import com.google.errorprone.matchers.Matcher;
@@ -50,7 +51,8 @@ public final class MethodMatcherFactory {
     checkArgument(m.matches(), "Not a valid method signature: %s", signature);
     String className = m.group(1);
     String methodName = m.group(2);
-    Iterable<String> parameterTypes = ARGUMENT_TYPE_SPLITTER.split(m.group(3));
+    Iterable<String> parameterTypes =
+        ARGUMENT_TYPE_SPLITTER.split(requireNonNull(m.group(3), "No parameter types"));
 
     return anyOf(
         instanceMethod().onDescendantOf(className).named(methodName).withParameters(parameterTypes),

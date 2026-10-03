@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableListMultimap;
@@ -61,7 +63,9 @@ public final class CodeTransformers {
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
-      return ClassPath.from(CodeTransformers.class.getClassLoader()).getResources();
+      return ClassPath.from(
+              requireNonNull(CodeTransformers.class.getClassLoader(), "No class loader"))
+          .getResources();
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to scan classpath for resources", e);
     }
@@ -94,18 +98,23 @@ public final class CodeTransformers {
               // project and all supported versions of Error Prone depend on Guava 33.8.0 or
               // greater.
               @Override
+              @SuppressWarnings(
+                  "NullAway" /* Class literals of top-level and member types have a canonical name. */)
               protected ObjectStreamClass readClassDescriptor()
                   throws IOException, ClassNotFoundException {
                 ObjectStreamClass descriptor = super.readClassDescriptor();
                 return ImmutableClassToInstanceMap.class
                         .getCanonicalName()
                         .equals(descriptor.getName())
-                    ? ObjectStreamClass.lookup(ImmutableClassToInstanceMap.class)
+                    ? requireNonNull(
+                        ObjectStreamClass.lookup(ImmutableClassToInstanceMap.class),
+                        "`ImmutableClassToInstanceMap` lacks a class descriptor")
                     : descriptor;
               }
             }) {
       @SuppressWarnings("BanSerializableRead" /* Part of the Refaster API. */)
-      CodeTransformer codeTransformer = (CodeTransformer) ois.readObject();
+      CodeTransformer codeTransformer =
+          (CodeTransformer) requireNonNull(ois.readObject(), "Resource lacks a code transformer");
       return Optional.of(codeTransformer);
     } catch (NoSuchElementException e) {
       /*

@@ -3,6 +3,7 @@ package tech.picnic.errorprone.documentation;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.attribute.AclEntryPermission.ADD_SUBDIRECTORY;
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
@@ -32,7 +33,9 @@ final class DocumentationGeneratorTaskListenerTest {
   @Test
   void readOnlyFileSystemWindows(@TempDir Path outputDirectory) throws IOException {
     AclFileAttributeView view =
-        Files.getFileAttributeView(outputDirectory, AclFileAttributeView.class);
+        requireNonNull(
+            Files.getFileAttributeView(outputDirectory, AclFileAttributeView.class),
+            "ACL file attribute view is not supported");
     view.setAcl(
         view.getAcl().stream()
             .map(

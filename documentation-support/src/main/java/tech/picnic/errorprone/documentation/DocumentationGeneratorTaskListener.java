@@ -90,6 +90,8 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
   }
 
   private static String getSimpleClassName(URI path) {
-    return Path.of(path).getFileName().toString().replace(".java", "");
+    return requireNonNull(Path.of(path).getFileName(), "Source file path lacks a file name")
+        .toString()
+        .replace(".java", "");
   }
 }

@@ -130,6 +130,9 @@ final class MoreTypePredicatesTest {
   private static final class HasAnnotationTestChecker extends BugChecker
       implements ClassTreeMatcher {
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings(
+        "NullAway" /* Class literals of top-level and member types have a canonical name. */)
     private static final Matcher<Tree> DELEGATE =
         typePredicateMatcher(MoreTypePredicates.hasAnnotation(Deprecated.class.getCanonicalName()));
 
@@ -146,6 +149,9 @@ final class MoreTypePredicatesTest {
   private static final class IsSubTypeOfTestChecker extends BugChecker
       implements MethodInvocationTreeMatcher {
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings(
+        "NullAway" /* Class literals of top-level and member types have a canonical name. */)
     private static final Matcher<Tree> DELEGATE =
         typePredicateMatcher(
             MoreTypePredicates.isSubTypeOf(
