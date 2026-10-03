@@ -66,6 +66,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
    * <p>Types listed here should be mutually exclusive with {@link
    * StaticImport#STATIC_IMPORT_CANDIDATE_TYPES}.
    */
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   @VisibleForTesting
   static final ImmutableSet<String> NON_STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
@@ -93,6 +95,8 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
   // XXX: Perhaps the set of exempted `java.util.Collections` methods is too strict. For now any
   // method name that could be considered "too vague" or could conceivably mean something else in a
   // specific context is left out.
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   static final ImmutableSetMultimap<String, String> NON_STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .putAll(

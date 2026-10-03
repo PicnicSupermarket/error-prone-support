@@ -83,14 +83,20 @@ final class AssertJEnumerableRules {
           enumerableAssert.hasSizeGreaterThan(0), enumerableAssert.hasSizeGreaterThanOrEqualTo(1));
     }
 
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1909 is
+    // resolved.
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* Works around a NullAway crash. */)
     AbstractIterableAssert<?, ?, E, ?> before(AbstractIterableAssert<?, ?, E, ?> enumerableAssert) {
       return Refaster.anyOf(
           enumerableAssert.size().isNotEqualTo(0).returnToIterable(),
           enumerableAssert.size().isPositive().returnToIterable());
     }
 
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1909 is
+    // resolved.
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* Works around a NullAway crash. */)
     AbstractIterableSizeAssert<
             ? extends
                 AbstractIterableAssert<

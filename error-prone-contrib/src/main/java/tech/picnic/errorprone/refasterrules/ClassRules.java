@@ -74,6 +74,7 @@ final class ClassRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
     Function<T, S> after(Class<U> clazz) {
       return clazz::cast;
     }

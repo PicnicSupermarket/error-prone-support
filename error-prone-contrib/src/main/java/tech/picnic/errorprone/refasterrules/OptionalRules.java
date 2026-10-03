@@ -237,6 +237,8 @@ final class OptionalRules {
    */
   static final class OptionalOrOrElseThrow<T> {
     @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* `Optional#orElseGet` yields `null` only if the supplier does. */)
     T before(Optional<T> optional1, Optional<T> optional2) {
       return optional1.orElseGet(() -> optional2.orElseThrow());
     }
@@ -253,6 +255,8 @@ final class OptionalRules {
   // replaced with a Refaster rule.
   static final class OptionalOrElse<T> {
     @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* `Optional#orElseGet` yields `null` only if the supplier does. */)
     T before(Optional<T> optional, @NotMatches(RequiresComputation.class) T other) {
       return optional.orElseGet(() -> other);
     }
@@ -448,6 +452,8 @@ final class OptionalRules {
   /** Prefer {@link Optional#stream()} over more contrived alternatives. */
   static final class OptionalStream<T> {
     @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* `Optional#orElseGet` yields `null` only if the supplier does. */)
     Stream<T> before(Optional<T> optional) {
       return optional.map(Stream::of).orElseGet(Stream::empty);
     }

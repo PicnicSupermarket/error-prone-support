@@ -225,6 +225,8 @@ final class AssertJPathRules {
   /** Prefer {@link AbstractPathAssert#hasExtension(String)} over more contrived alternatives. */
   static final class AssertThatHasExtension {
     @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* Matched expressions are in practice embedded in a larger context. */)
     AbstractStringAssert<?> before(Path actual, String expectedExtension) {
       return assertThat(Refaster.anyOf(actual.getFileName().toString(), actual.toString()))
           .endsWith(Refaster.anyOf('.' + expectedExtension, "." + expectedExtension));

@@ -390,6 +390,7 @@ static final class BigDecimalZero {
 
 ### `@SuppressWarnings` on template methods
 <!-- check: `@SuppressWarnings` entries have explanatory comments -->
+<!-- check: Established `@SuppressWarnings` comment texts are reused where applicable -->
 
 When a template method triggers a compiler or static-analysis warning, it is
 generally okay to suppress it with a comment. Preferably, use an established
@@ -422,6 +423,9 @@ Established comment patterns:
 | `/* Parentheses compensate for a Refaster bug. */` | Suppressing `"UnnecessaryParentheses"` |
 | `/* SonarCloud thinks that \`someParameter\` itself is \`@Nullable\`. */` | Suppressing SonarCloud false positive on `Supplier<@Nullable String>` parameters |
 | `/* Each variant requires a separate \`@BeforeTemplate\` method. */` | Rule class exceeds method-count threshold due to per-type overloads |
+| `/* Matched expressions are in practice embedded in a larger context. */` | The flagged Refaster template code is only unsafe when considered in isolation, such as a `@Nullable` dereference in a before-template |
+| `/* \`Class#cast\` maps non-\`null\` values to non-\`null\` values. */` | Suppressing `"NullAway"` where `Class#cast` is used as a `Function` |
+| `/* \`Optional#orElseGet\` yields \`null\` only if the supplier does. */` | Suppressing `"NullAway"` for `Optional#orElseGet` with a non-`null`-returning supplier |
 
 For general `@SuppressWarnings` conventions (smallest-scope principle,
 comment requirements for all Java files), see

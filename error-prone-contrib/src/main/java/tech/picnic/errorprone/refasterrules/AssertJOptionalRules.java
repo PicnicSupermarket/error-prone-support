@@ -102,7 +102,10 @@ final class AssertJOptionalRules {
 
   /** Prefer {@link AbstractOptionalAssert#hasValue(Object)} over more contrived alternatives. */
   static final class AbstractOptionalAssertHasValue<T> {
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1909 is
+    // resolved.
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* Works around a NullAway crash. */)
     AbstractAssert<?, ?> before(AbstractOptionalAssert<?, T> optionalAssert, T expectedValue) {
       return Refaster.anyOf(
           optionalAssert.get().isEqualTo(expectedValue),

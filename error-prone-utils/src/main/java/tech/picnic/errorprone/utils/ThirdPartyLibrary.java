@@ -28,6 +28,8 @@ public enum ThirdPartyLibrary {
    *
    * @see <a href="https://github.com/google/guava">Guava on GitHub</a>
    */
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   GUAVA(ImmutableList.class.getCanonicalName()),
   /**
    * VMWare's Project Reactor.

@@ -1,5 +1,7 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -59,7 +61,9 @@ public final class CodeTransformers {
 
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
-      return ClassPath.from(CodeTransformers.class.getClassLoader()).getResources();
+      return ClassPath.from(
+              requireNonNull(CodeTransformers.class.getClassLoader(), "No class loader"))
+          .getResources();
     } catch (IOException e) {
       throw new UncheckedIOException("Failed to scan classpath for resources", e);
     }
@@ -86,7 +90,8 @@ public final class CodeTransformers {
     try (InputStream in = resource.url().openStream();
         ObjectInputStream ois = new ObjectInputStream(in)) {
       @SuppressWarnings("BanSerializableRead" /* Part of the Refaster API. */)
-      CodeTransformer codeTransformer = (CodeTransformer) ois.readObject();
+      CodeTransformer codeTransformer =
+          (CodeTransformer) requireNonNull(ois.readObject(), "Resource lacks a code transformer");
       return Optional.of(codeTransformer);
     } catch (NoSuchElementException e) {
       /*

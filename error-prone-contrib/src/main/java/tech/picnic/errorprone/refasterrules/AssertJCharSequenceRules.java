@@ -36,7 +36,10 @@ final class AssertJCharSequenceRules {
 
   /** Prefer {@link AbstractCharSequenceAssert#isNotEmpty()} over more contrived alternatives. */
   static final class AssertThatIsNotEmpty {
+    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1909 is
+    // resolved.
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* Works around a NullAway crash. */)
     AbstractAssert<?, ?> before(CharSequence actual) {
       return Refaster.anyOf(
           assertThat(actual.isEmpty()).isFalse(),

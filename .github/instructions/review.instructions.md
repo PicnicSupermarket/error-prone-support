@@ -293,6 +293,7 @@ the files you modified.
 - [ ] Parameter names follow type-based naming conventions
 - [ ] Rule class name is derived *only* from `@AfterTemplate` identifiers
 - [ ] `@SuppressWarnings` entries have explanatory comments
+- [ ] Established `@SuppressWarnings` comment texts are reused where applicable
 - [ ] Behavior-changing rules have `<p><strong>Warning:</strong>` in Javadoc
 - [ ] Known limitations are documented with `// XXX:` comments
 - [ ] Type parameters are as wide as possible; wildcard bounds are eliminated

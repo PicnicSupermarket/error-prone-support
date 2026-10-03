@@ -55,6 +55,7 @@ public final class AmbiguousJsonCreator extends BugChecker implements Annotation
       return Description.NO_MATCH;
     }
 
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
     boolean customMode =
         ASTHelpers.getAnnotationMirror(tree).getElementValues().entrySet().stream()
             .filter(entry -> entry.getKey().getSimpleName().contentEquals("mode"))

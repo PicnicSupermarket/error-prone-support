@@ -1259,18 +1259,12 @@ final class ReactorRules {
     @Placeholder(allowsIdentity = true)
     abstract Optional<S> transformation(@MayOptionallyUse T value);
 
-    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
-    // resolved.
     @BeforeTemplate
-    @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<S> before(Flux<T> flux) {
       return flux.map(v -> transformation(v)).mapNotNull(o -> o.orElse(null));
     }
 
-    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
-    // resolved.
     @AfterTemplate
-    @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<S> after(Flux<T> flux) {
       return flux.mapNotNull(x -> transformation(x).orElse(null));
     }
@@ -1283,10 +1277,7 @@ final class ReactorRules {
       return flux.filter(Optional::isPresent).map(Optional::orElseThrow);
     }
 
-    // XXX: Drop the `NullAway` suppression once https://github.com/uber/NullAway/issues/1522 is
-    // resolved.
     @AfterTemplate
-    @SuppressWarnings("NullAway" /* `mapNotNull` result *is* `@Nullable`. */)
     Flux<T> after(Flux<Optional<T>> flux) {
       return flux.mapNotNull(x -> x.orElse(null));
     }
@@ -1488,6 +1479,7 @@ final class ReactorRules {
   /** Prefer {@link Mono#cast(Class)} over {@link Mono#map(Function)} with a cast. */
   static final class MonoCastClass<T, S> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
     Mono<S> before(Mono<T> mono) {
       return mono.map(Refaster.<S>clazz()::cast);
     }
@@ -1501,6 +1493,7 @@ final class ReactorRules {
   /** Prefer {@link Flux#cast(Class)} over {@link Flux#map(Function)} with a cast. */
   static final class FluxCastClass<T, S> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
     Flux<S> before(Flux<T> flux) {
       return flux.map(Refaster.<S>clazz()::cast);
     }

@@ -72,13 +72,13 @@ final class StreamRules {
   /** Prefer {@link Collectors#joining()} over more verbose alternatives. */
   static final class Joining {
     @BeforeTemplate
-    Collector<CharSequence, ?, String> before() {
+    Collector<@Nullable CharSequence, ?, String> before() {
       return joining("");
     }
 
     @AfterTemplate
     @UseImportPolicy(STATIC_IMPORT_ALWAYS)
-    Collector<CharSequence, ?, String> after() {
+    Collector<@Nullable CharSequence, ?, String> after() {
       return joining();
     }
   }
@@ -415,6 +415,7 @@ final class StreamRules {
    */
   static final class StreamMapMapGetFilterObjectsNonNull<T, K, V> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* The value is looked up only for keys known to be present. */)
     Stream<V> before(Stream<T> stream, Map<K, V> map) {
       return stream.filter(map::containsKey).map(map::get);
     }

@@ -87,6 +87,8 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
    * <p>Types listed here should be mutually exclusive with {@link
    * NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_TYPES}.
    */
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   @VisibleForTesting
   static final ImmutableSet<String> STATIC_IMPORT_CANDIDATE_TYPES =
       ImmutableSet.of(
@@ -153,6 +155,8 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
    *       NonStaticImport#NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS}.
    * </ul>
    */
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   static final ImmutableSetMultimap<String, String> STATIC_IMPORT_CANDIDATE_MEMBERS =
       ImmutableSetMultimap.<String, String>builder()
           .putAll(Comparators.class.getCanonicalName(), "emptiesFirst", "emptiesLast")

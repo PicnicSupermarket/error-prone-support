@@ -82,6 +82,7 @@ public final class RefasterMethodParameterOrder extends BugChecker implements Cl
         .orElse(Description.NO_MATCH);
   }
 
+  @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
   private static ImmutableList<MethodTree> getMethodsByPriority(
       ClassTree tree, VisitorState state) {
     return tree.getMembers().stream()

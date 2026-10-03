@@ -111,9 +111,9 @@ public final class AnnotationAttributeMatcher implements Serializable {
     }
 
     String annotationType = type.toString();
-    return tree.getArguments().stream()
-        .map(ExpressionTree.class::cast)
-        .filter(a -> matches(annotationType, extractAttributeName(a)));
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
+    Stream<ExpressionTree> arguments = tree.getArguments().stream().map(ExpressionTree.class::cast);
+    return arguments.filter(a -> matches(annotationType, extractAttributeName(a)));
   }
 
   private static String extractAttributeName(ExpressionTree expr) {

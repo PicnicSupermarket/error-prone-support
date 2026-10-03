@@ -84,6 +84,8 @@ final class NullRules {
   // an NPE.
   static final class RequireNonNullElseGet<T, S extends T> {
     @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* `Optional#orElseGet` yields `null` only if the supplier does. */)
     T before(T obj, Supplier<S> supplier) {
       return Optional.ofNullable(obj).orElseGet(supplier);
     }

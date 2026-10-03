@@ -2057,7 +2057,25 @@
                                     -XepOpt:NullAway:AnnotatedPackages=tech.picnic
                                     -XepOpt:NullAway:AssertsEnabled=true
                                     -XepOpt:NullAway:CheckOptionalEmptiness=true
+                                    -XepOpt:NullAway:JSpecifyExperimental=true
                                     -XepOpt:NullAway:JSpecifyMode=true
+                                    <!-- This flag, which is implied by
+                                    `JSpecifyExperimental`, reports generic
+                                    method invocations for which NullAway's
+                                    inference gives up. It is documented as an
+                                    aid for investigating NullAway's own
+                                    limitations, and the reported cases
+                                    (collector element and accumulator type
+                                    variables, `Function` results, and type
+                                    variables with contradictory constraints)
+                                    admit no resolution in our code. Do note
+                                    that this also hides the only signal for a
+                                    handful of Refaster `@BeforeTemplate`s that
+                                    are null-unsafe in isolation. -->
+                                    <!-- XXX: Re-enable this flag once
+                                    NullAway's JSpecify generics inference has
+                                    improved. -->
+                                    -XepOpt:NullAway:WarnOnGenericInferenceFailure=false
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
                                     -XepOpt:RefactorSwitch:EnableAssignmentSwitch=true

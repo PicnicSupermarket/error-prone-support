@@ -31,11 +31,14 @@ public final class MoreASTHelpers {
   public static ImmutableList<MethodTree> findMethods(CharSequence methodName, VisitorState state) {
     ClassTree clazz = state.findEnclosing(ClassTree.class);
     checkArgument(clazz != null, "Visited node is not enclosed by a class");
-    return clazz.getMembers().stream()
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .filter(method -> method.getName().contentEquals(methodName))
-        .collect(toImmutableList());
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
+    ImmutableList<MethodTree> methods =
+        clazz.getMembers().stream()
+            .filter(MethodTree.class::isInstance)
+            .map(MethodTree.class::cast)
+            .filter(method -> method.getName().contentEquals(methodName))
+            .collect(toImmutableList());
+    return methods;
   }
 
   /**

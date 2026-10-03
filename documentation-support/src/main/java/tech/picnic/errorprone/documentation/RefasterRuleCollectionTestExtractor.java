@@ -2,6 +2,7 @@ package tech.picnic.errorprone.documentation;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
 import com.google.auto.service.AutoService;
@@ -77,7 +78,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
   }
 
   private static boolean isInputFile(URI sourceFile) {
-    String path = sourceFile.getPath();
+    String path = requireNonNull(sourceFile.getPath(), "Source file URI lacks a path");
 
     // XXX: Instead of throwing an error here, it'd be nicer to have a bug checker validate key
     // aspects of `RefasterRuleCollectionTestCase` subtypes.
@@ -90,6 +91,7 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
                         path, TEST_CLASS_FILE_NAME_PATTERN)));
   }
 
+  @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
   private static ImmutableList<RefasterTestCase> getRefasterTestCases(
       ClassTree tree, VisitorState state) {
     return tree.getMembers().stream()
@@ -131,7 +133,9 @@ public final class RefasterRuleCollectionTestExtractor implements Extractor<Refa
 
   private static Optional<String> tryExtractPatternGroup(String input, Pattern pattern) {
     java.util.regex.Matcher matcher = pattern.matcher(input);
-    return matcher.matches() ? Optional.of(matcher.group(1)) : Optional.empty();
+    return matcher.matches()
+        ? Optional.of(requireNonNull(matcher.group(1), "No first capturing group"))
+        : Optional.empty();
   }
 
   @FormatMethod

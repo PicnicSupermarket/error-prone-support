@@ -154,6 +154,8 @@ final class MoreTypesTest {
      * @implNote The return value of this method should not be assigned to a field, as that would
      *     prevent mutations introduced by Pitest from being killed.
      */
+    @SuppressWarnings(
+        "NullAway" /* Class literals of top-level and member types have a canonical name. */)
     private static ImmutableSet<Supplier<Type>> getTestTypes() {
       return ImmutableSet.of(
           // Invalid types.

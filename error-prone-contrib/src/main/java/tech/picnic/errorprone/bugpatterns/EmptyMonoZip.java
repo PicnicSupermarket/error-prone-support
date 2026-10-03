@@ -51,6 +51,9 @@ public final class EmptyMonoZip extends BugChecker implements MethodInvocationTr
       anyOf(
           instanceMethod().onDescendantOf(MONO).named("zipWith"),
           staticMethod().onClass(MONO).named("zip"));
+
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   private static final Matcher<ExpressionTree> EMPTY_MONO =
       anyOf(
           staticMethod().onDescendantOf(MONO).named("empty"),

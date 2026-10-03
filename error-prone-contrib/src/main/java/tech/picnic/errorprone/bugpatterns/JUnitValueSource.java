@@ -179,14 +179,17 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
 
   private static Optional<MethodTree> findMatchingSibling(
       MethodTree tree, Predicate<? super MethodTree> predicate, VisitorState state) {
-    return requireNonNull(state.findEnclosing(ClassTree.class), "No class enclosing method")
-        .getMembers()
-        .stream()
-        .filter(MethodTree.class::isInstance)
-        .map(MethodTree.class::cast)
-        .filter(not(tree::equals))
-        .filter(predicate)
-        .findFirst();
+    ClassTree clazz =
+        requireNonNull(state.findEnclosing(ClassTree.class), "No class enclosing method");
+    @SuppressWarnings("NullAway" /* `Class#cast` maps non-`null` values to non-`null` values. */)
+    Optional<MethodTree> sibling =
+        clazz.getMembers().stream()
+            .filter(MethodTree.class::isInstance)
+            .map(MethodTree.class::cast)
+            .filter(not(tree::equals))
+            .filter(predicate)
+            .findFirst();
+    return sibling;
   }
 
   private static boolean hasValueFactory(
