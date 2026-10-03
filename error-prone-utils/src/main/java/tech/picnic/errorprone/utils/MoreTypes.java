@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A set of helper methods which together define a DSL for defining {@link Type types}.
@@ -125,7 +126,7 @@ public final class MoreTypes {
   }
 
   private static Supplier<Type> propagateNull(
-      Supplier<Type> type, BiFunction<VisitorState, Type, Type> transformer) {
+      Supplier<Type> type, BiFunction<VisitorState, Type, @Nullable Type> transformer) {
     return state ->
         Optional.ofNullable(type.get(state)).map(t -> transformer.apply(state, t)).orElse(null);
   }

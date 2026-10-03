@@ -81,6 +81,9 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
   private static final Pattern EMPTY_INSTANCE_FACTORY_METHOD_PATTERN = Pattern.compile("empty.*");
   private static final Matcher<Tree> EMPTY_COLLECTION_CONSTRUCTOR_ARGUMENT =
       anyOf(isPrimitiveType(), isSubtypeOf(Comparator.class));
+
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   private static final TypePredicate REGULAR_CONTAINER_TYPE =
       anyOf(
           isDescendantOfAny(
@@ -96,6 +99,7 @@ public final class IsEmpty implements Matcher<ExpressionTree> {
                   OptionalLong.class.getCanonicalName(),
                   Spliterator.class.getCanonicalName())),
           isArray());
+
   private static final TypePredicate REACTOR_CONTAINER_TYPE =
       anyOf(
           isDescendantOfAny(

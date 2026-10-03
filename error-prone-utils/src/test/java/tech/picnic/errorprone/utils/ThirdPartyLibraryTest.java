@@ -125,6 +125,9 @@ final class ThirdPartyLibraryTest {
   private static final class CanIntroduceUsageTestChecker extends BugChecker
       implements ClassTreeMatcher {
     private static final long serialVersionUID = 1L;
+
+    @SuppressWarnings(
+        "NullAway" /* Class literals of top-level and member types have a canonical name. */)
     private static final ImmutableMap<String, String> TYPES =
         ImmutableMap.of(
             "GUAVA_PUBLIC",

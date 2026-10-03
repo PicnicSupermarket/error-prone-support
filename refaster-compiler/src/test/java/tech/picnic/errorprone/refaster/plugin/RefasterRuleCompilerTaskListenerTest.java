@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refaster.plugin;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -68,7 +69,8 @@ final class RefasterRuleCompilerTaskListenerTest {
         new ObjectInputStream(Files.newInputStream(outputDirectory.resolve(RULE_FILE)))) {
       @SuppressWarnings("BanSerializableRead" /* Deserializing the Refaster rule under test. */)
       AnnotatedCompositeCodeTransformer transformer =
-          (AnnotatedCompositeCodeTransformer) in.readObject();
+          (AnnotatedCompositeCodeTransformer)
+              requireNonNull(in.readObject(), "Rule file lacks a code transformer");
       assertThat(transformer.annotations()).containsKey(Deprecated.class);
       assertThat(transformer.annotations().getInstance(SuppressWarnings.class))
           .satisfies(annotation -> assertThat(annotation.value()).containsExactly("bar"));

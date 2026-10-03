@@ -67,7 +67,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
       return suggestToCollectionAlternatives(
           tree,
           ImmutableList.class.getCanonicalName() + ".toImmutableList",
-          ArrayList.class.getCanonicalName(),
+          ArrayList.class,
           state);
     }
 
@@ -77,10 +77,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
     if (SET_COLLECTOR.matches(tree, state)) {
       return suggestToCollectionAlternatives(
-          tree,
-          ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
-          HashSet.class.getCanonicalName(),
-          state);
+          tree, ImmutableSet.class.getCanonicalName() + ".toImmutableSet", HashSet.class, state);
     }
 
     return Description.NO_MATCH;
@@ -89,13 +86,14 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
   private Description suggestToCollectionAlternatives(
       MethodInvocationTree tree,
       String immutableReplacement,
-      String mutableReplacement,
+      Class<?> mutableReplacement,
       VisitorState state) {
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String toCollectionSelect =
         SuggestedFixes.qualifyStaticImport(
             Collectors.class.getCanonicalName() + ".toCollection", mutableFix, state);
-    String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
+    String mutableCollection =
+        SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement.getCanonicalName());
 
     return buildDescription(tree)
         .addFix(replaceMethodInvocation(tree, immutableReplacement, state))

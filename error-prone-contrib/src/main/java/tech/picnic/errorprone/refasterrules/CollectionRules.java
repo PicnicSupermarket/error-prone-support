@@ -392,6 +392,8 @@ final class CollectionRules {
     }
 
     @AfterTemplate
+    @SuppressWarnings(
+        "NullAway" /* `Collection#toArray()` yields no `null`s for `@NonNull` element types. */)
     Object[] after(Collection<T> collection) {
       return collection.toArray();
     }
@@ -473,6 +475,7 @@ final class CollectionRules {
    */
   static final class OptionalOfNullableQueuePeek<T> {
     @BeforeTemplate
+    @SuppressWarnings("NullAway" /* `Queue#peek()` is non-`null` if the queue is not empty. */)
     Optional<T> before(Queue<T> queue) {
       return Refaster.anyOf(
           queue.stream().findFirst(),
@@ -490,6 +493,8 @@ final class CollectionRules {
   /** Prefer {@link Optional#ofNullable(Object)} over more contrived alternatives. */
   static final class OptionalOfNullableNavigableSetPollFirst<T> {
     @BeforeTemplate
+    @SuppressWarnings(
+        "NullAway" /* `NavigableSet#pollFirst()` is non-`null` if the set is not empty. */)
     Optional<T> before(NavigableSet<T> navigableSet) {
       return navigableSet.isEmpty()
           ? Optional.empty()

@@ -26,6 +26,8 @@ final class BugPatternExtractorTest {
     assertThat(outputDirectory.toAbsolutePath()).isEmptyDirectory();
   }
 
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   @Test
   void minimalBugPattern(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
@@ -57,6 +59,8 @@ final class BugPatternExtractorTest {
             ImmutableList.of(SuppressWarnings.class.getCanonicalName())));
   }
 
+  @SuppressWarnings(
+      "NullAway" /* Class literals of top-level and member types have a canonical name. */)
   @Test
   void completeBugPattern(@TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
