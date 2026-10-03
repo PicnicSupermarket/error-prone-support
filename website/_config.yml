@@ -73,3 +73,16 @@ social:
 twitter:
   username: picnic
   card: summary
+
+# XXX: Dart Sass deprecation warnings originate in the Just the Docs theme,
+# which we cannot fix. Drop these settings once the theme has migrated away
+# from deprecated Sass features. See
+# https://github.com/just-the-docs/just-the-docs/issues/1541.
+sass:
+  # Silences the `darken()`, `lighten()` and global built-in function
+  # deprecations triggered by the theme's own stylesheets.
+  quiet_deps: true
+  # Silences `@import` deprecations. Not covered by `quiet_deps`, because the
+  # theme's entry point and the color schemes it requires us to provide (see
+  # `_sass/color_schemes`) are loaded through `@import` from our own files.
+  silence_deprecations: [import]
