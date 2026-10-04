@@ -88,10 +88,11 @@ public final class CodeTransformers {
     try (InputStream in = resource.url().openStream();
         ObjectInputStream ois =
             new ObjectInputStream(in) {
-              // XXX: Here we override the class descriptor of `ImmutableClassToInstanceMap` for
-              // compatibility with Guava 33.7.0 - 33.7.2 when using Error Prone 2.50.0 or below.
-              // See https://github.com/google/guava/issues/8693. Drop this override once Error
-              // Prone 2.50.0 is no longer supported.
+              // XXX: Here we override the class descriptor of `ImmutableClassToInstanceMap` to
+              // side-step a vacuous `serialVersionUID` change. See
+              // https://github.com/google/guava/issues/8693. Drop this override once both this
+              // project and all supported versions of Error Prone depend on Guava 33.8.0 or
+              // greater.
               @Override
               protected ObjectStreamClass readClassDescriptor()
                   throws IOException, ClassNotFoundException {
