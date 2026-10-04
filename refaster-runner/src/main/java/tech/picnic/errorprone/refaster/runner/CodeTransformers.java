@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
@@ -9,6 +10,7 @@ import com.google.errorprone.CodeTransformer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectStreamClass;
 import java.io.UncheckedIOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -84,7 +86,23 @@ public final class CodeTransformers {
   })
   private static Optional<CodeTransformer> loadCodeTransformer(ResourceInfo resource) {
     try (InputStream in = resource.url().openStream();
-        ObjectInputStream ois = new ObjectInputStream(in)) {
+        ObjectInputStream ois =
+            new ObjectInputStream(in) {
+              // XXX: Here we override the class descriptor of `ImmutableClassToInstanceMap` for
+              // compatibility with Guava 33.7.0 - 33.7.2 when using Error Prone 2.50.0 or below.
+              // See https://github.com/google/guava/issues/8693. Drop this override once Error
+              // Prone 2.50.0 is no longer supported.
+              @Override
+              protected ObjectStreamClass readClassDescriptor()
+                  throws IOException, ClassNotFoundException {
+                ObjectStreamClass descriptor = super.readClassDescriptor();
+                return ImmutableClassToInstanceMap.class
+                        .getCanonicalName()
+                        .equals(descriptor.getName())
+                    ? ObjectStreamClass.lookup(ImmutableClassToInstanceMap.class)
+                    : descriptor;
+              }
+            }) {
       @SuppressWarnings("BanSerializableRead" /* Part of the Refaster API. */)
       CodeTransformer codeTransformer = (CodeTransformer) ois.readObject();
       return Optional.of(codeTransformer);
