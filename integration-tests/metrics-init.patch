@@ -38,7 +38,7 @@ new file mode 100644
              return TimeUnit.valueOf(String.valueOf(value).toUpperCase(Locale.US));
 --- a/pom.xml
 +++ b/pom.xml
-@@ -123,6 +123,27 @@
+@@ -123,6 +123,33 @@
          <url>https://github.com/dropwizard/metrics/issues/</url>
      </issueManagement>
  
@@ -54,6 +54,12 @@ new file mode 100644
 +                <artifactId>guava</artifactId>
 +                <version>33.7.2-jre<!-- Renovate: com.google.guava:guava-bom --></version>
 +            </dependency>
++            <!-- XXX: Drop this once Caffeine depends on the same version of JSpecify. -->
++            <dependency>
++                <groupId>org.jspecify</groupId>
++                <artifactId>jspecify</artifactId>
++                <version>1.0.1<!-- Renovate: org.jspecify:jspecify --></version>
++            </dependency>
 +        </dependencies>
 +    </dependencyManagement>
 +    <dependencies>
@@ -66,7 +72,7 @@ new file mode 100644
      <profiles>
          <profile>
              <id>jdk17</id>
-@@ -140,28 +161,32 @@
+@@ -140,28 +167,32 @@
                          <groupId>org.apache.maven.plugins</groupId>
                          <artifactId>maven-compiler-plugin</artifactId>
                          <configuration>
@@ -112,7 +118,7 @@ new file mode 100644
                                  </path>
                              </annotationProcessorPaths>
                          </configuration>
-@@ -283,8 +308,8 @@
+@@ -283,8 +314,8 @@
                  <groupId>org.apache.maven.plugins</groupId>
                  <artifactId>maven-compiler-plugin</artifactId>
                  <configuration>
