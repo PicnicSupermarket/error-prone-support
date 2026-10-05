@@ -197,6 +197,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
    */
   // XXX: Fall-through in colon-style switch statements is not analyzed; only the enclosing case's
   // labels are considered.
+  // XXX: Reassignment of the selector variable within the switch case is not taken into account.
   private static ImmutableSet<String> findSwitchCoveredValues(
       Symbol enumSymbolPassedToValueOf, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
     for (TreePath path = state.getPath(); path != null; path = path.getParentPath()) {
