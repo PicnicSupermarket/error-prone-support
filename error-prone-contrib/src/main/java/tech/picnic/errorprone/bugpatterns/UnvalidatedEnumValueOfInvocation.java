@@ -70,9 +70,11 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!(captureEnumType(tree, state) instanceof Captured(Type enumType))) {
+    CaptureResult captureResult = captureEnumType(tree, state);
+    if (captureResult instanceof NoMatch) {
       return Description.NO_MATCH;
     }
+    Type enumType = ((Captured) captureResult).capturedType();
 
     ExpressionTree nameArgument = tree.getArguments().getLast();
     if (!MoreASTHelpers.isStringTyped(nameArgument, state)) {
