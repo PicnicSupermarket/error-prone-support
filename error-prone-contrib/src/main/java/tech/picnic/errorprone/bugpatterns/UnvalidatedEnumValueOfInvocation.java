@@ -145,7 +145,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     return new NoMatch();
   }
 
-  private static CaptureResult capture(@Nullable Type type, VisitorState state) {
+  private static CaptureResult capture(Type type, VisitorState state) {
     Type enumType = toEnumType(type, state);
     return enumType == null ? new NoMatch() : new Captured(enumType);
   }
@@ -154,11 +154,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
    * Returns the enum type denoted by the given type, resolving type variables to their upper bound,
    * or {@code null} if it does not denote a specific enum type (e.g. {@code T extends Enum<T>}).
    */
-  private static @Nullable Type toEnumType(@Nullable Type type, VisitorState state) {
-    if (type == null) {
-      return null;
-    }
-
+  private static @Nullable Type toEnumType(Type type, VisitorState state) {
     Type upperBound = ASTHelpers.getUpperBound(type, state.getTypes());
     return upperBound.asElement().isEnum() ? upperBound : null;
   }
