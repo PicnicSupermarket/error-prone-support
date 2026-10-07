@@ -61,9 +61,9 @@ jobs:
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        # XXX: Drop `--disable-external` once we fully adopted the "Refaster
+        # rules" terminology on our website and in the code.
+        run: bundle exec htmlproofer --disable-external --no-check-external-hash ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
