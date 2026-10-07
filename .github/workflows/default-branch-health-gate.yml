@@ -22,7 +22,7 @@ jobs:
       actions: read # To list workflow runs.
       checks: read # To list check runs.
       contents: read
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4

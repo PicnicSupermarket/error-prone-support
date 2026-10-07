@@ -108,7 +108,7 @@ jobs:
   build:
     # No permissions block: silently inherits `contents: read` from the
     # workflow level above, whether or not this job needs it.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
   deploy:
     needs: build
     permissions:
@@ -121,8 +121,8 @@ jobs:
 Use explicit runner versions, not the `-latest` alias. The `-latest` alias can
 change between workflow runs, breaking reproducibility.
 
-- Linux: `ubuntu-24.04`
-- macOS: `macos-15`
+- Linux: `ubuntu-26.04`
+- macOS: `macos-26`
 - Windows: `windows-2025`
 
 ## Every step must have a name
@@ -264,7 +264,7 @@ item`) for longer arrays or multi-line values.
 branches: [ master ]
 types: [ created ]
 needs: [ build, test ]
-os: [ ubuntu-24.04, macos-15, windows-2025 ]
+os: [ ubuntu-26.04, macos-26, windows-2025 ]
 ```
 
 **Don't:**

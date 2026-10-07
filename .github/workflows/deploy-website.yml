@@ -14,7 +14,7 @@ jobs:
     permissions:
       contents: read
       pages: read # To configure GitHub pages.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -75,7 +75,7 @@ jobs:
     permissions:
       id-token: write # To obtain the OIDC token that certifies the origin of the deployment.
       pages: write # To deploy the built site to GitHub Pages.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

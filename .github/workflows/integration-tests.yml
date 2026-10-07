@@ -27,7 +27,7 @@ jobs:
   matrix:
     name: Determine integration test matrix
     if: ${{ github.event_name == 'push' || (github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     outputs:
@@ -73,7 +73,7 @@ jobs:
     name: Acknowledge request
     needs: [ matrix ]
     if: ${{ github.event_name != 'push' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       pull-requests: write # To post a PR comment.
     outputs:
@@ -109,7 +109,7 @@ jobs:
     # this job still runs in that case.
     needs: [ matrix, acknowledge ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -167,7 +167,7 @@ jobs:
     # validation build's result is observed in the same run.
     needs: [ matrix, patch ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -229,7 +229,7 @@ jobs:
     # Using `always()` ensures that this job runs even if previous jobs failed
     # or were cancelled.
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       pull-requests: write # To update the PR comment.
     steps:
