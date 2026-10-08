@@ -26,7 +26,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Stream.class, identity());
+    return ImmutableSet.of(ImmutableList.class, Stream.class, identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {
@@ -92,15 +92,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
-  void testCollectionsSort() {
-    Collections.sort(ImmutableList.of("foo", "bar"));
-  }
-
-  ImmutableSet<String> testCollectionsMin() {
-    return ImmutableSet.of(
-        Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
-  }
-
   String testCollectionsMinArraysAsList() {
     return Collections.min(Arrays.asList(new String[0]), naturalOrder());
   }
@@ -135,11 +126,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.min("waldo", "fred", (a, b) -> -1),
         Comparators.min("plugh", "xyzzy", (a, b) -> 0),
         Comparators.min("thud", "foo", (a, b) -> 1));
-  }
-
-  ImmutableSet<String> testCollectionsMax() {
-    return ImmutableSet.of(
-        Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
   }
 
   String testCollectionsMaxArraysAsList() {
