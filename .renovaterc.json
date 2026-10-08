@@ -17,6 +17,18 @@
       "datasourceTemplate": "maven"
     },
     {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/",
+        "/^\\.sdkmanrc$/"
+      ],
+      "matchStrings": [
+        "\\bmaven(?:-version: |=)(?<currentValue>\\S+)"
+      ],
+      "packageNameTemplate": "org.apache.maven:maven-plugin-api",
+      "datasourceTemplate": "maven"
+    },
+    {
       "description": "Identifies GitHub-hosted runners missed by the `github-actions` manager, such as matrix values and documentation.",
       "customType": "regex",
       "managerFilePatterns": [
@@ -30,6 +42,12 @@
     }
   ],
   "packageRules": [
+    {
+      "matchPackageNames": [
+        "org.apache.maven:maven-plugin-api"
+      ],
+      "groupName": "version.maven"
+    },
     {
       "matchPackageNames": [
         "/^org\\.springframework:spring-framework-bom$/",
