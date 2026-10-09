@@ -71,8 +71,8 @@ Name link references by category:
   `[bug-checkers]` for `bug-checkers.instructions.md`).
 - **Skill files**: `skill-` prefix + skill name (e.g., `[skill-bug-checker]`
   for `.agents/skills/bug-checker/SKILL.md`).
-- **Other files**: descriptive lowercase name (e.g., `[agent-md]` for
-  `AGENT.md`).
+- **Other files**: descriptive lowercase name (e.g., `[agents-md]` for
+  `AGENTS.md`).
 
 Do not abbreviate reference names. Use the full name for consistency.
 

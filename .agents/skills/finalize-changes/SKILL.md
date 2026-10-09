@@ -11,7 +11,7 @@ description: >
 Use this skill when implementation is complete and you need to validate before
 creating a PR.
 
-Follow [`AGENT.md`][agent-md] steps 5-14:
+Follow [`AGENTS.md`][agents-md] steps 5-14:
 
 1. **Review** (5-7): [`/review-changes`][skill-review-changes], then commit.
 2. **Quick build** (8): `mvn clean install -DskipTests -Dverification.skip`.
@@ -23,7 +23,7 @@ Follow [`AGENT.md`][agent-md] steps 5-14:
 Re-invoke [`/review-changes`][skill-review-changes] after phases with
 significant changes.
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [skill-apply-self-check]: ../apply-self-check/SKILL.md
 [skill-review-changes]: ../review-changes/SKILL.md
 [skill-run-mutation-tests]: ../run-mutation-tests/SKILL.md
