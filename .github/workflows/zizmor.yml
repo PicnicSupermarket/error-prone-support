@@ -1,0 +1,41 @@
+# Analyzes this repository's GitHub Actions workflows for various security
+# issues. Identified issues are registered with GitHub's code scanning
+# dashboard. When a pull request is analyzed, any offending lines are
+# annotated. See https://docs.zizmor.sh for details.
+name: Run zizmor analysis
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 4 * * 1'
+permissions: {}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  analyze:
+    name: Analyze workflows with zizmor
+    permissions:
+      contents: read
+      security-events: write # Needed to update the code scanning dashboard.
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          # XXX: We can't currently use `disable-sudo-and-containers` here, as
+          # the zizmor analysis step below runs a Docker container.
+          disable-sudo: true
+          allowed-endpoints: >
+            api.github.com:443
+            ghcr.io:443
+            github.com:443
+            pkg-containers.githubusercontent.com:443
+      - name: Check out code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Run zizmor analysis
+        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          persona: auditor
