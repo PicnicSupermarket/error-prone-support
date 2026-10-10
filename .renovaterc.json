@@ -8,13 +8,25 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^integration-tests/.*(-init\\.patch|\\.sh)$/"
+        "/^integration-tests/[^/]+(-init\\.patch|\\.sh)$/"
       ],
       "matchStrings": [
         "\\b(?<packageName>[a-z0-9_.-]+?:[a-z0-9_.-]+?):(?<currentValue>[^:]+?):[a-zA-Z0-9_-]+\\b",
         "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
       ],
       "datasourceTemplate": "maven"
+    },
+    {
+      "description": "Identifies GitHub-hosted runners missed by the `github-actions` manager, such as matrix values and documentation.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^\\.github/instructions/github-actions\\.instructions\\.md$/",
+        "/^\\.github/workflows/[^/]+\\.yml$/"
+      ],
+      "matchStrings": [
+        "\\b(?<depName>macos|ubuntu|windows)-(?<currentValue>\\d+(?:\\.\\d+)?)\\b"
+      ],
+      "datasourceTemplate": "github-runners"
     }
   ],
   "packageRules": [
@@ -27,7 +39,6 @@
     },
     {
       "matchPackageNames": [
-        "dawidd6/action-download-artifact",
         "github/codeql-action",
         "ruby/setup-ruby"
       ],
