@@ -1,6 +1,7 @@
 package tech.picnic.errorprone.bugpatterns;
 
 import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.SECOND;
+import static com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers.THIRD;
 
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
@@ -19,6 +20,9 @@ final class CollectorMutabilityTest {
             "import static java.util.stream.Collectors.toList;",
             "import static java.util.stream.Collectors.toMap;",
             "import static java.util.stream.Collectors.toSet;",
+            "import static java.util.stream.Collectors.toUnmodifiableList;",
+            "import static java.util.stream.Collectors.toUnmodifiableMap;",
+            "import static java.util.stream.Collectors.toUnmodifiableSet;",
             "",
             "import java.util.ArrayList;",
             "import java.util.HashMap;",
@@ -34,24 +38,28 @@ final class CollectorMutabilityTest {
             "    // BUG: Diagnostic contains:",
             "    Flux.just(2).collect(toList());",
             "    Flux.just(3).collect(toImmutableList());",
-            "    Flux.just(4).collect(toCollection(ArrayList::new));",
+            "    Flux.just(4).collect(toUnmodifiableList());",
+            "    Flux.just(5).collect(toCollection(ArrayList::new));",
             "",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(\"foo\").collect(Collectors.toMap(String::getBytes, String::length));",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(\"bar\").collect(toMap(String::getBytes, String::length));",
             "    Flux.just(\"baz\").collect(toImmutableMap(String::getBytes, String::length));",
+            "    Flux.just(\"qux\").collect(toUnmodifiableMap(String::getBytes, String::length));",
             "    // BUG: Diagnostic contains:",
-            "    Flux.just(\"qux\").collect(toMap(String::getBytes, String::length, (a, b) -> a));",
-            "    Flux.just(\"quux\").collect(toImmutableMap(String::getBytes, String::length, (a, b) -> a));",
-            "    Flux.just(\"quuz\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
+            "    Flux.just(\"quux\").collect(toMap(String::getBytes, String::length, (a, b) -> a));",
+            "    Flux.just(\"quuz\").collect(toImmutableMap(String::getBytes, String::length, (a, b) -> a));",
+            "    Flux.just(\"corge\").collect(toUnmodifiableMap(String::getBytes, String::length, (a, b) -> a));",
+            "    Flux.just(\"grault\").collect(toMap(String::getBytes, String::length, (a, b) -> a, HashMap::new));",
             "",
             "    // BUG: Diagnostic contains:",
             "    Stream.of(1).collect(Collectors.toSet());",
             "    // BUG: Diagnostic contains:",
             "    Stream.of(2).collect(toSet());",
             "    Stream.of(3).collect(toImmutableSet());",
-            "    Stream.of(4).collect(toCollection(HashSet::new));",
+            "    Stream.of(4).collect(toUnmodifiableSet());",
+            "    Stream.of(5).collect(toCollection(HashSet::new));",
             "",
             "    Flux.just(\"foo\").collect(Collectors.joining());",
             "  }",
@@ -60,9 +68,16 @@ final class CollectorMutabilityTest {
   }
 
   @Test
-  void identificationWithoutGuavaOnClasspath() {
+  void identificationWithoutGuavaOnJdk9() {
     CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
         .withClasspath()
+        .setArgs("--release", "9")
+        .expectErrorMessage(
+            "X", m -> !m.contains("toImmutableList") && !m.contains("toUnmodifiableList"))
+        .expectErrorMessage(
+            "Y", m -> !m.contains("toImmutableMap") && !m.contains("toUnmodifiableMap"))
+        .expectErrorMessage(
+            "Z", m -> !m.contains("toImmutableSet") && !m.contains("toUnmodifiableSet"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
@@ -70,7 +85,41 @@ final class CollectorMutabilityTest {
             "",
             "class A {",
             "  void m() {",
+            "    // BUG: Diagnostic matches: X",
             "    Stream.empty().collect(Collectors.toList());",
+            "    // BUG: Diagnostic matches: Y",
+            "    Stream.empty().collect(Collectors.toMap(o -> o, o -> o));",
+            "    // BUG: Diagnostic matches: Z",
+            "    Stream.empty().collect(Collectors.toSet());",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationWithoutGuavaOnJdk10() {
+    CompilationTestHelper.newInstance(CollectorMutability.class, getClass())
+        .withClasspath()
+        .setArgs("--release", "10")
+        .expectErrorMessage(
+            "X", m -> m.contains("toUnmodifiableList") && !m.contains("toImmutableList"))
+        .expectErrorMessage(
+            "Y", m -> m.contains("toUnmodifiableMap") && !m.contains("toImmutableMap"))
+        .expectErrorMessage(
+            "Z", m -> m.contains("toUnmodifiableSet") && !m.contains("toImmutableSet"))
+        .addSourceLines(
+            "A.java",
+            "import java.util.stream.Collectors;",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    // BUG: Diagnostic matches: X",
+            "    Stream.empty().collect(Collectors.toList());",
+            "    // BUG: Diagnostic matches: Y",
+            "    Stream.empty().collect(Collectors.toMap(o -> o, o -> o));",
+            "    // BUG: Diagnostic matches: Z",
+            "    Stream.empty().collect(Collectors.toSet());",
             "  }",
             "}")
         .doTest();
@@ -137,6 +186,64 @@ final class CollectorMutabilityTest {
   void replacementSecondSuggestedFix() {
     BugCheckerRefactoringTestHelper.newInstance(CollectorMutability.class, getClass())
         .setFixChooser(SECOND)
+        .addInputLines(
+            "A.java",
+            "import static java.util.stream.Collectors.toList;",
+            "import static java.util.stream.Collectors.toMap;",
+            "import static java.util.stream.Collectors.toSet;",
+            "",
+            "import java.util.stream.Collectors;",
+            "import java.util.stream.Stream;",
+            "import reactor.core.publisher.Flux;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Flux.just(1).collect(Collectors.toList());",
+            "    Flux.just(2).collect(toList());",
+            "",
+            "    Stream.of(\"foo\").collect(Collectors.toMap(String::getBytes, String::length));",
+            "    Stream.of(\"bar\").collect(toMap(String::getBytes, String::length));",
+            "    Flux.just(\"baz\").collect(Collectors.toMap(String::getBytes, String::length, (a, b) -> b));",
+            "    Flux.just(\"qux\").collect(toMap(String::getBytes, String::length, (a, b) -> b));",
+            "",
+            "    Stream.of(1).collect(Collectors.toSet());",
+            "    Stream.of(2).collect(toSet());",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import static java.util.stream.Collectors.toList;",
+            "import static java.util.stream.Collectors.toMap;",
+            "import static java.util.stream.Collectors.toSet;",
+            "import static java.util.stream.Collectors.toUnmodifiableList;",
+            "import static java.util.stream.Collectors.toUnmodifiableMap;",
+            "import static java.util.stream.Collectors.toUnmodifiableSet;",
+            "",
+            "import java.util.stream.Collectors;",
+            "import java.util.stream.Stream;",
+            "import reactor.core.publisher.Flux;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Flux.just(1).collect(toUnmodifiableList());",
+            "    Flux.just(2).collect(toUnmodifiableList());",
+            "",
+            "    Stream.of(\"foo\").collect(toUnmodifiableMap(String::getBytes, String::length));",
+            "    Stream.of(\"bar\").collect(toUnmodifiableMap(String::getBytes, String::length));",
+            "    Flux.just(\"baz\").collect(toUnmodifiableMap(String::getBytes, String::length, (a, b) -> b));",
+            "    Flux.just(\"qux\").collect(toUnmodifiableMap(String::getBytes, String::length, (a, b) -> b));",
+            "",
+            "    Stream.of(1).collect(toUnmodifiableSet());",
+            "    Stream.of(2).collect(toUnmodifiableSet());",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void replacementThirdSuggestedFix() {
+    BugCheckerRefactoringTestHelper.newInstance(CollectorMutability.class, getClass())
+        .setFixChooser(THIRD)
         .addInputLines(
             "A.java",
             "import static java.util.stream.Collectors.toList;",
