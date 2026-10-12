@@ -20,7 +20,7 @@ A typical skill file contains:
 2. A one-line description of when to use the skill.
 3. References to the relevant `.github/instructions/*.instructions.md` files.
 4. A reference to the review checklist.
-5. A reference to the `AGENT.md` workflow.
+5. A reference to the `AGENTS.md` workflow.
 
 **Example:**
 
@@ -41,7 +41,7 @@ Read `.github/instructions/java-style.instructions.md` for code style
 conventions and `.github/instructions/testing.instructions.md` for testing
 patterns. After implementation, review your changes against the applicable
 sections of `.github/instructions/review.instructions.md`. Then follow the
-workflow in `AGENT.md`.
+workflow in `AGENTS.md`.
 ```
 
 ## Skill naming convention
