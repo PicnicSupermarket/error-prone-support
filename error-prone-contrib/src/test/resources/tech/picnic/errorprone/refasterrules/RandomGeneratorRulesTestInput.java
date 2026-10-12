@@ -15,7 +15,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         new SecureRandom().nextDouble() * 3.0);
   }
 
-  double testRandomGeneratorNextDoubleWithOrigin() {
+  double testRandomGeneratorNextDoublePlus() {
     return 1.0 + new Random().nextDouble(2.0);
   }
 
@@ -24,7 +24,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         (int) new Random().nextDouble(1), (int) Math.round(new SplittableRandom().nextDouble(2)));
   }
 
-  int testRandomGeneratorNextIntWithOrigin() {
+  int testRandomGeneratorNextIntPlus() {
     return 1 + new Random().nextInt(2);
   }
 
@@ -36,7 +36,7 @@ final class RandomGeneratorRulesTest implements RefasterRuleCollectionTestCase {
         Math.round(ThreadLocalRandom.current().nextDouble(4L)));
   }
 
-  long testRandomGeneratorNextLongWithOrigin() {
+  long testRandomGeneratorNextLongPlus() {
     return 1L + new Random().nextLong(2L);
   }
 }

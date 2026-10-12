@@ -4,7 +4,6 @@ import static com.google.common.collect.ImmutableSortedMap.toImmutableSortedMap;
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Comparator.naturalOrder;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Streams;
 import com.google.errorprone.refaster.Refaster;
@@ -26,24 +25,21 @@ final class ImmutableSortedMapRules {
   private ImmutableSortedMapRules() {}
 
   /** Prefer {@link ImmutableSortedMap#orderedBy(Comparator)} over the associated constructor. */
-  static final class ImmutableSortedMapBuilder<K, V> {
+  static final class ImmutableSortedMapOrderedBy<K, V> {
     @BeforeTemplate
-    ImmutableSortedMap.Builder<K, V> before(Comparator<K> cmp) {
-      return new ImmutableSortedMap.Builder<>(cmp);
+    ImmutableSortedMap.Builder<K, V> before(Comparator<K> comparator) {
+      return new ImmutableSortedMap.Builder<>(comparator);
     }
 
     @AfterTemplate
-    ImmutableSortedMap.Builder<K, V> after(Comparator<K> cmp) {
-      return ImmutableSortedMap.orderedBy(cmp);
+    ImmutableSortedMap.Builder<K, V> after(Comparator<K> comparator) {
+      return ImmutableSortedMap.orderedBy(comparator);
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSortedMap#naturalOrder()} over the alternative that requires explicitly
-   * providing the {@link Comparator}.
-   */
+  /** Prefer {@link ImmutableSortedMap#naturalOrder()} over more verbose alternatives. */
   // XXX: This rule may drop generic type information, leading to non-compilable code.
-  static final class ImmutableSortedMapNaturalOrderBuilder<K extends Comparable<? super K>, V> {
+  static final class ImmutableSortedMapNaturalOrder<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap.Builder<K, V> before() {
       return ImmutableSortedMap.orderedBy(Comparator.<K>naturalOrder());
@@ -55,12 +51,9 @@ final class ImmutableSortedMapRules {
     }
   }
 
-  /**
-   * Prefer {@link ImmutableSortedMap#reverseOrder()} over the alternative that requires explicitly
-   * providing the {@link Comparator}.
-   */
+  /** Prefer {@link ImmutableSortedMap#reverseOrder()} over more verbose alternatives. */
   // XXX: This rule may drop generic type information, leading to non-compilable code.
-  static final class ImmutableSortedMapReverseOrderBuilder<K extends Comparable<? super K>, V> {
+  static final class ImmutableSortedMapReverseOrder<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap.Builder<K, V> before() {
       return ImmutableSortedMap.orderedBy(Comparator.<K>reverseOrder());
@@ -72,8 +65,8 @@ final class ImmutableSortedMapRules {
     }
   }
 
-  /** Prefer {@link ImmutableSortedMap#of()} over more contrived alternatives. */
-  static final class EmptyImmutableSortedMap<K extends Comparable<? super K>, V> {
+  /** Prefer {@link ImmutableSortedMap#of()} over less efficient alternatives. */
+  static final class ImmutableSortedMapOf<K extends Comparable<? super K>, V> {
     @BeforeTemplate
     ImmutableSortedMap<K, V> before() {
       return ImmutableSortedMap.<K, V>naturalOrder().buildOrThrow();
@@ -85,74 +78,79 @@ final class ImmutableSortedMapRules {
     }
   }
 
-  /** Prefer {@link ImmutableSortedMap#of(Object, Object)} over more contrived alternatives. */
+  /** Prefer {@link ImmutableSortedMap#of(Object, Object)} over less efficient alternatives. */
   // XXX: One can define variants for more than one key-value pair, but at some point the builder
   // actually produces nicer code. So it's not clear we should add Refaster rules for those
   // variants.
   // XXX: We could also rewrite builders with non-natural orders, but that would affect
   // `ImmutableSortedMap#comparator()`.
-  static final class PairToImmutableSortedMap<K extends Comparable<? super K>, V> {
+  static final class ImmutableSortedMapOfWithComparableAndObject<
+      K extends Comparable<? super K>, V> {
     @BeforeTemplate
-    ImmutableSortedMap<K, V> before(K key, V value) {
-      return ImmutableSortedMap.<K, V>naturalOrder().put(key, value).buildOrThrow();
+    ImmutableSortedMap<K, V> before(K k1, V v1) {
+      return ImmutableSortedMap.<K, V>naturalOrder().put(k1, v1).buildOrThrow();
     }
 
     @AfterTemplate
-    ImmutableSortedMap<K, V> after(K key, V value) {
-      return ImmutableSortedMap.of(key, value);
+    ImmutableSortedMap<K, V> after(K k1, V v1) {
+      return ImmutableSortedMap.of(k1, v1);
     }
   }
 
-  /** Prefer {@link ImmutableSortedMap#of(Object, Object)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ImmutableSortedMap#of(Object, Object)} over less efficient or more contrived
+   * alternatives.
+   */
   // XXX: We could also rewrite builders with non-natural orders, but that would affect
   // `ImmutableSortedMap#comparator()`.
-  static final class EntryToImmutableSortedMap<K extends Comparable<? super K>, V> {
+  static final class ImmutableSortedMapOfEntryGetKeyEntryGetValue<
+      K extends Comparable<? super K>, V, K2 extends K, V2 extends V> {
     @BeforeTemplate
-    ImmutableSortedMap<K, V> before(Map.Entry<? extends K, ? extends V> entry) {
+    ImmutableSortedMap<K, V> before(Map.Entry<K2, V2> entry) {
       return Refaster.anyOf(
           ImmutableSortedMap.<K, V>naturalOrder().put(entry).buildOrThrow(),
           Stream.of(entry).collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @AfterTemplate
-    ImmutableSortedMap<K, V> after(Map.Entry<? extends K, ? extends V> entry) {
+    ImmutableSortedMap<K, V> after(Map.Entry<K2, V2> entry) {
       return ImmutableSortedMap.of(entry.getKey(), entry.getValue());
     }
   }
 
-  /** Prefer {@link ImmutableSortedMap#copyOf(Iterable)} over more contrived alternatives. */
+  /**
+   * Prefer {@link ImmutableSortedMap#copyOf(Iterable)} over more verbose, less efficient, or more
+   * contrived alternatives.
+   */
   // XXX: There's also a variant with a custom Comparator. (And some special cases with
   // `reverseOrder`.) Worth the hassle?
-  static final class IterableToImmutableSortedMap<K extends Comparable<? super K>, V> {
+  static final class ImmutableSortedMapCopyOf<
+      K extends Comparable<? super K>, V, K2 extends K, V2 extends V, E extends Map.Entry<K2, V2>> {
     @BeforeTemplate
-    ImmutableMap<K, V> before(Map<? extends K, ? extends V> iterable) {
+    ImmutableSortedMap<K, V> before(Map<K2, V2> entries) {
       return Refaster.anyOf(
-          ImmutableSortedMap.copyOf(iterable, naturalOrder()),
-          ImmutableSortedMap.copyOf(iterable.entrySet()),
-          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).buildOrThrow());
+          ImmutableSortedMap.copyOf(entries, naturalOrder()),
+          ImmutableSortedMap.copyOf(entries.entrySet()),
+          ImmutableSortedMap.<K, V>naturalOrder().putAll(entries).buildOrThrow());
     }
 
     @BeforeTemplate
-    ImmutableSortedMap<K, V> before(
-        Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
+    ImmutableSortedMap<K, V> before(Iterable<E> entries) {
       return Refaster.anyOf(
-          ImmutableSortedMap.copyOf(iterable, naturalOrder()),
-          ImmutableSortedMap.<K, V>naturalOrder().putAll(iterable).buildOrThrow(),
-          Streams.stream(iterable)
+          ImmutableSortedMap.copyOf(entries, naturalOrder()),
+          ImmutableSortedMap.<K, V>naturalOrder().putAll(entries).buildOrThrow(),
+          Streams.stream(entries)
               .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
     @BeforeTemplate
-    ImmutableSortedMap<K, V> before(
-        Collection<? extends Map.Entry<? extends K, ? extends V>> iterable) {
-      return iterable.stream()
-          .collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue));
+    ImmutableSortedMap<K, V> before(Collection<E> entries) {
+      return entries.stream().collect(toImmutableSortedMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @AfterTemplate
-    ImmutableSortedMap<K, V> after(
-        Iterable<? extends Map.Entry<? extends K, ? extends V>> iterable) {
-      return ImmutableSortedMap.copyOf(iterable);
+    ImmutableSortedMap<K, V> after(Iterable<E> entries) {
+      return ImmutableSortedMap.copyOf(entries);
     }
   }
 

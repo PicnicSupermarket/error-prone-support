@@ -15,11 +15,11 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(MoreObjects.class, Optional.class, not(null));
   }
 
-  ImmutableSet<Boolean> testIsNull() {
+  ImmutableSet<Boolean> testEqualToNull() {
     return ImmutableSet.of(null == "foo", Objects.isNull("bar"));
   }
 
-  ImmutableSet<Boolean> testIsNotNull() {
+  ImmutableSet<Boolean> testNotEqualToNull() {
     return ImmutableSet.of(null != "foo", Objects.nonNull("bar"));
   }
 
@@ -32,11 +32,11 @@ final class NullRulesTest implements RefasterRuleCollectionTestCase {
     return Optional.ofNullable("foo").orElseGet(() -> "bar");
   }
 
-  ImmutableSet<Predicate<String>> testIsNullFunction() {
+  ImmutableSet<Predicate<String>> testObjectsIsNull() {
     return ImmutableSet.of(s -> s == null, not(Objects::nonNull));
   }
 
-  ImmutableSet<Predicate<String>> testNonNullFunction() {
+  ImmutableSet<Predicate<String>> testObjectsNonNull() {
     return ImmutableSet.of(s -> s != null, not(Objects::isNull));
   }
 }

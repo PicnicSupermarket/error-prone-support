@@ -10,40 +10,24 @@ final class AssertJPrimitiveRulesTest implements RefasterRuleCollectionTestCase 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEqualTo() {
     return ImmutableSet.of(
         assertThat(true).isEqualTo(false),
-        assertThat(true).isEqualTo(false),
-        assertThat((byte) 1).isEqualTo((byte) 2),
         assertThat((byte) 1).isEqualTo((byte) 2),
         assertThat((char) 1).isEqualTo((char) 2),
-        assertThat((char) 1).isEqualTo((char) 2),
-        assertThat((short) 1).isEqualTo((short) 2),
         assertThat((short) 1).isEqualTo((short) 2),
         assertThat(1).isEqualTo(2),
-        assertThat(1).isEqualTo(2),
-        assertThat(1L).isEqualTo(2L),
         assertThat(1L).isEqualTo(2L),
         assertThat(1f).isEqualTo(2f),
-        assertThat(1f).isEqualTo(2f),
-        assertThat(1.0).isEqualTo(2.0),
         assertThat(1.0).isEqualTo(2.0));
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(true).isNotEqualTo(false),
-        assertThat(true).isNotEqualTo(false),
-        assertThat((byte) 1).isNotEqualTo((byte) 2),
         assertThat((byte) 1).isNotEqualTo((byte) 2),
         assertThat((char) 1).isNotEqualTo((char) 2),
-        assertThat((char) 1).isNotEqualTo((char) 2),
-        assertThat((short) 1).isNotEqualTo((short) 2),
         assertThat((short) 1).isNotEqualTo((short) 2),
         assertThat(1).isNotEqualTo(2),
-        assertThat(1).isNotEqualTo(2),
-        assertThat(1L).isNotEqualTo(2L),
         assertThat(1L).isNotEqualTo(2L),
         assertThat(1f).isNotEqualTo(2f),
-        assertThat(1f).isNotEqualTo(2f),
-        assertThat(1.0).isNotEqualTo(2.0),
         assertThat(1.0).isNotEqualTo(2.0));
   }
 

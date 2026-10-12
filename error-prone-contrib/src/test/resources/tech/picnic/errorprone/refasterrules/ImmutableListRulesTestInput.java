@@ -26,58 +26,57 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
     return new ImmutableList.Builder<>();
   }
 
-  ImmutableSet<ImmutableList<Integer>> testIterableToImmutableList() {
+  ImmutableSet<ImmutableList<Integer>> testImmutableListCopyOf() {
     return ImmutableSet.of(
-        ImmutableList.of(1).stream().collect(toImmutableList()),
-        Streams.stream(ImmutableList.of(2)::iterator).collect(toImmutableList()),
-        Streams.stream(ImmutableList.of(3).iterator()).collect(toImmutableList()),
-        ImmutableList.<Integer>builder().addAll(ImmutableList.of(4)).build(),
+        ImmutableList.<Integer>builder().add(new Integer[] {1}).build(),
+        Arrays.stream(new Integer[] {2}).collect(toImmutableList()),
+        ImmutableList.<Integer>builder().addAll(ImmutableList.of(3).iterator()).build(),
+        Streams.stream(ImmutableList.of(4).iterator()).collect(toImmutableList()),
         ImmutableList.<Integer>builder().addAll(ImmutableList.of(5)::iterator).build(),
-        ImmutableList.<Integer>builder().addAll(ImmutableList.of(6).iterator()).build(),
-        ImmutableList.<Integer>builder().add(new Integer[] {7}).build(),
-        Arrays.stream(new Integer[] {8}).collect(toImmutableList()));
+        Streams.stream(ImmutableList.of(6)::iterator).collect(toImmutableList()),
+        ImmutableList.of(7).stream().collect(toImmutableList()));
   }
 
-  ImmutableList<Integer> testStreamToImmutableList() {
+  ImmutableList<Integer> testStreamCollectToImmutableList() {
     return ImmutableList.copyOf(Stream.of(1).iterator());
   }
 
   ImmutableSet<ImmutableList<Integer>> testImmutableListSortedCopyOf() {
     return ImmutableSet.of(
         ImmutableList.sortedCopyOf(naturalOrder(), ImmutableSet.of(1)),
-        ImmutableSet.of(2).stream().sorted().collect(toImmutableList()),
-        Streams.stream(ImmutableSet.of(3)::iterator).sorted().collect(toImmutableList()));
+        Streams.stream(ImmutableSet.of(2)::iterator).sorted().collect(toImmutableList()),
+        ImmutableSet.of(3).stream().sorted().collect(toImmutableList()));
   }
 
-  ImmutableSet<ImmutableList<String>> testImmutableListSortedCopyOfWithCustomComparator() {
+  ImmutableSet<ImmutableList<String>> testImmutableListSortedCopyOfWithComparator() {
     return ImmutableSet.of(
-        ImmutableSet.of("foo").stream()
+        Streams.stream(ImmutableSet.of("foo")::iterator)
             .sorted(comparing(String::length))
             .collect(toImmutableList()),
-        Streams.stream(ImmutableSet.of("bar")::iterator)
+        ImmutableSet.of("bar").stream()
             .sorted(comparing(String::isEmpty))
             .collect(toImmutableList()));
   }
 
   ImmutableSet<Iterator<Integer>> testImmutableListSortedCopyOfIterator() {
     return ImmutableSet.of(
-        ImmutableSet.of(1).stream().sorted().iterator(),
-        Streams.stream(ImmutableSet.of(2)::iterator).sorted().iterator());
+        Streams.stream(ImmutableList.of(1)::iterator).sorted().iterator(),
+        ImmutableList.of(2).stream().sorted().iterator());
   }
 
   ImmutableSet<Iterator<String>> testImmutableListSortedCopyOfIteratorWithComparator() {
     return ImmutableSet.of(
-        ImmutableSet.of("foo").stream().sorted(comparing(String::length)).iterator(),
-        Streams.stream(ImmutableSet.of("bar")::iterator)
-            .sorted(comparing(String::isEmpty))
-            .iterator());
+        Streams.stream(ImmutableList.of("foo")::iterator)
+            .sorted(Comparator.comparing(String::length))
+            .iterator(),
+        ImmutableList.of("bar").stream().sorted(Comparator.comparing(String::isEmpty)).iterator());
   }
 
-  ImmutableList<Integer> testStreamToDistinctImmutableList() {
+  ImmutableList<Integer> testStreamCollectToImmutableSetAsList() {
     return Stream.of(1).distinct().collect(toImmutableList());
   }
 
-  ImmutableSet<List<Integer>> testImmutableListOf() {
+  ImmutableSet<List<Integer>> testImmutableListOf0() {
     return ImmutableSet.of(
         ImmutableList.<Integer>builder().build(),
         Stream.<Integer>empty().collect(toImmutableList()),
@@ -86,7 +85,8 @@ final class ImmutableListRulesTest implements RefasterRuleCollectionTestCase {
   }
 
   ImmutableSet<List<Integer>> testImmutableListOf1() {
-    return ImmutableSet.of(Collections.singletonList(1), List.of(1));
+    return ImmutableSet.of(
+        ImmutableList.<Integer>builder().add(1).build(), Collections.singletonList(2), List.of(3));
   }
 
   List<Integer> testImmutableListOf2() {

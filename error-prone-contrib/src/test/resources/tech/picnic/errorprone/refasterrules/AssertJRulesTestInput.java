@@ -27,59 +27,59 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
         Collector.class, toImmutableList(), toImmutableMultiset(), toImmutableSet());
   }
 
-  AbstractAssert<?, ?> testAssertThatOptionalDouble() {
+  AbstractAssert<?, ?> testAssertThatHasValueOptionalDouble() {
     return assertThat(OptionalDouble.of(1.0).getAsDouble()).isEqualTo(2.0);
   }
 
-  AbstractAssert<?, ?> testAssertThatOptionalInt() {
+  AbstractAssert<?, ?> testAssertThatHasValueOptionalInt() {
     return assertThat(OptionalInt.of(1).getAsInt()).isEqualTo(2);
   }
 
-  AbstractAssert<?, ?> testAssertThatOptionalLong() {
+  AbstractAssert<?, ?> testAssertThatHasValueOptionalLong() {
     return assertThat(OptionalLong.of(1L).getAsLong()).isEqualTo(2L);
   }
 
-  ImmutableSet<ObjectEnumerableAssert<?, String>> testObjectEnumerableContainsOneElement() {
+  ImmutableSet<ObjectEnumerableAssert<?, String>> testObjectEnumerableAssertContains() {
     return ImmutableSet.of(
         assertThat(ImmutableList.of("foo")).containsAnyOf("bar"),
         assertThat(ImmutableList.of("baz")).containsSequence("qux"),
         assertThat(ImmutableList.of("quux")).containsSubsequence("corge"));
   }
 
-  ObjectEnumerableAssert<?, String> testObjectEnumerableDoesNotContainOneElement() {
+  ObjectEnumerableAssert<?, String> testObjectEnumerableAssertDoesNotContain() {
     return assertThat(ImmutableList.of("foo")).doesNotContainSequence("bar");
   }
 
-  ImmutableSet<ObjectEnumerableAssert<?, String>> testObjectEnumerableContainsExactlyOneElement() {
+  ImmutableSet<ObjectEnumerableAssert<?, String>> testObjectEnumerableAssertContainsExactly() {
     return ImmutableSet.of(
         assertThat(ImmutableList.of("foo")).containsExactlyInAnyOrder(new String[] {"bar"}),
         assertThat(ImmutableList.of("baz")).containsExactlyInAnyOrder("qux"));
   }
 
-  ObjectEnumerableAssert<?, String> testAssertThatSetContainsExactlyOneElement() {
+  ObjectEnumerableAssert<?, String> testAssertThatContainsExactlySet() {
     return assertThat(ImmutableSet.of("foo")).containsOnly("bar");
   }
 
-  ListAssert<String> testAssertThatListsAreEqual() {
+  ListAssert<String> testAssertThatContainsExactlyElementsOfList() {
     return assertThat(ImmutableList.of("foo")).isEqualTo(ImmutableList.of("bar"));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatSetsAreEqual() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatHasSameElementsAsSet() {
     return ImmutableSet.of(
         assertThat(ImmutableSet.of("foo")).isEqualTo(ImmutableSet.of("bar")),
         assertThat(ImmutableSet.of("baz"))
             .containsExactlyInAnyOrderElementsOf(ImmutableSet.of("qux")));
   }
 
-  AbstractAssert<?, ?> testAssertThatMultisetsAreEqual() {
+  AbstractAssert<?, ?> testAssertThatContainsExactlyInAnyOrderElementsOfMultiset() {
     return assertThat(ImmutableMultiset.of("foo")).isEqualTo(ImmutableMultiset.of("bar"));
   }
 
-  AbstractAssert<?, ?> testAssertThatMapContainsEntry() {
+  AbstractAssert<?, ?> testAssertThatContainsEntry() {
     return assertThat(ImmutableMap.<String, Object>of("foo", 1).get("bar")).isEqualTo(2);
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsAnyElementsOf() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsAnyElementsOf() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .containsAnyElementsOf(ImmutableList.of("bar")),
@@ -89,7 +89,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsAnyElementsOf(ImmutableList.of("corge")));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsAnyOf() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsAnyOf() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .containsAnyOf(new String[] {"bar"}),
@@ -98,7 +98,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsAnyOf(new String[] {"corge"}));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsAnyOfVarArgs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsAnyOfVarargs() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .containsAnyOf("bar", "baz"),
@@ -107,7 +107,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsAnyOf("garply", "waldo"));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsAll() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsAll() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .containsAll(ImmutableList.of("bar")),
@@ -116,7 +116,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsAll(ImmutableList.of("corge")));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContains() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContains() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .contains(new String[] {"bar"}),
@@ -124,7 +124,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Stream.of("quux").collect(toImmutableList())).contains(new String[] {"corge"}));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsVarArgs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsVarargs() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .contains("bar", "baz"),
@@ -132,21 +132,21 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Stream.of("grault").collect(toImmutableList())).contains("garply", "waldo"));
   }
 
-  ListAssert<String> testAssertThatStreamContainsExactlyElementsOf() {
+  ListAssert<String> testAssertThatContainsExactlyElementsOfStream() {
     return assertThat(Stream.of("foo").collect(toImmutableList()))
         .containsExactlyElementsOf(ImmutableList.of("bar"));
   }
 
-  ListAssert<String> testAssertThatStreamContainsExactly() {
+  ListAssert<String> testAssertThatContainsExactlyStream() {
     return assertThat(Stream.of("foo").collect(toImmutableList()))
         .containsExactly(new String[] {"bar"});
   }
 
-  ListAssert<String> testAssertThatStreamContainsExactlyVarargs() {
+  ListAssert<String> testAssertThatContainsExactlyVarargs() {
     return assertThat(Stream.of("foo").collect(toImmutableList())).containsExactly("bar", "baz");
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsExactlyInAnyOrderElementsOf() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsExactlyInAnyOrderElementsOfStream() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect(toImmutableList()))
             .containsExactlyInAnyOrderElementsOf(ImmutableList.of("bar")),
@@ -154,7 +154,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsExactlyInAnyOrderElementsOf(ImmutableList.of("qux")));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsExactlyInAnyOrder() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsExactlyInAnyOrder() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect(toImmutableList()))
             .containsExactlyInAnyOrder(new String[] {"bar"}),
@@ -162,7 +162,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsExactlyInAnyOrder(new String[] {"qux"}));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsExactlyInAnyOrderVarArgs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsExactlyInAnyOrderVarargs() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect(toImmutableList()))
             .containsExactlyInAnyOrder("bar", "baz"),
@@ -170,7 +170,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsExactlyInAnyOrder("quux", "corge"));
   }
 
-  ImmutableSet<ListAssert<String>> testAssertThatStreamContainsSequence() {
+  ImmutableSet<ListAssert<String>> testAssertThatContainsSequence() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect(toImmutableList()))
             .containsSequence(ImmutableList.of("bar")),
@@ -178,11 +178,11 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsSequence(new String[] {"qux"}));
   }
 
-  ListAssert<String> testAssertThatStreamContainsSequenceVarArgs() {
+  ListAssert<String> testAssertThatContainsSequenceVarargs() {
     return assertThat(Stream.of("foo").collect(toImmutableList())).containsSequence("bar", "baz");
   }
 
-  ImmutableSet<ListAssert<String>> testAssertThatStreamContainsSubsequence() {
+  ImmutableSet<ListAssert<String>> testAssertThatContainsSubsequence() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect(toImmutableList()))
             .containsSubsequence(ImmutableList.of("bar")),
@@ -190,12 +190,12 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsSubsequence(new String[] {"qux"}));
   }
 
-  ListAssert<String> testAssertThatStreamContainsSubsequenceVarArgs() {
+  ListAssert<String> testAssertThatContainsSubsequenceVarargs() {
     return assertThat(Stream.of("foo").collect(toImmutableList()))
         .containsSubsequence("bar", "baz");
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamDoesNotContainAnyElementsOf() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatDoesNotContainAnyElementsOf() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .doesNotContainAnyElementsOf(ImmutableList.of("bar")),
@@ -205,7 +205,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .doesNotContainAnyElementsOf(ImmutableList.of("corge")));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamDoesNotContain() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatDoesNotContain() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .doesNotContain(new String[] {"bar"}),
@@ -214,7 +214,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .doesNotContain(new String[] {"corge"}));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamDoesNotContainVarArgs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatDoesNotContainVarargs() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .doesNotContain("bar", "baz"),
@@ -223,7 +223,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .doesNotContain("garply", "waldo"));
   }
 
-  ImmutableSet<ListAssert<String>> testAssertThatStreamDoesNotContainSequence() {
+  ImmutableSet<ListAssert<String>> testAssertThatDoesNotContainSequence() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect(toImmutableList()))
             .doesNotContainSequence(ImmutableList.of("bar")),
@@ -231,12 +231,12 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .doesNotContainSequence(new String[] {"qux"}));
   }
 
-  ListAssert<String> testAssertThatStreamDoesNotContainSequenceVarArgs() {
+  ListAssert<String> testAssertThatDoesNotContainSequenceVarargs() {
     return assertThat(Stream.of("foo").collect(toImmutableList()))
         .doesNotContainSequence("bar", "baz");
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamHasSameElementsAs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatHasSameElementsAsStream() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .hasSameElementsAs(ImmutableList.of("bar")),
@@ -246,7 +246,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .hasSameElementsAs(ImmutableList.of("corge")));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsOnly() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsOnly() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .containsOnly(new String[] {"bar"}),
@@ -255,7 +255,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .containsOnly(new String[] {"corge"}));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamContainsOnlyVarArgs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatContainsOnlyVarargs() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .containsOnly("bar", "baz"),
@@ -263,7 +263,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Stream.of("grault").collect(toImmutableList())).containsOnly("garply", "waldo"));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamIsSubsetOf() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsSubsetOf() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .isSubsetOf(ImmutableList.of("bar")),
@@ -279,7 +279,7 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
             .isSubsetOf(new String[] {"xyzzy"}));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatStreamIsSubsetOfVarArgs() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsSubsetOfVarargs() {
     return ImmutableSet.of(
         assertThat(Stream.of("foo").collect((Collector<String, Object, Iterable<String>>) null))
             .isSubsetOf("bar", "baz"),
@@ -287,11 +287,11 @@ final class AssertJRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Stream.of("grault").collect(toImmutableList())).isSubsetOf("garply", "waldo"));
   }
 
-  void testAssertThatPredicateAccepts() {
+  void testAssertThatAccepts() {
     assertThat(((Predicate<String>) String::isEmpty).test("foo")).isTrue();
   }
 
-  void testAssertThatPredicateRejects() {
+  void testAssertThatRejects() {
     assertThat(((Predicate<String>) String::isEmpty).test("foo")).isFalse();
   }
 }

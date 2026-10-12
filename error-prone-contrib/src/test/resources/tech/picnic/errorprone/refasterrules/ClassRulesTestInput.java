@@ -1,30 +1,28 @@
 package tech.picnic.errorprone.refasterrules;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class ClassRulesTest implements RefasterRuleCollectionTestCase {
-  boolean testClassIsInstance() {
+  boolean testClassIsInstanceWithClassAndObject() {
     return CharSequence.class.isAssignableFrom("foo".getClass());
   }
 
-  ImmutableSet<Boolean> testInstanceof() {
-    Class<?> clazz = CharSequence.class;
-    return ImmutableSet.of(CharSequence.class.isInstance("foo"), clazz.isInstance("bar"));
+  boolean testRefasterIsInstance() {
+    return CharSequence.class.isInstance("foo");
   }
 
-  Predicate<String> testClassLiteralIsInstancePredicate() {
+  Predicate<String> testClassIsInstance() {
     return s -> s instanceof CharSequence;
   }
 
-  Predicate<String> testClassReferenceIsInstancePredicate() {
+  Predicate<String> testClassIsInstanceWithClass() {
     Class<?> clazz = CharSequence.class;
     return s -> clazz.isInstance(s);
   }
 
-  Function<Number, Integer> testClassReferenceCast() {
+  Function<Number, Integer> testClassCast() {
     return i -> Integer.class.cast(i);
   }
 }

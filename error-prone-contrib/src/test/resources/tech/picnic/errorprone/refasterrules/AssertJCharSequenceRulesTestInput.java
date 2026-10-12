@@ -7,20 +7,20 @@ import org.assertj.core.api.AbstractAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJCharSequenceRulesTest implements RefasterRuleCollectionTestCase {
-  void testAssertThatCharSequenceIsEmpty() {
+  void testAssertThatIsEmpty() {
     assertThat("foo".isEmpty()).isTrue();
     assertThat("bar".length()).isEqualTo(0L);
     assertThat("baz".length()).isNotPositive();
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatCharSequenceIsNotEmpty() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsNotEmpty() {
     return ImmutableSet.of(
         assertThat("foo".isEmpty()).isFalse(),
         assertThat("bar".length()).isNotEqualTo(0),
         assertThat("baz".length()).isPositive());
   }
 
-  AbstractAssert<?, ?> testAssertThatCharSequenceHasSize() {
+  AbstractAssert<?, ?> testAssertThatHasSize() {
     return assertThat("foo".length()).isEqualTo(3);
   }
 }

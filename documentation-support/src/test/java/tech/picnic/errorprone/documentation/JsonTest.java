@@ -26,7 +26,7 @@ final class JsonTest {
   void read(@TempDir Path directory) throws IOException {
     Path file = directory.resolve("test.json");
 
-    Files.writeString(file, TEST_JSON, UTF_8);
+    Files.writeString(file, TEST_JSON);
 
     assertThat(Json.read(file, TestObject.class)).isEqualTo(TEST_OBJECT);
   }

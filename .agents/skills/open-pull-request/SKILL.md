@@ -10,15 +10,18 @@ description: >
 Use this skill when asked to create, open, or prepare a pull request.
 
 1. **Read** [`.github/instructions/pull-request.instructions.md`][pull-request]
-   for the PR conventions (title, label, milestone, reviewers, description).
+   for the PR conventions (title, draft status, label, milestone, description).
 2. **Read**
    [`.github/instructions/commit-message.instructions.md`][commit-message] for
    the commit message conventions (the PR title and description depend on
    these).
-3. **Open the PR** following those conventions.
+3. **Open the PR as a draft** (e.g. `gh pr create --draft`), following those
+   conventions.
 4. **Review** the PR against the applicable sections of
    [`.github/instructions/review.instructions.md`][review].
-5. **Share** the full URL of the opened PR with the user.
+5. **Share** the full URL of the opened PR with the user, noting that it is a
+   draft awaiting their review, and that checks should pass before it is marked
+   ready for review by maintainers.
 
 [commit-message]: ../../../.github/instructions/commit-message.instructions.md
 [pull-request]: ../../../.github/instructions/pull-request.instructions.md

@@ -20,13 +20,13 @@ final class StringBuilderRules {
   // possible. Here, that would enable invoking the `StringBuilder#repeat(int, int)` overload.
   static final class StringBuilderRepeat {
     @BeforeTemplate
-    StringBuilder before(StringBuilder sb, String str, int count) {
-      return sb.append(str.repeat(count));
+    StringBuilder before(StringBuilder sb, String cs, int count) {
+      return sb.append(cs.repeat(count));
     }
 
     @AfterTemplate
-    StringBuilder after(StringBuilder sb, String str, int count) {
-      return sb.repeat(str, count);
+    StringBuilder after(StringBuilder sb, String cs, int count) {
+      return sb.repeat(cs, count);
     }
   }
 }

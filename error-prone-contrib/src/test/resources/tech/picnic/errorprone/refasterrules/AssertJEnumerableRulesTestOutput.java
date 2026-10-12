@@ -18,16 +18,16 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     assertThat(ImmutableSet.of(1)).isEmpty();
     assertThat(ImmutableSet.of(2)).isEmpty();
     assertThat(ImmutableSet.of(3)).isEmpty();
-    assertThat(ImmutableSet.of(4)).isEmpty();
-    assertThat(ImmutableSet.of(5)).hasSameSizeAs(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(6)).isEmpty();
-    assertThat(ImmutableSet.of(7)).containsExactlyElementsOf(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(8)).isEmpty();
-    assertThat(ImmutableSet.of(9)).containsExactlyInAnyOrderElementsOf(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(10)).isEmpty();
-    assertThat(ImmutableSet.of(11)).hasSameElementsAs(ImmutableSet.of(0));
-    assertThat(ImmutableSet.of(12)).isEmpty();
-    assertThat(ImmutableSet.of(13)).isSubsetOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(4)).hasSameSizeAs(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(5)).isEmpty();
+    assertThat(ImmutableSet.of(6)).containsExactlyElementsOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(7)).isEmpty();
+    assertThat(ImmutableSet.of(8)).containsExactlyInAnyOrderElementsOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(9)).isEmpty();
+    assertThat(ImmutableSet.of(10)).hasSameElementsAs(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(11)).isEmpty();
+    assertThat(ImmutableSet.of(12)).isSubsetOf(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(13)).isEmpty();
     assertThat(ImmutableSet.of(14)).isEmpty();
     assertThat(ImmutableSet.of(15)).isEmpty();
     assertThat(ImmutableSet.of(16)).isEmpty();
@@ -35,9 +35,9 @@ final class AssertJEnumerableRulesTest implements RefasterRuleCollectionTestCase
     assertThat(ImmutableSet.of(18)).isEmpty();
   }
 
-  void testAssertAndEnumerableAssertIsEmpty() {
-    assertThat(ImmutableSet.of(1)).isEmpty();
-    assertThat(ImmutableSet.of(2)).isEqualTo(ImmutableSet.of(0));
+  void testAssertIsEmpty() {
+    assertThat(ImmutableSet.of(1)).isEqualTo(ImmutableSet.of(0));
+    assertThat(ImmutableSet.of(2)).isEmpty();
   }
 
   ImmutableSet<AbstractAssert<?, ?>> testEnumerableAssertIsNotEmpty() {

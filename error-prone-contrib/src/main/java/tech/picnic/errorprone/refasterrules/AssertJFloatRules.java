@@ -15,53 +15,61 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class AssertJFloatRules {
   private AssertJFloatRules() {}
 
-  static final class AbstractFloatAssertIsCloseToWithOffset {
+  /**
+   * Prefer {@link AbstractFloatAssert#isCloseTo(float, Offset)} over less explicit alternatives.
+   */
+  static final class AbstractFloatAssertIsCloseTo {
     @BeforeTemplate
     AbstractFloatAssert<?> before(
-        AbstractFloatAssert<?> floatAssert, float n, Offset<Float> offset) {
-      return floatAssert.isEqualTo(n, offset);
+        AbstractFloatAssert<?> floatAssert, float expected, Offset<Float> offset) {
+      return floatAssert.isEqualTo(expected, offset);
     }
 
     @BeforeTemplate
     AbstractFloatAssert<?> before(
-        AbstractFloatAssert<?> floatAssert, Float n, Offset<Float> offset) {
-      return floatAssert.isEqualTo(n, offset);
+        AbstractFloatAssert<?> floatAssert, Float expected, Offset<Float> offset) {
+      return floatAssert.isEqualTo(expected, offset);
     }
 
     @AfterTemplate
     AbstractFloatAssert<?> after(
-        AbstractFloatAssert<?> floatAssert, float n, Offset<Float> offset) {
-      return floatAssert.isCloseTo(n, offset);
+        AbstractFloatAssert<?> floatAssert, float expected, Offset<Float> offset) {
+      return floatAssert.isCloseTo(expected, offset);
     }
   }
 
+  /** Prefer {@link AbstractFloatAssert#isEqualTo(float)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsEqualTo {
     @BeforeTemplate
-    AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
+    AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float expected) {
       return Refaster.anyOf(
-          floatAssert.isCloseTo(n, offset(0f)), floatAssert.isCloseTo(n, withPercentage(0)));
+          floatAssert.isCloseTo(expected, offset(0f)),
+          floatAssert.isCloseTo(expected, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert, float n) {
-      return floatAssert.isEqualTo(n);
+    AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert, float expected) {
+      return floatAssert.isEqualTo(expected);
     }
   }
 
+  /** Prefer {@link AbstractFloatAssert#isNotEqualTo(float)} over more contrived alternatives. */
   static final class AbstractFloatAssertIsNotEqualTo {
     @BeforeTemplate
-    AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float n) {
+    AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert, float other) {
       return Refaster.anyOf(
-          floatAssert.isNotCloseTo(n, offset(0f)), floatAssert.isNotCloseTo(n, withPercentage(0)));
+          floatAssert.isNotCloseTo(other, offset(0f)),
+          floatAssert.isNotCloseTo(other, withPercentage(0)));
     }
 
     @AfterTemplate
-    AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert, float n) {
-      return floatAssert.isNotEqualTo(n);
+    AbstractFloatAssert<?> after(AbstractFloatAssert<?> floatAssert, float other) {
+      return floatAssert.isNotEqualTo(other);
     }
   }
 
-  static final class AbstractFloatAssertIsZero {
+  /** Prefer {@code isEqualTo(0)} over more contrived alternatives. */
+  static final class AbstractFloatAssertIsEqualToZero {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isZero();
@@ -73,7 +81,8 @@ final class AssertJFloatRules {
     }
   }
 
-  static final class AbstractFloatAssertIsNotZero {
+  /** Prefer {@code isNotEqualTo(0)} over more contrived alternatives. */
+  static final class AbstractFloatAssertIsNotEqualToZero {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isNotZero();
@@ -85,7 +94,8 @@ final class AssertJFloatRules {
     }
   }
 
-  static final class AbstractFloatAssertIsOne {
+  /** Prefer {@code isEqualTo(1)} over more contrived alternatives. */
+  static final class AbstractFloatAssertIsEqualToOne {
     @BeforeTemplate
     AbstractFloatAssert<?> before(AbstractFloatAssert<?> floatAssert) {
       return floatAssert.isOne();

@@ -19,15 +19,15 @@ final class MockitoRulesTest implements RefasterRuleCollectionTestCase {
     return times(0);
   }
 
-  Object testVerifyOnce() {
+  Object testVerify() {
     return verify(mock(Object.class), times(1));
   }
 
-  Object testInvocationOnMockGetArguments() {
+  Object testInvocationOnMockGetArgument() {
     return ((InvocationOnMock) null).getArguments()[0];
   }
 
-  ImmutableSet<Number> testInvocationOnMockGetArgumentsWithTypeParameter() {
+  ImmutableSet<Number> testInvocationOnMockGetArgumentObject() {
     return ImmutableSet.of(
         ((InvocationOnMock) null).getArgument(0, Integer.class),
         (Double) ((InvocationOnMock) null).getArgument(1));

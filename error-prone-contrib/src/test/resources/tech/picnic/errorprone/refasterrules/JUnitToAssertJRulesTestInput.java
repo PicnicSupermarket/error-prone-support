@@ -15,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
@@ -36,135 +38,135 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
         (Runnable) () -> assertTrue(true));
   }
 
-  void testAssertThatBooleanArrayContainsExactly() {
+  void testAssertThatContainsExactlyBoolean() {
     assertArrayEquals(new boolean[] {true}, new boolean[] {false});
   }
 
-  void testAssertThatBooleanArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyBooleanString() {
     assertArrayEquals(new boolean[] {true}, new boolean[] {false}, "foo");
   }
 
-  void testAssertThatBooleanArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyBooleanSupplier() {
     assertArrayEquals(new boolean[] {true}, new boolean[] {false}, () -> "foo");
   }
 
-  void testAssertThatByteArrayContainsExactly() {
+  void testAssertThatContainsExactlyByte() {
     assertArrayEquals(new byte[] {1}, new byte[] {2});
   }
 
-  void testAssertThatByteArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyByteString() {
     assertArrayEquals(new byte[] {1}, new byte[] {2}, "foo");
   }
 
-  void testAssertThatByteArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyByteSupplier() {
     assertArrayEquals(new byte[] {1}, new byte[] {2}, () -> "foo");
   }
 
-  void testAssertThatCharArrayContainsExactly() {
+  void testAssertThatContainsExactlyChar() {
     assertArrayEquals(new char[] {'a'}, new char[] {'b'});
   }
 
-  void testAssertThatCharArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyCharString() {
     assertArrayEquals(new char[] {'a'}, new char[] {'b'}, "foo");
   }
 
-  void testAssertThatCharArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyCharSupplier() {
     assertArrayEquals(new char[] {'a'}, new char[] {'b'}, () -> "foo");
   }
 
-  void testAssertThatShortArrayContainsExactly() {
+  void testAssertThatContainsExactlyShort() {
     assertArrayEquals(new short[] {1}, new short[] {2});
   }
 
-  void testAssertThatShortArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyShortString() {
     assertArrayEquals(new short[] {1}, new short[] {2}, "foo");
   }
 
-  void testAssertThatShortArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyShortSupplier() {
     assertArrayEquals(new short[] {1}, new short[] {2}, () -> "foo");
   }
 
-  void testAssertThatIntArrayContainsExactly() {
+  void testAssertThatContainsExactlyInt() {
     assertArrayEquals(new int[] {1}, new int[] {2});
   }
 
-  void testAssertThatIntArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyIntString() {
     assertArrayEquals(new int[] {1}, new int[] {2}, "foo");
   }
 
-  void testAssertThatIntArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyIntSupplier() {
     assertArrayEquals(new int[] {1}, new int[] {2}, () -> "foo");
   }
 
-  void testAssertThatLongArrayContainsExactly() {
+  void testAssertThatContainsExactlyLong() {
     assertArrayEquals(new long[] {1L}, new long[] {2L});
   }
 
-  void testAssertThatLongArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyLongString() {
     assertArrayEquals(new long[] {1L}, new long[] {2L}, "foo");
   }
 
-  void testAssertThatLongArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyLongSupplier() {
     assertArrayEquals(new long[] {1L}, new long[] {2L}, () -> "foo");
   }
 
-  void testAssertThatFloatArrayContainsExactly() {
+  void testAssertThatContainsExactlyFloat() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f});
   }
 
-  void testAssertThatFloatArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyFloatString() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, "foo");
   }
 
-  void testAssertThatFloatArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyFloatSupplier() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, () -> "foo");
   }
 
-  void testAssertThatFloatArrayContainsExactlyWithOffset() {
+  void testAssertThatContainsExactlyOffsetFloat() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f);
   }
 
-  void testAssertThatFloatArrayWithFailMessageContainsExactlyWithOffset() {
+  void testAssertThatWithFailMessageContainsExactlyOffsetFloatString() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f, "foo");
   }
 
-  void testAssertThatFloatArrayWithFailMessageSupplierContainsExactlyWithOffset() {
+  void testAssertThatWithFailMessageContainsExactlyOffsetFloatSupplier() {
     assertArrayEquals(new float[] {1.0f}, new float[] {2.0f}, 0.1f, () -> "foo");
   }
 
-  void testAssertThatDoubleArrayContainsExactly() {
+  void testAssertThatContainsExactlyDouble() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0});
   }
 
-  void testAssertThatDoubleArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyDoubleString() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, "foo");
   }
 
-  void testAssertThatDoubleArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyDoubleSupplier() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, () -> "foo");
   }
 
-  void testAssertThatDoubleArrayContainsExactlyWithOffset() {
+  void testAssertThatContainsExactlyOffsetDouble() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1);
   }
 
-  void testAssertThatDoubleArrayWithFailMessageContainsExactlyWithOffset() {
+  void testAssertThatWithFailMessageContainsExactlyOffsetDoubleString() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1, "foo");
   }
 
-  void testAssertThatDoubleArrayWithFailMessageSupplierContainsExactlyWithOffset() {
+  void testAssertThatWithFailMessageContainsExactlyOffsetDoubleSupplier() {
     assertArrayEquals(new double[] {1.0}, new double[] {2.0}, 0.1, () -> "foo");
   }
 
-  void testAssertThatObjectArrayContainsExactly() {
+  void testAssertThatContainsExactlyObject() {
     assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"});
   }
 
-  void testAssertThatObjectArrayWithFailMessageContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyObjectString() {
     assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"}, "foo");
   }
 
-  void testAssertThatObjectArrayWithFailMessageSupplierContainsExactly() {
+  void testAssertThatWithFailMessageContainsExactlyObjectSupplier() {
     assertArrayEquals(new Object[] {"foo"}, new Object[] {"bar"}, () -> "foo");
   }
 
@@ -172,11 +174,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     return Assertions.fail();
   }
 
-  Object testFailWithMessage() {
+  Object testFailWithString() {
     return Assertions.fail("foo");
   }
 
-  Object testFailWithMessageAndThrowable() {
+  Object testFailWithStringAndThrowable() {
     return Assertions.fail("foo", new IllegalStateException());
   }
 
@@ -188,11 +190,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertTrue(true);
   }
 
-  void testAssertThatWithFailMessageStringIsTrue() {
+  void testAssertThatWithFailMessageIsTrueString() {
     assertTrue(true, "foo");
   }
 
-  void testAssertThatWithFailMessageSupplierIsTrue() {
+  void testAssertThatWithFailMessageIsTrueSupplier() {
     assertTrue(true, () -> "foo");
   }
 
@@ -200,11 +202,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertFalse(true);
   }
 
-  void testAssertThatWithFailMessageStringIsFalse() {
+  void testAssertThatWithFailMessageIsFalseString() {
     assertFalse(true, "foo");
   }
 
-  void testAssertThatWithFailMessageSupplierIsFalse() {
+  void testAssertThatWithFailMessageIsFalseSupplier() {
     assertFalse(true, () -> "foo");
   }
 
@@ -212,11 +214,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertNull(new Object());
   }
 
-  void testAssertThatWithFailMessageStringIsNull() {
+  void testAssertThatWithFailMessageIsNullString() {
     assertNull(new Object(), "foo");
   }
 
-  void testAssertThatWithFailMessageSupplierIsNull() {
+  void testAssertThatWithFailMessageIsNullSupplier() {
     assertNull(new Object(), () -> "foo");
   }
 
@@ -224,11 +226,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertNotNull(new Object());
   }
 
-  void testAssertThatWithFailMessageStringIsNotNull() {
+  void testAssertThatWithFailMessageIsNotNullString() {
     assertNotNull(new Object(), "foo");
   }
 
-  void testAssertThatWithFailMessageSupplierIsNotNull() {
+  void testAssertThatWithFailMessageIsNotNullSupplier() {
     assertNotNull(new Object(), () -> "foo");
   }
 
@@ -236,11 +238,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertSame("foo", "bar");
   }
 
-  void testAssertThatWithFailMessageStringIsSameAs() {
+  void testAssertThatWithFailMessageIsSameAsString() {
     assertSame("foo", "bar", "baz");
   }
 
-  void testAssertThatWithFailMessageSupplierIsSameAs() {
+  void testAssertThatWithFailMessageIsSameAsSupplier() {
     assertSame("foo", "bar", () -> "baz");
   }
 
@@ -248,50 +250,62 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertNotSame("foo", "bar");
   }
 
-  void testAssertThatWithFailMessageStringIsNotSameAs() {
+  void testAssertThatWithFailMessageIsNotSameAsString() {
     assertNotSame("foo", "bar", "baz");
   }
 
-  void testAssertThatWithFailMessageSupplierIsNotSameAs() {
+  void testAssertThatWithFailMessageIsNotSameAsSupplier() {
     assertNotSame("foo", "bar", () -> "baz");
   }
 
   void testAssertThatThrownByIsExactlyInstanceOf() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null);
     assertThrowsExactly(IllegalStateException.class, () -> {});
   }
 
-  void testAssertThatThrownByWithFailMessageStringIsExactlyInstanceOf() {
+  void testAssertThatThrownByWithFailMessageIsExactlyInstanceOfString() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null, "foo");
     assertThrowsExactly(IllegalStateException.class, () -> {}, "foo");
   }
 
-  void testAssertThatThrownByWithFailMessageSupplierIsExactlyInstanceOf() {
+  void testAssertThatThrownByWithFailMessageIsExactlyInstanceOfSupplier() {
+    assertThrowsExactly(IllegalStateException.class, (Executable) null, () -> "foo");
     assertThrowsExactly(IllegalStateException.class, () -> {}, () -> "foo");
   }
 
   void testAssertThatThrownByIsInstanceOf() {
+    assertThrows(IllegalStateException.class, (Executable) null);
     assertThrows(IllegalStateException.class, () -> {});
   }
 
-  void testAssertThatThrownByWithFailMessageStringIsInstanceOf() {
+  void testAssertThatThrownByWithFailMessageIsInstanceOfString() {
+    assertThrows(IllegalStateException.class, (Executable) null, "foo");
     assertThrows(IllegalStateException.class, () -> {}, "foo");
   }
 
-  void testAssertThatThrownByWithFailMessageSupplierIsInstanceOf() {
+  void testAssertThatThrownByWithFailMessageIsInstanceOfSupplier() {
+    assertThrows(IllegalStateException.class, (Executable) null, () -> "foo");
     assertThrows(IllegalStateException.class, () -> {}, () -> "foo");
   }
 
   void testAssertThatCodeDoesNotThrowAnyException() {
+    assertDoesNotThrow((Executable) null);
     assertDoesNotThrow(() -> {});
+    assertDoesNotThrow((ThrowingSupplier<String>) null);
     assertDoesNotThrow(() -> toString());
   }
 
-  void testAssertThatCodeWithFailMessageStringDoesNotThrowAnyException() {
+  void testAssertThatCodeWithFailMessageDoesNotThrowAnyExceptionString() {
+    assertDoesNotThrow((Executable) null);
     assertDoesNotThrow(() -> {}, "foo");
+    assertDoesNotThrow((ThrowingSupplier<String>) null, "bar");
     assertDoesNotThrow(() -> toString(), "bar");
   }
 
-  void testAssertThatCodeWithFailMessageSupplierDoesNotThrowAnyException() {
+  void testAssertThatCodeWithFailMessageDoesNotThrowAnyExceptionSupplier() {
+    assertDoesNotThrow((Executable) null, () -> "foo");
     assertDoesNotThrow(() -> {}, () -> "foo");
+    assertDoesNotThrow((ThrowingSupplier<String>) null, () -> "bar");
     assertDoesNotThrow(() -> toString(), () -> "bar");
   }
 
@@ -299,11 +313,11 @@ final class JUnitToAssertJRulesTest implements RefasterRuleCollectionTestCase {
     assertInstanceOf(Object.class, new Object());
   }
 
-  void testAssertThatWithFailMessageStringIsInstanceOf() {
+  void testAssertThatWithFailMessageIsInstanceOfString() {
     assertInstanceOf(Object.class, new Object(), "foo");
   }
 
-  void testAssertThatWithFailMessageSupplierIsInstanceOf() {
+  void testAssertThatWithFailMessageIsInstanceOfSupplier() {
     assertInstanceOf(Object.class, new Object(), () -> "foo");
   }
 }

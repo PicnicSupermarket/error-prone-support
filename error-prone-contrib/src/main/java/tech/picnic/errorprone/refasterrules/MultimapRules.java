@@ -103,7 +103,7 @@ final class MultimapRules {
     }
   }
 
-  /** Don't unnecessarily use {@link Multimap#entries()}. */
+  /** Prefer {@code multimap.keys().stream()} over more contrived alternatives. */
   static final class MultimapKeysStream<K, V> {
     @BeforeTemplate
     Stream<K> before(Multimap<K, V> multimap) {
@@ -116,7 +116,7 @@ final class MultimapRules {
     }
   }
 
-  /** Don't unnecessarily use {@link Multimap#entries()}. */
+  /** Prefer {@code multimap.values().stream()} over more contrived alternatives. */
   static final class MultimapValuesStream<K, V> {
     @BeforeTemplate
     Stream<V> before(Multimap<K, V> multimap) {

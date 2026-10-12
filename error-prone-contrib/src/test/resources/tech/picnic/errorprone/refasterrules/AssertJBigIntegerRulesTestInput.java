@@ -18,33 +18,33 @@ final class AssertJBigIntegerRulesTest implements RefasterRuleCollectionTestCase
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsEqualTo() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isCloseTo(BigInteger.ONE, offset(BigInteger.ZERO)),
-        assertThat(BigInteger.ZERO).isCloseTo(BigInteger.ONE, withPercentage(0)));
+        assertThat(BigInteger.ONE).isCloseTo(BigInteger.TWO, withPercentage(0)));
   }
 
   ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotEqualTo() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isNotCloseTo(BigInteger.ONE, offset(BigInteger.ZERO)),
-        assertThat(BigInteger.ZERO).isNotCloseTo(BigInteger.ONE, withPercentage(0)));
+        assertThat(BigInteger.ONE).isNotCloseTo(BigInteger.TWO, withPercentage(0)));
   }
 
-  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsZero() {
+  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsEqualToZero() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isZero(),
-        assertThat(BigInteger.ZERO).isEqualTo(0L),
-        assertThat(BigInteger.ZERO).isEqualTo(BigInteger.ZERO));
+        assertThat(BigInteger.ONE).isEqualTo(0L),
+        assertThat(BigInteger.TWO).isEqualTo(BigInteger.ZERO));
   }
 
-  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotZero() {
+  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsNotEqualToZero() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isNotZero(),
-        assertThat(BigInteger.ZERO).isNotEqualTo(0L),
-        assertThat(BigInteger.ZERO).isNotEqualTo(BigInteger.ZERO));
+        assertThat(BigInteger.ONE).isNotEqualTo(0L),
+        assertThat(BigInteger.TWO).isNotEqualTo(BigInteger.ZERO));
   }
 
-  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsOne() {
+  ImmutableSet<AbstractBigIntegerAssert<?>> testAbstractBigIntegerAssertIsEqualToOne() {
     return ImmutableSet.of(
         assertThat(BigInteger.ZERO).isOne(),
-        assertThat(BigInteger.ZERO).isEqualTo(1L),
-        assertThat(BigInteger.ZERO).isEqualTo(BigInteger.ONE));
+        assertThat(BigInteger.ONE).isEqualTo(1L),
+        assertThat(BigInteger.TWO).isEqualTo(BigInteger.ONE));
   }
 }

@@ -20,193 +20,179 @@ import tech.picnic.errorprone.refaster.annotation.OnlineDocumentation;
 final class RxJava2AdapterRules {
   private RxJava2AdapterRules() {}
 
-  /** Use the fluent API style when using {@link RxJava2Adapter#completableToMono}. */
-  static final class CompletableToMono {
+  /**
+   * Prefer {@link RxJava2Adapter#completableToMono(Completable)} over less idiomatic alternatives.
+   */
+  static final class CompletableAsRxJava2AdapterCompletableToMono {
     @BeforeTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> before(Completable completable) {
+    Mono<? extends @Nullable Void> before(Completable source) {
       return Refaster.anyOf(
-          RxJava2Adapter.completableToMono(completable),
-          completable.to(RxJava2Adapter::completableToMono));
+          RxJava2Adapter.completableToMono(source), source.to(RxJava2Adapter::completableToMono));
     }
 
     @AfterTemplate
     @SuppressWarnings("java:S4968" /* Result may be `Mono<Void>`. */)
-    Mono<? extends @Nullable Void> after(Completable completable) {
-      return completable.as(RxJava2Adapter::completableToMono);
+    Mono<? extends @Nullable Void> after(Completable source) {
+      return source.as(RxJava2Adapter::completableToMono);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#flowableToFlux(Flowable)} over less idiomatic alternatives. */
+  static final class FlowableAsRxJava2AdapterFlowableToFlux<T> {
+    @BeforeTemplate
+    Flux<T> before(Flowable<T> source) {
+      return Refaster.anyOf(
+          Flux.from(source),
+          source.to(Flux::from),
+          source.as(Flux::from),
+          RxJava2Adapter.flowableToFlux(source),
+          source.to(RxJava2Adapter::flowableToFlux));
+    }
+
+    @AfterTemplate
+    Flux<T> after(Flowable<T> source) {
+      return source.as(RxJava2Adapter::flowableToFlux);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#fluxToFlowable(Flux)} over less idiomatic alternatives. */
+  static final class FluxAsRxJava2AdapterFluxToFlowable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Flux<T> source) {
+      return Refaster.anyOf(
+          Flowable.fromPublisher(source),
+          source.as(Flowable::fromPublisher),
+          RxJava2Adapter.fluxToFlowable(source));
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Flux<T> source) {
+      return source.as(RxJava2Adapter::fluxToFlowable);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#fluxToObservable(Flux)} over less idiomatic alternatives. */
+  static final class FluxAsRxJava2AdapterFluxToObservable<T> {
+    @BeforeTemplate
+    Observable<T> before(Flux<T> publisher) {
+      return Refaster.anyOf(
+          Observable.fromPublisher(publisher),
+          publisher.as(Observable::fromPublisher),
+          RxJava2Adapter.fluxToObservable(publisher));
+    }
+
+    @AfterTemplate
+    Observable<T> after(Flux<T> publisher) {
+      return publisher.as(RxJava2Adapter::fluxToObservable);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#maybeToMono(Maybe)} over less idiomatic alternatives. */
+  static final class MaybeAsRxJava2AdapterMaybeToMono<T> {
+    @BeforeTemplate
+    Mono<T> before(Maybe<T> source) {
+      return Refaster.anyOf(
+          RxJava2Adapter.maybeToMono(source), source.to(RxJava2Adapter::maybeToMono));
+    }
+
+    @AfterTemplate
+    Mono<T> after(Maybe<T> source) {
+      return source.as(RxJava2Adapter::maybeToMono);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#monoToCompletable(Mono)} over less idiomatic alternatives. */
+  static final class MonoAsRxJava2AdapterMonoToCompletable<T> {
+    @BeforeTemplate
+    Completable before(Mono<T> publisher) {
+      return Refaster.anyOf(
+          Completable.fromPublisher(publisher),
+          publisher.as(Completable::fromPublisher),
+          RxJava2Adapter.monoToCompletable(publisher));
+    }
+
+    @AfterTemplate
+    Completable after(Mono<T> publisher) {
+      return publisher.as(RxJava2Adapter::monoToCompletable);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#monoToFlowable(Mono)} over less idiomatic alternatives. */
+  static final class MonoAsRxJava2AdapterMonoToFlowable<T> {
+    @BeforeTemplate
+    Flowable<T> before(Mono<T> source) {
+      return Refaster.anyOf(
+          Flowable.fromPublisher(source),
+          source.as(Flowable::fromPublisher),
+          RxJava2Adapter.monoToFlowable(source));
+    }
+
+    @AfterTemplate
+    Flowable<T> after(Mono<T> source) {
+      return source.as(RxJava2Adapter::monoToFlowable);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#monoToMaybe(Mono)} over less idiomatic alternatives. */
+  static final class MonoAsRxJava2AdapterMonoToMaybe<T> {
+    @BeforeTemplate
+    Maybe<T> before(Mono<T> source) {
+      return RxJava2Adapter.monoToMaybe(source);
+    }
+
+    @AfterTemplate
+    Maybe<T> after(Mono<T> source) {
+      return source.as(RxJava2Adapter::monoToMaybe);
+    }
+  }
+
+  /** Prefer {@link RxJava2Adapter#monoToSingle(Mono)} over less idiomatic alternatives. */
+  static final class MonoAsRxJava2AdapterMonoToSingle<T> {
+    @BeforeTemplate
+    Single<T> before(Mono<T> publisher) {
+      return Refaster.anyOf(
+          Single.fromPublisher(publisher),
+          publisher.as(Single::fromPublisher),
+          RxJava2Adapter.monoToSingle(publisher));
+    }
+
+    @AfterTemplate
+    Single<T> after(Mono<T> publisher) {
+      return publisher.as(RxJava2Adapter::monoToSingle);
     }
   }
 
   /**
-   * Use {@link RxJava2Adapter#flowableToFlux} to convert a {@link Flowable} to a {@link Flux}, and
-   * do so using the fluent API style.
+   * Prefer chaining {@link Observable#toFlowable(BackpressureStrategy)} with {@link
+   * RxJava2Adapter#flowableToFlux(Flowable)} over less idiomatic alternatives.
    */
-  static final class FlowableToFlux<T> {
+  static final class ObservableToFlowableAsRxJava2AdapterFlowableToFlux<T> {
     @BeforeTemplate
-    Flux<T> before(Flowable<T> flowable) {
+    Flux<T> before(Observable<T> source, BackpressureStrategy strategy) {
       return Refaster.anyOf(
-          Flux.from(flowable),
-          flowable.to(Flux::from),
-          flowable.as(Flux::from),
-          RxJava2Adapter.flowableToFlux(flowable),
-          flowable.to(RxJava2Adapter::flowableToFlux));
+          RxJava2Adapter.observableToFlux(source, strategy),
+          source.as(obs -> RxJava2Adapter.observableToFlux(obs, strategy)),
+          source.to(obs -> RxJava2Adapter.observableToFlux(obs, strategy)));
     }
 
     @AfterTemplate
-    Flux<T> after(Flowable<T> flowable) {
-      return flowable.as(RxJava2Adapter::flowableToFlux);
+    Flux<T> after(Observable<T> source, BackpressureStrategy strategy) {
+      return source.toFlowable(strategy).as(RxJava2Adapter::flowableToFlux);
     }
   }
 
-  /**
-   * Use {@link RxJava2Adapter#fluxToFlowable} to convert a {@link Flux} to a {@link Flowable}, and
-   * do so using the fluent API style.
-   */
-  static final class FluxToFlowable<T> {
+  /** Prefer {@link RxJava2Adapter#singleToMono(Single)} over less idiomatic alternatives. */
+  static final class SingleAsRxJava2AdapterSingleToMono<T> {
     @BeforeTemplate
-    Flowable<T> before(Flux<T> flux) {
+    Mono<T> before(Single<T> source) {
       return Refaster.anyOf(
-          Flowable.fromPublisher(flux),
-          flux.as(Flowable::fromPublisher),
-          RxJava2Adapter.fluxToFlowable(flux));
+          RxJava2Adapter.singleToMono(source), source.to(RxJava2Adapter::singleToMono));
     }
 
     @AfterTemplate
-    Flowable<T> after(Flux<T> flux) {
-      return flux.as(RxJava2Adapter::fluxToFlowable);
-    }
-  }
-
-  /**
-   * Use {@link RxJava2Adapter#fluxToObservable} to convert a {@link Flux} to a {@link Observable},
-   * and do so using the fluent API style.
-   */
-  static final class FluxToObservable<T> {
-    @BeforeTemplate
-    Observable<T> before(Flux<T> flux) {
-      return Refaster.anyOf(
-          Observable.fromPublisher(flux),
-          flux.as(Observable::fromPublisher),
-          RxJava2Adapter.fluxToObservable(flux));
-    }
-
-    @AfterTemplate
-    Observable<T> after(Flux<T> flux) {
-      return flux.as(RxJava2Adapter::fluxToObservable);
-    }
-  }
-
-  /** Use the fluent API style when using {@link RxJava2Adapter#maybeToMono}. */
-  static final class MaybeToMono<T> {
-    @BeforeTemplate
-    Mono<T> before(Maybe<T> maybe) {
-      return Refaster.anyOf(
-          RxJava2Adapter.maybeToMono(maybe), maybe.to(RxJava2Adapter::maybeToMono));
-    }
-
-    @AfterTemplate
-    Mono<T> after(Maybe<T> maybe) {
-      return maybe.as(RxJava2Adapter::maybeToMono);
-    }
-  }
-
-  /**
-   * Use {@link RxJava2Adapter#monoToCompletable} to convert a {@link Mono} to a {@link
-   * Completable}, and do so using the fluent API style.
-   */
-  static final class MonoToCompletable<T> {
-    @BeforeTemplate
-    Completable before(Mono<T> mono) {
-      return Refaster.anyOf(
-          Completable.fromPublisher(mono),
-          mono.as(Completable::fromPublisher),
-          RxJava2Adapter.monoToCompletable(mono));
-    }
-
-    @AfterTemplate
-    Completable after(Mono<T> mono) {
-      return mono.as(RxJava2Adapter::monoToCompletable);
-    }
-  }
-
-  /**
-   * Use {@link RxJava2Adapter#monoToFlowable} to convert a {@link Mono} to a {@link Flowable}, and
-   * do so using the fluent API style.
-   */
-  static final class MonoToFlowable<T> {
-    @BeforeTemplate
-    Flowable<T> before(Mono<T> mono) {
-      return Refaster.anyOf(
-          Flowable.fromPublisher(mono),
-          mono.as(Flowable::fromPublisher),
-          RxJava2Adapter.monoToFlowable(mono));
-    }
-
-    @AfterTemplate
-    Flowable<T> after(Mono<T> mono) {
-      return mono.as(RxJava2Adapter::monoToFlowable);
-    }
-  }
-
-  /** Use the fluent API style when using {@link RxJava2Adapter#monoToMaybe}. */
-  static final class MonoToMaybe<T> {
-    @BeforeTemplate
-    Maybe<T> before(Mono<T> mono) {
-      return RxJava2Adapter.monoToMaybe(mono);
-    }
-
-    @AfterTemplate
-    Maybe<T> after(Mono<T> mono) {
-      return mono.as(RxJava2Adapter::monoToMaybe);
-    }
-  }
-
-  /**
-   * Use {@link RxJava2Adapter#monoToSingle} to convert a {@link Mono} to a {@link Single}, and do
-   * so using the fluent API style.
-   */
-  static final class MonoToSingle<T> {
-    @BeforeTemplate
-    Single<T> before(Mono<T> mono) {
-      return Refaster.anyOf(
-          Single.fromPublisher(mono),
-          mono.as(Single::fromPublisher),
-          RxJava2Adapter.monoToSingle(mono));
-    }
-
-    @AfterTemplate
-    Single<T> after(Mono<T> mono) {
-      return mono.as(RxJava2Adapter::monoToSingle);
-    }
-  }
-
-  /** Use the fluent API style when using {@link RxJava2Adapter#observableToFlux}. */
-  static final class ObservableToFlux<T> {
-    @BeforeTemplate
-    Flux<T> before(Observable<T> observable, BackpressureStrategy strategy) {
-      return Refaster.anyOf(
-          RxJava2Adapter.observableToFlux(observable, strategy),
-          observable.as(obs -> RxJava2Adapter.observableToFlux(obs, strategy)),
-          observable.to(obs -> RxJava2Adapter.observableToFlux(obs, strategy)));
-    }
-
-    @AfterTemplate
-    Flux<T> after(Observable<T> observable, BackpressureStrategy strategy) {
-      return observable.toFlowable(strategy).as(RxJava2Adapter::flowableToFlux);
-    }
-  }
-
-  /** Use the fluent API style when using {@link RxJava2Adapter#singleToMono}. */
-  static final class SingleToMono<T> {
-    @BeforeTemplate
-    Mono<T> before(Single<T> single) {
-      return Refaster.anyOf(
-          RxJava2Adapter.singleToMono(single), single.to(RxJava2Adapter::singleToMono));
-    }
-
-    @AfterTemplate
-    Mono<T> after(Single<T> single) {
-      return single.as(RxJava2Adapter::singleToMono);
+    Mono<T> after(Single<T> source) {
+      return source.as(RxJava2Adapter::singleToMono);
     }
   }
 }

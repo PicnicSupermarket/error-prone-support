@@ -12,7 +12,7 @@ import org.assertj.core.api.OptionalAssert;
 import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 
 final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
-  AbstractAssert<?, ?> testAssertThatOptional() {
+  AbstractAssert<?, ?> testAssertThatGet() {
     return assertThat(Optional.of(new Object()).orElseThrow());
   }
 
@@ -22,7 +22,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(2)).isNotEqualTo(Optional.empty()));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatOptionalIsPresent() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsPresent() {
     return ImmutableSet.of(
         assertThat(Optional.of(1).isPresent()).isTrue(),
         assertThat(Optional.of(2).isEmpty()).isFalse());
@@ -34,7 +34,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(2)).isEqualTo(Optional.empty()));
   }
 
-  ImmutableSet<AbstractAssert<?, ?>> testAssertThatOptionalIsEmpty() {
+  ImmutableSet<AbstractAssert<?, ?>> testAssertThatIsEmpty() {
     return ImmutableSet.of(
         assertThat(Optional.of(1).isEmpty()).isTrue(),
         assertThat(Optional.of(2).isPresent()).isFalse());
@@ -61,7 +61,7 @@ final class AssertJOptionalRulesTest implements RefasterRuleCollectionTestCase {
         assertThat(Optional.of(Path.of("bar"))).get().satisfies(Object::toString));
   }
 
-  AbstractAssert<?, ?> testAssertThatOptionalHasValueMatching() {
+  AbstractAssert<?, ?> testAssertThatGetMatches() {
     return assertThat(Optional.of("foo").filter(String::isEmpty)).isPresent();
   }
 }

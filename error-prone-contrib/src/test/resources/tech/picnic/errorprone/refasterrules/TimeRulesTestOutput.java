@@ -28,7 +28,7 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
     return Clock.systemUTC().instant();
   }
 
-  ImmutableSet<ZoneId> testUtcConstant() {
+  ImmutableSet<ZoneId> testUtc() {
     return ImmutableSet.of(
         ZoneOffset.UTC,
         ZoneOffset.UTC,
@@ -83,11 +83,11 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         Instant.EPOCH.plusMillis(13));
   }
 
-  Instant testInstantTruncatedToMilliseconds() {
+  Instant testInstantTruncatedToChronoUnitMillis() {
     return Instant.EPOCH.truncatedTo(ChronoUnit.MILLIS);
   }
 
-  Instant testInstantTruncatedToSeconds() {
+  Instant testInstantTruncatedToChronoUnitSeconds() {
     return Instant.EPOCH.truncatedTo(ChronoUnit.SECONDS);
   }
 
@@ -105,11 +105,11 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
     return Instant.EPOCH.atZone(ZoneOffset.UTC);
   }
 
-  Clock testUtcClock() {
+  Clock testClockSystemUTC() {
     return Clock.systemUTC();
   }
 
-  ImmutableSet<Instant> testEpochInstant() {
+  ImmutableSet<Instant> testInstantEpoch() {
     return ImmutableSet.of(Instant.EPOCH, Instant.EPOCH, Instant.EPOCH, Instant.EPOCH);
   }
 
@@ -164,19 +164,19 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
         !ZonedDateTime.now().isAfter(ZonedDateTime.now()));
   }
 
-  ImmutableSet<Boolean> testOffsetDateTimeIsAfter() {
-    return ImmutableSet.of(
-        OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX),
-        !OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX));
-  }
-
   ImmutableSet<Boolean> testOffsetDateTimeIsBefore() {
     return ImmutableSet.of(
         OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX),
         !OffsetDateTime.MIN.isBefore(OffsetDateTime.MAX));
   }
 
-  ImmutableSet<Duration> testZeroDuration() {
+  ImmutableSet<Boolean> testOffsetDateTimeIsAfter() {
+    return ImmutableSet.of(
+        OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX),
+        !OffsetDateTime.MIN.isAfter(OffsetDateTime.MAX));
+  }
+
+  ImmutableSet<Duration> testDurationZero() {
     return ImmutableSet.of(
         Duration.ZERO,
         Duration.ZERO,
@@ -212,11 +212,11 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
     return Duration.ofSeconds(1);
   }
 
-  Duration testDurationBetweenInstants() {
+  Duration testDurationBetweenInstant() {
     return Duration.between(Instant.MIN, Instant.MAX);
   }
 
-  Duration testDurationBetweenOffsetDateTimes() {
+  Duration testDurationBetweenOffsetDateTime() {
     return Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX)
         .plus(Duration.between(OffsetDateTime.MIN, OffsetDateTime.MAX));
   }
@@ -225,7 +225,7 @@ final class TimeRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(Duration.ofDays(1).isZero(), Duration.ofDays(2).isZero());
   }
 
-  ImmutableSet<Period> testZeroPeriod() {
+  ImmutableSet<Period> testPeriodZero() {
     return ImmutableSet.of(Period.ZERO, Period.ZERO, Period.ZERO, Period.ZERO, Period.ZERO);
   }
 
