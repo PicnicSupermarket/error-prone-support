@@ -1,5 +1,13 @@
 package tech.picnic.errorprone.refaster.runner;
 
+import static javax.lang.model.element.ElementKind.BINDING_VARIABLE;
+import static javax.lang.model.element.ElementKind.EXCEPTION_PARAMETER;
+import static javax.lang.model.element.ElementKind.LOCAL_VARIABLE;
+import static javax.lang.model.element.ElementKind.PARAMETER;
+import static javax.lang.model.element.ElementKind.RESOURCE_VARIABLE;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.BinaryTree;
@@ -15,8 +23,10 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreeScanner;
+import com.sun.tools.javac.code.Symbol;
 import java.util.HashSet;
 import java.util.Set;
+import javax.lang.model.element.ElementKind;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -33,7 +43,9 @@ import org.jspecify.annotations.Nullable;
  */
 // XXX: Extend to also extract literals, as well as syntactic constructs such as `if` and `new`.
 final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<String>> {
-  private final Set<String> variableNames = new HashSet<>();
+  private static final ImmutableSet<ElementKind> LOCAL_VARIABLE_KINDS =
+      Sets.immutableEnumSet(
+          BINDING_VARIABLE, EXCEPTION_PARAMETER, LOCAL_VARIABLE, PARAMETER, RESOURCE_VARIABLE);
 
   /**
    * Extracts all identifiers from the given {@link Tree}.
@@ -70,11 +82,6 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
       return null;
     }
 
-    /* Track method parameters as variable names to exclude them. */
-    for (VariableTree param : node.getParameters()) {
-      variableNames.add(param.getName().toString());
-    }
-
     /*
      * Syntactic details of a method declaration other than its body do not need to be reflected
      * in a Refaster rule for it to apply to the method's code.
@@ -84,22 +91,20 @@ final class SourceIdentifierExtractor extends TreeScanner<@Nullable Void, Set<St
 
   @Override
   public @Nullable Void visitVariable(VariableTree node, Set<String> identifiers) {
-    /*
-     * Track variable names (both local variables and parameters) to exclude them from
-     * identifiers.
-     */
-    variableNames.add(node.getName().toString());
-
     /* A variable's modifiers and name do not influence where a Refaster rule matches. */
     return reduce(scan(node.getInitializer(), identifiers), scan(node.getType(), identifiers));
   }
 
   @Override
   public @Nullable Void visitIdentifier(IdentifierTree node, Set<String> identifiers) {
-    String name = node.getName().toString();
-    if (!variableNames.contains(name)) {
-      /* Register only fixed ("non-variable") identifiers. */
-      identifiers.add(name);
+    /*
+     * References to local variables and parameters are skipped, as Refaster rules never require
+     * such user-chosen names. The decision is based on the referenced symbol rather than the
+     * identifier's name, as the same name may also denote e.g. a statically imported method.
+     */
+    Symbol symbol = ASTHelpers.getSymbol(node);
+    if (symbol == null || !LOCAL_VARIABLE_KINDS.contains(symbol.getKind())) {
+      identifiers.add(node.getName().toString());
     }
     return null;
   }

@@ -197,6 +197,66 @@ final class SourceIdentifierExtractorTest {
         .doTest();
   }
 
+  @Test
+  void localVariableReferences() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [+, +=, AutoCloseable, RuntimeException, String, hashCode, length]",
+            "class A {",
+            "  int m(Object param) throws Exception {",
+            "    int local = 0;",
+            "    try (AutoCloseable resource = null) {",
+            "      local += resource.hashCode();",
+            "    } catch (RuntimeException exception) {",
+            "      local += exception.hashCode();",
+            "    }",
+            "    if (param instanceof String binding) {",
+            "      local += binding.length();",
+            "    }",
+            "    return local + param.hashCode();",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void localVariableNamedAfterStaticallyImportedMethod() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [*, Comparator, String, java, naturalOrder, util]",
+            "import static java.util.Comparator.*;",
+            "",
+            "import java.util.Comparator;",
+            "",
+            "class A {",
+            "  Comparator<String> m() {",
+            "    Comparator<String> naturalOrder = naturalOrder();",
+            "    return naturalOrder;",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void parameterNamedAfterMethodInvokedElsewhere() {
+    CompilationTestHelper.newInstance(SourceIdentifierExtractorTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "// BUG: Diagnostic contains: [*, Comparator, java, naturalOrder, util]",
+            "import static java.util.Comparator.*;",
+            "",
+            "class A {",
+            "  void m(Object naturalOrder) {}",
+            "",
+            "  void n() {",
+            "    naturalOrder();",
+            "  }",
+            "}")
+        .doTest();
+  }
+
   /**
    * A {@link BugChecker} that extracts identifiers from a {@link CompilationUnitTree} and reports
    * them as a diagnostic message.

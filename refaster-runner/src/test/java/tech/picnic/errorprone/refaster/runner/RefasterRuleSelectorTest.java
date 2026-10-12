@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refaster.runner;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import static com.google.common.collect.Iterables.getOnlyElement;
+import static com.google.errorprone.FileObjects.forSourceLines;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
@@ -10,6 +12,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.RefasterRule;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.tools.javac.api.JavacTool;
+import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -104,6 +109,41 @@ final class RefasterRuleSelectorTest {
         .containsExactly(ImmutableSet.of("&&", "==", "Integer", "valueOf", "isEmpty"));
     assertThat(identifiersByRule.get(rules.getLast()))
         .containsExactly(ImmutableSet.of("||", "Integer", "!", "valueOf", "isEmpty", "!="));
+  }
+
+  @Test
+  void selectCandidateRules() throws IOException {
+    CompilationUnitTree tree =
+        parse(
+            "class A {",
+            "  boolean m(String s, int i) {",
+            "    return s.isEmpty() && s.hashCode() == s.length() + i * i && i > 0 && i < 1;",
+            "  }",
+            "}");
+    RefasterRule<?, ?> nestedAnyOfRule =
+        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$NestedAnyOfRule");
+    RefasterRule<?, ?> multipleBeforeTemplatesRule =
+        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$MultipleBeforeTemplatesRule");
+    RefasterRule<?, ?> simpleMethodCallRule =
+        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$SimpleMethodCallRule");
+    RefasterRule<?, ?> binaryOperatorRule =
+        getRefasterRule("RefasterRuleIdentifierExtractorTestRules$BinaryOperatorRule");
+    ImmutableList<CodeTransformer> rules =
+        ImmutableList.of(
+            nestedAnyOfRule, multipleBeforeTemplatesRule, simpleMethodCallRule, binaryOperatorRule);
+
+    assertThat(RefasterRuleSelector.create(rules).selectCandidateRules(tree))
+        .containsExactly(nestedAnyOfRule, simpleMethodCallRule, binaryOperatorRule);
+    assertThat(RefasterRuleSelector.create(rules.reverse()).selectCandidateRules(tree))
+        .containsExactly(binaryOperatorRule, simpleMethodCallRule, nestedAnyOfRule);
+  }
+
+  private static CompilationUnitTree parse(String... lines) throws IOException {
+    return getOnlyElement(
+        JavacTool.create()
+            .getTask(
+                null, null, null, null, null, ImmutableList.of(forSourceLines("A.java", lines)))
+            .parse());
   }
 
   private static ImmutableSet<RefasterRule<?, ?>> getAllRefasterRules(String ruleName) {

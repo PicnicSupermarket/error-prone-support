@@ -1,9 +1,9 @@
 package tech.picnic.errorprone.refaster.runner;
 
-import static java.util.Collections.newSetFromMap;
-import static java.util.Objects.requireNonNull;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -11,9 +11,9 @@ import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.refaster.RefasterRule;
 import com.sun.source.tree.CompilationUnitTree;
-import java.util.IdentityHashMap;
+import java.util.BitSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 // XXX: Add some examples of which source files would match what templates in the tree.
@@ -61,10 +61,13 @@ import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
  * chance of matching. As a result, the performance of Refaster increases significantly.
  */
 final class RefasterRuleSelector {
-  private final Node<CodeTransformer> codeTransformers;
+  private final ImmutableList<CodeTransformer> codeTransformers;
+  private final Node<Integer> codeTransformerIndices;
 
-  private RefasterRuleSelector(Node<CodeTransformer> codeTransformers) {
+  private RefasterRuleSelector(
+      ImmutableList<CodeTransformer> codeTransformers, Node<Integer> codeTransformerIndices) {
     this.codeTransformers = codeTransformers;
+    this.codeTransformerIndices = codeTransformerIndices;
   }
 
   /**
@@ -77,33 +80,41 @@ final class RefasterRuleSelector {
     // versions.
     Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> ruleIdentifiersByTransformer =
         indexRuleIdentifiers(refasterRules);
+    ImmutableList<CodeTransformer> codeTransformers =
+        ImmutableList.copyOf(ruleIdentifiersByTransformer.keySet());
+    ImmutableList<ImmutableSet<ImmutableSet<String>>> ruleIdentifiers =
+        ImmutableList.copyOf(ruleIdentifiersByTransformer.values());
+
+    /*
+     * The tree references `CodeTransformer`s by index, such that candidate rules can cheaply be
+     * deduplicated and returned in a deterministic order.
+     */
     return new RefasterRuleSelector(
-        Node.create(
-            ruleIdentifiersByTransformer.keySet(),
-            t -> requireNonNull(ruleIdentifiersByTransformer.get(t))));
+        codeTransformers,
+        Node.create(ContiguousSet.closedOpen(0, codeTransformers.size()), ruleIdentifiers::get));
   }
 
   /**
-   * Retrieves a set of Refaster templates that can possibly match based on a {@link
+   * Retrieves the Refaster templates that can possibly match based on a {@link
    * CompilationUnitTree}.
    *
    * @param tree The {@link CompilationUnitTree} for which candidate Refaster templates are
    *     selected.
-   * @return Set of Refaster templates that can possibly match in the provided {@link
-   *     CompilationUnitTree}.
+   * @return The Refaster templates that can possibly match in the provided {@link
+   *     CompilationUnitTree}, in the order in which they were passed to {@link
+   *     #create(ImmutableCollection)}.
    */
-  Set<CodeTransformer> selectCandidateRules(CompilationUnitTree tree) {
-    Set<CodeTransformer> candidateRules = newSetFromMap(new IdentityHashMap<>());
-    codeTransformers.collectReachableValues(
-        SourceIdentifierExtractor.extractIdentifiers(tree), candidateRules::add);
-    return candidateRules;
+  ImmutableList<CodeTransformer> selectCandidateRules(CompilationUnitTree tree) {
+    BitSet candidateIndices = new BitSet(codeTransformers.size());
+    codeTransformerIndices.collectReachableValues(
+        SourceIdentifierExtractor.extractIdentifiers(tree), candidateIndices::set);
+    return candidateIndices.stream().mapToObj(codeTransformers::get).collect(toImmutableList());
   }
 
   @VisibleForTesting
   static Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> indexRuleIdentifiers(
       ImmutableCollection<CodeTransformer> codeTransformers) {
-    IdentityHashMap<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers =
-        new IdentityHashMap<>();
+    Map<CodeTransformer, ImmutableSet<ImmutableSet<String>>> identifiers = new LinkedHashMap<>();
     for (CodeTransformer transformer : codeTransformers) {
       collectRuleIdentifiers(transformer, identifiers);
     }

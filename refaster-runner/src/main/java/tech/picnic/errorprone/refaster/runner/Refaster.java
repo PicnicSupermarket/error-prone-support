@@ -43,7 +43,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -239,15 +238,14 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
 
   private record OptimizedCodeTransformer(RefasterRuleSelector ruleSelector)
       implements CodeTransformer {
-    private OptimizedCodeTransformer(ImmutableCollection<CodeTransformer> ruleSelector) {
-      this(RefasterRuleSelector.create(ruleSelector));
+    private OptimizedCodeTransformer(ImmutableCollection<CodeTransformer> refasterRules) {
+      this(RefasterRuleSelector.create(refasterRules));
     }
 
     @Override
     public void apply(TreePath path, Context context, DescriptionListener listener) {
-      Set<CodeTransformer> candidateTransformers =
-          ruleSelector.selectCandidateRules(path.getCompilationUnit());
-      for (CodeTransformer transformer : candidateTransformers) {
+      for (CodeTransformer transformer :
+          ruleSelector.selectCandidateRules(path.getCompilationUnit())) {
         transformer.apply(path, context, listener);
       }
     }

@@ -60,9 +60,9 @@ point that wires them together.
      in step 1.
    - Several constructs are deliberately excluded so the candidate set
      stays sound and sharp: package declarations, class headers (only
-     members are scanned), generated constructors, and variable and
-     parameter names (Refaster templates never bind on user-chosen
-     local names).
+     members are scanned), generated constructors, and references to
+     local variables and parameters (Refaster templates never bind on
+     user-chosen local names).
 3. **Traversing the tree** (`Node.collectReachableValues`).
    - The source identifiers are sorted lexicographically and used as
      edge labels in a depth-first traversal of the tree.
