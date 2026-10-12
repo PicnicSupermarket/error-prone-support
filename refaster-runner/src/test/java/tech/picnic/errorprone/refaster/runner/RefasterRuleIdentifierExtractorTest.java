@@ -77,6 +77,7 @@ final class RefasterRuleIdentifierExtractorTest {
         .filter(RefasterRule.class::isInstance)
         .map(RefasterRule.class::cast)
         .orElseThrow(
-            () -> new IllegalStateException("Could not find RefasterRule '%s".formatted(ruleName)));
+            () ->
+                new IllegalStateException("Could not find RefasterRule '%s'".formatted(ruleName)));
   }
 }

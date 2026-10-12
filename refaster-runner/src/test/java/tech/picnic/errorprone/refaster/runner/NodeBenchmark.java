@@ -6,8 +6,9 @@ import static java.util.function.Function.identity;
 import static org.openjdk.jmh.annotations.Mode.AverageTime;
 
 import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.jakewharton.nopen.annotation.Open;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -38,6 +39,9 @@ public class NodeBenchmark {
   @SuppressWarnings("NullAway" /* Initialized by `@Setup` method. */)
   private ImmutableListMultimap<NodeTestCase<Integer>, NodeTestCaseEntry<Integer>> testCases;
 
+  @SuppressWarnings("NullAway" /* Initialized by `@Setup` method. */)
+  private ImmutableMap<NodeTestCase<Integer>, Node<Integer>> trees;
+
   public static void main(String[] args) throws RunnerException {
     // XXX: Update `ErrorProneRuntimeClasspath` to allow same-package `Class` references.
     @SuppressWarnings("ErrorProneRuntimeClasspath")
@@ -61,6 +65,7 @@ public class NodeBenchmark {
             .collect(
                 flatteningToImmutableListMultimap(
                     identity(), testCase -> testCase.generateTestCaseEntries(random)));
+    trees = Maps.toMap(testCases.keySet(), NodeTestCase::buildTree);
   }
 
   @Benchmark
@@ -72,11 +77,9 @@ public class NodeBenchmark {
 
   @Benchmark
   public final void collectReachableValues(Blackhole bh) {
-    for (Map.Entry<NodeTestCase<Integer>, Collection<NodeTestCaseEntry<Integer>>> e :
-        testCases.asMap().entrySet()) {
-      Node<Integer> tree = e.getKey().buildTree();
-      for (NodeTestCaseEntry<Integer> testCaseEntry : e.getValue()) {
-        tree.collectReachableValues(testCaseEntry.candidateEdges(), bh::consume);
+    for (Map.Entry<NodeTestCase<Integer>, Node<Integer>> e : trees.entrySet()) {
+      for (NodeTestCaseEntry<Integer> testCaseEntry : testCases.get(e.getKey())) {
+        e.getValue().collectReachableValues(testCaseEntry.candidateEdges(), bh::consume);
       }
     }
   }
