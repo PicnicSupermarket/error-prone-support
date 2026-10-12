@@ -66,7 +66,7 @@ public final class AssertJNullnessAssertion extends BugChecker
     }
 
     String replacementAssertion = isPositiveAssertion(tree) ? "isNull" : "isNotNull";
-    SuggestedFix fix =
+    final SuggestedFix fix =
         SuggestedFixes.renameMethodInvocation(tree, replacementAssertion, state).toBuilder()
             .merge(SuggestedFix.delete(Iterables.getOnlyElement(tree.getArguments())))
             .build();
