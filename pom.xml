@@ -196,6 +196,7 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.50.0</version.error-prone-orig>
+        <version.google-java-format>1.37.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.9.16</version.maven>
         <version.pitest-git>2.3.4</version.pitest-git>
@@ -319,7 +320,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.37.0</version>
+                <version>${version.google-java-format}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -595,6 +596,13 @@
                         consider enabling reflowing of long strings.
                         <skipReflowingLongStrings>false</skipReflowingLongStrings> -->
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.google.googlejavaformat</groupId>
+                            <artifactId>google-java-format</artifactId>
+                            <version>${version.google-java-format}</version>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <id>check-source-format</id>
