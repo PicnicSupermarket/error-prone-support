@@ -7,11 +7,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
-permissions:
-  contents: read
+permissions: {}
 jobs:
   build:
     name: Build website
+    permissions:
+      contents: read
+      pages: read # To configure GitHub pages.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -46,7 +48,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Ruby
-        uses: ruby/setup-ruby@97ecb7b512899eb71ab1bf2310a624c6f1589ac6 # v1.308.0
+        uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
         with:
           working-directory: ./website
           bundler-cache: true
@@ -59,9 +61,9 @@ jobs:
         run: bundle exec jekyll build
       - name: Validate HTML output
         working-directory: ./website
-        # XXX: Drop `--disable_external true` once we fully adopted the
-        # "Refaster rules" terminology on our website and in the code.
-        run: bundle exec htmlproofer --disable_external true --check-external-hash false ./_site
+        # XXX: Drop `--disable-external` once we fully adopted the "Refaster
+        # rules" terminology on our website and in the code.
+        run: bundle exec htmlproofer --disable-external --no-check-external-hash ./_site
       - name: Upload website as artifact
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
@@ -71,8 +73,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/website' }}
     needs: build
     permissions:
-      id-token: write
-      pages: write
+      id-token: write # To obtain the OIDC token that certifies the origin of the deployment.
+      pages: write # To deploy the built site to GitHub Pages.
     runs-on: ubuntu-24.04
     environment:
       name: github-pages

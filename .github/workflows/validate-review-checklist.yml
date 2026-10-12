@@ -10,11 +10,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
-permissions:
-  contents: read
+permissions: {}
 jobs:
   validate:
     name: Check for review checklist drift
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner

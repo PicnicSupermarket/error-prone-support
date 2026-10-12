@@ -196,6 +196,7 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.50.0</version.error-prone-orig>
+        <version.google-java-format>1.37.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.9.16</version.maven>
         <version.pitest-git>2.3.4</version.pitest-git>
@@ -251,14 +252,14 @@
             <dependency>
                 <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>2.22.2</version>
+                <version>2.22.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -319,7 +320,7 @@
             <dependency>
                 <groupId>com.google.googlejavaformat</groupId>
                 <artifactId>google-java-format</artifactId>
-                <version>1.36.1</version>
+                <version>${version.google-java-format}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -329,7 +330,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.6.0-jre</version>
+                <version>33.7.2-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -442,7 +443,7 @@
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq-bom</artifactId>
-                <version>3.21.8</version>
+                <version>3.21.9</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -461,14 +462,14 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-bom</artifactId>
-                <version>5.23.0</version>
+                <version>5.24.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.12.0</version>
+                <version>5.13.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -492,7 +493,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-bom</artifactId>
-                <version>2.0.19</version>
+                <version>2.0.20</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -523,7 +524,7 @@
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -595,6 +596,13 @@
                         consider enabling reflowing of long strings.
                         <skipReflowingLongStrings>false</skipReflowingLongStrings> -->
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.google.googlejavaformat</groupId>
+                            <artifactId>google-java-format</artifactId>
+                            <version>${version.google-java-format}</version>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <id>check-source-format</id>
@@ -607,7 +615,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.10</version>
+                    <version>3.11</version>
                     <configuration>
                         <bundledSignatures>
                             <bundledSignature>jdk-internal</bundledSignature>
@@ -709,6 +717,7 @@
                                         <property name="allowIfAllCharactersEscaped" value="true" />
                                         <property name="allowNonPrintableEscapes" value="true" />
                                     </module>
+                                    <module name="AvoidModuleImport" />
                                     <module name="AvoidNoArgumentSuperConstructorCall" />
                                     <module name="ConstructorsDeclarationGrouping">
                                         <property name="orderByIncreasingParameterCount" value="true" />
@@ -754,6 +763,7 @@
                                         <property name="tokens" value="CLASS_DEF, CTOR_DEF, ENUM_DEF, INSTANCE_INIT, INTERFACE_DEF, METHOD_DEF, STATIC_INIT" />
                                     </module>
                                     <module name="EmptyStatement" />
+                                    <module name="ExpressionOverBlockLambda" />
                                     <module name="FinalClass" />
                                     <module name="GoogleNonConstantFieldName" />
                                     <module name="HiddenField">
@@ -865,6 +875,9 @@
                                     <module name="InnerAssignment" />
                                     <module name="InvalidJavadocPosition" />
                                     <module name="JavadocBlockTagLocation" />
+                                    <module name="JavadocNoErrorInThrowsTag" />
+                                    <module name="JavadocParamOrder" />
+                                    <module name="JavadocThrowsOrder" />
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
                                         <property name="query" value="//BLOCK_COMMENT_BEGIN[./COMMENT_CONTENT[contains(@text, '@author')]]" />
@@ -885,6 +898,10 @@
                                     </module>
                                     <module name="ParameterAssignment" />
                                     <module name="PatternVariableAssignment" />
+                                    <!-- XXX: Once `UnescapedEntity` recognizes
+                                    `@snippet`, enable this check. See
+                                    https://github.com/google/error-prone/issues/4914.
+                                    <module name="PreferCodeOrSnippetJavadocInlineTag" /> -->
                                     <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
@@ -928,7 +945,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>14.0.0</version>
+                            <version>14.1.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>

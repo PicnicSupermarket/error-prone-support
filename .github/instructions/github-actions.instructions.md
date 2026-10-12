@@ -68,29 +68,51 @@ steps:
 ```
 
 ## Declare least-privilege permissions
-<!-- check: `permissions` declared at workflow level with `contents: read` -->
-<!-- check: Job-level permissions scoped to only what is needed -->
+<!-- check: `permissions: {}` declared at workflow level -->
+<!-- check: Every job declares its own complete `permissions` block -->
+<!-- check: Permissions are listed lexicographically -->
+<!-- check: Permissions beyond `contents: read` have a trailing explanatory comment -->
 
-Always declare `permissions` at workflow level with `contents: read`. Add
-job-level permissions only for what each job needs. Never use `permissions:
+Declare `permissions: {}` at workflow level, granting nothing by default. Every
+job must declare its own complete `permissions` block, listing exactly what it
+needs. Permissions must be sorted alphabetically. Document every permission
+scope beyond `contents: read` with a trailing comment explaining why it is
+needed; `contents: read` itself needs no comment. Never use `permissions:
 write-all`.
 
 **Do:**
 
 ```yaml
-permissions:
-  contents: read
+permissions: {}
 jobs:
-  deploy:
+  build:
     permissions:
       contents: read
-      pages: write
+  deploy:
+    needs: build
+    permissions:
+      contents: read
+      pages: write # To deploy the built site to GitHub Pages.
 ```
 
 **Don't:**
 
 ```yaml
 permissions: write-all
+```
+
+```yaml
+permissions:
+  contents: read
+jobs:
+  build:
+    # No permissions block: silently inherits `contents: read` from the
+    # workflow level above, whether or not this job needs it.
+    runs-on: ubuntu-24.04
+  deploy:
+    needs: build
+    permissions:
+      pages: write
 ```
 
 ## Use explicit runner versions
