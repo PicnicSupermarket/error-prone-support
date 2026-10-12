@@ -7,38 +7,37 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": [
-        "/^integration-tests/[^/]+(-init\\.patch|\\.sh)$/"
-      ],
-      "matchStrings": [
-        "\\b(?<packageName>[a-z0-9_.-]+?:[a-z0-9_.-]+?):(?<currentValue>[^:]+?):[a-zA-Z0-9_-]+\\b",
-        "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
-      ],
-      "datasourceTemplate": "maven"
-    },
-    {
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^\\.github/workflows/[^/]+\\.yml$/",
-        "/^\\.sdkmanrc$/"
-      ],
-      "matchStrings": [
-        "\\bmaven(?:-version: |=)(?<currentValue>\\S+)"
-      ],
-      "packageNameTemplate": "org.apache.maven:maven-plugin-api",
-      "datasourceTemplate": "maven"
-    },
-    {
-      "description": "Identifies GitHub-hosted runners missed by the `github-actions` manager, such as matrix values and documentation.",
-      "customType": "regex",
+      "datasourceTemplate": "github-runners",
       "managerFilePatterns": [
         "/^\\.github/instructions/github-actions\\.instructions\\.md$/",
         "/^\\.github/workflows/[^/]+\\.yml$/"
       ],
       "matchStrings": [
         "\\b(?<depName>macos|ubuntu|windows)-(?<currentValue>\\d+(?:\\.\\d+)?)\\b"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "maven",
+      "managerFilePatterns": [
+        "/^integration-tests/[^/]+(-init\\.patch|\\.sh)$/"
       ],
-      "datasourceTemplate": "github-runners"
+      "matchStrings": [
+        "\\b(?<packageName>[a-z0-9_.-]+?:[a-z0-9_.-]+?):(?<currentValue>[^:]+?):[a-zA-Z0-9_-]+\\b",
+        "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "maven",
+      "packageNameTemplate": "org.apache.maven:maven-plugin-api",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/",
+        "/^\\.sdkmanrc$/"
+      ],
+      "matchStrings": [
+        "\\bmaven(?:-version: |=)(?<currentValue>\\S+)"
+      ]
     }
   ],
   "packageRules": [
