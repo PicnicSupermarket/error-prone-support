@@ -41,7 +41,7 @@ final class IsInstanceLambdaUsageTest {
             "  }",
             "}")
         .doTest();
-    }
+  }
 
   @Test
   void replacement() {
@@ -65,5 +65,5 @@ final class IsInstanceLambdaUsageTest {
             "  }",
             "}")
         .doTest();
-    }
+  }
 }
