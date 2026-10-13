@@ -17,6 +17,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -44,6 +45,11 @@ public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExp
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
     if (tree.getParameters().size() != 1
         || !(tree.getBody() instanceof InstanceOfTree instanceOf)) {
+      return Description.NO_MATCH;
+    }
+
+    Type type = ASTHelpers.getType(instanceOf.getType());
+    if (type == null || type.isParameterized()) {
       return Description.NO_MATCH;
     }
 
