@@ -10,6 +10,7 @@ final class IsInstanceLambdaUsageTest {
     CompilationTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
         .addSourceLines(
             "A.java",
+            "import java.util.List;",
             "import java.util.stream.Stream;",
             "import reactor.core.publisher.Flux;",
             "",
@@ -22,6 +23,9 @@ final class IsInstanceLambdaUsageTest {
             "    Stream.of(2).filter(Integer.class::isInstance);",
             "    Stream.of(3).filter(i -> i.getClass() instanceof Class);",
             "    Stream.of(4).filter(i -> localVariable instanceof Integer);",
+            "    Stream.<Object>of(List.of(\"bar\"), \"baz\")",
+            "        .filter(value -> value instanceof List<?>)",
+            "        .count();",
             "    // XXX: Ideally this case is also flagged. Pick this up in the context of merging the",
             "    // `IsInstanceLambdaUsage` and `MethodReferenceUsage` checks, or introduce a separate check that",
             "    // simplifies unnecessary block lambda expressions.",
@@ -37,7 +41,7 @@ final class IsInstanceLambdaUsageTest {
             "  }",
             "}")
         .doTest();
-  }
+    }
 
   @Test
   void replacement() {
@@ -61,35 +65,5 @@ final class IsInstanceLambdaUsageTest {
             "  }",
             "}")
         .doTest();
-  }
-
-  @Test
-  void doesNotReplaceParameterizedInstanceOfType() {
-    BugCheckerRefactoringTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
-        .addInputLines(
-            "A.java",
-            "import java.util.List;",
-            "import java.util.stream.Stream;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Stream.<Object>of(List.of(\"bar\"), \"baz\")",
-            "        .filter(value -> value instanceof List<?>)",
-            "        .count();",
-            "  }",
-            "}")
-        .addOutputLines(
-            "A.java",
-            "import java.util.List;",
-            "import java.util.stream.Stream;",
-            "",
-            "class A {",
-            "  void m() {",
-            "    Stream.<Object>of(List.of(\"bar\"), \"baz\")",
-            "        .filter(value -> value instanceof List<?>)",
-            "        .count();",
-            "  }",
-            "}")
-        .doTest();
-  }
+    }
 }
