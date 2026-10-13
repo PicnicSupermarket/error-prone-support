@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
-import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -18,6 +17,8 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.VariableTree;
+import com.sun.tools.javac.code.Type;
+import javax.lang.model.type.TypeKind;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -44,8 +45,16 @@ public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExp
   @Override
   public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
     if (tree.getParameters().size() != 1
-        || !(tree.getBody() instanceof InstanceOfTree instanceOf)
-        || requireNonNull(ASTHelpers.getType(instanceOf.getType())).isParameterized()) {
+        || !(tree.getBody() instanceof InstanceOfTree instanceOf)) {
+      return Description.NO_MATCH;
+    }
+
+    Type type = ASTHelpers.getType(instanceOf.getType());
+    if (type == null || type.isParameterized() || type.getKind() == TypeKind.TYPEVAR) {
+      /*
+       * Class literals cannot reference parameterized types or type variables. Additionally,
+       * record patterns (for which no type is available) perform more than just a type test.
+       */
       return Description.NO_MATCH;
     }
 
