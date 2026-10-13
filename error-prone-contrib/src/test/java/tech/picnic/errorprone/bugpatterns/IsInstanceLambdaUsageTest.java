@@ -62,4 +62,34 @@ final class IsInstanceLambdaUsageTest {
             "}")
         .doTest();
   }
+
+  @Test
+  void doesNotReplaceParameterizedInstanceOfType() {
+    BugCheckerRefactoringTestHelper.newInstance(IsInstanceLambdaUsage.class, getClass())
+        .addInputLines(
+            "A.java",
+            "import java.util.List;",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Stream.<Object>of(List.of(\"bar\"), \"baz\")",
+            "        .filter(value -> value instanceof List<?>)",
+            "        .count();",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import java.util.List;",
+            "import java.util.stream.Stream;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Stream.<Object>of(List.of(\"bar\"), \"baz\")",
+            "        .filter(value -> value instanceof List<?>)",
+            "        .count();",
+            "  }",
+            "}")
+        .doTest();
+  }
 }
