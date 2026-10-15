@@ -15,4 +15,5 @@ mvn -N -U \
   -Perror-prone-fork \
   versions:display-dependency-updates \
   versions:display-plugin-updates \
-  versions:display-property-updates
+  versions:display-property-updates \
+  -Dversions.showNewestPerSegment
