@@ -60,11 +60,6 @@ public final class FluxGroupByUsage extends BugChecker
   private static final String GROUP_BY = "groupBy";
   private static final String FUNCTION = Function.class.getCanonicalName();
   private static final Supplier<Type> FUNCTION_TYPE = Suppliers.typeFromString(FUNCTION);
-  /*
-   * Reactor's `Flux#groupBy` overloads. These are enumerated explicitly so that identically named
-   * methods declared by `Flux` subtypes are not matched, and so that the presence of a key mapper
-   * argument is guaranteed.
-   */
   private static final Matcher<ExpressionTree> FLUX_GROUP_BY =
       anyOf(
           instanceMethod().onDescendantOf(FLUX).named(GROUP_BY).withParameters(FUNCTION),
@@ -114,8 +109,8 @@ public final class FluxGroupByUsage extends BugChecker
   }
 
   /**
-   * Tells whether the given key mapper produces {@link Boolean} or enum keys, whose cardinality is
-   * statically bounded.
+   * Tells whether the given key mapper produces {@link Boolean} or enum keys, whose set of possible
+   * values is fixed at compile time.
    */
   private static boolean hasBoundedKeySpace(Type keyMapperType, VisitorState state) {
     Type functionType = state.getTypes().asSuper(keyMapperType, FUNCTION_TYPE.get(state).tsym);
