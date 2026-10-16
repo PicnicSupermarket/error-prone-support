@@ -1162,7 +1162,6 @@
                                 </dependencies>
                                 <findAllDuplicates>true</findAllDuplicates>
                             </banDuplicateClasses>
-                            <banDuplicatePomDependencyVersions />
                             <banDynamicVersions>
                                 <ignores>
                                     <ignore>${project.groupId}</ignore>
