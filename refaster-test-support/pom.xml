@@ -82,6 +82,18 @@
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.gaul</groupId>
+                    <artifactId>modernizer-maven-plugin</artifactId>
+                    <configuration>
+                        <ignoreClassNamePatterns>
+                            <!-- These Refaster rules mirror production rules
+                            that purposefully use outdated patterns in their
+                            `@BeforeTemplate` methods. -->
+                            <ignoreClassNamePattern>.*(Nested|Single)RefasterAnyOfRules.*</ignoreClassNamePattern>
+                        </ignoreClassNamePatterns>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>

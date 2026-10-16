@@ -23,8 +23,10 @@ final class RefasterRuleCollectionTest {
         MethodWithoutPrefixRules.class,
         MisnamedTestClassRules.class,
         MissingTestAndWrongTestRules.class,
+        NestedRefasterAnyOfRules.class,
         PartialTestMatchRules.class,
         RuleWithoutTestRules.class,
+        SingleRefasterAnyOfRules.class,
         ValidRules.class
       })
   void verifyRefasterRuleCollections(Class<?> clazz) {
