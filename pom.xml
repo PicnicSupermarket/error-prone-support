@@ -877,6 +877,7 @@
                                     <module name="JavadocBlockTagLocation" />
                                     <module name="JavadocNoErrorInThrowsTag" />
                                     <module name="JavadocParamOrder" />
+                                    <module name="JavadocSeeTagOrder" />
                                     <module name="JavadocThrowsOrder" />
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
