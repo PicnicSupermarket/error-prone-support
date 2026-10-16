@@ -19,14 +19,27 @@
 
     <servers>
         <server>
+            <!-- The credentials are used to deploy snapshots to the Central
+            Portal, which differs in origin from the default `central`
+            repository. Maven 3.10+ only uses server credentials for the
+            origins declared here or for the repositories declared using the
+            same ID. -->
             <id>central</id>
             <username>${env.MAVEN_CENTRAL_USER}</username>
             <password>${env.MAVEN_CENTRAL_PASS}</password>
+            <repositoryOrigins>
+                <repositoryOrigin>https://central.sonatype.com</repositoryOrigin>
+            </repositoryOrigins>
         </server>
         <server>
+            <!-- The `error-prone-fork` profile is activated using `-P`, so
+            Maven 3.10+ cannot discover the origin of its repository. -->
             <id>error-prone-fork</id>
             <username>${env.GITHUB_ACTOR}</username>
             <password>${env.GITHUB_TOKEN}</password>
+            <repositoryOrigins>
+                <repositoryOrigin>https://maven.pkg.github.com</repositoryOrigin>
+            </repositoryOrigins>
         </server>
     </servers>
 </settings>
