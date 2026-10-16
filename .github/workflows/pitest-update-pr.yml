@@ -2,7 +2,7 @@
 # performed by the `pitest-analyze-pr.yml` workflow. See
 # https://blog.pitest.org/oss-pitest-pr/ for details.
 name: Post mutation test results
-on:
+on: # zizmor: ignore[dangerous-triggers] the documented GitHub pattern for posting elevated-permission comments on fork PRs from a trusted, non-fork trigger
   workflow_run:
     workflows: ["Run mutation tests"]
     types: [ completed ]
