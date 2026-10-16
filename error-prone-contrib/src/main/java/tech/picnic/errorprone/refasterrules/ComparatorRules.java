@@ -269,35 +269,6 @@ final class ComparatorRules {
     }
   }
 
-  /** Prefer {@link Collections#sort(List)} over more verbose alternatives. */
-  static final class CollectionsSort<T extends Comparable<? super T>> {
-    @BeforeTemplate
-    void before(List<T> list) {
-      Collections.sort(list, naturalOrder());
-    }
-
-    @AfterTemplate
-    void after(List<T> list) {
-      Collections.sort(list);
-    }
-  }
-
-  /**
-   * Prefer {@link Collections#min(Collection)} over more verbose or more contrived alternatives.
-   */
-  static final class CollectionsMin<T extends Comparable<? super T>> {
-    @BeforeTemplate
-    T before(Collection<T> coll) {
-      return Refaster.anyOf(
-          Collections.min(coll, naturalOrder()), Collections.max(coll, reverseOrder()));
-    }
-
-    @AfterTemplate
-    T after(Collection<T> coll) {
-      return Collections.min(coll);
-    }
-  }
-
   /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
   static final class CollectionsMinArraysAsList<S, T extends S> {
     @BeforeTemplate
@@ -383,22 +354,6 @@ final class ComparatorRules {
     @AfterTemplate
     T after(T a, T b, Comparator<S> comparator) {
       return Comparators.min(a, b, comparator);
-    }
-  }
-
-  /**
-   * Prefer {@link Collections#max(Collection)} over more verbose or more contrived alternatives.
-   */
-  static final class CollectionsMax<T extends Comparable<? super T>> {
-    @BeforeTemplate
-    T before(Collection<T> coll) {
-      return Refaster.anyOf(
-          Collections.max(coll, naturalOrder()), Collections.min(coll, reverseOrder()));
-    }
-
-    @AfterTemplate
-    T after(Collection<T> coll) {
-      return Collections.max(coll);
     }
   }
 
