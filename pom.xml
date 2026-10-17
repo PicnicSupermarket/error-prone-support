@@ -198,7 +198,7 @@
         <version.error-prone-orig>2.50.0</version.error-prone-orig>
         <version.google-java-format>1.37.0</version.google-java-format>
         <version.jdk>21</version.jdk>
-        <version.maven>3.9.16</version.maven>
+        <version.maven>3.10.0</version.maven>
         <version.pitest-git>2.3.4</version.pitest-git>
     </properties>
 
@@ -1164,7 +1164,6 @@
                                 </dependencies>
                                 <findAllDuplicates>true</findAllDuplicates>
                             </banDuplicateClasses>
-                            <banDuplicatePomDependencyVersions />
                             <banDynamicVersions>
                                 <ignores>
                                     <ignore>${project.groupId}</ignore>
