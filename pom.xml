@@ -877,6 +877,7 @@
                                     <module name="JavadocBlockTagLocation" />
                                     <module name="JavadocNoErrorInThrowsTag" />
                                     <module name="JavadocParamOrder" />
+                                    <module name="JavadocSeeTagOrder" />
                                     <module name="JavadocThrowsOrder" />
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
@@ -912,6 +913,7 @@
                                     </module>
                                     <module name="TrailingComment" />
                                     <module name="UnnecessaryNullCheckWithInstanceOf" />
+                                    <module name="UnnecessaryPermitsClause" />
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
@@ -945,7 +947,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>14.1.0</version>
+                            <version>14.3.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
