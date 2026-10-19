@@ -259,7 +259,7 @@
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
-                <version>3.3.0</version>
+                <version>3.3.1</version>
             </dependency>
             <dependency>
                 <groupId>com.google.auto</groupId>
@@ -408,7 +408,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.14</version>
+                <version>1.18.15</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -877,6 +877,7 @@
                                     <module name="JavadocBlockTagLocation" />
                                     <module name="JavadocNoErrorInThrowsTag" />
                                     <module name="JavadocParamOrder" />
+                                    <module name="JavadocSeeTagOrder" />
                                     <module name="JavadocThrowsOrder" />
                                     <module name="LocalVariableName" />
                                     <module name="MatchXpath">
@@ -912,6 +913,7 @@
                                     </module>
                                     <module name="TrailingComment" />
                                     <module name="UnnecessaryNullCheckWithInstanceOf" />
+                                    <module name="UnnecessaryPermitsClause" />
                                     <module name="UnnecessarySemicolonAfterTypeMemberDeclaration" />
                                     <module name="UnnecessarySemicolonInEnumeration" />
                                     <module name="UnnecessarySemicolonInTryWithResources" />
@@ -945,7 +947,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>14.1.0</version>
+                            <version>14.3.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
@@ -1746,7 +1748,7 @@
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <version>0.11.0</version>
+                    <version>0.12.0</version>
                     <extensions>true</extensions>
                 </plugin>
             </plugins>
