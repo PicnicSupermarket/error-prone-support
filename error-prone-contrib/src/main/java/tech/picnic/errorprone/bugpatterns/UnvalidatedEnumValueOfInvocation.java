@@ -22,7 +22,6 @@ import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.SwitchTree;
@@ -102,37 +101,40 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
               .build();
     }
 
-    if (ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
-      ExpressionTree receiver = ASTHelpers.getReceiver(nameArgument);
-      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(receiver);
-      Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
-      if (enumSymbolPassedToValueOf == null || receiverType == null) {
-        return Description.NO_MATCH;
-      }
-
-      ImmutableSet<String> enumValuesOfNameInvocationReceiver =
-          enumSymbolPassedToValueOf.getKind() == ElementKind.ENUM_CONSTANT
-              ? ImmutableSet.of(enumSymbolPassedToValueOf.getSimpleName().toString())
-              : findSwitchCoveredValues(
-                  requireNonNull(receiver, "Receiver with symbol must be present"),
-                  enumSymbolPassedToValueOf,
-                  getEnumValues(receiverType),
-                  state);
-
-      ImmutableSet<String> missingValues =
-          Sets.difference(enumValuesOfNameInvocationReceiver, valuesSourceEnum).immutableCopy();
-      return missingValues.isEmpty()
-          ? Description.NO_MATCH
-          : buildDescription(tree)
-              .setMessage(
-                  "`%s` might generate values which are missing in `%s`: %s"
-                      .formatted(
-                          SourceCode.treeToString(nameArgument, state), enumType, missingValues))
-              .build();
+    if (!ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
+      /*
+       * Arbitrary `String` arguments are not flagged, as whether they are validated (e.g. by
+       * catching `IllegalArgumentException`) cannot be reliably determined.
+       */
+      return Description.NO_MATCH;
     }
 
-    // Match identifiers.
-    return nameArgument instanceof IdentifierTree ? describeMatch(tree) : Description.NO_MATCH;
+    ExpressionTree receiver = ASTHelpers.getReceiver(nameArgument);
+    Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(receiver);
+    Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
+    if (enumSymbolPassedToValueOf == null || receiverType == null) {
+      return Description.NO_MATCH;
+    }
+
+    ImmutableSet<String> enumValuesOfNameInvocationReceiver =
+        enumSymbolPassedToValueOf.getKind() == ElementKind.ENUM_CONSTANT
+            ? ImmutableSet.of(enumSymbolPassedToValueOf.getSimpleName().toString())
+            : findSwitchCoveredValues(
+                requireNonNull(receiver, "Receiver with symbol must be present"),
+                enumSymbolPassedToValueOf,
+                getEnumValues(receiverType),
+                state);
+
+    ImmutableSet<String> missingValues =
+        Sets.difference(enumValuesOfNameInvocationReceiver, valuesSourceEnum).immutableCopy();
+    return missingValues.isEmpty()
+        ? Description.NO_MATCH
+        : buildDescription(tree)
+            .setMessage(
+                "`%s` might generate values which are missing in `%s`: %s"
+                    .formatted(
+                        SourceCode.treeToString(nameArgument, state), enumType, missingValues))
+            .build();
   }
 
   private static CaptureResult captureEnumType(MethodInvocationTree tree, VisitorState state) {
