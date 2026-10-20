@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.FRAGILE_CODE;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -102,7 +103,8 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     }
 
     if (ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
-      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(ASTHelpers.getReceiver(nameArgument));
+      ExpressionTree receiver = ASTHelpers.getReceiver(nameArgument);
+      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(receiver);
       Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
       if (enumSymbolPassedToValueOf == null || receiverType == null) {
         return Description.NO_MATCH;
@@ -112,7 +114,10 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
           enumSymbolPassedToValueOf.getKind() == ElementKind.ENUM_CONSTANT
               ? ImmutableSet.of(enumSymbolPassedToValueOf.getSimpleName().toString())
               : findSwitchCoveredValues(
-                  enumSymbolPassedToValueOf, getEnumValues(receiverType), state);
+                  requireNonNull(receiver, "Receiver with symbol must be present"),
+                  enumSymbolPassedToValueOf,
+                  getEnumValues(receiverType),
+                  state);
 
       ImmutableSet<String> missingValues =
           Sets.difference(enumValuesOfNameInvocationReceiver, valuesSourceEnum).immutableCopy();
@@ -164,7 +169,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
 
   /**
    * Finds the enum values covered by the innermost enclosing switch case whose switch selects on
-   * {@code enumSymbolPassedToValueOf}.
+   * {@code receiver}.
    *
    * <p>For a non-default case, returns the labels of that case. For a default case, returns the
    * enum values not covered by other cases. Returns all values if there is no such switch case.
@@ -200,11 +205,14 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
   // XXX: Pattern labels are not analyzed; a non-default case with only pattern labels is considered
   // to cover no values.
   private static ImmutableSet<String> findSwitchCoveredValues(
-      Symbol enumSymbolPassedToValueOf, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
+      ExpressionTree receiver,
+      Symbol receiverSymbol,
+      ImmutableSet<String> valuesOfReceiver,
+      VisitorState state) {
     for (TreePath path = state.getPath(); path != null; path = path.getParentPath()) {
       if (path.getLeaf() instanceof CaseTree caseTree) {
         List<? extends CaseTree> switchCases =
-            getCasesIfSelecting(path.getParentPath().getLeaf(), enumSymbolPassedToValueOf);
+            getCasesIfSelecting(path.getParentPath().getLeaf(), receiver, receiverSymbol);
         if (switchCases != null) {
           return ASTHelpers.isSwitchDefault(caseTree)
               ? Sets.difference(valuesOfReceiver, getLabels(switchCases)).immutableCopy()
@@ -218,27 +226,39 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
 
   /**
    * Returns the cases of the given switch statement or expression, or {@code null} if it does not
-   * select on the given symbol.
+   * select on the given receiver.
    */
-  private static @Nullable List<? extends CaseTree> getCasesIfSelecting(Tree tree, Symbol symbol) {
+  private static @Nullable List<? extends CaseTree> getCasesIfSelecting(
+      Tree tree, ExpressionTree receiver, Symbol receiverSymbol) {
     return switch (tree) {
-      case SwitchTree switchTree when isSymbol(switchTree.getExpression(), symbol) ->
+      case SwitchTree switchTree
+          when isReceiver(switchTree.getExpression(), receiver, receiverSymbol) ->
           switchTree.getCases();
       case SwitchExpressionTree switchExpression
-          when isSymbol(switchExpression.getExpression(), symbol) ->
+          when isReceiver(switchExpression.getExpression(), receiver, receiverSymbol) ->
           switchExpression.getCases();
       default -> null;
     };
   }
 
-  private static boolean isSymbol(ExpressionTree tree, Symbol symbol) {
-    return symbol.equals(ASTHelpers.getSymbol(ASTHelpers.stripParentheses(tree)));
+  /**
+   * Tells whether the given switch selector denotes the given receiver. Instance fields must be
+   * accessed through the same qualifier; method invocations are assumed to yield the same value.
+   */
+  private static boolean isReceiver(
+      ExpressionTree selector, ExpressionTree receiver, Symbol receiverSymbol) {
+    ExpressionTree expression = ASTHelpers.stripParentheses(selector);
+    // XXX: `ASTHelpers#sameVariable` is symmetric, so the mutant that swaps its arguments cannot be
+    // killed.
+    return receiverSymbol.equals(ASTHelpers.getSymbol(expression))
+        && (!isInstanceField(receiverSymbol) || ASTHelpers.sameVariable(expression, receiver));
   }
 
-  /**
-   * Returns the names of the enum constants referenced by the given cases, ignoring {@code null}
-   * labels.
-   */
+  private static boolean isInstanceField(Symbol symbol) {
+    return symbol.getKind() == ElementKind.FIELD && !ASTHelpers.isStatic(symbol);
+  }
+
+  /** Returns the names of the enum constants used as labels by the given cases. */
   private static ImmutableSet<String> getLabels(List<? extends CaseTree> cases) {
     return cases.stream()
         .flatMap(caseTree -> caseTree.getExpressions().stream())
