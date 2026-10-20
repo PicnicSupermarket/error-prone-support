@@ -22,7 +22,6 @@ import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.CaseTree;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.SwitchExpressionTree;
 import com.sun.source.tree.SwitchTree;
@@ -31,6 +30,8 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
+import java.util.Objects;
+import javax.lang.model.element.ElementKind;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
@@ -90,33 +91,31 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     String value = ASTHelpers.constValue(nameArgument, String.class);
     ImmutableSet<String> valuesSourceEnum = getEnumValues(enumType);
 
-    if (value != null && !valuesSourceEnum.contains(value)) {
-      return buildDescription(tree)
-          .setMessage(
-              "`%s` is not a valid value for `%s`, possible values: %s"
-                  .formatted(value, enumType, valuesSourceEnum))
-          .build();
+    if (value != null) {
+      return valuesSourceEnum.contains(value)
+          ? Description.NO_MATCH
+          : buildDescription(tree)
+              .setMessage(
+                  "`%s` is not a valid value for `%s`, possible values: %s"
+                      .formatted(value, enumType, valuesSourceEnum))
+              .build();
     }
 
     if (ENUM_NAME_OR_TO_STRING_METHOD.matches(nameArgument, state)) {
-      ExpressionTree invocationReceiverTree = ASTHelpers.getReceiver(nameArgument);
-      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(invocationReceiverTree);
+      Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(ASTHelpers.getReceiver(nameArgument));
       Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
       if (enumSymbolPassedToValueOf == null || receiverType == null) {
         return Description.NO_MATCH;
       }
 
       ImmutableSet<String> enumValuesOfNameInvocationReceiver =
-          invocationReceiverTree instanceof MemberSelectTree memberSelectTree
-              ? ImmutableSet.of(memberSelectTree.getIdentifier().toString())
-              : getEnumValues(receiverType);
+          enumSymbolPassedToValueOf.getKind() == ElementKind.ENUM_CONSTANT
+              ? ImmutableSet.of(enumSymbolPassedToValueOf.getSimpleName().toString())
+              : findSwitchCoveredValues(
+                  enumSymbolPassedToValueOf, getEnumValues(receiverType), state);
 
       ImmutableSet<String> missingValues =
-          Sets.difference(
-                  findSwitchCoveredValues(
-                      enumSymbolPassedToValueOf, enumValuesOfNameInvocationReceiver, state),
-                  valuesSourceEnum)
-              .immutableCopy();
+          Sets.difference(enumValuesOfNameInvocationReceiver, valuesSourceEnum).immutableCopy();
       return missingValues.isEmpty()
           ? Description.NO_MATCH
           : buildDescription(tree)
@@ -198,6 +197,8 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
   // XXX: Fall-through in colon-style switch statements is not analyzed; only the enclosing case's
   // labels are considered.
   // XXX: Reassignment of the selector variable within the switch case is not taken into account.
+  // XXX: Pattern labels are not analyzed; a non-default case with only pattern labels is considered
+  // to cover no values.
   private static ImmutableSet<String> findSwitchCoveredValues(
       Symbol enumSymbolPassedToValueOf, ImmutableSet<String> valuesOfReceiver, VisitorState state) {
     for (TreePath path = state.getPath(); path != null; path = path.getParentPath()) {
@@ -206,8 +207,8 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
             getCasesIfSelecting(path.getParentPath().getLeaf(), enumSymbolPassedToValueOf);
         if (switchCases != null) {
           return ASTHelpers.isSwitchDefault(caseTree)
-              ? Sets.difference(valuesOfReceiver, getLabels(switchCases, state)).immutableCopy()
-              : getLabels(ImmutableList.of(caseTree), state);
+              ? Sets.difference(valuesOfReceiver, getLabels(switchCases)).immutableCopy()
+              : getLabels(ImmutableList.of(caseTree));
         }
       }
     }
@@ -234,11 +235,16 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     return symbol.equals(ASTHelpers.getSymbol(ASTHelpers.stripParentheses(tree)));
   }
 
-  private static ImmutableSet<String> getLabels(
-      List<? extends CaseTree> cases, VisitorState state) {
+  /**
+   * Returns the names of the enum constants referenced by the given cases, ignoring {@code null}
+   * labels.
+   */
+  private static ImmutableSet<String> getLabels(List<? extends CaseTree> cases) {
     return cases.stream()
-        .flatMap(caseTree -> caseTree.getLabels().stream())
-        .map(label -> SourceCode.treeToString(label, state))
+        .flatMap(caseTree -> caseTree.getExpressions().stream())
+        .map(ASTHelpers::getSymbol)
+        .filter(Objects::nonNull)
+        .map(symbol -> symbol.getSimpleName().toString())
         .collect(toImmutableSet());
   }
 
