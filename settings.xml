@@ -22,11 +22,17 @@
             <id>central</id>
             <username>${env.MAVEN_CENTRAL_USER}</username>
             <password>${env.MAVEN_CENTRAL_PASS}</password>
+            <repositoryOrigins>
+                <repositoryOrigin>https://central.sonatype.com</repositoryOrigin>
+            </repositoryOrigins>
         </server>
         <server>
             <id>error-prone-fork</id>
             <username>${env.GITHUB_ACTOR}</username>
             <password>${env.GITHUB_TOKEN}</password>
+            <repositoryOrigins>
+                <repositoryOrigin>https://maven.pkg.github.com</repositoryOrigin>
+            </repositoryOrigins>
         </server>
     </servers>
 </settings>
