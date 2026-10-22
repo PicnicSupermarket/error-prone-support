@@ -24,15 +24,22 @@ final class CollectorMutabilityTest {
             "import static java.util.stream.Collectors.toUnmodifiableMap;",
             "import static java.util.stream.Collectors.toUnmodifiableSet;",
             "",
+            "import com.google.common.collect.ImmutableSet;",
+            "import com.google.common.collect.Maps;",
             "import java.util.ArrayList;",
             "import java.util.HashMap;",
             "import java.util.HashSet;",
+            "import java.util.stream.Collector;",
             "import java.util.stream.Collectors;",
             "import java.util.stream.Stream;",
             "import reactor.core.publisher.Flux;",
             "",
             "class A {",
             "  void m() {",
+            "    NotCollectors.toList();",
+            "    Maps.toMap(ImmutableSet.of(1), String::valueOf);",
+            "    NotCollectors.toSet();",
+            "",
             "    // BUG: Diagnostic contains:",
             "    Flux.just(1).collect(Collectors.toList());",
             "    // BUG: Diagnostic contains:",
@@ -62,25 +69,15 @@ final class CollectorMutabilityTest {
             "    Stream.of(5).collect(toCollection(HashSet::new));",
             "",
             "    Flux.just(\"foo\").collect(Collectors.joining());",
-            "",
-            "    NotCollectors.toList();",
-            "    NotCollectors.toMap(String::getBytes, String::length);",
-            "    NotCollectors.toSet();",
             "  }",
             "}",
             "",
             "class NotCollectors {",
-            "  static <T> java.util.stream.Collector<T, ?, java.util.List<T>> toList() {",
+            "  static <T> Collector<T, ?, java.util.List<T>> toList() {",
             "    return toCollection(ArrayList::new);",
             "  }",
             "",
-            "  static <T, K, V> java.util.stream.Collector<T, ?, java.util.Map<K, V>> toMap(",
-            "      java.util.function.Function<? super T, ? extends K> keyMapper,",
-            "      java.util.function.Function<? super T, ? extends V> valueMapper) {",
-            "    return toUnmodifiableMap(keyMapper, valueMapper);",
-            "  }",
-            "",
-            "  static <T> java.util.stream.Collector<T, ?, java.util.Set<T>> toSet() {",
+            "  static <T> Collector<T, ?, java.util.Set<T>> toSet() {",
             "    return toCollection(HashSet::new);",
             "  }",
             "}")
@@ -122,11 +119,11 @@ final class CollectorMutabilityTest {
         .withClasspath()
         .setArgs("--release", "10")
         .expectErrorMessage(
-            "X", m -> m.contains("toUnmodifiableList") && !m.contains("toImmutableList"))
+            "X", m -> !m.contains("toImmutableList") && m.contains("toUnmodifiableList"))
         .expectErrorMessage(
-            "Y", m -> m.contains("toUnmodifiableMap") && !m.contains("toImmutableMap"))
+            "Y", m -> !m.contains("toImmutableMap") && m.contains("toUnmodifiableMap"))
         .expectErrorMessage(
-            "Z", m -> m.contains("toUnmodifiableSet") && !m.contains("toImmutableSet"))
+            "Z", m -> !m.contains("toImmutableSet") && m.contains("toUnmodifiableSet"))
         .addSourceLines(
             "A.java",
             "import java.util.stream.Collectors;",
@@ -228,14 +225,10 @@ final class CollectorMutabilityTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import static java.util.stream.Collectors.toList;",
-            "import static java.util.stream.Collectors.toMap;",
-            "import static java.util.stream.Collectors.toSet;",
             "import static java.util.stream.Collectors.toUnmodifiableList;",
             "import static java.util.stream.Collectors.toUnmodifiableMap;",
             "import static java.util.stream.Collectors.toUnmodifiableSet;",
             "",
-            "import java.util.stream.Collectors;",
             "import java.util.stream.Stream;",
             "import reactor.core.publisher.Flux;",
             "",
