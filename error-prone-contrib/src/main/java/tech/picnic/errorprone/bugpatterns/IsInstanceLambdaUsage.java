@@ -12,14 +12,13 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.LambdaExpressionTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.InstanceOfTree;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
-import javax.lang.model.type.TypeKind;
-import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with a method reference
@@ -50,10 +49,11 @@ public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExp
     }
 
     Type type = ASTHelpers.getType(instanceOf.getType());
-    if (type == null || type.isParameterized() || type.getKind() == TypeKind.TYPEVAR) {
+    if (type == null) {
       /*
-       * Class literals cannot reference parameterized types or type variables. Additionally,
-       * record patterns (for which no type is available) perform more than just a type test.
+       * A record pattern such as `o instanceof R(var i)` does more than test the type of `o`: it also
+       * matches the record's components against nested patterns. A class literal can't express that.
+       * Such a pattern has no type operand, and `InstanceOfTree#getType` returns `null` for it.
        */
       return Description.NO_MATCH;
     }
@@ -63,9 +63,13 @@ public final class IsInstanceLambdaUsage extends BugChecker implements LambdaExp
       return Description.NO_MATCH;
     }
 
-    return describeMatch(
-        tree,
-        SuggestedFix.replace(
-            tree, SourceCode.treeToString(instanceOf.getType(), state) + ".class::isInstance"));
+    /*
+     * Class literals cannot express parameterized types, type variables or arrays thereof. Because
+     * the `instanceof` operator only performs a runtime check against the erasure of its type
+     * operand, the erased type can be used instead.
+     */
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String typeName = SuggestedFixes.qualifyType(state, fix, state.getTypes().erasure(type));
+    return describeMatch(tree, fix.replace(tree, typeName + ".class::isInstance").build());
   }
 }
