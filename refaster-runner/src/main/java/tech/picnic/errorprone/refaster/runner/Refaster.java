@@ -24,7 +24,6 @@ import com.google.errorprone.CodeTransformer;
 import com.google.errorprone.CompositeCodeTransformer;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.ErrorProneOptions.Severity;
-import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.bugpatterns.BugChecker;
@@ -87,7 +86,7 @@ public final class Refaster extends BugChecker implements CompilationUnitTreeMat
   public Description matchCompilationUnit(CompilationUnitTree tree, VisitorState state) {
     /* First, collect all matches. */
     List<Description> matches = new ArrayList<>();
-    codeTransformer.apply(state.getPath(), new SubContext(state.context), matches::add);
+    codeTransformer.apply(state.getPath(), state.context, matches::add);
 
     /* Then apply them. */
     applyMatches(matches, ErrorProneEndPosTable.create(tree), state);

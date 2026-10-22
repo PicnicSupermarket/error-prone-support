@@ -54,10 +54,10 @@ import tech.picnic.errorprone.refaster.matchers.IsLambdaExpressionOrMethodRefere
  * for the wildcard matching (note that the type parameters of the map on the right-hand side will
  * be inferred to be {@code <Object, Object>} rather than {@code <String, Object>}).
  *
- * <pre>{@code
+ * {@snippet :
  * List<Map<String, Object>> myMaps = new ArrayList<>();
  * assertEquals(myMaps, ImmutableList.of(ImmutableMap.of()));
- * }</pre>
+ * }
  *
  * <p><strong>Warning:</strong> while both libraries throw an {@link AssertionError} in case of an
  * assertion failure, the exact subtype used generally differs.
