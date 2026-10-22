@@ -13,10 +13,8 @@ Use this skill for requests to add or change files in `*/refasterrules/*`.
 Read [`.github/instructions/refaster-rules.instructions.md`][refaster-rules]
 for the full conventions. Then:
 
-1. **Determine the target collection** from the rule's `@AfterTemplate` target
-   (the preferred alternative), not its `@BeforeTemplate` pattern: add to the
-   `{Topic}Rules.java` that relates to that target (extending an existing rule
-   if one already rewrites to it), or create a new collection.
+1. **Determine the target collection** based on the rule's `@AfterTemplate`:
+   add to an existing `{Topic}Rules.java` or create a new one.
 2. **Implement the rule** following the conventions in the instructions (rule
    file structure and advanced patterns).
 3. **Write the test input and output files** following the test conventions.

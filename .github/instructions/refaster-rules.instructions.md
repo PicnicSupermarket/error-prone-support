@@ -35,16 +35,12 @@ rule's name and its home are anchored to the code it rewrites _to_.
 
 If the `@AfterTemplate` references more than one type, the collection follows
 the _subject_ of the rewritten expression rather than the type wrapping it.
-So `CollectionRules.OptionalOfNullableQueuePeek`, which rewrites to
+For example, `CollectionRules.OptionalOfNullableQueuePeek`, which rewrites to
 `Optional.ofNullable(queue.peek())`, belongs in `CollectionRules` rather than
 `OptionalRules`.
 
-Before adding a new rule, check whether an existing rule already rewrites to
-the same target. If so, extend that rule instead of introducing a separate one:
-first try to fold the new pattern into an existing `@BeforeTemplate` using
-`Refaster.anyOf`, and only add another `@BeforeTemplate` method if that is not
-possible (see
-[Prefer `Refaster.anyOf` over multiple `@BeforeTemplate` methods](#prefer-refasteranyof-over-multiple-beforetemplate-methods)).
+Exception: migration collections (annotated with `@TypeMigration`, such as
+`JUnitToAssertJRules`) group rules by the API they migrate away from.
 
 ## File locations
 
