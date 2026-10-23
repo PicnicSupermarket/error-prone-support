@@ -2052,9 +2052,7 @@
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
-                                    <!-- XXX: Enable this once we target JDK
-                                    23+, which introduced Markdown documentation
-                                    comments. -->
+                                    <!-- XXX: Consider enabling this. -->
                                     -Xep:TraditionalJavadocToMarkdown:OFF
                                     <!-- We generally discourage `var` use. -->
                                     -Xep:Varifier:OFF
