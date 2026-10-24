@@ -22,7 +22,6 @@ import com.google.common.io.Resources;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
-import com.google.errorprone.SubContext;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.CompilationUnitTreeMatcher;
@@ -147,7 +146,7 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
     List<Description> matches = new ArrayList<>();
     delegate.matchCompilationUnit(
         tree,
-        VisitorState.createForCustomFindingCollection(new SubContext(state.context), matches::add)
+        VisitorState.createForCustomFindingCollection(state.context, matches::add)
             .withPath(state.getPath()));
 
     ImmutableRangeMap<Integer, String> indexedMatches =
