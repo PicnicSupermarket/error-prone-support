@@ -195,7 +195,7 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.50.0</version.error-prone-orig>
+        <version.error-prone-orig>2.51.0</version.error-prone-orig>
         <version.google-java-format>1.37.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.10.0</version.maven>
@@ -899,10 +899,7 @@
                                     </module>
                                     <module name="ParameterAssignment" />
                                     <module name="PatternVariableAssignment" />
-                                    <!-- XXX: Once `UnescapedEntity` recognizes
-                                    `@snippet`, enable this check. See
-                                    https://github.com/google/error-prone/issues/4914.
-                                    <module name="PreferCodeOrSnippetJavadocInlineTag" /> -->
+                                    <module name="PreferCodeOrSnippetJavadocInlineTag" />
                                     <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
                                     <module name="SimplifyBooleanExpression" />
@@ -2032,13 +2029,19 @@
                                     avoid that, so we simply tell Error Prone
                                     not to warn about generated code. -->
                                     -XepDisableWarningsInGeneratedCode
+                                    <!-- We exclude generated sources and the
+                                    Refaster test resources compiled by
+                                    `error-prone-contrib`. Error Prone matches
+                                    this pattern against a path that always
+                                    contains forward-slash path separators, and
+                                    interprets it using RE2 syntax, which does
+                                    not support lookarounds. -->
                                     <!-- XXX: Ideally we'd match against
                                     `\Q${project.build.directory}${file.separator}\E.*`,
                                     but that approach doesn't work on Windows,
-                                    as Error Prone matches against a path that
-                                    always contains forward-slash path
-                                    separators. -->
-                                    -XepExcludedPaths:(?!.*/src/[^/]+/java/.*).*
+                                    due to the aforementioned path separator
+                                    normalization. -->
+                                    -XepExcludedPaths:.*/(src/[^/]+/resources|target/generated-(test-)?sources)/.*
                                     <!-- We have package-level `@NullMarked`
                                     annotations. -->
                                     -Xep:AddNullMarkedToClass:OFF
@@ -2049,6 +2052,8 @@
                                     -Xep:Java8ApiChecker:OFF
                                     <!-- We don't target Android. -->
                                     -Xep:StaticOrDefaultInterfaceMethod:OFF
+                                    <!-- XXX: Consider enabling this. -->
+                                    -Xep:TraditionalJavadocToMarkdown:OFF
                                     <!-- We generally discourage `var` use. -->
                                     -Xep:Varifier:OFF
                                     <!-- Yoda conditions are not always more
@@ -2070,13 +2075,6 @@
                                     -XepOpt:Nullness:Conservative=false
                                     -XepOpt:RedundantNullCheck:CheckRequireNonNull=true
                                     -XepOpt:RefactorSwitch:EnableAssignmentSwitch=true
-                                    -XepOpt:RefactorSwitch:EnableSimplifySwitch=true
-                                    <!-- XXX: Enable once
-                                    https://github.com/google/error-prone/pull/5883
-                                    or
-                                    https://github.com/google/error-prone/pull/5884
-                                    is merged and released. -->
-                                    -XepOpt:TypeParameterQualifier:MatchMethodReferences=false
                                     -XepOpt:UnnamedVariable:OnlyRenameVariablesNamedUnused=false
                                     <!-- Append additional custom arguments. -->
                                     ${error-prone.patch-args}

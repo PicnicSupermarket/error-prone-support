@@ -19,15 +19,15 @@ import javax.tools.JavaFileObject;
 // XXX: This class is supported by the `ErrorProneTestHelperSourceFormat` check, but until that
 // support is covered by unit tests, make sure to update that logic if this class or its methods are
 // moved/renamed.
-public final class Compilation {
+final class Compilation {
   private Compilation() {}
 
-  public static void compileWithDocumentationGenerator(
+  static void compileWithDocumentationGenerator(
       Path outputDirectory, String path, String... lines) {
     compileWithDocumentationGenerator(outputDirectory.toAbsolutePath().toString(), path, lines);
   }
 
-  public static void compileWithDocumentationGenerator(
+  static void compileWithDocumentationGenerator(
       String outputDirectory, String path, String... lines) {
     /*
      * The compiler options specified here largely match those used by Error Prone's
