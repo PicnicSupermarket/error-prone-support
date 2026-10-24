@@ -22,9 +22,9 @@ for the full conventions. Then:
 5. **Verify** by running the tests.
 6. **Review** all changes against
    [`.github/instructions/review.instructions.md`][review].
-7. **Follow the workflow** in [`AGENT.md`][agent-md] (apply suggestions, full
+7. **Follow the workflow** in [`AGENTS.md`][agents-md] (apply suggestions, full
    build).
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [refaster-rules]: ../../../.github/instructions/refaster-rules.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md

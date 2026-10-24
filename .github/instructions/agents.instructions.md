@@ -1,5 +1,5 @@
 ---
-applyTo: "**/AGENT.md,**/CLAUDE.md,**/GEMINI.md,.github/copilot-instructions.md"
+applyTo: "**/AGENTS.md,**/CLAUDE.md,**/GEMINI.md,.github/copilot-instructions.md"
 ---
 
 # Agent Configuration Conventions
@@ -14,17 +14,17 @@ conventions and instructions live in `.github/instructions/*.instructions.md`
 files, which are readable by both humans and any AI agent. Agent-specific
 configuration is kept to a minimum.
 
-## `AGENT.md` is the canonical entry point
-<!-- check: `AGENT.md` is the single source of truth for agent workflow -->
+## `AGENTS.md` is the canonical entry point
+<!-- check: `AGENTS.md` is the single source of truth for agent workflow -->
 
-`AGENT.md` in the repository root is the canonical entry point for all AI
+`AGENTS.md` in the repository root is the canonical entry point for all AI
 coding agents. It contains:
 
 - Project overview and build commands.
 - The implementation workflow (plan, implement, test, review, verify).
 - References to task-specific instruction files.
 
-Do not duplicate `AGENT.md` content in agent-specific files.
+Do not duplicate `AGENTS.md` content in agent-specific files.
 
 ## Use symlinks to avoid duplication across agent platforms
 <!-- check: Agent-specific files use symlinks to canonical sources -->
@@ -33,7 +33,7 @@ When multiple agent platforms need the same content, use symbolic links rather
 than duplicating files. This applies to:
 
 - **Agent entry points**: `CLAUDE.md`, `GEMINI.md`,
-  `.github/copilot-instructions.md` etc. should be symlinks to `AGENT.md`
+  `.github/copilot-instructions.md` etc. should be symlinks to `AGENTS.md`
   unless the agent requires a genuinely different format.
 - **Skills directories**: agent-specific skill directories (e.g.,
   `.claude/skills`) should be symlinks to `.agents/skills`.
@@ -58,7 +58,7 @@ customization.
 
 ## Detailed conventions live in instruction files
 
-`AGENT.md` references `.github/instructions/*.instructions.md` files for
+`AGENTS.md` references `.github/instructions/*.instructions.md` files for
 detailed conventions. See [`instructions.instructions.md`][instructions] for
 the conventions governing these instruction files themselves.
 

@@ -14,8 +14,8 @@ Use this skill for requests to add or change files in `.github/workflows/*`.
   for the full conventions.
 * After implementation, review your changes against the applicable sections of
   [`.github/instructions/review.instructions.md`][review].
-* Finally, follow the workflow in [`AGENT.md`][agent-md].
+* Finally, follow the workflow in [`AGENTS.md`][agents-md].
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [github-actions]: ../../../.github/instructions/github-actions.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md
