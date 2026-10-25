@@ -1,0 +1,74 @@
+name: Request a new feature
+description: Suggest a new feature.
+labels:
+  - new feature
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: >-
+        Describe the context of the problem that you're facing, and which
+        you'd like to be solved through Error Prone Support.
+    validations:
+      required: true
+  - type: checkboxes
+    id: type
+    attributes:
+      label: Type of improvement
+      options:
+        - label: Support a stylistic preference.
+        - label: Avoid a common gotcha, or potential problem.
+        - label: Improve performance.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the proposed new feature
+      description: >-
+        Provide a clear and concise description of the desired change.
+    validations:
+      required: true
+  - type: textarea
+    id: code-before
+    attributes:
+      label: Code to rewrite
+      description: >-
+        If possible, provide a simple and minimal example of the code that
+        should be matched.
+      render: java
+  - type: textarea
+    id: code-after
+    attributes:
+      label: Desired code
+      description: >-
+        If possible, provide the code to which the above example should be
+        rewritten.
+      render: java
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Considerations
+      description: |
+        Mention any other aspects to consider. Relevant questions:
+
+        - If applicable, is the rewrite operation a clear improvement in all
+          cases?
+        - Are there special cases to consider?
+        - Can we further generalize the proposed solution?
+        - Are there alternative solutions we should consider?
+  - type: checkboxes
+    id: participation
+    attributes:
+      label: Participation
+      description: >-
+        Pull requests are very welcome, and we happily review contributions.
+        Are you up for the challenge? :D
+      options:
+        - label: >-
+            I am willing to submit a pull request to implement this
+            improvement.
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Provide any other context about the request here.

@@ -1,0 +1,90 @@
+# XXX: Consider disabling blank issues (`blank_issues_enabled: false` in
+# `config.yml`). That likely requires additional issue templates (e.g. for
+# questions or documentation issues), or enabling GitHub Discussions.
+name: Bug report
+description: Create a report to help us improve.
+labels:
+  - bug
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: >-
+        Provide a clear and concise description of what the bug or issue is.
+    validations:
+      required: true
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      options:
+        - label: >-
+            I have verified that the issue is reproducible against the latest
+            version of the project.
+        - label: >-
+            I have searched through existing issues to verify that this issue
+            is not already known.
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal Reproducible Example
+      description: |
+        Provide a clear and concise description of what happened, including
+        steps on how to reproduce the issue.
+
+        If applicable and possible, include the code that triggered the issue
+        in a fenced `java` code block. Without a code block, GitHub mangles
+        generics and annotations such as `List<String>` and `@Nullable`.
+      placeholder: |
+        ```java
+        // Code that triggers the issue.
+        ```
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Provide log output, if applicable.
+      render: text
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: >-
+        Provide a clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: e.g. MacOS Tahoe
+    validations:
+      required: true
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      description: The output of `java --version` will do.
+      placeholder: e.g. 21.0.12
+    validations:
+      required: true
+  - type: input
+    id: error-prone-version
+    attributes:
+      label: Error Prone version
+      placeholder: e.g. 2.50.0
+    validations:
+      required: true
+  - type: input
+    id: error-prone-support-version
+    attributes:
+      label: Error Prone Support version
+      placeholder: e.g. 0.30.0
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Provide any other context about the problem here.
