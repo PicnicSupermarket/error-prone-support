@@ -34,7 +34,7 @@ body:
       label: Code to rewrite
       description: >-
         If possible, provide a simple and minimal example of the code that
-        should be matched.
+        should be matched. No Markdown code fence is needed.
       render: java
   - type: textarea
     id: code-after
@@ -42,7 +42,7 @@ body:
       label: Desired code
       description: >-
         If possible, provide the code to which the above example should be
-        rewritten.
+        rewritten. No Markdown code fence is needed.
       render: java
   - type: textarea
     id: considerations

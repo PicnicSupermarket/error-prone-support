@@ -44,7 +44,8 @@ body:
     id: logs
     attributes:
       label: Logs
-      description: Provide log output, if applicable.
+      description: >-
+        Provide log output, if applicable. No Markdown code fence is needed.
       render: text
   - type: textarea
     id: expected
