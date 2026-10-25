@@ -41,12 +41,6 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(checkNotNull("foo"), Optional.of("bar").orElse("baz"));
   }
 
-  void testRequireNonNullBlock() {
-    if ("foo" == null) {
-      throw new NullPointerException();
-    }
-  }
-
   String testRequireNonNullWithStringExpression() {
     return checkNotNull("foo", "bar");
   }

@@ -7,17 +7,46 @@
   "customManagers": [
     {
       "customType": "regex",
+      "datasourceTemplate": "github-runners",
       "managerFilePatterns": [
-        "/^integration-tests/.*(-init\\.patch|\\.sh)$/"
+        "/^\\.github/instructions/github-actions\\.instructions\\.md$/",
+        "/^\\.github/workflows/[^/]+\\.yml$/"
+      ],
+      "matchStrings": [
+        "\\b(?<depName>macos|ubuntu|windows)-(?<currentValue>\\d+(?:\\.\\d+)?)\\b"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "maven",
+      "managerFilePatterns": [
+        "/^integration-tests/[^/]+(-init\\.patch|\\.sh)$/"
       ],
       "matchStrings": [
         "\\b(?<packageName>[a-z0-9_.-]+?:[a-z0-9_.-]+?):(?<currentValue>[^:]+?):[a-zA-Z0-9_-]+\\b",
         "<version>(?<currentValue>.*?)<!-- Renovate: (?<packageName>.*?) --></version>"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "maven",
+      "packageNameTemplate": "org.apache.maven:maven-plugin-api",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/",
+        "/^\\.sdkmanrc$/"
       ],
-      "datasourceTemplate": "maven"
+      "matchStrings": [
+        "\\bmaven(?:-version: |=)(?<currentValue>\\S+)"
+      ]
     }
   ],
   "packageRules": [
+    {
+      "matchPackageNames": [
+        "org.apache.maven:maven-plugin-api"
+      ],
+      "groupName": "version.maven"
+    },
     {
       "matchPackageNames": [
         "/^org\\.springframework:spring-framework-bom$/",
@@ -27,7 +56,6 @@
     },
     {
       "matchPackageNames": [
-        "dawidd6/action-download-artifact",
         "github/codeql-action",
         "ruby/setup-ruby"
       ],
@@ -35,7 +63,7 @@
     }
   ],
   "reviewers": [
-    "rickie",
-    "Stephan202"
+    "team:error-prone-support-guardians",
+    "mohamedsamehsalah"
   ]
 }

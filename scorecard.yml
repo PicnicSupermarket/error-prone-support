@@ -1,0 +1,11 @@
+# OpenSSF Scorecard maintainer annotations. This file is consulted by
+# `.github/workflows/openssf-scorecard.yml`. See also
+# https://github.com/ossf/scorecard/blob/main/config/README.md.
+annotations:
+  - checks:
+      - fuzzing
+    reasons:
+      # This project is a compile-time static analysis/refactoring tool. It has
+      # no network-facing surface and does not parse untrusted inputs, so
+      # fuzzing provides little value.
+      - reason: not-applicable

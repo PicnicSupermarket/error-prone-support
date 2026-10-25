@@ -36,10 +36,6 @@ final class PreconditionsRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of(requireNonNull("foo"), requireNonNull("bar"));
   }
 
-  void testRequireNonNullBlock() {
-    requireNonNull("foo");
-  }
-
   String testRequireNonNullWithStringExpression() {
     return requireNonNull("foo", "bar");
   }
