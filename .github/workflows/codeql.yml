@@ -26,6 +26,7 @@ jobs:
       contents: read
       security-events: write # To upload the analysis results to the code scanning dashboard.
     runs-on: ubuntu-24.04
+    timeout-minutes: ${{ matrix.language == 'java' && 20 || 10 }}
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3

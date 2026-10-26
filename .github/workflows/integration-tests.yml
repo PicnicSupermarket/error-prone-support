@@ -28,6 +28,7 @@ jobs:
     name: Determine integration test matrix
     if: ${{ github.event_name == 'push' || (github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')) }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
       contents: read
     outputs:
@@ -74,6 +75,7 @@ jobs:
     needs: [ matrix ]
     if: ${{ github.event_name != 'push' }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
       pull-requests: write # To post a PR comment.
     outputs:
@@ -110,6 +112,7 @@ jobs:
     needs: [ matrix, acknowledge ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     permissions:
       contents: read
     strategy:
@@ -168,6 +171,7 @@ jobs:
     needs: [ matrix, patch ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     permissions:
       contents: read
     strategy:
@@ -230,6 +234,7 @@ jobs:
     # or were cancelled.
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     permissions:
       pull-requests: write # To update the PR comment.
     steps:
@@ -256,7 +261,7 @@ jobs:
                 case 'success':
                   return [':white_check_mark:', 'Integration tests passed successfully!'];
                 case 'cancelled':
-                  return [':stop_sign:', 'The workflow was cancelled.'];
+                  return [':stop_sign:', 'The workflow was cancelled or a job timed out.'];
                 default:
                   return [':x:', 'Integration tests failed. Please check the logs.'];
               }

@@ -32,6 +32,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ${{ matrix.os }}
+    timeout-minutes: ${{ matrix.os == 'windows-2025' && 30 || 20 }}
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
@@ -88,6 +89,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     environment: maven-deploy
     steps:
       - name: Install Harden-Runner

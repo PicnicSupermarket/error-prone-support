@@ -125,6 +125,13 @@ the files you modified.
 
 - [ ] Runner uses explicit version (not `ubuntu-latest`)
 
+### Set a timeout on every job
+
+- [ ] Every job declares `timeout-minutes`, directly below `runs-on`
+- [ ] `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))` for recent successful runs of the job
+- [ ] Jobs that depend on external services or cold downloads have a timeout rounded up beyond the formula
+- [ ] `if:` conditions and result mappings account for timed-out jobs being reported as `cancelled`
+
 ### Every step must have a name
 
 - [ ] All steps have a `name:` field
