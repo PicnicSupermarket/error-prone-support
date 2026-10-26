@@ -127,9 +127,10 @@ change between workflow runs, breaking reproducibility.
 
 ## Set a timeout on every job
 <!-- check: Every job declares `timeout-minutes`, directly below `runs-on` -->
-<!-- check: `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))` for recent successful runs of the job -->
-<!-- check: Jobs that depend on external services or cold downloads have a timeout rounded up beyond the formula -->
-<!-- check: `if:` conditions and result mappings account for timed-out jobs being reported as `cancelled` -->
+<!-- check: `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))`, based on at least 20 recent successful runs of the job, excluding queueing time -->
+<!-- check: Jobs that install a toolchain or call an external service have a timeout of at least 10 minutes -->
+<!-- check: Matrix jobs use the largest result of the formula across all legs, or a matrix-dependent expression -->
+<!-- check: `if:` conditions and result mappings that distinguish `failure` from `cancelled` handle timed-out jobs deliberately -->
 
 Every job must declare `timeout-minutes`, directly below `runs-on`. Without it
 GitHub lets a stuck job run for 360 minutes, which delays feedback and the
@@ -147,22 +148,22 @@ is short enough to cut hung jobs short, yet leaves enough headroom for slow
 runners and a growing code base, such that the timeout does not itself become a
 source of failures.
 
-- Base the figures on a representative sample: at least the 20 most recent
-  successful runs, covering a period in which slow runs occurred.
-- Round up further for jobs that depend on external services or large
-  downloads (e.g. publishing artifacts or calling an LLM), as their duration is
-  less predictable.
-- For matrix jobs, size the timeout for the slowest leg. If the legs differ
-  substantially, use a matrix-dependent expression instead.
+- Base the figures on at least the 20 most recent successful runs.
+- Use a minimum of 10 instead of 5 for jobs that install a toolchain (e.g. a
+  JDK or Ruby) or call an external service (e.g. to publish artifacts or to
+  query an LLM), as their duration is less predictable.
+- For matrix jobs, apply the formula to each leg and use the largest result. If
+  the results differ substantially, use a matrix-dependent expression instead.
 - For a new job without run history, pick a generous estimate and revisit it
   once enough runs have completed.
 
-A job that exceeds its timeout is reported as `cancelled`, not as failed:
+GitHub documents only that a job exceeding its timeout is cancelled. In
+practice such a job is reported as `cancelled`, not as failed, which has the
+following consequences:
 
 - Within the job, steps conditioned on `always()` or `cancelled()` still run,
   while steps conditioned on `!cancelled()` or `failure()` are skipped.
-- In dependent jobs, `needs.<job_id>.result` is `cancelled`. For a matrix job
-  this holds for the job as a whole if any leg timed out. A `failure()`
+- In dependent jobs, `needs.<job_id>.result` is `cancelled`. A `failure()`
   condition does not match, while `!cancelled()` does, as that function only
   reflects cancellation of the workflow run.
 - "Re-run failed jobs" also re-runs timed-out jobs.
