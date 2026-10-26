@@ -110,7 +110,10 @@ final class MultimapRules {
       return multimap.entries().stream().map(Map.Entry::getKey);
     }
 
+    // XXX: Error Prone's `MultimapKeys` check flags code produced by this rule, suggesting a
+    // `keySet()` replacement that does not retain duplicate keys. Consider dropping this rule.
     @AfterTemplate
+    @SuppressWarnings("MultimapKeys" /* Duplicate keys must be retained. */)
     Stream<K> after(Multimap<K, V> multimap) {
       return multimap.keys().stream();
     }
