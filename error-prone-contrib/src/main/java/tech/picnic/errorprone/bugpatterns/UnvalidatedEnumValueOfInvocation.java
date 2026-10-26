@@ -178,7 +178,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
    *
    * <p>Example 1 - non-default case returns {@code ["B1", "B2"]}:
    *
-   * <pre>{@code
+   * {@snippet :
    * enum B {
    *     B1, B2, B3
    * }
@@ -186,11 +186,11 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
    * switch(b) {
    *     case B1, B2 -> A.valueOf(b.name());
    * }
-   * }</pre>
+   * }
    *
    * <p>Example 2 - default case returns {@code ["B3"]}:
    *
-   * <pre>{@code
+   * {@snippet :
    * enum B {
    *     B1, B2, B3
    * }
@@ -199,7 +199,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
    *     case B1, B2 -> null;
    *     default -> A.valueOf(b.name());
    * }
-   * }</pre>
+   * }
    */
   // XXX: Fall-through in colon-style switch statements is not analyzed; only the enclosing case's
   // labels are considered.
