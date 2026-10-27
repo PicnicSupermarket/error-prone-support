@@ -8928,16 +8928,15 @@
      @Override
 --- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/SummarySnapshot.java
 +++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/SummarySnapshot.java
-@@ -1,5 +1,8 @@
+@@ -1,5 +1,7 @@
  package io.prometheus.metrics.model.snapshots;
  
 +import static com.google.common.base.Preconditions.checkArgument;
-+import static java.util.Objects.requireNonNull;
 +
  import io.prometheus.metrics.config.EscapingScheme;
  import java.util.ArrayList;
  import java.util.Collection;
-@@ -24,14 +27,14 @@ public final class SummarySnapshot extends MetricSnapshot {
+@@ -24,14 +26,14 @@ public final class SummarySnapshot extends MetricSnapshot {
      super(metadata, data, internal);
    }
  
@@ -8954,23 +8953,18 @@
    MetricSnapshot escape(
        EscapingScheme escapingScheme, List<? extends DataPointSnapshot> dataPointSnapshots) {
      return new SummarySnapshot(
-@@ -114,13 +117,10 @@ public final class SummarySnapshot extends MetricSnapshot {
+@@ -114,9 +116,8 @@ public final class SummarySnapshot extends MetricSnapshot {
  
      private void validate() {
        for (Label label : getLabels()) {
 -        if (label.getName().equals("quantile")) {
 -          throw new IllegalArgumentException("quantile is a reserved label name for summaries");
 -        }
--      }
--      if (quantiles == null) {
--        throw new NullPointerException();
 +        checkArgument(
 +            !label.getName().equals("quantile"), "quantile is a reserved label name for summaries");
        }
-+      requireNonNull(quantiles);
-     }
- 
-     @Override
+       if (quantiles == null) {
+         throw new NullPointerException();
 --- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Unit.java
 +++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Unit.java
 @@ -1,5 +1,8 @@

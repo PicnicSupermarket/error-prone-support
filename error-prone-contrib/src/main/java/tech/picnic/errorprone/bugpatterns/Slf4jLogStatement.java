@@ -98,6 +98,7 @@ public final class Slf4jLogStatement extends BugChecker implements MethodInvocat
         : description.build();
   }
 
+  @SuppressWarnings("OrphanedFormatString" /* `%s` is referenced, not used as a placeholder. */)
   private static boolean isFormatString(
       String formatString,
       ExpressionTree tree,

@@ -1,15 +1,18 @@
 name: Run Reviewdog
 on:
   pull_request:
-permissions:
-  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
+    name: Report code issues with Reviewdog
     permissions:
       contents: read
-      pull-requests: write
+      pull-requests: write # To post findings and suggested fixes as PR comments.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -28,11 +31,11 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
+        uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
           java-version: 25.0.4
           java-distribution: temurin
-          maven-version: 3.9.16
+          maven-version: 3.10.0
       - name: Set up Reviewdog
         uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
@@ -68,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./apply-error-prone-suggestions.sh
       - name: Report suggested changes
-        uses: reviewdog/action-suggester@4553543bea739d9d503379d786148cfd561de5fa # v1.25.0
+        uses: reviewdog/action-suggester@ac5ce6d94e35c00530447dc63c271e38e4fd36c6 # v1.26.3
         with:
           tool_name: Error Prone
       - name: Remove installed project artifacts

@@ -9,18 +9,22 @@ on:
     branches: [ master ]
   schedule:
     - cron: '0 4 * * 1'
-permissions:
-  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   analyze:
+    name: Analyze code with CodeQL
     strategy:
       matrix:
         language: [ java, ruby ]
     permissions:
       contents: read
-      security-events: write
+      security-events: write # To upload the analysis results to the code scanning dashboard.
     runs-on: ubuntu-24.04
     steps:
       - name: Install Harden-Runner
@@ -37,19 +41,19 @@ jobs:
             repo.maven.apache.org:443
             uploads.github.com:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
+        uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
           java-version: 25.0.4
           java-distribution: temurin
-          maven-version: 3.9.16
+          maven-version: 3.10.0
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
+        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         with:
           languages: ${{ matrix.language }}
       - name: Perform minimal build
         if: ${{ matrix.language == 'java' }}
         run: mvn package -DskipTests -Dverification.skip
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@9e0d7b8d25671d64c341c19c0152d693099fb5ba # v4.35.5
+        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         with:
           category: /language:${{ matrix.language }}

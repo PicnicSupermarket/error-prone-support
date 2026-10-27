@@ -14,6 +14,15 @@ suffix. GitHub appends the PR number automatically on squash-merge.
 If this PR comprises multiple commits, generate a new commit message based on
 the full diff, as if all changes were part of a single commit.
 
+## Draft status
+<!-- check: PR opened by an AI agent is created as a draft, not marked ready for review -->
+
+When an AI agent opens the pull request, open it as a draft (e.g. `gh pr create
+--draft`). The agent's owner reviews the changes and confirms that all checks
+pass, then marks the PR ready for review. Only at that point are reviewers
+requested (see [Reviewers](#reviewers)) and maintainers expected to take a
+look.
+
 ## Label
 <!-- check: PR has exactly one label from `.github/release.yml` -->
 
@@ -28,11 +37,11 @@ Assign the nearest upcoming open milestone. For dependency upgrade PRs with the
 [`.github/workflows/assign-milestone.yml`][assign-milestone-workflow].
 
 ## Reviewers
-<!-- check: PR assigns the correct reviewers -->
+<!-- check: PR does not manually assign reviewers -->
 
-Assign `rickie` and `Stephan202` as reviewers. If either of these users is the
-PR author, assign `mohamedsamehsalah` as an additional reviewer instead of
-self-reviewing.
+Do not assign reviewers manually. [`CODEOWNERS`][codeowners] causes GitHub to
+automatically request a review from the relevant owners once the PR is marked
+ready for review (see [Draft status](#draft-status)).
 
 ## Description format
 <!-- check: PR description contains a suggested commit message in a fenced code block -->
@@ -52,5 +61,6 @@ After the PR is created and the PR number is known, edit the description to add
 the ` (#N)` suffix to the summary line inside the code block.
 
 [assign-milestone-workflow]: ../workflows/assign-milestone.yml
+[codeowners]: ../CODEOWNERS
 [commit-message]: commit-message.instructions.md
 [github-release]: ../release.yml

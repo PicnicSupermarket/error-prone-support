@@ -10,12 +10,16 @@ on:
   pull_request:
   push:
     branches: [ master ]
-permissions:
-  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
+permissions: {}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
   build:
+    name: Build and verify project
     strategy:
       matrix:
         os: [ ubuntu-24.04, macos-15, windows-2025 ]
@@ -25,6 +29,8 @@ jobs:
           - os: ubuntu-24.04
             build-jdk: 26.0.2
             target-jdk: 21.0.12
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Harden-Runner
@@ -46,26 +52,35 @@ jobs:
       # additionally enabling all checks defined in this project and any Error
       # Prone checks available only from other artifact repositories.
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
+        uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
           java-version: |
             ${{ matrix.target-jdk }}
             ${{ matrix.build-jdk }}
           java-distribution: temurin
-          maven-version: 3.9.16
+          maven-version: 3.10.0
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn install javadoc:jar
-      # Note that the `-D` argument is quoted for compatibility with the
-      # Windows build.
       - name: Build project with self-check against Error Prone fork, test using the targeted JDK
-        run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # While generally we avoid expression interpolation inside `run`
+        # arguments through the use of environment variables, we make an
+        # exception here to avoid shell-conditional syntax: PowerShell expects
+        # `$env:VAR` instead of `${VAR}`. We do not specify `shell: bash`, as
+        # that would make the Windows test environment "less realistic", and
+        # would cause e.g. some filesystem ACL settings to behave differently.
+        # Note that `matrix.target-jdk` is controlled by this workflow, so this
+        # compromise is safe.
+        run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
       - name: Remove installed project artifacts
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   deploy:
-    if: ${{ github.ref == github.event.repository.default_branch }}
+    name: Deploy artifacts
+    if: ${{ github.ref_name == github.event.repository.default_branch }}
     needs: build
+    permissions:
+      contents: read
     runs-on: ubuntu-24.04
     environment: maven-deploy
     steps:
@@ -80,15 +95,15 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
       - name: Check out code and set up JDK and Maven
-        uses: s4u/setup-maven-action@4a02cbd99769e46198135c31d5097c94618ba3f5 # v1.21.0
+        uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
           java-version: 25.0.4
           java-distribution: temurin
-          maven-version: 3.9.16
+          maven-version: 3.10.0
       - name: Build and deploy
-        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
         env:
           MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
           MAVEN_CENTRAL_PASS: ${{ secrets.MAVEN_CENTRAL_PASS }}
           MAVEN_GPG_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
+        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
