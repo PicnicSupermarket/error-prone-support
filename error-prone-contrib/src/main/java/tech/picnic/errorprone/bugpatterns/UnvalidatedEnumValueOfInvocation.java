@@ -109,10 +109,14 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
       return Description.NO_MATCH;
     }
 
+    if (isInGuardedCase(state)) {
+      return Description.NO_MATCH;
+    }
+
     ExpressionTree receiver = ASTHelpers.getReceiver(nameArgument);
     Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(receiver);
     Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
-    if (enumSymbolPassedToValueOf == null || receiverType == null || isInGuardedCase(state)) {
+    if (enumSymbolPassedToValueOf == null || receiverType == null) {
       return Description.NO_MATCH;
     }
 
