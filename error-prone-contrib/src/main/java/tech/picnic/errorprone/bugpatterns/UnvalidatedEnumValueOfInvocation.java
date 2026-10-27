@@ -112,7 +112,7 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
     ExpressionTree receiver = ASTHelpers.getReceiver(nameArgument);
     Symbol enumSymbolPassedToValueOf = ASTHelpers.getSymbol(receiver);
     Type receiverType = toEnumType(ASTHelpers.getReceiverType(nameArgument), state);
-    if (enumSymbolPassedToValueOf == null || receiverType == null) {
+    if (enumSymbolPassedToValueOf == null || receiverType == null || isInGuardedCase(state)) {
       return Description.NO_MATCH;
     }
 
@@ -163,6 +163,20 @@ public final class UnvalidatedEnumValueOfInvocation extends BugChecker
   private static @Nullable Type toEnumType(Type type, VisitorState state) {
     Type upperBound = ASTHelpers.getUpperBound(type, state.getTypes());
     return upperBound.asElement().isEnum() ? upperBound : null;
+  }
+
+  /**
+   * Tells whether the current path is enclosed by a switch case with a {@code when} guard. Guards
+   * may restrict the possible values of the receiver in ways that are not analyzed.
+   */
+  private static boolean isInGuardedCase(VisitorState state) {
+    for (TreePath path = state.getPath(); path != null; path = path.getParentPath()) {
+      if (path.getLeaf() instanceof CaseTree caseTree && caseTree.getGuard() != null) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private static ImmutableSet<String> getEnumValues(Type type) {
