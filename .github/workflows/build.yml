@@ -34,9 +34,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           disable-sudo-and-containers: true
+          # XXX: Block mode is not (yet) viable on macOS and Windows. Their
+          # runner images make many OS-native requests (to a varying set of
+          # domains) which Harden-Runner does not implicitly allow, and it
+          # offers no option to allow them without us enumerating them all.
+          # Revisit once the implicit allowlist for these OSes matures.
+          egress-policy: ${{ matrix.os == 'ubuntu-24.04' && 'block' || 'audit' }}
           allowed-endpoints: >
             api.adoptium.net:443
             github.com:443
@@ -85,7 +91,7 @@ jobs:
     environment: maven-deploy
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
