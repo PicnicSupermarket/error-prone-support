@@ -15,13 +15,13 @@ Use this skill for requests to add or change `.md` files.
   [`.github/instructions/instructions.instructions.md`][instructions].
 * When editing skill files, also read
   [`.github/instructions/skills.instructions.md`][skills].
-* When editing agent entry-point files such as `AGENT.md`, also read
+* When editing agent entry-point files such as `AGENTS.md`, also read
   [`.github/instructions/agents.instructions.md`][agents].
 * After implementation, review your changes against the applicable sections of
   [`.github/instructions/review.instructions.md`][review].
-* Finally, follow the workflow in [`AGENT.md`][agent-md].
+* Finally, follow the workflow in [`AGENTS.md`][agents-md].
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [agents]: ../../../.github/instructions/agents.instructions.md
 [documentation]: ../../../.github/instructions/documentation.instructions.md
 [instructions]: ../../../.github/instructions/instructions.instructions.md
