@@ -127,8 +127,9 @@ change between workflow runs, breaking reproducibility.
 
 ## Set a timeout on every job
 <!-- check: Every job declares `timeout-minutes`, directly below `runs-on` -->
-<!-- check: `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))`, based on at least 20 recent successful runs of the job, excluding queueing time -->
-<!-- check: Jobs that install a toolchain or call an external service have a timeout of at least 10 minutes -->
+<!-- check: `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))` -->
+<!-- check: The formula is based on at least 20 recent successful runs, excluding queueing time -->
+<!-- check: Jobs that install a toolchain or call a third-party service have a timeout of at least 10 minutes -->
 <!-- check: Matrix jobs use the largest result of the formula across all legs, or a matrix-dependent expression -->
 <!-- check: `if:` conditions and result mappings that distinguish `failure` from `cancelled` handle timed-out jobs deliberately -->
 
@@ -150,8 +151,9 @@ source of failures.
 
 - Base the figures on at least the 20 most recent successful runs.
 - Use a minimum of 10 instead of 5 for jobs that install a toolchain (e.g. a
-  JDK or Ruby) or call an external service (e.g. to publish artifacts or to
-  query an LLM), as their duration is less predictable.
+  JDK or Ruby) or call a third-party service (e.g. to publish artifacts or to
+  query an LLM), as their duration is less predictable. Jobs that only call the
+  GitHub API keep the minimum of 5.
 - For matrix jobs, apply the formula to each leg and use the largest result. If
   the results differ substantially, use a matrix-dependent expression instead.
 - For a new job without run history, pick a generous estimate and revisit it

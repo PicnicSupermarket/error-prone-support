@@ -128,8 +128,9 @@ the files you modified.
 ### Set a timeout on every job
 
 - [ ] Every job declares `timeout-minutes`, directly below `runs-on`
-- [ ] `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))`, based on at least 20 recent successful runs of the job, excluding queueing time
-- [ ] Jobs that install a toolchain or call an external service have a timeout of at least 10 minutes
+- [ ] `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))`
+- [ ] The formula is based on at least 20 recent successful runs, excluding queueing time
+- [ ] Jobs that install a toolchain or call a third-party service have a timeout of at least 10 minutes
 - [ ] Matrix jobs use the largest result of the formula across all legs, or a matrix-dependent expression
 - [ ] `if:` conditions and result mappings that distinguish `failure` from `cancelled` handle timed-out jobs deliberately
 
