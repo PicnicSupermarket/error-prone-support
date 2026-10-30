@@ -158,14 +158,13 @@ source of failures.
   once enough runs have completed.
 
 GitHub documents only that a job exceeding its timeout is cancelled. In
-practice such a job is reported as `cancelled`, not as failed, which has the
-following consequences:
+practice its result is `cancelled`, not `failure`, and only that job sees
+`cancelled()` as true:
 
-- Within the job, steps conditioned on `always()` or `cancelled()` still run,
-  while steps conditioned on `!cancelled()` or `failure()` are skipped.
-- In dependent jobs, `needs.<job_id>.result` is `cancelled`. A `failure()`
-  condition does not match, while `!cancelled()` does, as that function only
-  reflects cancellation of the workflow run.
+- Its own steps: `always()` and `cancelled()` run; `!cancelled()` and
+  `failure()` are skipped.
+- Dependent jobs: `needs.<job_id>.result` is `cancelled`, but the workflow run
+  is not, so `!cancelled()` and `always()` match while `failure()` does not.
 - "Re-run failed jobs" also re-runs timed-out jobs.
 
 **Do:**
