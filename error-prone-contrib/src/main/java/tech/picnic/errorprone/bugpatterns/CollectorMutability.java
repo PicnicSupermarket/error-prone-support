@@ -110,12 +110,12 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
         SuggestedFixes.qualifyStaticImport(
             Collectors.class.getCanonicalName() + ".toCollection", mutableFix, state);
     String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
-    description.addFix(
-        mutableFix
-            .replace(tree, "%s(%s::new)".formatted(toCollectionSelect, mutableCollection))
-            .build());
-
-    return description.build();
+    return description
+        .addFix(
+            mutableFix
+                .replace(tree, "%s(%s::new)".formatted(toCollectionSelect, mutableCollection))
+                .build())
+        .build();
   }
 
   private Description suggestToMapAlternatives(MethodInvocationTree tree, VisitorState state) {
@@ -141,15 +141,15 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     SuggestedFix.Builder mutableFix = SuggestedFix.builder();
     String hashMap =
         SuggestedFixes.qualifyType(state, mutableFix, HashMap.class.getCanonicalName());
-    description.addFix(
-        mutableFix
-            .postfixWith(
-                tree.getArguments().get(argCount - 1),
-                (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
-                    + ", %s::new".formatted(hashMap))
-            .build());
-
-    return description.build();
+    return description
+        .addFix(
+            mutableFix
+                .postfixWith(
+                    tree.getArguments().get(argCount - 1),
+                    (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
+                        + ", %s::new".formatted(hashMap))
+                .build())
+        .build();
   }
 
   private static SuggestedFix replaceMethodInvocation(
