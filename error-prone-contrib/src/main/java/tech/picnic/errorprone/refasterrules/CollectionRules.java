@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Collections.disjoint;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableCollection;
@@ -672,6 +674,51 @@ final class CollectionRules {
     @AfterTemplate
     S after(SortedSet<T> sortedSet) {
       return sortedSet.last();
+    }
+  }
+
+  /** Prefer {@link Collections#sort(List)} over more verbose alternatives. */
+  static final class CollectionsSort<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    void before(List<T> list) {
+      Collections.sort(list, naturalOrder());
+    }
+
+    @AfterTemplate
+    void after(List<T> list) {
+      Collections.sort(list);
+    }
+  }
+
+  /**
+   * Prefer {@link Collections#min(Collection)} over more verbose or more contrived alternatives.
+   */
+  static final class CollectionsMin<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    T before(Collection<T> coll) {
+      return Refaster.anyOf(
+          Collections.min(coll, naturalOrder()), Collections.max(coll, reverseOrder()));
+    }
+
+    @AfterTemplate
+    T after(Collection<T> coll) {
+      return Collections.min(coll);
+    }
+  }
+
+  /**
+   * Prefer {@link Collections#max(Collection)} over more verbose or more contrived alternatives.
+   */
+  static final class CollectionsMax<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    T before(Collection<T> coll) {
+      return Refaster.anyOf(
+          Collections.max(coll, naturalOrder()), Collections.min(coll, reverseOrder()));
+    }
+
+    @AfterTemplate
+    T after(Collection<T> coll) {
+      return Collections.max(coll);
     }
   }
 
