@@ -19,13 +19,18 @@ Before doing so, please:
   may have been provided.
 
 When filing a bug report, please include the following:
-- Any relevant information about your environment. This should generally
-  include the output of `java --version`, as well as the version of Error Prone
-  you're using.
-- A description of what is going on (e.g. logging output, stacktraces).
+- Any relevant information about your environment: the operating system, the
+  output of `java --version`, and the versions of Error Prone and Error Prone
+  Support you're using.
+- A description of what is going on (e.g. logging output, stacktraces) and of
+  the behavior you expected.
 - A minimum reproducible example, so that other developers can try to reproduce
   (and optionally fix) the bug.
 - Any additional information that may be relevant.
+
+The GitHub web UI presents these items as an [issue form][bug-report-form]. If
+you file the issue some other way (e.g. using the GitHub CLI), please use the
+same headings as that form.
 
 ## 💡 Reporting an improvement
 
@@ -125,6 +130,7 @@ detailed code style conventions and a list of key utilities from the
 `error-prone-utils` module.
 
 [bug-checkers]: .github/instructions/bug-checkers.instructions.md
+[bug-report-form]: .github/ISSUE_TEMPLATE/bug_report.yml
 [java-style]: .github/instructions/java-style.instructions.md
 [documentation-java]: https://github.com/PicnicSupermarket/error-prone-support/blob/master/error-prone-utils/src/main/java/tech/picnic/errorprone/utils/Documentation.java
 [error-prone-criteria]: https://errorprone.info/docs/criteria
