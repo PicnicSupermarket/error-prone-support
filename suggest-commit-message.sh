@@ -3,6 +3,10 @@
 # Upserts a suggested commit message comment on the specified pull request,
 # based on the workflow definition present on the specified branch. The
 # generated commit message is also written to stdout.
+#
+# No commit message is generated if the pull request already has a suggestion
+# by someone else, or if the workflow's comment was edited manually. In that
+# case a note is written to stderr and nothing is written to stdout.
 
 set -e -u -o pipefail
 
@@ -20,10 +24,19 @@ run_id=$(
     | jq -r '.[].databaseId'
 )
 
-gh run watch "${run_id}"
+gh run watch --exit-status "${run_id}"
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf -- "${tmp_dir}"' INT TERM HUP EXIT
 
-gh run download -n suggested-commit-message --dir "${tmp_dir}" "${run_id}"
-cat "${tmp_dir}/suggested-commit-message.txt"
+has_artifact=$(
+  gh api "repos/{owner}/{repo}/actions/runs/${run_id}/artifacts" \
+    --jq '.artifacts | any(.name == "suggested-commit-message")'
+)
+
+if [ "${has_artifact}" = 'true' ]; then
+  gh run download -n suggested-commit-message --dir "${tmp_dir}" "${run_id}"
+  cat "${tmp_dir}/suggested-commit-message.txt"
+else
+  echo 'No commit message generated: the PR already has a suggestion, or its suggestion comment was edited.' >&2
+fi

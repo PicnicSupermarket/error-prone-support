@@ -1,5 +1,10 @@
 name: Suggest PR commit message
 on:
+  # XXX: As this workflow does not react to new comments and reviews, a newly
+  # posted commit message suggestion is referenced only upon the next
+  # `pull_request` run (e.g., after a push or PR edit). Consider also reacting
+  # to `issue_comment` and `pull_request_review` events, taking into account
+  # that such runs have access to secrets, and do not run for the PR's head.
   pull_request:
     types: [ edited, opened, reopened, synchronize ]
   workflow_dispatch:
@@ -20,6 +25,8 @@ env:
     github.com:443
     registry.npmjs.org:443
     release-assets.githubusercontent.com:443
+  # Hidden marker identifying this workflow's pull request comment.
+  COMMENT_MARKER: <!-- codex-suggested-commit-message -->
 jobs:
   suggest:
     name: Suggest commit message
@@ -68,6 +75,73 @@ jobs:
             core.setOutput('baseSha', pr.base.sha ?? '');
             core.setOutput('headRef', pr.head.ref ?? '');
             core.setOutput('headSha', pr.head.sha ?? '');
+      - name: Check existing commit message suggestions
+        id: suggestions
+        # If someone else already suggested a commit message, then this step
+        # makes this workflow's comment (if any) reference that suggestion, and
+        # no suggestion is generated. The same holds if someone edited this
+        # workflow's comment, as such edits are never overwritten.
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PR_NUMBER: ${{ steps.pr-details.outputs.number }}
+          PR_BODY: ${{ steps.pr-details.outputs.body }}
+        with:
+          script: |
+            const marker = process.env.COMMENT_MARKER;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: process.env.PR_NUMBER,
+              per_page: 100,
+            });
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              ...context.repo,
+              pull_number: process.env.PR_NUMBER,
+              per_page: 100,
+            });
+
+            // A suggestion is a "suggested commit message" phrase followed by a fenced code block. The latest comment
+            // or review containing one takes precedence over the pull request description.
+            const isSuggestion = (text) =>
+              /suggested\s+commit\s+message[^\n`>]*\s*(?:`{3,}|~{3,})/i.test(text) && !text.includes(marker);
+            const latest = [...comments, ...reviews]
+              .filter((item) => isSuggestion(item.body))
+              .sort((a, b) => (a.created_at ?? a.submitted_at).localeCompare(b.created_at ?? b.submitted_at))
+              .at(-1);
+            const reference = latest
+              ? `[this comment](${latest.html_url})`
+              : isSuggestion(process.env.PR_BODY) ? 'the pull request description' : '';
+
+            // Determine who, if anybody, last edited the existing comment.
+            const existing = comments.find((comment) => comment.body?.includes(marker));
+            const commentNode = existing && await github.graphql(
+              `query ($id: ID!) {
+                 node(id: $id) {
+                   ... on IssueComment {
+                     editor {
+                       login
+                     }
+                   }
+                 }
+               }`,
+              { id: existing.node_id },
+            );
+
+            // Note that the `[bot]` suffix is stripped because it does not seem to be present consistently.
+            const lastEditor = commentNode?.node.editor?.login?.replace(/\[bot\]$/, '');
+            const edited = Boolean(lastEditor) && lastEditor !== existing.user.login.replace(/\[bot\]$/, '');
+
+            core.info(`Other suggestion: ${reference || 'none'}; comment edited manually: ${edited}.`);
+            core.setOutput('generate', !reference && !edited);
+
+            const commentBody = `Suggested commit message: see ${reference}\n${marker}\n`;
+            if (reference && existing && !edited && existing.body !== commentBody) {
+              await github.rest.issues.updateComment({
+                ...context.repo,
+                comment_id: existing.id,
+                body: commentBody,
+              });
+              core.info(`Updated comment ${existing.id} to reference ${reference}.`);
+            }
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -225,6 +299,7 @@ jobs:
           EOF
       - name: Suggest commit message with Codex
         id: codex
+        if: ${{ steps.suggestions.outputs.generate == 'true' }}
         uses: openai/codex-action@bdf19a4a223ec2549a3e2274a0cf61556bc07675 # v1.13
         with:
           permission-profile: suggest-commit-message
@@ -252,6 +327,7 @@ jobs:
               "additionalProperties": false
             }
       - name: Upsert pull request comment
+        if: ${{ steps.suggestions.outputs.generate == 'true' }}
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           PR_NUMBER: ${{ steps.pr-details.outputs.number }}
@@ -278,7 +354,7 @@ jobs:
             const fence = '`'.repeat(Math.max(3, ...backtickRuns.map((length) => length + 1)));
 
             // The comment to be upserted includes a hidden marker to identify it.
-            const marker = '<!-- codex-suggested-commit-message -->';
+            const marker = process.env.COMMENT_MARKER;
             const commentBody = `Suggested commit message:\n${marker}\n\n${fence}\n${commitMessage}\n${fence}\n`;
 
             const comments = await github.paginate(github.rest.issues.listComments, {
@@ -305,39 +381,15 @@ jobs:
               return;
             }
 
-            // Determine who, if anybody, last edited the existing comment.
-            const commentNode = await github.graphql(
-              `query ($id: ID!) {
-                 node(id: $id) {
-                   ... on IssueComment {
-                     editor {
-                       login
-                     }
-                   }
-                 }
-               }`,
-              { id: existing.node_id },
-            );
-
-            // If another user last edited the comment, skip the update. Note that the `[bot]` suffix is stripped
-            // because it does not seem to be present consistently.
-            const originalCommenter = existing.user.login.replace(/\[bot\]$/, '');
-            const lastEditor = commentNode.node.editor?.login?.replace(/\[bot\]$/, '');
-            if (lastEditor && lastEditor !== originalCommenter) {
-              core.info(
-                `Skipping update because comment was last edited by ${lastEditor} rather than ${originalCommenter}.`,
-              );
-              return;
-            }
-
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: existing.id,
               body: commentBody,
             });
-            core.info(`Updated comment ${existing.id} by ${originalCommenter}.`);
+            core.info(`Updated comment ${existing.id}.`);
       - name: Upload suggested commit message
+        if: ${{ steps.suggestions.outputs.generate == 'true' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: suggested-commit-message
