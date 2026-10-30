@@ -152,8 +152,7 @@ source of failures.
 - Base the figures on at least the 20 most recent successful runs.
 - Use a minimum of 10 instead of 5 for jobs that install a toolchain (e.g. a
   JDK or Ruby) or call a third-party service (e.g. to publish artifacts or to
-  query an LLM), as their duration is less predictable. Jobs that only call the
-  GitHub API keep the minimum of 5.
+  query an LLM), as their duration is less predictable.
 - For matrix jobs, apply the formula to each leg and use the largest result. If
   the results differ substantially, use a matrix-dependent expression instead.
 - For a new job without run history, pick a generous estimate and revisit it
