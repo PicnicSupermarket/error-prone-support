@@ -31,10 +31,11 @@ jobs:
       contents: read
       pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     environment: codex
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           # We can't disable `sudo`, as `openai/codex-action` requires it in
           # all cases. However, that action does revoke `sudo` access before

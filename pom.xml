@@ -199,7 +199,7 @@
         <version.google-java-format>1.37.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.10.0</version.maven>
-        <version.pitest-git>2.3.4</version.pitest-git>
+        <version.pitest-git>2.4.0</version.pitest-git>
     </properties>
 
     <dependencyManagement>
@@ -354,14 +354,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.17.1</version>
+                <version>1.17.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2025.0.7</version>
+                <version>2025.0.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -408,7 +408,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.15</version>
+                <version>1.18.16</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.25.1</version>
+                <version>1.9.26</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -500,19 +500,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>7.0.9</version>
+                <version>7.0.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.1.1</version>
+                <version>4.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>7.1.1</version>
+                <version>7.1.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
