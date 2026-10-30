@@ -14,6 +14,7 @@ jobs:
       contents: read
       pull-requests: write # To post findings and suggested fixes as PR comments.
     runs-on: ubuntu-24.04
+    timeout-minutes: 25
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3

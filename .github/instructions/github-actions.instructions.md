@@ -125,6 +125,65 @@ change between workflow runs, breaking reproducibility.
 - macOS: `macos-15`
 - Windows: `windows-2025`
 
+## Set a timeout on every job
+<!-- check: Every job declares `timeout-minutes`, directly below `runs-on` -->
+<!-- check: `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))` -->
+<!-- check: The formula is based on at least 20 recent successful runs, excluding queueing time -->
+<!-- check: Jobs that install a toolchain or call a third-party service have a timeout of at least 10 minutes -->
+<!-- check: Matrix jobs use the largest result of the formula across all legs, or a matrix-dependent expression -->
+<!-- check: `if:` conditions and result mappings that distinguish `failure` from `cancelled` handle timed-out jobs deliberately -->
+
+Every job must declare `timeout-minutes`, directly below `runs-on`. Without it
+GitHub lets a stuck job run for 360 minutes, which delays feedback and the
+re-run that usually resolves the problem.
+
+Derive the value from the duration of recent successful runs of the job
+(excluding time spent queueing), using the following formula:
+
+```
+max(5, roundup5(max(2 * slowest success, 3 * median)))
+```
+
+Here `roundup5` rounds up to the next multiple of 5. The aim is a timeout that
+is short enough to cut hung jobs short, yet leaves enough headroom for slow
+runners and a growing code base, such that the timeout does not itself become a
+source of failures.
+
+- Base the figures on at least the 20 most recent successful runs.
+- Use a minimum of 10 instead of 5 for jobs that install a toolchain (e.g. a
+  JDK or Ruby) or call a third-party service (e.g. to publish artifacts or to
+  query an LLM), as their duration is less predictable.
+- For matrix jobs, apply the formula to each leg and use the largest result. If
+  the results differ substantially, use a matrix-dependent expression instead.
+- For a new job without run history, pick a generous estimate and revisit it
+  once enough runs have completed.
+
+GitHub documents only that a job exceeding its timeout is cancelled. In
+practice its result is `cancelled`, not `failure`, and only that job sees
+`cancelled()` as true:
+
+- Its own steps: `always()` and `cancelled()` run; `!cancelled()` and
+  `failure()` are skipped.
+- Dependent jobs: `needs.<job_id>.result` is `cancelled`, but the workflow run
+  is not, so `!cancelled()` and `always()` match while `failure()` does not.
+- "Re-run failed jobs" also re-runs timed-out jobs.
+
+**Do:**
+
+```yaml
+build:
+  runs-on: ${{ matrix.os }}
+  timeout-minutes: ${{ matrix.os == 'windows-2025' && 30 || 20 }}
+```
+
+**Don't:**
+
+```yaml
+build:
+  runs-on: ubuntu-24.04
+  # No `timeout-minutes`: a stuck job runs for 360 minutes.
+```
+
 ## Every step must have a name
 <!-- check: All steps have a `name:` field -->
 
