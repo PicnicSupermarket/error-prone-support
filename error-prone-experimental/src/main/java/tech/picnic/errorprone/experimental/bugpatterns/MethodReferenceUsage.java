@@ -32,6 +32,8 @@ import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Optional;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.Name;
 
 /**
@@ -150,6 +152,9 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
 
     Name lhs = identifier.getName();
     if (expectedInstance.isEmpty()) {
+      if (isMutableField(identifier)) {
+        return Optional.empty();
+      }
       return constructFix(lambdaExpr, lhs, subTree.getIdentifier());
     }
 
@@ -162,6 +167,13 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
     // valid expression, but in some cases it's necessary to keep them. Maybe return multiple
     // variants?
     return constructFix(lambdaExpr, lhsType.tsym, subTree.getIdentifier());
+  }
+
+  private static boolean isMutableField(IdentifierTree tree) {
+    Symbol symbol = ASTHelpers.getSymbol(tree);
+    return symbol != null
+        && symbol.getKind() == ElementKind.FIELD
+        && !symbol.getModifiers().contains(Modifier.FINAL);
   }
 
   // XXX: Refactor or replace inner `Optional` with a custom type.

@@ -427,4 +427,22 @@ final class MethodReferenceUsageTest {
             "}")
         .doTest();
   }
+
+  @Test
+  void doesNotFlagBoundMethodReferenceWithMutableFieldReceiver() {
+      CompilationTestHelper.newInstance(MethodReferenceUsage.class, getClass())
+            .addSourceLines(
+                "A.java",
+                "class A {",
+                "  private String label;",
+                "",
+                "  private final Runnable action = () -> label.toUpperCase();",
+                "",
+                "  void initialise() {",
+                "    label = \"ready\";",
+                "    action.run();",
+                "  }",
+                "}")
+            .doTest();
+  }
 }
