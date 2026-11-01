@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 permissions: {}
+env:
+  # Opts out of CodeBoarding's usage telemetry.
+  CODEBOARDING_TELEMETRY: 'false'
 jobs:
   review:
     name: Review architecture changes with CodeBoarding
@@ -22,8 +25,8 @@ jobs:
       issues: write # To post the architecture review as a PR comment.
       pull-requests: write # To post the architecture review as a PR comment.
     runs-on: ubuntu-24.04
-    # XXX: Revisit once at least 20 successful runs have completed.
-    timeout-minutes: 30
+    # Scratch only: generous timeout, to observe how long a full run takes.
+    timeout-minutes: 180
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
