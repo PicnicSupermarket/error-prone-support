@@ -25,17 +25,35 @@ jobs:
       issues: write # To post the architecture review as a PR comment.
       pull-requests: write # To post the architecture review as a PR comment.
     runs-on: ubuntu-24.04
-    # Scratch only: generous timeout, to observe how long a full run takes.
-    timeout-minutes: 180
+    # Analyzing a base commit for which no analysis is stored takes about 35
+    # minutes; analyzing a pull request on top of a stored base takes a few.
+    # XXX: Revisit once at least 20 successful runs have completed.
+    timeout-minutes: 60
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
         with:
           disable-sudo-and-containers: true
-          # XXX: Replace with an explicit `allowed-endpoints` list, based on the
-          # outbound calls observed in audit mode.
-          egress-policy: audit
+          # The `lambda-url` endpoint is CodeBoarding's hosted LLM proxy. Its
+          # host name is hard-coded in the action; check it on each upgrade.
+          allowed-endpoints: >
+            api.github.com:443
+            auduihjmm4b735zci7vyabuikq0hppqn.lambda-url.us-east-1.on.aws:443
+            download.eclipse.org:443
+            files.pythonhosted.org:443
+            github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
+            models.dev:443
+            pypi.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            results-receiver.actions.githubusercontent.com:443
+            run-actions-*-azure-*.actions.githubusercontent.com:443
+            services.gradle.org:443
       - name: Review architecture changes
         uses: CodeBoarding/CodeBoarding-action@18c91426356241185a0ce51a786f98c96a35d3d2 # v1.18.0
         with:
           llm: hosted
+          # Disables the experimental review guide, which would send the
+          # analysis to an additional CodeBoarding service.
+          review_guide_url: ''
