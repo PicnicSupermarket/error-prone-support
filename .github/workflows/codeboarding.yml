@@ -1,0 +1,38 @@
+# Posts an architecture diagram of the changes in a pull request, using
+# CodeBoarding. See https://www.codeboarding.org and
+# https://github.com/CodeBoarding/CodeBoarding-action.
+name: Visualize architecture changes
+on:
+  pull_request:
+    paths: [ '**/*.java', .github/workflows/codeboarding.yml ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions: {}
+jobs:
+  review:
+    name: Review architecture changes with CodeBoarding
+    # Analysis of code in forked repositories is skipped, as such workflow runs
+    # do not receive the OIDC credentials required to use the hosted LLM.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      actions: read # To reuse analyses of earlier runs.
+      contents: read
+      id-token: write # To authenticate against CodeBoarding's hosted LLM.
+      issues: write # To post the architecture review as a PR comment.
+      pull-requests: write # To post the architecture review as a PR comment.
+    runs-on: ubuntu-24.04
+    # XXX: Revisit once at least 20 successful runs have completed.
+    timeout-minutes: 30
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          disable-sudo-and-containers: true
+          # XXX: Replace with an explicit `allowed-endpoints` list, based on the
+          # outbound calls observed in audit mode.
+          egress-policy: audit
+      - name: Review architecture changes
+        uses: CodeBoarding/CodeBoarding-action@18c91426356241185a0ce51a786f98c96a35d3d2 # v1.18.0
+        with:
+          llm: hosted
