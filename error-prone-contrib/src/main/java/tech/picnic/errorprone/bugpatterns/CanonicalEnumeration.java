@@ -12,10 +12,8 @@ import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.utils.MoreTypes.generic;
-import static tech.picnic.errorprone.utils.MoreTypes.raw;
 import static tech.picnic.errorprone.utils.MoreTypes.subOf;
 import static tech.picnic.errorprone.utils.MoreTypes.type;
-import static tech.picnic.errorprone.utils.MoreTypes.unbound;
 
 import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableBiMap;
@@ -41,8 +39,11 @@ import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.BoundKind;
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Type;
+import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.util.Name;
 import java.util.Collection;
 import java.util.List;
@@ -71,9 +72,12 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
 // Doing so requires proving that the variable does not escape and that no element is added
 // conditionally.
 // XXX: Explicit type arguments are dropped, which in the absence of a target type (such as in a
-// `var` declaration or in receiver position) may narrow the expression's type.
-// XXX: The `Comparable` guards approximate the `E extends Comparable<? super E>` bound of the
-// sorted collections' factory methods; an `E extends Comparable<SomethingElse>` would slip through.
+// `var` declaration or in receiver position) may narrow the expression's type, to the point of
+// yielding uncompilable code. The narrowed type may also cause a different overload to be selected.
+// XXX: Unlike `Set#of`, the canonical factory methods do not reject duplicate values; rewriting
+// `Set#of` invocations therefore drops a runtime precondition.
+// XXX: Arguments passed to a builder's sizing factory method, such as
+// `ImmutableList#builderWithExpectedSize(int)`, are dropped; any side effects they have are lost.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Prefer the canonical factory method for enumerating a fixed number of values",
@@ -92,22 +96,11 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           .onDescendantOf(Collection.class.getCanonicalName())
           .named("stream")
           .withNoParameters();
-  private static final Matcher<ExpressionTree> ENUMERATES_COMPARABLES =
-      MoreMatchers.isSubTypeOf(
-          generic(
-              type(Iterable.class.getCanonicalName()),
-              subOf(raw(type(Comparable.class.getCanonicalName())))));
   private static final Matcher<ExpressionTree> ENUMERATES_TAGS =
       MoreMatchers.isSubTypeOf(
           generic(
               type(Iterable.class.getCanonicalName()),
               subOf(type("io.micrometer.core.instrument.Tag"))));
-  private static final Matcher<ExpressionTree> HAS_COMPARABLE_KEYS =
-      MoreMatchers.isSubTypeOf(
-          generic(
-              type(Map.class.getCanonicalName()),
-              subOf(raw(type(Comparable.class.getCanonicalName()))),
-              unbound()));
   private static final Matcher<ExpressionTree> IMMUTABLE_LIST_FACTORY =
       staticMethod().onClass(ImmutableList.class.getCanonicalName()).named("of");
   private static final Matcher<ExpressionTree> IMMUTABLE_MULTIMAP_FACTORY =
@@ -133,19 +126,6 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
   private static final Supplier<Name> FACTORY_METHOD_NAME =
       VisitorState.memoize(state -> state.getName("of"));
 
-  /**
-   * The enumerations that may be streamed directly.
-   *
-   * <p>Only enumerations that preserve both the order and the cardinality of the values enumerated
-   * qualify; streaming e.g. a {@link Set} would impose an unspecified iteration order, and
-   * streaming a deduplicating collection would change the number of values streamed.
-   */
-  private static final ImmutableList<Enumerator> STREAMABLE_ENUMERATORS =
-      ImmutableList.of(
-          arguments(JDK_LIST_FACTORY),
-          arguments(IMMUTABLE_LIST_FACTORY),
-          builderChain(ImmutableList.class, /* argsPerEntry= */ 1));
-
   /** The non-canonical enumerations recognized, and the factory methods that supersede them. */
   private static final ImmutableList<Rule> RULES =
       ImmutableList.of(
@@ -155,7 +135,7 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           guavaRule(CanonicalEnumeration::enumerateMapEntries, ImmutableMap.class),
           guavaRule(arguments(IMMUTABLE_MULTIMAP_FACTORY), ImmutableListMultimap.class),
           new Rule(
-              arguments(TAG_ENUMERATION_FACTORY),
+              CanonicalEnumeration::enumerateTags,
               "io.micrometer.core.instrument.Tags",
               ENUMERATES_TAGS),
           new Rule(
@@ -169,8 +149,30 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
           builderRule(ImmutableMultiset.class, /* argsPerEntry= */ 1),
           builderRule(ImmutableSet.class, /* argsPerEntry= */ 1),
           builderRule(ImmutableSetMultimap.class, /* argsPerEntry= */ 2),
-          builderRule(ImmutableSortedMap.class, /* argsPerEntry= */ 2, HAS_COMPARABLE_KEYS),
-          builderRule(ImmutableSortedSet.class, /* argsPerEntry= */ 1, ENUMERATES_COMPARABLES));
+          builderRule(
+              ImmutableSortedMap.class,
+              /* argsPerEntry= */ 2,
+              CanonicalEnumeration::hasComparableKeys),
+          builderRule(
+              ImmutableSortedSet.class,
+              /* argsPerEntry= */ 1,
+              CanonicalEnumeration::enumeratesComparables));
+
+  /**
+   * Recognizes the enumerations that may be streamed directly.
+   *
+   * <p>Only enumerations that preserve both the order and the cardinality of the values enumerated
+   * qualify; streaming e.g. a {@link Set} would impose an unspecified iteration order, and
+   * streaming a deduplicating collection would change the number of values streamed.
+   */
+  private static final ImmutableList<Enumerator> STREAMABLE_ENUMERATORS =
+      ImmutableList.of(
+          arguments(JDK_LIST_FACTORY),
+          arguments(IMMUTABLE_LIST_FACTORY),
+          builderChain(ImmutableList.class, /* argsPerEntry= */ 1));
+
+  /** Recognizes the enumerations of Micrometer tags that may be rewritten. */
+  private static final Enumerator TAG_ENUMERATOR = arguments(TAG_ENUMERATION_FACTORY);
 
   /** Instantiates a new {@link CanonicalEnumeration} instance. */
   public CanonicalEnumeration() {}
@@ -210,11 +212,78 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
         allOf(CanonicalEnumeration::isGuavaIntroductionAllowed, guard));
   }
 
-  // XXX: This guard cannot be exercised by a test, as Guava is on the classpath of every test. It
-  // is retained for explicitness; absent Guava the target types' factory method overloads cannot be
-  // resolved either, so `Rule#hasOverload` would reject the enumeration regardless.
+  // XXX: This guard's outcome cannot be observed: the witness type by way of which Guava's presence
+  // is established is itself one of the target types, so absent Guava the target types' factory
+  // method overloads cannot be resolved either, and the `Rule#hasOverload` check that precedes this
+  // guard already rejects the enumeration. The guard is nevertheless retained, as it is the sole
+  // remaining safeguard should that check fail to establish the target type's absence.
   private static boolean isGuavaIntroductionAllowed(ExpressionTree tree, VisitorState state) {
     return ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state);
+  }
+
+  /**
+   * Tells whether the values enumerated by the given expression are mutually comparable, as
+   * required by {@link ImmutableSortedSet}'s factory methods.
+   */
+  private static boolean enumeratesComparables(ExpressionTree tree, VisitorState state) {
+    return hasSelfComparableTypeArgument(tree, Iterable.class, state);
+  }
+
+  /**
+   * Tells whether the keys enumerated by the given expression are mutually comparable, as required
+   * by {@link ImmutableSortedMap}'s factory methods.
+   */
+  private static boolean hasComparableKeys(ExpressionTree tree, VisitorState state) {
+    return hasSelfComparableTypeArgument(tree, Map.class, state);
+  }
+
+  /**
+   * Tells whether the given expression's first type argument, relative to the given supertype, is
+   * comparable to itself.
+   */
+  private static boolean hasSelfComparableTypeArgument(
+      ExpressionTree tree, Class<?> superType, VisitorState state) {
+    Symbol symbol =
+        JavacElements.instance(state.context).getTypeElement(superType.getCanonicalName());
+    Type type = ASTHelpers.getType(tree);
+    if (symbol == null || type == null) {
+      return false;
+    }
+
+    Type superTypeInstance = state.getTypes().asSuper(type, symbol);
+    return superTypeInstance != null
+        && !superTypeInstance.getTypeArguments().isEmpty()
+        && isSelfComparable(superTypeInstance.getTypeArguments().getFirst(), state);
+  }
+
+  /**
+   * Tells whether the given type {@code T} implements {@code Comparable<? super T>}.
+   *
+   * <p>This is the bound imposed by the sorted collection types' factory methods. It must be
+   * verified exactly: Guava's sorted collection types declare additional unbounded factory method
+   * overloads that are selected precisely when this bound is <em>not</em> satisfied, and that throw
+   * when invoked. Approximating the bound would therefore yield code that compiles but always
+   * fails.
+   */
+  private static boolean isSelfComparable(Type type, VisitorState state) {
+    Type bound =
+        state.getType(
+            state.getSymtab().comparableType,
+            /* isArray= */ false,
+            ImmutableList.of(
+                new Type.WildcardType(type, BoundKind.SUPER, state.getSymtab().boundClass)));
+    return bound != null && state.getTypes().isSubtype(type, bound);
+  }
+
+  /**
+   * Enumerates the tags enumerated by the given expression, if it enumerates at least one.
+   *
+   * <p>The empty case is excluded, as a reference to {@code Tags#of()} is ambiguous: {@code Tags}
+   * declares both a {@code String}-valued and a {@code Tag}-valued variadic overload.
+   */
+  private static Optional<ImmutableList<ExpressionTree>> enumerateTags(
+      ExpressionTree tree, VisitorState state) {
+    return TAG_ENUMERATOR.enumerate(tree, state).filter(tags -> !tags.isEmpty());
   }
 
   /** Enumerates the arguments of an invocation of the given method. */
@@ -231,11 +300,9 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
    * Enumerates the values added to a fluent chain of invocations rooted at one of the given type's
    * builder factory methods.
    *
-   * <p>Builder factory methods that impose a non-natural ordering, such as {@code orderedBy} and
-   * {@code reverseOrder}, are deliberately omitted.
-   *
-   * @param target The type whose builder invocations are to be enumerated.
-   * @param argsPerEntry The number of arguments that make up a single enumerated entry.
+   * <p>Each enumerated entry consists of {@code argsPerEntry} arguments. Builder factory methods
+   * that impose a non-natural ordering, such as {@code orderedBy} and {@code reverseOrder}, are
+   * deliberately omitted.
    */
   private static Enumerator builderChain(Class<?> target, int argsPerEntry) {
     Matcher<ExpressionTree> builderFactory =
@@ -370,13 +437,21 @@ public final class CanonicalEnumeration extends BugChecker implements MethodInvo
     }
 
     /** Tells whether the factory method has an overload that accepts the given argument count. */
-    // XXX: The null check below is unkillable: every target type is either part of the JDK or
-    // implied by the matched expression's own type.
     private boolean hasOverload(int argCount, VisitorState state) {
-      Type type = state.getTypeFromString(targetFqcn);
-      if (type == null) {
+      /*
+       * The target type is looked up by way of `JavacElements`, as `VisitorState#getTypeFromString`
+       * consults only the symbol table: it fails to resolve types that are on the classpath but not
+       * referenced by any source file in the compilation, making this check's outcome depend on
+       * unrelated files.
+       */
+      // XXX: The mutant that replaces the early return below with `true` is unkillable: if the
+      // target type cannot be resolved then `guard` rejects the enumeration regardless.
+      Symbol target = JavacElements.instance(state.context).getTypeElement(targetFqcn);
+      if (target == null) {
         return false;
       }
+
+      Type type = target.type;
 
       /*
        * Only overloads declared by the target type itself are considered; static methods declared
