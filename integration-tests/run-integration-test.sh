@@ -105,7 +105,12 @@ case "$(uname -s)" in
     ;;
 esac
 
+# The first three flags mirror this repository's `.mvn/maven.config`, which does
+# not apply to the target projects.
 shared_build_flags="
+  --errors
+  --strict-checksums
+  -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles=false
   -T1C
   -Derror-prone.version=$(
     mvn -f "${error_prone_support_root}" help:evaluate -Dexpression=version.error-prone -q -DforceStdout
