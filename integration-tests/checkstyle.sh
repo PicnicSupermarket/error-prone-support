@@ -5,7 +5,7 @@ set -e -u -o pipefail
 test_name="$(basename "${0}" .sh)"
 project='checkstyle'
 repository='https://github.com/checkstyle/checkstyle.git'
-revision='checkstyle-14.0.0'
+revision='checkstyle-14.4.0'
 # The `no-validations` profile disables the code quality plugins using which
 # this project validates its own sources; those sources are here reformatted
 # using Google Java Format, which such validation does not tolerate. The
@@ -16,8 +16,9 @@ additional_source_directories='${project.basedir}${file.separator}src${file.sepa
 shared_error_prone_flags='-XepExcludedPaths:(\Q${project.basedir}${file.separator}src${file.separator}\E(it|test|xdocs-examples)\Q${file.separator}resources\E|\Q${project.build.directory}${file.separator}\E).*'
 patch_error_prone_flags=''
 validation_error_prone_flags=''
-# The `no-validations` profile enabled above also skips the tests.
-validation_build_flags='-DskipTests=false'
+# The `no-validations` profile enabled above also skips the unit and integration
+# tests.
+validation_build_flags='-DskipTests=false -DskipITs=false'
 
 "$(dirname "${0}")/run-integration-test.sh" \
   "${test_name}" \

@@ -1,6 +1,6 @@
 --- a/pom.xml
 +++ b/pom.xml
-@@ -431,6 +431,12 @@
+@@ -432,6 +432,12 @@
        <version>1.4.4</version>
        <scope>test</scope>
      </dependency>
@@ -13,7 +13,7 @@
      <dependency>
        <groupId>nl.jqno.equalsverifier</groupId>
        <artifactId>equalsverifier</artifactId>
-@@ -1035,6 +1041,10 @@
+@@ -1071,6 +1077,10 @@
              <phase>process-classes</phase>
              <goals><goal>java</goal></goals>
              <configuration>
@@ -24,7 +24,15 @@
                <classpathScope>compile</classpathScope>
                <mainClass>
                  com.puppycrawl.tools.checkstyle.site.SearchIndexGenerator
-@@ -2808,6 +2818,8 @@
+@@ -2757,7 +2767,6 @@
+                   <goal>compile</goal>
+                 </goals>
+                 <configuration>
+-                  <failOnError>false</failOnError>
+                   <compilerArgs>
+                     <arg>-Xpkginfo:always</arg>
+                     <arg>-XDcompilePolicy=simple</arg>
+@@ -2766,6 +2775,8 @@
                      <arg>
                        -Xplugin:ErrorProne ${error-prone.configuration-args}
                      </arg>
@@ -33,7 +41,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2820,6 +2832,11 @@
+@@ -2778,6 +2789,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -45,7 +53,18 @@
                    </annotationProcessorPaths>
                  </configuration>
                </execution>
-@@ -2864,9 +2881,10 @@
+@@ -2814,7 +2830,9 @@
+                   <goal>testCompile</goal>
+                 </goals>
+                 <configuration>
+-                  <failOnError>false</failOnError>
++                  <!-- As with the `default-testCompile` execution that this one replaces: the tests
++                  are not part of the module, so compile them on the classpath. -->
++                  <useModulePath>false</useModulePath>
+                   <compilerArgs>
+                     <arg>--should-stop=ifError=FLOW</arg>
+                     <arg>-Xpkginfo:always</arg>
+@@ -2822,9 +2840,10 @@
                      <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
                      <arg>
                        -Xplugin:ErrorProne \
@@ -57,7 +76,7 @@
                    </compilerArgs>
                    <annotationProcessorPaths>
                      <path>
-@@ -2879,6 +2897,11 @@
+@@ -2837,6 +2856,11 @@
                        <artifactId>error-prone-contrib</artifactId>
                        <version>${error-prone-support.version}</version>
                      </path>
@@ -146,7 +165,7 @@
                                      TRY_IN_ALL_REGISTERED_PACKAGES);
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/SarifLoggerTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/SarifLoggerTest.java
-@@ -30,6 +30,7 @@ import java.io.Serial;
+@@ -31,6 +31,7 @@ import java.net.URI;
  import java.nio.charset.StandardCharsets;
  import java.util.Map;
  
@@ -154,7 +173,7 @@
  import org.junit.jupiter.api.Test;
  
  import com.puppycrawl.tools.checkstyle.AbstractAutomaticBean.OutputStreamOptions;
-@@ -41,6 +42,9 @@ import com.puppycrawl.tools.checkstyle.internal.utils.CloseAndFlushTestByteArray
+@@ -42,6 +43,9 @@ import com.puppycrawl.tools.checkstyle.internal.utils.CloseAndFlushTestByteArray
  import com.puppycrawl.tools.checkstyle.internal.utils.TestUtil;
  import com.puppycrawl.tools.checkstyle.meta.ModuleDetails;
  
@@ -205,7 +224,7 @@
  import org.junit.jupiter.api.Test;
  
  import com.google.common.base.Splitter;
-@@ -505,6 +506,10 @@ public class AllChecksTest extends AbstractModuleTestSupport {
+@@ -515,6 +516,10 @@ public class AllChecksTest extends AbstractModuleTestSupport {
          }
      }
  
@@ -247,7 +266,7 @@
  import java.nio.file.Files;
  import java.nio.file.Path;
  import java.util.ArrayList;
-@@ -345,8 +346,12 @@ public class XdocsExampleFileTest {
+@@ -307,8 +308,12 @@ public class XdocsExampleFileTest {
  
          try {
              final Class<?> testClass = Class.forName(className);
@@ -262,7 +281,7 @@
              final String packageLocation = instance.getPackageLocation();
  
              scanExampleDirectory(examplesResources.resolve(packageLocation),
-@@ -390,8 +395,12 @@ public class XdocsExampleFileTest {
+@@ -354,8 +359,12 @@ public class XdocsExampleFileTest {
  
          try {
              final Class<?> testClass = Class.forName(className);
@@ -287,7 +306,7 @@
  import org.junit.jupiter.api.Test;
  import org.w3c.dom.Document;
  import org.w3c.dom.Element;
-@@ -288,6 +289,10 @@ public class XdocsExamplesAstConsistencyTest {
+@@ -259,6 +260,10 @@ public class XdocsExamplesAstConsistencyTest {
       *
       * @throws IOException if an I/O error occurs
       */
@@ -298,7 +317,7 @@
      @Test
      public void testExampleCountMatchesPropertyCount() throws IOException {
          final List<String> violations = Collections.synchronizedList(new ArrayList<>());
-@@ -312,6 +317,10 @@ public class XdocsExamplesAstConsistencyTest {
+@@ -283,6 +288,10 @@ public class XdocsExamplesAstConsistencyTest {
       *
       * @throws IOException if an I/O error occurs
       */
@@ -311,7 +330,7 @@
          final List<String> violations = Collections.synchronizedList(new ArrayList<>());
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsJavaDocsTest.java
-@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
+@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
  import javax.xml.parsers.ParserConfigurationException;
  
  import org.junit.jupiter.api.BeforeEach;
@@ -319,7 +338,7 @@
  import org.junit.jupiter.api.Test;
  import org.w3c.dom.Document;
  import org.w3c.dom.NamedNodeMap;
-@@ -79,6 +80,10 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
+@@ -80,6 +81,10 @@ public class XdocsJavaDocsTest extends AbstractModuleTestSupport {
          checker = createChecker(checkConfig);
      }
  
@@ -353,7 +372,7 @@
          for (Path path : XdocUtil.getXdocsFilePaths()) {
 --- a/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsPagesTest.java
 +++ b/src/test/java/com/puppycrawl/tools/checkstyle/internal/XdocsPagesTest.java
-@@ -61,6 +61,7 @@ import javax.xml.parsers.DocumentBuilder;
+@@ -62,6 +62,7 @@ import javax.xml.parsers.DocumentBuilder;
  import javax.xml.parsers.DocumentBuilderFactory;
  
  import org.apache.commons.beanutils.PropertyUtils;
@@ -361,7 +380,7 @@
  import org.junit.jupiter.api.Test;
  import org.w3c.dom.Document;
  import org.w3c.dom.Element;
-@@ -341,6 +342,10 @@ public class XdocsPagesTest {
+@@ -355,6 +356,10 @@ public class XdocsPagesTest {
          }
      }
  
@@ -372,7 +391,7 @@
      @Test
      public void testAllModulesPageInSyncWithModuleSummaries() throws Exception {
          validateModulesSyncWithTheirSummaries(AVAILABLE_CHECKS_PATH,
-@@ -651,6 +656,10 @@ public class XdocsPagesTest {
+@@ -665,6 +670,10 @@ public class XdocsPagesTest {
          return result;
      }
  
@@ -383,7 +402,7 @@
      @Test
      public void testAllSubSections() throws Exception {
          for (Path path : XdocUtil.getXdocsFilePaths()) {
-@@ -703,6 +712,10 @@ public class XdocsPagesTest {
+@@ -717,6 +726,10 @@ public class XdocsPagesTest {
          }
      }
  
@@ -394,7 +413,7 @@
      @Test
      public void testAllXmlExamples() throws Exception {
          for (Path path : XdocUtil.getXdocsFilePaths()) {
-@@ -813,6 +826,10 @@ public class XdocsPagesTest {
+@@ -831,6 +844,10 @@ public class XdocsPagesTest {
          return true;
      }
  
@@ -418,7 +437,7 @@
      @Override
 --- a/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/annotation/SuppressWarningsHolderExamplesTest.java
 +++ b/src/xdocs-examples/java/com/puppycrawl/tools/checkstyle/checks/annotation/SuppressWarningsHolderExamplesTest.java
-@@ -19,13 +19,18 @@
+@@ -19,12 +19,17 @@
  
  package com.puppycrawl.tools.checkstyle.checks.annotation;
  
@@ -429,7 +448,6 @@
  
  import com.puppycrawl.tools.checkstyle.AbstractExamplesModuleTestSupport;
 +import com.puppycrawl.tools.checkstyle.checks.SuppressWarningsHolder;
- import com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck;
  import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
  import com.puppycrawl.tools.checkstyle.checks.sizes.ParameterNumberCheck;
  import com.puppycrawl.tools.checkstyle.checks.whitespace.NoWhitespaceAfterCheck;
@@ -437,7 +455,7 @@
  
  public class SuppressWarningsHolderExamplesTest extends AbstractExamplesModuleTestSupport {
  
-@@ -34,6 +39,18 @@ public class SuppressWarningsHolderExamplesTest extends AbstractExamplesModuleTe
+@@ -33,6 +38,18 @@ public class SuppressWarningsHolderExamplesTest extends AbstractExamplesModuleTe
          return "com/puppycrawl/tools/checkstyle/checks/annotation/suppresswarningsholder";
      }
  
