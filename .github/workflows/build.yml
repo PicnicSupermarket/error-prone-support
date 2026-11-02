@@ -27,7 +27,7 @@ jobs:
         target-jdk: [ 21.0.12 ]
         include:
           - os: ubuntu-24.04
-            build-jdk: 26.0.2
+            build-jdk: 27
             target-jdk: 21.0.12
     permissions:
       contents: read
