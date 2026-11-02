@@ -378,7 +378,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.55</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -469,7 +469,7 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.13.0</version>
+                <version>5.14.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1123,7 +1123,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -1385,7 +1385,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1653,7 +1653,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.15</version>
+                    <version>0.8.16</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method

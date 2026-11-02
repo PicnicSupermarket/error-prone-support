@@ -31,6 +31,7 @@ jobs:
       contents: read
       pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     environment: codex
     steps:
       - name: Install Harden-Runner
