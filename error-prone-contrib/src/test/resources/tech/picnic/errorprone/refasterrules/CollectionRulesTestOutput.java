@@ -1,6 +1,8 @@
 package tech.picnic.errorprone.refasterrules;
 
 import static java.util.Collections.disjoint;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableList;
@@ -12,6 +14,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -25,7 +28,13 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Iterables.class, Lists.class, Streams.class, toUnmodifiableSet());
+    return ImmutableSet.of(
+        Iterables.class,
+        Lists.class,
+        Streams.class,
+        naturalOrder(),
+        reverseOrder(),
+        toUnmodifiableSet());
   }
 
   ImmutableSet<Boolean> testCollectionIsEmpty() {
@@ -216,5 +225,43 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
 
   String testSortedSetLast() {
     return ImmutableSortedSet.of("foo").last();
+  }
+
+  void testCollectionsSort() {
+    Collections.sort(ImmutableList.of("foo", "bar"));
+  }
+
+  ImmutableSet<String> testCollectionsMin() {
+    return ImmutableSet.of(
+        Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
+  }
+
+  String testCollectionsMinArraysAsList() {
+    return Collections.min(Arrays.asList(new String[0]), naturalOrder());
+  }
+
+  String testCollectionsMinWithComparator() {
+    return Collections.min(ImmutableSet.of("foo", "bar"), naturalOrder());
+  }
+
+  int testCollectionsMinArraysAsListVarargs() {
+    return Collections.min(Arrays.asList(1, 2), naturalOrder());
+  }
+
+  ImmutableSet<String> testCollectionsMax() {
+    return ImmutableSet.of(
+        Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
+  }
+
+  String testCollectionsMaxArraysAsList() {
+    return Collections.max(Arrays.asList(new String[0]), naturalOrder());
+  }
+
+  String testCollectionsMaxWithComparator() {
+    return Collections.max(ImmutableSet.of("foo", "bar"), naturalOrder());
+  }
+
+  int testCollectionsMaxArraysAsListVarargs() {
+    return Collections.max(Arrays.asList(1, 2), naturalOrder());
   }
 }

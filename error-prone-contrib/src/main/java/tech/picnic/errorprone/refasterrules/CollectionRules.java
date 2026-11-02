@@ -2,6 +2,8 @@ package tech.picnic.errorprone.refasterrules;
 
 import static com.google.errorprone.refaster.ImportPolicy.STATIC_IMPORT_ALWAYS;
 import static java.util.Collections.disjoint;
+import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.google.common.collect.ImmutableCollection;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -672,6 +675,129 @@ final class CollectionRules {
     @AfterTemplate
     S after(SortedSet<T> sortedSet) {
       return sortedSet.last();
+    }
+  }
+
+  /** Prefer {@link Collections#sort(List)} over more verbose alternatives. */
+  static final class CollectionsSort<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    void before(List<T> list) {
+      Collections.sort(list, naturalOrder());
+    }
+
+    @AfterTemplate
+    void after(List<T> list) {
+      Collections.sort(list);
+    }
+  }
+
+  /**
+   * Prefer {@link Collections#min(Collection)} over more verbose or more contrived alternatives.
+   */
+  static final class CollectionsMin<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    T before(Collection<T> coll) {
+      return Refaster.anyOf(
+          Collections.min(coll, naturalOrder()), Collections.max(coll, reverseOrder()));
+    }
+
+    @AfterTemplate
+    T after(Collection<T> coll) {
+      return Collections.min(coll);
+    }
+  }
+
+  /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMinArraysAsList<S, T extends S> {
+    @BeforeTemplate
+    T before(T[] array, Comparator<S> comp) {
+      return Arrays.stream(array).min(comp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(T[] array, Comparator<S> comp) {
+      return Collections.min(Arrays.asList(array), comp);
+    }
+  }
+
+  /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMinWithComparator<S, T extends S> {
+    @BeforeTemplate
+    T before(Collection<T> coll, Comparator<S> comp) {
+      return coll.stream().min(comp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(Collection<T> coll, Comparator<S> comp) {
+      return Collections.min(coll, comp);
+    }
+  }
+
+  /** Prefer {@link Collections#min(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMinArraysAsListVarargs<S, T extends S> {
+    @BeforeTemplate
+    T before(@Repeated T a, Comparator<S> comp) {
+      return Stream.of(Refaster.asVarargs(a)).min(comp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(@Repeated T a, Comparator<S> comp) {
+      return Collections.min(Arrays.asList(Refaster.asVarargs(a)), comp);
+    }
+  }
+
+  /**
+   * Prefer {@link Collections#max(Collection)} over more verbose or more contrived alternatives.
+   */
+  static final class CollectionsMax<T extends Comparable<? super T>> {
+    @BeforeTemplate
+    T before(Collection<T> coll) {
+      return Refaster.anyOf(
+          Collections.max(coll, naturalOrder()), Collections.min(coll, reverseOrder()));
+    }
+
+    @AfterTemplate
+    T after(Collection<T> coll) {
+      return Collections.max(coll);
+    }
+  }
+
+  /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMaxArraysAsList<S, T extends S> {
+    @BeforeTemplate
+    T before(T[] array, Comparator<S> comp) {
+      return Arrays.stream(array).max(comp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(T[] array, Comparator<S> comp) {
+      return Collections.max(Arrays.asList(array), comp);
+    }
+  }
+
+  /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMaxWithComparator<S, T extends S> {
+    @BeforeTemplate
+    T before(Collection<T> coll, Comparator<S> comp) {
+      return coll.stream().max(comp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(Collection<T> coll, Comparator<S> comp) {
+      return Collections.max(coll, comp);
+    }
+  }
+
+  /** Prefer {@link Collections#max(Collection, Comparator)} over less efficient alternatives. */
+  static final class CollectionsMaxArraysAsListVarargs<S, T extends S> {
+    @BeforeTemplate
+    T before(@Repeated T a, Comparator<S> comp) {
+      return Stream.of(Refaster.asVarargs(a)).max(comp).orElseThrow();
+    }
+
+    @AfterTemplate
+    T after(@Repeated T a, Comparator<S> comp) {
+      return Collections.max(Arrays.asList(Refaster.asVarargs(a)), comp);
     }
   }
 
