@@ -20,7 +20,7 @@ matches a code pattern; the `@AfterTemplate` specifies its replacement. Rules
 are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 
 ## Choosing the collection
-<!-- check: Rule lives in the collection matching its `@AfterTemplate` target -->
+<!-- check: Rules live in the collection matching their `@AfterTemplate` target -->
 
 A rule's collection is determined by its `@AfterTemplate` code (the preferred
 alternative), not by the `@BeforeTemplate` pattern it replaces. This mirrors

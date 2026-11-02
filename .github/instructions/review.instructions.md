@@ -293,7 +293,7 @@ the files you modified.
 
 ### Choosing the collection
 
-- [ ] Rule lives in the collection matching its `@AfterTemplate` target
+- [ ] Rules live in the collection matching their `@AfterTemplate` target
 
 ### Rule file structure
 
