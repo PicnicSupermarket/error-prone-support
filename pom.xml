@@ -199,7 +199,7 @@
         <version.google-java-format>1.37.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.10.0</version.maven>
-        <version.pitest-git>2.3.4</version.pitest-git>
+        <version.pitest-git>2.4.0</version.pitest-git>
     </properties>
 
     <dependencyManagement>
@@ -354,14 +354,14 @@
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-bom</artifactId>
-                <version>1.17.1</version>
+                <version>1.17.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
-                <version>2025.0.7</version>
+                <version>2025.0.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -378,7 +378,7 @@
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-annotations</artifactId>
-                <version>2.2.55</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.servlet</groupId>
@@ -408,7 +408,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.15</version>
+                <version>1.18.16</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.25.1</version>
+                <version>1.9.26</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -469,9 +469,14 @@
             <dependency>
                 <groupId>org.mongodb</groupId>
                 <artifactId>mongodb-driver-bom</artifactId>
-                <version>5.13.0</version>
+                <version>5.14.0</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>3.6</version>
             </dependency>
             <dependency>
                 <groupId>org.openrewrite</groupId>
@@ -484,6 +489,13 @@
                 <groupId>org.openrewrite</groupId>
                 <artifactId>rewrite-templating</artifactId>
                 <version>1.44.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm-bom</artifactId>
+                <version>9.11.1</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.reactivestreams</groupId>
@@ -500,19 +512,19 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>7.0.9</version>
+                <version>7.0.10</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>4.1.1</version>
+                <version>4.1.2</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-bom</artifactId>
-                <version>7.1.1</version>
+                <version>7.1.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1123,7 +1135,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                     <configuration>
                         <fail>false</fail>
                         <rules>
@@ -1166,18 +1178,41 @@
                                     <ignore>${project.groupId}</ignore>
                                 </ignores>
                             </banDynamicVersions>
-                            <dependencyConvergence />
+                            <dependencyConvergence>
+                                <excludedScopes />
+                            </dependencyConvergence>
                             <enforceBytecodeVersion>
-                                <ignoredScopes>
-                                    <ignoredScope>provided</ignoredScope>
-                                    <ignoredScope>test</ignoredScope>
-                                </ignoredScopes>
+                                <excludes>
+                                    <!-- Testing generated OpenRewrite recipes
+                                    using the newest supported JDK requires
+                                    this `test`-scoped dependency. -->
+                                    <exclude>org.openrewrite:rewrite-java-25</exclude>
+                                </excludes>
                                 <maxJdkVersion>${version.jdk}</maxJdkVersion>
                             </enforceBytecodeVersion>
+                            <!-- XXX: Currently `reactorModuleConvergence`
+                            fails `mvn -pl <module>` builds that omit `-am`,
+                            because the parent POM is then not part of the
+                            reactor. Look into how to fix this.
+                            <reactorModuleConvergence /> -->
                             <requireEncoding>
                                 <acceptAsciiSubset>true</acceptAsciiSubset>
                                 <encoding>ISO-8859-1</encoding>
-                                <includes>src/main/resources/**/*.properties,src/test/resources/**/*.properties</includes>
+                                <excludes>**/target/**,**/.repos/**</excludes>
+                                <includes>**/*.properties</includes>
+                            </requireEncoding>
+                            <requireEncoding>
+                                <encoding>US-ASCII</encoding>
+                                <excludes>**/target/**,**/.repos/**</excludes>
+                                <includes>**/*.sh,**/*.xml,**/*.yml</includes>
+                            </requireEncoding>
+                            <!-- XXX: In `documentation.instructions.md` we
+                            require ASCII also for Markdown files. Refine that
+                            rule, or make files compliant. -->
+                            <requireEncoding>
+                                <acceptAsciiSubset>true</acceptAsciiSubset>
+                                <encoding>UTF-8</encoding>
+                                <excludes>**/*.properties,**/target/**,**/.repos/**</excludes>
                             </requireEncoding>
                             <requireJavaVersion>
                                 <version>25</version>
@@ -1190,8 +1225,18 @@
                                 <version>${version.maven}</version>
                             </requireMavenVersion>
                             <requireNoRepositories />
-                            <requirePluginVersions />
-                            <requireUpperBoundDeps />
+                            <requirePluginVersions>
+                                <additionalPlugins>
+                                    <!-- Invoked from the integration test
+                                    scripts, without being bound to a build
+                                    phase. -->
+                                    <additionalPlugin>org.apache.maven.plugins:maven-help-plugin</additionalPlugin>
+                                </additionalPlugins>
+                            </requirePluginVersions>
+                            <requireProfileIdsExist />
+                            <requireUpperBoundDeps>
+                                <excludedScopes />
+                            </requireUpperBoundDeps>
                         </rules>
                     </configuration>
                     <dependencies>
@@ -1225,6 +1270,11 @@
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-help-plugin</artifactId>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1385,7 +1435,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.6.1</version>
                     <configuration>
                         <includes>
                             <include>**/*Test.java</include>
@@ -1653,7 +1703,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.15</version>
+                    <version>0.8.16</version>
                     <configuration>
                         <excludes>
                             <!-- Refaster rules are tested using a custom method
@@ -1683,7 +1733,7 @@
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
-                    <version>1.30.0</version>
+                    <version>1.30.1</version>
                     <configuration>
                         <excludedClasses>
                             <!-- Refaster rule collections. -->

@@ -12,14 +12,13 @@ import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.LambdaExpressionTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
+import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.TypeCastTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Type;
-import javax.lang.model.type.TypeKind;
-import tech.picnic.errorprone.utils.SourceCode;
 
 /**
  * A {@link BugChecker} that flags lambda expressions that can be replaced with a method reference
@@ -50,13 +49,12 @@ public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpr
 
     Type type = ASTHelpers.getType(typeCast);
     if (type == null
-        || type.isParameterized()
         || type.isPrimitive()
-        || type.getKind() == TypeKind.TYPEVAR) {
+        || !state.getTypes().isSameType(type, state.getTypes().erasure(type))) {
       /*
-       * The method reference syntax does not support casting to parameterized types, and type
-       * variables aren't supported either. Additionally, `Class#cast` does not support the same
-       * range of type conversions between (boxed) primitive types as the cast operator.
+       * Class literals cannot express parameterized types, type variables or arrays thereof, and
+       * `Class#cast` would yield the erased type. Additionally, `Class#cast` does not support the
+       * same range of type conversions between (boxed) primitive types as the cast operator.
        */
       // XXX: Depending on the declared type of the value being cast, in some cases we _can_ rewrite
       // primitive casts. Add support for this.
@@ -68,9 +66,8 @@ public final class ClassCastLambdaUsage extends BugChecker implements LambdaExpr
       return Description.NO_MATCH;
     }
 
-    return describeMatch(
-        tree,
-        SuggestedFix.replace(
-            tree, SourceCode.treeToString(typeCast.getType(), state) + ".class::cast"));
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String typeName = SuggestedFixes.qualifyType(state, fix, type);
+    return describeMatch(tree, fix.replace(tree, typeName + ".class::cast").build());
   }
 }
