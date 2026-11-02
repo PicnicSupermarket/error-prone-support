@@ -27,10 +27,11 @@ alternative), not by the `@BeforeTemplate` pattern it replaces. This mirrors
 the [rule naming convention](#rule-named-after-aftertemplate-content): both a
 rule's name and its home are anchored to the code it rewrites _to_.
 
-- **Do**: place a rule whose `@AfterTemplate` calls `Objects.requireNonNull` in
-  `PreconditionsRules`, alongside the other `requireNonNull` rewrites.
-- **Don't**: place that rule in `OptionalRules` merely because its
-  `@BeforeTemplate` matches an `Optional.of(...).orElse(...)` expression.
+- **Do**: place a rule whose `@AfterTemplate` calls `String.join` in
+  `StringRules`.
+- **Don't**: place that rule in `StreamRules` merely because its
+  `@BeforeTemplate` matches an `elements.stream().collect(joining(delimiter))`
+  expression.
 
 If the `@AfterTemplate` references more than one type, the collection follows
 the _subject_ of the rewritten expression rather than the type wrapping it.
@@ -39,8 +40,11 @@ So `CollectionRules.OptionalOfNullableQueuePeek`, which rewrites to
 `OptionalRules`.
 
 Before adding a new rule, check whether an existing rule already rewrites to
-the same target. If so, prefer extending that rule with an additional
-`@BeforeTemplate` over introducing a separate rule.
+the same target. If so, extend that rule instead of introducing a separate one:
+first try to fold the new pattern into an existing `@BeforeTemplate` using
+`Refaster.anyOf`, and only add another `@BeforeTemplate` method if that is not
+possible (see
+[Prefer `Refaster.anyOf` over multiple `@BeforeTemplate` methods](#prefer-refasteranyof-over-multiple-beforetemplate-methods)).
 
 ## File locations
 
