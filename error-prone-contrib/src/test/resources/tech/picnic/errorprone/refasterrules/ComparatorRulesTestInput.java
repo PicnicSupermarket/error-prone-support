@@ -101,18 +101,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>reverseOrder().compare("baz", "qux"));
   }
 
-  String testCollectionsMinArraysAsList() {
-    return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
-  }
-
-  String testCollectionsMinWithComparator() {
-    return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
-  }
-
-  int testCollectionsMinArraysAsListVarargs() {
-    return Stream.of(1, 2).min(naturalOrder()).orElseThrow();
-  }
-
   ImmutableSet<String> testComparatorsMin2() {
     return ImmutableSet.of(
         "foo".compareTo("bar") <= 0 ? "foo" : "bar",
@@ -137,18 +125,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(Arrays.asList("waldo", "fred"), (a, b) -> -1),
         Collections.min(ImmutableList.of("plugh", "xyzzy"), (a, b) -> 0),
         Collections.min(ImmutableSet.of("thud", "foo"), (a, b) -> 1));
-  }
-
-  String testCollectionsMaxArraysAsList() {
-    return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
-  }
-
-  String testCollectionsMaxWithComparator() {
-    return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
-  }
-
-  int testCollectionsMaxArraysAsListVarargs() {
-    return Stream.of(1, 2).max(naturalOrder()).orElseThrow();
   }
 
   ImmutableSet<String> testComparatorsMax2() {

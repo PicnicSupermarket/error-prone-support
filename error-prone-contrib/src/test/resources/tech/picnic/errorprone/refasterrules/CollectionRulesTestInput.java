@@ -293,9 +293,33 @@ final class CollectionRulesTest implements RefasterRuleCollectionTestCase {
         Collections.max(ImmutableList.of("bar"), reverseOrder()));
   }
 
+  String testCollectionsMinArraysAsList() {
+    return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
+  }
+
+  String testCollectionsMinWithComparator() {
+    return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
+  }
+
+  int testCollectionsMinArraysAsListVarargs() {
+    return Stream.of(1, 2).min(naturalOrder()).orElseThrow();
+  }
+
   ImmutableSet<String> testCollectionsMax() {
     return ImmutableSet.of(
         Collections.max(ImmutableList.of("foo"), naturalOrder()),
         Collections.min(ImmutableList.of("bar"), reverseOrder()));
+  }
+
+  String testCollectionsMaxArraysAsList() {
+    return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
+  }
+
+  String testCollectionsMaxWithComparator() {
+    return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
+  }
+
+  int testCollectionsMaxArraysAsListVarargs() {
+    return Stream.of(1, 2).max(naturalOrder()).orElseThrow();
   }
 }
