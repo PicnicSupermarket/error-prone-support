@@ -19,6 +19,11 @@ final class TypeMemberSpecTest {
   }
 
   @Test
+  void parseMemberWithoutType() {
+    assertThat(TypeMemberSpec.parse("#max")).isEqualTo(new TypeMemberSpec("", Optional.of("max")));
+  }
+
+  @Test
   void parseSplitsOnFirstHashOnly() {
     assertThat(TypeMemberSpec.parse("java.lang.Math#max#min"))
         .isEqualTo(new TypeMemberSpec(Math.class.getCanonicalName(), Optional.of("max#min")));
