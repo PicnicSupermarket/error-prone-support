@@ -42,14 +42,6 @@ final class StaticImportConfigTest {
         .doesNotContainAnyElementsOf(StaticImportConfig.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
   }
 
-  @SuppressWarnings(
-      "java:S3415" /* Comparing a constant against a non-constant value is intentional here. */)
-  @Test
-  void candidateIdentifiersDoNotClash() {
-    assertThat(StaticImportConfig.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS)
-        .doesNotContainAnyElementsOf(StaticImportConfig.STATIC_IMPORT_CANDIDATE_MEMBERS.values());
-  }
-
   private static Stream<Arguments> additionalCandidateValidationTestCases() {
     /* { value, expectedError } */
     return Stream.of(
@@ -60,6 +52,10 @@ final class StaticImportConfigTest {
         arguments(
             "java.lang.Math, java.util.UUID",
             "Invalid `StaticImport:AdditionalCandidates` flag value ' java.util.UUID': expected "
+                + "'<type>' or '<type>#<member>'"),
+        arguments(
+            "java..lang.Math",
+            "Invalid `StaticImport:AdditionalCandidates` flag value 'java..lang.Math': expected "
                 + "'<type>' or '<type>#<member>'"),
         arguments(
             "java.lang.Math#min#max",

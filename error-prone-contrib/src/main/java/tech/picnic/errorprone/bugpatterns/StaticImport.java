@@ -70,7 +70,7 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
 
   @Override
   public Description matchMemberSelect(MemberSelectTree tree, VisitorState state) {
-    if (!isCandidateContext(state) || !config.isCandidate(tree)) {
+    if (!isCandidateContext(state) || !config.isPotentialCandidate(tree)) {
       return Description.NO_MATCH;
     }
 

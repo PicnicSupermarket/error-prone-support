@@ -3,7 +3,6 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Functions;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -50,7 +49,9 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import javax.lang.model.SourceVersion;
 import tech.picnic.errorprone.utils.Flags;
+import tech.picnic.errorprone.utils.SourceCode;
 import tech.picnic.errorprone.utils.TypeMemberSpec;
 
 /**
@@ -281,63 +282,16 @@ final class StaticImportConfig implements Serializable {
    */
   @Inject
   StaticImportConfig(ErrorProneFlags flags) {
-    AdditionalCandidates additional = parseAdditionalCandidates(flags);
-    candidateTypes =
-        // XXX: The parameter swap mutant of this `Sets#union` invocation is unkillable: the
-        // argument order influences only iteration order, while the result is queried
-        // exclusively using `ImmutableSet#contains`.
-        Sets.union(STATIC_IMPORT_CANDIDATE_TYPES, additional.types()).immutableCopy();
-    candidateMembers =
-        ImmutableSetMultimap.<String, String>builder()
-            .putAll(STATIC_IMPORT_CANDIDATE_MEMBERS)
-            .putAll(additional.members())
-            .build();
-  }
-
-  /**
-   * Tells whether the given {@link MemberSelectTree} identifies a type member that could be
-   * eligible for static import, regardless of whether it is actually a configured candidate.
-   */
-  boolean isCandidate(MemberSelectTree tree) {
-    String identifier = tree.getIdentifier().toString();
-    if (NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifier)) {
-      return false;
-    }
-
-    Type type = ASTHelpers.getType(tree.getExpression());
-    return type != null
-        && !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
-  }
-
-  /** Returns the simple name under which the given static import candidate should be imported. */
-  Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {
-    String canonicalName = importInfo.canonicalName();
-    return importInfo
-        .simpleName()
-        .toJavaUtil()
-        .filter(
-            name ->
-                candidateTypes.contains(canonicalName)
-                    || candidateMembers.containsEntry(canonicalName, name));
-  }
-
-  /** Tells whether the given statically imported type member should not have been. */
-  boolean shouldNotBeStaticallyImported(String type, String member) {
-    return (NON_STATIC_IMPORT_CANDIDATE_TYPES.contains(type)
-            && !candidateMembers.containsEntry(type, member))
-        || NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type, member)
-        || NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(member);
-  }
-
-  private static AdditionalCandidates parseAdditionalCandidates(ErrorProneFlags flags) {
-    ImmutableSet.Builder<String> types = ImmutableSet.builder();
-    ImmutableSetMultimap.Builder<String, String> members = ImmutableSetMultimap.builder();
+    ImmutableSet.Builder<String> types =
+        ImmutableSet.<String>builder().addAll(STATIC_IMPORT_CANDIDATE_TYPES);
+    ImmutableSetMultimap.Builder<String, String> members =
+        ImmutableSetMultimap.<String, String>builder().putAll(STATIC_IMPORT_CANDIDATE_MEMBERS);
 
     for (String entry : Flags.getSet(flags, ADDITIONAL_CANDIDATES_FLAG)) {
       TypeMemberSpec spec = TypeMemberSpec.parse(entry);
       checkArgument(
-          isWellFormed(spec.type())
-              && spec.member().map(StaticImportConfig::isWellFormed).orElse(true),
+          SourceVersion.isName(spec.type())
+              && spec.member().map(SourceCode::isValidIdentifier).orElse(true),
           "Invalid `%s` flag value '%s': expected '<type>' or '<type>#<member>'",
           ADDITIONAL_CANDIDATES_FLAG,
           entry);
@@ -365,15 +319,46 @@ final class StaticImportConfig implements Serializable {
       }
     }
 
-    return new AdditionalCandidates(types.build(), members.build());
+    candidateTypes = types.build();
+    candidateMembers = members.build();
   }
 
-  private static boolean isWellFormed(String typeOrMember) {
-    return !typeOrMember.isEmpty()
-        && CharMatcher.whitespace().matchesNoneOf(typeOrMember)
-        && typeOrMember.indexOf('#') < 0;
+  /**
+   * Tells whether the given {@link MemberSelectTree} identifies a type member that is not excluded
+   * from static import. Whether such a member is actually a static import candidate is determined
+   * by {@link #getCandidateSimpleName(StaticImportInfo)}.
+   */
+  boolean isPotentialCandidate(MemberSelectTree tree) {
+    String identifier = tree.getIdentifier().toString();
+    if (NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(identifier)) {
+      return false;
+    }
+
+    Type type = ASTHelpers.getType(tree.getExpression());
+    return type != null
+        && !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type.toString(), identifier);
   }
 
-  private record AdditionalCandidates(
-      ImmutableSet<String> types, ImmutableSetMultimap<String, String> members) {}
+  /**
+   * Returns the simple name under which the given type member should be statically imported, if it
+   * is a static import candidate.
+   */
+  Optional<String> getCandidateSimpleName(StaticImportInfo importInfo) {
+    String canonicalName = importInfo.canonicalName();
+    return importInfo
+        .simpleName()
+        .toJavaUtil()
+        .filter(
+            name ->
+                candidateTypes.contains(canonicalName)
+                    || candidateMembers.containsEntry(canonicalName, name));
+  }
+
+  /** Tells whether the given statically imported type member should not have been. */
+  boolean shouldNotBeStaticallyImported(String type, String member) {
+    return (NON_STATIC_IMPORT_CANDIDATE_TYPES.contains(type)
+            && !candidateMembers.containsEntry(type, member))
+        || NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type, member)
+        || NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(member);
+  }
 }

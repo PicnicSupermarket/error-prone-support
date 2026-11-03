@@ -89,7 +89,7 @@ final class NonStaticImportTest {
   }
 
   @Test
-  void identificationWithAdditionalStaticImportCandidateMembers() {
+  void identificationWithAdditionalCandidates() {
     CompilationTestHelper.newInstance(NonStaticImport.class, getClass())
         .setArgs("-XepOpt:StaticImport:AdditionalCandidates=reactor.core.publisher.Flux#just")
         .addSourceLines(
