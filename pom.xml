@@ -196,7 +196,7 @@
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
         <version.error-prone-orig>2.51.0</version.error-prone-orig>
-        <version.google-java-format>1.37.0</version.google-java-format>
+        <version.google-java-format>2.0.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.10.0</version.maven>
         <version.pitest-git>2.4.0</version.pitest-git>
