@@ -59,6 +59,7 @@ public final class CodeTransformers {
     return transformers.build();
   }
 
+  @SuppressWarnings("ExceptionThrowShouldUseContext" /* There's no relevant context to include. */)
   private static ImmutableSet<ResourceInfo> getClassPathResources() {
     try {
       return ClassPath.from(CodeTransformers.class.getClassLoader()).getResources();

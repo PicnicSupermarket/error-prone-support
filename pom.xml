@@ -701,17 +701,14 @@
                             application of google-java-format (GJF). -->
                             <module name="Checker">
                                 <module name="NewlineAtEndOfFile" />
-                                <module name="RegexpMultiline">
-                                    <!-- GJF drops trailing horizontal
-                                    whitespace and blank lines preceding a
-                                    closing curly brace, but it does not remove
-                                    a blank line following an opening curly
-                                    brace. Here we disallow that specific case.
-                                    (The regular expression assumes that the
-                                    code has already been formatted using GJF.) -->
-                                    <property name="fileExtensions" value="java" />
-                                    <property name="format" value="\{\r?\n\r?\n" />
-                                    <property name="message" value="Avoid blank lines at the start of a block." />
+                                <module name="SuppressionSingleFilter">
+                                    <!-- These test resources deliberately end
+                                    with a top-level `;`: it is the only way to
+                                    produce a type declaration that is not a
+                                    class, which `RefasterRuleCollection` must
+                                    report as an "Unexpected token". -->
+                                    <property name="checks" value="EmptyStatement" />
+                                    <property name="files" value="MisnamedTestClassRulesTest(Input|Output)\.java$" />
                                 </module>
                                 <module name="SuppressWarningsFilter" />
                                 <module name="TreeWalker">
@@ -774,7 +771,21 @@
                                         https://github.com/google/google-java-format/issues/399. -->
                                         <property name="tokens" value="CLASS_DEF, CTOR_DEF, ENUM_DEF, INSTANCE_INIT, INTERFACE_DEF, METHOD_DEF, STATIC_INIT" />
                                     </module>
+                                    <module name="EmptyLineWrappingInBlock">
+                                        <!-- XXX: This check does not (yet)
+                                        cover `record` declarations, compact
+                                        constructors, the curly brace of a
+                                        `switch` and `case` blocks using `->`.
+                                        See
+                                        https://github.com/checkstyle/checkstyle/issues/22374
+                                        and
+                                        https://github.com/checkstyle/checkstyle/issues/22459. -->
+                                        <property name="bottomSeparator" value="no_empty_line" />
+                                        <property name="tokens" value="ANNOTATION_ARRAY_INIT, ANNOTATION_DEF, ARRAY_INIT, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF, INSTANCE_INIT, INTERFACE_DEF, LAMBDA, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_NEW, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF, SLIST, STATIC_INIT" />
+                                        <property name="topSeparator" value="no_empty_line" />
+                                    </module>
                                     <module name="EmptyStatement" />
+                                    <module name="ExceptionThrowShouldUseContext" />
                                     <module name="ExpressionOverBlockLambda" />
                                     <module name="FinalClass" />
                                     <module name="GoogleNonConstantFieldName" />
@@ -900,6 +911,7 @@
                                     <module name="MultilineCommentLeadingAsteriskPresence" />
                                     <module name="MutableException" />
                                     <module name="NeedBraces" />
+                                    <module name="NoCauseGetMessageInExceptionConstructor" />
                                     <module name="NoClone" />
                                     <module name="NoCodeInFile" />
                                     <module name="NoEnumTrailingComma" />
@@ -914,6 +926,9 @@
                                     <module name="PreferCodeOrSnippetJavadocInlineTag" />
                                     <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
+                                    <module name="RedundantThis">
+                                        <property name="checkMethods" value="true" />
+                                    </module>
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
                                     <module name="SummaryJavadoc" />

@@ -8,6 +8,6 @@ final class IncorrectNameRulesTest implements RefasterRuleCollectionTestCase {
   }
 }
 
-// This is a comment to appease Checkstyle.
+// This is a comment to appease Checkstyle's `EmptyLineSeparator` check.
 /* ERROR: Unexpected token. */
 ;
