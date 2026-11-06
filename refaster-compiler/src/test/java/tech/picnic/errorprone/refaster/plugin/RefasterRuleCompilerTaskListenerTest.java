@@ -56,14 +56,15 @@ final class RefasterRuleCompilerTaskListenerTest {
           "  }",
           "}");
 
+  private static final JavaFileObject INVALID_SOURCE =
+      FileObjects.forSourceLines("Invalid.java", "class Invalid { int i = \"foo\"; }");
+
   @Test
   void compileRule(@TempDir Path outputDirectory) throws IOException, ClassNotFoundException {
     assertThat(compile(fileManager(outputDirectory), ImmutableList.of(RULE_SOURCE))).isTrue();
 
     try (ObjectInputStream in =
-        new ObjectInputStream(
-            Files.newInputStream(
-                outputDirectory.resolve("pkg").resolve("A$B$FooRule" + REFASTER_FILE_EXTENSION)))) {
+        new ObjectInputStream(Files.newInputStream(compiledRuleFile(outputDirectory)))) {
       @SuppressWarnings("BanSerializableRead" /* Deserializing the Refaster rule under test. */)
       AnnotatedCompositeCodeTransformer transformer =
           (AnnotatedCompositeCodeTransformer) in.readObject();
@@ -75,8 +76,10 @@ final class RefasterRuleCompilerTaskListenerTest {
 
   @Test
   void filePersistenceFailure() throws IOException {
+    ImmutableList<JavaFileObject> sources = ImmutableList.of(RULE_SOURCE);
+
     try (JavaFileManager fileManager = new FailingJavaFileManager()) {
-      assertThatThrownBy(() -> compile(fileManager, ImmutableList.of(RULE_SOURCE)))
+      assertThatThrownBy(() -> compile(fileManager, sources))
           .cause()
           .isInstanceOf(UncheckedIOException.class)
           .hasMessage("Failed to persist compiled Refaster rule 'FooRule'")
@@ -86,14 +89,22 @@ final class RefasterRuleCompilerTaskListenerTest {
     }
   }
 
+  /**
+   * Like the {@code .class} files that javac emits for the classes it processes before an error is
+   * reported, a Refaster rule that is compiled before an error is reported is persisted.
+   */
+  @Test
+  void ruleCompiledBeforeErrorIsWritten(@TempDir Path outputDirectory) throws IOException {
+    assertThat(compile(fileManager(outputDirectory), ImmutableList.of(RULE_SOURCE, INVALID_SOURCE)))
+        .isFalse();
+
+    assertThat(compiledRuleFile(outputDirectory)).exists();
+  }
+
   private static Stream<Arguments> noCompiledRuleIsWrittenTestCases() {
     /* { expectedSuccess, sources } */
     return Stream.of(
-        arguments(
-            false,
-            ImmutableList.of(
-                FileObjects.forSourceLines("Invalid.java", "class Invalid { int i = \"foo\"; }"),
-                RULE_SOURCE)),
+        arguments(false, ImmutableList.of(INVALID_SOURCE, RULE_SOURCE)),
         arguments(
             true,
             ImmutableList.of(
@@ -110,6 +121,10 @@ final class RefasterRuleCompilerTaskListenerTest {
     try (Stream<Path> files = Files.walk(outputDirectory)) {
       assertThat(files).noneMatch(file -> file.toString().endsWith(REFASTER_FILE_EXTENSION));
     }
+  }
+
+  private static Path compiledRuleFile(Path outputDirectory) {
+    return outputDirectory.resolve("pkg").resolve("A$B$FooRule" + REFASTER_FILE_EXTENSION);
   }
 
   private static JavacFileManager fileManager(Path outputDirectory) throws IOException {
