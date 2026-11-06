@@ -98,7 +98,8 @@ final class RefasterRuleCompilerTaskListenerTest {
     assertThat(compile(fileManager(outputDirectory), sources)).isEqualTo(expectedSuccess);
 
     try (Stream<Path> files = Files.walk(outputDirectory)) {
-      assertThat(files.filter(file -> file.toString().endsWith(REFASTER_FILE_EXTENSION)))
+      assertThat(files)
+          .filteredOn(file -> file.toString().endsWith(REFASTER_FILE_EXTENSION))
           .map(outputDirectory::relativize)
           .containsExactlyInAnyOrderElementsOf(expectedRuleFiles);
     }
