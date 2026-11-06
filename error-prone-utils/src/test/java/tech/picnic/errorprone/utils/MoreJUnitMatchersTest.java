@@ -126,7 +126,7 @@ final class MoreJUnitMatchersTest {
             "  // BUG: Diagnostic contains: [matchingMethodSource]",
             "  void matchingMethodSource(boolean b) {}",
             "",
-            "  @MethodSource()",
+            "  @MethodSource",
             "  // BUG: Diagnostic contains: [matchingMethodSourceWithParens]",
             "  void matchingMethodSourceWithParens(boolean b) {}",
             "",
