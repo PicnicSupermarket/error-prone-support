@@ -21,8 +21,8 @@ Use this skill for requests to add or change `.md` files.
   [`.github/instructions/review.instructions.md`][review].
 * Finally, follow the workflow in [`AGENTS.md`][agents-md].
 
-[agents-md]: ../../../AGENTS.md
 [agents]: ../../../.github/instructions/agents.instructions.md
+[agents-md]: ../../../AGENTS.md
 [documentation]: ../../../.github/instructions/documentation.instructions.md
 [instructions]: ../../../.github/instructions/instructions.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md
