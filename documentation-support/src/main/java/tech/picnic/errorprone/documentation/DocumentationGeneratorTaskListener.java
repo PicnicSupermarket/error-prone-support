@@ -69,10 +69,8 @@ final class DocumentationGeneratorTaskListener implements TaskListener {
     for (Extractor<?> extractor : EXTRACTORS) {
       extractor
           .tryExtract(classTree, state)
-          .ifPresent(
-              data ->
-                  writeToFile(
-                      extractor.identifier(), getSimpleClassName(sourceFile.toUri()), data));
+          .ifPresent(data ->
+              writeToFile(extractor.identifier(), getSimpleClassName(sourceFile.toUri()), data));
     }
   }
 

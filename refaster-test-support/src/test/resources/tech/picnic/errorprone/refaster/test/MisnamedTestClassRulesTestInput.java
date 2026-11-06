@@ -6,6 +6,3 @@ final class IncorrectNameRulesTest implements RefasterRuleCollectionTestCase {
     return "foo".equals("");
   }
 }
-
-// This is a comment to appease Checkstyle's `EmptyLineSeparator` check.
-;
