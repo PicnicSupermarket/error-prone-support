@@ -93,10 +93,9 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
   private static String getRuleCollectionUnderTest(ErrorProneFlags flags) {
     return flags
         .get(RULE_COLLECTION_FLAG)
-        .orElseThrow(
-            () ->
-                new IllegalStateException(
-                    "Error Prone flag `%s` must be specified".formatted(RULE_COLLECTION_FLAG)));
+        .orElseThrow(() ->
+            new IllegalStateException(
+                "Error Prone flag `%s` must be specified".formatted(RULE_COLLECTION_FLAG)));
   }
 
   private static Refaster createRefasterChecker(String ruleCollectionUnderTest) {
@@ -288,12 +287,12 @@ public final class RefasterRuleCollection extends BugChecker implements Compilat
             tree,
             "The following matches unexpectedly occurred in method `%s`".formatted(tree.getName()),
             unexpectedMatchesByLineNumber.entries().stream()
-                .map(
-                    e ->
-                        """
-                        Rule `%s` matches on line %s, while it should match in a method named \
-                        `test%s`."""
-                            .formatted(e.getValue(), e.getKey(), e.getValue()))
+                .map(e ->
+                    """
+                    Rule `%s` matches on line %s, while it should match in a method named \
+                    `test%s`.\
+                    """
+                        .formatted(e.getValue(), e.getKey(), e.getValue()))
                 .collect(toImmutableSet()),
             state);
       }

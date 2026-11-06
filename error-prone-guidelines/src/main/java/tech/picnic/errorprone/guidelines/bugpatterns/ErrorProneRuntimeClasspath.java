@@ -52,7 +52,8 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
     summary =
         """
         Prefer `Class#getCanonicalName()` over an equivalent string literal if and only if the \
-        type will be on the runtime classpath""",
+        type will be on the runtime classpath\
+        """,
     link = BUG_PATTERNS_BASE_URL + "ErrorProneRuntimeClasspath",
     linkType = CUSTOM,
     severity = SUGGESTION,

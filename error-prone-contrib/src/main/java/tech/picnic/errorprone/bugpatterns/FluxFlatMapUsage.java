@@ -52,7 +52,8 @@ import reactor.core.publisher.Flux;
     summary =
         """
         `Flux#flatMap` and `Flux#flatMapSequential` have subtle semantics; please use \
-        `Flux#concatMap` or explicitly specify the desired amount of concurrency""",
+        `Flux#concatMap` or explicitly specify the desired amount of concurrency\
+        """,
     link = BUG_PATTERNS_BASE_URL + "FluxFlatMapUsage",
     linkType = CUSTOM,
     severity = ERROR,

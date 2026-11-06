@@ -706,15 +706,6 @@
                             application of google-java-format (GJF). -->
                             <module name="Checker">
                                 <module name="NewlineAtEndOfFile" />
-                                <module name="SuppressionSingleFilter">
-                                    <!-- These test resources deliberately end
-                                    with a top-level `;`: it is the only way to
-                                    produce a type declaration that is not a
-                                    class, which `RefasterRuleCollection` must
-                                    report as an "Unexpected token". -->
-                                    <property name="checks" value="EmptyStatement" />
-                                    <property name="files" value="MisnamedTestClassRulesTest(Input|Output)\.java$" />
-                                </module>
                                 <module name="SuppressWarningsFilter" />
                                 <module name="TreeWalker">
                                     <module name="AbbreviationAsWordInName" />
