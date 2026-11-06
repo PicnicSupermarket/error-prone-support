@@ -22,6 +22,7 @@ import com.google.errorprone.util.ASTHelpers;
 import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 import com.google.googlejavaformat.java.ImportOrderer;
+import com.google.googlejavaformat.java.JavaFormatterOptions;
 import com.google.googlejavaformat.java.JavaFormatterOptions.Style;
 import com.google.googlejavaformat.java.RemoveUnusedImports;
 import com.sun.source.tree.ExpressionTree;
@@ -34,8 +35,10 @@ import java.util.Optional;
 /**
  * A {@link BugChecker} that flags improperly formatted Error Prone test code.
  *
- * <p>All test code should be formatted in accordance with Google Java Format's {@link Formatter}
- * output, and imports should be ordered according to the {@link Style#GOOGLE Google} style.
+ * <p>All test code must be formatted in accordance with Google Java Format's {@link Formatter}
+ * output, and imports should be ordered according to the {@link Style#GOOGLE Google} style. Test
+ * code does not need to be {@link JavaFormatterOptions#cleanup() clean}, as it may be required to
+ * validate that code under test correctly handles non-idiomatic syntax.
  *
  * <p>This checker inspects inline code passed to {@code
  * com.google.errorprone.CompilationTestHelper} and {@code
@@ -61,7 +64,8 @@ import java.util.Optional;
 public final class ErrorProneTestHelperSourceFormat extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Formatter FORMATTER = new Formatter();
+  private static final Formatter FORMATTER =
+      new Formatter(JavaFormatterOptions.builder().cleanup(false).build());
   private static final Matcher<ExpressionTree> INPUT_SOURCE_ACCEPTING_METHOD =
       anyOf(
           instanceMethod()

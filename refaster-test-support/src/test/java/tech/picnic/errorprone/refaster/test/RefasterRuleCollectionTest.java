@@ -35,8 +35,6 @@ final class RefasterRuleCollectionTest {
     RefasterRuleCollection.validate(clazz);
   }
 
-  @SuppressWarnings(
-      "ErrorProneTestHelperSourceFormat" /* Google Java Format would remove the top-level `;`. */)
   @Test
   void unexpectedToken() {
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, getClass())
