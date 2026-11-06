@@ -35,6 +35,13 @@ final class RefasterRuleCollectionTest {
     RefasterRuleCollection.validate(clazz);
   }
 
+  /**
+   * Validates {@link RefasterRuleCollection} error reporting for unexpected tokens.
+   *
+   * @implNote This test is separate from the test cases passed to {@link
+   *     #verifyRefasterRuleCollections(Class)}, as those are subject the Maven build's Google Java
+   *     Format configuration, which disallows the top-level semicolon flagged here.
+   */
   @Test
   void unexpectedToken() {
     BugCheckerRefactoringTestHelper.newInstance(RefasterRuleCollection.class, getClass())
