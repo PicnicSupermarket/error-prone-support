@@ -139,11 +139,8 @@ final class ThirdPartyLibraryTest {
       return buildDescription(tree)
           .setMessage(
               TYPES.entrySet().stream()
-                  .map(
-                      e ->
-                          e.getKey()
-                              + ": "
-                              + ThirdPartyLibrary.canIntroduceUsage(e.getValue(), state))
+                  .map(e ->
+                      e.getKey() + ": " + ThirdPartyLibrary.canIntroduceUsage(e.getValue(), state))
                   .collect(joining(", ")))
           .build();
     }

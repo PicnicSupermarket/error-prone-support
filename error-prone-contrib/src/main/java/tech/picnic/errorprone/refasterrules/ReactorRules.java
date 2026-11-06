@@ -1145,10 +1145,9 @@ final class ReactorRules {
 
     @BeforeTemplate
     Mono<S> before(Mono<T> mono) {
-      return mono.flatMap(
-          x ->
-              Refaster.anyOf(
-                  Mono.justOrEmpty(transformation(x)), Mono.fromSupplier(() -> transformation(x))));
+      return mono.flatMap(x ->
+          Refaster.anyOf(
+              Mono.justOrEmpty(transformation(x)), Mono.fromSupplier(() -> transformation(x))));
     }
 
     @AfterTemplate
@@ -1169,22 +1168,18 @@ final class ReactorRules {
     @SuppressWarnings("java:S138" /* Method is long, but not complex. */)
     Flux<S> before(Flux<T> flux, int prefetch, boolean delayUntilEnd, int concurrency) {
       return Refaster.anyOf(
-          flux.concatMap(
-              x ->
-                  Refaster.anyOf(
-                      Mono.justOrEmpty(transformation(x)),
-                      Mono.fromSupplier(() -> transformation(x)))),
+          flux.concatMap(x ->
+              Refaster.anyOf(
+                  Mono.justOrEmpty(transformation(x)), Mono.fromSupplier(() -> transformation(x)))),
           flux.concatMap(
               x ->
                   Refaster.anyOf(
                       Mono.justOrEmpty(transformation(x)),
                       Mono.fromSupplier(() -> transformation(x))),
               prefetch),
-          flux.concatMapDelayError(
-              x ->
-                  Refaster.anyOf(
-                      Mono.justOrEmpty(transformation(x)),
-                      Mono.fromSupplier(() -> transformation(x)))),
+          flux.concatMapDelayError(x ->
+              Refaster.anyOf(
+                  Mono.justOrEmpty(transformation(x)), Mono.fromSupplier(() -> transformation(x)))),
           flux.concatMapDelayError(
               x ->
                   Refaster.anyOf(
@@ -1238,11 +1233,10 @@ final class ReactorRules {
                       Mono.fromSupplier(() -> transformation(x))),
               concurrency,
               prefetch),
-          flux.switchMap(
-              x ->
-                  Refaster.anyOf(
-                      Mono.justOrEmpty(transformation(x)),
-                      Mono.fromSupplier(() -> transformation(x)))));
+          flux.switchMap(x ->
+              Refaster.anyOf(
+                  Mono.justOrEmpty(transformation(x)),
+                  Mono.fromSupplier(() -> transformation(x)))));
     }
 
     @AfterTemplate
