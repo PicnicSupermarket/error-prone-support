@@ -130,7 +130,7 @@ final class SpringMvcAnnotationTest {
             "import org.springframework.web.bind.annotation.RequestMethod;",
             "",
             "interface A {",
-            "  @GetMapping",
+            "  @GetMapping()",
             "  A simple();",
             "",
             "  @PostMapping(path = \"/foo/bar\")",
@@ -144,7 +144,7 @@ final class SpringMvcAnnotationTest {
             "      consumes = {\"a\", \"b\"})",
             "  A surrounded();",
             "",
-            "  @PatchMapping",
+            "  @PatchMapping()",
             "  A curly();",
             "}")
         .doTest();
