@@ -16,7 +16,7 @@ jobs:
     name: Check for review checklist drift
     permissions:
       contents: read
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - name: Install Harden-Runner
