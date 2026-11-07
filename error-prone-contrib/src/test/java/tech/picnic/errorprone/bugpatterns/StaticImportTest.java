@@ -1,33 +1,10 @@
 package tech.picnic.errorprone.bugpatterns;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.CompilationTestHelper;
 import org.junit.jupiter.api.Test;
 
 final class StaticImportTest {
-  @Test
-  void candidateTypesDoNotClash() {
-    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES)
-        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_TYPES);
-  }
-
-  @Test
-  void candidateMembersAreNotRedundant() {
-    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.keySet())
-        .doesNotContainAnyElementsOf(StaticImport.STATIC_IMPORT_CANDIDATE_TYPES);
-  }
-
-  @Test
-  void candidateMembersDoNotClash() {
-    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.entries())
-        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_MEMBERS.entries());
-
-    assertThat(StaticImport.STATIC_IMPORT_CANDIDATE_MEMBERS.values())
-        .doesNotContainAnyElementsOf(NonStaticImport.NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS);
-  }
-
   @Test
   void identification() {
     CompilationTestHelper.newInstance(StaticImport.class, getClass())
@@ -119,6 +96,33 @@ final class StaticImportTest {
             "  void refasterAfterTemplate() {}",
             "",
             "  void toImmutableMultiset() {}",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void identificationWithAdditionalCandidates() {
+    CompilationTestHelper.newInstance(StaticImport.class, getClass())
+        .setArgs(
+            "-XepOpt:StaticImport:AdditionalCandidates=java.lang.Math,"
+                + "java.util.Objects#hash,reactor.core.publisher.Flux#just")
+        .addSourceLines(
+            "A.java",
+            "import java.util.Objects;",
+            "import reactor.core.publisher.Flux;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    Objects.equals(1, 2);",
+            "    Flux.range(0, 1);",
+            "",
+            "    // BUG: Diagnostic contains:",
+            "    Math.max(1, 2);",
+            "    // BUG: Diagnostic contains:",
+            "    Objects.hash(1, 2);",
+            "    // BUG: Diagnostic contains:",
+            "    Flux.just(1);",
+            "  }",
             "}")
         .doTest();
   }
@@ -291,6 +295,38 @@ final class StaticImportTest {
             "",
             "  @SpringBootTest(webEnvironment = RANDOM_PORT)",
             "  final class Test {}",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void replacementWithAdditionalCandidates() {
+    BugCheckerRefactoringTestHelper.newInstance(StaticImport.class, getClass())
+        .setArgs(
+            "-XepOpt:StaticImport:AdditionalCandidates=java.lang.Math,"
+                + "reactor.core.publisher.Flux#just")
+        .addInputLines(
+            "A.java",
+            "import reactor.core.publisher.Flux;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    double d = Math.toRadians(90);",
+            "    Flux<Integer> f = Flux.just(1);",
+            "  }",
+            "}")
+        .addOutputLines(
+            "A.java",
+            "import static java.lang.Math.toRadians;",
+            "import static reactor.core.publisher.Flux.just;",
+            "",
+            "import reactor.core.publisher.Flux;",
+            "",
+            "class A {",
+            "  void m() {",
+            "    double d = toRadians(90);",
+            "    Flux<Integer> f = just(1);",
+            "  }",
             "}")
         .doTest();
   }
