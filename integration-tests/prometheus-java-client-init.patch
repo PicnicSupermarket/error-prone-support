@@ -1,179 +1,133 @@
---- a/integration-tests/it-common/src/test/java/io/prometheus/client/it/common/ExporterTest.java
-+++ b/integration-tests/it-common/src/test/java/io/prometheus/client/it/common/ExporterTest.java
-@@ -34,7 +34,7 @@ public abstract class ExporterTest {
-         Volume.create("it-exporter")
-             .copy("../../it-" + sampleApp + "/target/" + sampleApp + ".jar");
-     this.sampleAppContainer =
--        new GenericContainer<>("openjdk:17")
-+        new GenericContainer<>("openjdk:21")
-             .withFileSystemBind(sampleAppVolume.getHostPath(), "/app", BindMode.READ_ONLY)
-             .withWorkingDirectory("/app")
-             .withLogConsumer(LogConsumer.withPrefix(sampleApp))
---- a/integration-tests/it-exporter/it-exporter-test/pom.xml
-+++ b/integration-tests/it-exporter/it-exporter-test/pom.xml
-@@ -24,5 +24,24 @@
-       <version>${project.version}</version>
-       <scope>test</scope>
-     </dependency>
-+    <!-- XXX: Drop this if/when https://github.com/prometheus/client_java/pull/2407 lands. -->
-+    <dependency>
-+      <groupId>io.prometheus</groupId>
-+      <artifactId>it-exporter-servlet-tomcat-sample</artifactId>
-+      <version>${project.version}</version>
-+      <scope>test</scope>
-+    </dependency>
-+    <dependency>
-+      <groupId>io.prometheus</groupId>
-+      <artifactId>it-exporter-servlet-jetty-sample</artifactId>
-+      <version>${project.version}</version>
-+      <scope>test</scope>
-+    </dependency>
-+    <dependency>
-+      <groupId>io.prometheus</groupId>
-+      <artifactId>it-exporter-httpserver-sample</artifactId>
-+      <version>${project.version}</version>
-+      <scope>test</scope>
-+    </dependency>
-   </dependencies>
- </project>
---- a/integration-tests/it-exporter/it-no-protobuf-test/pom.xml
-+++ b/integration-tests/it-exporter/it-no-protobuf-test/pom.xml
-@@ -24,5 +24,12 @@
-       <version>${project.version}</version>
-       <scope>test</scope>
-     </dependency>
-+    <!-- XXX: Drop this if/when https://github.com/prometheus/client_java/pull/2407 lands. -->
-+    <dependency>
-+      <groupId>io.prometheus</groupId>
-+      <artifactId>it-exporter-no-protobuf</artifactId>
-+      <version>${project.version}</version>
-+      <scope>test</scope>
-+    </dependency>
-   </dependencies>
- </project>
---- a/integration-tests/it-spring-boot-smoke-test/pom.xml
-+++ b/integration-tests/it-spring-boot-smoke-test/pom.xml
-@@ -58,6 +58,19 @@
-       <artifactId>micrometer-registry-prometheus</artifactId>
-       <scope>runtime</scope>
-     </dependency>
-+    <!-- XXX: Drop this if/when https://github.com/prometheus/client_java/pull/2407 lands. -->
-+    <dependency>
-+      <groupId>io.prometheus</groupId>
-+      <artifactId>prometheus-metrics-core</artifactId>
-+      <version>${project.version}</version>
-+      <scope>runtime</scope>
-+      <exclusions>
-+        <exclusion>
-+          <groupId>io.prometheus</groupId>
-+          <artifactId>prometheus-metrics-tracer-initializer</artifactId>
-+        </exclusion>
-+      </exclusions>
-+    </dependency>
-     <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-test</artifactId>
 --- a/pom.xml
 +++ b/pom.xml
-@@ -252,36 +252,49 @@
-           <release>${java.version}</release>
-           <source>${java.version}</source>
-           <target>${java.version}</target>
--          <testRelease>17</testRelease>
--          <testSource>17</testSource>
--          <testTarget>17</testTarget>
-+          <testRelease>${java.version}</testRelease>
-+          <testSource>${java.version}</testSource>
-+          <testTarget>${java.version}</testTarget>
-           <showWarnings>true</showWarnings>
-           <compilerArgs>
-             <arg>-Xlint:all,-serial,-processing,-options</arg>
-             <arg>${warnings}</arg>
-             <arg>--should-stop=ifError=FLOW</arg>
-             <arg>-XDcompilePolicy=simple</arg>
-+            <!-- XXX: Drop this flag once the project uses Error Prone 2.46.0+ by default. -->
-+            <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
-             <arg>
-               -Xplugin:ErrorProne
-               -Xep:AlmostJavadoc:OFF
-               -Xep:MissingSummary:OFF
-               -Xep:LongDoubleConversion:OFF
-               -Xep:StringSplitter:OFF
--              -XepExcludedPaths:(.*/generated/.*|.*/src/test/java/.*|.*/examples/.*|.*/integration-tests/.*)
-+              -XepExcludedPaths:.*/generated/.*
-               -XepOpt:NullAway:AnnotatedPackages=io.prometheus.metrics
-+              ${error-prone.configuration-args}
-             </arg>
-           </compilerArgs>
-           <annotationProcessorPaths>
-             <path>
-               <groupId>com.google.errorprone</groupId>
-               <artifactId>error_prone_core</artifactId>
--              <version>2.41.0</version>
-+              <version>${error-prone.version}</version>
-             </path>
-             <path>
-               <groupId>com.uber.nullaway</groupId>
-               <artifactId>nullaway</artifactId>
-               <version>0.12.8</version>
-             </path>
-+            <path>
-+              <groupId>tech.picnic.error-prone-support</groupId>
-+              <artifactId>error-prone-contrib</artifactId>
-+              <version>${error-prone-support.version}</version>
-+            </path>
-+            <path>
-+              <groupId>tech.picnic.error-prone-support</groupId>
-+              <artifactId>refaster-runner</artifactId>
-+              <version>${error-prone-support.version}</version>
-+            </path>
-             <!-- Other annotation processors go here.
+@@ -27,7 +27,8 @@
+     <wiremock.version>3.13.2</wiremock.version>
+     <junit-jupiter.version>6.1.3</junit-jupiter.version>
+     <otel.instrumentation.version>2.32.0-alpha</otel.instrumentation.version>
+-    <java.version>8</java.version>
++    <!-- XXX: Drop this override once the build JDK supports the target JRE. -->
++    <java.version>21</java.version>
+     <test.java.version>25</test.java.version>
+     <!-- Bumped by .github/workflows/bump-api-diff-baseline.yml after each release. -->
+     <api.diff.baseline.version>1.9.0</api.diff.baseline.version>
+@@ -72,6 +73,11 @@
+       <version>3.0.2</version>
+       <scope>provided</scope>
+     </dependency>
++    <dependency>
++      <groupId>com.google.guava</groupId>
++      <artifactId>guava</artifactId>
++      <version>${guava.version}</version>
++    </dependency>
+     <!-- test dependencies -->
+     <dependency>
+       <groupId>org.junit.jupiter</groupId>
+@@ -469,21 +475,34 @@
+                   -Xep:MissingSummary:OFF
+                   -Xep:LongDoubleConversion:OFF
+                   -Xep:StringSplitter:OFF
+-                  -XepExcludedPaths:(.*/generated/.*|.*/src/test/java/.*|.*/examples/.*|.*/integration-tests/.*)
++                  -XepExcludedPaths:.*/generated/.*
+                   -XepOpt:NullAway:AnnotatedPackages=io.prometheus.metrics
++                  ${error-prone.configuration-args}
+                 </arg>
++                <arg>-Xmaxwarns</arg>
++                <arg>1000000</arg>
+               </compilerArgs>
+               <annotationProcessorPaths>
+                 <path>
+                   <groupId>com.google.errorprone</groupId>
+                   <artifactId>error_prone_core</artifactId>
+-                  <version>2.50.0</version>
++                  <version>${error-prone.version}</version>
+                 </path>
+                 <path>
+                   <groupId>com.uber.nullaway</groupId>
+                   <artifactId>nullaway</artifactId>
+                   <version>0.14.2</version>
+                 </path>
++                <path>
++                  <groupId>tech.picnic.error-prone-support</groupId>
++                  <artifactId>error-prone-contrib</artifactId>
++                  <version>${error-prone-support.version}</version>
++                </path>
++                <path>
++                  <groupId>tech.picnic.error-prone-support</groupId>
++                  <artifactId>refaster-runner</artifactId>
++                  <version>${error-prone-support.version}</version>
++                </path>
+               </annotationProcessorPaths>
+             </configuration>
+           </plugin>
+--- a/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/PrometheusPropertiesLoaderTest.java
++++ b/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/PrometheusPropertiesLoaderTest.java
+@@ -28,6 +28,12 @@ class PrometheusPropertiesLoaderTest {
  
-             If 'annotationProcessorPaths' is set, processors will no longer be
-@@ -394,7 +407,6 @@
-           <groupId>com.google.guava</groupId>
-           <artifactId>guava</artifactId>
-           <version>${guava.version}</version>
--          <scope>test</scope>
-         </dependency>
-         <dependency>
-           <groupId>org.slf4j</groupId>
---- a/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/ExemplarTest.java
-+++ b/prometheus-metrics-exporter-opentelemetry/src/test/java/io/prometheus/metrics/exporter/opentelemetry/ExemplarTest.java
-@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
- import static org.awaitility.Awaitility.await;
+   @Test
+   @SetSystemProperty(key = "prometheus.config", value = "nonexistent.properties")
++  // XXX: Drop these suppressions once the Refaster rules that they name no longer break a trailing
++  // `withMessageNotContaining` call, which `AbstractThrowableAssert` lacks.
++  @SuppressWarnings({
++    "AssertThatThrownByAsInstanceOfThrowable",
++    "AssertThatThrownByIsInstanceOfHasMessage"
++  })
+   void cantLoadPropertiesFile() {
+     assertThatExceptionOfType(PrometheusPropertiesException.class)
+         .isThrownBy(() -> PrometheusPropertiesLoader.load(new Properties()))
+--- a/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/UtilTest.java
++++ b/prometheus-metrics-config/src/test/java/io/prometheus/metrics/config/UtilTest.java
+@@ -55,6 +55,12 @@ class UtilTest {
+   }
  
- import com.github.tomakehurst.wiremock.http.Request;
-+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
- import com.github.tomakehurst.wiremock.junit5.WireMockTest;
- import com.github.tomakehurst.wiremock.matching.MatchResult;
- import com.github.tomakehurst.wiremock.matching.ValueMatcher;
-@@ -34,7 +35,8 @@ import org.junit.jupiter.api.AfterEach;
- import org.junit.jupiter.api.BeforeEach;
- import org.junit.jupiter.api.Test;
+   @Test
++  // XXX: Drop these suppressions once the Refaster rules that they name no longer break a trailing
++  // `withMessageNotContaining` call, which `AbstractThrowableAssert` lacks.
++  @SuppressWarnings({
++    "AssertThatThrownByAsInstanceOfThrowable",
++    "AssertThatThrownByIsInstanceOfHasMessage"
++  })
+   void invalidValueMessageRedactsRawValue() {
+     String secret = "bad\n\"secret-value";
+     Map<Object, Object> regularProperties = new HashMap<>(Map.of("foo", secret));
+--- a/prometheus-metrics-core/pom.xml
++++ b/prometheus-metrics-core/pom.xml
+@@ -66,7 +66,6 @@
+       <groupId>com.google.guava</groupId>
+       <artifactId>guava</artifactId>
+       <version>${guava.version}</version>
+-      <scope>test</scope>
+     </dependency>
+   </dependencies>
  
--@WireMockTest(httpPort = 4317)
-+// XXX: Drop these changes if/when https://github.com/prometheus/client_java/pull/2407 lands.
-+@WireMockTest
- class ExemplarTest {
-   private static final String ENDPOINT_PATH = "/v1/metrics";
-   private static final int TIMEOUT = 3;
-@@ -45,10 +47,10 @@ class ExemplarTest {
-   private OpenTelemetryExporter openTelemetryExporter;
+--- a/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/metrics/CKMSQuantiles.java
++++ b/prometheus-metrics-core/src/main/java/io/prometheus/metrics/core/metrics/CKMSQuantiles.java
+@@ -245,6 +245,8 @@ final class CKMSQuantiles {
+    * static invariant — but enforcing it at insert and merge time is what matters, because those are
+    * the only operations that create sample widths.
+    */
++  // `Math.clamp` throws if its bounds are inverted, which can happen here.
++  @SuppressWarnings("MathClampDouble")
+   int maxWidthNotCrossingTargets(int r) {
+     double min = Double.MAX_VALUE;
+     for (Quantile q : quantiles) {
+--- a/prometheus-metrics-exporter-pushgateway/src/test/java/io/prometheus/metrics/exporter/pushgateway/PushGatewayTest.java
++++ b/prometheus-metrics-exporter-pushgateway/src/test/java/io/prometheus/metrics/exporter/pushgateway/PushGatewayTest.java
+@@ -50,6 +50,12 @@ class PushGatewayTest {
+   }
  
-   @BeforeEach
--  public void setUp() {
-+  public void setUp(WireMockRuntimeInfo wireMockRuntimeInfo) {
-     openTelemetryExporter =
-         OpenTelemetryExporter.builder()
--            .endpoint("http://localhost:4317")
-+            .endpoint(wireMockRuntimeInfo.getHttpBaseUrl())
-             .protocol("http/protobuf")
-             .intervalSeconds(1)
-             .buildAndStart();
+   @Test
++  // XXX: Drop these suppressions once the Refaster rules that they name no longer break a trailing
++  // `withMessageNotContaining` call, which `AbstractThrowableAssert` lacks.
++  @SuppressWarnings({
++    "AssertThatThrownByAsInstanceOfThrowable",
++    "AssertThatThrownByIsInstanceOfHasMessage"
++  })
+   void testInvalidURLDoesNotExposeCredentials() {
+     String secretAddress = "user:secret@[::";
+     assertThatExceptionOfType(PrometheusPropertiesException.class)
 --- a/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
 +++ b/prometheus-metrics-exposition-textformats/src/test/java/io/prometheus/metrics/expositionformats/ExpositionFormatsTest.java
-@@ -32,6 +32,8 @@ import org.junit.jupiter.api.Test;
+@@ -34,6 +34,8 @@ import org.junit.jupiter.api.Test;
  import org.junit.jupiter.params.ParameterizedTest;
  import org.junit.jupiter.params.provider.CsvSource;
  
@@ -182,3 +136,30 @@
  class ExpositionFormatsTest {
  
    private final String exemplar1String =
+--- a/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Exemplars.java
++++ b/prometheus-metrics-model/src/main/java/io/prometheus/metrics/model/snapshots/Exemplars.java
+@@ -16,6 +16,9 @@ import javax.annotation.Nullable;
+  * efficient data structure.
+  */
+ @StableApi
++// Tests assert that an empty instance yields the JDK's singleton empty iterator, which
++// `ImmutableList#of()` does not provide.
++@SuppressWarnings("ImmutableListOf0")
+ public class Exemplars implements Iterable<Exemplar> {
+ 
+   /** EMPTY means no Exemplars. */
+--- a/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/CounterSnapshotTest.java
++++ b/prometheus-metrics-model/src/test/java/io/prometheus/metrics/model/snapshots/CounterSnapshotTest.java
+@@ -132,6 +132,12 @@ class CounterSnapshotTest {
+   }
+ 
+   @Test
++  // XXX: Drop these suppressions once the Refaster rules that they name no longer break the
++  // subsequent `withMessageContaining` calls, which `AbstractThrowableAssert` lacks.
++  @SuppressWarnings({
++    "AssertThatThrownByAsInstanceOfThrowable",
++    "AssertThatThrownByIsInstanceOfHasMessageContaining"
++  })
+   void testNegativeValueIncludesMetricNameInMessage() {
+     assertThatExceptionOfType(IllegalArgumentException.class)
+         .isThrownBy(
