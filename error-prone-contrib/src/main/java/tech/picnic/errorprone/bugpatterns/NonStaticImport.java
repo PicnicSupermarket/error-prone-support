@@ -138,6 +138,7 @@ public final class NonStaticImport extends BugChecker implements CompilationUnit
           "MAX",
           "MAX_VALUE",
           "MIN",
+          "MIN_POSITIVE_VALUE",
           "MIN_VALUE",
           "newBuilder",
           "newInstance",
