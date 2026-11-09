@@ -347,7 +347,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.13.4</version>
+                <version>0.14.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -408,7 +408,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.16</version>
+                <version>1.18.17</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.26</version>
+                <version>1.9.27</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
