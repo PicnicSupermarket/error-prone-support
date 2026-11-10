@@ -52,7 +52,7 @@ new file mode 100644
 +            <dependency>
 +                <groupId>com.google.guava</groupId>
 +                <artifactId>guava</artifactId>
-+                <version>33.7.2-jre<!-- Renovate: com.google.guava:guava-bom --></version>
++                <version>33.8.0-jre<!-- Renovate: com.google.guava:guava-bom --></version>
 +            </dependency>
 +            <!-- XXX: Drop this once Caffeine depends on the same version of JSpecify. -->
 +            <dependency>
