@@ -22,7 +22,7 @@ jobs:
       contents: read
       id-token: write # To obtain the OIDC token with which published Scorecard results are signed.
       security-events: write # To upload the analysis results to the code scanning dashboard.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - name: Install Harden-Runner
