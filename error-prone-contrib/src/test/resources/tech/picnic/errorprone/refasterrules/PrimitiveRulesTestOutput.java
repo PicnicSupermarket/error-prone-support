@@ -19,8 +19,6 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
     return ImmutableSet.of(
         Chars.class,
-        Doubles.class,
-        Floats.class,
         Ints.class,
         Longs.class,
         Shorts.class,
@@ -135,6 +133,14 @@ final class PrimitiveRulesTest implements RefasterRuleCollectionTestCase {
 
   int testDoubleBytes() {
     return Double.BYTES;
+  }
+
+  float testFloatsMinPositiveValue() {
+    return Floats.MIN_POSITIVE_VALUE;
+  }
+
+  double testDoublesMinPositiveValue() {
+    return Doubles.MIN_POSITIVE_VALUE;
   }
 
   ImmutableSet<Boolean> testIntegerSignumIsPositive() {

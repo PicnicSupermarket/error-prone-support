@@ -261,6 +261,32 @@ final class PrimitiveRules {
     }
   }
 
+  /** Prefer {@link Floats#MIN_POSITIVE_VALUE} over less explicit alternatives. */
+  static final class FloatsMinPositiveValue {
+    @BeforeTemplate
+    float before() {
+      return Float.MIN_VALUE;
+    }
+
+    @AfterTemplate
+    float after() {
+      return Floats.MIN_POSITIVE_VALUE;
+    }
+  }
+
+  /** Prefer {@link Doubles#MIN_POSITIVE_VALUE} over less explicit alternatives. */
+  static final class DoublesMinPositiveValue {
+    @BeforeTemplate
+    double before() {
+      return Double.MIN_VALUE;
+    }
+
+    @AfterTemplate
+    double after() {
+      return Doubles.MIN_POSITIVE_VALUE;
+    }
+  }
+
   /** Prefer {@code Integer.signum(i) > 0} over less idiomatic alternatives. */
   static final class IntegerSignumIsPositive {
     @BeforeTemplate
