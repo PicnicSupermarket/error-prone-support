@@ -56,12 +56,11 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
 
     return Optional.of(collector.getCollectedTests())
         .filter(not(ImmutableList::isEmpty))
-        .map(
-            tests ->
-                new BugPatternTestCases(
-                    state.getPath().getCompilationUnit().getSourceFile().toUri(),
-                    ASTHelpers.getSymbol(tree).className(),
-                    tests));
+        .map(tests ->
+            new BugPatternTestCases(
+                state.getPath().getCompilationUnit().getSourceFile().toUri(),
+                ASTHelpers.getSymbol(tree).className(),
+                tests));
   }
 
   private static final class BugPatternTestCollector
@@ -105,21 +104,20 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
       boolean isReplacementTest = REPLACEMENT_DO_TEST.matches(node, state);
       if (isReplacementTest || COMPILATION_HELPER_DO_TEST.matches(node, state)) {
         getClassUnderTest(node, state)
-            .ifPresent(
-                classUnderTest -> {
-                  List<TestEntry> entries = new ArrayList<>();
-                  if (isReplacementTest) {
-                    extractReplacementBugPatternTestCases(node, entries, state);
-                  } else {
-                    extractIdentificationBugPatternTestCases(node, entries, state);
-                  }
+            .ifPresent(classUnderTest -> {
+              List<TestEntry> entries = new ArrayList<>();
+              if (isReplacementTest) {
+                extractReplacementBugPatternTestCases(node, entries, state);
+              } else {
+                extractIdentificationBugPatternTestCases(node, entries, state);
+              }
 
-                  if (!entries.isEmpty()) {
-                    collectedBugPatternTestCases.add(
-                        new BugPatternTestCase(
-                            classUnderTest, ImmutableList.copyOf(entries).reverse()));
-                  }
-                });
+              if (!entries.isEmpty()) {
+                collectedBugPatternTestCases.add(
+                    new BugPatternTestCase(
+                        classUnderTest, ImmutableList.copyOf(entries).reverse()));
+              }
+            });
       }
 
       return super.visitMethodInvocation(node, state);

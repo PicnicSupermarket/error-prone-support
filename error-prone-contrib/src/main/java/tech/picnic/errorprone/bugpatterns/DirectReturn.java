@@ -87,20 +87,18 @@ public final class DirectReturn extends BugChecker implements BlockTreeMatcher {
     StatementTree precedingStatement = statements.get(statements.size() - 2);
 
     return tryMatchAssignment(variableSymbol, precedingStatement)
-        .filter(
-            resultExpr ->
-                canInlineToReturnStatement(resultExpr, state)
-                    && !isIdentifierSymbolReferencedInAssociatedFinallyBlock(variableSymbol, state))
-        .map(
-            resultExpr ->
-                describeMatch(
-                    precedingStatement,
-                    SuggestedFix.builder()
-                        .replace(
-                            precedingStatement,
-                            "return %s;".formatted(SourceCode.treeToString(resultExpr, state)))
-                        .delete(finalStatement)
-                        .build()))
+        .filter(resultExpr ->
+            canInlineToReturnStatement(resultExpr, state)
+                && !isIdentifierSymbolReferencedInAssociatedFinallyBlock(variableSymbol, state))
+        .map(resultExpr ->
+            describeMatch(
+                precedingStatement,
+                SuggestedFix.builder()
+                    .replace(
+                        precedingStatement,
+                        "return %s;".formatted(SourceCode.treeToString(resultExpr, state)))
+                    .delete(finalStatement)
+                    .build()))
         .orElse(Description.NO_MATCH);
   }
 

@@ -45,7 +45,8 @@ import tech.picnic.errorprone.utils.SourceCode;
     summary =
         """
         Prefer `Optional#orElseGet` over `Optional#orElse` if the fallback requires additional \
-        computation""",
+        computation\
+        """,
     linkType = NONE,
     severity = WARNING,
     tags = PERFORMANCE)

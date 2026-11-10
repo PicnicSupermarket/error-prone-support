@@ -203,10 +203,9 @@ final class OptionalRules {
 
     @BeforeTemplate
     Optional<S> before(Optional<T> optional) {
-      return optional.flatMap(
-          v ->
-              Refaster.anyOf(
-                  Optional.of(toNullableFunction(v)), Optional.ofNullable(toNullableFunction(v))));
+      return optional.flatMap(v ->
+          Refaster.anyOf(
+              Optional.of(toNullableFunction(v)), Optional.ofNullable(toNullableFunction(v))));
     }
 
     @AfterTemplate

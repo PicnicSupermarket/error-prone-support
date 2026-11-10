@@ -16,9 +16,9 @@ Use this skill when working on Java code outside `*/refasterrules/*`.
   patterns.
 * After implementation, review your changes against the applicable sections of
   [`.github/instructions/review.instructions.md`][review].
-* Finally, follow the workflow in [`AGENT.md`][agent-md].
+* Finally, follow the workflow in [`AGENTS.md`][agents-md].
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [java-style]: ../../../.github/instructions/java-style.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md
 [testing]: ../../../.github/instructions/testing.instructions.md

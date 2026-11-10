@@ -77,12 +77,11 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
       MethodTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     MethodSymbol symbol = ASTHelpers.getSymbol(tree);
     tryCanonicalizeMethodName(symbol)
-        .ifPresent(
-            newName ->
-                ConflictDetection.findMethodRenameBlocker(symbol, newName, state)
-                    .ifPresentOrElse(
-                        blocker -> reportMethodRenameBlocker(tree, blocker, state),
-                        () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
+        .ifPresent(newName ->
+            ConflictDetection.findMethodRenameBlocker(symbol, newName, state)
+                .ifPresentOrElse(
+                    blocker -> reportMethodRenameBlocker(tree, blocker, state),
+                    () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
   }
 
   private void reportMethodRenameBlocker(MethodTree tree, String reason, VisitorState state) {

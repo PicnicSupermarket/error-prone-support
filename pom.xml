@@ -195,8 +195,8 @@
         <version.auto-service>1.1.1</version.auto-service>
         <version.error-prone>${version.error-prone-orig}</version.error-prone>
         <version.error-prone-fork>${version.error-prone-orig}-picnic-1</version.error-prone-fork>
-        <version.error-prone-orig>2.51.0</version.error-prone-orig>
-        <version.google-java-format>1.37.0</version.google-java-format>
+        <version.error-prone-orig>2.52.0</version.error-prone-orig>
+        <version.google-java-format>2.0.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.10.0</version.maven>
         <version.pitest-git>2.4.0</version.pitest-git>
@@ -330,7 +330,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava-bom</artifactId>
-                <version>33.7.2-jre</version>
+                <version>33.8.0-jre</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -347,7 +347,7 @@
             <dependency>
                 <groupId>com.uber.nullaway</groupId>
                 <artifactId>nullaway-bom</artifactId>
-                <version>0.13.4</version>
+                <version>0.14.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -408,7 +408,7 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.18.16</version>
+                <version>1.18.17</version>
             </dependency>
             <!-- Specified so that Renovate will file Maven upgrade PRs, which
             subsequently will cause `maven-enforcer-plugin` to require that
@@ -421,7 +421,7 @@
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.26</version>
+                <version>1.9.27</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
@@ -532,6 +532,11 @@
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>7.12.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>tools.jackson</groupId>
@@ -701,18 +706,6 @@
                             application of google-java-format (GJF). -->
                             <module name="Checker">
                                 <module name="NewlineAtEndOfFile" />
-                                <module name="RegexpMultiline">
-                                    <!-- GJF drops trailing horizontal
-                                    whitespace and blank lines preceding a
-                                    closing curly brace, but it does not remove
-                                    a blank line following an opening curly
-                                    brace. Here we disallow that specific case.
-                                    (The regular expression assumes that the
-                                    code has already been formatted using GJF.) -->
-                                    <property name="fileExtensions" value="java" />
-                                    <property name="format" value="\{\r?\n\r?\n" />
-                                    <property name="message" value="Avoid blank lines at the start of a block." />
-                                </module>
                                 <module name="SuppressWarningsFilter" />
                                 <module name="TreeWalker">
                                     <module name="AbbreviationAsWordInName" />
@@ -774,7 +767,21 @@
                                         https://github.com/google/google-java-format/issues/399. -->
                                         <property name="tokens" value="CLASS_DEF, CTOR_DEF, ENUM_DEF, INSTANCE_INIT, INTERFACE_DEF, METHOD_DEF, STATIC_INIT" />
                                     </module>
+                                    <module name="EmptyLineWrappingInBlock">
+                                        <!-- XXX: This check does not (yet)
+                                        cover `record` declarations, compact
+                                        constructors, the curly brace of a
+                                        `switch` and `case` blocks using `->`.
+                                        See
+                                        https://github.com/checkstyle/checkstyle/issues/22374
+                                        and
+                                        https://github.com/checkstyle/checkstyle/issues/22459. -->
+                                        <property name="bottomSeparator" value="no_empty_line" />
+                                        <property name="tokens" value="ANNOTATION_ARRAY_INIT, ANNOTATION_DEF, ARRAY_INIT, CLASS_DEF, CTOR_DEF, ENUM_CONSTANT_DEF, ENUM_DEF, INSTANCE_INIT, INTERFACE_DEF, LAMBDA, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_NEW, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, METHOD_DEF, SLIST, STATIC_INIT" />
+                                        <property name="topSeparator" value="no_empty_line" />
+                                    </module>
                                     <module name="EmptyStatement" />
+                                    <module name="ExceptionThrowShouldUseContext" />
                                     <module name="ExpressionOverBlockLambda" />
                                     <module name="FinalClass" />
                                     <module name="GoogleNonConstantFieldName" />
@@ -900,6 +907,7 @@
                                     <module name="MultilineCommentLeadingAsteriskPresence" />
                                     <module name="MutableException" />
                                     <module name="NeedBraces" />
+                                    <module name="NoCauseGetMessageInExceptionConstructor" />
                                     <module name="NoClone" />
                                     <module name="NoCodeInFile" />
                                     <module name="NoEnumTrailingComma" />
@@ -914,6 +922,9 @@
                                     <module name="PreferCodeOrSnippetJavadocInlineTag" />
                                     <module name="PreferLiteralJavadocInlineTag" />
                                     <module name="RedundantModifier" />
+                                    <module name="RedundantThis">
+                                        <property name="checkMethods" value="true" />
+                                    </module>
                                     <module name="SimplifyBooleanExpression" />
                                     <module name="SimplifyBooleanReturn" />
                                     <module name="SummaryJavadoc" />
@@ -956,7 +967,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>14.3.0</version>
+                            <version>14.4.0</version>
                         </dependency>
                         <dependency>
                             <groupId>io.spring.nohttp</groupId>
