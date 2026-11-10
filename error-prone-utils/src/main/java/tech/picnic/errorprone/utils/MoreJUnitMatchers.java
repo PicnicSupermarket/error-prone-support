@@ -74,11 +74,10 @@ public final class MoreJUnitMatchers {
   public static ImmutableList<String> getMethodSourceFactoryNames(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
     return getMethodSourceFactoryDescriptors(methodSourceAnnotation, method).stream()
-        .map(
-            descriptor -> {
-              int index = descriptor.indexOf('(');
-              return index < 0 ? descriptor : descriptor.substring(0, index);
-            })
+        .map(descriptor -> {
+          int index = descriptor.indexOf('(');
+          return index < 0 ? descriptor : descriptor.substring(0, index);
+        })
         .collect(toImmutableList());
   }
 

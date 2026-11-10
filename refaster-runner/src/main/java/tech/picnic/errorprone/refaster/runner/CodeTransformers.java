@@ -50,10 +50,9 @@ public final class CodeTransformers {
 
     for (ResourceInfo resource : getClassPathResources()) {
       getRefasterRuleName(resource)
-          .ifPresent(
-              ruleName ->
-                  loadCodeTransformer(resource)
-                      .ifPresent(transformer -> transformers.put(ruleName, transformer)));
+          .ifPresent(ruleName ->
+              loadCodeTransformer(resource)
+                  .ifPresent(transformer -> transformers.put(ruleName, transformer)));
     }
 
     return transformers.build();

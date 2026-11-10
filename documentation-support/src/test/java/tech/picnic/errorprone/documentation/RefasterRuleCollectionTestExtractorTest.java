@@ -23,14 +23,13 @@ final class RefasterRuleCollectionTestExtractorTest {
 
   @Test
   void invalidTestClassName(@TempDir Path outputDirectory) {
-    assertThatThrownBy(
-            () ->
-                Compilation.compileWithDocumentationGenerator(
-                    outputDirectory,
-                    "InvalidTestClassNameInput.java",
-                    "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-                    "",
-                    "final class InvalidTestClassName implements RefasterRuleCollectionTestCase {}"))
+    assertThatThrownBy(() ->
+            Compilation.compileWithDocumentationGenerator(
+                outputDirectory,
+                "InvalidTestClassNameInput.java",
+                "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
+                "",
+                "final class InvalidTestClassName implements RefasterRuleCollectionTestCase {}"))
         .cause()
         .isInstanceOf(VerifyException.class)
         .hasMessage(
@@ -39,14 +38,13 @@ final class RefasterRuleCollectionTestExtractorTest {
 
   @Test
   void invalidFileName(@TempDir Path outputDirectory) {
-    assertThatThrownBy(
-            () ->
-                Compilation.compileWithDocumentationGenerator(
-                    outputDirectory,
-                    "InvalidFileNameTest.java",
-                    "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
-                    "",
-                    "final class InvalidFileNameTest implements RefasterRuleCollectionTestCase {}"))
+    assertThatThrownBy(() ->
+            Compilation.compileWithDocumentationGenerator(
+                outputDirectory,
+                "InvalidFileNameTest.java",
+                "import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;",
+                "",
+                "final class InvalidFileNameTest implements RefasterRuleCollectionTestCase {}"))
         .cause()
         .isInstanceOf(VerifyException.class)
         .hasMessage(
@@ -98,7 +96,8 @@ final class RefasterRuleCollectionTestExtractorTest {
                     """
                     int testMyRule() {
                       return 42;
-                    }"""))));
+                    }\
+                    """))));
   }
 
   @Test
@@ -145,13 +144,15 @@ final class RefasterRuleCollectionTestExtractorTest {
                     """
                     String testFirstRule() {
                       return "Don't panic";
-                    }"""),
+                    }\
+                    """),
                 new RefasterTestCase(
                     "SecondRule",
                     """
                     String testSecondRule() {
                       return "Carry a towel";
-                    }"""),
+                    }\
+                    """),
                 new RefasterTestCase("EmptyRule", "void testEmptyRule() {}"))));
   }
 
