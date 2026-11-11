@@ -1759,7 +1759,7 @@
                         for surviving mutants; this may replace the
                         `pitest-{analyze,update}-pr.yml` GitHub actions
                         workflows. -->
-                        <outputFormats>CSV,HTML</outputFormats>
+                        <outputFormats>CSV,ARCMUTATE_HTML</outputFormats>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
