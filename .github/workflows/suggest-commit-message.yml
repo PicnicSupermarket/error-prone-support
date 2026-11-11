@@ -37,7 +37,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
-    runs-on: ubuntu-26.04
+    # XXX: Use `ubuntu-26.04` once `openai/codex-action` supports it. On that
+    # image the action's `drop-sudo` step fails, as `/usr/bin/test -w` ignores
+    # the ACL the action applies to `/run/dbus/system_bus_socket`. See
+    # https://github.com/openai/codex-action/issues/188.
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: codex
     steps:
