@@ -1759,7 +1759,7 @@
                         for surviving mutants; this may replace the
                         `pitest-{analyze,update}-pr.yml` GitHub actions
                         workflows. -->
-                        <outputFormats>CSV,HTML</outputFormats>
+                        <outputFormats>ARCMUTATE_HTML,CSV</outputFormats>
                         <!-- Use multiple threads to speed things up. Extend
                         timeouts to prevent false positives as a result of
                         contention. -->
@@ -1771,7 +1771,7 @@
                         <dependency>
                             <groupId>com.arcmutate</groupId>
                             <artifactId>base</artifactId>
-                            <version>1.7.2</version>
+                            <version>1.7.3</version>
                         </dependency>
                         <dependency>
                             <groupId>com.arcmutate</groupId>
