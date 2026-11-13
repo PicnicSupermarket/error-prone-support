@@ -1478,21 +1478,8 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.8.0</version>
                     <executions>
-                        <execution>
-                            <id>derive-jpms-module-name-base</id>
-                            <goals>
-                                <goal>regex-property</goal>
-                            </goals>
-                            <configuration>
-                                <failIfNoMatch>false</failIfNoMatch>
-                                <name>jpms.module-name.base</name>
-                                <regex>^(?:error-prone-)?(.*?)(?:-support)?$</regex>
-                                <replacement>tech.picnic.errorprone.$1</replacement>
-                                <value>${project.artifactId}</value>
-                            </configuration>
-                        </execution>
                         <execution>
                             <id>derive-jpms-module-name</id>
                             <goals>
@@ -1501,9 +1488,17 @@
                             <configuration>
                                 <failIfNoMatch>false</failIfNoMatch>
                                 <name>jpms.module-name</name>
-                                <regex>-</regex>
-                                <replacement>.</replacement>
-                                <value>${jpms.module-name.base}</value>
+                                <replacements>
+                                    <replacement>
+                                        <regex>^(?:error-prone-)?(.*?)(?:-support)?$</regex>
+                                        <replacement>tech.picnic.errorprone.$1</replacement>
+                                    </replacement>
+                                    <replacement>
+                                        <regex>-</regex>
+                                        <replacement>.</replacement>
+                                    </replacement>
+                                </replacements>
+                                <value>${project.artifactId}</value>
                             </configuration>
                         </execution>
                     </executions>
