@@ -44,7 +44,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
-          java-version: 25.0.4
+          java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.0
       - name: Initialize CodeQL

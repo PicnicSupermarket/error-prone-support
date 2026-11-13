@@ -139,8 +139,8 @@ jobs:
         with:
           checkout-ref: ${{ env.CHECKOUT_REF }}
           java-version: |
-            21.0.12
-            25.0.4
+            21.0.13
+            25.0.5
           java-distribution: temurin
           maven-version: 3.10.0
       - name: Install project to local Maven repository
@@ -207,8 +207,8 @@ jobs:
         with:
           checkout-ref: ${{ env.CHECKOUT_REF }}
           java-version: |
-            21.0.12
-            25.0.4
+            21.0.13
+            25.0.5
           java-distribution: temurin
           maven-version: 3.10.0
       - name: Install project to local Maven repository

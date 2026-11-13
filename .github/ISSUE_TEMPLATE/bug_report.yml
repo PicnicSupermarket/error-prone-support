@@ -67,14 +67,14 @@ body:
     attributes:
       label: Java version
       description: The output of `java --version` will do.
-      placeholder: e.g. 21.0.12
+      placeholder: e.g. 21.0.13
     validations:
       required: true
   - type: input
     id: error-prone-version
     attributes:
       label: Error Prone version
-      placeholder: e.g. 2.50.0
+      placeholder: e.g. 2.52.0
     validations:
       required: true
   - type: input

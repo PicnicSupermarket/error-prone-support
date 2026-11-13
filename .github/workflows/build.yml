@@ -23,12 +23,12 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-26.04, macos-26, windows-2025 ]
-        build-jdk: [ 25.0.4 ]
-        target-jdk: [ 21.0.12 ]
+        build-jdk: [ 25.0.5 ]
+        target-jdk: [ 21.0.13 ]
         include:
           - os: ubuntu-26.04
-            build-jdk: 27
-            target-jdk: 21.0.12
+            build-jdk: 27.0.1
+            target-jdk: 21.0.13
     permissions:
       contents: read
     runs-on: ${{ matrix.os }}
@@ -105,7 +105,7 @@ jobs:
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
-          java-version: 25.0.4
+          java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.0
       - name: Build and deploy
