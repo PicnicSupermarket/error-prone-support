@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.bugpatterns.BugChecker;
+import com.google.errorprone.matchers.Description;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.Constants;
 import com.sun.tools.javac.util.Convert;
@@ -45,5 +46,13 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
 
   int testASTHelpersGetStartPosition() {
     return ((JCTree) null).getStartPosition();
+  }
+
+  ImmutableSet<Description.Builder> testDescriptionBuilderSetMessage() {
+    return ImmutableSet.of(
+        ((Description.Builder) null).setMessage("%s foo".formatted()),
+        ((Description.Builder) null).setMessage(toString().formatted(1)),
+        ((Description.Builder) null).setMessage("%s bar".formatted(2)),
+        ((Description.Builder) null).setMessage("%s baz".formatted(3, 4)));
   }
 }
