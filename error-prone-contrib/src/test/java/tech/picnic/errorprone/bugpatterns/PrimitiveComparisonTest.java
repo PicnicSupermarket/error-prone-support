@@ -659,7 +659,6 @@ final class PrimitiveComparisonTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import static java.util.Comparator.comparing;",
             "import static java.util.Comparator.comparingDouble;",
             "import static java.util.Comparator.comparingInt;",
             "import static java.util.Comparator.comparingLong;",
@@ -701,9 +700,6 @@ final class PrimitiveComparisonTest {
         .addOutputLines(
             "A.java",
             "import static java.util.Comparator.comparing;",
-            "import static java.util.Comparator.comparingDouble;",
-            "import static java.util.Comparator.comparingInt;",
-            "import static java.util.Comparator.comparingLong;",
             "",
             "import java.util.Comparator;",
             "",

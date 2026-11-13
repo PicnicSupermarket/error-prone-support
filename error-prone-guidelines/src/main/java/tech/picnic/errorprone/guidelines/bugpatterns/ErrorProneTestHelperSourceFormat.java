@@ -39,14 +39,6 @@ import java.util.Optional;
  * output, and imports should be ordered according to the {@link Style#GOOGLE Google} style. Test
  * code does not need to be {@link JavaFormatterOptions#cleanup() clean}, as it may be required to
  * validate that code under test correctly handles non-idiomatic syntax.
- *
- * <p>This checker inspects inline code passed to {@code
- * com.google.errorprone.CompilationTestHelper} and {@code
- * com.google.errorprone.BugCheckerRefactoringTestHelper}. It requires that this code is properly
- * formatted and that its imports are organized. Only code that represents the expected output of a
- * refactoring operation is allowed to have unused imports, as most {@link BugChecker}s do not (and
- * are not able to) remove imports that become obsolete as a result of applying their suggested
- * fix(es).
  */
 // XXX: Once we target JDK 17 (optionally?) suggest text block fixes.
 // XXX: GJF guesses the line separator to be used by inspecting the source. When using text blocks
@@ -66,7 +58,7 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
   private static final long serialVersionUID = 1L;
   private static final Formatter FORMATTER =
       new Formatter(JavaFormatterOptions.builder().cleanup(false).build());
-  private static final Matcher<ExpressionTree> INPUT_SOURCE_ACCEPTING_METHOD =
+  private static final Matcher<ExpressionTree> SOURCE_ACCEPTING_METHOD =
       anyOf(
           instanceMethod()
               .onDescendantOf("com.google.errorprone.CompilationTestHelper")
@@ -74,23 +66,21 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
           instanceMethod()
               .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper")
               .named("addInputLines"),
+          instanceMethod()
+              .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
+              .named("addOutputLines"),
           // XXX: Add tests for `Compilation.compileWithDocumentationGenerator`. Until done, make
           // sure to update this matcher if that method's class or name is changed/moved.
           staticMethod()
               .onClass("tech.picnic.errorprone.documentation.Compilation")
               .named("compileWithDocumentationGenerator"));
-  private static final Matcher<ExpressionTree> OUTPUT_SOURCE_ACCEPTING_METHOD =
-      instanceMethod()
-          .onDescendantOf("com.google.errorprone.BugCheckerRefactoringTestHelper.ExpectOutput")
-          .named("addOutputLines");
 
   /** Instantiates a new {@link ErrorProneTestHelperSourceFormat} instance. */
   public ErrorProneTestHelperSourceFormat() {}
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    boolean isOutputSource = OUTPUT_SOURCE_ACCEPTING_METHOD.matches(tree, state);
-    if (!isOutputSource && !INPUT_SOURCE_ACCEPTING_METHOD.matches(tree, state)) {
+    if (!SOURCE_ACCEPTING_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -106,17 +96,17 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
 
     /* Attempt to format the source code only if it fully consists of constant expressions. */
     return getConstantSourceCode(sourceLines)
-        .map(source -> flagFormattingIssues(startPos, endPos, source, isOutputSource, state))
+        .map(source -> flagFormattingIssues(startPos, endPos, source, state))
         .orElse(Description.NO_MATCH);
   }
 
   private Description flagFormattingIssues(
-      int startPos, int endPos, String source, boolean retainUnusedImports, VisitorState state) {
+      int startPos, int endPos, String source, VisitorState state) {
     Tree methodInvocation = state.getPath().getLeaf();
 
     String formatted;
     try {
-      formatted = formatSourceCode(source, retainUnusedImports).trim();
+      formatted = formatSourceCode(source).trim();
     } catch (
         @SuppressWarnings("java:S1166" /* Stack trace not relevant. */)
         FormatterException e) {
@@ -152,14 +142,10 @@ public final class ErrorProneTestHelperSourceFormat extends BugChecker
                 .collect(joining(", "))));
   }
 
-  private static String formatSourceCode(String source, boolean retainUnusedImports)
-      throws FormatterException {
-    String withReorderedImports = ImportOrderer.reorderImports(source, Style.GOOGLE);
-    String withOptionallyRemovedImports =
-        retainUnusedImports
-            ? withReorderedImports
-            : RemoveUnusedImports.removeUnusedImports(withReorderedImports);
-    return FORMATTER.formatSource(withOptionallyRemovedImports);
+  private static String formatSourceCode(String source) throws FormatterException {
+    return FORMATTER.formatSource(
+        RemoveUnusedImports.removeUnusedImports(
+            ImportOrderer.reorderImports(source, Style.GOOGLE)));
   }
 
   // XXX: This logic is duplicated in `BugPatternTestExtractor`. Can we do better?

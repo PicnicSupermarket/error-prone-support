@@ -84,8 +84,6 @@ final class AutowiredConstructorTest {
             "}")
         .addOutputLines(
             "Container.java",
-            "import org.springframework.beans.factory.annotation.Autowired;",
-            "",
             "interface Container {",
             "  class A {",
             "    @Deprecated",

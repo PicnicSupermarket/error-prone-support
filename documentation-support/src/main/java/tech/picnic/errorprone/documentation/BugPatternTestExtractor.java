@@ -170,6 +170,10 @@ public final class BugPatternTestExtractor implements Extractor<BugPatternTestCa
         String path = ASTHelpers.constValue(inputTree.getArguments().getFirst(), String.class);
         Optional<String> inputCode = getSourceCode(inputTree);
         if (path != null && inputCode.isPresent()) {
+          // XXX: As `ErrorProneTestHelperSourceFormat` drops unused imports from expected output,
+          // the resultant input/output diff may suggest that a check removes imports that it
+          // actually leaves in place. Consider having the website note that import cleanup
+          // generally relies on other tooling, such as Google Java Format.
           Optional<String> outputCode =
               REPLACEMENT_EXPECT_UNCHANGED.matches(tree, state) ? inputCode : getSourceCode(tree);
 

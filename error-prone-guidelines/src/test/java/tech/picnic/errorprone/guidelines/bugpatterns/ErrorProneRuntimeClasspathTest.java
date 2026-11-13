@@ -111,11 +111,8 @@ final class ErrorProneRuntimeClasspathTest {
         .addOutputLines(
             "A.java",
             "import com.google.common.collect.ImmutableList;",
-            "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
             "import com.google.errorprone.BugPattern;",
-            "import com.google.errorprone.CompilationTestHelper;",
             "import com.google.errorprone.util.ErrorProneToken;",
-            "import org.junit.jupiter.api.Test;",
             "",
             "class A {",
             "  void m(Object o) {",

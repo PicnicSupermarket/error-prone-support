@@ -128,7 +128,6 @@ final class NonEmptyMonoTest {
             "A.java",
             "import static com.google.common.collect.ImmutableList.toImmutableList;",
             "",
-            "import com.google.common.collect.ImmutableList;",
             "import reactor.core.publisher.Flux;",
             "import reactor.core.publisher.Mono;",
             "",

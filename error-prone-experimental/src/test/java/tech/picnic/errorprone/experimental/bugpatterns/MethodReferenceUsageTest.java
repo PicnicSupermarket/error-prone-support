@@ -367,8 +367,6 @@ final class MethodReferenceUsageTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import static java.util.Collections.emptyList;",
-            "",
             "import java.util.Collections;",
             "import java.util.List;",
             "import java.util.Map;",

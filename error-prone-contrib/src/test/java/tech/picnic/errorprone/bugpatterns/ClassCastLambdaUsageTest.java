@@ -61,7 +61,6 @@ final class ClassCastLambdaUsageTest {
         .addOutputLines(
             "A.java",
             "import java.util.stream.Stream;",
-            "import org.jspecify.annotations.Nullable;",
             "",
             "class A {",
             "  void m() {",
