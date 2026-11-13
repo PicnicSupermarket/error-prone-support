@@ -17,17 +17,6 @@ public final class MoreTypePredicates {
   private MoreTypePredicates() {}
 
   /**
-   * Returns a {@link TypePredicate} that matches types that are annotated with the indicated
-   * annotation type.
-   *
-   * @param annotationType The fully-qualified name of the annotation type.
-   * @return A {@link TypePredicate} that matches appropriate types.
-   */
-  public static TypePredicate hasAnnotation(String annotationType) {
-    return (type, state) -> ASTHelpers.hasAnnotation(type.tsym, annotationType, state);
-  }
-
-  /**
    * Returns a {@link TypePredicate} that matches subtypes of the type returned by the specified
    * {@link Supplier}.
    *

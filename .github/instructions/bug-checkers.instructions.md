@@ -563,14 +563,12 @@ Key methods from the `error-prone-utils` module
 | `MoreASTHelpers` | `findMethods(name, state)` | Finds methods by name in the enclosing class |
 | `MoreASTHelpers` | `findMethodExitedOnReturn(state)` | Finds the method exited by a `return` statement |
 | `MoreASTHelpers` | `areSameType(treeA, treeB, state)` | Checks whether two trees have the same type |
-| `MoreMatchers` | `hasMetaAnnotation(annotationType)` | Matches annotations meta-annotated with the given type |
 | `MoreMatchers` | `isSubTypeOf(type)` | Matches trees whose type is a subtype of the given type |
 | `ThirdPartyLibrary` | `X.isIntroductionAllowed(state)` | Checks whether a third-party library dependency is acceptable |
 | `Flags` | `getList(flags, name)` | Parses a comma-separated flag value into a list |
 | `Flags` | `getSet(flags, name)` | Parses a comma-separated flag value into a set |
 | `ConflictDetection` | `findMethodRenameBlocker(...)` | Validates that a method rename does not introduce conflicts |
 | `MoreJUnitMatchers` | `TEST_METHOD` | Matches JUnit test methods |
-| `MoreJUnitMatchers` | `SETUP_OR_TEARDOWN_METHOD` | Matches JUnit setup/teardown methods |
 
 ## Avoid suggesting breaking changes in fixes
 <!-- check: Suggested fixes do not introduce compilation errors -->
