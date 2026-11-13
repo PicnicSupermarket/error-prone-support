@@ -1,0 +1,64 @@
+# Posts an architecture diagram of the changes in a pull request, using
+# CodeBoarding. See https://www.codeboarding.org and
+# https://github.com/CodeBoarding/CodeBoarding-action.
+name: Visualize architecture changes
+on:
+  pull_request:
+    paths: [ '**/*.java', .github/workflows/codeboarding.yml ]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions: {}
+env:
+  # Opts out of CodeBoarding's usage telemetry.
+  CODEBOARDING_TELEMETRY: 'false'
+jobs:
+  review:
+    name: Review architecture changes with CodeBoarding
+    # Analysis of code in forked repositories is skipped, as such workflow runs
+    # do not receive the OIDC credentials required to use the hosted LLM.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      actions: read # To reuse analyses of earlier runs.
+      contents: read
+      id-token: write # To authenticate against CodeBoarding's hosted LLM.
+      issues: write # To post the architecture review as a PR comment.
+      pull-requests: write # To post the architecture review as a PR comment.
+    runs-on: ubuntu-24.04
+    # Analyzing a base commit for which no analysis is stored takes about 35
+    # minutes; analyzing a pull request on top of a stored base takes a few.
+    # XXX: Revisit once at least 20 successful runs have completed.
+    timeout-minutes: 60
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          disable-sudo-and-containers: true
+          # The `lambda-url` endpoints are CodeBoarding's hosted LLM proxy and
+          # review guide service. Their host names are hard-coded in the
+          # action; check them on each upgrade.
+          allowed-endpoints: >
+            api.github.com:443
+            auduihjmm4b735zci7vyabuikq0hppqn.lambda-url.us-east-1.on.aws:443
+            download.eclipse.org:443
+            files.pythonhosted.org:443
+            github.com:443
+            hosted-compute-watchdog-prod-*.githubapp.com:443
+            jxivqwx4or6oip3krgdmdaiunm0iaybf.lambda-url.us-east-1.on.aws:443
+            models.dev:443
+            pypi.org:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+            results-receiver.actions.githubusercontent.com:443
+            run-actions-*-azure-*.actions.githubusercontent.com:443
+            services.gradle.org:443
+      - name: Review architecture changes
+        uses: CodeBoarding/CodeBoarding-action@18c91426356241185a0ce51a786f98c96a35d3d2 # v1.18.0
+        with:
+          llm: hosted
+          # XXX: Consider setting `review_guide_url: ''`. That disables the
+          # experimental review guide, which is only viewable on the
+          # CodeBoarding website and requires sending that service the full
+          # contents of changed files, their diffs, the PR title and body, and
+          # the commit subjects. It also makes the second `lambda-url`
+          # endpoint above redundant.
