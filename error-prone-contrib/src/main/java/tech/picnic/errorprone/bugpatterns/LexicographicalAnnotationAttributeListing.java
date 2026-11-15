@@ -4,6 +4,14 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
+import static com.google.errorprone.matchers.Matchers.typePredicateMatcher;
+import static com.google.errorprone.predicates.TypePredicates.isArrayOf;
+import static com.google.errorprone.predicates.TypePredicates.isDescendantOfAny;
+import static com.google.errorprone.suppliers.Suppliers.ANNOTATION_TYPE;
+import static com.google.errorprone.suppliers.Suppliers.BOOLEAN_TYPE;
+import static com.google.errorprone.suppliers.Suppliers.CHAR_TYPE;
+import static com.google.errorprone.suppliers.Suppliers.CLASS_TYPE;
+import static com.google.errorprone.suppliers.Suppliers.STRING_TYPE;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
@@ -23,6 +31,7 @@ import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
 import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
+import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
@@ -33,11 +42,8 @@ import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.PrimitiveTypeTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Symtab;
-import com.sun.tools.javac.code.Type;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.AnnotationAttributeMatcher;
@@ -66,6 +72,24 @@ import tech.picnic.errorprone.utils.SourceCode;
 public final class LexicographicalAnnotationAttributeListing extends BugChecker
     implements AnnotationTreeMatcher {
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Matches arrays of which the elements can be sorted lexicographically.
+   *
+   * <p>For now we don't force sorting on numeric types.
+   */
+  private static final Matcher<Tree> IS_SORTABLE_ARRAY =
+      typePredicateMatcher(
+          isArrayOf(
+              isDescendantOfAny(
+                  ImmutableList.of(
+                      ANNOTATION_TYPE,
+                      BOOLEAN_TYPE,
+                      CHAR_TYPE,
+                      CLASS_TYPE,
+                      state -> state.getSymtab().enumSym.type,
+                      STRING_TYPE))));
+
   private static final ImmutableSet<String> BLACKLISTED_ANNOTATIONS =
       ImmutableSet.of(
           // XXX: Unless `JsonPropertyOrder#alphabetic` is true...
@@ -133,7 +157,7 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
 
   private static Optional<SuggestedFix.Builder> suggestSorting(
       NewArrayTree array, VisitorState state) {
-    if (array.getInitializers().size() < 2 || !canSort(array, state)) {
+    if (array.getInitializers().size() < 2 || !IS_SORTABLE_ARRAY.matches(array, state)) {
       /* There's nothing to sort, or we don't want to sort. */
       return Optional.empty();
     }
@@ -151,26 +175,6 @@ public final class LexicographicalAnnotationAttributeListing extends BugChecker
             .map(expr -> SourceCode.treeToString(expr, state))
             .collect(joining(", ", "{", "}"));
     return Optional.of(SuggestedFix.builder().replace(array, suggestion));
-  }
-
-  private static boolean canSort(Tree array, VisitorState state) {
-    Type type = ASTHelpers.getType(array);
-    if (type == null) {
-      return false;
-    }
-
-    Symtab symtab = state.getSymtab();
-    Type elemType = state.getTypes().elemtype(type);
-
-    /* For now we don't force sorting on numeric types. */
-    return Stream.of(
-            symtab.annotationType,
-            symtab.booleanType,
-            symtab.charType,
-            symtab.classType,
-            symtab.enumSym.type,
-            symtab.stringType)
-        .anyMatch(t -> ASTHelpers.isSubtype(elemType, t, state));
   }
 
   private static ImmutableList<? extends ExpressionTree> doSort(
