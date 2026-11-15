@@ -7,8 +7,10 @@ import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.anyMethod;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static com.google.errorprone.suppliers.Suppliers.STRING_TYPE;
 import static java.util.stream.Collectors.joining;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -36,7 +38,6 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
-import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -134,6 +135,7 @@ public final class FormatStringConcatenation extends BugChecker
       instanceMethod()
           .onDescendantOf("org.slf4j.Logger")
           .namedAnyOf("debug", "error", "info", "trace", "warn");
+  private static final Matcher<ExpressionTree> STRING = isSameType(STRING_TYPE);
 
   /** Instantiates a new {@link FormatStringConcatenation} instance. */
   public FormatStringConcatenation() {}
@@ -204,7 +206,7 @@ public final class FormatStringConcatenation extends BugChecker
 
     ExpressionTree argument = ASTHelpers.stripParentheses(arguments.get(argPosition));
     return argument instanceof BinaryTree
-        && MoreASTHelpers.isStringTyped(argument, state)
+        && STRING.matches(argument, state)
         && ASTHelpers.constValue(argument, String.class) == null;
   }
 
@@ -220,7 +222,7 @@ public final class FormatStringConcatenation extends BugChecker
 
     @Override
     public @Nullable Void visitBinary(BinaryTree tree, VisitorState state) {
-      if (tree.getKind() == Kind.PLUS && MoreASTHelpers.isStringTyped(tree, state)) {
+      if (tree.getKind() == Kind.PLUS && STRING.matches(tree, state)) {
         tree.getLeftOperand().accept(this, state);
         tree.getRightOperand().accept(this, state);
       } else {
