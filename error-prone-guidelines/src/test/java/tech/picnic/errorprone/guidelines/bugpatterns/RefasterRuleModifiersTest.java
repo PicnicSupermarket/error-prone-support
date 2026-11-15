@@ -22,6 +22,8 @@ final class RefasterRuleModifiersTest {
             "    return str;",
             "  }",
             "",
+            "  public class NonRefasterClass {}",
+            "",
             "  static final class Inner {",
             "    @BeforeTemplate",
             "    String before(String str) {",
