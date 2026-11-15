@@ -87,8 +87,7 @@ public final class AssociativeMethodInvocation extends BugChecker
     SuggestedFix.Builder fix = SuggestedFix.builder();
 
     for (ExpressionTree arg : tree.getArguments()) {
-      if (matcher.matches(arg, state)) {
-        MethodInvocationTree invocation = (MethodInvocationTree) arg;
+      if (arg instanceof MethodInvocationTree invocation && matcher.matches(invocation, state)) {
         fix.merge(
             invocation.getArguments().isEmpty()
                 ? SuggestedFixes.removeElement(invocation, tree.getArguments(), state)
