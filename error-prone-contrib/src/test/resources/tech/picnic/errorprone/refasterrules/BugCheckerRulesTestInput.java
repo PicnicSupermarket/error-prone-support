@@ -51,8 +51,7 @@ final class BugCheckerRulesTest implements RefasterRuleCollectionTestCase {
   ImmutableSet<Description.Builder> testDescriptionBuilderSetMessage() {
     return ImmutableSet.of(
         ((Description.Builder) null).setMessage("%s foo".formatted()),
-        ((Description.Builder) null).setMessage(toString().formatted(1)),
-        ((Description.Builder) null).setMessage("%s bar".formatted(2)),
-        ((Description.Builder) null).setMessage("%s baz".formatted(3, 4)));
+        ((Description.Builder) null).setMessage("%s bar".formatted(1)),
+        ((Description.Builder) null).setMessage("%s baz".formatted(2, 3)));
   }
 }

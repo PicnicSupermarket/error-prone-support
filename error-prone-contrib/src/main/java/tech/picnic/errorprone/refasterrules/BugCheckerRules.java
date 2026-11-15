@@ -3,12 +3,10 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.matchers.CompileTimeConstantExpressionMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
-import com.google.errorprone.refaster.annotation.Matches;
 import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.Tree;
@@ -122,17 +120,11 @@ final class BugCheckerRules {
    * Prefer {@link Description.Builder#setMessage(String, Object...)} over more verbose
    * alternatives.
    */
-  // XXX: This rule does not match format strings that aren't compile-time constants, as rewriting
-  // those would generally yield a `FormatStringAnnotation` violation. Consider also supporting
-  // `@FormatString` method parameters.
   static final class DescriptionBuilderSetMessage {
     @BeforeTemplate
     @SuppressWarnings("ArrayToString" /* Varargs converted to array. */)
     Description.Builder before(
-        Description.Builder builder,
-        @Matches(CompileTimeConstantExpressionMatcher.class) String format,
-        Object firstArg,
-        @Repeated Object otherArgs) {
+        Description.Builder builder, String format, Object firstArg, @Repeated Object otherArgs) {
       return builder.setMessage(format.formatted(firstArg, Refaster.asVarargs(otherArgs)));
     }
 
