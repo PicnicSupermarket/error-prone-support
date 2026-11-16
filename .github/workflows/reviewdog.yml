@@ -40,7 +40,6 @@ jobs:
       - name: Set up Reviewdog
         uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
-          # XXX: Configure Renovate to maintain this version.
           reviewdog_version: v0.20.3
       - name: Install project to local Maven repository
         # XXX: Consider configuring Reviewdog such that it reports build
