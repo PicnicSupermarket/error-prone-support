@@ -199,7 +199,7 @@
         <version.google-java-format>2.0.0</version.google-java-format>
         <version.jdk>21</version.jdk>
         <version.maven>3.10.0</version.maven>
-        <version.pitest-git>2.4.0</version.pitest-git>
+        <version.pitest-git>2.4.1</version.pitest-git>
     </properties>
 
     <dependencyManagement>
