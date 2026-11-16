@@ -1652,15 +1652,9 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.24.0</version>
+                    <version>2.25.2</version>
                     <configuration>
                         <ruleSet>
-                            <ignoreVersions>
-                                <ignoreVersion>
-                                    <type>regex</type>
-                                    <version>.*\b(alpha\d*|beta-?\d*|b\d+(\.\d+)*|M\d+|(rc|RC)-?\d+)\b.*</version>
-                                </ignoreVersion>
-                            </ignoreVersions>
                             <rules>
                                 <rule>
                                     <groupId>net.bytebuddy</groupId>
