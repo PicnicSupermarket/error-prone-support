@@ -382,16 +382,16 @@ final class BugPatternTestExtractorTest {
   }
 
   @Test
-  void singleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestMode(
+  void singleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooser(
       @TempDir Path outputDirectory) {
     Compilation.compileWithDocumentationGenerator(
         outputDirectory,
-        "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java",
+        "SingleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooserTest.java",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper;",
         "import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;",
         "import com.google.errorprone.bugpatterns.BugChecker;",
         "",
-        "final class SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest {",
+        "final class SingleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooserTest {",
         "  private static class TestChecker extends BugChecker {}",
         "",
         "  void m() {",
@@ -406,14 +406,14 @@ final class BugPatternTestExtractorTest {
 
     verifyGeneratedFileContent(
         outputDirectory,
-        "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
+        "SingleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooserTest",
         new BugPatternTestCases(
             URI.create(
-                "file:///SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.java"),
-            "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest",
+                "file:///SingleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooserTest.java"),
+            "SingleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooserTest",
             ImmutableList.of(
                 new BugPatternTestCase(
-                    "SingleFileBugCheckerRefactoringTestHelperWithSetArgsFixChooserAndCustomTestModeTest.TestChecker",
+                    "SingleFileBugCheckerRefactoringTestHelperWithSetArgsAndFixChooserTest.TestChecker",
                     ImmutableList.of(
                         new ReplacementTestEntry(
                             "A.java", "class A {}\n", "class A { /* This is a change. */ }\n"))))));
