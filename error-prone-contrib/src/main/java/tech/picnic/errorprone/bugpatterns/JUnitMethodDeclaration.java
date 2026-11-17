@@ -88,8 +88,8 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
     state.reportMatch(
         buildDescription(tree)
             .setMessage(
-                "This method's name should not redundantly start with `%s` (but note that %s)"
-                    .formatted(TEST_PREFIX, reason))
+                "This method's name should not redundantly start with `%s` (but note that %s)",
+                TEST_PREFIX, reason)
             .build());
   }
 

@@ -90,12 +90,12 @@ public final class ConstantNaming extends BugChecker implements VariableTreeMatc
     Description.Builder description = buildDescription(tree);
     if (!IS_PRIVATE.matches(tree, state)) {
       description.setMessage(
-          "%s; consider renaming to '%s', though note that this is not a private constant"
-              .formatted(message(), replacement));
+          "%s; consider renaming to '%s', though note that this is not a private constant",
+          message(), replacement);
     } else if (isVariableNameInUse(replacement, state)) {
       description.setMessage(
-          "%s; consider renaming to '%s', though note that a variable with this name is already declared"
-              .formatted(message(), replacement));
+          "%s; consider renaming to '%s', though note that a variable with this name is already declared",
+          message(), replacement);
     } else {
       description.addFix(SuggestedFixes.renameVariable(tree, replacement, state));
     }
