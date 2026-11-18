@@ -65,12 +65,7 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     }
 
     if (LIST_COLLECTOR.matches(tree, state)) {
-      return suggestToCollectionAlternatives(
-          tree,
-          ImmutableList.class.getCanonicalName() + ".toImmutableList",
-          Collectors.class.getCanonicalName() + ".toUnmodifiableList",
-          ArrayList.class.getCanonicalName(),
-          state);
+      return resolveListReplacement(tree, state);
     }
 
     if (MAP_COLLECTOR.matches(tree, state)) {
@@ -78,15 +73,28 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     }
 
     if (SET_COLLECTOR.matches(tree, state)) {
-      return suggestToCollectionAlternatives(
-          tree,
-          ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
-          Collectors.class.getCanonicalName() + ".toUnmodifiableSet",
-          HashSet.class.getCanonicalName(),
-          state);
+      return resolveSetReplacement(tree, state);
     }
 
     return Description.NO_MATCH;
+  }
+
+  private Description resolveListReplacement(MethodInvocationTree tree, VisitorState state) {
+    return suggestToCollectionAlternatives(
+        tree,
+        ImmutableList.class.getCanonicalName() + ".toImmutableList",
+        Collectors.class.getCanonicalName() + ".toUnmodifiableList",
+        ArrayList.class.getCanonicalName(),
+        state);
+  }
+
+  private Description resolveSetReplacement(MethodInvocationTree tree, VisitorState state) {
+    return suggestToCollectionAlternatives(
+        tree,
+        ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
+        Collectors.class.getCanonicalName() + ".toUnmodifiableSet",
+        HashSet.class.getCanonicalName(),
+        state);
   }
 
   private Description suggestToCollectionAlternatives(
