@@ -58,7 +58,7 @@ public final class UnqualifiedSuggestedFixImport extends BugChecker
   private Description createDescription(
       MethodInvocationTree tree, String method, String alternative) {
     return buildDescription(tree)
-        .setMessage("Prefer `%s` over direct invocation of `%s`".formatted(alternative, method))
+        .setMessage("Prefer `%s` over direct invocation of `%s`", alternative, method)
         .build();
   }
 }

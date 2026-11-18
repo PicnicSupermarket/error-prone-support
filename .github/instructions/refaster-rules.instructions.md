@@ -19,6 +19,29 @@ conventions, see [`testing.instructions.md`][testing].
 matches a code pattern; the `@AfterTemplate` specifies its replacement. Rules
 are grouped into topic-based _collections_ (e.g., `BigDecimalRules`).
 
+## Choosing the collection
+<!-- check: Rules live in the collection matching their `@AfterTemplate` target -->
+
+A rule's collection is determined by its `@AfterTemplate` code (the preferred
+alternative), not by the `@BeforeTemplate` pattern it replaces. This mirrors
+the [rule naming convention](#rule-named-after-aftertemplate-content): both a
+rule's name and its home are anchored to the code it rewrites _to_.
+
+- **Do**: place a rule whose `@AfterTemplate` calls `String.join` in
+  `StringRules`.
+- **Don't**: place that rule in `StreamRules` merely because its
+  `@BeforeTemplate` matches an `elements.stream().collect(joining(delimiter))`
+  expression.
+
+If the `@AfterTemplate` references more than one type, the collection follows
+the _subject_ of the rewritten expression rather than the type wrapping it.
+For example, `CollectionRules.OptionalOfNullableQueuePeek`, which rewrites to
+`Optional.ofNullable(queue.peek())`, belongs in `CollectionRules` rather than
+`OptionalRules`.
+
+Exception: migration collections (annotated with `@TypeMigration`, such as
+`JUnitToAssertJRules`) group rules by the API they migrate away from.
+
 ## File locations
 
 | Purpose | Path |

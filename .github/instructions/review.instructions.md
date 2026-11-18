@@ -14,9 +14,9 @@ the files you modified.
 
 ## Agent Configuration Conventions (`agents.instructions.md`)
 
-### `AGENT.md` is the canonical entry point
+### `AGENTS.md` is the canonical entry point
 
-- [ ] `AGENT.md` is the single source of truth for agent workflow
+- [ ] `AGENTS.md` is the single source of truth for agent workflow
 
 ### Use symlinks to avoid duplication across agent platforms
 
@@ -124,6 +124,15 @@ the files you modified.
 ### Use explicit runner versions
 
 - [ ] Runner uses explicit version (not `ubuntu-latest`)
+
+### Set a timeout on every job
+
+- [ ] Every job declares `timeout-minutes`, directly below `runs-on`
+- [ ] `timeout-minutes` follows `max(5, roundup5(max(2 * slowest success, 3 * median)))`
+- [ ] The formula is based on at least 20 recent successful runs, excluding queueing time
+- [ ] Jobs that install a toolchain or call a third-party service have a timeout of at least 10 minutes
+- [ ] Matrix jobs use the largest result of the formula across all legs, or a matrix-dependent expression
+- [ ] `if:` conditions and result mappings that distinguish `failure` from `cancelled` handle timed-out jobs deliberately
 
 ### Every step must have a name
 
@@ -281,6 +290,10 @@ the files you modified.
 - [ ] PR description contains a suggested commit message in a fenced code block
 
 ## Refaster Rule Conventions (`refaster-rules.instructions.md`)
+
+### Choosing the collection
+
+- [ ] Rules live in the collection matching their `@AfterTemplate` target
 
 ### Rule file structure
 

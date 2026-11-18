@@ -13,10 +13,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write # To post findings and suggested fixes as PR comments.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -35,11 +36,10 @@ jobs:
         with:
           java-version: 25.0.4
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Set up Reviewdog
         uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:
-          # XXX: Configure Renovate to maintain this version.
           reviewdog_version: v0.20.3
       - name: Install project to local Maven repository
         # XXX: Consider configuring Reviewdog such that it reports build
@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./apply-error-prone-suggestions.sh
       - name: Report suggested changes
-        uses: reviewdog/action-suggester@ac5ce6d94e35c00530447dc63c271e38e4fd36c6 # v1.26.3
+        uses: reviewdog/action-suggester@fd22a83b1ebc13fd8aee5d57b06793fce6f20fb9 # v1.27.1
         with:
           tool_name: Error Prone
       - name: Remove installed project artifacts

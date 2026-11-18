@@ -13,8 +13,8 @@ Use this skill for requests to add or change files in `*/refasterrules/*`.
 Read [`.github/instructions/refaster-rules.instructions.md`][refaster-rules]
 for the full conventions. Then:
 
-1. **Determine the target collection** based on the topic: add to an existing
-   `{Topic}Rules.java` or create a new one.
+1. **Determine the target collection** based on the rule's `@AfterTemplate`:
+   add to an existing `{Topic}Rules.java` or create a new one.
 2. **Implement the rule** following the conventions in the instructions (rule
    file structure and advanced patterns).
 3. **Write the test input and output files** following the test conventions.
@@ -22,9 +22,9 @@ for the full conventions. Then:
 5. **Verify** by running the tests.
 6. **Review** all changes against
    [`.github/instructions/review.instructions.md`][review].
-7. **Follow the workflow** in [`AGENT.md`][agent-md] (apply suggestions, full
+7. **Follow the workflow** in [`AGENTS.md`][agents-md] (apply suggestions, full
    build).
 
-[agent-md]: ../../../AGENT.md
+[agents-md]: ../../../AGENTS.md
 [refaster-rules]: ../../../.github/instructions/refaster-rules.instructions.md
 [review]: ../../../.github/instructions/review.instructions.md

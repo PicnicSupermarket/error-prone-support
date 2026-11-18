@@ -49,7 +49,7 @@ public enum ThirdPartyLibrary {
    *     classpath iff the associated third-party library is on the classpath.
    */
   ThirdPartyLibrary(String witnessFqcn) {
-    this.canUse = VisitorState.memoize(state -> canIntroduceUsage(witnessFqcn, state));
+    canUse = VisitorState.memoize(state -> canIntroduceUsage(witnessFqcn, state));
   }
 
   /**

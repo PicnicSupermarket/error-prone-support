@@ -13,8 +13,6 @@ import com.google.common.collect.Comparators;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +24,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Stream.class, identity());
+    return ImmutableSet.of(ImmutableList.class, Stream.class, identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {
@@ -92,27 +90,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
     return ImmutableSet.of("foo".compareTo("bar"), "qux".compareTo("baz"));
   }
 
-  void testCollectionsSort() {
-    Collections.sort(ImmutableList.of("foo", "bar"));
-  }
-
-  ImmutableSet<String> testCollectionsMin() {
-    return ImmutableSet.of(
-        Collections.min(ImmutableList.of("foo")), Collections.min(ImmutableList.of("bar")));
-  }
-
-  String testCollectionsMinArraysAsList() {
-    return Collections.min(Arrays.asList(new String[0]), naturalOrder());
-  }
-
-  String testCollectionsMinWithComparator() {
-    return Collections.min(ImmutableSet.of("foo", "bar"), naturalOrder());
-  }
-
-  int testCollectionsMinArraysAsListVarargs() {
-    return Collections.min(Arrays.asList(1, 2), naturalOrder());
-  }
-
   ImmutableSet<String> testComparatorsMin2() {
     return ImmutableSet.of(
         Comparators.min("foo", "bar"),
@@ -135,23 +112,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparators.min("waldo", "fred", (a, b) -> -1),
         Comparators.min("plugh", "xyzzy", (a, b) -> 0),
         Comparators.min("thud", "foo", (a, b) -> 1));
-  }
-
-  ImmutableSet<String> testCollectionsMax() {
-    return ImmutableSet.of(
-        Collections.max(ImmutableList.of("foo")), Collections.max(ImmutableList.of("bar")));
-  }
-
-  String testCollectionsMaxArraysAsList() {
-    return Collections.max(Arrays.asList(new String[0]), naturalOrder());
-  }
-
-  String testCollectionsMaxWithComparator() {
-    return Collections.max(ImmutableSet.of("foo", "bar"), naturalOrder());
-  }
-
-  int testCollectionsMaxArraysAsListVarargs() {
-    return Collections.max(Arrays.asList(1, 2), naturalOrder());
   }
 
   ImmutableSet<String> testComparatorsMax2() {

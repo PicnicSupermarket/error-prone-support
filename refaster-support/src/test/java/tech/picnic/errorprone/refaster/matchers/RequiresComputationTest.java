@@ -145,10 +145,9 @@ final class RequiresComputationTest {
     private static final long serialVersionUID = 1L;
 
     private MatcherTestChecker() {
-      super(
-          (expressionTree, state) ->
-              state.getPath().getParentPath().getLeaf() instanceof ReturnTree
-                  && new RequiresComputation().matches(expressionTree, state));
+      super((expressionTree, state) ->
+          state.getPath().getParentPath().getLeaf() instanceof ReturnTree
+              && new RequiresComputation().matches(expressionTree, state));
     }
   }
 }

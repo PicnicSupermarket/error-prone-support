@@ -27,14 +27,15 @@ jobs:
   matrix:
     name: Determine integration test matrix
     if: ${{ github.event_name == 'push' || (github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
     permissions:
       contents: read
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -73,14 +74,15 @@ jobs:
     name: Acknowledge request
     needs: [ matrix ]
     if: ${{ github.event_name != 'push' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
     permissions:
       pull-requests: write # To post a PR comment.
     outputs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -109,7 +111,8 @@ jobs:
     # this job still runs in that case.
     needs: [ matrix, acknowledge ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 35
     permissions:
       contents: read
     strategy:
@@ -118,7 +121,7 @@ jobs:
         integration-test: ${{ fromJson(needs.matrix.outputs.matrix) }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -139,7 +142,7 @@ jobs:
             21.0.12
             25.0.4
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Apply patches
@@ -167,7 +170,8 @@ jobs:
     # validation build's result is observed in the same run.
     needs: [ matrix, patch ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
     permissions:
       contents: read
     strategy:
@@ -176,7 +180,7 @@ jobs:
         integration-test: ${{ fromJson(needs.matrix.outputs.matrix) }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -206,7 +210,7 @@ jobs:
             21.0.12
             25.0.4
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Validate patched code
@@ -229,12 +233,13 @@ jobs:
     # Using `always()` ensures that this job runs even if previous jobs failed
     # or were cancelled.
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
     permissions:
       pull-requests: write # To update the PR comment.
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -256,7 +261,7 @@ jobs:
                 case 'success':
                   return [':white_check_mark:', 'Integration tests passed successfully!'];
                 case 'cancelled':
-                  return [':stop_sign:', 'The workflow was cancelled.'];
+                  return [':stop_sign:', 'The workflow was cancelled or a job timed out.'];
                 default:
                   return [':x:', 'Integration tests failed. Please check the logs.'];
               }

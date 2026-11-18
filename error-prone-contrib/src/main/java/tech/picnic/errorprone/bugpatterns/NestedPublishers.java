@@ -36,7 +36,8 @@ import com.sun.tools.javac.code.Type;
     summary =
         """
         Avoid `Publisher`s that emit other `Publishers`s; the resultant code is hard to reason \
-        about""",
+        about\
+        """,
     link = BUG_PATTERNS_BASE_URL + "NestedPublishers",
     linkType = CUSTOM,
     severity = WARNING,

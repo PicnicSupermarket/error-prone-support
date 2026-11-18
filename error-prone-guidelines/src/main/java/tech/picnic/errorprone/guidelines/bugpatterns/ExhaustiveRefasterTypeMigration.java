@@ -73,7 +73,8 @@ import tech.picnic.errorprone.utils.SourceCode;
     summary =
         """
         The set of unmigrated methods listed by the `@TypeMigration` annotation must be minimal \
-        yet exhaustive""",
+        yet exhaustive\
+        """,
     link = BUG_PATTERNS_BASE_URL + "ExhaustiveRefasterTypeMigration",
     linkType = CUSTOM,
     severity = WARNING,
@@ -104,7 +105,7 @@ public final class ExhaustiveRefasterTypeMigration extends BugChecker implements
     if (migratedType.asType().isPrimitive()
         || !(migratedType instanceof ClassSymbol migratedClass)) {
       return buildDescription(migrationAnnotation)
-          .setMessage("Migration of type '%s' is unsupported".formatted(migratedType))
+          .setMessage("Migration of type '%s' is unsupported", migratedType)
           .build();
     }
 

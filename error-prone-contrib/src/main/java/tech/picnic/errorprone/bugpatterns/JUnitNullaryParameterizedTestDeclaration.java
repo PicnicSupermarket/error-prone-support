@@ -6,9 +6,9 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.hasMetaAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.utils.MoreMatchers.hasMetaAnnotation;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;

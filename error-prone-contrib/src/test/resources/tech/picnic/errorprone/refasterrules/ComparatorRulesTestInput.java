@@ -25,7 +25,7 @@ import tech.picnic.errorprone.refaster.test.RefasterRuleCollectionTestCase;
 final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
   @Override
   public ImmutableSet<Object> elidedTypesAndStaticImports() {
-    return ImmutableSet.of(Stream.class, identity());
+    return ImmutableSet.of(ImmutableList.class, Stream.class, identity());
   }
 
   ImmutableSet<Comparator<String>> testNaturalOrder() {
@@ -101,28 +101,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Comparator.<String>reverseOrder().compare("baz", "qux"));
   }
 
-  void testCollectionsSort() {
-    Collections.sort(ImmutableList.of("foo", "bar"), naturalOrder());
-  }
-
-  ImmutableSet<String> testCollectionsMin() {
-    return ImmutableSet.of(
-        Collections.min(ImmutableList.of("foo"), naturalOrder()),
-        Collections.max(ImmutableList.of("bar"), reverseOrder()));
-  }
-
-  String testCollectionsMinArraysAsList() {
-    return Arrays.stream(new String[0]).min(naturalOrder()).orElseThrow();
-  }
-
-  String testCollectionsMinWithComparator() {
-    return ImmutableSet.of("foo", "bar").stream().min(naturalOrder()).orElseThrow();
-  }
-
-  int testCollectionsMinArraysAsListVarargs() {
-    return Stream.of(1, 2).min(naturalOrder()).orElseThrow();
-  }
-
   ImmutableSet<String> testComparatorsMin2() {
     return ImmutableSet.of(
         "foo".compareTo("bar") <= 0 ? "foo" : "bar",
@@ -147,24 +125,6 @@ final class ComparatorRulesTest implements RefasterRuleCollectionTestCase {
         Collections.min(Arrays.asList("waldo", "fred"), (a, b) -> -1),
         Collections.min(ImmutableList.of("plugh", "xyzzy"), (a, b) -> 0),
         Collections.min(ImmutableSet.of("thud", "foo"), (a, b) -> 1));
-  }
-
-  ImmutableSet<String> testCollectionsMax() {
-    return ImmutableSet.of(
-        Collections.max(ImmutableList.of("foo"), naturalOrder()),
-        Collections.min(ImmutableList.of("bar"), reverseOrder()));
-  }
-
-  String testCollectionsMaxArraysAsList() {
-    return Arrays.stream(new String[0]).max(naturalOrder()).orElseThrow();
-  }
-
-  String testCollectionsMaxWithComparator() {
-    return ImmutableSet.of("foo", "bar").stream().max(naturalOrder()).orElseThrow();
-  }
-
-  int testCollectionsMaxArraysAsListVarargs() {
-    return Stream.of(1, 2).max(naturalOrder()).orElseThrow();
   }
 
   ImmutableSet<String> testComparatorsMax2() {

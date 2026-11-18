@@ -27,18 +27,18 @@ final class ClassCastLambdaUsageTest {
             "    // `ClassCastLambdaUsage` and `MethodReferenceUsage` checks, or introduce a separate check that",
             "    // simplifies unnecessary block lambda expressions.",
             "    Stream.of(5)",
-            "        .map(",
-            "            i -> {",
-            "              return (Integer) i;",
-            "            });",
+            "        .map(i -> {",
+            "          return (Integer) i;",
+            "        });",
             "    Stream.<ImmutableSet>of(ImmutableSet.of(6)).map(s -> (ImmutableSet<Number>) s);",
             "    Stream.of(ImmutableSet.of(7)).map(s -> (ImmutableSet<?>) s);",
             "    Stream.of(8).reduce((a, b) -> (Integer) a);",
             "    IntStream.of(9).mapToObj(i -> (char) i);",
             "    Stream.of(10).map(i -> (T) i);",
+            "    Stream.of(new Object[] {11}).map(v -> (T[]) v);",
             "",
             "    // BUG: Diagnostic contains:",
-            "    Stream.of(11).map(i -> (Integer) i);",
+            "    Stream.of(12).map(i -> (Integer) i);",
             "  }",
             "}")
         .doTest();
@@ -50,19 +50,23 @@ final class ClassCastLambdaUsageTest {
         .addInputLines(
             "A.java",
             "import java.util.stream.Stream;",
+            "import org.jspecify.annotations.Nullable;",
             "",
             "class A {",
             "  void m() {",
             "    Stream.of(1).map(i -> (Integer) i);",
+            "    Stream.of(2).map(o -> (@Nullable Number) o);",
             "  }",
             "}")
         .addOutputLines(
             "A.java",
             "import java.util.stream.Stream;",
+            "import org.jspecify.annotations.Nullable;",
             "",
             "class A {",
             "  void m() {",
             "    Stream.of(1).map(Integer.class::cast);",
+            "    Stream.of(2).map(Number.class::cast);",
             "  }",
             "}")
         .doTest();

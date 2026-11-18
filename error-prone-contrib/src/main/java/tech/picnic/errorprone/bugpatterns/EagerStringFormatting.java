@@ -208,8 +208,7 @@ public final class EagerStringFormatting extends BugChecker implements MethodInv
   private Description createSimplificationSuggestion(MethodInvocationTree context, String library) {
     return buildDescription(context)
         .setMessage(
-            "%s (assuming that %s's simplified formatting support suffices)"
-                .formatted(message(), library))
+            "%s (assuming that %s's simplified formatting support suffices)", message(), library)
         .build();
   }
 
