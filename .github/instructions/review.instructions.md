@@ -161,6 +161,10 @@ the files you modified.
 - [ ] Every job has a `name:` field, in imperative form, unique across the repository's workflows
 - [ ] Step names use imperative form (e.g., "Install Harden-Runner")
 
+### Java and Maven setup
+
+- [ ] Jobs that install this project's artifacts into the local Maven repository end with a `dependency:purge-local-repository` step
+
 ### YAML formatting
 
 - [ ] Bracket arrays use whitespace padding (`[ a, b ]`)
