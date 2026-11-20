@@ -251,8 +251,6 @@ final class SourceCodeTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "",
             "class A {",
             "  Object[] m() {",
             "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ /*f*/ 1 /*g*/, /*h*/ 2 /*i*/ /*j*/}};",
@@ -284,8 +282,6 @@ final class SourceCodeTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import com.google.common.collect.ImmutableList;",
-            "",
             "class A {",
             "  Object[] m() {",
             "    return new Object[][] {{}, {1}, {1, 2}, {0, /*a*/ 1, 2 /*j*/}};",
