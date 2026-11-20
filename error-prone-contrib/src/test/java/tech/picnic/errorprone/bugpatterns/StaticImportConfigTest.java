@@ -70,9 +70,9 @@ final class StaticImportConfigTest {
             "Invalid `StaticImport:AdditionalCandidates` flag value 'java.util.Objects#': "
                 + "expected '<type>' or '<type>#<member>'"),
         arguments(
-            "java.lang.Math#max, java.lang.Math#min",
-            "Invalid `StaticImport:AdditionalCandidates` flag value ' java.lang.Math#min': "
-                + "expected '<type>' or '<type>#<member>'"),
+            "java.util.Map#Entry.comparingByKey",
+            "Invalid `StaticImport:AdditionalCandidates` flag value "
+                + "'java.util.Map#Entry.comparingByKey': expected '<type>' or '<type>#<member>'"),
         arguments(
             "com.example.Foo#of",
             "Invalid `StaticImport:AdditionalCandidates` flag value 'com.example.Foo#of': "
@@ -86,11 +86,10 @@ final class StaticImportConfigTest {
   @MethodSource("additionalCandidateValidationTestCases")
   @ParameterizedTest
   void additionalCandidateValidation(String value, String expectedError) {
-    assertThatThrownBy(
-            () ->
-                new StaticImportConfig(
-                    ErrorProneFlags.fromMap(
-                        ImmutableMap.of("StaticImport:AdditionalCandidates", value))))
+    ErrorProneFlags flags =
+        ErrorProneFlags.fromMap(ImmutableMap.of("StaticImport:AdditionalCandidates", value));
+
+    assertThatThrownBy(() -> new StaticImportConfig(flags))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage(expectedError);
   }

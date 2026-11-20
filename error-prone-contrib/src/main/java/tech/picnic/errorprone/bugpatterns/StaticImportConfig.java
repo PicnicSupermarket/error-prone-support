@@ -64,6 +64,9 @@ import tech.picnic.errorprone.utils.TypeMemberSpec;
  * additional member). Entries specified this way are honored by both checks, so {@link
  * NonStaticImport} never undoes a static import introduced by {@link StaticImport}.
  */
+// XXX: Consider generalizing `AnnotationAttributeMatcher` into a broader type/member matcher (name
+// TBD), covering e.g. a bare-identifier-only restriction (independent of any type), and delegate
+// this class's candidate matching to it, rather than just sharing `TypeMemberSpec` parsing.
 final class StaticImportConfig implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -289,38 +292,40 @@ final class StaticImportConfig implements Serializable {
 
     for (String entry : Flags.getSet(flags, ADDITIONAL_CANDIDATES_FLAG)) {
       TypeMemberSpec spec = TypeMemberSpec.parse(entry);
-      checkArgument(
-          SourceVersion.isName(spec.type())
+      String type = spec.type();
+      checkFlagValue(
+          SourceVersion.isName(type)
               && spec.member().map(SourceCode::isValidIdentifier).orElse(true),
-          "Invalid `%s` flag value '%s': expected '<type>' or '<type>#<member>'",
-          ADDITIONAL_CANDIDATES_FLAG,
-          entry);
+          entry,
+          "expected '<type>' or '<type>#<member>'");
 
       if (spec.member().isEmpty()) {
-        checkArgument(
-            !NON_STATIC_IMPORT_CANDIDATE_TYPES.contains(spec.type()),
-            "Invalid `%s` flag value '%s': type is a non-static import candidate",
-            ADDITIONAL_CANDIDATES_FLAG,
-            entry);
-        types.add(spec.type());
+        checkFlagValue(
+            !NON_STATIC_IMPORT_CANDIDATE_TYPES.contains(type),
+            entry,
+            "type is a non-static import candidate");
+        types.add(type);
       } else {
         String member = spec.member().orElseThrow();
-        checkArgument(
+        checkFlagValue(
             !NON_STATIC_IMPORT_CANDIDATE_IDENTIFIERS.contains(member),
-            "Invalid `%s` flag value '%s': identifier is a non-static import candidate",
-            ADDITIONAL_CANDIDATES_FLAG,
-            entry);
-        checkArgument(
-            !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(spec.type(), member),
-            "Invalid `%s` flag value '%s': member is a non-static import candidate",
-            ADDITIONAL_CANDIDATES_FLAG,
-            entry);
-        members.put(spec.type(), member);
+            entry,
+            "identifier is a non-static import candidate");
+        checkFlagValue(
+            !NON_STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(type, member),
+            entry,
+            "member is a non-static import candidate");
+        members.put(type, member);
       }
     }
 
     candidateTypes = types.build();
     candidateMembers = members.build();
+  }
+
+  private static void checkFlagValue(boolean isValid, String value, String problem) {
+    checkArgument(
+        isValid, "Invalid `%s` flag value '%s': %s", ADDITIONAL_CANDIDATES_FLAG, value, problem);
   }
 
   /**
