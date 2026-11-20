@@ -77,7 +77,6 @@ final class IsInstanceLambdaUsageTest {
             "import java.util.ArrayList;",
             "import java.util.List;",
             "import java.util.stream.Stream;",
-            "import org.jspecify.annotations.Nullable;",
             "",
             "class A {",
             "  <T> void m() {",

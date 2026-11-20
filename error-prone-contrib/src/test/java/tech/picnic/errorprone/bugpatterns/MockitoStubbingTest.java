@@ -75,13 +75,11 @@ final class MockitoStubbingTest {
             "}")
         .addOutputLines(
             "A.java",
-            "import static org.mockito.ArgumentMatchers.eq;",
             "import static org.mockito.Mockito.doAnswer;",
             "import static org.mockito.Mockito.mock;",
             "",
             "import java.util.function.BiConsumer;",
             "import java.util.function.Consumer;",
-            "import org.mockito.ArgumentMatchers;",
             "",
             "class A {",
             "  void m() {",

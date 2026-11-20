@@ -41,7 +41,7 @@ final class ErrorProneTestHelperSourceFormatTest {
             "        .addOutputLines(\"A.java\", \"class A { }\")",
             "        // BUG: Diagnostic contains: Test code should follow the Google Java style",
             "        .addInputLines(\"B.java\", \"import java.util.Map;\", \"\", \"class B {}\")",
-            "        // Unused import, but in an output file, so not flagged.",
+            "        // BUG: Diagnostic contains: Test code should follow the Google Java style",
             "        .addOutputLines(\"B.java\", \"import java.util.Map;\", \"\", \"class B {}\")",
             "        .doTest();",
             "  }",
@@ -51,10 +51,6 @@ final class ErrorProneTestHelperSourceFormatTest {
 
   @Test
   void replacement() {
-    /*
-     * Verifies that import sorting and code formatting is performed unconditionally, while unused
-     * imports are removed unless part of a `BugCheckerRefactoringTestHelper` expected output file.
-     */
     BugCheckerRefactoringTestHelper.newInstance(ErrorProneTestHelperSourceFormat.class, getClass())
         .addInputLines(
             "A.java",
@@ -128,7 +124,6 @@ final class ErrorProneTestHelperSourceFormatTest {
             "            \"interface A extends List<A>, Map<A, A> {}\")",
             "        .addOutputLines(",
             "            \"A.java\",",
-            "            \"import java.util.Collection;\",",
             "            \"import java.util.List;\",",
             "            \"import java.util.Map;\",",
             "            \"\",",

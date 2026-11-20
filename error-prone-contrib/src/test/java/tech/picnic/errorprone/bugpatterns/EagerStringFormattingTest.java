@@ -246,7 +246,6 @@ final class EagerStringFormattingTest {
             "import static com.google.common.base.Verify.verifyNotNull;",
             "import static java.util.Objects.requireNonNull;",
             "",
-            "import java.util.Locale;",
             "import org.slf4j.Logger;",
             "import org.slf4j.LoggerFactory;",
             "import org.slf4j.Marker;",

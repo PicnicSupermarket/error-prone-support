@@ -91,12 +91,6 @@ final class JUnitNullaryParameterizedTestDeclarationTest {
         .addOutputLines(
             "A.java",
             "import org.junit.jupiter.api.Test;",
-            "import org.junit.jupiter.params.ParameterizedTest;",
-            "import org.junit.jupiter.params.provider.ArgumentsProvider;",
-            "import org.junit.jupiter.params.provider.ArgumentsSource;",
-            "import org.junit.jupiter.params.provider.ArgumentsSources;",
-            "import org.junit.jupiter.params.provider.MethodSource;",
-            "import org.junit.jupiter.params.provider.ValueSource;",
             "",
             "class A {",
             "  @Test",
@@ -141,8 +135,6 @@ final class JUnitNullaryParameterizedTestDeclarationTest {
             "}")
         .addOutputLines(
             "B.java",
-            "import org.junit.jupiter.params.ParameterizedTest;",
-            "",
             "class B {",
             "  @org.junit.jupiter.api.Test",
             "  void scopeInWhichIdentifierTestIsAlreadyDeclared() {}",
