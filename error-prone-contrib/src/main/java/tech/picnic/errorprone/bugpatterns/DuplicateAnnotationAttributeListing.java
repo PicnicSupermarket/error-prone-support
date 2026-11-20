@@ -1,67 +1,56 @@
 package tech.picnic.errorprone.bugpatterns;
 
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
-import static com.google.errorprone.BugPattern.StandardTags.STYLE;
+import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
-import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.ElementKind.INTERFACE;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.Streams;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.ErrorProneFlags;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.AnnotationTreeMatcher;
-import com.google.errorprone.fixes.Fix;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.NewArrayTree;
-import com.sun.source.tree.PrimitiveTypeTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.util.TreeScanner;
-import com.sun.tools.javac.code.Symbol;
-import java.util.HashSet;
+import com.sun.tools.javac.code.Attribute;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import javax.inject.Inject;
-import javax.tools.JavaFileObject.Kind;
-import org.jspecify.annotations.Nullable;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
 import tech.picnic.errorprone.utils.AnnotationAttributeMatcher;
 import tech.picnic.errorprone.utils.Flags;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
- * A {@link BugChecker} that flags and removes duplicate listings inside declared annotations.
+ * A {@link BugChecker} that flags annotation array listings that contain duplicate entries.
  *
- * <p><b>Example:</b>
- *
- * <pre>
- *   {@code @JsonPropertyOrder({ "a", "b", "a" })}
- * </pre>
- *
- * <p><b>Will be flagged and fixed to the following:</b>
- *
- * <pre>
- *   {@code @JsonPropertyOrder({ "a", "b"})}
- * </pre>
+ * <p>Two entries are considered duplicates if they denote the same value, as determined by the
+ * compiler. This means that e.g. {@code 'a'} and {@code 97} in a {@code char[]}, {@code 1} and
+ * {@code 1L} in a {@code long[]}, and {@code TYPE} and {@code ElementType.TYPE} are duplicates.
  */
+// XXX: If both an annotation array and an annotation nested inside one of its entries contain
+// duplicates, then the suggested fixes overlap. Consider deduplicating nested listings as part of
+// the enclosing fix.
 @AutoService(BugChecker.class)
 @BugPattern(
-    summary = "Duplicate listings within an annotation are often a mistake.",
+    summary = "Avoid duplicate entries in annotation array attributes",
     link = BUG_PATTERNS_BASE_URL + "DuplicateAnnotationAttributeListing",
     linkType = CUSTOM,
     severity = SUGGESTION,
-    tags = STYLE)
+    tags = SIMPLIFICATION)
 @SuppressWarnings("java:S2160" /* Super class equality definition suffices. */)
 public final class DuplicateAnnotationAttributeListing extends BugChecker
     implements AnnotationTreeMatcher {
@@ -89,168 +78,66 @@ public final class DuplicateAnnotationAttributeListing extends BugChecker
 
   @Override
   public Description matchAnnotation(AnnotationTree tree, VisitorState state) {
-    return removeDuplicateAnnotationEntries(tree, state)
-        .map(fix -> describeMatch(tree, fix))
+    Map<? extends ExecutableElement, ? extends AnnotationValue> values =
+        ASTHelpers.getAnnotationMirror(tree).getElementValues();
+    /* The compiler represents each argument as an assignment, even if `value =` is elided. */
+    return matcher
+        .extractMatchingArguments(tree)
+        .map(AssignmentTree.class::cast)
+        .flatMap(argument ->
+            removeDuplicates(
+                argument,
+                requireNonNull(
+                    values.get(ASTHelpers.getSymbol(argument.getVariable())),
+                    "Explicit annotation argument lacks value"),
+                state)
+                .stream())
+        .reduce(SuggestedFix.Builder::merge)
+        .map(fix -> describeMatch(tree, fix.build()))
         .orElse(Description.NO_MATCH);
   }
 
-  private Optional<Fix> removeDuplicateAnnotationEntries(AnnotationTree tree, VisitorState state) {
-    return matcher
-        .extractMatchingArguments(tree)
-        .map(expr -> extractArray(expr).flatMap(arr -> removeDuplicates(arr, tree, state)))
-        .flatMap(Optional::stream)
-        .reduce(SuggestedFix.Builder::merge)
-        .map(SuggestedFix.Builder::build);
-  }
-
-  private static Optional<NewArrayTree> extractArray(ExpressionTree expr) {
-    return expr instanceof AssignmentTree assignment
-        ? extractArray(assignment.getExpression())
-        : Optional.of(expr).filter(NewArrayTree.class::isInstance).map(NewArrayTree.class::cast);
-  }
-
-  private static Optional<SuggestedFix.Builder> removeDuplicates(
-      NewArrayTree array, AnnotationTree tree, VisitorState state) {
-    if (array.getInitializers().size() < 2) {
-      /* There's only one element, no duplicates are expected. */
-      return Optional.empty();
-    }
-
-    List<? extends ExpressionTree> actualEntries = array.getInitializers();
-
-    ImmutableSet<Tree> nonDuplicateEntries = getNonDuplicateEntries(array, state);
-
-    if (actualEntries.size() == nonDuplicateEntries.size()) {
-      /* In the (presumably) common case that no duplicates are found. */
-      return Optional.empty();
-    }
-
-    String prefix = shouldOmitBrackets(tree, nonDuplicateEntries) ? "" : "{";
-    String suffix = prefix.isBlank() ? "" : "}";
-
-    String suggestion =
-        nonDuplicateEntries.stream()
-            .map(expr -> extractName(state, expr))
-            .collect(joining(", ", prefix, suffix));
-    return Optional.of(SuggestedFix.builder().replace(array, suggestion));
-  }
-
   /**
-   * Extracts from the given array element expression a distinct set of {@link Tree nodes} omitting
-   * the duplicate entries.
+   * Suggests to remove duplicate entries from the given annotation argument, if it is an array
+   * listing.
    *
-   * @implNote Annotations are a special case in which we want to make sure we get the distinct
-   *     value of the full annotation expression instead of the annotation name. For example, we
-   *     want to flag the following as a duplicate annotation entry:
-   *     <pre>
-   *       {@code @Foo(anns = { @Bar("a"), @Bar("a") })}
-   *      </pre>
-   *     but not:
-   *     <pre>
-   *       {@code @Foo(anns = { @Bar("a"), @Bar("b") })}
-   *      </pre>
-   *     To do this, we conditionally visit the identifiers, literals and primitive types of the
-   *     original annotation but not those of the annotation entry being visited, given that the
-   *     listings of each nested annotation will be the visited through the {@link
-   *     AnnotationTreeMatcher}.
+   * @implNote Entries are identified by the string representation of their compiler-computed {@link
+   *     Attribute}, which unambiguously renders constants (with their element type),
+   *     fully-qualified enum constants and class literals, and nested annotations.
    */
-  private static ImmutableSet<Tree> getNonDuplicateEntries(
-      ExpressionTree array, VisitorState state) {
-    // Helper collections to identify when a node has been visited by its identifier, to avoid
-    // including duplicate nodes.
-    Set<String> visitedAnnotations = new HashSet<>();
-    Set<String> visitedIdentifiers = new HashSet<>();
-    Set<String> visitedLiterals = new HashSet<>();
-    Set<String> visitPrimitiveType = new HashSet<>();
-
-    ImmutableSet.Builder<Tree> nodes = ImmutableSet.builder();
-
-    new TreeScanner<@Nullable Void, Set<String>>() {
-      @Override
-      public @Nullable Void visitAnnotation(AnnotationTree node, Set<String> visitedAnnotations) {
-        String annotation = SourceCode.treeToString(node, state);
-        if (!visitedAnnotations.contains(annotation)) {
-          nodes.add(node);
-        }
-        visitedAnnotations.add(annotation);
-
-        return super.visitAnnotation(node, visitedAnnotations);
-      }
-
-      @Override
-      public @Nullable Void visitIdentifier(IdentifierTree node, Set<String> visitedAnnotations) {
-        String identifier = node.getName().toString();
-
-        if (visitedAnnotations.isEmpty() && !visitedIdentifiers.contains(identifier)) {
-          nodes.add(node);
-        }
-        visitedIdentifiers.add(identifier);
-
-        return super.visitIdentifier(node, visitedAnnotations);
-      }
-
-      @Override
-      public @Nullable Void visitLiteral(LiteralTree node, Set<String> visitedAnnotations) {
-        String literal = String.valueOf(ASTHelpers.constValue(node));
-
-        if (visitedAnnotations.isEmpty() && !visitedLiterals.contains(literal)) {
-          nodes.add(node);
-        }
-        visitedLiterals.add(literal);
-
-        return super.visitLiteral(node, visitedAnnotations);
-      }
-
-      @Override
-      public @Nullable Void visitPrimitiveType(
-          PrimitiveTypeTree node, Set<String> visitedAnnotations) {
-        String primitiveTypeKind = node.getPrimitiveTypeKind().toString();
-
-        if (visitedAnnotations.isEmpty() && !visitPrimitiveType.contains(primitiveTypeKind)) {
-          nodes.add(node);
-        }
-        visitPrimitiveType.add(primitiveTypeKind);
-
-        return super.visitPrimitiveType(node, visitedAnnotations);
-      }
-    }.scan(array, visitedAnnotations);
-
-    return nodes.build();
-  }
-
-  // In the case of entries defined for the special attribute name value, if after removing the
-  // duplicates in a listing array, there's only one element left, then we can omit the brackets.
-  private static boolean shouldOmitBrackets(
-      AnnotationTree tree, ImmutableSet<Tree> nonDuplicateEntries) {
-    boolean hasValueKeyword =
-        tree.getArguments().stream()
-            .filter(arg -> arg.getKind() == Tree.Kind.ASSIGNMENT)
-            .map(AssignmentTree.class::cast)
-            .map(AssignmentTree::getVariable)
-            .map(IdentifierTree.class::cast)
-            .map(IdentifierTree::getName)
-            .anyMatch(name -> name.contentEquals("value"));
-    return nonDuplicateEntries.size() == 1 && hasValueKeyword;
-  }
-
-  private static String extractName(VisitorState state, Tree expr) {
-    String exprString = SourceCode.treeToString(expr, state);
-
-    Symbol symbol = ASTHelpers.getSymbol(expr);
-    if (symbol != null) {
-      return (symbol.getKind() == INTERFACE || symbol.getKind() == CLASS)
-          ? exprString + Kind.CLASS.extension
-          : exprString;
+  private static Optional<SuggestedFix.Builder> removeDuplicates(
+      AssignmentTree argument, AnnotationValue value, VisitorState state) {
+    if (!(argument.getExpression() instanceof NewArrayTree array)) {
+      return Optional.empty();
     }
 
-    return exprString;
+    List<? extends ExpressionTree> entries = array.getInitializers();
+    ImmutableCollection<? extends ExpressionTree> distinctEntries =
+        Streams.zip(
+                ((Attribute.Array) value).getValue().stream().map(Attribute::toString),
+                entries.stream(),
+                Map::entry)
+            .collect(
+                toImmutableMap(Map.Entry::getKey, Map.Entry::getValue, (first, second) -> first))
+            .values();
+    if (distinctEntries.size() == entries.size()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(
+        SuggestedFix.builder()
+            .replace(
+                array,
+                distinctEntries.stream()
+                    .map(entry -> SourceCode.treeToString(entry, state))
+                    .collect(joining(", ", "{", "}"))));
   }
 
   private static AnnotationAttributeMatcher createAnnotationAttributeMatcher(
       ErrorProneFlags flags) {
     return AnnotationAttributeMatcher.create(
         flags.get(INCLUDED_ANNOTATIONS_FLAG).isPresent()
-            ? Optional.of(Flags.getSet(flags, INCLUDED_ANNOTATIONS_FLAG))
+            ? Optional.of(flags.getListOrEmpty(INCLUDED_ANNOTATIONS_FLAG))
             : Optional.empty(),
         Flags.getSet(flags, EXCLUDED_ANNOTATIONS_FLAG));
   }
