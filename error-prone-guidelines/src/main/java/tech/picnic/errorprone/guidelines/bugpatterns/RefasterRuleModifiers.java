@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.anyOf;
 import static com.google.errorprone.matchers.Matchers.hasAnnotation;
+import static com.google.errorprone.matchers.Matchers.hasMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -24,7 +25,6 @@ import com.google.errorprone.refaster.annotation.Placeholder;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.Tree;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.lang.model.element.Modifier;
@@ -43,18 +43,23 @@ import javax.lang.model.element.Modifier;
 public final class RefasterRuleModifiers extends BugChecker
     implements ClassTreeMatcher, MethodTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Matcher<Tree> BEFORE_TEMPLATE_METHOD = hasAnnotation(BeforeTemplate.class);
-  private static final Matcher<Tree> AFTER_TEMPLATE_METHOD = hasAnnotation(AfterTemplate.class);
-  private static final Matcher<Tree> PLACEHOLDER_METHOD = hasAnnotation(Placeholder.class);
-  private static final Matcher<Tree> REFASTER_METHOD =
+  private static final Matcher<MethodTree> BEFORE_TEMPLATE_METHOD =
+      hasAnnotation(BeforeTemplate.class);
+  private static final Matcher<MethodTree> AFTER_TEMPLATE_METHOD =
+      hasAnnotation(AfterTemplate.class);
+  private static final Matcher<MethodTree> PLACEHOLDER_METHOD = hasAnnotation(Placeholder.class);
+  private static final Matcher<MethodTree> REFASTER_METHOD =
       anyOf(BEFORE_TEMPLATE_METHOD, AFTER_TEMPLATE_METHOD, PLACEHOLDER_METHOD);
+  private static final Matcher<ClassTree> HAS_BEFORE_TEMPLATE_METHOD =
+      hasMethod(BEFORE_TEMPLATE_METHOD);
+  private static final Matcher<ClassTree> HAS_PLACEHOLDER_METHOD = hasMethod(PLACEHOLDER_METHOD);
 
   /** Instantiates a new {@link RefasterRuleModifiers} instance. */
   public RefasterRuleModifiers() {}
 
   @Override
   public Description matchClass(ClassTree tree, VisitorState state) {
-    if (!hasMatchingMember(tree, BEFORE_TEMPLATE_METHOD, state)) {
+    if (!HAS_BEFORE_TEMPLATE_METHOD.matches(tree, state)) {
       /* This class does not contain a Refaster template. */
       return Description.NO_MATCH;
     }
@@ -86,7 +91,7 @@ public final class RefasterRuleModifiers extends BugChecker
     Set<Modifier> modifiersToAdd = EnumSet.noneOf(Modifier.class);
     Set<Modifier> modifiersToRemove = EnumSet.of(Modifier.SYNCHRONIZED);
 
-    if (!hasMatchingMember(tree, PLACEHOLDER_METHOD, state)) {
+    if (!HAS_PLACEHOLDER_METHOD.matches(tree, state)) {
       /*
        * Rules without a `@Placeholder` method should be `final`. Note that Refaster enforces
        * that `@Placeholder` methods are `abstract`, so rules _with_ such a method will
@@ -107,10 +112,5 @@ public final class RefasterRuleModifiers extends BugChecker
     SuggestedFixes.removeModifiers(tree.getModifiers(), state, modifiersToRemove)
         .ifPresent(fix::merge);
     return fix.build();
-  }
-
-  private static boolean hasMatchingMember(
-      ClassTree tree, Matcher<Tree> matcher, VisitorState state) {
-    return tree.getMembers().stream().anyMatch(member -> matcher.matches(member, state));
   }
 }

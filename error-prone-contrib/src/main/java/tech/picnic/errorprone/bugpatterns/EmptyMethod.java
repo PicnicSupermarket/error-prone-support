@@ -6,6 +6,7 @@ import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -17,10 +18,8 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.util.ASTHelpers;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
-import java.util.Optional;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /** A {@link BugChecker} that flags empty methods that seemingly can simply be deleted. */
@@ -39,6 +38,8 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
           anyOf(
               isType(Override.class.getCanonicalName()),
               isType("org.aspectj.lang.annotation.Pointcut")));
+  private static final Matcher<Tree> IN_POSSIBLE_TEST_HELPER_CLASS =
+      enclosingClass((tree, state) -> tree.getSimpleName().toString().contains("Test"));
 
   /** Instantiates a new {@link EmptyMethod} instance. */
   public EmptyMethod() {}
@@ -50,7 +51,7 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
         || !tree.getBody().getStatements().isEmpty()
         || ASTHelpers.containsComments(tree, state)
         || PERMITTED_ANNOTATION.matches(tree, state)
-        || isInPossibleTestHelperClass(state)) {
+        || IN_POSSIBLE_TEST_HELPER_CLASS.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -59,12 +60,5 @@ public final class EmptyMethod extends BugChecker implements MethodTreeMatcher {
     }
 
     return describeMatch(tree, SourceCode.deleteWithTrailingWhitespace(tree, state));
-  }
-
-  private static boolean isInPossibleTestHelperClass(VisitorState state) {
-    return Optional.ofNullable(state.findEnclosing(ClassTree.class))
-        .map(ClassTree::getSimpleName)
-        .filter(name -> name.toString().contains("Test"))
-        .isPresent();
   }
 }

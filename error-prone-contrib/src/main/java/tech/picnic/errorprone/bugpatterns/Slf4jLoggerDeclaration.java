@@ -7,8 +7,10 @@ import static com.google.errorprone.BugPattern.StandardTags.STYLE;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.classLiteral;
 import static com.google.errorprone.matchers.Matchers.instanceMethod;
+import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
+import static com.google.errorprone.suppliers.Suppliers.STRING_TYPE;
 import static java.util.Objects.requireNonNull;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -37,7 +39,6 @@ import com.sun.tools.javac.code.Symbol;
 import java.util.EnumSet;
 import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
-import tech.picnic.errorprone.utils.MoreASTHelpers;
 
 /** A {@link BugChecker} that flags non-canonical SLF4J logger declarations. */
 @AutoService(BugChecker.class)
@@ -63,6 +64,7 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
           allOf(
               instanceMethod().anyClass().named("getClass").withNoParameters(),
               Slf4jLoggerDeclaration::getClassReceiverIsEnclosingClassInstance));
+  private static final Matcher<ExpressionTree> IS_STRING = isSameType(STRING_TYPE);
   private static final ImmutableSet<Modifier> INSTANCE_DECLARATION_MODIFIERS =
       Sets.immutableEnumSet(Modifier.PRIVATE, Modifier.FINAL);
   private static final ImmutableSet<Modifier> STATIC_DECLARATION_MODIFIERS =
@@ -119,7 +121,7 @@ public final class Slf4jLoggerDeclaration extends BugChecker implements Variable
           state);
       suggestRename(tree, canonicalStaticFieldName, fix, state);
 
-      if (!MoreASTHelpers.isStringTyped(factoryArg, state)
+      if (!IS_STRING.matches(factoryArg, state)
           && !IS_STATIC_ENCLOSING_CLASS_REFERENCE.matches(factoryArg, state)) {
         /*
          * Loggers with a custom string name are generally "special", but those with a name derived

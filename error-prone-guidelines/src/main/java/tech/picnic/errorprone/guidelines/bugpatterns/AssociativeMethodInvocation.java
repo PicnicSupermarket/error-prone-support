@@ -3,7 +3,10 @@ package tech.picnic.errorprone.guidelines.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
 import static com.google.errorprone.matchers.Matchers.allOf;
+import static com.google.errorprone.matchers.Matchers.hasArguments;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.Matchers.not;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
@@ -21,12 +24,9 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.refaster.Refaster;
-import com.google.errorprone.suppliers.Supplier;
 import com.google.errorprone.suppliers.Suppliers;
-import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Type;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -49,15 +49,17 @@ import tech.picnic.errorprone.utils.SourceCode;
 public final class AssociativeMethodInvocation extends BugChecker
     implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
-  private static final Supplier<Type> ITERABLE = Suppliers.typeFromClass(Iterable.class);
+  private static final Matcher<ExpressionTree> LACKS_ITERABLE_ARGUMENT =
+      toType(
+          MethodInvocationTree.class, not(hasArguments(AT_LEAST_ONE, isSubtypeOf(Iterable.class))));
   private static final ImmutableSet<Matcher<ExpressionTree>> ASSOCIATIVE_OPERATIONS =
       ImmutableSet.of(
           allOf(
               staticMethod().onClass(Suppliers.typeFromClass(Matchers.class)).named("allOf"),
-              toType(MethodInvocationTree.class, not(hasArgumentOfType(ITERABLE)))),
+              LACKS_ITERABLE_ARGUMENT),
           allOf(
               staticMethod().onClass(Suppliers.typeFromClass(Matchers.class)).named("anyOf"),
-              toType(MethodInvocationTree.class, not(hasArgumentOfType(ITERABLE)))),
+              LACKS_ITERABLE_ARGUMENT),
           staticMethod().onClass(Suppliers.typeFromClass(Refaster.class)).named("anyOf"));
 
   /** Instantiates a new {@link AssociativeMethodInvocation} instance. */
@@ -85,8 +87,7 @@ public final class AssociativeMethodInvocation extends BugChecker
     SuggestedFix.Builder fix = SuggestedFix.builder();
 
     for (ExpressionTree arg : tree.getArguments()) {
-      if (matcher.matches(arg, state)) {
-        MethodInvocationTree invocation = (MethodInvocationTree) arg;
+      if (arg instanceof MethodInvocationTree invocation && matcher.matches(invocation, state)) {
         fix.merge(
             invocation.getArguments().isEmpty()
                 ? SuggestedFixes.removeElement(invocation, tree.getArguments(), state)
@@ -95,11 +96,5 @@ public final class AssociativeMethodInvocation extends BugChecker
     }
 
     return fix.build();
-  }
-
-  private static Matcher<MethodInvocationTree> hasArgumentOfType(Supplier<Type> type) {
-    return (tree, state) ->
-        tree.getArguments().stream()
-            .anyMatch(arg -> ASTHelpers.isSubtype(ASTHelpers.getType(arg), type.get(state), state));
   }
 }

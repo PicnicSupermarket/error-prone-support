@@ -17,6 +17,7 @@ import static com.google.errorprone.matchers.Matchers.isSameType;
 import static com.google.errorprone.matchers.Matchers.methodHasParameters;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
 import static com.google.errorprone.matchers.Matchers.toType;
+import static com.google.errorprone.suppliers.Suppliers.CLASS_TYPE;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.joining;
@@ -119,9 +120,7 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static final Matcher<MethodTree> IS_UNARY_METHOD_WITH_SUPPORTED_PARAMETER =
       methodHasParameters(
           anyOf(
-              isPrimitiveOrBoxedPrimitiveType(),
-              isSameType(String.class),
-              isSameType(state -> state.getSymtab().classType)));
+              isPrimitiveOrBoxedPrimitiveType(), isSameType(String.class), isSameType(CLASS_TYPE)));
 
   /** Instantiates a new {@link JUnitValueSource} instance. */
   public JUnitValueSource() {}

@@ -4,6 +4,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
 import static com.google.errorprone.matchers.Matchers.staticMethod;
+import static com.google.errorprone.matchers.Matchers.toType;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
 import com.google.auto.service.AutoService;
@@ -34,7 +35,9 @@ import tech.picnic.errorprone.utils.SourceCode;
 public final class MockitoStubbing extends BugChecker implements MethodInvocationTreeMatcher {
   private static final long serialVersionUID = 1L;
   private static final Matcher<ExpressionTree> MOCKITO_EQ_METHOD =
-      staticMethod().onClass("org.mockito.ArgumentMatchers").named("eq");
+      toType(
+          MethodInvocationTree.class,
+          staticMethod().onClass("org.mockito.ArgumentMatchers").named("eq"));
 
   /** Instantiates a new {@link MockitoStubbing} instance. */
   public MockitoStubbing() {}
@@ -42,7 +45,8 @@ public final class MockitoStubbing extends BugChecker implements MethodInvocatio
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
     List<? extends ExpressionTree> arguments = tree.getArguments();
-    if (arguments.isEmpty() || !arguments.stream().allMatch(arg -> isEqInvocation(arg, state))) {
+    if (arguments.isEmpty()
+        || !arguments.stream().allMatch(arg -> MOCKITO_EQ_METHOD.matches(arg, state))) {
       return Description.NO_MATCH;
     }
 
@@ -55,9 +59,5 @@ public final class MockitoStubbing extends BugChecker implements MethodInvocatio
     }
 
     return describeMatch(tree, suggestedFix.build());
-  }
-
-  private static boolean isEqInvocation(ExpressionTree tree, VisitorState state) {
-    return tree instanceof MethodInvocationTree && MOCKITO_EQ_METHOD.matches(tree, state);
   }
 }
