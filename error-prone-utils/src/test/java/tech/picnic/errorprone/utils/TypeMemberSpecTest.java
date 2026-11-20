@@ -13,12 +13,16 @@ final class TypeMemberSpecTest {
   private static Stream<Arguments> parseTestCases() {
     /* { spec, expected } */
     return Stream.of(
-        arguments("java.lang.Math", new TypeMemberSpec("java.lang.Math", Optional.empty())),
-        arguments("java.lang.Math#max", new TypeMemberSpec("java.lang.Math", Optional.of("max"))),
+        arguments(
+            Math.class.getCanonicalName(),
+            new TypeMemberSpec(Math.class.getCanonicalName(), Optional.empty())),
+        arguments(
+            "java.lang.Math#max",
+            new TypeMemberSpec(Math.class.getCanonicalName(), Optional.of("max"))),
         arguments("#max", new TypeMemberSpec("", Optional.of("max"))),
         arguments(
             "java.lang.Math#max#min",
-            new TypeMemberSpec("java.lang.Math", Optional.of("max#min"))));
+            new TypeMemberSpec(Math.class.getCanonicalName(), Optional.of("max#min"))));
   }
 
   @MethodSource("parseTestCases")
