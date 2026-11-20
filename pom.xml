@@ -198,8 +198,8 @@
         <version.error-prone-orig>2.52.0</version.error-prone-orig>
         <version.google-java-format>2.0.0</version.google-java-format>
         <version.jdk>21</version.jdk>
-        <version.maven>3.10.0</version.maven>
-        <version.pitest-git>2.4.0</version.pitest-git>
+        <version.maven>3.10.1</version.maven>
+        <version.pitest-git>2.4.1</version.pitest-git>
     </properties>
 
     <dependencyManagement>
@@ -541,7 +541,7 @@
             <dependency>
                 <groupId>tools.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
-                <version>3.2.4</version>
+                <version>3.3.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -1213,14 +1213,6 @@
                                 <includes>**/*.properties</includes>
                             </requireEncoding>
                             <requireEncoding>
-                                <encoding>US-ASCII</encoding>
-                                <excludes>**/target/**,**/.repos/**</excludes>
-                                <includes>**/*.sh,**/*.xml,**/*.yml</includes>
-                            </requireEncoding>
-                            <!-- XXX: In `documentation.instructions.md` we
-                            require ASCII also for Markdown files. Refine that
-                            rule, or make files compliant. -->
-                            <requireEncoding>
                                 <acceptAsciiSubset>true</acceptAsciiSubset>
                                 <encoding>UTF-8</encoding>
                                 <excludes>**/*.properties,**/target/**,**/.repos/**</excludes>
@@ -1285,7 +1277,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
-                    <version>3.5.2</version>
+                    <version>3.6.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1478,21 +1470,8 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.7.0</version>
+                    <version>3.8.0</version>
                     <executions>
-                        <execution>
-                            <id>derive-jpms-module-name-base</id>
-                            <goals>
-                                <goal>regex-property</goal>
-                            </goals>
-                            <configuration>
-                                <failIfNoMatch>false</failIfNoMatch>
-                                <name>jpms.module-name.base</name>
-                                <regex>^(?:error-prone-)?(.*?)(?:-support)?$</regex>
-                                <replacement>tech.picnic.errorprone.$1</replacement>
-                                <value>${project.artifactId}</value>
-                            </configuration>
-                        </execution>
                         <execution>
                             <id>derive-jpms-module-name</id>
                             <goals>
@@ -1501,9 +1480,17 @@
                             <configuration>
                                 <failIfNoMatch>false</failIfNoMatch>
                                 <name>jpms.module-name</name>
-                                <regex>-</regex>
-                                <replacement>.</replacement>
-                                <value>${jpms.module-name.base}</value>
+                                <replacements>
+                                    <replacement>
+                                        <regex>^(?:error-prone-)?(.*?)(?:-support)?$</regex>
+                                        <replacement>tech.picnic.errorprone.$1</replacement>
+                                    </replacement>
+                                    <replacement>
+                                        <regex>-</regex>
+                                        <replacement>.</replacement>
+                                    </replacement>
+                                </replacements>
+                                <value>${project.artifactId}</value>
                             </configuration>
                         </execution>
                     </executions>
@@ -1511,7 +1498,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.8.0</version>
+                    <version>2.9.0</version>
                     <configuration>
                         <includedLicenses>
                             <!-- The SPDX IDs of licenses of third-party
@@ -1639,7 +1626,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>tidy-maven-plugin</artifactId>
-                    <version>1.4.1</version>
+                    <version>1.5.0</version>
                     <executions>
                         <execution>
                             <id>check-pom</id>
@@ -1652,15 +1639,9 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.24.0</version>
+                    <version>2.25.2</version>
                     <configuration>
                         <ruleSet>
-                            <ignoreVersions>
-                                <ignoreVersion>
-                                    <type>regex</type>
-                                    <version>.*\b(alpha\d*|beta-?\d*|b\d+(\.\d+)*|M\d+|(rc|RC)-?\d+)\b.*</version>
-                                </ignoreVersion>
-                            </ignoreVersions>
                             <rules>
                                 <rule>
                                     <groupId>net.bytebuddy</groupId>
