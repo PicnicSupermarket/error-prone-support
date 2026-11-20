@@ -26,7 +26,8 @@ import com.sun.source.tree.MethodInvocationTree;
     summary =
         """
         Avoid MongoDB's `$text` filter operator, as it can trigger heavy queries and even cause \
-        the server to run out of memory""",
+        the server to run out of memory\
+        """,
     link = BUG_PATTERNS_BASE_URL + "MongoDBTextFilterUsage",
     linkType = CUSTOM,
     severity = SUGGESTION,

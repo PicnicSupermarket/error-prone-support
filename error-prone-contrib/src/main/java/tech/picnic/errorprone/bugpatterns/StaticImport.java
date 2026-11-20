@@ -236,10 +236,9 @@ public final class StaticImport extends BugChecker implements MemberSelectTreeMa
     return importInfo
         .simpleName()
         .toJavaUtil()
-        .filter(
-            name ->
-                STATIC_IMPORT_CANDIDATE_TYPES.contains(canonicalName)
-                    || STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(canonicalName, name));
+        .filter(name ->
+            STATIC_IMPORT_CANDIDATE_TYPES.contains(canonicalName)
+                || STATIC_IMPORT_CANDIDATE_MEMBERS.containsEntry(canonicalName, name));
   }
 
   private static Optional<Fix> tryStaticImport(

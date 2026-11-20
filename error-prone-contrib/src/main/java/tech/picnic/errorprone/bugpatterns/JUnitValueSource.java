@@ -138,16 +138,14 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
             "Missing type for method parameter");
 
     return findMethodSourceAnnotation(tree, state)
-        .flatMap(
-            methodSourceAnnotation ->
-                getSoleLocalFactoryName(methodSourceAnnotation, tree)
-                    .filter(factory -> !hasSiblingReferencingValueFactory(tree, factory, state))
-                    .flatMap(factory -> findSiblingWithName(tree, factory, state))
-                    .flatMap(
-                        factoryMethod ->
-                            tryConstructValueSourceFix(
-                                parameterType, methodSourceAnnotation, factoryMethod, state))
-                    .map(fix -> describeMatch(methodSourceAnnotation, fix)))
+        .flatMap(methodSourceAnnotation ->
+            getSoleLocalFactoryName(methodSourceAnnotation, tree)
+                .filter(factory -> !hasSiblingReferencingValueFactory(tree, factory, state))
+                .flatMap(factory -> findSiblingWithName(tree, factory, state))
+                .flatMap(factoryMethod ->
+                    tryConstructValueSourceFix(
+                        parameterType, methodSourceAnnotation, factoryMethod, state))
+                .map(fix -> describeMatch(methodSourceAnnotation, fix)))
         .orElse(Description.NO_MATCH);
   }
 
@@ -192,9 +190,8 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
   private static boolean hasValueFactory(
       MethodTree tree, String valueFactoryMethodName, VisitorState state) {
     return findMethodSourceAnnotation(tree, state).stream()
-        .anyMatch(
-            annotation ->
-                getMethodSourceFactoryNames(annotation, tree).contains(valueFactoryMethodName));
+        .anyMatch(annotation ->
+            getMethodSourceFactoryNames(annotation, tree).contains(valueFactoryMethodName));
   }
 
   private static Optional<AnnotationTree> findMethodSourceAnnotation(
@@ -209,22 +206,21 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
       VisitorState state) {
     return getSingleReturnExpression(valueFactoryMethod)
         .flatMap(expression -> tryExtractValueSourceAttributeValue(expression, state))
-        .map(
-            valueSourceAttributeValue -> {
-              SuggestedFix.Builder fix = SuggestedFix.builder();
-              String valueSource =
-                  SuggestedFixes.qualifyType(
-                      state, fix, "org.junit.jupiter.params.provider.ValueSource");
-              return fix.replace(
-                      methodSourceAnnotation,
-                      "@%s(%s = %s)"
-                          .formatted(
-                              valueSource,
-                              toValueSourceAttributeName(parameterType),
-                              valueSourceAttributeValue))
-                  .delete(valueFactoryMethod)
-                  .build();
-            });
+        .map(valueSourceAttributeValue -> {
+          SuggestedFix.Builder fix = SuggestedFix.builder();
+          String valueSource =
+              SuggestedFixes.qualifyType(
+                  state, fix, "org.junit.jupiter.params.provider.ValueSource");
+          return fix.replace(
+                  methodSourceAnnotation,
+                  "@%s(%s = %s)"
+                      .formatted(
+                          valueSource,
+                          toValueSourceAttributeName(parameterType),
+                          valueSourceAttributeValue))
+              .delete(valueFactoryMethod)
+              .build();
+        });
   }
 
   // XXX: This pattern also occurs a few times inside Error Prone; contribute upstream.
@@ -271,11 +267,10 @@ public final class JUnitValueSource extends BugChecker implements MethodTreeMatc
      */
     return Optional.of(
             arguments.stream()
-                .map(
-                    arg ->
-                        arg instanceof MethodInvocationTree methodInvocation
-                            ? Iterables.getOnlyElement(methodInvocation.getArguments())
-                            : arg)
+                .map(arg ->
+                    arg instanceof MethodInvocationTree methodInvocation
+                        ? Iterables.getOnlyElement(methodInvocation.getArguments())
+                        : arg)
                 .map(argument -> SourceCode.treeToString(argument, state))
                 .collect(joining(", ")))
         .map(value -> arguments.size() > 1 ? "{%s}".formatted(value) : value);

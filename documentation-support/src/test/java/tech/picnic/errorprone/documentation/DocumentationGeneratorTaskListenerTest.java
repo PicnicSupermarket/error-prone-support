@@ -35,13 +35,12 @@ final class DocumentationGeneratorTaskListenerTest {
         Files.getFileAttributeView(outputDirectory, AclFileAttributeView.class);
     view.setAcl(
         view.getAcl().stream()
-            .map(
-                entry ->
-                    AclEntry.newBuilder(entry)
-                        .setPermissions(
-                            Sets.difference(
-                                entry.permissions(), Sets.immutableEnumSet(ADD_SUBDIRECTORY)))
-                        .build())
+            .map(entry ->
+                AclEntry.newBuilder(entry)
+                    .setPermissions(
+                        Sets.difference(
+                            entry.permissions(), Sets.immutableEnumSet(ADD_SUBDIRECTORY)))
+                    .build())
             .collect(toImmutableList()));
 
     readOnlyFileSystemFailsToWrite(outputDirectory.resolve("nonexistent"));
@@ -58,10 +57,8 @@ final class DocumentationGeneratorTaskListenerTest {
   }
 
   private static void readOnlyFileSystemFailsToWrite(Path outputDirectory) {
-    assertThatThrownBy(
-            () ->
-                Compilation.compileWithDocumentationGenerator(
-                    outputDirectory, "A.java", "class A {}"))
+    assertThatThrownBy(() ->
+            Compilation.compileWithDocumentationGenerator(outputDirectory, "A.java", "class A {}"))
         .hasRootCauseInstanceOf(FileSystemException.class)
         .hasCauseInstanceOf(IllegalStateException.class)
         .hasMessageEndingWith("Error while creating directory with path '%s'", outputDirectory);
@@ -77,26 +74,24 @@ final class DocumentationGeneratorTaskListenerTest {
   @Test
   void excessArguments(@TempDir Path outputDirectory) {
     String actualOutputDirectory = outputDirectory.toAbsolutePath() + " extra-arg";
-    assertThatThrownBy(
-            () ->
-                Compilation.compileWithDocumentationGenerator(
-                    actualOutputDirectory, "A.java", "package pkg;"))
+    assertThatThrownBy(() ->
+            Compilation.compileWithDocumentationGenerator(
+                actualOutputDirectory, "A.java", "package pkg;"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessage("Precisely one path must be provided");
   }
 
   @Test
   void skipOnError(@TempDir Path outputDirectory) {
-    assertThatThrownBy(
-            () ->
-                Compilation.compileWithDocumentationGenerator(
-                    outputDirectory,
-                    "A.java",
-                    "class A {",
-                    "  void m() {",
-                    "    nonExistentMethod();",
-                    "  }",
-                    "}"))
+    assertThatThrownBy(() ->
+            Compilation.compileWithDocumentationGenerator(
+                outputDirectory,
+                "A.java",
+                "class A {",
+                "  void m() {",
+                "    nonExistentMethod();",
+                "  }",
+                "}"))
         .isInstanceOf(AssertionError.class)
         .hasMessageContainingAll("error: cannot find symbol", "nonExistentMethod()");
 
@@ -147,13 +142,12 @@ final class DocumentationGeneratorTaskListenerTest {
     public Optional<ExtractionParameters> tryExtract(ClassTree tree, VisitorState state) {
       return Optional.of(tree.getSimpleName().toString())
           .filter(n -> n.contains(DocumentationGeneratorTaskListenerTest.class.getSimpleName()))
-          .map(
-              className ->
-                  new ExtractionParameters(
-                      className,
-                      Streams.stream(state.getPath())
-                          .map(TestExtractor::describeTree)
-                          .collect(toImmutableList())));
+          .map(className ->
+              new ExtractionParameters(
+                  className,
+                  Streams.stream(state.getPath())
+                      .map(TestExtractor::describeTree)
+                      .collect(toImmutableList())));
     }
 
     private static String describeTree(Tree tree) {

@@ -92,9 +92,8 @@ public record AnnotatedCompositeCodeTransformer(
     Iterator<String> nameComponents = CLASS_NAME_SPLITTER.splitToStream(checkName).iterator();
     return getAnnotationValue(OnlineDocumentation.class, OnlineDocumentation::value, delegate)
         .map(url -> url.replace(TOP_LEVEL_CLASS_URL_PLACEHOLDER, nameComponents.next()))
-        .map(
-            url ->
-                url.replace(NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, "")));
+        .map(url ->
+            url.replace(NESTED_CLASS_URL_PLACEHOLDER, Iterators.getNext(nameComponents, "")));
   }
 
   private SeverityLevel getSeverity(CodeTransformer delegate) {

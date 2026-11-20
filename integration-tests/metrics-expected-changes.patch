@@ -4462,7 +4462,7 @@
  }
 --- a/metrics-core/src/test/java/io/dropwizard/metrics5/WeightedSnapshotTest.java
 +++ b/metrics-core/src/test/java/io/dropwizard/metrics5/WeightedSnapshotTest.java
-@@ -1,8 +1,10 @@
+@@ -1,27 +1,30 @@
  package io.dropwizard.metrics5;
  
 +import static com.google.common.base.Preconditions.checkArgument;
@@ -4474,7 +4474,10 @@
  import static org.mockito.Mockito.doReturn;
  import static org.mockito.Mockito.spy;
  import static org.mockito.Mockito.when;
-@@ -12,16 +14,16 @@ import java.io.ByteArrayOutputStream;
+ 
++import com.google.common.primitives.Doubles;
+ import io.dropwizard.metrics5.WeightedSnapshot.WeightedSample;
+ import java.io.ByteArrayOutputStream;
  import java.util.ArrayList;
  import java.util.List;
  import org.junit.jupiter.api.Test;
@@ -4497,7 +4500,7 @@
  
      final List<WeightedSnapshot.WeightedSample> samples = new ArrayList<>();
      for (int i = 0; i < values.length; i++) {
-@@ -36,69 +38,69 @@ class WeightedSnapshotTest {
+@@ -36,69 +39,69 @@ class WeightedSnapshotTest {
  
    @Test
    void smallQuantilesAreTheFirstValue() {
@@ -4590,7 +4593,7 @@
    }
  
    @Test
-@@ -118,7 +120,7 @@ class WeightedSnapshotTest {
+@@ -118,7 +121,7 @@ class WeightedSnapshotTest {
      final List<WeightedSample> spyItems = spy(originalItems);
      doReturn(originalItems.toArray(new WeightedSample[] {}))
          .when(spyItems)
@@ -4599,7 +4602,7 @@
      when(spyItems.size()).thenReturn(4, 5);
  
      final Snapshot other = new WeightedSnapshot(spyItems);
-@@ -133,7 +135,7 @@ class WeightedSnapshotTest {
+@@ -133,7 +136,7 @@ class WeightedSnapshotTest {
      final List<WeightedSample> spyItems = spy(originalItems);
      doReturn(originalItems.toArray(new WeightedSample[] {}))
          .when(spyItems)
@@ -4608,7 +4611,7 @@
      when(spyItems.size()).thenReturn(6, 5);
  
      final Snapshot other = new WeightedSnapshot(spyItems);
-@@ -147,7 +149,7 @@ class WeightedSnapshotTest {
+@@ -147,7 +150,7 @@ class WeightedSnapshotTest {
  
      snapshot.dump(output);
  
@@ -4617,7 +4620,7 @@
    }
  
    @Test
-@@ -167,7 +169,7 @@ class WeightedSnapshotTest {
+@@ -167,7 +170,7 @@ class WeightedSnapshotTest {
  
    @Test
    void calculatesTheStdDev() {
@@ -4626,7 +4629,7 @@
    }
  
    @Test
-@@ -175,7 +177,7 @@ class WeightedSnapshotTest {
+@@ -175,7 +178,7 @@ class WeightedSnapshotTest {
      final Snapshot emptySnapshot =
          new WeightedSnapshot(weightedArray(new long[] {}, new double[] {}));
  
@@ -4635,7 +4638,7 @@
    }
  
    @Test
-@@ -183,7 +185,7 @@ class WeightedSnapshotTest {
+@@ -183,7 +186,7 @@ class WeightedSnapshotTest {
      final Snapshot emptySnapshot =
          new WeightedSnapshot(weightedArray(new long[] {}, new double[] {}));
  
@@ -4644,7 +4647,7 @@
    }
  
    @Test
-@@ -191,7 +193,7 @@ class WeightedSnapshotTest {
+@@ -191,7 +194,7 @@ class WeightedSnapshotTest {
      final Snapshot emptySnapshot =
          new WeightedSnapshot(weightedArray(new long[] {}, new double[] {}));
  
@@ -4653,7 +4656,7 @@
    }
  
    @Test
-@@ -199,7 +201,7 @@ class WeightedSnapshotTest {
+@@ -199,7 +202,7 @@ class WeightedSnapshotTest {
      final Snapshot emptySnapshot =
          new WeightedSnapshot(weightedArray(new long[] {}, new double[] {}));
  
@@ -4662,7 +4665,7 @@
    }
  
    @Test
-@@ -207,7 +209,7 @@ class WeightedSnapshotTest {
+@@ -207,7 +210,7 @@ class WeightedSnapshotTest {
      final Snapshot singleItemSnapshot =
          new WeightedSnapshot(weightedArray(new long[] {1}, new double[] {1.0}));
  
@@ -4671,6 +4674,17 @@
    }
  
    @Test
+@@ -216,7 +219,9 @@ class WeightedSnapshotTest {
+         new WeightedSnapshot(
+             weightedArray(
+                 new long[] {1, 2, 3},
+-                new double[] {Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE}));
++                new double[] {
++                  Doubles.MIN_POSITIVE_VALUE, Doubles.MIN_POSITIVE_VALUE, Doubles.MIN_POSITIVE_VALUE
++                }));
+ 
+     assertThat(scatteredSnapshot.getMean()).isEqualTo(2);
+   }
 --- a/metrics-ehcache/src/test/java/io/dropwizard/metrics5/ehcache/InstrumentedCacheDecoratorFactoryTest.java
 +++ b/metrics-ehcache/src/test/java/io/dropwizard/metrics5/ehcache/InstrumentedCacheDecoratorFactoryTest.java
 @@ -12,7 +12,7 @@ import net.sf.ehcache.Element;

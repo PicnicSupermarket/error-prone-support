@@ -92,13 +92,13 @@ public final class SourceCode {
    *     SuggestedFix#delete(Tree)}.
    */
   public static SuggestedFix deleteWithTrailingWhitespace(Tree tree, VisitorState state) {
-    CharSequence sourceCode = state.getSourceCode();
     int endPos = state.getEndPosition(tree);
-    if (sourceCode == null || endPos == NOPOS) {
+    if (endPos == NOPOS) {
       /* We can't identify the trailing whitespace; delete just the tree. */
       return SuggestedFix.delete(tree);
     }
 
+    CharSequence sourceCode = state.getSourceCode();
     int whitespaceEndPos = NON_WHITESPACE_MATCHER.indexIn(sourceCode, endPos);
     return SuggestedFix.replace(
         ASTHelpers.getStartPosition(tree),
@@ -123,14 +123,14 @@ public final class SourceCode {
    * @return A non-{@code null} {@link SuggestedFix}.
    */
   public static SuggestedFix unwrapMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    CharSequence sourceCode = state.getSourceCode();
     int startPosition = state.getEndPosition(tree.getMethodSelect());
     int endPosition = state.getEndPosition(tree);
 
-    if (sourceCode == null || startPosition == Position.NOPOS || endPosition == Position.NOPOS) {
+    if (startPosition == Position.NOPOS || endPosition == Position.NOPOS) {
       return unwrapMethodInvocationDroppingWhitespaceAndComments(tree, state);
     }
 
+    CharSequence sourceCode = state.getSourceCode();
     ImmutableList<ErrorProneToken> tokens =
         ErrorProneTokens.getTokens(
             sourceCode.subSequence(startPosition, endPosition).toString(), state.context);

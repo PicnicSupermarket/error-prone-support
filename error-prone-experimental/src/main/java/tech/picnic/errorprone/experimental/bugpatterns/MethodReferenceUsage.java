@@ -75,10 +75,9 @@ public final class MethodReferenceUsage extends BugChecker implements LambdaExpr
      */
     return constructMethodRef(tree, tree.getBody())
         .map(SuggestedFix.Builder::build)
-        .filter(
-            fix ->
-                SuggestedFixes.compilesWithFix(
-                    fix, state, ImmutableList.of(), /* onlyInSameCompilationUnit= */ true))
+        .filter(fix ->
+            SuggestedFixes.compilesWithFix(
+                fix, state, ImmutableList.of(), /* onlyInSameCompilationUnit= */ true))
         .map(fix -> describeMatch(tree, fix))
         .orElse(Description.NO_MATCH);
   }

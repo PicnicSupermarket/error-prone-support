@@ -318,9 +318,8 @@ public final class RedundantStringConversion extends BugChecker
   private Optional<SuggestedFix.Builder> tryFix(
       ExpressionTree tree, VisitorState state, Matcher<ExpressionTree> filter) {
     return trySimplify(tree, state, filter)
-        .map(
-            replacement ->
-                SuggestedFix.builder().replace(tree, SourceCode.treeToString(replacement, state)));
+        .map(replacement ->
+            SuggestedFix.builder().replace(tree, SourceCode.treeToString(replacement, state)));
   }
 
   private Optional<ExpressionTree> trySimplify(

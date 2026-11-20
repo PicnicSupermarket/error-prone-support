@@ -3,13 +3,13 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.JUnitMatchers.JUNIT5_LIFECYCLE_METHOD;
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.enclosingClass;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.not;
 import static java.util.function.Predicate.not;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
-import static tech.picnic.errorprone.utils.MoreJUnitMatchers.SETUP_OR_TEARDOWN_METHOD;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.TEST_METHOD;
 
 import com.google.auto.service.AutoService;
@@ -35,6 +35,7 @@ import tech.picnic.errorprone.utils.ConflictDetection;
 // 2. If not `abstract`, are package-private and don't have public methods and subclasses.
 // 3. Only have private fields.
 // XXX: If implemented, the current logic could flag only `private` JUnit methods.
+// XXX: Review whether this check should also flag and normalize `@TestFactory`-annotated methods.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "JUnit method declaration can likely be improved",
@@ -61,7 +62,7 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
     }
 
     boolean isTestMethod = TEST_METHOD.matches(tree, state);
-    if (!isTestMethod && !SETUP_OR_TEARDOWN_METHOD.matches(tree, state)) {
+    if (!isTestMethod && !JUNIT5_LIFECYCLE_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
@@ -77,20 +78,19 @@ public final class JUnitMethodDeclaration extends BugChecker implements MethodTr
       MethodTree tree, SuggestedFix.Builder fixBuilder, VisitorState state) {
     MethodSymbol symbol = ASTHelpers.getSymbol(tree);
     tryCanonicalizeMethodName(symbol)
-        .ifPresent(
-            newName ->
-                ConflictDetection.findMethodRenameBlocker(symbol, newName, state)
-                    .ifPresentOrElse(
-                        blocker -> reportMethodRenameBlocker(tree, blocker, state),
-                        () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
+        .ifPresent(newName ->
+            ConflictDetection.findMethodRenameBlocker(symbol, newName, state)
+                .ifPresentOrElse(
+                    blocker -> reportMethodRenameBlocker(tree, blocker, state),
+                    () -> fixBuilder.merge(SuggestedFixes.renameMethod(tree, newName, state))));
   }
 
   private void reportMethodRenameBlocker(MethodTree tree, String reason, VisitorState state) {
     state.reportMatch(
         buildDescription(tree)
             .setMessage(
-                "This method's name should not redundantly start with `%s` (but note that %s)"
-                    .formatted(TEST_PREFIX, reason))
+                "This method's name should not redundantly start with `%s` (but note that %s)",
+                TEST_PREFIX, reason)
             .build());
   }
 

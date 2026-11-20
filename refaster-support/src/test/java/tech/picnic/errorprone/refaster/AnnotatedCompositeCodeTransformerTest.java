@@ -128,14 +128,13 @@ final class AnnotatedCompositeCodeTransformerTest {
     List<Description> collected = new ArrayList<>();
     codeTransformer.apply(DUMMY_PATH, context, collected::add);
     assertThat(collected)
-        .satisfiesExactly(
-            actual -> {
-              assertThat(actual.position).isEqualTo(expectedDescription.position);
-              assertThat(actual.checkName).isEqualTo(expectedDescription.checkName);
-              assertThat(actual.fixes).containsExactlyElementsOf(expectedDescription.fixes);
-              assertThat(actual.getLink()).isEqualTo(expectedDescription.getLink());
-              assertThat(actual.getRawMessage()).isEqualTo(expectedDescription.getRawMessage());
-            });
+        .satisfiesExactly(actual -> {
+          assertThat(actual.position).isEqualTo(expectedDescription.position);
+          assertThat(actual.checkName).isEqualTo(expectedDescription.checkName);
+          assertThat(actual.fixes).containsExactlyElementsOf(expectedDescription.fixes);
+          assertThat(actual.getLink()).isEqualTo(expectedDescription.getLink());
+          assertThat(actual.getRawMessage()).isEqualTo(expectedDescription.getRawMessage());
+        });
   }
 
   private static ImmutableClassToInstanceMap<Annotation> indexAnnotations(

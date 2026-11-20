@@ -112,7 +112,8 @@ public final class RequestMappingAnnotation extends BugChecker implements Method
                 """
                 Not all parameters of this request mapping method are annotated; this may be a \
                 mistake. If the unannotated parameters represent query string parameters, annotate \
-                them with `@RequestParam`.""")
+                them with `@RequestParam`.\
+                """)
             .build()
         : Description.NO_MATCH;
   }

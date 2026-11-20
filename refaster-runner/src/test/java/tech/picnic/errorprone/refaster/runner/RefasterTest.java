@@ -170,10 +170,9 @@ final class RefasterTest {
       assertThatThrownBy(compilationTestHelper::doTest)
           .isInstanceOf(AssertionError.class)
           .message()
-          .satisfies(
-              message ->
-                  assertThat(extractRefasterSeverities("A.java", message))
-                      .containsExactlyElementsOf(expectedSeverities));
+          .satisfies(message ->
+              assertThat(extractRefasterSeverities("A.java", message))
+                  .containsExactlyElementsOf(expectedSeverities));
     }
   }
 

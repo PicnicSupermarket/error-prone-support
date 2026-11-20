@@ -7,7 +7,3 @@ final class IncorrectNameRulesTest implements RefasterRuleCollectionTestCase {
     return "foo".isEmpty();
   }
 }
-
-// This is a comment to appease Checkstyle.
-/* ERROR: Unexpected token. */
-;

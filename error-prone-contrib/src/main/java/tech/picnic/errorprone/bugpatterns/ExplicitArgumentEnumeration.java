@@ -93,9 +93,8 @@ public final class ExplicitArgumentEnumeration extends BugChecker
                       ImmutableMultiset.class.getCanonicalName(),
                       ImmutableSet.class.getCanonicalName())
                   .named("copyOf"),
-              symbolMatcher(
-                  (symbol, state) ->
-                      state.getTypes().isArray(((MethodSymbol) symbol).params().getFirst().type))),
+              symbolMatcher((symbol, state) ->
+                  state.getTypes().isArray(((MethodSymbol) symbol).params().getFirst().type))),
           staticMethod().onClass(Arrays.class.getCanonicalName()).named("asList"));
   private static final Matcher<ExpressionTree> FLUX =
       staticMethod().onDescendantOf("reactor.core.publisher.Flux");
@@ -233,10 +232,9 @@ public final class ExplicitArgumentEnumeration extends BugChecker
         Iterables.getOnlyElement(
             parameters.getLast().type.getTypeArguments(), state.getSymtab().objectType);
     return overloads.stream()
-        .anyMatch(
-            m ->
-                isCompatibleVarargsOverload(
-                    m, method.getReturnType(), initialParameterTypes, finalParameterType, state));
+        .anyMatch(m ->
+            isCompatibleVarargsOverload(
+                m, method.getReturnType(), initialParameterTypes, finalParameterType, state));
   }
 
   private static boolean isCompatibleVarargsOverload(
@@ -279,11 +277,10 @@ public final class ExplicitArgumentEnumeration extends BugChecker
       Map<String, String> alternatives) {
     return Optional.ofNullable(
             alternatives.get(ASTHelpers.getSymbol(tree).getSimpleName().toString()))
-        .map(
-            replacement ->
-                SuggestedFixes.renameMethodInvocation(tree, replacement, state).toBuilder()
-                    .merge(SourceCode.unwrapMethodInvocation(argument, state))
-                    .build());
+        .map(replacement ->
+            SuggestedFixes.renameMethodInvocation(tree, replacement, state).toBuilder()
+                .merge(SourceCode.unwrapMethodInvocation(argument, state))
+                .build());
   }
 
   private static boolean isAtLeastAsVisible(Element symbol, Element reference) {

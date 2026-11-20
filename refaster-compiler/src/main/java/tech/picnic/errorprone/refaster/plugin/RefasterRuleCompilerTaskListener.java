@@ -1,5 +1,6 @@
 package tech.picnic.errorprone.refaster.plugin;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -35,12 +36,14 @@ import tech.picnic.errorprone.refaster.AnnotatedCompositeCodeTransformer;
 
 /**
  * A variant of {@code com.google.errorprone.refaster.RefasterRuleCompilerAnalyzer} that stores
- * compiled Refaster rules in a {@code .refaster} file next to the compiled {@code .class} file,
- * rather than at a fixed location.
+ * compiled Refaster rules in a {@value #REFASTER_FILE_EXTENSION} file next to the compiled {@code
+ * .class} file, rather than at a fixed location.
  *
  * <p>This {@link TaskListener} thus supports compilation of multiple Refaster rules.
  */
 final class RefasterRuleCompilerTaskListener implements TaskListener {
+  @VisibleForTesting static final String REFASTER_FILE_EXTENSION = ".refaster";
+
   private final Context context;
 
   RefasterRuleCompilerTaskListener(Context context) {
@@ -63,7 +66,10 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
       try {
         outputCodeTransformer(rule.getValue(), getOutputFile(taskEvent, rule.getKey()));
       } catch (IOException e) {
-        throw new UncheckedIOException("Failed to persist compiled Refaster rules", e);
+        throw new UncheckedIOException(
+            "Failed to persist compiled Refaster rule '%s'"
+                .formatted(rule.getKey().getSimpleName()),
+            e);
       }
     }
   }
@@ -98,7 +104,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
     return fileManager.getFileForOutput(
         StandardLocation.CLASS_OUTPUT,
         toPackageName(symbol),
-        toSimpleFlatName(symbol) + ".refaster",
+        toSimpleFlatName(symbol) + REFASTER_FILE_EXTENSION,
         taskEvent.getSourceFile());
   }
 
@@ -137,8 +143,7 @@ final class RefasterRuleCompilerTaskListener implements TaskListener {
 
   private static String toSimpleFlatName(ClassSymbol symbol) {
     String flatName = symbol.flatName().toString();
-    int lastDot = flatName.lastIndexOf((byte) '.');
-    return lastDot < 0 ? flatName : flatName.substring(lastDot + 1);
+    return flatName.substring(flatName.lastIndexOf('.') + 1);
   }
 
   private static void outputCodeTransformer(CodeTransformer codeTransformer, FileObject target)

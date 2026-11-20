@@ -7,6 +7,17 @@
   "customManagers": [
     {
       "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "reviewdog/reviewdog",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.yml$/"
+      ],
+      "matchStrings": [
+        "\\breviewdog_version: (?<currentValue>\\S+)"
+      ]
+    },
+    {
+      "customType": "regex",
       "datasourceTemplate": "github-runners",
       "managerFilePatterns": [
         "/^\\.github/instructions/github-actions\\.instructions\\.md$/",

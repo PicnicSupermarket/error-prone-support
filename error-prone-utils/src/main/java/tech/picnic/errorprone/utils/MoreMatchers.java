@@ -1,12 +1,10 @@
 package tech.picnic.errorprone.utils;
 
 import static com.google.errorprone.matchers.Matchers.typePredicateMatcher;
-import static tech.picnic.errorprone.utils.MoreTypePredicates.hasAnnotation;
 
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.matchers.Matchers;
 import com.google.errorprone.suppliers.Supplier;
-import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
 
@@ -17,19 +15,6 @@ import com.sun.tools.javac.code.Type;
  */
 public final class MoreMatchers {
   private MoreMatchers() {}
-
-  /**
-   * Returns a {@link Matcher} that determines whether a given {@link AnnotationTree} has a
-   * meta-annotation of the specified type.
-   *
-   * @param <T> The type of tree to match against.
-   * @param annotationType The binary type name of the annotation (e.g.
-   *     "org.jspecify.annotations.Nullable", or "some.package.OuterClassName$InnerClassName")
-   * @return A {@link Matcher} that matches trees with the specified meta-annotation.
-   */
-  public static <T extends AnnotationTree> Matcher<T> hasMetaAnnotation(String annotationType) {
-    return typePredicateMatcher(hasAnnotation(annotationType));
-  }
 
   /**
    * Returns a {@link Matcher} that determines whether the type of a given {@link Tree} is a subtype

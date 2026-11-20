@@ -2,11 +2,13 @@ package tech.picnic.errorprone.utils;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAST_ONE;
+import static com.google.errorprone.matchers.JUnitMatchers.JUNIT5_TEST_METHOD;
+import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.annotations;
-import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.hasAnnotation;
 import static com.google.errorprone.matchers.Matchers.isType;
+import static com.google.errorprone.matchers.Matchers.not;
 import static java.util.Objects.requireNonNullElse;
-import static tech.picnic.errorprone.utils.MoreMatchers.hasMetaAnnotation;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -28,22 +30,11 @@ import org.jspecify.annotations.Nullable;
  */
 public final class MoreJUnitMatchers {
   /** Matches JUnit Jupiter test methods. */
-  public static final MultiMatcher<MethodTree, AnnotationTree> TEST_METHOD =
-      annotations(
-          AT_LEAST_ONE,
-          anyOf(
-              isType("org.junit.jupiter.api.Test"),
-              hasMetaAnnotation("org.junit.jupiter.api.TestTemplate")));
-
-  /** Matches JUnit Jupiter setup and teardown methods. */
-  public static final MultiMatcher<MethodTree, AnnotationTree> SETUP_OR_TEARDOWN_METHOD =
-      annotations(
-          AT_LEAST_ONE,
-          anyOf(
-              isType("org.junit.jupiter.api.AfterAll"),
-              isType("org.junit.jupiter.api.AfterEach"),
-              isType("org.junit.jupiter.api.BeforeAll"),
-              isType("org.junit.jupiter.api.BeforeEach")));
+  // XXX: Unlike this matcher, `JUnitMatchers#JUNIT5_TEST_METHOD` also matches `@TestFactory`
+  // methods, which aren't test methods. Propose that Error Prone exposes those through a separate
+  // constant, such that this matcher can be dropped.
+  public static final Matcher<MethodTree> TEST_METHOD =
+      allOf(JUNIT5_TEST_METHOD, not(hasAnnotation("org.junit.jupiter.api.TestFactory")));
 
   /**
    * Matches methods that have a {@link org.junit.jupiter.params.provider.MethodSource} annotation.
@@ -74,11 +65,10 @@ public final class MoreJUnitMatchers {
   public static ImmutableList<String> getMethodSourceFactoryNames(
       AnnotationTree methodSourceAnnotation, MethodTree method) {
     return getMethodSourceFactoryDescriptors(methodSourceAnnotation, method).stream()
-        .map(
-            descriptor -> {
-              int index = descriptor.indexOf('(');
-              return index < 0 ? descriptor : descriptor.substring(0, index);
-            })
+        .map(descriptor -> {
+          int index = descriptor.indexOf('(');
+          return index < 0 ? descriptor : descriptor.substring(0, index);
+        })
         .collect(toImmutableList());
   }
 

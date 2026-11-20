@@ -27,7 +27,7 @@ jobs:
   matrix:
     name: Determine integration test matrix
     if: ${{ github.event_name == 'push' || (github.event.issue.pull_request && contains(github.event.comment.body, '/integration-test')) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       contents: read
@@ -35,7 +35,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -74,7 +74,7 @@ jobs:
     name: Acknowledge request
     needs: [ matrix ]
     if: ${{ github.event_name != 'push' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       pull-requests: write # To post a PR comment.
@@ -82,7 +82,7 @@ jobs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -111,7 +111,7 @@ jobs:
     # this job still runs in that case.
     needs: [ matrix, acknowledge ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 35
     permissions:
       contents: read
@@ -121,7 +121,7 @@ jobs:
         integration-test: ${{ fromJson(needs.matrix.outputs.matrix) }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -142,7 +142,7 @@ jobs:
             21.0.12
             25.0.4
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Apply patches
@@ -170,7 +170,7 @@ jobs:
     # validation build's result is observed in the same run.
     needs: [ matrix, patch ]
     if: ${{ !cancelled() && needs.matrix.result == 'success' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 25
     permissions:
       contents: read
@@ -180,7 +180,7 @@ jobs:
         integration-test: ${{ fromJson(needs.matrix.outputs.matrix) }}
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -210,7 +210,7 @@ jobs:
             21.0.12
             25.0.4
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Validate patched code
@@ -233,13 +233,13 @@ jobs:
     # Using `always()` ensures that this job runs even if previous jobs failed
     # or were cancelled.
     if: ${{ always() && github.event.issue.pull_request && needs.acknowledge.outputs.comment_id }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       pull-requests: write # To update the PR comment.
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >

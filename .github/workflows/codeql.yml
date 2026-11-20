@@ -25,11 +25,11 @@ jobs:
     permissions:
       contents: read
       security-events: write # To upload the analysis results to the code scanning dashboard.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           disable-sudo-and-containers: true
           allowed-endpoints: >
@@ -46,7 +46,7 @@ jobs:
         with:
           java-version: 25.0.4
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Initialize CodeQL
         uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
         with:

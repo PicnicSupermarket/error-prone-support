@@ -37,12 +37,12 @@ jobs:
     permissions:
       contents: read
       pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     environment: codex
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
         with:
           # We can't disable `sudo`, as `openai/codex-action` requires it in
           # all cases. However, that action does revoke `sudo` access before
@@ -303,7 +303,7 @@ jobs:
       - name: Suggest commit message with Codex
         id: codex
         if: ${{ steps.suggestions.outputs.generate == 'true' }}
-        uses: openai/codex-action@bdf19a4a223ec2549a3e2274a0cf61556bc07675 # v1.13
+        uses: openai/codex-action@306c6a196a99dcc6582530c396a19d2672d5e9ec # v1.14
         with:
           permission-profile: suggest-commit-message
           # By default the Codex CLI reports metrics to `ab.chatgpt.com`.

@@ -7,13 +7,13 @@ import static com.google.errorprone.matchers.ChildMultiMatcher.MatchType.AT_LEAS
 import static com.google.errorprone.matchers.Matchers.allOf;
 import static com.google.errorprone.matchers.Matchers.annotations;
 import static com.google.errorprone.matchers.Matchers.anyOf;
+import static com.google.errorprone.matchers.Matchers.hasMetaAnnotation;
 import static com.google.errorprone.matchers.Matchers.hasMethod;
 import static com.google.errorprone.matchers.Matchers.hasModifier;
 import static com.google.errorprone.matchers.Matchers.isType;
 import static com.google.errorprone.matchers.Matchers.not;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 import static tech.picnic.errorprone.utils.MoreJUnitMatchers.TEST_METHOD;
-import static tech.picnic.errorprone.utils.MoreMatchers.hasMetaAnnotation;
 
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
@@ -32,6 +32,8 @@ import javax.lang.model.element.Modifier;
  * A {@link BugChecker} that flags non-final and non package-private JUnit test class declarations,
  * unless abstract.
  */
+// XXX: Review whether this check should also consider classes that declare a
+// `@TestFactory`-annotated method.
 @AutoService(BugChecker.class)
 @BugPattern(
     summary = "Non-abstract JUnit test classes should be declared package-private and final",

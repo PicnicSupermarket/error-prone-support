@@ -242,7 +242,7 @@ Other highly relevant commands:
 - [`./run-branch-mutation-tests.sh`][script-run-branch-mutation-tests] uses
   [Pitest][pitest] to run mutation tests against code that is modified relative
   to the upstream default branch. The results can be reviewed by opening the
-  respective `target/pit-reports/index.html` files. One can use
+  respective `target/pit-reports/arcmutate/index.html` files. One can use
   [`./run-mutation-tests.sh`][script-run-mutation-tests] to run mutation tests
   against _all_ code in the current working directory. For more information
   check the [PIT Maven plugin][pitest-maven].
