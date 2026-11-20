@@ -1213,14 +1213,6 @@
                                 <includes>**/*.properties</includes>
                             </requireEncoding>
                             <requireEncoding>
-                                <encoding>US-ASCII</encoding>
-                                <excludes>**/target/**,**/.repos/**</excludes>
-                                <includes>**/*.sh,**/*.xml,**/*.yml</includes>
-                            </requireEncoding>
-                            <!-- XXX: In `documentation.instructions.md` we
-                            require ASCII also for Markdown files. Refine that
-                            rule, or make files compliant. -->
-                            <requireEncoding>
                                 <acceptAsciiSubset>true</acceptAsciiSubset>
                                 <encoding>UTF-8</encoding>
                                 <excludes>**/*.properties,**/target/**,**/.repos/**</excludes>
