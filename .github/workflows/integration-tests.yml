@@ -142,7 +142,7 @@ jobs:
             21.0.13
             25.0.5
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Apply patches
@@ -210,7 +210,7 @@ jobs:
             21.0.13
             25.0.5
           java-distribution: temurin
-          maven-version: 3.10.0
+          maven-version: 3.10.1
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Validate patched code

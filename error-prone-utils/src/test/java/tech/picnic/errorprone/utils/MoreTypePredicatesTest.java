@@ -12,41 +12,16 @@ import com.google.errorprone.BugPattern;
 import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
-import com.google.errorprone.bugpatterns.BugChecker.ClassTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.predicates.TypePredicate;
 import com.google.errorprone.suppliers.Supplier;
-import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.Tree;
 import org.junit.jupiter.api.Test;
 
 final class MoreTypePredicatesTest {
-  @Test
-  void hasAnnotation() {
-    CompilationTestHelper.newInstance(HasAnnotationTestChecker.class, getClass())
-        .addSourceLines(
-            "A.java",
-            "class A {",
-            "  class NoAnnotation {}",
-            "",
-            "  @SuppressWarnings(\"foo\")",
-            "  interface OtherAnnotation {}",
-            "",
-            "  @Deprecated",
-            "  // BUG: Diagnostic contains:",
-            "  class FlaggedAnnotation {}",
-            "",
-            "  @Deprecated",
-            "  @SuppressWarnings(\"foo\")",
-            "  // BUG: Diagnostic contains:",
-            "  class MultipleAnnotations {}",
-            "}")
-        .doTest();
-  }
-
   @Test
   void isSubTypeOf() {
     CompilationTestHelper.newInstance(IsSubTypeOfTestChecker.class, getClass())
@@ -121,22 +96,6 @@ final class MoreTypePredicatesTest {
             "  }",
             "}")
         .doTest();
-  }
-
-  /** A {@link BugChecker} that delegates to {@link MoreTypePredicates#hasAnnotation(String)}. */
-  @BugPattern(
-      summary = "Interacts with `MoreTypePredicates` for testing purposes",
-      severity = ERROR)
-  private static final class HasAnnotationTestChecker extends BugChecker
-      implements ClassTreeMatcher {
-    private static final long serialVersionUID = 1L;
-    private static final Matcher<Tree> DELEGATE =
-        typePredicateMatcher(MoreTypePredicates.hasAnnotation(Deprecated.class.getCanonicalName()));
-
-    @Override
-    public Description matchClass(ClassTree tree, VisitorState state) {
-      return DELEGATE.matches(tree, state) ? describeMatch(tree) : Description.NO_MATCH;
-    }
   }
 
   /** A {@link BugChecker} that delegates to {@link MoreTypePredicates#isSubTypeOf(Supplier)}. */

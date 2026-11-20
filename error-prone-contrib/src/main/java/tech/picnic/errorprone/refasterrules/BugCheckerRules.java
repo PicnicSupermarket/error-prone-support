@@ -3,9 +3,11 @@ package tech.picnic.errorprone.refasterrules;
 import com.google.errorprone.BugCheckerRefactoringTestHelper;
 import com.google.errorprone.BugCheckerRefactoringTestHelper.FixChoosers;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.matchers.Description;
 import com.google.errorprone.refaster.Refaster;
 import com.google.errorprone.refaster.annotation.AfterTemplate;
 import com.google.errorprone.refaster.annotation.BeforeTemplate;
+import com.google.errorprone.refaster.annotation.Repeated;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.Constants;
@@ -111,6 +113,26 @@ final class BugCheckerRules {
     @AfterTemplate
     int after(Tree tree) {
       return ASTHelpers.getStartPosition(tree);
+    }
+  }
+
+  /**
+   * Prefer {@link Description.Builder#setMessage(String, Object...)} over more verbose
+   * alternatives.
+   */
+  static final class DescriptionBuilderSetMessage {
+    @BeforeTemplate
+    @SuppressWarnings("ArrayToString" /* Varargs converted to array. */)
+    Description.Builder before(
+        Description.Builder builder, String format, Object firstArg, @Repeated Object otherArgs) {
+      return builder.setMessage(format.formatted(firstArg, Refaster.asVarargs(otherArgs)));
+    }
+
+    @AfterTemplate
+    @SuppressWarnings("FormatStringAnnotation" /* Matched expression may very well be compliant. */)
+    Description.Builder after(
+        Description.Builder builder, String format, Object firstArg, @Repeated Object otherArgs) {
+      return builder.setMessage(format, firstArg, Refaster.asVarargs(otherArgs));
     }
   }
 }
