@@ -36,7 +36,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
       contents: read
-      id-token: write # To let Secure Registry verify the repository and runner.
+      id-token: write # To let Harden-Runner's Secure Registry verify the repository and runner.
       pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
     runs-on: ubuntu-26.04
     timeout-minutes: 10
@@ -52,6 +52,11 @@ jobs:
           # `openai/codex-action` being the sole step of the second job.
           disable-sudo-and-containers: false
           allowed-endpoints: ${{ env.ALLOWED_ENDPOINTS }}
+          # XXX: We don't enable this setting for most other jobs, because in
+          # most cases the relevant artifact repositories aren't proxied. On
+          # the other hand, we may want to be forward-compatible and just
+          # enable this for all jobs. This would then also involve setting
+          # `id-token: write` everywhere.
           secure-registry: true
       - name: Resolve pull request metadata
         id: pr-details

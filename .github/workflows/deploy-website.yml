@@ -13,7 +13,6 @@ jobs:
     name: Build website
     permissions:
       contents: read
-      id-token: write # To let Secure Registry verify the repository and runner.
       pages: read # To configure GitHub pages.
     runs-on: ubuntu-26.04
     timeout-minutes: 10
@@ -45,7 +44,6 @@ jobs:
             www.bestpractices.dev:443
             www.youtube.com:443
             youtrack.jetbrains.com:443
-          secure-registry: true
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -90,7 +88,6 @@ jobs:
           disable-sudo-and-containers: true
           allowed-endpoints: >
             api.github.com:443
-          secure-registry: true
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

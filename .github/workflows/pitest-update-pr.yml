@@ -20,7 +20,6 @@ jobs:
       actions: read # To download the analysis artifact from the triggering workflow run.
       checks: write # To annotate surviving mutants using a check run.
       contents: read
-      id-token: write # To let Secure Registry verify the repository and runner.
       pull-requests: write # To post a summary as a PR comment.
     runs-on: ubuntu-26.04
     timeout-minutes: 10
@@ -36,7 +35,6 @@ jobs:
             objects.githubusercontent.com:443
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
-          secure-registry: true
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:

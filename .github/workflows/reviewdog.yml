@@ -12,7 +12,6 @@ jobs:
     name: Report code issues with Reviewdog
     permissions:
       contents: read
-      id-token: write # To let Secure Registry verify the repository and runner.
       pull-requests: write # To post findings and suggested fixes as PR comments.
     runs-on: ubuntu-26.04
     timeout-minutes: 25
@@ -32,7 +31,6 @@ jobs:
             raw.githubusercontent.com:443
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
-          secure-registry: true
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:

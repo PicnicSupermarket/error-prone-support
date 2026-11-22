@@ -15,7 +15,6 @@ jobs:
     # directly push to this repository.
     if: ${{ github.event.label.name == 'dependencies' && github.event.pull_request.milestone == null && github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
-      id-token: write # To let Secure Registry verify the repository and runner.
       pull-requests: write # To set the milestone.
     runs-on: ubuntu-26.04
     timeout-minutes: 5
@@ -26,7 +25,6 @@ jobs:
           disable-sudo-and-containers: true
           allowed-endpoints: >
             api.github.com:443
-          secure-registry: true
       - name: Assign first upcoming milestone
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:

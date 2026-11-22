@@ -16,7 +16,6 @@ jobs:
     name: Check for review checklist drift
     permissions:
       contents: read
-      id-token: write # To let Secure Registry verify the repository and runner.
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
@@ -32,7 +31,6 @@ jobs:
             api.github.com:443
             github.com:443
             release-assets.githubusercontent.com:443
-          secure-registry: true
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

@@ -24,7 +24,6 @@ jobs:
         language: [ java, ruby ]
     permissions:
       contents: read
-      id-token: write # To let Secure Registry verify the repository and runner.
       security-events: write # To upload the analysis results to the code scanning dashboard.
     runs-on: ubuntu-26.04
     timeout-minutes: 15
@@ -42,7 +41,6 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             uploads.github.com:443
-          secure-registry: true
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
