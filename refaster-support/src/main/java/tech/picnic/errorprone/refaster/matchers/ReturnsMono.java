@@ -6,6 +6,7 @@ import static tech.picnic.errorprone.utils.MoreTypes.generic;
 import static tech.picnic.errorprone.utils.MoreTypes.subOf;
 import static tech.picnic.errorprone.utils.MoreTypes.unbound;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.matchers.Matcher;
 import com.google.errorprone.predicates.TypePredicate;
@@ -18,6 +19,7 @@ import com.sun.source.tree.MemberReferenceTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Type;
 import java.util.function.Function;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.MoreTypePredicates;
 
 /**
@@ -64,8 +66,18 @@ public final class ReturnsMono implements Matcher<ExpressionTree> {
     }
 
     return switch (tree) {
-      case LambdaExpressionTree lambdaExpression ->
-          IS_MONO_TREE.matches(lambdaExpression.getBody(), state);
+      case LambdaExpressionTree lambdaExpression -> {
+        ImmutableList<ExpressionTree> results =
+            MoreASTHelpers.findResultExpressions(lambdaExpression);
+        /*
+         * A conditional expression's type may be less specific than those of its branches, so we
+         * inspect each.
+         */
+        yield !results.isEmpty()
+            && results.stream()
+                .flatMap(result -> MoreASTHelpers.findBranchExpressions(result).stream())
+                .allMatch(expression -> IS_MONO_TREE.matches(expression, state));
+      }
       case MemberReferenceTree memberReference ->
           IS_MONO_TYPE.apply(
               ASTHelpers.getSymbol(memberReference).type.asMethodType().getReturnType(), state);

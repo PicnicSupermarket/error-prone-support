@@ -34,6 +34,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import tech.picnic.errorprone.utils.MoreASTHelpers;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -157,10 +158,14 @@ public final class PrimitiveComparison extends BugChecker implements MethodInvoc
   }
 
   private static Optional<Type> getPotentiallyBoxedReturnType(ExpressionTree tree) {
-    return switch (tree) {
+    return switch (ASTHelpers.stripParentheses(tree)) {
       case LambdaExpressionTree lambdaExpression ->
-          /* Return the lambda expression's actual return type. */
-          Optional.ofNullable(ASTHelpers.getType(lambdaExpression.getBody()));
+          /* Return the type of the lambda expression's sole result expression, if any. */
+          // XXX: Also support lambda expressions with multiple result expressions, by selecting the
+          // narrowest primitive type to which all result types can be widened.
+          Optional.of(MoreASTHelpers.findResultExpressions(lambdaExpression))
+              .filter(results -> results.size() == 1)
+              .map(results -> ASTHelpers.getType(results.getFirst()));
       case JCMemberReference memberReference ->
           // XXX: The match against a concrete type and reference to one of its fields is fragile.
           // Do better.
