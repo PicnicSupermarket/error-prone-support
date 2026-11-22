@@ -43,6 +43,7 @@ jobs:
             repo.maven.apache.org:443
             *.sigstore.dev:443
             www.bestpractices.dev:443
+          secure-registry: true
       - name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

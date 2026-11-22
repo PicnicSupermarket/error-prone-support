@@ -36,6 +36,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     permissions:
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
       pull-requests: write # To read PR metadata and to upsert the suggested commit message comment.
     runs-on: ubuntu-26.04
     timeout-minutes: 10
@@ -51,6 +52,7 @@ jobs:
           # `openai/codex-action` being the sole step of the second job.
           disable-sudo-and-containers: false
           allowed-endpoints: ${{ env.ALLOWED_ENDPOINTS }}
+          secure-registry: true
       - name: Resolve pull request metadata
         id: pr-details
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0

@@ -31,6 +31,7 @@ jobs:
             target-jdk: 21.0.13
     permissions:
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
     runs-on: ${{ matrix.os }}
     timeout-minutes: ${{ matrix.os == 'windows-2025' && 30 || 20 }}
     steps:
@@ -53,6 +54,7 @@ jobs:
             objects.githubusercontent.com:443
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
+          secure-registry: true
       # We run the build twice for each supported JDK: once against the
       # original Error Prone release, using only Error Prone checks available
       # on Maven Central, and once against the Picnic Error Prone fork,
@@ -88,6 +90,7 @@ jobs:
     needs: build
     permissions:
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     environment: maven-deploy
@@ -102,6 +105,7 @@ jobs:
             github.com:443
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
+          secure-registry: true
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:

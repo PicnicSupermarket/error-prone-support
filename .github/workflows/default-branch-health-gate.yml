@@ -22,6 +22,7 @@ jobs:
       actions: read # To list workflow runs.
       checks: read # To list check runs.
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
@@ -32,6 +33,7 @@ jobs:
           allowed-endpoints: >
             api.github.com:443
             github.com:443
+          secure-registry: true
       - name: Check default branch health
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:

@@ -31,6 +31,7 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -40,6 +41,7 @@ jobs:
           disable-sudo-and-containers: true
           allowed-endpoints: >
             github.com:443
+          secure-registry: true
       - name: Check out integration tests
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -77,6 +79,7 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
+      id-token: write # To let Secure Registry verify the repository and runner.
       pull-requests: write # To post a PR comment.
     outputs:
       comment_id: ${{ steps.post-comment.outputs.commentId }}
@@ -87,6 +90,7 @@ jobs:
           disable-sudo-and-containers: true
           allowed-endpoints: >
             api.github.com:443
+          secure-registry: true
       - name: Post comment with workflow link
         id: post-comment
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
@@ -115,6 +119,7 @@ jobs:
     timeout-minutes: 35
     permissions:
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
     strategy:
       fail-fast: false
       matrix:
@@ -134,6 +139,7 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             results-receiver.actions.githubusercontent.com:443
+          secure-registry: true
       - name: Check out code and set up JDK and Maven
         uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
         with:
@@ -174,6 +180,7 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: read
+      id-token: write # To let Secure Registry verify the repository and runner.
     strategy:
       fail-fast: false
       matrix:
@@ -195,6 +202,7 @@ jobs:
             release-assets.githubusercontent.com:443
             repo.maven.apache.org:443
             results-receiver.actions.githubusercontent.com:443
+          secure-registry: true
       # Download the `patch` job's output before the more expensive setup
       # steps, so that a missing artifact is reported within seconds.
       - name: Download patch phase artifacts
@@ -236,6 +244,7 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
+      id-token: write # To let Secure Registry verify the repository and runner.
       pull-requests: write # To update the PR comment.
     steps:
       - name: Install Harden-Runner
@@ -244,6 +253,7 @@ jobs:
           disable-sudo-and-containers: true
           allowed-endpoints: >
             api.github.com:443
+          secure-registry: true
       - name: Update comment with results
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
