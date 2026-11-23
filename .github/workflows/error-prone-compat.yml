@@ -50,6 +50,13 @@ jobs:
           java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Quickly build and install project
         run: mvn install -Dverification.skip
       - name: Build and test project with self-check against the latest Error Prone release

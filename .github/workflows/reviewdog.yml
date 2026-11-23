@@ -38,6 +38,13 @@ jobs:
           java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Set up Reviewdog
         uses: reviewdog/action-setup@d8a7baabd7f3e8544ee4dbde3ee41d0011c3a93f # v1.5.0
         with:

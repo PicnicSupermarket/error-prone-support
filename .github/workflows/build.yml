@@ -66,6 +66,14 @@ jobs:
             ${{ matrix.build-jdk }}
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        id: restore-maven-repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn install javadoc:jar
       - name: Build project with self-check against Error Prone fork, test using the targeted JDK
@@ -80,8 +88,18 @@ jobs:
         # Note that `matrix.target-jdk` is controlled by this workflow, so this
         # compromise is safe.
         run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
+      # Only `push` runs populate the cache, as this job resolves the most
+      # complete set of dependencies, and its `pull_request` runs would only
+      # populate pull request-scoped cache entries.
       - name: Remove installed project artifacts
+        if: ${{ github.event_name == 'push' && steps.restore-maven-repository.outputs.cache-hit != 'true' }}
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+      - name: Save local Maven repository
+        if: ${{ github.event_name == 'push' && steps.restore-maven-repository.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.restore-maven-repository.outputs.cache-primary-key }}
   deploy:
     name: Deploy artifacts
     if: ${{ github.ref_name == github.event.repository.default_branch }}
@@ -109,6 +127,13 @@ jobs:
           java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Build and deploy
         env:
           MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}

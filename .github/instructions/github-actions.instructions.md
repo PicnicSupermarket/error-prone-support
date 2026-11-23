@@ -346,6 +346,13 @@ For workflows that build Java code:
 
 - Use the `s4u/setup-maven-action` for checkout, JDK, and Maven setup in a
   single step.
+- Set `cache-enabled: false` on `s4u/setup-maven-action`, and instead restore
+  the local Maven repository using `actions/cache/restore`, with key
+  `maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}` and
+  restore key `maven-repository-${{ runner.os }}-`. This key does not depend
+  on the job's JDK or Maven version, so all jobs share the same cache entry.
+  Only the `build` job in `build.yml` saves this cache entry, using
+  `actions/cache/save`, as it resolves the most complete set of dependencies.
 - Set `MAVEN_ARGS` as an environment variable at the workflow or job level:
   ```yaml
   env:
