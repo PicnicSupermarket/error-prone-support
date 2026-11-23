@@ -15,9 +15,6 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 permissions: {}
-# Cache entries saved by `pull_request` runs are rarely reused, so only `push`
-# runs populate the cache.
-cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -36,6 +33,9 @@ jobs:
       contents: read
     runs-on: ${{ matrix.os }}
     timeout-minutes: ${{ matrix.os == 'windows-2025' && 30 || 20 }}
+    # Cache entries saved by `pull_request` runs are rarely reused, so only
+    # `push` runs populate the cache.
+    cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
     steps:
       - name: Install Harden-Runner
         uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
