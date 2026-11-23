@@ -116,49 +116,48 @@ jobs:
 ```
 
 ## Declare least-privilege cache access
-<!-- check: `cache-mode` declared at workflow level -->
-<!-- check: `cache-mode: none` for workflows and jobs that do not use the GitHub Actions cache -->
-<!-- check: `cache-mode` grants write access only to jobs triggered by `push`, `schedule` or `workflow_dispatch` -->
-<!-- check: Only jobs that may save the cache remove project artifacts from the local Maven repository -->
+<!-- check: `cache-mode` is declared at workflow level, unless the workflow must save the cache on a trusted trigger such as `push` -->
+<!-- check: `cache-mode: none` for workflows that do not use the GitHub Actions cache -->
+<!-- check: `cache-mode` is never set to `write` or `write-only` -->
+<!-- check: Jobs that may save the cache and install project artifacts remove those artifacts afterwards; other jobs do not -->
 
 Declare [`cache-mode`][cache-mode] at workflow level, overriding it per job
 where needed. Without it, GitHub picks a default based on the trigger, which
-permits cache writes that are unnecessary or unsafe.
+often grants more access than needed.
 
-- Use `none` for workflows and jobs that do not use the cache.
+- Use `none` for workflows that do not use the cache.
 - Use `read` for workflows that are only triggered by `pull_request`: entries
   saved by such runs are only visible to the same pull request, so they are
   rarely reused, while still counting against the repository's cache quota.
-- Use `read` for workflows that build untrusted code (e.g. `issue_comment`
-  workflows that check out a pull request) or that resolve non-default
-  dependency versions.
-- For workflows that combine `pull_request` with trusted triggers, use
-  `${{ github.event_name == 'pull_request' && 'read' || 'write' }}`.
-- Never use `write` or `write-only` for low-trust triggers such as
-  `issue_comment`, `pull_request_target` or `workflow_run`: this reintroduces
+- Use `read` for workflows and jobs that build untrusted code (e.g.
+  `issue_comment` workflows that check out a pull request), that resolve
+  non-default dependency versions, or that install project artifacts without
+  removing them afterwards: such code and artifacts should not end up in a
+  cache shared with other workflows.
+- Omit `cache-mode` for workflows that must save the cache when triggered by
+  a trusted trigger such as `push` or `schedule`. `cache-mode` does not
+  support expressions, so it cannot vary by trigger, while the trigger-based
+  default grants write access only to trusted triggers and `pull_request`.
+- Never declare `write` or `write-only`: on low-trust triggers such as
+  `issue_comment`, `pull_request_target` or `workflow_run` this reintroduces
   the risk of cache poisoning.
 
 Jobs that may save the cache and install project artifacts into the local Maven
 repository must remove those artifacts afterwards, so that they do not end up
-in the cache:
+in the cache. Jobs restricted to `read` access do not need this step.
 
 ```yaml
 - name: Remove installed project artifacts
   run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
 ```
 
-Jobs restricted to `read` access do not need this step.
-
 **Do:**
 
 ```yaml
+on:
+  pull_request:
 permissions: {}
-cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
-jobs:
-  build:
-    # Uses the cache.
-  deploy:
-    cache-mode: none
+cache-mode: read
 ```
 
 **Don't:**

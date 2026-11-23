@@ -123,10 +123,10 @@ the files you modified.
 
 ### Declare least-privilege cache access
 
-- [ ] `cache-mode` declared at workflow level
-- [ ] `cache-mode: none` for workflows and jobs that do not use the GitHub Actions cache
-- [ ] `cache-mode` grants write access only to jobs triggered by `push`, `schedule` or `workflow_dispatch`
-- [ ] Only jobs that may save the cache remove project artifacts from the local Maven repository
+- [ ] `cache-mode` is declared at workflow level, unless the workflow must save the cache on a trusted trigger such as `push`
+- [ ] `cache-mode: none` for workflows that do not use the GitHub Actions cache
+- [ ] `cache-mode` is never set to `write` or `write-only`
+- [ ] Jobs that may save the cache and install project artifacts remove those artifacts afterwards; other jobs do not
 
 ### Use explicit runner versions
 

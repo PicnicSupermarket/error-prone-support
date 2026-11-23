@@ -20,8 +20,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'issue_comment' }}
   queue: ${{ github.event_name == 'issue_comment' && 'single' || 'max' }}
 permissions: {}
-# This workflow builds untrusted pull request code, so it must not write to
-# the cache. On `push`, the `build.yml` workflow saves the same cache entry.
+# This workflow builds untrusted pull request code and installs project
+# artifacts, neither of which should end up in the cache. The cache entries it
+# restores are saved by the `build.yml` workflow.
 cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
