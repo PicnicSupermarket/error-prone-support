@@ -115,6 +115,63 @@ jobs:
       pages: write
 ```
 
+## Declare least-privilege cache access
+<!-- check: `cache-mode` declared at workflow level -->
+<!-- check: `cache-mode: none` for workflows and jobs that do not use the GitHub Actions cache -->
+<!-- check: `cache-mode` grants write access only to jobs triggered by `push`, `schedule` or `workflow_dispatch` -->
+<!-- check: Only jobs that may save the cache remove project artifacts from the local Maven repository -->
+
+Declare [`cache-mode`][cache-mode] at workflow level, overriding it per job
+where needed. Without it, GitHub picks a default based on the trigger, which
+permits cache writes that are unnecessary or unsafe.
+
+- Use `none` for workflows and jobs that do not use the cache.
+- Use `read` for workflows that are only triggered by `pull_request`: entries
+  saved by such runs are only visible to the same pull request, so they are
+  rarely reused, while still counting against the repository's cache quota.
+- Use `read` for workflows that build untrusted code (e.g. `issue_comment`
+  workflows that check out a pull request) or that resolve non-default
+  dependency versions.
+- For workflows that combine `pull_request` with trusted triggers, use
+  `${{ github.event_name == 'pull_request' && 'read' || 'write' }}`.
+- Never use `write` or `write-only` for low-trust triggers such as
+  `issue_comment`, `pull_request_target` or `workflow_run`: this reintroduces
+  the risk of cache poisoning.
+
+Jobs that may save the cache and install project artifacts into the local Maven
+repository must remove those artifacts afterwards, so that they do not end up
+in the cache:
+
+```yaml
+- name: Remove installed project artifacts
+  run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+```
+
+Jobs restricted to `read` access do not need this step.
+
+**Do:**
+
+```yaml
+permissions: {}
+cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
+jobs:
+  build:
+    # Uses the cache.
+  deploy:
+    cache-mode: none
+```
+
+**Don't:**
+
+```yaml
+on:
+  issue_comment:
+    types: [ created ]
+permissions: {}
+# Lets untrusted pull request code populate the default branch's cache.
+cache-mode: write
+```
+
 ## Use explicit runner versions
 <!-- check: Runner uses explicit version (not `ubuntu-latest`) -->
 
@@ -333,3 +390,5 @@ branches: [master]
 branches:
   - master
 ```
+
+[cache-mode]: https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#controlling-cache-access-with-cache-mode

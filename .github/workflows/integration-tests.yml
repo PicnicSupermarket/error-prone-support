@@ -20,6 +20,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'issue_comment' }}
   queue: ${{ github.event_name == 'issue_comment' && 'single' || 'max' }}
 permissions: {}
+# This workflow builds untrusted pull request code, so it must not write to
+# the cache. On `push`, the `build.yml` workflow saves the same cache entry.
+cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
   CHECKOUT_REF: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
@@ -162,8 +165,6 @@ jobs:
           path: "${{ runner.temp }}/artifacts"
           if-no-files-found: error
           retention-days: 7
-      - name: Remove installed project artifacts
-        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   validate:
     name: Validate patched code
     # Runs even if the `patch` job reported unexpected changes, so that the
@@ -225,8 +226,6 @@ jobs:
         with:
           name: "integration-test-validate-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
-      - name: Remove installed project artifacts
-        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   report:
     name: Report integration test result
     needs: [ acknowledge, patch, validate ]

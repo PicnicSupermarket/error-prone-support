@@ -20,6 +20,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   queue: max
 permissions: {}
+# This workflow resolves a non-default Error Prone version and installs
+# project artifacts, neither of which should end up in the cache shared with
+# other workflows.
+cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:

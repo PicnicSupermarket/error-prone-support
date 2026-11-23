@@ -15,6 +15,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
   queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
 permissions: {}
+cache-mode: none
 jobs:
   analyze:
     name: Run OpenSSF Scorecard analysis

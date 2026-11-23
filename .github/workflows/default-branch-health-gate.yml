@@ -14,6 +14,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 permissions: {}
+cache-mode: none
 jobs:
   check:
     name: Check default branch health

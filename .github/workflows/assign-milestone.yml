@@ -6,6 +6,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.label.name }}
   cancel-in-progress: true
 permissions: {}
+cache-mode: none
 jobs:
   assign:
     name: Assign milestone
