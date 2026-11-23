@@ -118,26 +118,24 @@ jobs:
 ## Declare least-privilege cache access
 <!-- check: `cache-mode` is declared at workflow level, unless the workflow must save the cache on a trusted trigger such as `push` -->
 <!-- check: `cache-mode: none` for workflows that do not use the GitHub Actions cache -->
+<!-- check: `cache-mode: read` for workflows that only use caches populated by other workflows -->
 <!-- check: `cache-mode` is never set to `write` or `write-only` -->
 <!-- check: Jobs that may save the cache and install project artifacts remove those artifacts afterwards; other jobs do not -->
 
 Declare [`cache-mode`][cache-mode] at workflow level, overriding it per job
 where needed. Without it, GitHub picks a default based on the trigger, which
-often grants more access than needed.
+grants write access to, among others, all `push`, `schedule` and `pull_request`
+runs.
 
 - Use `none` for workflows that do not use the cache.
-- Use `read` for workflows that are only triggered by `pull_request`: entries
-  saved by such runs are only visible to the same pull request, so they are
-  rarely reused, while still counting against the repository's cache quota.
-- Use `read` for workflows and jobs that build untrusted code (e.g.
-  `issue_comment` workflows that check out a pull request), that resolve
-  non-default dependency versions, or that install project artifacts without
-  removing them afterwards: such code and artifacts should not end up in a
-  cache shared with other workflows.
+- Use `read` for workflows that only use caches populated by other workflows.
+  Limiting write access to as few jobs as possible limits the impact of cache
+  poisoning. It also ensures that a cache entry shared by multiple workflows
+  contains the dependencies resolved by the job that should populate it,
+  rather than those of whichever job happens to save it first.
 - Omit `cache-mode` for workflows that must save the cache when triggered by
   a trusted trigger such as `push` or `schedule`. `cache-mode` does not
-  support expressions, so it cannot vary by trigger, while the trigger-based
-  default grants write access only to trusted triggers and `pull_request`.
+  support expressions, so it cannot vary by trigger.
 - Never declare `write` or `write-only`: on low-trust triggers such as
   `issue_comment`, `pull_request_target` or `workflow_run` this reintroduces
   the risk of cache poisoning.

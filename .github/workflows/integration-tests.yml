@@ -21,8 +21,7 @@ concurrency:
   queue: ${{ github.event_name == 'issue_comment' && 'single' || 'max' }}
 permissions: {}
 # This workflow builds untrusted pull request code and installs project
-# artifacts, neither of which should end up in the cache. The cache entries it
-# restores are saved by the `build.yml` workflow.
+# artifacts, neither of which should end up in the cache.
 cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C

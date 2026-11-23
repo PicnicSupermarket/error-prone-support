@@ -9,8 +9,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 permissions: {}
-# Cache entries saved by `pull_request` runs are rarely reused; other
-# workflows populate the cache on `push`.
 cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
