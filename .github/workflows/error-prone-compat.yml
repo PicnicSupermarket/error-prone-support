@@ -45,7 +45,7 @@ jobs:
         with:
           java-version: 25.0.5
           java-distribution: temurin
-          maven-version: 3.10.1
+          maven-version: 3.10.2
       - name: Quickly build and install project
         run: mvn install -Dverification.skip
       - name: Build and test project with self-check against the latest Error Prone release
