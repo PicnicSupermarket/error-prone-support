@@ -73,7 +73,9 @@ jobs:
         with:
           path: ~/.m2/repository
           key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: maven-repository-${{ runner.os }}-
+          # Runs that save the cache resolve all dependencies from scratch, so
+          # that cache entries are never derived from older ones.
+          restore-keys: ${{ github.event_name != 'push' && format('maven-repository-{0}-', runner.os) || '' }}
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn install javadoc:jar
       - name: Build project with self-check against Error Prone fork, test using the targeted JDK
@@ -133,7 +135,6 @@ jobs:
         with:
           path: ~/.m2/repository
           key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: maven-repository-${{ runner.os }}-
       - name: Build and deploy
         env:
           MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}

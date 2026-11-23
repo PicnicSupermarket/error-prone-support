@@ -353,6 +353,9 @@ For workflows that build Java code:
   on the job's JDK or Maven version, so all jobs share the same cache entry.
   Only the `build` job in `build.yml` saves this cache entry, using
   `actions/cache/save`, as it resolves the most complete set of dependencies.
+  Its `push` runs omit the restore key, so that cache entries are never
+  derived from older ones. Jobs that hold publishing secrets restore exact
+  matches only.
 - Set `MAVEN_ARGS` as an environment variable at the workflow or job level:
   ```yaml
   env:
