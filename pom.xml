@@ -198,7 +198,7 @@
         <version.error-prone-orig>2.52.0</version.error-prone-orig>
         <version.google-java-format>2.0.0</version.google-java-format>
         <version.jdk>21</version.jdk>
-        <version.maven>3.10.1</version.maven>
+        <version.maven>3.10.2</version.maven>
         <version.pitest-git>2.4.1</version.pitest-git>
     </properties>
 
