@@ -121,6 +121,14 @@ the files you modified.
 - [ ] Permissions are listed lexicographically
 - [ ] Permissions beyond `contents: read` have a trailing explanatory comment
 
+### Declare least-privilege cache access
+
+- [ ] `cache-mode` is declared at workflow level, unless the workflow must save the cache on a trusted trigger such as `push`
+- [ ] `cache-mode: none` for workflows that do not use the GitHub Actions cache
+- [ ] `cache-mode: read` for workflows that only use caches populated by other workflows
+- [ ] `cache-mode` is never set to `write` or `write-only`
+- [ ] Jobs that may save the cache and install project artifacts remove those artifacts afterwards; other jobs do not
+
 ### Use explicit runner versions
 
 - [ ] Runner uses explicit version (not `ubuntu-latest`)

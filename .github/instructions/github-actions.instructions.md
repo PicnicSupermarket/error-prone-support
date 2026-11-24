@@ -115,6 +115,60 @@ jobs:
       pages: write
 ```
 
+## Declare least-privilege cache access
+<!-- check: `cache-mode` is declared at workflow level, unless the workflow must save the cache on a trusted trigger such as `push` -->
+<!-- check: `cache-mode: none` for workflows that do not use the GitHub Actions cache -->
+<!-- check: `cache-mode: read` for workflows that only use caches populated by other workflows -->
+<!-- check: `cache-mode` is never set to `write` or `write-only` -->
+<!-- check: Jobs that may save the cache and install project artifacts remove those artifacts afterwards; other jobs do not -->
+
+Declare [`cache-mode`][cache-mode] at workflow level, overriding it per job
+where needed. Without it, GitHub picks a default based on the trigger, which
+grants write access to, among others, all `push`, `schedule` and `pull_request`
+runs.
+
+- Use `none` for workflows that do not use the cache.
+- Use `read` for workflows that only use caches populated by other workflows.
+  Limiting write access to as few jobs as possible limits the impact of cache
+  poisoning. It also ensures that a cache entry shared by multiple workflows
+  contains the dependencies resolved by the job that should populate it,
+  rather than those of whichever job happens to save it first.
+- Omit `cache-mode` for workflows that must save the cache when triggered by
+  a trusted trigger such as `push` or `schedule`. `cache-mode` does not
+  support expressions, so it cannot vary by trigger.
+- Never declare `write` or `write-only`: on low-trust triggers such as
+  `issue_comment`, `pull_request_target` or `workflow_run` this reintroduces
+  the risk of cache poisoning.
+
+Jobs that may save the cache and install project artifacts into the local Maven
+repository must remove those artifacts afterwards, so that they do not end up
+in the cache. Jobs restricted to `read` access do not need this step.
+
+```yaml
+- name: Remove installed project artifacts
+  run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+```
+
+**Do:**
+
+```yaml
+on:
+  pull_request:
+permissions: {}
+cache-mode: read
+```
+
+**Don't:**
+
+```yaml
+on:
+  issue_comment:
+    types: [ created ]
+permissions: {}
+# Lets untrusted pull request code populate the default branch's cache.
+cache-mode: write
+```
+
 ## Use explicit runner versions
 <!-- check: Runner uses explicit version (not `ubuntu-latest`) -->
 
@@ -292,6 +346,16 @@ For workflows that build Java code:
 
 - Use the `s4u/setup-maven-action` for checkout, JDK, and Maven setup in a
   single step.
+- Set `cache-enabled: false` on `s4u/setup-maven-action`, and instead restore
+  the local Maven repository using `actions/cache/restore`, with key
+  `maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}` and
+  restore key `maven-repository-${{ runner.os }}-`. This key does not depend
+  on the job's JDK or Maven version, so all jobs share the same cache entry.
+  Only the `build` job in `build.yml` saves this cache entry, using
+  `actions/cache/save`, as it resolves the most complete set of dependencies.
+  Its `push` runs omit the restore key, so that cache entries are never
+  derived from older ones. Jobs that hold publishing secrets restore exact
+  matches only.
 - Set `MAVEN_ARGS` as an environment variable at the workflow or job level:
   ```yaml
   env:
@@ -333,3 +397,5 @@ branches: [master]
 branches:
   - master
 ```
+
+[cache-mode]: https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#controlling-cache-access-with-cache-mode

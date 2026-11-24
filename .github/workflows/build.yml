@@ -66,6 +66,16 @@ jobs:
             ${{ matrix.build-jdk }}
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        id: restore-maven-repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          # Runs that save the cache resolve all dependencies from scratch, so
+          # that cache entries are never derived from older ones.
+          restore-keys: ${{ github.event_name != 'push' && format('maven-repository-{0}-', runner.os) || '' }}
       - name: Build project against vanilla Error Prone, compile Javadoc
         run: mvn install javadoc:jar
       - name: Build project with self-check against Error Prone fork, test using the targeted JDK
@@ -80,8 +90,18 @@ jobs:
         # Note that `matrix.target-jdk` is controlled by this workflow, so this
         # compromise is safe.
         run: mvn clean verify -s settings.xml -Perror-prone-fork -Pself-check '-Dsurefire.jdk-toolchain-version=${{ matrix.target-jdk }}'
+      # Only `push` runs populate the cache, as this job resolves the most
+      # complete set of dependencies, and its `pull_request` runs would only
+      # populate pull request-scoped cache entries.
       - name: Remove installed project artifacts
+        if: ${{ github.event_name == 'push' && steps.restore-maven-repository.outputs.cache-hit != 'true' }}
         run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+      - name: Save local Maven repository
+        if: ${{ github.event_name == 'push' && steps.restore-maven-repository.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: ${{ steps.restore-maven-repository.outputs.cache-primary-key }}
   deploy:
     name: Deploy artifacts
     if: ${{ github.ref_name == github.event.repository.default_branch }}
@@ -90,6 +110,7 @@ jobs:
       contents: read
     runs-on: ubuntu-26.04
     timeout-minutes: 10
+    cache-mode: read
     environment: maven-deploy
     steps:
       - name: Install Harden-Runner
@@ -108,10 +129,16 @@ jobs:
           java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
       - name: Build and deploy
         env:
           MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
           MAVEN_CENTRAL_PASS: ${{ secrets.MAVEN_CENTRAL_PASS }}
           MAVEN_GPG_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
-        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip
+        run: mvn deploy -s settings.xml -DskipTests -Dverification.skip -Dmaven.install.skip

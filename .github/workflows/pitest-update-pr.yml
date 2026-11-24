@@ -10,6 +10,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.workflow_run.head_repository.full_name }}-${{ github.event.workflow_run.head_branch }}-${{ github.event.workflow_run.conclusion }}
   cancel-in-progress: true
 permissions: {}
+cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
 jobs:
@@ -41,6 +42,13 @@ jobs:
           java-version: 25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Download Pitest analysis artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:

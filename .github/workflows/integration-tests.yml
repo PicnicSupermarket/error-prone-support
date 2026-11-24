@@ -20,6 +20,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'issue_comment' }}
   queue: ${{ github.event_name == 'issue_comment' && 'single' || 'max' }}
 permissions: {}
+# This workflow builds untrusted pull request code and installs project
+# artifacts, neither of which should end up in the cache.
+cache-mode: read
 env:
   MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
   CHECKOUT_REF: ${{ github.event.issue.pull_request && format('refs/pull/{0}/head', github.event.issue.number) || github.ref }}
@@ -143,6 +146,13 @@ jobs:
             25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Apply patches
@@ -162,8 +172,6 @@ jobs:
           path: "${{ runner.temp }}/artifacts"
           if-no-files-found: error
           retention-days: 7
-      - name: Remove installed project artifacts
-        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   validate:
     name: Validate patched code
     # Runs even if the `patch` job reported unexpected changes, so that the
@@ -211,6 +219,13 @@ jobs:
             25.0.5
           java-distribution: temurin
           maven-version: 3.10.1
+          cache-enabled: false
+      - name: Restore local Maven repository
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-repository-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-repository-${{ runner.os }}-
       - name: Install project to local Maven repository
         run: mvn install -DskipTests -Dverification.skip
       - name: Validate patched code
@@ -225,8 +240,6 @@ jobs:
         with:
           name: "integration-test-validate-${{ matrix.integration-test }}"
           path: "${{ runner.temp }}/artifacts"
-      - name: Remove installed project artifacts
-        run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
   report:
     name: Report integration test result
     needs: [ acknowledge, patch, validate ]
