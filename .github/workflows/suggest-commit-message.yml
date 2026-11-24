@@ -18,6 +18,11 @@ concurrency:
   cancel-in-progress: true
 permissions: {}
 env:
+  # XXX: Once supported for organizations with a StepSecurity subscription,
+  # configure Harden-Runner with `secure-registry: true` and drop the
+  # `registry.npmjs.org:443` entry from this list. Also set `id-token: write`
+  # with explanation "To let Harden-Runner's Secure Registry verify the
+  # repository and runner.".
   ALLOWED_ENDPOINTS: >
     api.github.com:443
     api.openai.com:443
@@ -42,7 +47,7 @@ jobs:
     environment: codex
     steps:
       - name: Install Harden-Runner
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@aebdcf6156ab6691adf63218240e476564a1ed4c # v2.23.0
         with:
           # We can't disable `sudo`, as `openai/codex-action` requires it in
           # all cases. However, that action does revoke `sudo` access before
