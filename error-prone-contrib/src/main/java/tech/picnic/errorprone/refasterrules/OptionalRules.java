@@ -367,7 +367,6 @@ final class OptionalRules {
   static final class OptionalOr<T> {
     @BeforeTemplate
     @SuppressWarnings({
-      "LexicographicalAnnotationAttributeListing" /* `key-*` entry must remain last. */,
       "NestedOptionals" /* This violation will be rewritten. */,
       "OptionalOrElse" /* Parameters represent expressions that may require computation. */,
       "z-key-to-resolve-AnnotationUseStyle-and-TrailingComment-check-conflict"
