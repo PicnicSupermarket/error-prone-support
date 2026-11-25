@@ -1866,7 +1866,7 @@ final class ReactorRules {
     Mono<T> before(
         Mono<T> mono,
         Class<? extends Throwable> type,
-        BiConsumer<Throwable, Object> errorConsumer) {
+        BiConsumer<Throwable, @Nullable Object> errorConsumer) {
       return mono.onErrorContinue(type::isInstance, errorConsumer);
     }
 
@@ -1874,7 +1874,7 @@ final class ReactorRules {
     Mono<T> after(
         Mono<T> mono,
         Class<? extends Throwable> type,
-        BiConsumer<Throwable, Object> errorConsumer) {
+        BiConsumer<Throwable, @Nullable Object> errorConsumer) {
       return mono.onErrorContinue(type, errorConsumer);
     }
   }
@@ -1888,7 +1888,7 @@ final class ReactorRules {
     Flux<T> before(
         Flux<T> flux,
         Class<? extends Throwable> type,
-        BiConsumer<Throwable, Object> errorConsumer) {
+        BiConsumer<Throwable, @Nullable Object> errorConsumer) {
       return flux.onErrorContinue(type::isInstance, errorConsumer);
     }
 
@@ -1896,7 +1896,7 @@ final class ReactorRules {
     Flux<T> after(
         Flux<T> flux,
         Class<? extends Throwable> type,
-        BiConsumer<Throwable, Object> errorConsumer) {
+        BiConsumer<Throwable, @Nullable Object> errorConsumer) {
       return flux.onErrorContinue(type, errorConsumer);
     }
   }
