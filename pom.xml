@@ -1155,21 +1155,6 @@
                             <banDuplicateClasses>
                                 <dependencies>
                                     <dependency>
-                                        <groupId>io.github.eisop</groupId>
-                                        <artifactId>dataflow-errorprone</artifactId>
-                                        <!-- This package is contained in
-                                        Checker Framework's `checker-qual` and
-                                        `dataflow-errorprone` modules. Error
-                                        Prone requires the latter, while Guava
-                                        pulls in the former. Since the package
-                                        contains mostly annotations, this is
-                                        not expected to cause trouble in
-                                        practice. -->
-                                        <ignoreClasses>
-                                            <ignoreClass>org.checkerframework.dataflow.qual.*</ignoreClass>
-                                        </ignoreClasses>
-                                    </dependency>
-                                    <dependency>
                                         <groupId>org.openrewrite</groupId>
                                         <artifactId>rewrite-java-*</artifactId>
                                         <!-- Testing generated OpenRewrite
