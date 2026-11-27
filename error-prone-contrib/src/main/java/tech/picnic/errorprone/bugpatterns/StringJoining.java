@@ -3,6 +3,7 @@ package tech.picnic.errorprone.bugpatterns;
 import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.SUGGESTION;
 import static com.google.errorprone.BugPattern.StandardTags.SIMPLIFICATION;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -17,16 +18,12 @@ import com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.suppliers.Supplier;
-import com.google.errorprone.suppliers.Suppliers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Type;
 import java.util.Formattable;
 import java.util.Iterator;
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 import tech.picnic.errorprone.utils.SourceCode;
 
 /**
@@ -51,9 +48,8 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
   private static final Splitter FORMAT_SPECIFIER_SPLITTER = Splitter.on("%s");
   private static final Matcher<ExpressionTree> STRING_FORMAT_INVOCATION =
       staticMethod().onClass(String.class.getCanonicalName()).named("format");
-  private static final Supplier<Type> CHAR_SEQUENCE_TYPE =
-      Suppliers.typeFromClass(CharSequence.class);
-  private static final Supplier<Type> FORMATTABLE_TYPE = Suppliers.typeFromClass(Formattable.class);
+  private static final Matcher<ExpressionTree> CHAR_SEQUENCE = isSubtypeOf(CharSequence.class);
+  private static final Matcher<ExpressionTree> FORMATTABLE = isSubtypeOf(Formattable.class);
 
   /** Instantiates a new {@link StringJoining} instance. */
   public StringJoining() {}
@@ -125,7 +121,7 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
   private Description trySuggestExplicitStringConversion(
       MethodInvocationTree tree, VisitorState state) {
     ExpressionTree argument = tree.getArguments().get(1);
-    if (isSubtype(ASTHelpers.getType(argument), FORMATTABLE_TYPE, state)) {
+    if (FORMATTABLE.matches(argument, state)) {
       /*
        * `Formattable` arguments are handled specially; `String#valueOf` is not a suitable
        * alternative.
@@ -155,8 +151,7 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
 
     while (arguments.hasNext()) {
       ExpressionTree argument = arguments.next();
-      Type argumentType = ASTHelpers.getType(argument);
-      if (isSubtype(argumentType, FORMATTABLE_TYPE, state)) {
+      if (FORMATTABLE.matches(argument, state)) {
         /*
          * `Formattable` arguments are handled specially; `String#join` is not a suitable
          * alternative.
@@ -164,7 +159,7 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
         return Description.NO_MATCH;
       }
 
-      if (!isSubtype(argumentType, CHAR_SEQUENCE_TYPE, state)) {
+      if (!CHAR_SEQUENCE.matches(argument, state)) {
         /*
          * The argument was previously implicitly converted to a string; now this must happen
          * explicitly.
@@ -174,11 +169,6 @@ public final class StringJoining extends BugChecker implements MethodInvocationT
     }
 
     return describeMatch(tree, fix.build());
-  }
-
-  private static boolean isSubtype(
-      @Nullable Type subType, Supplier<Type> superType, VisitorState state) {
-    return ASTHelpers.isSubtype(subType, superType.get(state), state);
   }
 
   private static String withStringConversionExpression(

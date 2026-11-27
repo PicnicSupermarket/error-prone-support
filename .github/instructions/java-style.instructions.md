@@ -388,6 +388,15 @@ extracting it meaningfully improves readability or performance.
 These conventions apply primarily to `BugChecker` implementation code, but also
 to logic in the `error-prone-utils` and `refaster-support` modules.
 
+### Prefer existing matcher and utility APIs over manual logic
+<!-- check: New logic maximally reuses existing APIs -->
+
+Before implementing manual `Tree`, symbol, or `Type` logic, search Error Prone
+and this repository for existing matcher, predicate, supplier, and utility
+APIs. Existing `BugChecker` implementations can show useful compositions.
+Prefer an existing API when one fits; fall back to a manual implementation only
+when it is clearer.
+
 ### Define matchers as `private static final` fields
 
 All `Matcher<T>` instances must be declared as `private static final` fields

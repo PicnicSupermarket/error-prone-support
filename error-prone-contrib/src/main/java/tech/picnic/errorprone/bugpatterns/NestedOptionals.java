@@ -40,7 +40,7 @@ public final class NestedOptionals extends BugChecker implements MethodInvocatio
   private static final long serialVersionUID = 1L;
   private static final Supplier<Type> OPTIONAL = Suppliers.typeFromClass(Optional.class);
   private static final Matcher<Tree> IS_OPTIONAL_OF_OPTIONAL =
-      isSubTypeOf(VisitorState.memoize(generic(OPTIONAL, subOf(raw(OPTIONAL)))));
+      isSubTypeOf(generic(OPTIONAL, subOf(raw(OPTIONAL))));
 
   /** Instantiates a new {@link NestedOptionals} instance. */
   public NestedOptionals() {}

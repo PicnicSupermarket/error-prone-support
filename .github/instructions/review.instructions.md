@@ -213,6 +213,7 @@ the files you modified.
 
 ### Error Prone API usage
 
+- [ ] New logic maximally reuses existing APIs
 - [ ] Define matchers as `private static final` fields
 - [ ] Prefer static `Matcher` fields over manual boolean predicate methods
 - [ ] Prefer `instanceof` pattern matching over `Tree#getKind()`

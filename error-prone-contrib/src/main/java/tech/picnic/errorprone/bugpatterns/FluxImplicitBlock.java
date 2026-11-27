@@ -5,6 +5,7 @@ import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.BugPattern.StandardTags.CONCURRENCY;
 import static com.google.errorprone.BugPattern.StandardTags.PERFORMANCE;
+import static com.google.errorprone.matchers.Matchers.isSubtypeOf;
 import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
 import static tech.picnic.errorprone.utils.Documentation.BUG_PATTERNS_BASE_URL;
 
@@ -18,12 +19,10 @@ import com.google.errorprone.fixes.SuggestedFix;
 import com.google.errorprone.fixes.SuggestedFixes;
 import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
-import com.google.errorprone.suppliers.Supplier;
-import com.google.errorprone.suppliers.Suppliers;
 import com.google.errorprone.util.ASTHelpers;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
-import com.sun.tools.javac.code.Type;
+import com.sun.source.tree.Tree;
 import com.sun.tools.javac.util.Position;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,8 +49,7 @@ public final class FluxImplicitBlock extends BugChecker implements MethodInvocat
           .onDescendantOf("reactor.core.publisher.Flux")
           .namedAnyOf("toIterable", "toStream")
           .withNoParameters();
-  private static final Supplier<Type> STREAM =
-      Suppliers.typeFromString(Stream.class.getCanonicalName());
+  private static final Matcher<Tree> IS_STREAM = isSubtypeOf(Stream.class.getCanonicalName());
 
   /** Instantiates a new {@link FluxImplicitBlock} instance. */
   public FluxImplicitBlock() {}
@@ -82,11 +80,10 @@ public final class FluxImplicitBlock extends BugChecker implements MethodInvocat
     String replacementMethodInvocation =
         SuggestedFixes.qualifyStaticImport(fullyQualifiedCollectorMethod, importSuggestion, state);
 
-    boolean isStream =
-        ASTHelpers.isSubtype(ASTHelpers.getResultType(tree), STREAM.get(state), state);
     String replacement =
         ".collect(%s()).block()%s"
-            .formatted(replacementMethodInvocation, isStream ? ".stream()" : "");
+            .formatted(
+                replacementMethodInvocation, IS_STREAM.matches(tree, state) ? ".stream()" : "");
     return importSuggestion.merge(replaceMethodInvocation(tree, replacement, state)).build();
   }
 
