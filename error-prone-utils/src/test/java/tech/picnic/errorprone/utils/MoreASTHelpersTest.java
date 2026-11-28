@@ -1,7 +1,10 @@
 package tech.picnic.errorprone.utils;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static java.util.Objects.requireNonNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.errorprone.BugPattern;
@@ -9,10 +12,13 @@ import com.google.errorprone.CompilationTestHelper;
 import com.google.errorprone.VisitorState;
 import com.google.errorprone.bugpatterns.BugChecker;
 import com.google.errorprone.bugpatterns.BugChecker.ExpressionStatementTreeMatcher;
+import com.google.errorprone.bugpatterns.BugChecker.LambdaExpressionTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.MethodTreeMatcher;
 import com.google.errorprone.bugpatterns.BugChecker.ReturnTreeMatcher;
 import com.google.errorprone.matchers.Description;
 import com.sun.source.tree.ExpressionStatementTree;
+import com.sun.source.tree.ExpressionTree;
+import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
@@ -76,7 +82,7 @@ final class MoreASTHelpersTest {
 
   @Test
   void findMethodExitedOnReturn() {
-    CompilationTestHelper.newInstance(FindMethodReturnTestChecker.class, getClass())
+    CompilationTestHelper.newInstance(FindMethodExitedOnReturnTestChecker.class, getClass())
         .addSourceLines(
             "A.java",
             "import java.util.stream.Stream;",
@@ -118,6 +124,97 @@ final class MoreASTHelpersTest {
   }
 
   @Test
+  void findResultExpressions() {
+    CompilationTestHelper.newInstance(FindResultExpressionsTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "import java.util.function.Supplier;",
+            "",
+            "abstract class A {",
+            "  // BUG: Diagnostic contains: [\"foo\"]",
+            "  Supplier<String> expressionBody = () -> (\"foo\");",
+            "",
+            "  // BUG: Diagnostic contains: []",
+            "  abstract int abstractMethod();",
+            "",
+            "  // BUG: Diagnostic contains: []",
+            "  void voidMethod() {",
+            "    return;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: [1, 2]",
+            "  int multipleReturns(boolean b) {",
+            "    if (b) {",
+            "      return (1);",
+            "    }",
+            "    return 2;",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: [1, 2]",
+            "  int switchStatement(int i) {",
+            "    switch (i) {",
+            "      case 0:",
+            "        return 1;",
+            "      default:",
+            "        return 2;",
+            "    }",
+            "  }",
+            "",
+            "  // BUG: Diagnostic contains: [s]",
+            "  Supplier<String> nestedScopes() {",
+            "    Supplier<String> s =",
+            "        // BUG: Diagnostic contains: [\"bar\"]",
+            "        () -> {",
+            "          Object o =",
+            "              new Object() {",
+            "                @Override",
+            "                // BUG: Diagnostic contains: [\"baz\"]",
+            "                public String toString() {",
+            "                  return \"baz\";",
+            "                }",
+            "              };",
+            "          Supplier<String> t =",
+            "              // BUG: Diagnostic contains: [\"qux\"]",
+            "              () -> {",
+            "                return \"qux\";",
+            "              };",
+            "          return \"bar\";",
+            "        };",
+            "    return s;",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
+  void findBranchExpressions() {
+    CompilationTestHelper.newInstance(FindBranchExpressionsTestChecker.class, getClass())
+        .addSourceLines(
+            "A.java",
+            "class A {",
+            "  int plain() {",
+            "    // BUG: Diagnostic contains: [1]",
+            "    return (1);",
+            "  }",
+            "",
+            "  int conditional(boolean b, boolean c) {",
+            "    // BUG: Diagnostic contains: [1, 2, 3]",
+            "    return b ? (1) : (c ? 2 : 3);",
+            "  }",
+            "",
+            "  int switchExpression(int i) {",
+            "    // XXX: Ideally the switch expression's result expressions are reported instead.",
+            "    // BUG: Diagnostic contains: [switch",
+            "    return switch (i) {",
+            "      case 0 -> 1;",
+            "      default -> 2;",
+            "    };",
+            "  }",
+            "}")
+        .doTest();
+  }
+
+  @Test
   void areSameType() {
     CompilationTestHelper.newInstance(AreSameTypeTestChecker.class, getClass())
         .addSourceLines(
@@ -136,10 +233,31 @@ final class MoreASTHelpersTest {
         .doTest();
   }
 
-  private static String createMethodSearchDiagnosticsMessage(
-      BiFunction<String, VisitorState, Object> valueFunction, VisitorState state) {
-    return Maps.toMap(ImmutableSet.of("foo", "bar", "baz"), key -> valueFunction.apply(key, state))
-        .toString();
+  /**
+   * An abstract {@link BugChecker} that provides helper functions for the construction of {@link
+   * Description}s against which test cases can match.
+   */
+  private abstract static class TestChecker extends BugChecker {
+    private static final long serialVersionUID = 1L;
+
+    <T> Description reportSearchResults(
+        Tree tree, BiFunction<String, VisitorState, T> searchFunction, VisitorState state) {
+      return report(
+          tree,
+          Maps.toMap(ImmutableSet.of("foo", "bar", "baz"), key -> searchFunction.apply(key, state))
+              .toString());
+    }
+
+    Description reportSources(
+        Tree tree, ImmutableList<? extends Tree> subTrees, VisitorState state) {
+      return report(
+          tree,
+          subTrees.stream().map(e -> SourceCode.treeToString(e, state)).collect(toImmutableList()));
+    }
+
+    <T> Description report(Tree tree, T value) {
+      return buildDescription(tree).setMessage(value.toString()).build();
+    }
   }
 
   /**
@@ -147,17 +265,14 @@ final class MoreASTHelpersTest {
    * VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  private static final class FindMethodsTestChecker extends BugChecker
+  private static final class FindMethodsTestChecker extends TestChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
-      return buildDescription(tree)
-          .setMessage(
-              createMethodSearchDiagnosticsMessage(
-                  (methodName, s) -> MoreASTHelpers.findMethods(methodName, s).size(), state))
-          .build();
+      return reportSearchResults(
+          tree, (methodName, s) -> MoreASTHelpers.findMethods(methodName, s).size(), state);
     }
   }
 
@@ -166,17 +281,13 @@ final class MoreASTHelpersTest {
    * MoreASTHelpers#methodExistsInEnclosingClass(CharSequence, VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  private static final class MethodExistsTestChecker extends BugChecker
+  private static final class MethodExistsTestChecker extends TestChecker
       implements MethodTreeMatcher {
     private static final long serialVersionUID = 1L;
 
     @Override
     public Description matchMethod(MethodTree tree, VisitorState state) {
-      return buildDescription(tree)
-          .setMessage(
-              createMethodSearchDiagnosticsMessage(
-                  MoreASTHelpers::methodExistsInEnclosingClass, state))
-          .build();
+      return reportSearchResults(tree, MoreASTHelpers::methodExistsInEnclosingClass, state);
     }
   }
 
@@ -185,7 +296,7 @@ final class MoreASTHelpersTest {
    * MoreASTHelpers#findMethodExitedOnReturn(VisitorState)}.
    */
   @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
-  private static final class FindMethodReturnTestChecker extends BugChecker
+  private static final class FindMethodExitedOnReturnTestChecker extends TestChecker
       implements ExpressionStatementTreeMatcher, ReturnTreeMatcher {
     private static final long serialVersionUID = 1L;
 
@@ -201,8 +312,45 @@ final class MoreASTHelpersTest {
 
     private Description flagMethodReturnLocation(Tree tree, VisitorState state) {
       return MoreASTHelpers.findMethodExitedOnReturn(state)
-          .map(m -> buildDescription(tree).setMessage(m.getName().toString()).build())
+          .map(m -> report(tree, m.getName()))
           .orElse(Description.NO_MATCH);
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link
+   * MoreASTHelpers#findResultExpressions(LambdaExpressionTree)} and {@link
+   * MoreASTHelpers#findResultExpressions(MethodTree)}.
+   */
+  @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
+  private static final class FindResultExpressionsTestChecker extends TestChecker
+      implements LambdaExpressionTreeMatcher, MethodTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchLambdaExpression(LambdaExpressionTree tree, VisitorState state) {
+      return reportSources(tree, MoreASTHelpers.findResultExpressions(tree), state);
+    }
+
+    @Override
+    public Description matchMethod(MethodTree tree, VisitorState state) {
+      return reportSources(tree, MoreASTHelpers.findResultExpressions(tree), state);
+    }
+  }
+
+  /**
+   * A {@link BugChecker} that delegates to {@link
+   * MoreASTHelpers#findBranchExpressions(ExpressionTree)}.
+   */
+  @BugPattern(summary = "Interacts with `MoreASTHelpers` for testing purposes", severity = ERROR)
+  private static final class FindBranchExpressionsTestChecker extends TestChecker
+      implements ReturnTreeMatcher {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Description matchReturn(ReturnTree tree, VisitorState state) {
+      return reportSources(
+          tree, MoreASTHelpers.findBranchExpressions(requireNonNull(tree.getExpression())), state);
     }
   }
 

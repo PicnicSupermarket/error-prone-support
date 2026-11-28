@@ -562,6 +562,8 @@ Key methods from the `error-prone-utils` module
 | `SourceCode` | `toStringConstantExpression(value, state)` | Converts a value to a string constant expression |
 | `MoreASTHelpers` | `findMethods(name, state)` | Finds methods by name in the enclosing class |
 | `MoreASTHelpers` | `findMethodExitedOnReturn(state)` | Finds the method exited by a `return` statement |
+| `MoreASTHelpers` | `findResultExpressions(tree)` | Finds the result expressions of a lambda expression or method |
+| `MoreASTHelpers` | `findBranchExpressions(tree)` | Finds the branches that may provide an expression's value |
 | `MoreASTHelpers` | `areSameType(treeA, treeB, state)` | Checks whether two trees have the same type |
 | `MoreMatchers` | `isSubTypeOf(type)` | Matches trees whose type is a subtype of the given type |
 | `ThirdPartyLibrary` | `X.isIntroductionAllowed(state)` | Checks whether a third-party library dependency is acceptable |
