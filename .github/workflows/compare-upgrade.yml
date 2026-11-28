@@ -1,0 +1,106 @@
+# Compares the behaviour of the build before and after the changes made by a
+# pull request, using `upgrade-checks/compare-upgrade.sh`, and summarizes the
+# result in a pull request comment. The comparison runs code introduced by the
+# pull request (e.g. a new Maven plugin release). Such code can influence the
+# content of the comment, but it does not run in the job that has write
+# access.
+name: Compare upgrade behaviour
+on:
+  pull_request:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions: {}
+env:
+  MAVEN_ARGS: --batch-mode -Dstyle.color=always -T1C
+jobs:
+  compare:
+    name: Compare build behaviour before and after upgrade
+    # Upgrade pull requests do not originate from forks, and for those no
+    # comment could be posted.
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    permissions:
+      contents: read
+    runs-on: ubuntu-26.04
+    timeout-minutes: 45
+    outputs:
+      report: ${{ steps.compare.outputs.report }}
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          disable-sudo-and-containers: true
+          # - `api.adoptium.net`: JDK version lookup.
+          # - `github.com`, `release-assets.githubusercontent.com`: checkout,
+          #   and JDK and `reviewdog` release downloads.
+          # - `maven.pkg.github.com`: `./list-potential-upgrades.sh` queries
+          #   the Picnic Error Prone fork repository. (Without credentials
+          #   this yields HTTP 401 responses, which Maven tolerates.)
+          # - `repo.maven.apache.org`: Maven, plugin and dependency downloads.
+          allowed-endpoints: >
+            api.adoptium.net:443
+            github.com:443
+            maven.pkg.github.com:443
+            release-assets.githubusercontent.com:443
+            repo.maven.apache.org:443
+      - name: Check out code and set up JDK and Maven
+        uses: s4u/setup-maven-action@5d4481650d2563723ad6c5e8f009ac8fd746e3e8 # v1.22.0
+        with:
+          checkout-fetch-depth: 2
+          java-version: 25.0.5
+          java-distribution: temurin
+          maven-version: 3.10.1
+      - name: Compare build behaviour
+        id: compare
+        # The first parent of the checked-out merge commit is the base branch,
+        # such that comparing the two isolates the pull request's changes.
+        run: |
+          upgrade-checks/compare-upgrade.sh HEAD^1 HEAD > "${RUNNER_TEMP}/report.md"
+          delimiter="$(openssl rand -hex 16)"
+          { echo "report<<${delimiter}"; cat "${RUNNER_TEMP}/report.md"; echo "${delimiter}"; } >> "${GITHUB_OUTPUT}"
+  report:
+    name: Report build behaviour comparison
+    needs: compare
+    # Also report a failed or timed-out comparison, but not a superseded one.
+    if: ${{ !cancelled() && needs.compare.result != 'skipped' }}
+    permissions:
+      pull-requests: write # To upsert the pull request comment summarizing the comparison.
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - name: Install Harden-Runner
+        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        with:
+          disable-sudo-and-containers: true
+          allowed-endpoints: >
+            api.github.com:443
+      - name: Upsert pull request comment
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          COMPARE_RESULT: ${{ needs.compare.result }}
+          REPORT: ${{ needs.compare.outputs.report }}
+        with:
+          # The comment is identified by a hidden marker. It is created only if
+          # some comparison applies, but once created it is kept up to date.
+          script: |
+            const marker = '<!-- upgrade-checks -->';
+            const report = process.env.REPORT.trim();
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const result = process.env.COMPARE_RESULT !== 'success'
+              ? ':x: The comparison failed.'
+              : report || 'No comparison applies.';
+            const body = `## Upgrade checks\n${marker}\n\nCommit ${context.payload.pull_request.head.sha} ([workflow run](${runUrl})):\n\n${result}\n`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(
+              (comment) => comment.user?.login === 'github-actions[bot]' && comment.body?.includes(marker),
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+            } else if (report) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+            }

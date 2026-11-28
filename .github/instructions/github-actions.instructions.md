@@ -300,6 +300,22 @@ For workflows that build Java code:
 - Use the current standard JDK and Maven versions (see existing workflows for
   the latest values).
 
+### Purge installed project artifacts
+<!-- check: Jobs that install this project's artifacts into the local Maven repository end with a `dependency:purge-local-repository` step -->
+
+`s4u/setup-maven-action` caches the local Maven repository. A job that
+installs this project's artifacts (e.g. using `mvn install`) must remove them
+again in its last step, so that they are not cached and later resolved in
+place of freshly built artifacts:
+
+```yaml
+- name: Remove installed project artifacts
+  run: mvn dependency:purge-local-repository -DmanualInclude='${project.groupId}' -DresolutionFuzziness=groupId
+```
+
+Prefer avoiding the installation altogether, e.g. by building only up to a
+phase that resolves the project's own modules from the reactor.
+
 ## Configure workflow triggers
 
 - Use `paths:` trigger filters when a workflow only applies to specific files.
