@@ -20,6 +20,7 @@ import com.google.errorprone.matchers.Description;
 import com.google.errorprone.matchers.Matcher;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
+import com.sun.tools.javac.code.Source;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,8 @@ import tech.picnic.errorprone.utils.ThirdPartyLibrary;
  * (im)mutability.
  *
  * <p>Replacing such collectors with alternatives that produce immutable collections is preferred.
- * Do note that Guava's immutable collections are null-hostile.
+ * Do note that both Guava's immutable collections and the JDK's unmodifiable collections are
+ * null-hostile.
  */
 @AutoService(BugChecker.class)
 @BugPattern(
@@ -58,75 +60,89 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
-    if (!ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)
-        || !COLLECTOR_METHOD.matches(tree, state)) {
+    if (!COLLECTOR_METHOD.matches(tree, state)) {
       return Description.NO_MATCH;
     }
 
     if (LIST_COLLECTOR.matches(tree, state)) {
-      return suggestToCollectionAlternatives(
-          tree,
-          ImmutableList.class.getCanonicalName() + ".toImmutableList",
-          ArrayList.class.getCanonicalName(),
-          state);
+      return resolveListReplacement(tree, state);
     }
 
-    if (MAP_COLLECTOR.matches(tree, state)) {
-      return suggestToMapAlternatives(tree, state);
+    if (MAP_COLLECTOR.matches(tree, state) && tree.getArguments().size() <= 3) {
+      return resolveMapReplacement(tree, state);
     }
 
     if (SET_COLLECTOR.matches(tree, state)) {
-      return suggestToCollectionAlternatives(
-          tree,
-          ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
-          HashSet.class.getCanonicalName(),
-          state);
+      return resolveSetReplacement(tree, state);
     }
 
     return Description.NO_MATCH;
   }
 
-  private Description suggestToCollectionAlternatives(
-      MethodInvocationTree tree,
-      String immutableReplacement,
-      String mutableReplacement,
-      VisitorState state) {
-    SuggestedFix.Builder mutableFix = SuggestedFix.builder();
-    String toCollectionSelect =
-        SuggestedFixes.qualifyStaticImport(
-            Collectors.class.getCanonicalName() + ".toCollection", mutableFix, state);
-    String mutableCollection = SuggestedFixes.qualifyType(state, mutableFix, mutableReplacement);
-
-    return buildDescription(tree)
-        .addFix(replaceMethodInvocation(tree, immutableReplacement, state))
-        .addFix(
-            mutableFix
-                .replace(tree, "%s(%s::new)".formatted(toCollectionSelect, mutableCollection))
-                .build())
-        .build();
+  private Description resolveListReplacement(MethodInvocationTree tree, VisitorState state) {
+    return suggestAlternatives(
+        tree,
+        ImmutableList.class.getCanonicalName() + ".toImmutableList",
+        Collectors.class.getCanonicalName() + ".toUnmodifiableList",
+        mutableCollectionFix(tree, ArrayList.class.getCanonicalName(), state),
+        state);
   }
 
-  private Description suggestToMapAlternatives(MethodInvocationTree tree, VisitorState state) {
-    int argCount = tree.getArguments().size();
-    if (argCount > 3) {
-      return Description.NO_MATCH;
+  private Description resolveMapReplacement(MethodInvocationTree tree, VisitorState state) {
+    return suggestAlternatives(
+        tree,
+        ImmutableMap.class.getCanonicalName() + ".toImmutableMap",
+        Collectors.class.getCanonicalName() + ".toUnmodifiableMap",
+        mutableMapFix(tree, state),
+        state);
+  }
+
+  private Description resolveSetReplacement(MethodInvocationTree tree, VisitorState state) {
+    return suggestAlternatives(
+        tree,
+        ImmutableSet.class.getCanonicalName() + ".toImmutableSet",
+        Collectors.class.getCanonicalName() + ".toUnmodifiableSet",
+        mutableCollectionFix(tree, HashSet.class.getCanonicalName(), state),
+        state);
+  }
+
+  private Description suggestAlternatives(
+      MethodInvocationTree tree,
+      String guavaReplacement,
+      String unmodifiableReplacement,
+      SuggestedFix mutableFix,
+      VisitorState state) {
+    Description.Builder description = buildDescription(tree);
+
+    if (ThirdPartyLibrary.GUAVA.isIntroductionAllowed(state)) {
+      description.addFix(replaceMethodInvocation(tree, guavaReplacement, state));
     }
 
-    SuggestedFix.Builder mutableFix = SuggestedFix.builder();
-    String hashMap =
-        SuggestedFixes.qualifyType(state, mutableFix, HashMap.class.getCanonicalName());
+    if (supportsUnmodifiableCollectors(state)) {
+      description.addFix(replaceMethodInvocation(tree, unmodifiableReplacement, state));
+    }
 
-    return buildDescription(tree)
-        .addFix(
-            replaceMethodInvocation(
-                tree, ImmutableMap.class.getCanonicalName() + ".toImmutableMap", state))
-        .addFix(
-            mutableFix
-                .postfixWith(
-                    tree.getArguments().get(argCount - 1),
-                    (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
-                        + ", %s::new".formatted(hashMap))
-                .build())
+    return description.addFix(mutableFix).build();
+  }
+
+  private static SuggestedFix mutableCollectionFix(
+      MethodInvocationTree tree, String collectionType, VisitorState state) {
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String toCollection =
+        SuggestedFixes.qualifyStaticImport(
+            Collectors.class.getCanonicalName() + ".toCollection", fix, state);
+    String collection = SuggestedFixes.qualifyType(state, fix, collectionType);
+    return fix.replace(tree, "%s(%s::new)".formatted(toCollection, collection)).build();
+  }
+
+  private static SuggestedFix mutableMapFix(MethodInvocationTree tree, VisitorState state) {
+    int argCount = tree.getArguments().size();
+    SuggestedFix.Builder fix = SuggestedFix.builder();
+    String hashMap = SuggestedFixes.qualifyType(state, fix, HashMap.class.getCanonicalName());
+    return fix.postfixWith(
+            tree.getArguments().get(argCount - 1),
+            (argCount == 2 ? ", (a, b) -> { throw new IllegalStateException(); }" : "")
+                + ", %s::new".formatted(hashMap))
         .build();
   }
 
@@ -136,5 +152,9 @@ public final class CollectorMutability extends BugChecker implements MethodInvoc
     String replacement = SuggestedFixes.qualifyStaticImport(fullyQualifiedReplacement, fix, state);
     fix.merge(SuggestedFix.replace(tree.getMethodSelect(), replacement));
     return fix.build();
+  }
+
+  private static boolean supportsUnmodifiableCollectors(VisitorState state) {
+    return Source.instance(state.context).compareTo(Source.JDK10) >= 0;
   }
 }
